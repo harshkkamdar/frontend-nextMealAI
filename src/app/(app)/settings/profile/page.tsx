@@ -18,7 +18,7 @@ import { queryKeys } from '@/lib/query-keys'
 import type { ActivityLevel, PrimaryGoal, DietaryStyle } from '@/types/profile.types'
 
 const schema = z.object({
-  weight_kg: z.number().min(30).max(300).optional(),
+  current_weight_kg: z.number().min(30).max(300).optional(),
   target_weight_kg: z.number().min(30).max(300).optional(),
   height_cm: z.number().min(100).max(250).optional(),
   equipment: z.array(z.string()),
@@ -59,7 +59,7 @@ export default function ProfilePage() {
     resolver: zodResolver(schema),
     values: profile
       ? {
-          weight_kg: profile.weight_kg,
+          current_weight_kg: profile.current_weight_kg,
           target_weight_kg: profile.target_weight_kg,
           height_cm: profile.height_cm,
           equipment: profile.equipment ?? [],
@@ -101,8 +101,8 @@ export default function ProfilePage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="weight">Current weight (kg)</Label>
-            <Input id="weight" type="number" placeholder="70" {...register('weight_kg', { valueAsNumber: true })} />
-            {errors.weight_kg && <p className="text-xs text-destructive">{errors.weight_kg.message}</p>}
+            <Input id="weight" type="number" placeholder="70" {...register('current_weight_kg', { valueAsNumber: true })} />
+            {errors.current_weight_kg && <p className="text-xs text-destructive">{errors.current_weight_kg.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="target">Target weight (kg)</Label>

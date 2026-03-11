@@ -1,28 +1,17 @@
-export type GeoTone = 'supportive' | 'direct' | 'data_driven' | 'balanced'
-export type GeoVerbosity = 'concise' | 'balanced' | 'detailed'
-export type GeoEmojiUsage = 'none' | 'moderate' | 'frequent'
-
-export interface GeoPersonality {
-  tone: GeoTone
-  verbosity: GeoVerbosity
-  emoji_usage: GeoEmojiUsage
-}
-
-export interface NotificationSettings {
-  push_enabled: boolean
-  email_enabled: boolean
-  daily_summary: boolean
-  plan_suggestions: boolean
-}
-
+// Actual backend settings DB schema
 export interface Settings {
   id: string
   user_id: string
-  geo_personality: GeoPersonality
-  auto_apply_edits: boolean
-  daily_evaluation_time: string // HH:mm
-  notifications: NotificationSettings
-  geo_personality_description?: string
+  notifications_enabled: boolean
+  notification_time: string // HH:mm:ss
+  notification_types: string[]
+  geo_personality: string // plain string e.g. 'balanced', 'supportive'
+  auto_apply_suggestions: boolean
+  auto_apply_threshold: number
+  theme: string
+  language: string
+  share_progress: boolean
+  analytics_enabled: boolean
   created_at: string
   updated_at: string
 }

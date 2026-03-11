@@ -1,11 +1,12 @@
 export type PlanType = 'meal' | 'workout'
+export type PlanStatus = 'draft' | 'active' | 'superseded' | 'completed'
 
 export interface MealPlanFood {
   name: string
   calories?: number
-  protein_g?: number
-  carbs_g?: number
-  fat_g?: number
+  protein?: number
+  carbs?: number
+  fat?: number
 }
 
 export interface MealPlanMeal {
@@ -38,20 +39,30 @@ export interface WorkoutPlanDay {
 interface PlanBase {
   id: string
   user_id: string
-  name: string
-  is_active: boolean
+  type: PlanType
+  status: PlanStatus
+  version?: number
+  start_date?: string
+  end_date?: string
   created_at: string
   updated_at: string
 }
 
 export interface MealPlan extends PlanBase {
   type: 'meal'
-  days: MealPlanDay[]
+  content: {
+    days?: MealPlanDay[]
+    daily_targets?: { calories: number; protein: number; carbs: number; fat: number }
+    [key: string]: unknown
+  }
 }
 
 export interface WorkoutPlan extends PlanBase {
   type: 'workout'
-  days: WorkoutPlanDay[]
+  content: {
+    days?: WorkoutPlanDay[]
+    [key: string]: unknown
+  }
 }
 
 export type Plan = MealPlan | WorkoutPlan

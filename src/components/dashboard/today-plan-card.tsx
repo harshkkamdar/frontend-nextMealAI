@@ -16,10 +16,10 @@ export function TodayPlanCard({ mealPlan, workoutPlan, today }: TodayPlanCardPro
     )
   }
 
-  const todayMeals = mealPlan?.days.find((d) =>
+  const todayMeals = mealPlan?.content?.days?.find((d) =>
     d.day.toLowerCase() === today || d.day.toLowerCase().startsWith(today.slice(0, 3))
   )
-  const todayWorkout = workoutPlan?.days.find((d) =>
+  const todayWorkout = workoutPlan?.content?.days?.find((d) =>
     d.day.toLowerCase() === today || d.day.toLowerCase().startsWith(today.slice(0, 3))
   )
 

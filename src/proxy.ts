@@ -36,7 +36,7 @@ export async function proxy(request: NextRequest) {
       )
       if (response.ok) {
         const data = await response.json()
-        if (data.can_use_app) {
+        if (data.personal?.complete && data.fitness?.complete && data.nutrition?.complete) {
           return NextResponse.redirect(new URL('/dashboard', request.url))
         }
       }
@@ -64,7 +64,7 @@ export async function proxy(request: NextRequest) {
         )
         if (response.ok) {
           const data = await response.json()
-          if (!data.can_use_app) {
+          if (!(data.personal?.complete && data.fitness?.complete && data.nutrition?.complete)) {
             return NextResponse.redirect(new URL('/onboarding/personal', request.url))
           }
           // Cache onboarding status for 5 minutes

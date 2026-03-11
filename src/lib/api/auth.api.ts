@@ -48,8 +48,9 @@ export async function logout(): Promise<void> {
 }
 
 export async function refreshToken(refreshToken: string): Promise<AuthSession> {
-  return apiFetch<AuthSession>('/auth/refresh', {
+  const result = await apiFetch<{ session: AuthSession }>('/auth/refresh', {
     method: 'POST',
     body: { refresh_token: refreshToken },
   })
+  return result.session
 }

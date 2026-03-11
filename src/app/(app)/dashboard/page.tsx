@@ -34,8 +34,8 @@ export default function DashboardPage() {
     queryFn: () => getSuggestions({ status: 'pending' }),
   })
 
-  const mealPlan = plans?.find((p): p is MealPlan => p.type === 'meal')
-  const workoutPlan = plans?.find((p): p is WorkoutPlan => p.type === 'workout')
+  const mealPlan = plans?.find((p): p is MealPlan => p.type === 'meal' && p.status === 'active')
+  const workoutPlan = plans?.find((p): p is WorkoutPlan => p.type === 'workout' && p.status === 'active')
   const pendingSuggestion = suggestions?.[0]
 
   // Backend returns { period, summary: { avg_daily_calories, avg_daily_protein, ... } }
