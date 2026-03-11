@@ -6,7 +6,7 @@ export async function getProfile(): Promise<Profile> {
 }
 
 export async function updateProfile(data: Partial<Profile>): Promise<Profile> {
-  return apiFetch<Profile>('/v1/profile', { method: 'PATCH', body: data })
+  return apiFetch<Profile>('/v1/profile', { method: 'PUT', body: data })
 }
 
 export async function getOnboardingStatus(): Promise<OnboardingStatus> {
