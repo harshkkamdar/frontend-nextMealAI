@@ -1,3 +1,5 @@
+// CLIENT-SIDE ONLY: This module reads from Zustand's persisted store (localStorage).
+// Do not import or call apiFetch from Server Components or Route Handlers.
 import { ApiException } from '@/types/api.types'
 import { useAuthStore } from '@/stores/auth.store'
 
