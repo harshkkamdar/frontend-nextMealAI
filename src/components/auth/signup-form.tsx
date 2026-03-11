@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -38,7 +39,7 @@ export function SignupForm() {
     try {
       const result = await signup(data)
       setSession(result.user, result.session.access_token, result.session.refresh_token)
-      document.cookie = `nextmealai-token=${result.session.access_token}; path=/; samesite=lax`
+      document.cookie = `nextmealai-token=${result.session.access_token}; path=/; samesite=lax; max-age=${7 * 24 * 60 * 60}`
       router.push('/onboarding/personal')
     } catch (err) {
       if (err instanceof ApiException) {
@@ -109,9 +110,9 @@ export function SignupForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{' '}
-        <a href="/login" className="text-brand hover:underline font-medium">
+        <Link href="/login" className="text-brand hover:underline font-medium">
           Sign in
-        </a>
+        </Link>
       </p>
     </div>
   )
