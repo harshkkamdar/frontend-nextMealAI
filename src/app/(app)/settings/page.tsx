@@ -185,7 +185,7 @@ export default function SettingsPage() {
           <input
             type="time"
             value={settings.daily_evaluation_time}
-            onChange={(e) => patch({ daily_evaluation_time: e.target.value })}
+            onBlur={(e) => patch({ daily_evaluation_time: e.target.value })}
             className="bg-bg-primary border border-border rounded-lg px-3 py-1.5 text-sm text-foreground focus:outline-none focus:border-brand/50"
           />
         </div>
