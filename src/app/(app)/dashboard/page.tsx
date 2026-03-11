@@ -38,21 +38,24 @@ export default function DashboardPage() {
   const workoutPlan = plans?.find((p): p is WorkoutPlan => p.type === 'workout')
   const pendingSuggestion = suggestions?.[0]
 
+  // Backend returns { period, summary: { avg_daily_calories, avg_daily_protein, ... } }
+  // No carbs/fat at summary level — only available in daily_breakdown (week/month periods)
+  const todayBreakdown = summary?.daily_breakdown?.[0]
   const macroData = summary
     ? {
-        consumed: summary.totals.calories,
-        target: summary.daily_targets?.calories ?? 2000,
+        consumed: summary.summary.avg_daily_calories,
+        target: 2000, // No targets from API — placeholder
         protein: {
-          consumed: summary.totals.protein_g,
-          target: summary.daily_targets?.protein_g ?? 150,
+          consumed: summary.summary.avg_daily_protein,
+          target: 150,
         },
         carbs: {
-          consumed: summary.totals.carbs_g,
-          target: summary.daily_targets?.carbs_g ?? 250,
+          consumed: todayBreakdown?.carbs ?? 0,
+          target: 250,
         },
         fat: {
-          consumed: summary.totals.fat_g,
-          target: summary.daily_targets?.fat_g ?? 65,
+          consumed: todayBreakdown?.fat ?? 0,
+          target: 65,
         },
       }
     : null

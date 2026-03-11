@@ -22,19 +22,21 @@ export interface Log {
 }
 
 export interface LogsSummary {
-  date: string
   period: string
-  totals: {
-    calories: number
-    protein_g: number
-    carbs_g: number
-    fat_g: number
+  summary: {
+    total_logs: number
+    avg_daily_calories: number
+    avg_daily_protein: number
+    workout_count: number
+    avg_sleep_hours: number
+    avg_energy_rating: number
   }
-  daily_targets?: {
+  daily_breakdown?: Array<{
+    date: string
     calories: number
-    protein_g: number
-    carbs_g: number
-    fat_g: number
-  }
-  logs_count: number
+    protein: number
+    carbs: number
+    fat: number
+    workouts: number
+  }>
 }
