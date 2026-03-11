@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
@@ -22,13 +22,13 @@ export default function GeneratingPage() {
   const [messageIndex, setMessageIndex] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(true)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   async function generatePlan() {
     setIsGenerating(true)
     setError(null)
 
-    // Cycle messages while waiting
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setMessageIndex((i) => (i + 1) % messages.length)
     }, 2000)
 
@@ -37,12 +37,11 @@ export default function GeneratingPage() {
         message: 'Generate my initial 7-day meal and workout plan based on my profile.',
         session_id: uuidv4(),
       })
-      clearInterval(interval)
-      // Set onboarded cookie so middleware knows
-      document.cookie = 'nextmealai-onboarded=true; path=/; max-age=300'
+      if (intervalRef.current) clearInterval(intervalRef.current)
+      document.cookie = 'nextmealai-onboarded=true; path=/; max-age=86400'
       router.push('/dashboard')
     } catch (err) {
-      clearInterval(interval)
+      if (intervalRef.current) clearInterval(intervalRef.current)
       setIsGenerating(false)
       if (err instanceof ApiException) {
         setError(err.message || 'Plan generation failed. Please try again.')
@@ -54,6 +53,9 @@ export default function GeneratingPage() {
 
   useEffect(() => {
     generatePlan()
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

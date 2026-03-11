@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { StepIndicator } from './step-indicator'
 import { GeoCommentary } from './geo-commentary'
+import { MultiChip } from './multi-chip'
 import { submitNutritionOnboarding } from '@/lib/api/profile.api'
 import { ApiException } from '@/types/api.types'
 
@@ -64,40 +65,6 @@ const dietaryOptions = [
   'kosher',
 ] as const
 const cuisineOptions = ['Indian', 'Italian', 'Mexican', 'Mediterranean', 'Asian', 'American']
-
-function MultiChip({
-  options,
-  value,
-  onChange,
-}: {
-  options: string[]
-  value: string[]
-  onChange: (v: string[]) => void
-}) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {options.map((opt) => {
-        const selected = value.includes(opt)
-        return (
-          <button
-            key={opt}
-            type="button"
-            onClick={() =>
-              onChange(selected ? value.filter((v) => v !== opt) : [...value, opt])
-            }
-            className={`px-3 py-1.5 rounded-full border text-sm font-medium transition-colors ${
-              selected
-                ? 'bg-brand border-brand text-white'
-                : 'bg-bg-secondary border-border text-foreground hover:border-brand/50'
-            }`}
-          >
-            {opt}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
 
 export function NutritionForm() {
   const router = useRouter()
