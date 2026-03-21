@@ -1,13 +1,15 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-bg-deep flex flex-col items-center justify-center gap-4">
-      <h1 className="text-2xl font-bold text-foreground">Page not found</h1>
-      <Button asChild className="bg-brand hover:bg-brand/90 text-white">
-        <Link href="/dashboard">Go to Dashboard</Link>
-      </Button>
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-[22px] font-semibold text-text-primary">Page not found</h1>
+        <p className="text-sm text-text-secondary mt-2">The page you&apos;re looking for doesn&apos;t exist.</p>
+        <Link href="/dashboard" className="text-sm text-accent font-medium mt-4 inline-block">
+          Go home
+        </Link>
+      </div>
     </div>
   )
 }

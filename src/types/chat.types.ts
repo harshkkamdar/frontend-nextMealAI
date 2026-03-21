@@ -32,5 +32,5 @@ export interface ChatResponse {
 
 export interface SendMessageInput {
   message: string
-  session_id: string
+  session_id?: string
 }

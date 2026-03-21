@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('nextmealai-token')?.value
 
@@ -22,7 +22,6 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith('/onboarding')) {
     const onboardingCookie = request.cookies.get('nextmealai-onboarded')?.value
     if (onboardingCookie) {
-      // Already onboarded — send to dashboard and clear the cache cookie
       const res = NextResponse.redirect(new URL('/dashboard', request.url))
       res.cookies.set('nextmealai-onboarded', '', { path: '/', maxAge: 0 })
       return res

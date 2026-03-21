@@ -1,68 +1,78 @@
 export type PlanType = 'meal' | 'workout'
 export type PlanStatus = 'draft' | 'active' | 'superseded' | 'completed'
 
-export interface MealPlanFood {
+export interface MealPlanMeal {
+  type: string
   name: string
+  time?: string
   calories?: number
   protein?: number
   carbs?: number
   fat?: number
 }
 
-export interface MealPlanMeal {
+export interface MealPlanSnack {
   name: string
   time?: string
-  foods?: MealPlanFood[]
-  notes?: string
+  calories?: number
+  protein?: number
+  carbs?: number
+  fat?: number
 }
 
 export interface MealPlanDay {
-  day: string
+  date: string
   meals: MealPlanMeal[]
+  snacks?: MealPlanSnack[]
 }
 
 export interface WorkoutExercise {
   name: string
   sets?: number
-  reps?: string
-  duration?: string
+  reps?: number
+  weight?: number
+  duration_seconds?: number
   notes?: string
 }
 
 export interface WorkoutPlanDay {
-  day: string
+  date: string
   name: string
+  is_rest_day?: boolean
   exercises?: WorkoutExercise[]
-  rest?: boolean
 }
 
-interface PlanBase {
+export interface MealPlan {
   id: string
   user_id: string
-  type: PlanType
+  type: 'meal'
   status: PlanStatus
   version?: number
   start_date?: string
   end_date?: string
+  content: {
+    days?: MealPlanDay[]
+    daily_targets?: { calories: number; protein: number; carbs: number; fat: number }
+    notes?: string
+  }
   created_at: string
   updated_at: string
 }
 
-export interface MealPlan extends PlanBase {
-  type: 'meal'
-  content: {
-    days?: MealPlanDay[]
-    daily_targets?: { calories: number; protein: number; carbs: number; fat: number }
-    [key: string]: unknown
-  }
-}
-
-export interface WorkoutPlan extends PlanBase {
+export interface WorkoutPlan {
+  id: string
+  user_id: string
   type: 'workout'
+  status: PlanStatus
+  version?: number
+  start_date?: string
+  end_date?: string
   content: {
     days?: WorkoutPlanDay[]
-    [key: string]: unknown
+    notes?: string
   }
+  created_at: string
+  updated_at: string
 }
 
 export type Plan = MealPlan | WorkoutPlan

@@ -1,9 +1,11 @@
 export type SuggestionAction = 'approve' | 'reject' | 'dismiss'
-export type SuggestionStatus = 'pending' | 'approved' | 'rejected' | 'dismissed'
+export type SuggestionStatus = 'pending' | 'approved' | 'rejected' | 'dismissed' | 'applied' | 'expired'
+export type SuggestionType = 'meal_swap' | 'macro_adjustment' | 'workout_modification' | 'rest_day' | 'hydration' | 'sleep' | 'general'
 
 export interface Suggestion {
   id: string
   user_id: string
+  type: SuggestionType
   title: string
   description: string
   confidence?: number

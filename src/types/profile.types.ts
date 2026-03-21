@@ -1,16 +1,16 @@
 export type Sex = 'male' | 'female' | 'other'
-export type ActivityLevel = 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active'
-export type PrimaryGoal = 'fat_loss' | 'muscle_gain' | 'maintenance' | 'body_recomposition'
+export type ActivityLevel = 'sedentary' | 'light' | 'lightly_active' | 'moderate' | 'moderately_active' | 'active' | 'very_active'
+export type PrimaryGoal = 'fat_loss' | 'muscle_gain' | 'maintenance' | 'body_recomposition' | 'improve_health' | 'athletic_performance'
 export type DietaryStyle = 'omnivore' | 'vegetarian' | 'vegan' | 'pescatarian' | 'keto' | 'paleo' | 'halal' | 'kosher'
 
 export interface Profile {
   id: string
   user_id: string
-  full_name?: string       // NOT 'name'
+  full_name?: string
   dob?: string
   sex?: Sex
   height_cm?: number
-  current_weight_kg?: number   // NOT 'weight_kg'
+  current_weight_kg?: number
   target_weight_kg?: number
   activity_level?: ActivityLevel
   primary_goal?: PrimaryGoal
@@ -18,8 +18,8 @@ export interface Profile {
   equipment?: string[]
   injuries?: string[]
   allergies?: string[]
-  disliked_foods?: string[]    // NOT 'dislikes'
-  preferred_cuisines?: string[]  // NOT 'cuisines'
+  disliked_foods?: string[]
+  preferred_cuisines?: string[]
   meals_per_day?: number
   workout_frequency?: number
   onboarding_personal_complete?: boolean
@@ -35,7 +35,6 @@ export interface OnboardingStatus {
   nutrition: { complete: boolean; completed_at: string | null }
 }
 
-// Helper to derive can_use_app from onboarding status
 export function canUseApp(status: OnboardingStatus): boolean {
   return status.personal.complete && status.fitness.complete && status.nutrition.complete
 }

@@ -1,56 +1,37 @@
 import { apiFetch } from './client'
+import { useAuthStore } from '@/stores/auth.store'
 
-export interface AuthUser {
-  id: string
-  email: string
-  created_at: string
+interface AuthResponse {
+  user: { id: string; email: string }
+  session: { access_token: string; refresh_token: string }
 }
 
-export interface AuthSession {
-  access_token: string
-  refresh_token: string
-  expires_at?: number
-}
-
-export interface AuthResponse {
-  user: AuthUser
-  session: AuthSession
-}
-
-export interface SignupInput {
-  email: string
-  password: string
-  name?: string
-}
-
-export interface LoginInput {
-  email: string
-  password: string
-}
-
-// Note: auth routes have no /v1/ prefix
-export async function signup(input: SignupInput): Promise<AuthResponse> {
-  return apiFetch<AuthResponse>('/auth/signup', {
+export async function signup(email: string, password: string, fullName?: string): Promise<AuthResponse> {
+  const data = await apiFetch<AuthResponse>('/auth/signup', {
     method: 'POST',
-    body: input,
+    body: { email, password, fullName },
   })
+  useAuthStore.getState().setSession(data.user, data.session.access_token, data.session.refresh_token)
+  document.cookie = `nextmealai-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`
+  return data
 }
 
-export async function login(input: LoginInput): Promise<AuthResponse> {
-  return apiFetch<AuthResponse>('/auth/login', {
+export async function login(email: string, password: string): Promise<AuthResponse> {
+  const data = await apiFetch<AuthResponse>('/auth/login', {
     method: 'POST',
-    body: input,
+    body: { email, password },
   })
+  useAuthStore.getState().setSession(data.user, data.session.access_token, data.session.refresh_token)
+  document.cookie = `nextmealai-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`
+  return data
 }
 
 export async function logout(): Promise<void> {
-  return apiFetch<void>('/auth/logout', { method: 'POST' })
-}
-
-export async function refreshToken(refreshToken: string): Promise<AuthSession> {
-  const result = await apiFetch<{ session: AuthSession }>('/auth/refresh', {
-    method: 'POST',
-    body: { refresh_token: refreshToken },
-  })
-  return result.session
+  try {
+    await apiFetch('/auth/logout', { method: 'POST' })
+  } finally {
+    useAuthStore.getState().clearSession()
+    document.cookie = 'nextmealai-token=; path=/; max-age=0'
+    document.cookie = 'nextmealai-onboarded=; path=/; max-age=0'
+  }
 }

@@ -14,13 +14,13 @@ export async function getOnboardingStatus(): Promise<OnboardingStatus> {
 }
 
 export async function submitPersonalOnboarding(data: PersonalOnboardingInput): Promise<void> {
-  return apiFetch<void>('/v1/profile/onboarding/personal', { method: 'POST', body: data })
+  await apiFetch('/v1/profile/onboarding/personal', { method: 'POST', body: data })
 }
 
 export async function submitFitnessOnboarding(data: FitnessOnboardingInput): Promise<void> {
-  return apiFetch<void>('/v1/profile/onboarding/fitness', { method: 'POST', body: data })
+  await apiFetch('/v1/profile/onboarding/fitness', { method: 'POST', body: data })
 }
 
 export async function submitNutritionOnboarding(data: NutritionOnboardingInput): Promise<void> {
-  return apiFetch<void>('/v1/profile/onboarding/nutrition', { method: 'POST', body: data })
+  await apiFetch('/v1/profile/onboarding/nutrition', { method: 'POST', body: data })
 }

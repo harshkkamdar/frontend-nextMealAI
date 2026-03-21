@@ -1,18 +1,11 @@
-export interface ApiError {
-  error: string
-  code?: string
-  message?: string
-  statusCode: number
-}
-
 export class ApiException extends Error {
   constructor(
-    public readonly statusCode: number,
-    public readonly error: string,
-    public readonly code?: string,
-    message?: string
+    public statusCode: number,
+    public error: string,
+    public code?: string,
+    public details?: string
   ) {
-    super(message ?? error)
+    super(details ?? error)
     this.name = 'ApiException'
   }
 }

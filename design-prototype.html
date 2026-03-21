@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NextMealAI — Design Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #1A1A1A;
+    color: #F9F7F4;
+    padding: 60px 24px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Section labels */
+  .section-label {
+    text-align: center;
+    margin: 80px auto 40px;
+    max-width: 800px;
+  }
+  .section-label:first-child { margin-top: 0; }
+  .section-label h2 {
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #9C9590;
+    margin-bottom: 8px;
+  }
+  .section-label p {
+    font-size: 14px;
+    color: #6B6560;
+  }
+  .section-divider {
+    width: 48px;
+    height: 2px;
+    background: #E8663C;
+    margin: 0 auto 16px;
+    border-radius: 1px;
+  }
+
+  /* Color palette */
+  .palette-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    max-width: 800px;
+    margin: 0 auto;
+    justify-content: center;
+  }
+  .swatch {
+    width: 120px;
+    text-align: center;
+  }
+  .swatch-color {
+    width: 120px;
+    height: 72px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .swatch-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #F9F7F4;
+    margin-bottom: 2px;
+  }
+  .swatch-hex {
+    font-size: 11px;
+    color: #9C9590;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  /* Typography showcase */
+  .type-showcase {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 40px;
+  }
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 20px 0;
+    border-bottom: 1px solid #E8E4DF;
+  }
+  .type-row:last-child { border-bottom: none; }
+  .type-sample { flex: 1; }
+  .type-meta {
+    font-size: 12px;
+    color: #9C9590;
+    text-align: right;
+    white-space: nowrap;
+    margin-left: 24px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  /* Geo Avatar */
+  .avatar-showcase {
+    display: flex;
+    gap: 32px;
+    align-items: end;
+    justify-content: center;
+    padding: 40px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .avatar-item { text-align: center; }
+  .avatar-size-label {
+    font-size: 11px;
+    color: #9C9590;
+    margin-top: 10px;
+    font-weight: 500;
+  }
+
+  .geo-avatar {
+    border-radius: 50%;
+    background: #E8663C;
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .geo-avatar-sm { width: 32px; height: 32px; }
+  .geo-avatar-md { width: 40px; height: 40px; }
+  .geo-avatar-lg { width: 56px; height: 56px; }
+
+  /* Eyes */
+  .geo-avatar::before {
+    content: '';
+    position: absolute;
+    background: #FFFFFF;
+    border-radius: 50%;
+  }
+  .geo-avatar::after {
+    content: '';
+    position: absolute;
+    background: #FFFFFF;
+    border-radius: 50%;
+  }
+  /* Left eye */
+  .geo-avatar::before {
+    /* positioned per size via specific rules below */
+  }
+
+  /* We need inner element for the smile */
+  .geo-smile {
+    position: absolute;
+    border: 2px solid #FFFFFF;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0 0 50% 50%;
+  }
+
+  /* Small avatar: 32px */
+  .geo-avatar-sm::before {
+    width: 4px; height: 4px;
+    top: 11px; left: 9px;
+  }
+  .geo-avatar-sm::after {
+    width: 4px; height: 4px;
+    top: 11px; right: 9px;
+  }
+  .geo-avatar-sm .geo-smile {
+    width: 8px; height: 4px;
+    bottom: 8px; left: 12px;
+    border-width: 1.5px;
+  }
+
+  /* Medium avatar: 40px */
+  .geo-avatar-md::before {
+    width: 5px; height: 5px;
+    top: 14px; left: 11px;
+  }
+  .geo-avatar-md::after {
+    width: 5px; height: 5px;
+    top: 14px; right: 11px;
+  }
+  .geo-avatar-md .geo-smile {
+    width: 10px; height: 5px;
+    bottom: 10px; left: 15px;
+    border-width: 1.5px;
+  }
+
+  /* Large avatar: 56px */
+  .geo-avatar-lg::before {
+    width: 7px; height: 7px;
+    top: 19px; left: 15px;
+  }
+  .geo-avatar-lg::after {
+    width: 7px; height: 7px;
+    top: 19px; right: 15px;
+  }
+  .geo-avatar-lg .geo-smile {
+    width: 14px; height: 7px;
+    bottom: 13px; left: 21px;
+    border-width: 2px;
+  }
+
+  /* Phone frame */
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    background: #FFFFFF;
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .phone-frame-inner {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 40px;
+  }
+  /* Hide scrollbar */
+  .phone-frame-inner::-webkit-scrollbar { display: none; }
+  .phone-frame-inner { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1A1A1A;
+  }
+  .status-bar-icons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  /* -- Screens container -- */
+  .screens-row {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .screen-col {
+    text-align: center;
+  }
+  .screen-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #F9F7F4;
+    margin-bottom: 16px;
+    letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COLOR PALETTE ===================== -->
+<div class="section-label">
+  <div class="section-divider"></div>
+  <h2>Color Palette</h2>
+  <p>Warm, earthy tones grounded in terracotta and cream</p>
+</div>
+
+<div class="palette-grid">
+  <div class="swatch">
+    <div class="swatch-color" style="background:#FFFFFF;"></div>
+    <div class="swatch-name">Background</div>
+    <div class="swatch-hex">#FFFFFF</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#F9F7F4;"></div>
+    <div class="swatch-name">Surface</div>
+    <div class="swatch-hex">#F9F7F4</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#F3EFEA;"></div>
+    <div class="swatch-name">Surface Hover</div>
+    <div class="swatch-hex">#F3EFEA</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#E8E4DF;"></div>
+    <div class="swatch-name">Border</div>
+    <div class="swatch-hex">#E8E4DF</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#1A1A1A;"></div>
+    <div class="swatch-name">Text Primary</div>
+    <div class="swatch-hex">#1A1A1A</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#6B6560;"></div>
+    <div class="swatch-name">Text Secondary</div>
+    <div class="swatch-hex">#6B6560</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#9C9590;"></div>
+    <div class="swatch-name">Text Tertiary</div>
+    <div class="swatch-hex">#9C9590</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#E8663C;"></div>
+    <div class="swatch-name">Accent</div>
+    <div class="swatch-hex">#E8663C</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#D45A32;"></div>
+    <div class="swatch-name">Accent Hover</div>
+    <div class="swatch-hex">#D45A32</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#FEF3EE;"></div>
+    <div class="swatch-name">Accent Light</div>
+    <div class="swatch-hex">#FEF3EE</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#3D8B5E;"></div>
+    <div class="swatch-name">Success</div>
+    <div class="swatch-hex">#3D8B5E</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#EEF6F1;"></div>
+    <div class="swatch-name">Success Light</div>
+    <div class="swatch-hex">#EEF6F1</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#D49A4E;"></div>
+    <div class="swatch-name">Warning</div>
+    <div class="swatch-hex">#D49A4E</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#FDF6EC;"></div>
+    <div class="swatch-name">Warning Light</div>
+    <div class="swatch-hex">#FDF6EC</div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#C67B4B;"></div>
+    <div class="swatch-name">Accent Alt</div>
+    <div class="swatch-hex">#C67B4B</div>
+  </div>
+</div>
+
+
+<!-- ===================== TYPOGRAPHY ===================== -->
+<div class="section-label">
+  <div class="section-divider"></div>
+  <h2>Typography</h2>
+  <p>Inter — clean, modern, and highly legible</p>
+</div>
+
+<div class="type-showcase">
+  <div class="type-row">
+    <div class="type-sample" style="font-size:28px; font-weight:600; letter-spacing:-0.02em; color:#1A1A1A;">Your AI nutrition coach</div>
+    <div class="type-meta">H1 · 28/600 · -0.02em</div>
+  </div>
+  <div class="type-row">
+    <div class="type-sample" style="font-size:22px; font-weight:600; letter-spacing:-0.01em; color:#1A1A1A;">Good morning, Harsh</div>
+    <div class="type-meta">H2 · 22/600 · -0.01em</div>
+  </div>
+  <div class="type-row">
+    <div class="type-sample" style="font-size:17px; font-weight:500; color:#1A1A1A;">Grilled chicken bowl</div>
+    <div class="type-meta">H3 · 17/500</div>
+  </div>
+  <div class="type-row">
+    <div class="type-sample" style="font-size:15px; font-weight:400; color:#1A1A1A;">Personalized meals, workouts, and guidance — all through one conversation.</div>
+    <div class="type-meta">Body · 15/400</div>
+  </div>
+  <div class="type-row">
+    <div class="type-sample" style="font-size:13px; font-weight:400; color:#6B6560;">Monday, March 17</div>
+    <div class="type-meta">Caption · 13/400</div>
+  </div>
+  <div class="type-row">
+    <div class="type-sample" style="font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.05em; color:#9C9590;">NEXT UP &middot; LUNCH</div>
+    <div class="type-meta">Overline · 12/500 · 0.05em</div>
+  </div>
+</div>
+
+
+<!-- ===================== GEO AVATAR ===================== -->
+<div class="section-label">
+  <div class="section-divider"></div>
+  <h2>Geo Avatar</h2>
+  <p>A minimal, friendly face — warm and approachable</p>
+</div>
+
+<div class="avatar-showcase">
+  <div class="avatar-item">
+    <div class="geo-avatar geo-avatar-sm"><div class="geo-smile"></div></div>
+    <div class="avatar-size-label">32px</div>
+  </div>
+  <div class="avatar-item">
+    <div class="geo-avatar geo-avatar-md"><div class="geo-smile"></div></div>
+    <div class="avatar-size-label">40px</div>
+  </div>
+  <div class="avatar-item">
+    <div class="geo-avatar geo-avatar-lg"><div class="geo-smile"></div></div>
+    <div class="avatar-size-label">56px</div>
+  </div>
+</div>
+
+<!-- Also show on dark bg -->
+<div style="display:flex; gap:32px; align-items:end; justify-content:center; padding:40px; background:#1A1A1A; border-radius:16px; max-width:500px; margin:16px auto 0; border:1px solid rgba(255,255,255,0.08);">
+  <div class="avatar-item">
+    <div class="geo-avatar geo-avatar-sm"><div class="geo-smile"></div></div>
+    <div class="avatar-size-label">on dark</div>
+  </div>
+  <div class="avatar-item">
+    <div class="geo-avatar geo-avatar-md"><div class="geo-smile"></div></div>
+    <div class="avatar-size-label">on dark</div>
+  </div>
+  <div class="avatar-item">
+    <div class="geo-avatar geo-avatar-lg"><div class="geo-smile"></div></div>
+    <div class="avatar-size-label">on dark</div>
+  </div>
+</div>
+
+
+<!-- ===================== SCREENS ===================== -->
+<div class="section-label">
+  <div class="section-divider"></div>
+  <h2>Screen Designs</h2>
+  <p>Three key screens — Signup, Dashboard, and Chat</p>
+</div>
+
+<div class="screens-row">
+
+<!-- ===================== SCREEN 1: SIGNUP ===================== -->
+<div class="screen-col">
+  <div class="screen-title">Signup</div>
+  <div class="phone-frame">
+    <div class="phone-frame-inner">
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="status-bar-icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1A1A1A"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#1A1A1A"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#E8E4DF"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2C10.7 2 13.1 3.1 14.8 4.9L16 3.7C14 1.5 11.2 0 8 0C4.8 0 2 1.5 0 3.7L1.2 4.9C2.9 3.1 5.3 2 8 2Z" fill="#1A1A1A"/><path d="M8 6C9.8 6 11.4 6.7 12.6 8L13.8 6.8C12.3 5.2 10.3 4.2 8 4.2C5.7 4.2 3.7 5.2 2.2 6.8L3.4 8C4.6 6.7 6.2 6 8 6Z" fill="#1A1A1A"/><circle cx="8" cy="10.5" r="1.5" fill="#1A1A1A"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0" y="1" width="22" height="10" rx="2.5" stroke="#1A1A1A" stroke-width="1"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#1A1A1A"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="#1A1A1A"/></svg>
+        </div>
+      </div>
+
+      <!-- Gradient top -->
+      <div style="height:200px; background:linear-gradient(180deg, #FEF3EE 0%, #FFFFFF 100%); display:flex; align-items:center; justify-content:center; flex-direction:column; padding-top:24px;">
+        <!-- Geo avatar large as hero -->
+        <div style="width:72px; height:72px; border-radius:50%; background:#E8663C; position:relative; margin-bottom:16px; box-shadow: 0 8px 24px rgba(232,102,60,0.25);">
+          <div style="position:absolute; width:9px; height:9px; background:#FFF; border-radius:50%; top:24px; left:19px;"></div>
+          <div style="position:absolute; width:9px; height:9px; background:#FFF; border-radius:50%; top:24px; right:19px;"></div>
+          <div style="position:absolute; width:18px; height:9px; border:2.5px solid #FFF; border-top:none; border-radius:0 0 50% 50%; bottom:17px; left:27px;"></div>
+        </div>
+        <div style="font-size:13px; font-weight:500; color:#E8663C; letter-spacing:0.02em;">NextMealAI</div>
+      </div>
+
+      <!-- Content -->
+      <div style="padding:32px 24px 40px;">
+        <h1 style="font-size:28px; font-weight:600; letter-spacing:-0.02em; color:#1A1A1A; margin-bottom:12px; text-align:center;">Your AI nutrition coach</h1>
+        <p style="font-size:15px; color:#6B6560; text-align:center; line-height:1.5; margin-bottom:40px;">Personalized meals, workouts, and guidance — all through one conversation.</p>
+
+        <!-- Email input -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:13px; font-weight:500; color:#1A1A1A; display:block; margin-bottom:6px;">Email</label>
+          <div style="border:1.5px solid #E8E4DF; border-radius:12px; padding:14px 16px; font-size:15px; color:#9C9590; background:#FFFFFF; transition:all 0.2s;">harsh@example.com</div>
+        </div>
+
+        <!-- Password input -->
+        <div style="margin-bottom:24px;">
+          <label style="font-size:13px; font-weight:500; color:#1A1A1A; display:block; margin-bottom:6px;">Password</label>
+          <div style="border:1.5px solid #E8E4DF; border-radius:12px; padding:14px 16px; font-size:15px; color:#1A1A1A; background:#FFFFFF; display:flex; justify-content:space-between; align-items:center;">
+            <span style="letter-spacing:0.15em;">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4C6 4 2.7 6.7 1 10c1.7 3.3 5 6 9 6s7.3-2.7 9-6c-1.7-3.3-5-6-9-6zm0 10c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4zm0-6.5c-1.4 0-2.5 1.1-2.5 2.5s1.1 2.5 2.5 2.5 2.5-1.1 2.5-2.5S11.4 7.5 10 7.5z" fill="#9C9590"/></svg>
+          </div>
+        </div>
+
+        <!-- Create account button -->
+        <div style="background:#E8663C; color:#FFFFFF; font-size:15px; font-weight:600; text-align:center; padding:16px; border-radius:12px; cursor:pointer; box-shadow:0 2px 8px rgba(232,102,60,0.25); margin-bottom:24px;">Create account</div>
+
+        <!-- Divider -->
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
+          <div style="flex:1; height:1px; background:#E8E4DF;"></div>
+          <span style="font-size:13px; color:#9C9590;">or</span>
+          <div style="flex:1; height:1px; background:#E8E4DF;"></div>
+        </div>
+
+        <!-- Google button -->
+        <div style="border:1.5px solid #E8E4DF; border-radius:12px; padding:14px; text-align:center; font-size:15px; font-weight:500; color:#1A1A1A; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:32px; cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+          Continue with Google
+        </div>
+
+        <!-- Sign in link -->
+        <p style="text-align:center; font-size:14px; color:#6B6560;">Already have an account? <span style="color:#E8663C; font-weight:500; cursor:pointer;">Sign in</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 2: DASHBOARD ===================== -->
+<div class="screen-col">
+  <div class="screen-title">Dashboard</div>
+  <div class="phone-frame">
+    <div class="phone-frame-inner">
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="status-bar-icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1A1A1A"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#1A1A1A"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#E8E4DF"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2C10.7 2 13.1 3.1 14.8 4.9L16 3.7C14 1.5 11.2 0 8 0C4.8 0 2 1.5 0 3.7L1.2 4.9C2.9 3.1 5.3 2 8 2Z" fill="#1A1A1A"/><path d="M8 6C9.8 6 11.4 6.7 12.6 8L13.8 6.8C12.3 5.2 10.3 4.2 8 4.2C5.7 4.2 3.7 5.2 2.2 6.8L3.4 8C4.6 6.7 6.2 6 8 6Z" fill="#1A1A1A"/><circle cx="8" cy="10.5" r="1.5" fill="#1A1A1A"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0" y="1" width="22" height="10" rx="2.5" stroke="#1A1A1A" stroke-width="1"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#1A1A1A"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="#1A1A1A"/></svg>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div style="padding:16px 24px 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <h2 style="font-size:22px; font-weight:600; letter-spacing:-0.01em; color:#1A1A1A;">Good morning, Harsh</h2>
+          <!-- Profile avatar -->
+          <div style="width:36px; height:36px; border-radius:50%; background:#F3EFEA; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:#6B6560;">H</div>
+        </div>
+        <p style="font-size:13px; color:#9C9590;">Monday, March 17</p>
+      </div>
+
+      <!-- Hero Card: Next Meal -->
+      <div style="margin:20px 16px 0; background:#F9F7F4; border:1px solid #E8E4DF; border-radius:16px; padding:20px; box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);">
+        <div style="font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.05em; color:#9C9590; margin-bottom:12px;">NEXT UP &middot; LUNCH</div>
+        <div style="font-size:17px; font-weight:500; color:#1A1A1A; margin-bottom:4px;">Grilled chicken bowl</div>
+        <div style="font-size:14px; color:#6B6560; margin-bottom:12px; line-height:1.4;">with quinoa, roasted veggies, and tahini</div>
+        <div style="font-size:13px; color:#9C9590; margin-bottom:16px;">520 cal &middot; 42g protein &middot; 58g carbs &middot; 18g fat</div>
+        <div style="display:flex; gap:10px;">
+          <div style="flex:1; background:#E8663C; color:#FFFFFF; font-size:14px; font-weight:600; text-align:center; padding:12px; border-radius:10px; cursor:pointer;">Log it &#10003;</div>
+          <div style="flex:1; border:1.5px solid #E8E4DF; color:#1A1A1A; font-size:14px; font-weight:500; text-align:center; padding:12px; border-radius:10px; cursor:pointer; background:#FFFFFF;">Swap</div>
+        </div>
+      </div>
+
+      <!-- Today's Progress -->
+      <div style="padding:24px 16px 0;">
+        <div style="font-size:14px; font-weight:600; color:#1A1A1A; margin-bottom:14px;">Today's progress</div>
+
+        <!-- Calorie bar -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+            <span style="font-size:13px; font-weight:500; color:#1A1A1A;">Calories</span>
+            <span style="font-size:13px; color:#6B6560;"><span style="font-weight:600; color:#1A1A1A;">1,240</span> / 2,100</span>
+          </div>
+          <div style="height:8px; background:#F3EFEA; border-radius:4px; overflow:hidden;">
+            <div style="width:59%; height:100%; background:#E8663C; border-radius:4px;"></div>
+          </div>
+        </div>
+
+        <!-- Macro bars row -->
+        <div style="display:flex; gap:12px;">
+          <!-- Protein -->
+          <div style="flex:1;">
+            <div style="font-size:12px; color:#6B6560; margin-bottom:6px;">Protein</div>
+            <div style="height:6px; background:#EEF6F1; border-radius:3px; overflow:hidden; margin-bottom:4px;">
+              <div style="width:55%; height:100%; background:#3D8B5E; border-radius:3px;"></div>
+            </div>
+            <div style="font-size:11px; color:#9C9590;">78 / 145g</div>
+          </div>
+          <!-- Carbs -->
+          <div style="flex:1;">
+            <div style="font-size:12px; color:#6B6560; margin-bottom:6px;">Carbs</div>
+            <div style="height:6px; background:#EDF1F5; border-radius:3px; overflow:hidden; margin-bottom:4px;">
+              <div style="width:62%; height:100%; background:#7B8FA3; border-radius:3px;"></div>
+            </div>
+            <div style="font-size:11px; color:#9C9590;">155 / 250g</div>
+          </div>
+          <!-- Fat -->
+          <div style="flex:1;">
+            <div style="font-size:12px; color:#6B6560; margin-bottom:6px;">Fat</div>
+            <div style="height:6px; background:#FDF6EC; border-radius:3px; overflow:hidden; margin-bottom:4px;">
+              <div style="width:50%; height:100%; background:#D49A4E; border-radius:3px;"></div>
+            </div>
+            <div style="font-size:11px; color:#9C9590;">35 / 70g</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Geo Suggestion -->
+      <div style="margin:20px 16px 0; background:#FEF3EE; border:1px solid rgba(232,102,60,0.12); border-radius:14px; padding:16px;">
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:32px; height:32px; border-radius:50%; background:#E8663C; position:relative; flex-shrink:0;">
+            <div style="position:absolute; width:4px; height:4px; background:#FFF; border-radius:50%; top:11px; left:9px;"></div>
+            <div style="position:absolute; width:4px; height:4px; background:#FFF; border-radius:50%; top:11px; right:9px;"></div>
+            <div style="position:absolute; width:8px; height:4px; border:1.5px solid #FFF; border-top:none; border-radius:0 0 50% 50%; bottom:8px; left:12px;"></div>
+          </div>
+          <div style="flex:1;">
+            <p style="font-size:14px; color:#1A1A1A; line-height:1.45; margin-bottom:12px;">You've been low on protein the last 3 days. Want me to adjust your meal plan to prioritize higher-protein options?</p>
+            <div style="display:flex; gap:8px;">
+              <div style="font-size:13px; font-weight:500; color:#E8663C; padding:6px 14px; border-radius:8px; background:rgba(232,102,60,0.08); cursor:pointer;">Yes, adjust</div>
+              <div style="font-size:13px; font-weight:500; color:#6B6560; padding:6px 14px; border-radius:8px; cursor:pointer;">Dismiss</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming -->
+      <div style="padding:20px 16px 0;">
+        <div style="font-size:14px; font-weight:600; color:#1A1A1A; margin-bottom:14px;">Upcoming</div>
+
+        <!-- Timeline item 1 -->
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:16px;">
+          <div style="display:flex; flex-direction:column; align-items:center; padding-top:2px;">
+            <div style="width:8px; height:8px; border-radius:50%; background:#E8663C;"></div>
+            <div style="width:1.5px; height:40px; background:#E8E4DF;"></div>
+          </div>
+          <div style="flex:1; padding-bottom:4px;">
+            <div style="font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.05em; color:#9C9590; margin-bottom:4px;">2:00 PM &middot; SNACK</div>
+            <div style="font-size:14px; font-weight:500; color:#1A1A1A;">Greek yogurt with berries</div>
+            <div style="font-size:12px; color:#9C9590; margin-top:2px;">180 cal &middot; 15g protein</div>
+          </div>
+        </div>
+
+        <!-- Timeline item 2 -->
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:16px;">
+          <div style="display:flex; flex-direction:column; align-items:center; padding-top:2px;">
+            <div style="width:8px; height:8px; border-radius:50%; background:#3D8B5E;"></div>
+            <div style="width:1.5px; height:40px; background:#E8E4DF;"></div>
+          </div>
+          <div style="flex:1; padding-bottom:4px;">
+            <div style="font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.05em; color:#9C9590; margin-bottom:4px;">4:30 PM &middot; WORKOUT</div>
+            <div style="font-size:14px; font-weight:500; color:#1A1A1A;">Upper body strength</div>
+            <div style="font-size:12px; color:#9C9590; margin-top:2px;">45 min &middot; Push focus</div>
+          </div>
+        </div>
+
+        <!-- Timeline item 3 -->
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:100px;">
+          <div style="display:flex; flex-direction:column; align-items:center; padding-top:2px;">
+            <div style="width:8px; height:8px; border-radius:50%; background:#C67B4B;"></div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.05em; color:#9C9590; margin-bottom:4px;">7:00 PM &middot; DINNER</div>
+            <div style="font-size:14px; font-weight:500; color:#1A1A1A;">Salmon with sweet potato</div>
+            <div style="font-size:12px; color:#9C9590; margin-top:2px;">580 cal &middot; 38g protein</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div style="position:sticky; bottom:0; left:0; right:0; background:#FFFFFF; border-top:1px solid #E8E4DF; padding:8px 24px 28px; display:flex; justify-content:space-around; align-items:center; z-index:10;">
+        <!-- Floating + button -->
+        <div style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); width:48px; height:48px; background:#E8663C; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(232,102,60,0.3); cursor:pointer; z-index:11;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+
+        <!-- Home (active) -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 8.5L11 2l8 6.5V19a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 013 19V8.5z" fill="#E8663C"/><path d="M8.5 20.5V14h5v6.5" stroke="#FFF" stroke-width="1.5"/></svg>
+          <span style="font-size:10px; font-weight:600; color:#E8663C;">Home</span>
+        </div>
+
+        <!-- Chat -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M19 10.5c0 4.14-3.58 7.5-8 7.5-.93 0-1.82-.15-2.64-.42L4 19l1.42-3.36C4.52 14.42 3 12.6 3 10.5 3 6.36 6.58 3 11 3s8 3.36 8 7.5z" stroke="#9C9590" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:10px; font-weight:500; color:#9C9590;">Chat</span>
+        </div>
+
+        <!-- Spacer for + button -->
+        <div style="width:48px;"></div>
+
+        <!-- Plans -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 5h14M4 9h14M4 13h10M4 17h7" stroke="#9C9590" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span style="font-size:10px; font-weight:500; color:#9C9590;">Plans</span>
+        </div>
+
+        <!-- More -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="5" cy="11" r="1.5" fill="#9C9590"/><circle cx="11" cy="11" r="1.5" fill="#9C9590"/><circle cx="17" cy="11" r="1.5" fill="#9C9590"/></svg>
+          <span style="font-size:10px; font-weight:500; color:#9C9590;">More</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 3: CHAT ===================== -->
+<div class="screen-col">
+  <div class="screen-title">Chat</div>
+  <div class="phone-frame">
+    <div class="phone-frame-inner" style="display:flex; flex-direction:column;">
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="status-bar-icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1A1A1A"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#1A1A1A"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#E8E4DF"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2C10.7 2 13.1 3.1 14.8 4.9L16 3.7C14 1.5 11.2 0 8 0C4.8 0 2 1.5 0 3.7L1.2 4.9C2.9 3.1 5.3 2 8 2Z" fill="#1A1A1A"/><path d="M8 6C9.8 6 11.4 6.7 12.6 8L13.8 6.8C12.3 5.2 10.3 4.2 8 4.2C5.7 4.2 3.7 5.2 2.2 6.8L3.4 8C4.6 6.7 6.2 6 8 6Z" fill="#1A1A1A"/><circle cx="8" cy="10.5" r="1.5" fill="#1A1A1A"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0" y="1" width="22" height="10" rx="2.5" stroke="#1A1A1A" stroke-width="1"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#1A1A1A"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="#1A1A1A"/></svg>
+        </div>
+      </div>
+
+      <!-- Chat top bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 20px 12px; border-bottom:1px solid #E8E4DF;">
+        <div style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 15l-5-5 5-5" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:15px; color:#1A1A1A; font-weight:500;">Sessions</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:24px; height:24px; border-radius:50%; background:#E8663C; position:relative;">
+            <div style="position:absolute; width:3px; height:3px; background:#FFF; border-radius:50%; top:8px; left:7px;"></div>
+            <div style="position:absolute; width:3px; height:3px; background:#FFF; border-radius:50%; top:8px; right:7px;"></div>
+            <div style="position:absolute; width:6px; height:3px; border:1px solid #FFF; border-top:none; border-radius:0 0 50% 50%; bottom:6px; left:9px;"></div>
+          </div>
+          <span style="font-size:15px; font-weight:600; color:#1A1A1A;">Geo</span>
+        </div>
+        <div style="cursor:pointer; padding:4px;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.5" fill="#1A1A1A"/><circle cx="10" cy="10" r="1.5" fill="#1A1A1A"/><circle cx="10" cy="15" r="1.5" fill="#1A1A1A"/></svg>
+        </div>
+      </div>
+
+      <!-- Messages area -->
+      <div style="flex:1; overflow-y:auto; padding:20px 16px;">
+
+        <!-- Date chip -->
+        <div style="text-align:center; margin-bottom:20px;">
+          <span style="font-size:12px; color:#9C9590; background:#F9F7F4; padding:4px 12px; border-radius:10px;">Today</span>
+        </div>
+
+        <!-- Geo message 1 -->
+        <div style="display:flex; gap:10px; align-items:flex-end; margin-bottom:20px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:#E8663C; position:relative; flex-shrink:0;">
+            <div style="position:absolute; width:3.5px; height:3.5px; background:#FFF; border-radius:50%; top:9px; left:7.5px;"></div>
+            <div style="position:absolute; width:3.5px; height:3.5px; background:#FFF; border-radius:50%; top:9px; right:7.5px;"></div>
+            <div style="position:absolute; width:7px; height:3.5px; border:1.2px solid #FFF; border-top:none; border-radius:0 0 50% 50%; bottom:7px; left:10.5px;"></div>
+          </div>
+          <div style="max-width:75%; background:#F9F7F4; border-radius:16px 16px 16px 4px; padding:12px 16px;">
+            <p style="font-size:14px; color:#1A1A1A; line-height:1.5;">Good morning, Harsh! I noticed you hit your protein goal yesterday for the first time this week. Nice work! Want me to build on that momentum for today?</p>
+            <div style="font-size:11px; color:#9C9590; margin-top:6px;">9:32 AM</div>
+          </div>
+        </div>
+
+        <!-- User message 1 -->
+        <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+          <div style="max-width:75%; background:#E8663C; border-radius:16px 16px 4px 16px; padding:12px 16px;">
+            <p style="font-size:14px; color:#FFFFFF; line-height:1.5;">Yes! Also, can you bump up my protein target? I think I can handle 145g.</p>
+            <div style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:6px;">9:33 AM</div>
+          </div>
+        </div>
+
+        <!-- Geo message 2 -->
+        <div style="display:flex; gap:10px; align-items:flex-end; margin-bottom:12px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:#E8663C; position:relative; flex-shrink:0;">
+            <div style="position:absolute; width:3.5px; height:3.5px; background:#FFF; border-radius:50%; top:9px; left:7.5px;"></div>
+            <div style="position:absolute; width:3.5px; height:3.5px; background:#FFF; border-radius:50%; top:9px; right:7.5px;"></div>
+            <div style="position:absolute; width:7px; height:3.5px; border:1.2px solid #FFF; border-top:none; border-radius:0 0 50% 50%; bottom:7px; left:10.5px;"></div>
+          </div>
+          <div style="max-width:75%; background:#F9F7F4; border-radius:16px 16px 16px 4px; padding:12px 16px;">
+            <p style="font-size:14px; color:#1A1A1A; line-height:1.5;">Absolutely! I've updated your protein target. I've also adjusted today's meals to get you there with some extra Greek yogurt and chicken.</p>
+            <div style="font-size:11px; color:#9C9590; margin-top:6px;">9:33 AM</div>
+          </div>
+        </div>
+
+        <!-- Action card -->
+        <div style="margin-left:38px; margin-bottom:20px; max-width:75%;">
+          <div style="background:#EEF6F1; border:1px solid rgba(61,139,94,0.15); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:10px;">
+            <div style="width:20px; height:20px; background:#3D8B5E; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:13px; font-weight:500; color:#3D8B5E;">Plan updated</div>
+              <div style="font-size:12px; color:#6B6560;">Protein target: 145g</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Geo message 3 -->
+        <div style="display:flex; gap:10px; align-items:flex-end; margin-bottom:20px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:#E8663C; position:relative; flex-shrink:0;">
+            <div style="position:absolute; width:3.5px; height:3.5px; background:#FFF; border-radius:50%; top:9px; left:7.5px;"></div>
+            <div style="position:absolute; width:3.5px; height:3.5px; background:#FFF; border-radius:50%; top:9px; right:7.5px;"></div>
+            <div style="position:absolute; width:7px; height:3.5px; border:1.2px solid #FFF; border-top:none; border-radius:0 0 50% 50%; bottom:7px; left:10.5px;"></div>
+          </div>
+          <div style="max-width:75%; background:#F9F7F4; border-radius:16px 16px 16px 4px; padding:12px 16px;">
+            <p style="font-size:14px; color:#1A1A1A; line-height:1.5;">Here's your updated schedule for today. Your lunch is a grilled chicken bowl — that alone packs 42g of protein. You've got this!</p>
+            <div style="font-size:11px; color:#9C9590; margin-top:6px;">9:34 AM</div>
+          </div>
+        </div>
+
+        <!-- User message 2 -->
+        <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+          <div style="max-width:75%; background:#E8663C; border-radius:16px 16px 4px 16px; padding:12px 16px;">
+            <p style="font-size:14px; color:#FFFFFF; line-height:1.5;">Perfect, thanks Geo!</p>
+            <div style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:6px;">9:34 AM</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Input area -->
+      <div style="padding:12px 16px 32px; border-top:1px solid #E8E4DF; background:#FFFFFF;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="flex:1; background:#F9F7F4; border:1px solid #E8E4DF; border-radius:12px; padding:12px 16px; font-size:14px; color:#9C9590;">Ask Geo anything...</div>
+          <div style="width:40px; height:40px; background:#E8663C; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; box-shadow:0 2px 8px rgba(232,102,60,0.25);">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M10 4l5 5-5 5" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end screens-row -->
+
+<!-- Footer -->
+<div style="text-align:center; padding:80px 24px 40px; color:#6B6560; font-size:13px;">
+  NextMealAI Design Prototype &middot; March 2026
+</div>
+
+</body>
+</html>
