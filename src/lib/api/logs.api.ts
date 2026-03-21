@@ -8,7 +8,8 @@ export async function getLogs(params?: { type?: string; days?: number; limit?: n
   if (params?.limit) query.set('limit', String(params.limit))
   if (params?.offset) query.set('offset', String(params.offset))
   const qs = query.toString()
-  return apiFetch<Log[]>(`/v1/logs${qs ? `?${qs}` : ''}`)
+  const res = await apiFetch<{ logs: Log[] } | Log[]>(`/v1/logs${qs ? `?${qs}` : ''}`)
+  return Array.isArray(res) ? res : res.logs ?? []
 }
 
 export async function getLogsSummary(period: 'day' | 'week' | 'month'): Promise<LogsSummary> {

@@ -27,6 +27,13 @@ const ACTIVITY_OPTIONS: { value: ActivityLevel; label: string }[] = [
   { value: 'very_active', label: 'Very Active' },
 ]
 
+// Backend onboarding uses lightly_active/moderately_active; profile update uses light/moderate/active
+function normalizeActivityLevel(level?: ActivityLevel): ActivityLevel | undefined {
+  if (level === 'lightly_active') return 'light'
+  if (level === 'moderately_active') return 'moderate'
+  return level
+}
+
 const DIETARY_OPTIONS: { value: DietaryStyle; label: string }[] = [
   { value: 'omnivore', label: 'Omnivore' },
   { value: 'vegetarian', label: 'Vegetarian' },
@@ -71,7 +78,7 @@ export function ProfileForm() {
         setTargetWeight(p.target_weight_kg?.toString() ?? '')
         setHeight(p.height_cm?.toString() ?? '')
         setGoal(p.primary_goal)
-        setActivity(p.activity_level)
+        setActivity(normalizeActivityLevel(p.activity_level))
         setDiet(p.dietary_style)
         setEquipment(p.equipment ?? [])
       })

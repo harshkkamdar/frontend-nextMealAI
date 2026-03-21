@@ -6,7 +6,8 @@ export async function getSuggestions(params?: { status?: string; type?: string }
   if (params?.status) query.set('status', params.status)
   if (params?.type) query.set('type', params.type)
   const qs = query.toString()
-  return apiFetch<Suggestion[]>(`/v1/suggestions${qs ? `?${qs}` : ''}`)
+  const res = await apiFetch<{ suggestions: Suggestion[] } | Suggestion[]>(`/v1/suggestions${qs ? `?${qs}` : ''}`)
+  return Array.isArray(res) ? res : res.suggestions ?? []
 }
 
 export async function takeSuggestionAction(id: string, input: SuggestionActionInput): Promise<void> {

@@ -6,7 +6,8 @@ export async function getPlans(params?: { type?: string; active_only?: boolean }
   if (params?.type) query.set('type', params.type)
   if (params?.active_only) query.set('active_only', 'true')
   const qs = query.toString()
-  return apiFetch<Plan[]>(`/v1/plans${qs ? `?${qs}` : ''}`)
+  const res = await apiFetch<{ plans: Plan[] } | Plan[]>(`/v1/plans${qs ? `?${qs}` : ''}`)
+  return Array.isArray(res) ? res : res.plans ?? []
 }
 
 export async function getPlan(id: string): Promise<Plan> {

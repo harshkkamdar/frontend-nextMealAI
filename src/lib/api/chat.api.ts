@@ -6,7 +6,8 @@ export async function sendMessage(input: SendMessageInput): Promise<ChatResponse
 }
 
 export async function getChatSessions(): Promise<ChatSession[]> {
-  return apiFetch<ChatSession[]>('/v1/chat/sessions')
+  const res = await apiFetch<{ sessions: ChatSession[] } | ChatSession[]>('/v1/chat/sessions')
+  return Array.isArray(res) ? res : res.sessions ?? []
 }
 
 export async function getChatSession(sessionId: string, params?: { limit?: number; offset?: number }): Promise<{ messages: ChatMessage[] }> {

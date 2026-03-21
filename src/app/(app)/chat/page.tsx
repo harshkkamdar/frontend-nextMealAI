@@ -27,6 +27,9 @@ export default function ChatListPage() {
     try {
       const res = await sendMessage({ message: 'Hi!' })
       router.push(`/chat/${res.session_id}`)
+    } catch {
+      const { toast } = await import('sonner')
+      toast.error('Failed to start new chat')
     } finally {
       setCreating(false)
     }

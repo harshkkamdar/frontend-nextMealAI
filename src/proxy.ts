@@ -22,9 +22,7 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith('/onboarding')) {
     const onboardingCookie = request.cookies.get('nextmealai-onboarded')?.value
     if (onboardingCookie) {
-      const res = NextResponse.redirect(new URL('/dashboard', request.url))
-      res.cookies.set('nextmealai-onboarded', '', { path: '/', maxAge: 0 })
-      return res
+      return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     try {
       const response = await fetch(

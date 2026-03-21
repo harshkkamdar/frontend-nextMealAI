@@ -20,7 +20,7 @@ export default function ActiveChatPage({
 
   useEffect(() => {
     getChatSession(sessionId)
-      .then((data) => setMessages(data.messages))
+      .then((data) => setMessages(data.messages ?? []))
       .catch(() => toast.error('Failed to load messages'))
       .finally(() => setLoading(false))
   }, [sessionId])
@@ -54,7 +54,7 @@ export default function ActiveChatPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="h-dvh flex flex-col bg-background overflow-hidden">
         <ChatHeader sessionId={sessionId} />
         <div className="flex-1 flex items-center justify-center">
           <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
@@ -64,7 +64,7 @@ export default function ActiveChatPage({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-dvh flex flex-col bg-background overflow-hidden">
       <ChatHeader sessionId={sessionId} />
       <ChatThread messages={messages} isTyping={isTyping} />
       <ChatInput onSend={handleSend} disabled={isTyping} />

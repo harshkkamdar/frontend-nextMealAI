@@ -25,7 +25,7 @@ export function SettingsRow({
   destructive?: boolean
   children?: React.ReactNode
 }) {
-  const Comp = onClick ? 'button' : 'div'
+  const Comp: React.ElementType = onClick ? 'button' : 'div'
 
   return (
     <Comp
