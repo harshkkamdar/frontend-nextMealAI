@@ -86,7 +86,7 @@ export function WeightChart({ startWeight, targetWeight, weightLogs, profileCrea
             />
             <Tooltip
               contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
-              formatter={(value: number) => [`${value} kg`, 'Weight']}
+              formatter={(value) => [`${Number(value)} kg`, 'Weight']}
             />
             <ReferenceLine
               y={targetWeight}
