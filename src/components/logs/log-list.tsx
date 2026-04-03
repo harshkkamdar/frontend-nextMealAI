@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ClipboardList } from 'lucide-react'
-import { getLogs } from '@/lib/api/logs.api'
+import { ClipboardList, Check } from 'lucide-react'
+import { toast } from 'sonner'
+import { getLogs, bulkDeleteLogs } from '@/lib/api/logs.api'
 import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload } from '@/types/logs.types'
@@ -94,10 +95,54 @@ function relativeTime(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString()
 }
 
-export function LogList() {
+interface LogListProps {
+  filterType?: LogType | 'all'
+}
+
+export function LogList({ filterType }: LogListProps = {}) {
   const [logs, setLogs] = useState<Log[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<LogType | 'all'>('all')
+  const [selectMode, setSelectMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
+  // Sync external filterType prop when it changes
+  useEffect(() => {
+    if (filterType !== undefined) {
+      setFilter(filterType)
+    }
+  }, [filterType])
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return
+    setBulkDeleting(true)
+    try {
+      await bulkDeleteLogs(Array.from(selectedIds))
+      setLogs(prev => prev.filter(l => !selectedIds.has(l.id)))
+      toast.success(`${selectedIds.size} logs deleted`)
+      setSelectedIds(new Set())
+      setSelectMode(false)
+    } catch {
+      toast.error('Failed to delete logs')
+    } finally {
+      setBulkDeleting(false)
+    }
+  }
+
+  const exitSelectMode = () => {
+    setSelectMode(false)
+    setSelectedIds(new Set())
+  }
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -118,21 +163,31 @@ export function LogList() {
 
   return (
     <div>
-      {/* Filter chips */}
-      <div className="flex gap-2 overflow-x-auto pb-3 mb-4 -mx-4 px-4 scrollbar-hide">
-        {FILTERS.map((f) => (
+      {/* Header row: filter chips + Select/Cancel button */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide flex-1">
+          {FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setFilter(f.value)}
+              className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
+                filter === f.value
+                  ? 'bg-accent border border-accent text-white'
+                  : 'bg-surface border border-border text-text-primary hover:bg-surface-hover'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        {logs.length > 0 && !loading && (
           <button
-            key={f.value}
-            onClick={() => setFilter(f.value)}
-            className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
-              filter === f.value
-                ? 'bg-accent border border-accent text-white'
-                : 'bg-surface border border-border text-text-primary hover:bg-surface-hover'
-            }`}
+            onClick={selectMode ? exitSelectMode : () => setSelectMode(true)}
+            className="ml-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors bg-surface border border-border text-text-primary hover:bg-surface-hover shrink-0"
           >
-            {f.label}
+            {selectMode ? 'Cancel' : 'Select'}
           </button>
-        ))}
+        )}
       </div>
 
       {/* Content */}
@@ -153,8 +208,25 @@ export function LogList() {
           {logs.map((log) => (
             <div
               key={log.id}
-              className="flex items-center gap-3 bg-surface border border-border rounded-xl px-4 py-3"
+              onClick={selectMode ? () => toggleSelect(log.id) : undefined}
+              className={`flex items-center gap-3 bg-surface border rounded-xl px-4 py-3 ${
+                selectMode && selectedIds.has(log.id)
+                  ? 'border-accent'
+                  : 'border-border'
+              } ${selectMode ? 'cursor-pointer' : ''}`}
             >
+              {/* Checkbox in select mode */}
+              {selectMode && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleSelect(log.id) }}
+                  className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    selectedIds.has(log.id) ? 'bg-accent border-accent' : 'border-border'
+                  }`}
+                >
+                  {selectedIds.has(log.id) && <Check className="w-3 h-3 text-white" />}
+                </button>
+              )}
+
               {/* Color dot */}
               <div
                 className={`w-2 h-2 rounded-full shrink-0 ${TYPE_COLORS[log.type] ?? 'bg-text-tertiary'}`}
@@ -178,6 +250,22 @@ export function LogList() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Floating action bar for bulk delete */}
+      {selectMode && selectedIds.size > 0 && (
+        <div className="fixed bottom-24 left-0 right-0 z-40 flex justify-center">
+          <div className="bg-surface border border-border rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
+            <span className="text-sm text-text-primary font-medium">{selectedIds.size} selected</span>
+            <button
+              onClick={handleBulkDelete}
+              disabled={bulkDeleting}
+              className="px-3 py-1.5 text-xs font-medium rounded-full bg-destructive text-white disabled:opacity-50"
+            >
+              {bulkDeleting ? 'Deleting...' : 'Delete'}
+            </button>
+          </div>
         </div>
       )}
     </div>

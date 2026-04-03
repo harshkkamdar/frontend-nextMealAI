@@ -1,9 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Moon } from 'lucide-react'
+import { ArrowLeft, Moon, Play } from 'lucide-react'
+import { toast } from 'sonner'
 import type { WorkoutPlan, PlanStatus } from '@/types/plans.types'
 import { formatDate } from '@/lib/utils'
+import { PlanChangelog } from '@/components/plans/plan-changelog'
+import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
 
 const STATUS_STYLES: Record<PlanStatus, string> = {
   active: 'bg-[#34C759]/10 text-[#34C759]',
@@ -12,8 +16,10 @@ const STATUS_STYLES: Record<PlanStatus, string> = {
   completed: 'bg-[#3B82F6]/10 text-[#3B82F6]',
 }
 
-function formatDayDate(dateStr: string): string {
+function formatDayDate(dateStr: string | undefined, fallbackIndex?: number): string {
+  if (!dateStr) return fallbackIndex !== undefined ? `Day ${fallbackIndex + 1}` : 'Day'
   const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return fallbackIndex !== undefined ? `Day ${fallbackIndex + 1}` : 'Day'
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
@@ -47,6 +53,19 @@ function formatExerciseDetail(exercise: { sets?: number; reps?: number; weight?:
 
 export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
   const router = useRouter()
+  const [startingIdx, setStartingIdx] = useState<number | null>(null)
+
+  const handleStartWorkout = async (dayIdx: number) => {
+    if (startingIdx !== null) return
+    setStartingIdx(dayIdx)
+    try {
+      const session = await startWorkoutSession({ plan_id: plan.id, plan_day_index: dayIdx })
+      router.push(`/activity/workout/${session.id}`)
+    } catch {
+      toast.error('Failed to start workout')
+      setStartingIdx(null)
+    }
+  }
 
   return (
     <div>
@@ -87,7 +106,7 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
           {plan.content.days.map((day, idx) => (
             <div key={idx} className="bg-surface border border-border rounded-2xl p-4">
               <h3 className="text-sm font-semibold text-text-primary mb-2">
-                {formatDayDate(day.date)}
+                {formatDayDate(day.date, idx)}
               </h3>
 
               {day.is_rest_day ? (
@@ -97,9 +116,9 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
                 </div>
               ) : (
                 <>
-                  <p className="text-base font-semibold text-text-primary mb-3">{day.name}</p>
+                  {day.name && <p className="text-base font-semibold text-text-primary mb-3">{day.name}</p>}
                   {day.exercises && day.exercises.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="space-y-2 mb-3">
                       {day.exercises.map((exercise, eIdx) => {
                         const detail = formatExerciseDetail(exercise)
                         return (
@@ -120,6 +139,14 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
                       })}
                     </div>
                   )}
+                  <button
+                    onClick={() => handleStartWorkout(idx)}
+                    disabled={startingIdx !== null}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-gradient-to-r from-accent to-accent-hover text-white disabled:opacity-50 transition-opacity"
+                  >
+                    <Play className="w-3 h-3 fill-white" />
+                    {startingIdx === idx ? 'Starting...' : 'Start Workout'}
+                  </button>
                 </>
               )}
             </div>
@@ -130,6 +157,8 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
           No workout days configured yet
         </p>
       )}
+
+      <PlanChangelog planId={plan.id} />
     </div>
   )
 }

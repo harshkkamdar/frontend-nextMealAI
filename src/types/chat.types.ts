@@ -33,4 +33,5 @@ export interface ChatResponse {
 export interface SendMessageInput {
   message: string
   session_id?: string
+  image?: string // base64 encoded image
 }

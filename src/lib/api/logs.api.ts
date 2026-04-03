@@ -23,3 +23,7 @@ export async function createLog(data: CreateLogInput): Promise<Log> {
 export async function deleteLog(id: string): Promise<void> {
   await apiFetch(`/v1/logs/${id}`, { method: 'DELETE' })
 }
+
+export async function bulkDeleteLogs(ids: string[]): Promise<{ deleted: number }> {
+  return apiFetch<{ deleted: number }>('/v1/logs/bulk-delete', { method: 'POST', body: { ids } })
+}

@@ -34,3 +34,31 @@
     @apply bg-background text-text-primary font-sans antialiased;
   }
 }
+
+.dark {
+  --color-background: #0F0F0F;
+  --color-surface: #1A1A1A;
+  --color-surface-hover: #242424;
+  --color-border: #2E2E2E;
+  --color-accent: #E8663C;
+  --color-accent-hover: #F0885E;
+  --color-accent-light: #2A1810;
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #A0A0A0;
+  --color-text-tertiary: #666666;
+  --color-success: #34C759;
+  --color-info: #5B9CF6;
+  --color-warning: #FFB84D;
+  --color-purple: #C084FC;
+  --color-destructive: #FF6B6B;
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

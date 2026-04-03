@@ -6,14 +6,15 @@ import { Plus } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { SessionList } from '@/components/chat/session-list'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
-import { getChatSessions, sendMessage } from '@/lib/api/chat.api'
+import { getChatSessions } from '@/lib/api/chat.api'
+import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import type { ChatSession } from '@/types/chat.types'
 
 export default function ChatListPage() {
+  useSetGeoScreen('chat_list', {})
   const router = useRouter()
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [loading, setLoading] = useState(true)
-  const [creating, setCreating] = useState(false)
 
   useEffect(() => {
     getChatSessions()
@@ -21,18 +22,9 @@ export default function ChatListPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleNewChat = async () => {
-    if (creating) return
-    setCreating(true)
-    try {
-      const res = await sendMessage({ message: 'Hi!' })
-      router.push(`/chat/${res.session_id}`)
-    } catch {
-      const { toast } = await import('sonner')
-      toast.error('Failed to start new chat')
-    } finally {
-      setCreating(false)
-    }
+  const handleNewChat = () => {
+    const newSessionId = crypto.randomUUID()
+    router.push(`/chat/${newSessionId}`)
   }
 
   const handleSelect = (sessionId: string) => {
@@ -45,8 +37,7 @@ export default function ChatListPage() {
         <h1 className="text-[22px] font-semibold text-text-primary">Chats</h1>
         <button
           onClick={handleNewChat}
-          disabled={creating}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-gradient-to-r from-accent to-accent-hover text-white disabled:opacity-50 transition-opacity"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-gradient-to-r from-accent to-accent-hover text-white transition-opacity"
         >
           <Plus className="w-3.5 h-3.5" />
           New Chat

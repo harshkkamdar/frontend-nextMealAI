@@ -49,6 +49,9 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/chat') ||
     pathname.startsWith('/settings') ||
     pathname.startsWith('/plans') ||
+    pathname.startsWith('/activity') ||
+    pathname.startsWith('/diary') ||
+    pathname.startsWith('/foods') ||
     pathname.startsWith('/logs')
   ) {
     const onboardingCookie = request.cookies.get('nextmealai-onboarded')?.value
@@ -64,9 +67,9 @@ export async function proxy(request: NextRequest) {
           if (!(data.personal?.complete && data.fitness?.complete && data.nutrition?.complete)) {
             return NextResponse.redirect(new URL('/onboarding/personal', request.url))
           }
-          // Cache onboarding status for 5 minutes
+          // Cache onboarding status for 24 hours
           const res = NextResponse.next()
-          res.cookies.set('nextmealai-onboarded', 'true', { path: '/', maxAge: 300 })
+          res.cookies.set('nextmealai-onboarded', 'true', { path: '/', maxAge: 86400 })
           return res
         }
       } catch {

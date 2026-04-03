@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import type { MealPlan, PlanStatus } from '@/types/plans.types'
 import { formatDate } from '@/lib/utils'
+import { PlanChangelog } from '@/components/plans/plan-changelog'
 
 const STATUS_STYLES: Record<PlanStatus, string> = {
   active: 'bg-[#34C759]/10 text-[#34C759]',
@@ -12,8 +13,10 @@ const STATUS_STYLES: Record<PlanStatus, string> = {
   completed: 'bg-[#3B82F6]/10 text-[#3B82F6]',
 }
 
-function formatDayDate(dateStr: string): string {
+function formatDayDate(dateStr: string | undefined, fallbackIndex?: number): string {
+  if (!dateStr) return fallbackIndex !== undefined ? `Day ${fallbackIndex + 1}` : 'Day'
   const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return fallbackIndex !== undefined ? `Day ${fallbackIndex + 1}` : 'Day'
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
@@ -88,7 +91,7 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
           {plan.content.days.map((day, idx) => (
             <div key={idx} className="bg-surface border border-border rounded-2xl p-4">
               <h3 className="text-sm font-semibold text-text-primary mb-3">
-                {formatDayDate(day.date)}
+                {formatDayDate(day.date, idx)}
               </h3>
 
               {/* Meals */}
@@ -102,10 +105,10 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
                     {(meal.calories != null || meal.protein != null) && (
                       <p className="text-xs text-text-secondary mt-0.5">
                         {[
-                          meal.calories != null ? `${meal.calories} kcal` : null,
-                          meal.protein != null ? `${meal.protein}g P` : null,
-                          meal.carbs != null ? `${meal.carbs}g C` : null,
-                          meal.fat != null ? `${meal.fat}g F` : null,
+                          meal.calories != null ? `${meal.calories ?? 0} kcal` : null,
+                          meal.protein != null ? `${meal.protein ?? 0}g P` : null,
+                          meal.carbs != null ? `${meal.carbs ?? 0}g C` : null,
+                          meal.fat != null ? `${meal.fat ?? 0}g F` : null,
                         ]
                           .filter(Boolean)
                           .join(' / ')}
@@ -126,7 +129,7 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
                       <p className="text-sm font-medium text-text-primary">{snack.name}</p>
                       {snack.calories != null && (
                         <p className="text-xs text-text-secondary mt-0.5">
-                          {snack.calories} kcal
+                          {snack.calories ?? 0} kcal
                         </p>
                       )}
                     </div>
@@ -139,6 +142,8 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
       ) : (
         <p className="text-sm text-text-tertiary text-center py-8">No meal days configured yet</p>
       )}
+
+      <PlanChangelog planId={plan.id} />
     </div>
   )
 }

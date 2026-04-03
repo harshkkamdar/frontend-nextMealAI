@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 
-export function ChatHeader({ sessionId }: { sessionId?: string }) {
+export function ChatHeader({ sessionId, title }: { sessionId?: string; title?: string }) {
   const router = useRouter()
 
   return (
@@ -18,9 +18,9 @@ export function ChatHeader({ sessionId }: { sessionId?: string }) {
           <ArrowLeft className="w-5 h-5 text-text-primary" />
         </button>
         <GeoAvatar state="default" size={36} />
-        <div className="flex flex-col">
-          <span className="text-base font-semibold text-text-primary leading-tight">
-            Geo
+        <div className="flex flex-col min-w-0">
+          <span className="text-base font-semibold text-text-primary leading-tight truncate">
+            {title ?? 'Geo'}
           </span>
           <div className="flex items-center gap-1">
             <div className="w-1.5 h-1.5 rounded-full bg-success" />

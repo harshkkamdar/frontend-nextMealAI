@@ -2,45 +2,53 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, MessageCircle, Plus, CalendarDays, MoreHorizontal } from 'lucide-react'
+import { House, BookOpen, Dumbbell, MoreHorizontal } from 'lucide-react'
 import { useUIStore } from '@/stores/ui.store'
+import { GeoAvatar } from '@/components/shared/geo-avatar'
 
 const navItems = [
-  { icon: Home, label: 'Home', href: '/dashboard' },
-  { icon: MessageCircle, label: 'Chat', href: '/chat' },
-  { type: 'fab' as const },
-  { icon: CalendarDays, label: 'Plans', href: '/plans' },
+  { icon: House, label: 'Home', href: '/dashboard' },
+  { icon: BookOpen, label: 'Diary', href: '/diary' },
+  { type: 'geo' as const },
+  { icon: Dumbbell, label: 'Activity', href: '/activity' },
   { icon: MoreHorizontal, label: 'More', href: '/settings' },
 ] as const
 
 export function BottomNav() {
   const pathname = usePathname()
 
-  // Hide on active chat view (e.g. /chat/abc123)
-  if (pathname.match(/^\/chat\/.+/)) return null
+  // Hide on active chat and workout follow screens
+  if (pathname.match(/^\/chat\/.+/) || pathname.match(/^\/activity\/workout\/.+/)) return null
 
-  const handleFabClick = () => {
-    useUIStore.getState().openSheet('quick-log')
+  const handleGeoTap = () => {
+    useUIStore.getState().openSheet('geo-companion')
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/92 backdrop-blur-xl border-t border-border">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/92 backdrop-blur-xl border-t border-border">
       <div className="max-w-md mx-auto flex items-end justify-around px-2 pt-2 pb-2">
-        {navItems.map((item, index) => {
-          if ('type' in item && item.type === 'fab') {
+        {navItems.map((item) => {
+          if ('type' in item && item.type === 'geo') {
             return (
               <button
-                key="fab"
-                onClick={handleFabClick}
-                className="-mt-6 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-accent to-accent-hover text-white shadow-lg shadow-accent/30 active:scale-95 transition-transform"
-                aria-label="Quick log"
+                key="geo"
+                onClick={handleGeoTap}
+                className="-mt-6 flex flex-col items-center gap-0.5 active:scale-95 transition-transform"
+                aria-label="Talk to Geo"
               >
-                <Plus className="w-6 h-6" />
+                <div className="relative">
+                  <div className="w-14 h-14 rounded-full bg-accent-light shadow-lg shadow-accent/20 flex items-center justify-center ring-2 ring-background">
+                    <GeoAvatar state="default" size={46} />
+                  </div>
+                </div>
+                <span className="text-[10px] leading-tight text-accent font-medium mt-0.5">
+                  Geo
+                </span>
               </button>
             )
           }
 
-          const navItem = item as { icon: typeof Home; label: string; href: string }
+          const navItem = item as { icon: typeof House; label: string; href: string }
           const Icon = navItem.icon
           const isActive = pathname === navItem.href || pathname.startsWith(navItem.href + '/')
 

@@ -2,6 +2,8 @@ export type GeoPersonality = 'nurturing' | 'drill_sergeant' | 'balanced' | 'data
 export type Theme = 'light' | 'dark' | 'system'
 export type NotificationType = 'daily_summary' | 'meal_reminders' | 'workout_reminders' | 'goal_achievements'
 
+export type RestTimerDuration = 60 | 90 | 120 | 180
+
 export interface Settings {
   id: string
   user_id: string
@@ -15,6 +17,7 @@ export interface Settings {
   language: string
   share_progress: boolean
   analytics_enabled: boolean
+  rest_timer_seconds: RestTimerDuration
   created_at: string
   updated_at: string
 }

@@ -6,6 +6,8 @@ export interface FoodPayload {
   quantity_g?: number
   est_macros?: { calories?: number; protein?: number; carbs?: number; fat?: number }
   meal_type?: string
+  user_food_id?: string
+  servings?: number
   notes?: string
 }
 

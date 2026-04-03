@@ -21,3 +21,18 @@ export async function getChatSession(sessionId: string, params?: { limit?: numbe
 export async function deleteChatSession(sessionId: string): Promise<void> {
   await apiFetch(`/v1/chat/sessions/${sessionId}`, { method: 'DELETE' })
 }
+
+export async function renameChatSession(sessionId: string, title: string): Promise<void> {
+  await apiFetch(`/v1/chat/sessions/${sessionId}`, { method: 'PATCH', body: { title } })
+}
+
+export async function startCompanionSession(screen: string, screenContext: Record<string, unknown> = {}): Promise<{ session_id: string; context_loaded: boolean }> {
+  return apiFetch('/v1/chat/companion', {
+    method: 'POST',
+    body: { screen, screen_context: screenContext }
+  })
+}
+
+export async function extractSessionMemories(sessionId: string): Promise<void> {
+  await apiFetch(`/v1/chat/sessions/${sessionId}/extract-memories`, { method: 'POST' })
+}

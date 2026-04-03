@@ -2,25 +2,30 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { MessageCircle } from 'lucide-react'
+import { MessageCircle, RefreshCw } from 'lucide-react'
+import { toast } from 'sonner'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { PlanOverviewCard } from '@/components/plans/plan-overview-card'
 import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { getPlans } from '@/lib/api/plans.api'
+import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import type { Plan, MealPlan, WorkoutPlan } from '@/types/plans.types'
 
 export default function PlansPage() {
+  useSetGeoScreen('plans', {})
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [plans, setPlans] = useState<Plan[]>([])
 
   const fetchPlans = useCallback(async () => {
+    setLoading(true)
     try {
       const data = await getPlans({ active_only: true })
       setPlans(data)
-    } catch {
+    } catch (err: any) {
       setPlans([])
+      toast.error(err?.message || 'Failed to load plans')
     } finally {
       setLoading(false)
     }
@@ -30,12 +35,31 @@ export default function PlansPage() {
     fetchPlans()
   }, [fetchPlans])
 
+  // Re-fetch when returning to this page from another tab/page
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (!document.hidden) fetchPlans()
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [fetchPlans])
+
   const mealPlan = (plans.find((p) => p.type === 'meal') as MealPlan) ?? null
   const workoutPlan = (plans.find((p) => p.type === 'workout') as WorkoutPlan) ?? null
 
   return (
     <PageWrapper>
-      <h1 className="text-[22px] font-semibold tracking-tight text-text-primary mb-6">Plans</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary">Plans</h1>
+        <button
+          onClick={fetchPlans}
+          disabled={loading}
+          className="p-2 text-text-secondary hover:text-text-primary transition-colors disabled:opacity-40"
+          aria-label="Refresh plans"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
 
       {loading ? (
         <div className="space-y-4">
