@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { getLogs, bulkDeleteLogs } from '@/lib/api/logs.api'
 import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload } from '@/types/logs.types'
 
 const FILTERS: { label: string; value: LogType | 'all' }[] = [
@@ -106,6 +107,7 @@ export function LogList({ filterType }: LogListProps = {}) {
   const [selectMode, setSelectMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [bulkDeleting, setBulkDeleting] = useState(false)
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false)
 
   // Sync external filterType prop when it changes
   useEffect(() => {
@@ -136,6 +138,7 @@ export function LogList({ filterType }: LogListProps = {}) {
       toast.error('Failed to delete logs')
     } finally {
       setBulkDeleting(false)
+      setShowBulkDeleteConfirm(false)
     }
   }
 
@@ -259,7 +262,7 @@ export function LogList({ filterType }: LogListProps = {}) {
           <div className="bg-surface border border-border rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
             <span className="text-sm text-text-primary font-medium">{selectedIds.size} selected</span>
             <button
-              onClick={handleBulkDelete}
+              onClick={() => setShowBulkDeleteConfirm(true)}
               disabled={bulkDeleting}
               className="px-3 py-1.5 text-xs font-medium rounded-full bg-destructive text-white disabled:opacity-50"
             >
@@ -268,6 +271,17 @@ export function LogList({ filterType }: LogListProps = {}) {
           </div>
         </div>
       )}
+
+      {/* Bulk delete confirmation dialog */}
+      <ConfirmDialog
+        open={showBulkDeleteConfirm}
+        onClose={() => setShowBulkDeleteConfirm(false)}
+        onConfirm={handleBulkDelete}
+        title={`Delete ${selectedIds.size} log${selectedIds.size !== 1 ? 's' : ''}?`}
+        description="This action cannot be undone. The selected logs will be permanently removed."
+        confirmLabel="Delete"
+        variant="danger"
+      />
     </div>
   )
 }

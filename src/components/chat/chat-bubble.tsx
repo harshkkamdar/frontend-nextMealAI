@@ -93,10 +93,22 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
     : null
 
   if (isUser) {
+    // Strip "[Photo attached]" from content (legacy messages stored it in text)
+    const displayContent = message.content.replace(/\s*\[Photo attached\]\s*/g, '').trim()
+
     return (
       <div className="flex flex-col items-end max-w-[85%] ml-auto">
         <div className="bg-gradient-to-r from-accent to-accent-hover text-white rounded-2xl rounded-br-sm px-4 py-2.5">
-          <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+          {message.image && (
+            <img
+              src={message.image}
+              alt="Uploaded food"
+              className="rounded-xl max-w-[200px] max-h-[200px] object-cover mb-2"
+            />
+          )}
+          {displayContent && (
+            <p className="text-sm whitespace-pre-wrap break-words">{displayContent}</p>
+          )}
         </div>
         {formattedTime && (
           <span className="text-[10px] text-text-tertiary mt-1 mr-1">

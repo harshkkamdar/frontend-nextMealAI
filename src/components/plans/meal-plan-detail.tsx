@@ -47,7 +47,7 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
       </div>
 
       {/* Status + date range */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-6">
         <span
           className={`text-[10px] font-medium px-2 py-0.5 rounded-full capitalize ${STATUS_STYLES[plan.status]}`}
         >
@@ -60,34 +60,42 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
 
       {/* Daily targets */}
       {targets && (
-        <div className="grid grid-cols-4 gap-2 mb-6">
-          <div className="bg-surface border border-border rounded-xl p-3 text-center">
-            <p className="text-lg font-semibold text-text-primary">{targets.calories}</p>
-            <p className="text-[10px] text-text-tertiary mt-0.5">kcal</p>
+        <div className="mb-8">
+          {/* Calories — hero number */}
+          <div className="bg-surface border border-border rounded-2xl p-6 text-center mb-4">
+            <p className="text-4xl font-bold text-accent">{targets.calories}</p>
+            <p className="text-xs text-text-tertiary mt-1 uppercase tracking-wider">kcal / day</p>
           </div>
-          <div className="bg-surface border border-border rounded-xl p-3 text-center">
-            <p className="text-lg font-semibold text-text-primary">{targets.protein}g</p>
-            <p className="text-[10px] text-text-tertiary mt-0.5">protein</p>
-          </div>
-          <div className="bg-surface border border-border rounded-xl p-3 text-center">
-            <p className="text-lg font-semibold text-text-primary">{targets.carbs}g</p>
-            <p className="text-[10px] text-text-tertiary mt-0.5">carbs</p>
-          </div>
-          <div className="bg-surface border border-border rounded-xl p-3 text-center">
-            <p className="text-lg font-semibold text-text-primary">{targets.fat}g</p>
-            <p className="text-[10px] text-text-tertiary mt-0.5">fat</p>
+
+          {/* Macros row */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-surface border border-border rounded-2xl p-5 text-center">
+              <p className="text-2xl font-semibold text-text-primary">{targets.protein}g</p>
+              <p className="text-xs text-text-tertiary mt-1">protein</p>
+            </div>
+            <div className="bg-surface border border-border rounded-2xl p-5 text-center">
+              <p className="text-2xl font-semibold text-text-primary">{targets.carbs}g</p>
+              <p className="text-xs text-text-tertiary mt-1">carbs</p>
+            </div>
+            <div className="bg-surface border border-border rounded-2xl p-5 text-center">
+              <p className="text-2xl font-semibold text-text-primary">{targets.fat}g</p>
+              <p className="text-xs text-text-tertiary mt-1">fat</p>
+            </div>
           </div>
         </div>
       )}
 
       {/* Notes */}
       {plan.content.notes && (
-        <p className="text-xs text-text-secondary mb-6 italic">{plan.content.notes}</p>
+        <div className="bg-surface border border-border rounded-2xl p-5 mb-8">
+          <p className="text-[10px] font-medium text-text-tertiary uppercase tracking-wider mb-2">Notes</p>
+          <p className="text-sm leading-relaxed text-text-secondary">{plan.content.notes}</p>
+        </div>
       )}
 
-      {/* Day-by-day */}
-      {plan.content.days && plan.content.days.length > 0 ? (
-        <div className="space-y-3">
+      {/* Day-by-day (only shown when meal days exist) */}
+      {plan.content.days && plan.content.days.length > 0 && (
+        <div className="space-y-3 mb-8">
           {plan.content.days.map((day, idx) => (
             <div key={idx} className="bg-surface border border-border rounded-2xl p-4">
               <h3 className="text-sm font-semibold text-text-primary mb-3">
@@ -139,8 +147,6 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
             </div>
           ))}
         </div>
-      ) : (
-        <p className="text-sm text-text-tertiary text-center py-8">No meal days configured yet</p>
       )}
 
       <PlanChangelog planId={plan.id} />

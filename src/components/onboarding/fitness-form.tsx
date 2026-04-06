@@ -11,7 +11,7 @@ import { GeoCommentary } from '@/components/onboarding/geo-commentary'
 import { MultiChip } from '@/components/onboarding/multi-chip'
 import { submitFitnessOnboarding } from '@/lib/api/profile.api'
 import { cn } from '@/lib/utils'
-import type { ActivityLevel, PrimaryGoal } from '@/types/profile.types'
+import type { ActivityLevel, ExperienceLevel, PrimaryGoal } from '@/types/profile.types'
 
 const EQUIPMENT_OPTIONS = [
   'Dumbbells',
@@ -26,9 +26,16 @@ const EQUIPMENT_OPTIONS = [
 
 const ACTIVITY_LEVELS: { label: string; value: ActivityLevel }[] = [
   { label: 'Sedentary', value: 'sedentary' },
-  { label: 'Lightly Active', value: 'lightly_active' },
-  { label: 'Moderately Active', value: 'moderately_active' },
+  { label: 'Light', value: 'light' },
+  { label: 'Moderate', value: 'moderate' },
+  { label: 'Active', value: 'active' },
   { label: 'Very Active', value: 'very_active' },
+]
+
+const EXPERIENCE_LEVELS: { label: string; value: ExperienceLevel }[] = [
+  { label: 'Beginner', value: 'beginner' },
+  { label: 'Intermediate', value: 'intermediate' },
+  { label: 'Advanced', value: 'advanced' },
 ]
 
 const GOALS: { label: string; value: PrimaryGoal }[] = [
@@ -45,6 +52,7 @@ export function FitnessForm() {
   const [equipment, setEquipment] = useState<string[]>([])
   const [injuries, setInjuries] = useState<string[]>([])
   const [injuryInput, setInjuryInput] = useState('')
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | null>(null)
   const [activityLevel, setActivityLevel] = useState<ActivityLevel | null>(null)
   const [workoutFrequency, setWorkoutFrequency] = useState<number>(3)
   const [primaryGoal, setPrimaryGoal] = useState<PrimaryGoal | null>(null)
@@ -78,6 +86,7 @@ export function FitnessForm() {
       await submitFitnessOnboarding({
         equipment,
         injuries,
+        ...(experienceLevel ? { experience_level: experienceLevel } : {}),
         activity_level: activityLevel,
         workout_frequency: workoutFrequency,
         primary_goal: primaryGoal,
@@ -160,6 +169,27 @@ export function FitnessForm() {
                 className={cn(
                   'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
                   activityLevel === level.value
+                    ? 'bg-accent border-accent text-white'
+                    : 'bg-surface border-border text-text-primary hover:bg-surface-hover'
+                )}
+              >
+                {level.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Experience level</Label>
+          <div className="flex flex-wrap gap-2">
+            {EXPERIENCE_LEVELS.map((level) => (
+              <button
+                key={level.value}
+                type="button"
+                onClick={() => setExperienceLevel(level.value)}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
+                  experienceLevel === level.value
                     ? 'bg-accent border-accent text-white'
                     : 'bg-surface border-border text-text-primary hover:bg-surface-hover'
                 )}

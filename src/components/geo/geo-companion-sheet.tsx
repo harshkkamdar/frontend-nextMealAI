@@ -82,8 +82,9 @@ export function GeoCompanionSheet() {
     const userMsg: ChatMessage = {
       id: `temp-${Date.now()}`,
       role: 'user',
-      content: image ? `${message} [Photo attached]` : message,
+      content: message,
       timestamp: new Date().toISOString(),
+      image: image ? `data:image/jpeg;base64,${image}` : undefined,
     }
 
     setMessages((prev) => [...prev, userMsg])

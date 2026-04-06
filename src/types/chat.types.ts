@@ -6,6 +6,7 @@ export interface ChatMessage {
   content: string
   timestamp?: string
   tokens_used?: number
+  image?: string // data URL or blob URL for local display
 }
 
 export interface ChatSession {

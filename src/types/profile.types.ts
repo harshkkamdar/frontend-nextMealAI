@@ -1,6 +1,7 @@
 export type Sex = 'male' | 'female' | 'other'
 export type ActivityLevel = 'sedentary' | 'light' | 'lightly_active' | 'moderate' | 'moderately_active' | 'active' | 'very_active'
 export type PrimaryGoal = 'fat_loss' | 'muscle_gain' | 'maintenance' | 'body_recomposition' | 'improve_health' | 'athletic_performance'
+export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced'
 export type DietaryStyle = 'omnivore' | 'vegetarian' | 'vegan' | 'pescatarian' | 'keto' | 'paleo' | 'halal' | 'kosher'
 
 export interface Profile {
@@ -15,6 +16,7 @@ export interface Profile {
   activity_level?: ActivityLevel
   primary_goal?: PrimaryGoal
   dietary_style?: DietaryStyle
+  experience_level?: ExperienceLevel
   equipment?: string[]
   injuries?: string[]
   allergies?: string[]
@@ -43,11 +45,13 @@ export interface PersonalOnboardingInput {
   name: string
   dob: string
   sex: Sex
+  height_cm: number
 }
 
 export interface FitnessOnboardingInput {
   equipment: string[]
   injuries: string[]
+  experience_level?: ExperienceLevel
   activity_level: ActivityLevel
   workout_frequency: number
   primary_goal: PrimaryGoal

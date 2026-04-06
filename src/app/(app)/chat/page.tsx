@@ -31,6 +31,10 @@ export default function ChatListPage() {
     router.push(`/chat/${sessionId}`)
   }
 
+  const handleDelete = (sessionId: string) => {
+    setSessions((prev) => prev.filter((s) => s.session_id !== sessionId && s.id !== sessionId))
+  }
+
   return (
     <PageWrapper>
       <div className="flex items-center justify-between mb-4">
@@ -51,7 +55,7 @@ export default function ChatListPage() {
           <CardSkeleton />
         </div>
       ) : (
-        <SessionList sessions={sessions} onSelect={handleSelect} />
+        <SessionList sessions={sessions} onSelect={handleSelect} onDelete={handleDelete} />
       )}
     </PageWrapper>
   )

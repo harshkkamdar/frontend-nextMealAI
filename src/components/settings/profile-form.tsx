@@ -147,6 +147,8 @@ export function ProfileForm() {
             <Label className="text-text-secondary text-xs mb-1">Weight (kg)</Label>
             <Input
               type="number"
+              inputMode="decimal"
+              step="0.1"
               value={currentWeight}
               onChange={(e) => setCurrentWeight(e.target.value)}
               placeholder="75"
@@ -156,6 +158,8 @@ export function ProfileForm() {
             <Label className="text-text-secondary text-xs mb-1">Target (kg)</Label>
             <Input
               type="number"
+              inputMode="decimal"
+              step="0.1"
               value={targetWeight}
               onChange={(e) => setTargetWeight(e.target.value)}
               placeholder="70"

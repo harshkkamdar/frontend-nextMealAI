@@ -227,6 +227,7 @@ export function NutritionForm() {
           <Input
             id="weight-kg"
             type="number"
+            inputMode="decimal"
             min={20}
             max={300}
             step="0.1"
@@ -241,6 +242,7 @@ export function NutritionForm() {
           <Input
             id="target-weight-kg"
             type="number"
+            inputMode="decimal"
             min={20}
             max={300}
             step="0.1"

@@ -31,6 +31,7 @@ export function PersonalForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [sex, setSex] = useState<Sex | null>(null)
+  const [heightCm, setHeightCm] = useState<string>('')
 
   const {
     register,
@@ -50,9 +51,14 @@ export function PersonalForm() {
       return
     }
 
+    if (!heightCm || Number(heightCm) < 100 || Number(heightCm) > 250) {
+      toast.error('Please enter a valid height (100–250 cm)')
+      return
+    }
+
     setIsLoading(true)
     try {
-      await submitPersonalOnboarding({ name: data.name, dob: data.dob, sex })
+      await submitPersonalOnboarding({ name: data.name, dob: data.dob, sex, height_cm: Number(heightCm) })
       toast.success('Step 1 complete')
       router.push('/onboarding/fitness')
     } catch (error) {
@@ -115,6 +121,21 @@ export function PersonalForm() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="height-cm">Height (cm)</Label>
+          <Input
+            id="height-cm"
+            type="number"
+            inputMode="numeric"
+            min={100}
+            max={250}
+            step="1"
+            placeholder="e.g. 175"
+            value={heightCm}
+            onChange={(e) => setHeightCm(e.target.value)}
+          />
         </div>
 
         <Button

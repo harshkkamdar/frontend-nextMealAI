@@ -19,26 +19,32 @@ export async function proxy(request: NextRequest) {
   }
 
   // For onboarding routes: redirect to dashboard if already complete
+  // But always allow generating and review pages through (they run AFTER steps complete)
   if (pathname.startsWith('/onboarding')) {
+    const isPostOnboarding = pathname.startsWith('/onboarding/generating') || pathname.startsWith('/onboarding/review')
+
     const onboardingCookie = request.cookies.get('nextmealai-onboarded')?.value
-    if (onboardingCookie) {
+    if (onboardingCookie && !isPostOnboarding) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_CORE_API_URL}/v1/profile/onboarding`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+
+    if (!isPostOnboarding) {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_CORE_API_URL}/v1/profile/onboarding`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+        if (response.ok) {
+          const data = await response.json()
+          if (data.personal?.complete && data.fitness?.complete && data.nutrition?.complete) {
+            return NextResponse.redirect(new URL('/onboarding/generating', request.url))
+          }
         }
-      )
-      if (response.ok) {
-        const data = await response.json()
-        if (data.personal?.complete && data.fitness?.complete && data.nutrition?.complete) {
-          return NextResponse.redirect(new URL('/dashboard', request.url))
-        }
+      } catch {
+        // If check fails, allow through
       }
-    } catch {
-      // If check fails, allow through
     }
     return NextResponse.next()
   }

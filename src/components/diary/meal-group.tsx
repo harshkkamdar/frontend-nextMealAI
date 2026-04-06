@@ -5,6 +5,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { deleteLog } from '@/lib/api/logs.api'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import type { Log, FoodPayload } from '@/types/logs.types'
 
 interface MealGroupProps {
@@ -16,6 +17,7 @@ interface MealGroupProps {
 
 export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroupProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [confirmDeleteLog, setConfirmDeleteLog] = useState<Log | null>(null)
 
   const subtotalCals = items.reduce((sum, item) => {
     const payload = item.payload as FoodPayload
@@ -37,6 +39,7 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
       toast.error('Failed to remove')
     } finally {
       setDeletingId(null)
+      setConfirmDeleteLog(null)
     }
   }
 
@@ -75,7 +78,7 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
                 </p>
               </div>
               <button
-                onClick={() => handleDelete(item.id)}
+                onClick={() => setConfirmDeleteLog(item)}
                 disabled={deletingId === item.id}
                 className="p-1.5 rounded-full text-text-tertiary hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
                 aria-label="Remove food"
@@ -105,6 +108,25 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
           Add to {mealType}
         </button>
       )}
+
+      {/* Delete confirmation dialog */}
+      <ConfirmDialog
+        open={confirmDeleteLog !== null}
+        onClose={() => setConfirmDeleteLog(null)}
+        onConfirm={() => {
+          if (confirmDeleteLog) {
+            return handleDelete(confirmDeleteLog.id)
+          }
+        }}
+        title="Delete food log?"
+        description={`This will remove ${
+          confirmDeleteLog
+            ? (confirmDeleteLog.payload as FoodPayload).food_name
+            : 'this item'
+        } from your diary.`}
+        confirmLabel="Delete"
+        variant="danger"
+      />
     </div>
   )
 }

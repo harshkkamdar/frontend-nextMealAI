@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { getPersonalFoods, updateFood, deleteUserFood, saveFood } from '@/lib/api/foods.api'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import type { UserFood, FoodMacros } from '@/types/foods.types'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -45,7 +46,7 @@ function FoodCard({
   onToggleFavorite: (id: string, current: boolean) => void
   onDelete: (id: string) => void
 }) {
-  const [confirming, setConfirming] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const macros = food.macros_per_serving
 
   return (
@@ -110,36 +111,27 @@ function FoodCard({
       </div>
 
       {/* Delete */}
-      {confirming ? (
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={() => {
-              onDelete(food.id)
-              setConfirming(false)
-            }}
-            className="text-[11px] font-medium text-red-500 bg-red-50 px-2 py-1 rounded-lg active:scale-95 transition-transform"
-          >
-            Delete
-          </button>
-          <button
-            type="button"
-            onClick={() => setConfirming(false)}
-            className="text-[11px] font-medium text-text-secondary px-1.5 py-1 rounded-lg"
-          >
-            Cancel
-          </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setConfirming(true)}
-          className="mt-0.5 shrink-0 active:scale-90 transition-transform"
-          aria-label="Delete food"
-        >
-          <Trash2 className="w-4 h-4 text-text-tertiary" />
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={() => setShowDeleteConfirm(true)}
+        className="mt-0.5 shrink-0 active:scale-90 transition-transform"
+        aria-label="Delete food"
+      >
+        <Trash2 className="w-4 h-4 text-text-tertiary" />
+      </button>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={async () => {
+          onDelete(food.id)
+          setShowDeleteConfirm(false)
+        }}
+        title="Delete food?"
+        description={`This will permanently remove "${food.name}" from your saved foods.`}
+        confirmLabel="Delete"
+        variant="danger"
+      />
     </motion.div>
   )
 }
