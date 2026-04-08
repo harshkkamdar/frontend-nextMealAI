@@ -13,6 +13,8 @@ interface RestTimerProps {
 export function RestTimer({ isActive, duration, onSkip, onComplete }: RestTimerProps) {
   const [remaining, setRemaining] = useState(duration)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const onCompleteRef = useRef(onComplete)
+  onCompleteRef.current = onComplete
 
   useEffect(() => {
     if (isActive) {
@@ -22,11 +24,10 @@ export function RestTimer({ isActive, duration, onSkip, onComplete }: RestTimerP
         setRemaining((prev) => {
           if (prev <= 1) {
             clearInterval(intervalRef.current!)
-            // Vibrate on completion
             if (typeof navigator !== 'undefined' && navigator.vibrate) {
               navigator.vibrate([200, 100, 200])
             }
-            onComplete()
+            onCompleteRef.current()
             return 0
           }
           return prev - 1
@@ -39,7 +40,7 @@ export function RestTimer({ isActive, duration, onSkip, onComplete }: RestTimerP
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [isActive, duration, onComplete])
+  }, [isActive, duration])
 
   if (!isActive) return null
 

@@ -58,6 +58,11 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
     }
   }, [isOpen])
 
+  // Clean up debounce on unmount
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [])
+
   // Debounced search
   const handleSearch = useCallback((q: string) => {
     setQuery(q)
