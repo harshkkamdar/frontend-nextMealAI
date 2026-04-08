@@ -19,25 +19,15 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [confirmDeleteLog, setConfirmDeleteLog] = useState<Log | null>(null)
 
-  const subtotalCals = items.reduce((sum, item) => {
+  const subtotals = items.reduce((acc, item) => {
     const payload = item.payload as FoodPayload
-    return sum + (payload.est_macros?.calories ?? 0)
-  }, 0)
-
-  const subtotalProtein = items.reduce((sum, item) => {
-    const payload = item.payload as FoodPayload
-    return sum + (payload.est_macros?.protein ?? 0)
-  }, 0)
-
-  const subtotalCarbs = items.reduce((sum, item) => {
-    const payload = item.payload as FoodPayload
-    return sum + (payload.est_macros?.carbs ?? 0)
-  }, 0)
-
-  const subtotalFat = items.reduce((sum, item) => {
-    const payload = item.payload as FoodPayload
-    return sum + (payload.est_macros?.fat ?? 0)
-  }, 0)
+    return {
+      calories: acc.calories + (payload.est_macros?.calories ?? 0),
+      protein: acc.protein + (payload.est_macros?.protein ?? 0),
+      carbs: acc.carbs + (payload.est_macros?.carbs ?? 0),
+      fat: acc.fat + (payload.est_macros?.fat ?? 0),
+    }
+  }, { calories: 0, protein: 0, carbs: 0, fat: 0 })
 
   const handleDelete = async (logId: string) => {
     setDeletingId(logId)
@@ -60,7 +50,7 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
         <span className="text-sm font-semibold text-text-primary">{mealType}</span>
         {items.length > 0 && (
           <span className="text-xs text-text-secondary tabular-nums">
-            {subtotalCals} cal &middot; {Math.round(subtotalProtein)}P &middot; {Math.round(subtotalCarbs)}C &middot; {Math.round(subtotalFat)}F
+            {subtotals.calories} cal &middot; {Math.round(subtotals.protein)}P &middot; {Math.round(subtotals.carbs)}C &middot; {Math.round(subtotals.fat)}F
           </span>
         )}
       </div>

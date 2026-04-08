@@ -139,7 +139,7 @@ export default function ActivityPage() {
           <p className="text-xs text-text-secondary mb-4">Chat with Geo to create a workout plan</p>
           <Button
             onClick={() => useUIStore.getState().openSheet('geo-companion')}
-            className="bg-gradient-to-r from-accent to-accent-hover text-white"
+            className="bg-accent hover:bg-accent-hover text-white"
           >
             <MessageCircle className="w-4 h-4 mr-1" />
             Talk to Geo
@@ -202,7 +202,7 @@ export default function ActivityPage() {
                 <Button
                   onClick={handleStartWorkout}
                   disabled={starting || !!inProgress}
-                  className="w-full bg-gradient-to-r from-accent to-accent-hover text-white"
+                  className="w-full bg-accent hover:bg-accent-hover text-white"
                 >
                   <Play className="w-4 h-4 mr-1 fill-white" />
                   {starting ? 'Starting...' : 'Start Workout'}

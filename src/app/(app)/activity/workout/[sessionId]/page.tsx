@@ -180,7 +180,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
               <p className="text-[10px] text-text-tertiary">kg volume</p>
             </div>
           </div>
-          <Button onClick={() => router.push('/activity')} className="w-full max-w-xs bg-gradient-to-r from-accent to-accent-hover text-white">
+          <Button onClick={() => router.push('/activity')} className="w-full max-w-xs bg-accent hover:bg-accent-hover text-white">
             Done
           </Button>
         </div>
@@ -200,7 +200,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
       {/* Header */}
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3">
         <div className="flex items-center justify-between">
-          <button onClick={handleBack} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-hover">
+          <button onClick={handleBack} aria-label="Go back" className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-hover">
             <ArrowLeft className="w-5 h-5 text-text-primary" />
           </button>
           <div className="text-center">
@@ -210,6 +210,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
           <button
             onClick={handleComplete}
             disabled={completing}
+            aria-label="Complete workout"
             className="w-8 h-8 flex items-center justify-center rounded-full bg-success/10 hover:bg-success/20"
           >
             <Check className="w-4 h-4 text-success" />
@@ -348,6 +349,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
                   {/* Notes */}
                   <textarea
                     placeholder="Notes (form cues, how it felt...)"
+                    aria-label={`Notes for ${exercise.name}`}
                     value={exercise.notes || ''}
                     onChange={(e) => {
                       if (!session) return

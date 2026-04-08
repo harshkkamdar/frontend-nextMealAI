@@ -36,7 +36,7 @@ export function SuggestionCard({
               type="button"
               disabled={loading}
               onClick={() => handleAction('approve')}
-              className="rounded-lg bg-gradient-to-r from-accent to-accent-hover px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+              className="rounded-lg bg-accent hover:bg-accent-hover px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
             >
               Yes, update
             </button>

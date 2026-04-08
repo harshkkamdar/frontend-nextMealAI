@@ -158,7 +158,7 @@ export function FoodLogForm() {
       <Button
         onClick={handleSave}
         disabled={saving}
-        className="w-full bg-gradient-to-r from-accent to-accent-hover text-white mt-6"
+        className="w-full bg-accent hover:bg-accent-hover text-white mt-6"
       >
         {saving ? 'Saving...' : 'Save'}
       </Button>

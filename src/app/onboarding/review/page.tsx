@@ -213,7 +213,7 @@ export default function ReviewPage() {
           <div className="space-y-3 pt-2">
             <Button
               onClick={handleAccept}
-              className="w-full bg-gradient-to-r from-accent to-accent-hover text-white hover:opacity-90"
+              className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
               size="lg"
             >
               Looks good, let&apos;s go!
@@ -242,7 +242,7 @@ export default function ReviewPage() {
           </p>
           <Button
             onClick={handleAccept}
-            className="w-full bg-gradient-to-r from-accent to-accent-hover text-white hover:opacity-90"
+            className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
           >
             Continue to dashboard
           </Button>

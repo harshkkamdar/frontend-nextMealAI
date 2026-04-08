@@ -28,7 +28,7 @@ export function MultiChip({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2" role="group">
       {options.map((option) => {
         const isActive = selected.includes(option)
         return (
@@ -36,6 +36,7 @@ export function MultiChip({
             key={option}
             type="button"
             onClick={() => toggle(option)}
+            aria-pressed={isActive}
             className={cn(
               'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
               isActive

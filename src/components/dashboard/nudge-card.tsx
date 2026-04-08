@@ -34,7 +34,7 @@ export function NudgeCard({ nudge, onAction }: NudgeCardProps) {
           <p className="text-sm text-text-primary">{nudge.message}</p>
           <button
             onClick={() => onAction(nudge)}
-            className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-gradient-to-r from-accent to-accent-hover text-white active:scale-95 transition-transform"
+            className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-accent hover:bg-accent-hover text-white active:scale-95 transition-transform"
           >
             <Icon className="w-3.5 h-3.5" />
             {nudge.cta}

@@ -41,7 +41,7 @@ export default function ChatListPage() {
         <h1 className="text-[22px] font-semibold text-text-primary">Chats</h1>
         <button
           onClick={handleNewChat}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-gradient-to-r from-accent to-accent-hover text-white transition-opacity"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-accent hover:bg-accent-hover text-white transition-opacity"
         >
           <Plus className="w-3.5 h-3.5" />
           New Chat

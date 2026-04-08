@@ -90,7 +90,7 @@ export function LoginForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-accent to-accent-hover text-white hover:opacity-90"
+          className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
         </Button>

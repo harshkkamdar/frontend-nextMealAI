@@ -142,7 +142,7 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
                   <button
                     onClick={() => handleStartWorkout(idx)}
                     disabled={startingIdx !== null}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-gradient-to-r from-accent to-accent-hover text-white disabled:opacity-50 transition-opacity"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-accent hover:bg-accent-hover text-white disabled:opacity-50 transition-opacity"
                   >
                     <Play className="w-3 h-3 fill-white" />
                     {startingIdx === idx ? 'Starting...' : 'Start Workout'}

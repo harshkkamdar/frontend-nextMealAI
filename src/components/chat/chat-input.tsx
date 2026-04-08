@@ -99,6 +99,7 @@ export function ChatInput({
           />
           <button
             onClick={clearImage}
+            aria-label="Remove attached image"
             className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-text-primary text-background flex items-center justify-center"
           >
             <X className="w-3 h-3" />
@@ -114,7 +115,7 @@ export function ChatInput({
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
               className="p-1 mb-0.5 text-text-tertiary hover:text-accent transition-colors disabled:opacity-50 shrink-0"
-              aria-label="Take or attach a photo for Geo to analyze"
+              aria-label="Attach photo"
             >
               <Camera className="w-5 h-5" />
             </button>
@@ -136,12 +137,13 @@ export function ChatInput({
           placeholder="Message Geo..."
           disabled={disabled}
           rows={1}
+          aria-label="Type a message"
           className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-tertiary outline-none disabled:opacity-50 resize-none py-1 leading-5"
         />
         <button
           onClick={handleSend}
           disabled={disabled || (!value.trim() && !imageBase64)}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-accent to-accent-hover text-white disabled:opacity-40 transition-opacity shrink-0 mb-0.5"
+          className="flex items-center justify-center w-8 h-8 rounded-full bg-accent hover:bg-accent-hover text-white disabled:opacity-40 transition-opacity shrink-0 mb-0.5"
           aria-label="Send message"
         >
           <ArrowUp className="w-4 h-4" />

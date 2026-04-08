@@ -306,7 +306,7 @@ export function ProfileForm() {
         type="button"
         onClick={handleSave}
         disabled={saving}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-accent to-accent-hover py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
       >
         {saving && <Loader2 className="w-4 h-4 animate-spin" />}
         {saving ? 'Saving...' : 'Save changes'}

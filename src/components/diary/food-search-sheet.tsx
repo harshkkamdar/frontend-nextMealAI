@@ -211,6 +211,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="food-sheet-title"
             className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl flex flex-col"
             style={{ maxHeight: '85vh' }}
             onClick={(e) => e.stopPropagation()}
@@ -222,10 +225,10 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
 
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
-              <h2 className="text-base font-semibold text-text-primary">
+              <h2 id="food-sheet-title" className="text-base font-semibold text-text-primary">
                 Add to {mealType}
               </h2>
-              <button onClick={onClose} className="p-1.5 rounded-full hover:bg-surface-hover">
+              <button onClick={onClose} aria-label="Close" className="p-1.5 rounded-full hover:bg-surface-hover">
                 <X className="w-4 h-4 text-text-secondary" />
               </button>
             </div>
@@ -283,6 +286,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setServings(Math.max(0.25, servings - 0.25))}
+                        aria-label="Decrease servings"
                         className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
                       >
                         <Minus className="w-4 h-4" />
@@ -292,6 +296,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                       </span>
                       <button
                         onClick={() => setServings(servings + 0.25)}
+                        aria-label="Increase servings"
                         className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
                       >
                         <Plus className="w-4 h-4" />
@@ -301,6 +306,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setGrams(Math.max(1, grams - 10))}
+                        aria-label="Decrease grams"
                         className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
                       >
                         <Minus className="w-4 h-4" />
@@ -310,12 +316,14 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                           type="number"
                           value={grams}
                           onChange={(e) => setGrams(Math.max(1, Number(e.target.value) || 1))}
+                          aria-label="Grams"
                           className="w-20 text-xl font-semibold text-text-primary tabular-nums text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                         <span className="text-sm text-text-tertiary">g</span>
                       </div>
                       <button
                         onClick={() => setGrams(grams + 10)}
+                        aria-label="Increase grams"
                         className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
                       >
                         <Plus className="w-4 h-4" />
@@ -352,7 +360,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                 <Button
                   onClick={handleConfirmLog}
                   disabled={saving}
-                  className="w-full bg-gradient-to-r from-accent to-accent-hover text-white"
+                  className="w-full bg-accent hover:bg-accent-hover text-white"
                 >
                   {saving ? 'Logging...' : 'Log Food'}
                 </Button>
@@ -428,7 +436,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                       <p className="text-sm text-text-secondary mb-3">No results found</p>
                       <button
                         onClick={() => { setShowCustomForm(true); setCustomName(query) }}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-full bg-gradient-to-r from-accent to-accent-hover text-white"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-full bg-accent hover:bg-accent-hover text-white"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Add &ldquo;{query}&rdquo; as custom food
@@ -522,7 +530,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                 <Button
                   onClick={handleSaveCustomFood}
                   disabled={saving || !customName.trim()}
-                  className="w-full bg-gradient-to-r from-accent to-accent-hover text-white mt-4"
+                  className="w-full bg-accent hover:bg-accent-hover text-white mt-4"
                 >
                   {saving ? 'Saving...' : 'Save & Log'}
                 </Button>

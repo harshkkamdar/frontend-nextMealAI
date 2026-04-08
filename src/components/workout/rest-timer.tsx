@@ -54,12 +54,13 @@ export function RestTimer({ isActive, duration, onSkip, onComplete }: RestTimerP
         <div className="flex items-center gap-2">
           <Timer className="w-4 h-4 text-accent" />
           <span className="text-xs font-medium text-text-secondary">Rest</span>
-          <span className="text-base font-semibold text-text-primary tabular-nums">
+          <span className="text-base font-semibold text-text-primary tabular-nums" aria-live="polite">
             {minutes}:{seconds.toString().padStart(2, '0')}
           </span>
         </div>
         <button
           onClick={onSkip}
+          aria-label="Skip rest timer"
           className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-text-secondary hover:text-text-primary rounded-full bg-surface border border-border transition-colors"
         >
           Skip

@@ -80,7 +80,7 @@ export function NextUpCard({
         </p>
         <Link
           href="/logs/new/food"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-accent to-accent-hover px-4 py-2 text-sm font-medium text-white"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
         >
           <Check className="w-4 h-4" />
           Log a meal
@@ -105,7 +105,7 @@ export function NextUpCard({
       <div className="flex items-center gap-2">
         <Link
           href="/logs/new/food"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-accent to-accent-hover px-4 py-2 text-sm font-medium text-white"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
         >
           <Check className="w-4 h-4" />
           Log it

@@ -61,7 +61,7 @@ function WaterSheet({ onDone }: { onDone: () => void }) {
         </button>
       </div>
       <button onClick={handle} disabled={saving}
-        className="w-full rounded-xl bg-gradient-to-r from-accent to-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
+        className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
         {saving ? 'Saving…' : 'Save'}
       </button>
     </div>
@@ -96,7 +96,7 @@ function RatingSheet({ title, color, onDone, type }: { title: string; color: str
         ))}
       </div>
       <button onClick={handle} disabled={saving}
-        className="w-full rounded-xl bg-gradient-to-r from-accent to-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
+        className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
         {saving ? 'Saving…' : 'Save'}
       </button>
     </div>
@@ -138,7 +138,7 @@ function SleepSheet({ onDone }: { onDone: () => void }) {
         </div>
       </div>
       <button onClick={handle} disabled={saving}
-        className="w-full rounded-xl bg-gradient-to-r from-accent to-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
+        className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
         {saving ? 'Saving…' : 'Save'}
       </button>
     </div>
@@ -171,7 +171,7 @@ function WeightSheet({ currentWeight, onDone }: { currentWeight?: number; onDone
         <span className="text-lg text-text-secondary font-medium">kg</span>
       </div>
       <button onClick={handle} disabled={saving}
-        className="w-full rounded-xl bg-gradient-to-r from-accent to-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
+        className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
         {saving ? 'Saving…' : 'Save'}
       </button>
     </div>
