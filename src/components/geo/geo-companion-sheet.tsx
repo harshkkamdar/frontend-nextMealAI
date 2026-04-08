@@ -114,9 +114,12 @@ export function GeoCompanionSheet() {
   }
 
   const handleOpenFullChat = () => {
-    handleClose()
-    if (sessionId) {
-      router.push(`/chat/${sessionId}`)
+    // Navigate first without closing — let any in-flight API call finish
+    // The full chat page will re-fetch messages from the server
+    const targetSessionId = sessionId
+    closeSheet() // close sheet UI without extracting memories mid-conversation
+    if (targetSessionId) {
+      router.push(`/chat/${targetSessionId}?t=${Date.now()}`)
     } else {
       router.push('/chat')
     }

@@ -3,7 +3,6 @@
 import { use, useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Check, ChevronDown, MessageCircle } from 'lucide-react'
-import { AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { RestTimer } from '@/components/workout/rest-timer'
@@ -22,7 +21,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
   const router = useRouter()
   const [session, setSession] = useState<WorkoutSession | null>(null)
   const [loading, setLoading] = useState(true)
-  const [expandedIndex, setExpandedIndex] = useState(0)
+  const [collapsedIndices, setCollapsedIndices] = useState<Set<number>>(new Set())
   const [showRestTimer, setShowRestTimer] = useState(false)
   const [restSeconds, setRestSeconds] = useState(90)
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
@@ -32,16 +31,15 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
 
   useSetGeoScreen('workout_follow', {
     sessionId,
-    currentExercise: session?.exercises?.[expandedIndex]?.name ?? null,
-    exerciseIndex: expandedIndex,
+    currentExercise: null,
+    exerciseIndex: 0,
   })
 
   const loadSession = useCallback((showToast = false) => {
     return getWorkoutSession(sessionId)
       .then((s) => {
         setSession(s)
-        const idx = s.exercises.findIndex((e) => e.status !== 'completed')
-        if (idx >= 0) setExpandedIndex(idx)
+        // All exercises expanded by default — no need to track expanded index
         if (showToast) toast.success('Workout updated!')
       })
       .catch(() => { toast.error('Failed to load workout'); router.back() })
@@ -110,9 +108,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
         updated[exIndex] = { ...updated[exIndex], status: 'completed', sets }
         setSession({ ...session, exercises: updated })
         saveExercises(updated)
-        // Auto-expand next incomplete exercise
-        const next = updated.findIndex((e, i) => i > exIndex && e.status !== 'completed')
-        if (next >= 0) setTimeout(() => setExpandedIndex(next), 500)
+        // All exercises stay expanded — no auto-collapse needed
         return
       }
 
@@ -194,11 +190,12 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
 
   return (
     <div className="h-dvh flex flex-col bg-background">
-      <AnimatePresence>
-        {showRestTimer && (
-          <RestTimer seconds={restSeconds} onDismiss={() => setShowRestTimer(false)} />
-        )}
-      </AnimatePresence>
+      <RestTimer
+        isActive={showRestTimer}
+        duration={restSeconds}
+        onSkip={() => setShowRestTimer(false)}
+        onComplete={() => setShowRestTimer(false)}
+      />
 
       {/* Header */}
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3">
@@ -223,7 +220,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
       {/* Exercise accordion list */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 pb-24">
         {exercises.map((exercise, exIndex) => {
-          const isExpanded = expandedIndex === exIndex
+          const isExpanded = !collapsedIndices.has(exIndex)
           const completedSets = exercise.sets.filter((s) => s.completed).length
           const totalSets = exercise.sets.length
 
@@ -239,7 +236,11 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
             >
               {/* Row header — tap to expand/collapse */}
               <button
-                onClick={() => setExpandedIndex(isExpanded ? -1 : exIndex)}
+                onClick={() => setCollapsedIndices(prev => {
+                  const next = new Set(prev)
+                  next.has(exIndex) ? next.delete(exIndex) : next.add(exIndex)
+                  return next
+                })}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left"
               >
                 <div className={cn(

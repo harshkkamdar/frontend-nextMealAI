@@ -29,6 +29,16 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
     return sum + (payload.est_macros?.protein ?? 0)
   }, 0)
 
+  const subtotalCarbs = items.reduce((sum, item) => {
+    const payload = item.payload as FoodPayload
+    return sum + (payload.est_macros?.carbs ?? 0)
+  }, 0)
+
+  const subtotalFat = items.reduce((sum, item) => {
+    const payload = item.payload as FoodPayload
+    return sum + (payload.est_macros?.fat ?? 0)
+  }, 0)
+
   const handleDelete = async (logId: string) => {
     setDeletingId(logId)
     try {
@@ -50,7 +60,7 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
         <span className="text-sm font-semibold text-text-primary">{mealType}</span>
         {items.length > 0 && (
           <span className="text-xs text-text-secondary tabular-nums">
-            {subtotalCals} cal &middot; {subtotalProtein}g P
+            {subtotalCals} cal &middot; {Math.round(subtotalProtein)}P &middot; {Math.round(subtotalCarbs)}C &middot; {Math.round(subtotalFat)}F
           </span>
         )}
       </div>
@@ -61,6 +71,8 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
           const payload = item.payload as FoodPayload
           const cals = payload.est_macros?.calories ?? 0
           const protein = payload.est_macros?.protein ?? 0
+          const carbsVal = payload.est_macros?.carbs ?? 0
+          const fatVal = payload.est_macros?.fat ?? 0
 
           return (
             <motion.div
@@ -74,7 +86,9 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
                 <p className="text-[11px] text-text-tertiary tabular-nums">
                   {payload.quantity_g ? `${payload.quantity_g}g` : '1 serving'}
                   {cals > 0 && ` · ${cals} cal`}
-                  {protein > 0 && ` · ${protein}g P`}
+                  {protein > 0 && <> · <span className="text-info">{Math.round(protein)}P</span></>}
+                  {carbsVal > 0 && <> · <span className="text-warning">{Math.round(carbsVal)}C</span></>}
+                  {fatVal > 0 && <> · <span className="text-purple-400">{Math.round(fatVal)}F</span></>}
                 </p>
               </div>
               <button

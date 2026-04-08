@@ -11,11 +11,19 @@ export function MultiChip({
   selected: string[]
   onChange: (val: string[]) => void
 }) {
+  const noneValue = options.find((o) => o.toLowerCase() === 'none')
+
   function toggle(option: string) {
     if (selected.includes(option)) {
+      // Deselect
       onChange(selected.filter((s) => s !== option))
+    } else if (noneValue && option.toLowerCase() === 'none') {
+      // Selecting "None" clears everything else
+      onChange([option])
     } else {
-      onChange([...selected, option])
+      // Selecting a real option removes "None" if present
+      const without = noneValue ? selected.filter((s) => s.toLowerCase() !== 'none') : selected
+      onChange([...without, option])
     }
   }
 

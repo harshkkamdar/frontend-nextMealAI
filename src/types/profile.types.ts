@@ -55,6 +55,10 @@ export interface FitnessOnboardingInput {
   activity_level: ActivityLevel
   workout_frequency: number
   primary_goal: PrimaryGoal
+  waist_cm?: number
+  chest_cm?: number
+  hip_cm?: number
+  body_fat_pct?: number
 }
 
 export interface NutritionOnboardingInput {

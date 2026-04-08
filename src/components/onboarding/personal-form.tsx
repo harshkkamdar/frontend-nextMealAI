@@ -131,7 +131,7 @@ export function PersonalForm() {
             inputMode="numeric"
             min={100}
             max={250}
-            step="1"
+            step="any"
             placeholder="e.g. 175"
             value={heightCm}
             onChange={(e) => setHeightCm(e.target.value)}

@@ -56,6 +56,10 @@ export function FitnessForm() {
   const [activityLevel, setActivityLevel] = useState<ActivityLevel | null>(null)
   const [workoutFrequency, setWorkoutFrequency] = useState<number>(3)
   const [primaryGoal, setPrimaryGoal] = useState<PrimaryGoal | null>(null)
+  const [waistCm, setWaistCm] = useState<string>('')
+  const [chestCm, setChestCm] = useState<string>('')
+  const [hipCm, setHipCm] = useState<string>('')
+  const [bodyFatPct, setBodyFatPct] = useState<string>('')
 
   function addInjury() {
     const trimmed = injuryInput.trim()
@@ -90,6 +94,10 @@ export function FitnessForm() {
         activity_level: activityLevel,
         workout_frequency: workoutFrequency,
         primary_goal: primaryGoal,
+        ...(waistCm ? { waist_cm: Number(waistCm) } : {}),
+        ...(chestCm ? { chest_cm: Number(chestCm) } : {}),
+        ...(hipCm ? { hip_cm: Number(hipCm) } : {}),
+        ...(bodyFatPct ? { body_fat_pct: Number(bodyFatPct) } : {}),
       })
       toast.success('Step 2 complete')
       router.push('/onboarding/nutrition')
@@ -230,6 +238,67 @@ export function FitnessForm() {
                 {goal.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Optional body measurements */}
+        <div className="space-y-3 rounded-lg border border-border bg-surface/50 p-4">
+          <div>
+            <Label className="text-base font-semibold">Body Measurements</Label>
+            <p className="text-sm text-text-secondary mt-0.5">
+              Optional — helps Geo make more accurate plans
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="waist-cm">Waist (cm)</Label>
+              <Input
+                id="waist-cm"
+                type="number"
+                min={0}
+                step="0.1"
+                placeholder="e.g. 80"
+                value={waistCm}
+                onChange={(e) => setWaistCm(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="chest-cm">Chest (cm)</Label>
+              <Input
+                id="chest-cm"
+                type="number"
+                min={0}
+                step="0.1"
+                placeholder="e.g. 100"
+                value={chestCm}
+                onChange={(e) => setChestCm(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="hip-cm">Hip (cm)</Label>
+              <Input
+                id="hip-cm"
+                type="number"
+                min={0}
+                step="0.1"
+                placeholder="e.g. 95"
+                value={hipCm}
+                onChange={(e) => setHipCm(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="body-fat-pct">Body fat (%)</Label>
+              <Input
+                id="body-fat-pct"
+                type="number"
+                min={0}
+                max={60}
+                step="0.1"
+                placeholder="e.g. 18"
+                value={bodyFatPct}
+                onChange={(e) => setBodyFatPct(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 

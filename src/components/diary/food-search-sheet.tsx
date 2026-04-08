@@ -25,6 +25,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
   const [searching, setSearching] = useState(false)
   const [selectedFood, setSelectedFood] = useState<FoodSearchResult | null>(null)
   const [servings, setServings] = useState(1)
+  const [inputMode, setInputMode] = useState<'servings' | 'grams'>('servings')
+  const [grams, setGrams] = useState<number>(100)
   const [saving, setSaving] = useState(false)
   const [showCustomForm, setShowCustomForm] = useState(false)
   const [customName, setCustomName] = useState('')
@@ -43,6 +45,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
       setResults([])
       setSelectedFood(null)
       setServings(1)
+      setInputMode('servings')
+      setGrams(100)
       setShowCustomForm(false)
       setCustomName('')
       setCustomCalories('')
@@ -90,15 +94,17 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
   const handleSelectFood = (food: FoodSearchResult) => {
     setSelectedFood(food)
     setServings(1)
+    setGrams(food.serving_size_g || 100)
+    setInputMode('servings')
   }
 
   const handleConfirmLog = async () => {
     if (!selectedFood) return
     setSaving(true)
 
-    const macros = selectedFood.macros_per_serving ?? { calories: 0, protein: 0, carbs: 0, fat: 0 }
-    const multiplier = servings
-    const quantity = Math.round((selectedFood.serving_size_g || 100) * multiplier)
+    const quantity = inputMode === 'servings'
+      ? Math.round((selectedFood.serving_size_g || 100) * servings)
+      : Math.round(grams)
 
     try {
       await createLog({
@@ -106,15 +112,10 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
         payload: {
           food_name: selectedFood.name,
           quantity_g: quantity,
-          est_macros: {
-            calories: Math.round((macros.calories ?? 0) * multiplier),
-            protein: Math.round((macros.protein ?? 0) * multiplier),
-            carbs: Math.round((macros.carbs ?? 0) * multiplier),
-            fat: Math.round((macros.fat ?? 0) * multiplier),
-          },
+          est_macros: calculatedMacros!,
           meal_type: mealType.toLowerCase(),
           user_food_id: selectedFood.id || undefined,
-          servings: multiplier,
+          servings: inputMode === 'servings' ? servings : undefined,
         },
         source: 'manual',
       })
@@ -173,11 +174,17 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
     useUIStore.getState().openSheet('geo-companion')
   }
 
+  const effectiveMultiplier = selectedFood
+    ? inputMode === 'servings'
+      ? servings
+      : grams / (selectedFood.serving_size_g || 100)
+    : 1
+
   const calculatedMacros = selectedFood ? {
-    calories: Math.round((selectedFood.macros_per_serving.calories ?? 0) * servings),
-    protein: Math.round((selectedFood.macros_per_serving.protein ?? 0) * servings),
-    carbs: Math.round((selectedFood.macros_per_serving.carbs ?? 0) * servings),
-    fat: Math.round((selectedFood.macros_per_serving.fat ?? 0) * servings),
+    calories: Math.round((selectedFood.macros_per_serving.calories ?? 0) * effectiveMultiplier),
+    protein: Math.round((selectedFood.macros_per_serving.protein ?? 0) * effectiveMultiplier),
+    carbs: Math.round((selectedFood.macros_per_serving.carbs ?? 0) * effectiveMultiplier),
+    fat: Math.round((selectedFood.macros_per_serving.fat ?? 0) * effectiveMultiplier),
   } : null
 
   return (
@@ -220,6 +227,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
 
             {selectedFood ? (
               /* Confirmation view */
+              <>
               <div className="flex-1 overflow-y-auto px-4 pb-6">
                 <button
                   onClick={() => setSelectedFood(null)}
@@ -238,26 +246,77 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                   </p>
                 </div>
 
-                {/* Servings adjuster */}
+                {/* Input mode toggle */}
                 <div className="mb-4">
-                  <Label className="text-xs text-text-secondary mb-2 block">Servings</Label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex rounded-lg bg-surface border border-border p-0.5 mb-3">
                     <button
-                      onClick={() => setServings(Math.max(0.25, servings - 0.25))}
-                      className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                      onClick={() => setInputMode('servings')}
+                      className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                        inputMode === 'servings'
+                          ? 'bg-accent text-white'
+                          : 'text-text-secondary hover:text-text-primary'
+                      }`}
                     >
-                      <Minus className="w-4 h-4" />
+                      Servings
                     </button>
-                    <span className="text-xl font-semibold text-text-primary tabular-nums min-w-[48px] text-center">
-                      {servings}
-                    </span>
                     <button
-                      onClick={() => setServings(servings + 0.25)}
-                      className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                      onClick={() => {
+                        setInputMode('grams')
+                        setGrams(Math.round((selectedFood?.serving_size_g || 100) * servings))
+                      }}
+                      className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                        inputMode === 'grams'
+                          ? 'bg-accent text-white'
+                          : 'text-text-secondary hover:text-text-primary'
+                      }`}
                     >
-                      <Plus className="w-4 h-4" />
+                      Grams
                     </button>
                   </div>
+
+                  {inputMode === 'servings' ? (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setServings(Math.max(0.25, servings - 0.25))}
+                        className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="text-xl font-semibold text-text-primary tabular-nums min-w-[48px] text-center">
+                        {servings}
+                      </span>
+                      <button
+                        onClick={() => setServings(servings + 0.25)}
+                        className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setGrams(Math.max(1, grams - 10))}
+                        className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          value={grams}
+                          onChange={(e) => setGrams(Math.max(1, Number(e.target.value) || 1))}
+                          className="w-20 text-xl font-semibold text-text-primary tabular-nums text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <span className="text-sm text-text-tertiary">g</span>
+                      </div>
+                      <button
+                        onClick={() => setGrams(grams + 10)}
+                        className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Macro preview */}
@@ -282,6 +341,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                   </div>
                 )}
 
+              </div>
+              {/* Sticky log button */}
+              <div className="px-4 pb-20 pt-2 border-t border-border">
                 <Button
                   onClick={handleConfirmLog}
                   disabled={saving}
@@ -290,6 +352,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                   {saving ? 'Logging...' : 'Log Food'}
                 </Button>
               </div>
+              </>
             ) : (
               /* Search view */
               <>

@@ -234,18 +234,25 @@ export default function ActivityPage() {
             ) : (
               <div className="space-y-3">
                 {selectedDateHistory.map((session) => (
-                  <div key={session.id} className="bg-surface border border-border rounded-xl p-4">
+                  <button
+                    key={session.id}
+                    onClick={() => router.push(`/activity/workout/${session.id}`)}
+                    className="w-full text-left bg-surface border border-border rounded-xl p-4 hover:border-accent/30 transition-colors"
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-semibold text-text-primary">{session.day_name}</p>
-                      <span className="text-xs text-text-tertiary">
-                        {session.duration_minutes}min
-                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-text-tertiary">
+                          {session.duration_minutes}min
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-text-tertiary" />
+                      </div>
                     </div>
                     <div className="flex gap-4 text-xs text-text-secondary">
                       <span>{session.exercises.filter(e => e.status === 'completed').length}/{session.exercises.length} exercises</span>
                       {session.total_volume_kg && <span>{session.total_volume_kg.toLocaleString()} kg volume</span>}
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}

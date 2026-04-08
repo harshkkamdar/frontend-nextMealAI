@@ -1,85 +1,77 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { useEffect, useState, useRef } from 'react'
+import { Timer, X } from 'lucide-react'
 
 interface RestTimerProps {
-  seconds: number
-  onDismiss: () => void
+  isActive: boolean
+  duration: number // seconds
+  onSkip: () => void
+  onComplete: () => void
 }
 
-export function RestTimer({ seconds, onDismiss }: RestTimerProps) {
-  const [remaining, setRemaining] = useState(seconds)
-  const onDismissRef = useRef(onDismiss)
+export function RestTimer({ isActive, duration, onSkip, onComplete }: RestTimerProps) {
+  const [remaining, setRemaining] = useState(duration)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
-    onDismissRef.current = onDismiss
-  }, [onDismiss])
+    if (isActive) {
+      setRemaining(duration)
 
-  useEffect(() => {
-    setRemaining(seconds)
-  }, [seconds])
-
-  useEffect(() => {
-    if (remaining <= 0) {
-      // Vibrate if supported
-      try {
-        if (typeof navigator !== 'undefined' && navigator.vibrate) {
-          navigator.vibrate([100, 50, 100])
-        }
-      } catch {}
-      onDismissRef.current()
-      return
+      intervalRef.current = setInterval(() => {
+        setRemaining((prev) => {
+          if (prev <= 1) {
+            clearInterval(intervalRef.current!)
+            // Vibrate on completion
+            if (typeof navigator !== 'undefined' && navigator.vibrate) {
+              navigator.vibrate([200, 100, 200])
+            }
+            onComplete()
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current)
     }
 
-    const timer = setInterval(() => {
-      setRemaining((prev) => prev - 1)
-    }, 1000)
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [isActive, duration, onComplete])
 
-    return () => clearInterval(timer)
-  }, [remaining])
+  if (!isActive) return null
 
-  const pct = seconds > 0 ? ((seconds - remaining) / seconds) * 100 : 100
-  const circumference = 2 * Math.PI * 54
-  const strokeDashoffset = circumference - (pct / 100) * circumference
+  const progress = remaining / duration
+  const minutes = Math.floor(remaining / 60)
+  const seconds = remaining % 60
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="fixed inset-0 z-40 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center"
-    >
-      <p className="text-sm font-medium text-text-secondary mb-6">Rest</p>
-
-      {/* Circular timer */}
-      <div className="relative w-32 h-32 mb-6">
-        <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="54" fill="none" stroke="var(--color-border)" strokeWidth="6" />
-          <circle
-            cx="60" cy="60" r="54" fill="none"
-            stroke="var(--color-accent)" strokeWidth="6"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            className="transition-[stroke-dashoffset] duration-1000 ease-linear"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-3xl font-semibold text-text-primary tabular-nums">
-            {remaining}
+    <div className="sticky top-0 z-30 bg-bg-secondary border-b border-border">
+      <div className="flex items-center justify-between px-4 py-2.5">
+        <div className="flex items-center gap-2">
+          <Timer className="w-4 h-4 text-accent" />
+          <span className="text-xs font-medium text-text-secondary">Rest</span>
+          <span className="text-base font-semibold text-text-primary tabular-nums">
+            {minutes}:{seconds.toString().padStart(2, '0')}
           </span>
         </div>
+        <button
+          onClick={onSkip}
+          className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-text-secondary hover:text-text-primary rounded-full bg-surface border border-border transition-colors"
+        >
+          Skip
+          <X className="w-3 h-3" />
+        </button>
       </div>
-
-      <button
-        onClick={onDismiss}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-border text-sm text-text-secondary hover:bg-surface-hover transition-colors"
-      >
-        <X className="w-4 h-4" />
-        Skip
-      </button>
-    </motion.div>
+      {/* Progress bar */}
+      <div className="h-0.5 bg-border">
+        <div
+          className="h-full bg-accent transition-all duration-1000 ease-linear"
+          style={{ width: `${progress * 100}%` }}
+        />
+      </div>
+    </div>
   )
 }

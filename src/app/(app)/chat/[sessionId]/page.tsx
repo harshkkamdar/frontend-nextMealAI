@@ -34,14 +34,27 @@ export default function ActiveChatPage({
   useSetGeoScreen('chat', { sessionId })
 
   useEffect(() => {
-    Promise.all([
-      getChatSession(sessionId).catch(() => ({ messages: [] as ChatMessage[] })),
-      getChatSessions().catch(() => []),
-    ]).then(([sessionData, sessions]) => {
-      setMessages(sessionData.messages ?? [])
-      const match = sessions.find((s) => s.session_id === sessionId || s.id === sessionId)
-      if (match?.title) setSessionTitle(match.title)
-    }).finally(() => setLoading(false))
+    let cancelled = false
+    const fetchSession = () =>
+      Promise.all([
+        getChatSession(sessionId).catch(() => ({ messages: [] as ChatMessage[] })),
+        getChatSessions().catch(() => []),
+      ]).then(([sessionData, sessions]) => {
+        if (cancelled) return
+        setMessages(sessionData.messages ?? [])
+        const match = sessions.find((s) => s.session_id === sessionId || s.id === sessionId)
+        if (match?.title) setSessionTitle(match.title)
+      })
+
+    fetchSession().finally(() => { if (!cancelled) setLoading(false) })
+
+    // If coming from companion sheet mid-response, re-fetch after a delay
+    // to pick up the Geo reply that was still in-flight
+    const timer = setTimeout(() => {
+      if (!cancelled) fetchSession()
+    }, 4000)
+
+    return () => { cancelled = true; clearTimeout(timer) }
   }, [sessionId])
 
   const handleSend = async (message: string, image?: string) => {
