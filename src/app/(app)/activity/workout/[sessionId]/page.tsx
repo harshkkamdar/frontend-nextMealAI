@@ -264,6 +264,9 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
                       <span className="text-accent mr-2">{exercise.muscle_group}</span>
                     )}
                     {completedSets}/{totalSets} sets
+                    {exercise.rest_seconds && (
+                      <span className="ml-2 text-text-tertiary">{exercise.rest_seconds >= 60 ? `${Math.floor(exercise.rest_seconds / 60)}m${exercise.rest_seconds % 60 ? ` ${exercise.rest_seconds % 60}s` : ''}` : `${exercise.rest_seconds}s`} rest</span>
+                    )}
                   </p>
                 </div>
 
