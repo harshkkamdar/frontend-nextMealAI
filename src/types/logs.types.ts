@@ -12,13 +12,21 @@ export interface FoodPayload {
 }
 
 export interface WorkoutPayload {
-  exercise: string
+  // Optional because workout-session completion entries (inserted by
+  // backend POST /v1/workout-sessions/:id/complete) do not include `exercise`
+  // — they carry day_name + session_id instead. See FB-09.
+  exercise?: string
   sets?: number
   reps?: number
   weight_kg?: number
   duration_min?: number
   difficulty_rating?: number
   notes?: string
+  // Session-completion fields:
+  session_id?: string
+  day_name?: string
+  exercises_completed?: number
+  total_exercises?: number
 }
 
 export interface SleepPayload {
