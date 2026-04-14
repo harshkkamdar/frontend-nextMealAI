@@ -387,6 +387,7 @@ export default function DashboardPage() {
             protein={{ consumed: proteinConsumed, target: proteinTarget }}
             carbs={{ consumed: carbsConsumed, target: carbsTarget }}
             fat={{ consumed: fatConsumed, target: fatTarget }}
+            foodLogs={todayLogs.filter((l) => l.type === 'food')}
           />
           <QuickStats
             water={water}
