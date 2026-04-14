@@ -1,7 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ClipboardList, Check } from 'lucide-react'
+import {
+  ClipboardList,
+  Check,
+  Utensils,
+  Dumbbell,
+  Droplet,
+  Scale,
+  Smile,
+  Moon,
+  Zap,
+  History,
+  type LucideIcon,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { getLogs, bulkDeleteLogs } from '@/lib/api/logs.api'
 import { EmptyState } from '@/components/shared/empty-state'
@@ -21,23 +33,48 @@ const FILTERS: { label: string; value: LogType | 'all' }[] = [
   { label: 'Energy', value: 'energy' },
 ]
 
-const TYPE_COLORS: Record<LogType, string> = {
-  food: 'bg-accent',
-  workout: 'bg-[#34C759]',
-  water: 'bg-[#3B82F6]',
-  weight: 'bg-[#A855F7]',
-  mood: 'bg-[#FF9F0A]',
-  sleep: 'bg-[#6366F1]',
-  energy: 'bg-accent',
-  correction: 'bg-text-tertiary',
+// Typed icons double as the Activity Log legend — each row's type is
+// identifiable without a separate legend chip. Colours are retained via
+// text-* utility on each icon so filter states still read visually.
+const FALLBACK_ICON = { icon: ClipboardList, label: 'Activity', color: 'text-text-tertiary' } as const
+
+const TYPE_ICONS: Record<LogType, { icon: LucideIcon; label: string; color: string }> = {
+  food: { icon: Utensils, label: 'Food activity', color: 'text-accent' },
+  workout: { icon: Dumbbell, label: 'Workout activity', color: 'text-[#34C759]' },
+  water: { icon: Droplet, label: 'Water activity', color: 'text-[#3B82F6]' },
+  weight: { icon: Scale, label: 'Weight activity', color: 'text-[#A855F7]' },
+  mood: { icon: Smile, label: 'Mood activity', color: 'text-[#FF9F0A]' },
+  sleep: { icon: Moon, label: 'Sleep activity', color: 'text-[#6366F1]' },
+  energy: { icon: Zap, label: 'Energy activity', color: 'text-accent' },
+  correction: { icon: History, label: 'Correction activity', color: 'text-text-tertiary' },
+}
+
+function LogTypeIcon({ type }: { type: LogType }) {
+  const entry = TYPE_ICONS[type] ?? FALLBACK_ICON
+  const Icon = entry.icon
+  return (
+    <>
+      <Icon aria-hidden="true" className={`w-4 h-4 shrink-0 ${entry.color}`} />
+      <span className="sr-only">{entry.label}</span>
+    </>
+  )
 }
 
 function getLogDescription(log: Log): string {
   switch (log.type) {
     case 'food':
       return (log.payload as FoodPayload).food_name
-    case 'workout':
-      return (log.payload as WorkoutPayload).exercise
+    case 'workout': {
+      // Workout logs come from two sources:
+      //   (a) manual form entry — payload has `exercise`
+      //   (b) session completion (POST /v1/workout-sessions/:id/complete) —
+      //       payload has `day_name` + `session_id`, no `exercise`
+      // Fall back through the chain so no row ever renders a blank title. See FB-09.
+      const w = log.payload as WorkoutPayload
+      if (w.exercise) return w.exercise
+      if (w.day_name) return `${w.day_name} completed`
+      return 'Workout completed'
+    }
     case 'water': {
       const w = log.payload as WaterPayload
       return `${w.glasses ?? 0} glasses`
@@ -231,10 +268,8 @@ export function LogList({ filterType }: LogListProps = {}) {
                 </button>
               )}
 
-              {/* Color dot */}
-              <div
-                className={`w-2 h-2 rounded-full shrink-0 ${TYPE_COLORS[log.type] ?? 'bg-text-tertiary'}`}
-              />
+              {/* Typed icon — doubles as the legend (FB-09) */}
+              <LogTypeIcon type={log.type} />
 
               {/* Description */}
               <div className="flex-1 min-w-0">
