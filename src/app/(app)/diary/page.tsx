@@ -157,6 +157,7 @@ export default function DiaryPage() {
             protein={{ consumed: dayTotals.protein, target: targets.protein }}
             carbs={{ consumed: dayTotals.carbs, target: targets.carbs }}
             fat={{ consumed: dayTotals.fat, target: targets.fat }}
+            foodLogs={dayLogs}
           />
 
           {mealPlan && (
