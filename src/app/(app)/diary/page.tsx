@@ -7,11 +7,13 @@ import { CalendarStrip } from '@/components/shared/calendar-strip'
 import { MacroProgress } from '@/components/shared/macro-progress'
 import { MealGroup } from '@/components/diary/meal-group'
 import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
+import { MonthViewSheet } from '@/components/diary/month-view-sheet'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { todayISO } from '@/lib/utils'
+import { formatWeekMonthLabel } from '@/lib/month-label'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import type { MealPlan } from '@/types/plans.types'
 
@@ -24,6 +26,7 @@ export default function DiaryPage() {
   const [loading, setLoading] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedMealType, setSelectedMealType] = useState<string>('Breakfast')
+  const [monthOpen, setMonthOpen] = useState(false)
 
   const router = useRouter()
   useSetGeoScreen('food_diary', { selectedDate })
@@ -88,6 +91,18 @@ export default function DiaryPage() {
 
   const targets = mealPlan?.content?.daily_targets ?? { calories: 2000, protein: 150, carbs: 250, fat: 65 }
 
+  // FB-07: month label for the current ±3 day window
+  const weekLabel = useMemo(() => {
+    const center = new Date(selectedDate + 'T12:00:00')
+    const weekDates: string[] = []
+    for (let offset = -3; offset <= 3; offset++) {
+      const d = new Date(center)
+      d.setDate(d.getDate() + offset)
+      weekDates.push(d.toISOString().split('T')[0])
+    }
+    return formatWeekMonthLabel(weekDates)
+  }, [selectedDate])
+
   // Calendar indicators
   const indicators = useMemo(() => {
     const map = new Map<string, { food?: boolean; workout?: boolean }>()
@@ -125,6 +140,8 @@ export default function DiaryPage() {
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
         indicators={indicators}
+        label={weekLabel}
+        onLabelClick={() => setMonthOpen(true)}
       />
 
       {loading ? (
@@ -168,6 +185,13 @@ export default function DiaryPage() {
         onClose={() => setSearchOpen(false)}
         mealType={selectedMealType}
         onFoodLogged={handleFoodLogged}
+      />
+
+      <MonthViewSheet
+        isOpen={monthOpen}
+        initialDate={selectedDate}
+        onClose={() => setMonthOpen(false)}
+        onSelectDate={setSelectedDate}
       />
     </PageWrapper>
   )

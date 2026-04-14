@@ -1,12 +1,17 @@
 'use client'
 
 import { useRef, useEffect, memo } from 'react'
+import { CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface CalendarStripProps {
   selectedDate: string // ISO date string (YYYY-MM-DD)
   onSelectDate: (date: string) => void
   indicators?: Map<string, { food?: boolean; workout?: boolean }>
+  /** FB-07: month-spanning label rendered above the strip (e.g. "March – April 2026"). */
+  label?: string
+  /** FB-07: fires when the user taps the label (to open the month-view sheet). */
+  onLabelClick?: () => void
 }
 
 function toISO(d: Date): string {
@@ -36,10 +41,11 @@ function generateDays(centerDate: string): Array<{ date: string; dayName: string
 export const CalendarStrip = memo(function CalendarStrip({
   selectedDate,
   onSelectDate,
-  indicators
+  indicators,
+  label,
+  onLabelClick
 }: CalendarStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const today = toISO(new Date())
   const days = generateDays(selectedDate)
 
   // Center-scroll on mount
@@ -55,6 +61,25 @@ export const CalendarStrip = memo(function CalendarStrip({
   }, [])
 
   return (
+    <div className="space-y-1.5">
+      {label && (
+        onLabelClick ? (
+          <button
+            type="button"
+            onClick={onLabelClick}
+            aria-label={`${label} — open month view`}
+            className="flex items-center gap-1.5 px-1 py-0.5 rounded-md text-xs font-medium uppercase tracking-[0.08em] text-text-secondary hover:text-accent transition-colors"
+          >
+            <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        ) : (
+          <div className="flex items-center gap-1.5 px-1 py-0.5 text-xs font-medium uppercase tracking-[0.08em] text-text-secondary">
+            <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>{label}</span>
+          </div>
+        )
+      )}
     <div
       ref={scrollRef}
       className="flex gap-1 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4"
@@ -112,6 +137,7 @@ export const CalendarStrip = memo(function CalendarStrip({
           </button>
         )
       })}
+    </div>
     </div>
   )
 })
