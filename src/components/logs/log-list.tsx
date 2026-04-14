@@ -7,6 +7,7 @@ import { getLogs, bulkDeleteLogs } from '@/lib/api/logs.api'
 import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { formatMacroKcal } from '@/lib/macros'
 import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload } from '@/types/logs.types'
 
 const FILTERS: { label: string; value: LogType | 'all' }[] = [
@@ -58,7 +59,7 @@ function getLogMetric(log: Log): string {
   switch (log.type) {
     case 'food': {
       const f = log.payload as FoodPayload
-      return f.est_macros?.calories ? `${f.est_macros.calories} kcal` : ''
+      return f.est_macros?.calories ? `${formatMacroKcal(f.est_macros.calories)} kcal` : ''
     }
     case 'workout': {
       const w = log.payload as WorkoutPayload

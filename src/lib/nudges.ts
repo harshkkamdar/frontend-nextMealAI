@@ -1,6 +1,7 @@
 import type { Log, LogsSummary, FoodPayload } from '@/types/logs.types'
 import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 import type { Profile } from '@/types/profile.types'
+import { formatMacroGrams } from '@/lib/macros'
 
 export type NudgeType = 'time_to_eat' | 'workout_today' | 'protein_check' | 'program_complete'
 
@@ -89,7 +90,7 @@ export function computeNudges(input: NudgeInput): Nudge[] {
       nudges.push({
         type: 'protein_check',
         title: 'Protein Check',
-        message: `You're at ${proteinConsumed}g of your ${proteinTarget}g protein goal. A quick protein shake could help!`,
+        message: `You're at ${formatMacroGrams(proteinConsumed)} of your ${formatMacroGrams(proteinTarget)} protein goal. A quick protein shake could help!`,
         cta: 'Log a snack',
         action: 'open_food_search',
         actionData: { mealType: 'Snack' }

@@ -1,0 +1,14 @@
+stack: nextjs
+framework_version: next@16
+test_framework: vitest
+test_dir: __tests__
+plans_dir: docs/plans
+personas: [end_user]
+context_sources:
+  - name: backend
+    path: ~/Developer/clients/backend-nextMealAI
+    purpose: API contracts, totals endpoint, log schemas
+  - name: obsidian
+    path: ~/Library/Mobile Documents/iCloud~md~obsidian/Documents/vedVault/02_Projects/NextMealAI
+    purpose: project state, session logs, feedback rounds
+obsidian_project: NextMealAI

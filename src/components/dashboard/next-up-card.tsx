@@ -3,6 +3,7 @@
 import { UtensilsCrossed, Check, MessageSquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import type { MealPlan } from '@/types/plans.types'
+import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 
 export function NextUpCard({
   mealPlan,
@@ -76,7 +77,7 @@ export function NextUpCard({
         </div>
         <p className="text-[17px] font-semibold text-text-primary mb-1">No meals scheduled today</p>
         <p className="text-xs text-text-secondary mb-3">
-          {targets ? `Target: ${targets.calories ?? 0} cal · ${targets.protein ?? 0}g protein` : 'Log your meals manually.'}
+          {targets ? `Target: ${formatMacroKcal(targets.calories)} cal · ${formatMacroGrams(targets.protein)} protein` : 'Log your meals manually.'}
         </p>
         <Link
           href="/logs/new/food"
@@ -99,8 +100,8 @@ export function NextUpCard({
       </div>
       <p className="text-[17px] font-semibold text-text-primary mb-1">{meal.name}</p>
       <p className="text-xs text-text-secondary tabular-nums mb-4">
-        {meal.calories ?? 0} cal &middot; {meal.protein ?? 0}g protein &middot;{' '}
-        {meal.carbs ?? 0}g carbs &middot; {meal.fat ?? 0}g fat
+        {formatMacroKcal(meal.calories)} cal &middot; {formatMacroGrams(meal.protein)} protein &middot;{' '}
+        {formatMacroGrams(meal.carbs)} carbs &middot; {formatMacroGrams(meal.fat)} fat
       </p>
       <div className="flex items-center gap-2">
         <Link

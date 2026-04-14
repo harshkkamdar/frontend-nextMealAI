@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood } from '@/lib/api/foods.api'
 import { createLog } from '@/lib/api/logs.api'
+import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 import type { FoodSearchResult } from '@/types/foods.types'
 
 interface FoodSearchSheetProps {
@@ -185,11 +186,13 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
       : grams / (selectedFood.serving_size_g || 100)
     : 1
 
+  // Raw (unrounded) values — rounding happens at render via formatMacroGrams / formatMacroKcal
+  // (single source of truth, matches backend roundMacros rules).
   const calculatedMacros = selectedFood ? {
-    calories: Math.round((selectedFood.macros_per_serving.calories ?? 0) * effectiveMultiplier),
-    protein: Math.round((selectedFood.macros_per_serving.protein ?? 0) * effectiveMultiplier),
-    carbs: Math.round((selectedFood.macros_per_serving.carbs ?? 0) * effectiveMultiplier),
-    fat: Math.round((selectedFood.macros_per_serving.fat ?? 0) * effectiveMultiplier),
+    calories: (selectedFood.macros_per_serving.calories ?? 0) * effectiveMultiplier,
+    protein: (selectedFood.macros_per_serving.protein ?? 0) * effectiveMultiplier,
+    carbs: (selectedFood.macros_per_serving.carbs ?? 0) * effectiveMultiplier,
+    fat: (selectedFood.macros_per_serving.fat ?? 0) * effectiveMultiplier,
   } : null
 
   return (
@@ -336,19 +339,19 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                 {calculatedMacros && (
                   <div className="grid grid-cols-4 gap-2 mb-6">
                     <div className="bg-surface border border-border rounded-lg p-2.5 text-center">
-                      <p className="text-sm font-semibold text-text-primary">{calculatedMacros.calories}</p>
+                      <p className="text-sm font-semibold text-text-primary">{formatMacroKcal(calculatedMacros.calories)}</p>
                       <p className="text-[9px] text-text-tertiary">kcal</p>
                     </div>
                     <div className="bg-surface border border-border rounded-lg p-2.5 text-center">
-                      <p className="text-sm font-semibold text-info">{calculatedMacros.protein}g</p>
+                      <p className="text-sm font-semibold text-info">{formatMacroGrams(calculatedMacros.protein)}</p>
                       <p className="text-[9px] text-text-tertiary">protein</p>
                     </div>
                     <div className="bg-surface border border-border rounded-lg p-2.5 text-center">
-                      <p className="text-sm font-semibold text-warning">{calculatedMacros.carbs}g</p>
+                      <p className="text-sm font-semibold text-warning">{formatMacroGrams(calculatedMacros.carbs)}</p>
                       <p className="text-[9px] text-text-tertiary">carbs</p>
                     </div>
                     <div className="bg-surface border border-border rounded-lg p-2.5 text-center">
-                      <p className="text-sm font-semibold text-purple">{calculatedMacros.fat}g</p>
+                      <p className="text-sm font-semibold text-purple">{formatMacroGrams(calculatedMacros.fat)}</p>
                       <p className="text-[9px] text-text-tertiary">fat</p>
                     </div>
                   </div>
@@ -404,7 +407,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                           <div className="flex-1 min-w-0">
                             <p className="text-sm text-text-primary truncate">{food.name}</p>
                             <p className="text-[11px] text-text-tertiary">
-                              {food.macros_per_serving.calories ?? 0} cal
+                              {formatMacroKcal(food.macros_per_serving.calories)} cal
                               {food.brand ? ` · ${food.brand}` : ''}
                               {food.source === 'usda' && ' · USDA'}
                             </p>

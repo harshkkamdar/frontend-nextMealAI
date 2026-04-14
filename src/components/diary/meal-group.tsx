@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { deleteLog } from '@/lib/api/logs.api'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 import type { Log, FoodPayload } from '@/types/logs.types'
 
 interface MealGroupProps {
@@ -50,7 +51,7 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
         <span className="text-sm font-semibold text-text-primary">{mealType}</span>
         {items.length > 0 && (
           <span className="text-xs text-text-secondary tabular-nums">
-            {subtotals.calories} cal &middot; {Math.round(subtotals.protein)}P &middot; {Math.round(subtotals.carbs)}C &middot; {Math.round(subtotals.fat)}F
+            {formatMacroKcal(subtotals.calories)} cal &middot; {formatMacroGrams(subtotals.protein)} P &middot; {formatMacroGrams(subtotals.carbs)} C &middot; {formatMacroGrams(subtotals.fat)} F
           </span>
         )}
       </div>
@@ -75,10 +76,10 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
                 <p className="text-sm text-text-primary truncate">{payload.food_name}</p>
                 <p className="text-[11px] text-text-tertiary tabular-nums">
                   {payload.quantity_g ? `${payload.quantity_g}g` : '1 serving'}
-                  {cals > 0 && ` · ${cals} cal`}
-                  {protein > 0 && <> · <span className="text-info">{Math.round(protein)}P</span></>}
-                  {carbsVal > 0 && <> · <span className="text-warning">{Math.round(carbsVal)}C</span></>}
-                  {fatVal > 0 && <> · <span className="text-purple-400">{Math.round(fatVal)}F</span></>}
+                  {cals > 0 && ` · ${formatMacroKcal(cals)} cal`}
+                  {protein > 0 && <> · <span className="text-info">{formatMacroGrams(protein)} P</span></>}
+                  {carbsVal > 0 && <> · <span className="text-warning">{formatMacroGrams(carbsVal)} C</span></>}
+                  {fatVal > 0 && <> · <span className="text-purple-400">{formatMacroGrams(fatVal)} F</span></>}
                 </p>
               </div>
               <button

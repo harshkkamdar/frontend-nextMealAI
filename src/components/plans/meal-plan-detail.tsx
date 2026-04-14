@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import type { MealPlan, PlanStatus } from '@/types/plans.types'
 import { formatDate } from '@/lib/utils'
+import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 import { PlanChangelog } from '@/components/plans/plan-changelog'
 
 const STATUS_STYLES: Record<PlanStatus, string> = {
@@ -70,15 +71,15 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
           {/* Macros row */}
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-surface border border-border rounded-2xl p-5 text-center">
-              <p className="text-2xl font-semibold text-text-primary">{targets.protein}g</p>
+              <p className="text-2xl font-semibold text-text-primary">{formatMacroGrams(targets.protein)}</p>
               <p className="text-xs text-text-tertiary mt-1">protein</p>
             </div>
             <div className="bg-surface border border-border rounded-2xl p-5 text-center">
-              <p className="text-2xl font-semibold text-text-primary">{targets.carbs}g</p>
+              <p className="text-2xl font-semibold text-text-primary">{formatMacroGrams(targets.carbs)}</p>
               <p className="text-xs text-text-tertiary mt-1">carbs</p>
             </div>
             <div className="bg-surface border border-border rounded-2xl p-5 text-center">
-              <p className="text-2xl font-semibold text-text-primary">{targets.fat}g</p>
+              <p className="text-2xl font-semibold text-text-primary">{formatMacroGrams(targets.fat)}</p>
               <p className="text-xs text-text-tertiary mt-1">fat</p>
             </div>
           </div>
@@ -113,10 +114,10 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
                     {(meal.calories != null || meal.protein != null) && (
                       <p className="text-xs text-text-secondary mt-0.5">
                         {[
-                          meal.calories != null ? `${meal.calories ?? 0} kcal` : null,
-                          meal.protein != null ? `${meal.protein ?? 0}g P` : null,
-                          meal.carbs != null ? `${meal.carbs ?? 0}g C` : null,
-                          meal.fat != null ? `${meal.fat ?? 0}g F` : null,
+                          meal.calories != null ? `${formatMacroKcal(meal.calories)} kcal` : null,
+                          meal.protein != null ? `${formatMacroGrams(meal.protein)} P` : null,
+                          meal.carbs != null ? `${formatMacroGrams(meal.carbs)} C` : null,
+                          meal.fat != null ? `${formatMacroGrams(meal.fat)} F` : null,
                         ]
                           .filter(Boolean)
                           .join(' / ')}
@@ -137,7 +138,7 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
                       <p className="text-sm font-medium text-text-primary">{snack.name}</p>
                       {snack.calories != null && (
                         <p className="text-xs text-text-secondary mt-0.5">
-                          {snack.calories ?? 0} kcal
+                          {formatMacroKcal(snack.calories)} kcal
                         </p>
                       )}
                     </div>
