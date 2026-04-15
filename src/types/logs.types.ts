@@ -1,14 +1,36 @@
 export type LogType = 'food' | 'workout' | 'sleep' | 'mood' | 'energy' | 'water' | 'weight' | 'correction'
 export type LogSource = 'manual' | 'menu_scan' | 'ai_suggestion' | 'quick_log' | 'import'
 
+export interface FoodMacros {
+  calories?: number
+  protein?: number
+  carbs?: number
+  fat?: number
+}
+
+/**
+ * FB-10: per-component breakdown of an itemised food log. Produced by Geo
+ * from image estimates so users can sanity-check each component before
+ * logging the compound meal.
+ */
+export interface FoodLogItem {
+  name: string
+  quantity_g?: number
+  quantity_label?: string
+  est_macros: FoodMacros
+  notes?: string
+}
+
 export interface FoodPayload {
   food_name: string
   quantity_g?: number
-  est_macros?: { calories?: number; protein?: number; carbs?: number; fat?: number }
+  est_macros?: FoodMacros
   meal_type?: string
   user_food_id?: string
   servings?: number
   notes?: string
+  /** FB-10 — optional per-component breakdown for image estimates */
+  items?: FoodLogItem[]
 }
 
 export interface WorkoutPayload {
