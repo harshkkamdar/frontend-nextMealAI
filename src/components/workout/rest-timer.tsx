@@ -8,9 +8,17 @@ interface RestTimerProps {
   duration: number // seconds
   onSkip: () => void
   onComplete: () => void
+  /**
+   * FB-05 tick-ahead fix. Bumped by the parent on every set completion so the
+   * countdown resets to full `duration` even when `duration` itself is
+   * unchanged (common: multiple sets within one exercise share rest_seconds).
+   * Without this, ticking a second set while the timer is running would allow
+   * the user to cheese the rest period.
+   */
+  resetToken?: number
 }
 
-export function RestTimer({ isActive, duration, onSkip, onComplete }: RestTimerProps) {
+export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }: RestTimerProps) {
   const [remaining, setRemaining] = useState(duration)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const onCompleteRef = useRef(onComplete)
@@ -40,7 +48,7 @@ export function RestTimer({ isActive, duration, onSkip, onComplete }: RestTimerP
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [isActive, duration])
+  }, [isActive, duration, resetToken])
 
   if (!isActive) return null
 

@@ -9,7 +9,10 @@ export async function getWorkoutSession(id: string): Promise<WorkoutSession> {
   return apiFetch<WorkoutSession>(`/v1/workout-sessions/${id}`)
 }
 
-export async function updateWorkoutSession(id: string, data: { exercises?: SessionExercise[]; notes?: string }): Promise<WorkoutSession> {
+export async function updateWorkoutSession(
+  id: string,
+  data: { exercises?: SessionExercise[]; notes?: string; started_at?: string }
+): Promise<WorkoutSession> {
   return apiFetch<WorkoutSession>(`/v1/workout-sessions/${id}`, { method: 'PATCH', body: data })
 }
 
