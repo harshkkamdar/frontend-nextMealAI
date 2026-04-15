@@ -398,11 +398,19 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                   {!searching && results.length > 0 && (
                     <div className="space-y-1" role="listbox" aria-label="Food search results">
                       {results.map((food, i) => (
-                        <button
+                        <div
                           key={food.id ?? `usda-${food.usda_fdc_id ?? i}`}
                           role="option"
+                          aria-selected={false}
+                          tabIndex={0}
                           onClick={() => handleSelectFood(food)}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-hover transition-colors text-left"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              handleSelectFood(food)
+                            }
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-hover transition-colors text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent"
                         >
                           <div className="flex-1 min-w-0">
                             <p className="text-sm text-text-primary truncate">{food.name}</p>
@@ -429,7 +437,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                           <div className="w-8 h-8 rounded-full bg-accent-light flex items-center justify-center shrink-0">
                             <Plus className="w-4 h-4 text-accent" />
                           </div>
-                        </button>
+                        </div>
                       ))}
                     </div>
                   )}
