@@ -7,8 +7,11 @@ import { ChatHeader } from '@/components/chat/chat-header'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { ChatInput } from '@/components/chat/chat-input'
 import { getChatSession, getChatSessions, sendMessage } from '@/lib/api/chat.api'
+import { extractWorkoutProgram, isLikelyWorkoutProgramPrompt } from '@/lib/api/vision.api'
+import { WorkoutProgramPreviewCard } from '@/components/plans/workout-program-preview-card'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import type { ChatMessage } from '@/types/chat.types'
+import type { WorkoutProgramContent } from '@/types/plans.types'
 
 function PrefillReader({ onPrefill }: { onPrefill: (v: string) => void }) {
   const searchParams = useSearchParams()
@@ -30,6 +33,10 @@ export default function ActiveChatPage({
   const [sessionTitle, setSessionTitle] = useState<string | undefined>()
   const [isTyping, setIsTyping] = useState(false)
   const [loading, setLoading] = useState(true)
+  // FB-15: preview card for an extracted workout program. One at a time.
+  const [programPreview, setProgramPreview] = useState<
+    { program: WorkoutProgramContent; confidence: number } | null
+  >(null)
 
   useSetGeoScreen('chat', { sessionId })
 
@@ -68,6 +75,20 @@ export default function ActiveChatPage({
 
     setMessages((prev) => [...prev, userMessage])
     setIsTyping(true)
+
+    // FB-15: if the user attached an image with a workout-programmy
+    // message, try to extract a program first and show the preview
+    // card. Failures fall through to Geo's normal flow silently.
+    if (image && isLikelyWorkoutProgramPrompt(message)) {
+      try {
+        const extracted = await extractWorkoutProgram(image)
+        if (extracted?.program?.days?.length) {
+          setProgramPreview(extracted)
+        }
+      } catch {
+        // swallow — normal chat flow continues below
+      }
+    }
 
     try {
       const res = await sendMessage({ message, session_id: sessionId, image })
@@ -111,6 +132,16 @@ export default function ActiveChatPage({
         <PrefillReader onPrefill={setPrefill} />
       </Suspense>
       <ChatHeader sessionId={sessionId} title={sessionTitle} />
+      {programPreview && (
+        <div className="px-4 pt-3">
+          <WorkoutProgramPreviewCard
+            program={programPreview.program}
+            confidence={programPreview.confidence}
+            onAccept={() => setProgramPreview(null)}
+            onDiscard={() => setProgramPreview(null)}
+          />
+        </div>
+      )}
       <ChatThread messages={messages} isTyping={isTyping} />
       <ChatInput onSend={handleSend} disabled={isTyping} showCamera defaultValue={prefill} />
     </div>
