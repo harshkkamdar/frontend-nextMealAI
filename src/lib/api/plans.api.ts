@@ -19,6 +19,20 @@ export async function activatePlan(id: string): Promise<void> {
   await apiFetch(`/v1/plans/${id}/activate`, { method: 'POST' })
 }
 
+/**
+ * FB-15: minimal createPlan wrapper used by the screenshot-to-program
+ * accept flow. Matches the backend POST /v1/plans contract.
+ */
+export async function createPlan(body: {
+  type: 'meal' | 'workout'
+  content: Record<string, unknown>
+  start_date?: string
+  end_date?: string
+  generated_by?: 'ai' | 'manual' | 'template'
+}): Promise<Plan> {
+  return apiFetch<Plan>('/v1/plans', { method: 'POST', body })
+}
+
 export async function generatePlans(): Promise<{ success: boolean; plans: Plan[] }> {
   return apiFetch('/v1/plans/generate', { method: 'POST' })
 }

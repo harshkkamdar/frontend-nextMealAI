@@ -32,6 +32,16 @@ export interface WorkoutExercise {
   reps?: number
   weight?: number
   duration_seconds?: number
+  rest_seconds?: number
+  notes?: string
+}
+
+/**
+ * FB-15: shape returned by POST /v1/vision/workout-program and accepted by
+ * the create-plan flow. Matches the backend WorkoutPlanContentSchema.
+ */
+export interface WorkoutProgramContent {
+  days: WorkoutPlanDay[]
   notes?: string
 }
 
