@@ -79,7 +79,7 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
           <ArrowLeft className="w-5 h-5 text-text-primary" />
         </button>
         <h1 className="text-[22px] font-semibold tracking-tight text-text-primary">
-          Workout Plan
+          {plan.content.name || 'Workout Plan'}
         </h1>
       </div>
 

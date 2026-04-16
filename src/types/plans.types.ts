@@ -51,6 +51,7 @@ export interface MealPlan {
   start_date?: string
   end_date?: string
   content: {
+    name?: string
     days?: MealPlanDay[]
     daily_targets?: { calories: number; protein: number; carbs: number; fat: number }
     notes?: string
@@ -68,6 +69,7 @@ export interface WorkoutPlan {
   start_date?: string
   end_date?: string
   content: {
+    name?: string
     days?: WorkoutPlanDay[]
     notes?: string
   }

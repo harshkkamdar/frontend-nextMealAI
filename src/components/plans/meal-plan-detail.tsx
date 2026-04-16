@@ -44,7 +44,7 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
         >
           <ArrowLeft className="w-5 h-5 text-text-primary" />
         </button>
-        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary">Meal Plan</h1>
+        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary">{plan.content.name || 'Meal Plan'}</h1>
       </div>
 
       {/* Status + date range */}

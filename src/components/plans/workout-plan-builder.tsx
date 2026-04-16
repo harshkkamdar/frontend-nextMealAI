@@ -84,7 +84,7 @@ function fromInitial(plan: WorkoutPlan | undefined): {
     exercises: (d.exercises ?? []).map((ex) => ({ ...ex, _key: nextKey() })),
   }))
   return {
-    name: (plan.content as unknown as { name?: string }).name ?? '',
+    name: plan.content.name ?? '',
     notes: plan.content.notes ?? '',
     startDate: plan.start_date ?? '',
     endDate: plan.end_date ?? '',
@@ -157,7 +157,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
     }
     setSubmitting(true)
     try {
-      const content: WorkoutPlan['content'] & { name?: string } = {
+      const content: WorkoutPlan['content'] = {
         name: name.trim(),
         days: days.map((d) => ({
           date: d.date || undefined,
