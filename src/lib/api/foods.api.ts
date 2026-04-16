@@ -28,3 +28,11 @@ export async function updateFood(id: string, data: Partial<{ name: string; is_fa
 export async function deleteUserFood(id: string): Promise<void> {
   await apiFetch(`/v1/foods/${id}`, { method: 'DELETE' })
 }
+
+export async function getRecentFoods(limit = 8): Promise<UserFood[]> {
+  const foods = await getPersonalFoods()
+  return foods
+    .filter((f) => f.last_used_at)
+    .sort((a, b) => new Date(b.last_used_at!).getTime() - new Date(a.last_used_at!).getTime())
+    .slice(0, limit)
+}

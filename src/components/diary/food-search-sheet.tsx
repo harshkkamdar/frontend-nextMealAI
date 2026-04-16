@@ -8,10 +8,56 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useUIStore } from '@/stores/ui.store'
-import { searchFoods, updateFood, saveFood } from '@/lib/api/foods.api'
+import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
 import { createLog } from '@/lib/api/logs.api'
 import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 import type { FoodSearchResult } from '@/types/foods.types'
+
+function FoodRow({ food, onSelect, onToggleFavorite }: {
+  food: FoodSearchResult
+  onSelect: (food: FoodSearchResult) => void
+  onToggleFavorite: (food: FoodSearchResult) => void
+}) {
+  return (
+    <div
+      role="option"
+      aria-selected={false}
+      tabIndex={0}
+      onClick={() => onSelect(food)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect(food)
+        }
+      }}
+      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-hover transition-colors text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent"
+    >
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-text-primary truncate">{food.name}</p>
+        <p className="text-[11px] text-text-tertiary">
+          {formatMacroKcal(food.macros_per_serving.calories)} cal
+          {food.brand ? ` · ${food.brand}` : ''}
+          {food.source === 'usda' && ' · USDA'}
+        </p>
+      </div>
+
+      {food.source === 'personal' && food.id && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(food) }}
+          className="p-1 shrink-0"
+        >
+          <Star
+            className={`w-4 h-4 ${food.is_favorite ? 'fill-warning text-warning' : 'text-text-tertiary'}`}
+          />
+        </button>
+      )}
+
+      <div className="w-8 h-8 rounded-full bg-accent-light flex items-center justify-center shrink-0">
+        <Plus className="w-4 h-4 text-accent" />
+      </div>
+    </div>
+  )
+}
 
 interface FoodSearchSheetProps {
   isOpen: boolean
@@ -27,7 +73,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
   const [selectedFood, setSelectedFood] = useState<FoodSearchResult | null>(null)
   const [servings, setServings] = useState(1)
   const [inputMode, setInputMode] = useState<'servings' | 'grams'>('servings')
-  const [grams, setGrams] = useState<number>(100)
+  const [grams, setGrams] = useState<number | ''>(100)
   const [saving, setSaving] = useState(false)
   const [showCustomForm, setShowCustomForm] = useState(false)
   const [customName, setCustomName] = useState('')
@@ -36,6 +82,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
   const [customCarbs, setCustomCarbs] = useState<number | ''>('')
   const [customFat, setCustomFat] = useState<number | ''>('')
   const [customServingG, setCustomServingG] = useState<number | ''>(100)
+  const [recentFoods, setRecentFoods] = useState<FoodSearchResult[]>([])
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -56,6 +103,19 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
       setCustomFat('')
       setCustomServingG(100)
       setTimeout(() => inputRef.current?.focus(), 300)
+      getRecentFoods(8).then((foods) =>
+        setRecentFoods(foods.map((f) => ({
+          id: f.id,
+          usda_fdc_id: f.usda_fdc_id,
+          name: f.name,
+          brand: f.brand,
+          serving_size_g: f.serving_size_g,
+          macros_per_serving: f.macros_per_serving,
+          source: 'personal' as const,
+          is_favorite: f.is_favorite,
+          use_count: f.use_count,
+        })))
+      ).catch(() => {})
     }
   }, [isOpen])
 
@@ -110,7 +170,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
 
     const quantity = inputMode === 'servings'
       ? Math.round((selectedFood.serving_size_g || 100) * servings)
-      : Math.round(grams)
+      : Math.round(grams || 0)
 
     try {
       await createLog({
@@ -183,7 +243,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
   const effectiveMultiplier = selectedFood
     ? inputMode === 'servings'
       ? servings
-      : grams / (selectedFood.serving_size_g || 100)
+      : (grams || 0) / (selectedFood.serving_size_g || 100)
     : 1
 
   // Raw (unrounded) values — rounding happens at render via formatMacroGrams / formatMacroKcal
@@ -308,7 +368,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                   ) : (
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => setGrams(Math.max(1, grams - 10))}
+                        onClick={() => setGrams(Math.max(1, (grams || 0) - 10))}
                         aria-label="Decrease grams"
                         className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
                       >
@@ -318,14 +378,20 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                         <input
                           type="number"
                           value={grams}
-                          onChange={(e) => setGrams(Math.max(1, Number(e.target.value) || 1))}
+                          onChange={(e) => {
+                            const val = e.target.value
+                            if (val === '') { setGrams(''); return }
+                            const num = Number(val)
+                            if (!isNaN(num)) setGrams(Math.max(0, Math.round(num)))
+                          }}
+                          onBlur={() => { if (grams === '' || grams === 0) setGrams(1) }}
                           aria-label="Grams"
                           className="w-20 text-xl font-semibold text-text-primary tabular-nums text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                         <span className="text-sm text-text-tertiary">g</span>
                       </div>
                       <button
-                        onClick={() => setGrams(grams + 10)}
+                        onClick={() => setGrams((grams || 0) + 10)}
                         aria-label="Increase grams"
                         className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
                       >
@@ -362,7 +428,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
               <div className="px-4 pb-20 pt-2 border-t border-border">
                 <Button
                   onClick={handleConfirmLog}
-                  disabled={saving}
+                  disabled={saving || (inputMode === 'grams' && !grams)}
                   className="w-full bg-accent hover:bg-accent-hover text-white"
                 >
                   {saving ? 'Logging...' : 'Log Food'}
@@ -398,46 +464,12 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                   {!searching && results.length > 0 && (
                     <div className="space-y-1" role="listbox" aria-label="Food search results">
                       {results.map((food, i) => (
-                        <div
+                        <FoodRow
                           key={food.id ?? `usda-${food.usda_fdc_id ?? i}`}
-                          role="option"
-                          aria-selected={false}
-                          tabIndex={0}
-                          onClick={() => handleSelectFood(food)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault()
-                              handleSelectFood(food)
-                            }
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-hover transition-colors text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-text-primary truncate">{food.name}</p>
-                            <p className="text-[11px] text-text-tertiary">
-                              {formatMacroKcal(food.macros_per_serving.calories)} cal
-                              {food.brand ? ` · ${food.brand}` : ''}
-                              {food.source === 'usda' && ' · USDA'}
-                            </p>
-                          </div>
-
-                          {/* Favorite toggle (personal foods only) */}
-                          {food.source === 'personal' && food.id && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleToggleFavorite(food) }}
-                              className="p-1 shrink-0"
-                            >
-                              <Star
-                                className={`w-4 h-4 ${food.is_favorite ? 'fill-warning text-warning' : 'text-text-tertiary'}`}
-                              />
-                            </button>
-                          )}
-
-                          {/* Quick-add button */}
-                          <div className="w-8 h-8 rounded-full bg-accent-light flex items-center justify-center shrink-0">
-                            <Plus className="w-4 h-4 text-accent" />
-                          </div>
-                        </div>
+                          food={food}
+                          onSelect={handleSelectFood}
+                          onToggleFavorite={handleToggleFavorite}
+                        />
                       ))}
                     </div>
                   )}
@@ -455,11 +487,25 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                     </div>
                   )}
 
-                  {!searching && query.length < 2 && (
+                  {!searching && query.length < 2 && recentFoods.length > 0 ? (
+                    <div>
+                      <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide mb-2">Recent</p>
+                      <div className="space-y-1" role="listbox" aria-label="Recent foods">
+                        {recentFoods.map((food, i) => (
+                          <FoodRow
+                            key={food.id ?? `recent-${i}`}
+                            food={food}
+                            onSelect={handleSelectFood}
+                            onToggleFavorite={handleToggleFavorite}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : !searching && query.length < 2 ? (
                     <div className="text-center py-8 space-y-4">
                       <p className="text-sm text-text-tertiary">Type to search foods</p>
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Bottom actions */}

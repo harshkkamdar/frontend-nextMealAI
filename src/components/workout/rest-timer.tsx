@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { Timer, X } from 'lucide-react'
+import { playBell } from '@/lib/audio'
 
 interface RestTimerProps {
   isActive: boolean
@@ -23,31 +24,65 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const onCompleteRef = useRef(onComplete)
   onCompleteRef.current = onComplete
+  // FB-R4-02 — anchor timestamp so we can recalculate remaining on tab refocus
+  const startedAtRef = useRef<number>(0)
+  // Track whether the timer has been started so the completion effect doesn't
+  // fire on mount when remaining happens to equal 0.
+  const timerStartedRef = useRef(false)
+
+  // Completion side-effects — kept OUT of state updaters to avoid the React
+  // "Cannot update a component while rendering a different component" error.
+  useEffect(() => {
+    if (remaining === 0 && timerStartedRef.current) {
+      timerStartedRef.current = false
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([200, 100, 200])
+      }
+      playBell()
+      onCompleteRef.current()
+    }
+  }, [remaining])
 
   useEffect(() => {
     if (isActive) {
       setRemaining(duration)
+      startedAtRef.current = Date.now()
+      timerStartedRef.current = true
 
       intervalRef.current = setInterval(() => {
         setRemaining((prev) => {
           if (prev <= 1) {
             clearInterval(intervalRef.current!)
-            if (typeof navigator !== 'undefined' && navigator.vibrate) {
-              navigator.vibrate([200, 100, 200])
-            }
-            onCompleteRef.current()
             return 0
           }
           return prev - 1
         })
       }, 1000)
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+
+      // FB-R4-02 — recalculate remaining when tab regains focus. Mobile
+      // browsers throttle/kill setInterval when the app is backgrounded.
+      const onVisible = () => {
+        if (document.hidden || !startedAtRef.current) return
+        const elapsed = Math.floor((Date.now() - startedAtRef.current) / 1000)
+        const newRemaining = Math.max(0, duration - elapsed)
+        if (newRemaining <= 0) {
+          if (intervalRef.current) clearInterval(intervalRef.current)
+          // Setting remaining to 0 triggers the completion effect above.
+          setRemaining(0)
+        } else {
+          setRemaining(newRemaining)
+        }
+      }
+      document.addEventListener('visibilitychange', onVisible)
+
+      return () => {
+        if (intervalRef.current) clearInterval(intervalRef.current)
+        document.removeEventListener('visibilitychange', onVisible)
+      }
     }
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
+    // Not active — clear any lingering interval from a previous cycle.
+    if (intervalRef.current) clearInterval(intervalRef.current)
   }, [isActive, duration, resetToken])
 
   if (!isActive) return null

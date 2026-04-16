@@ -6,6 +6,7 @@ import { ArrowLeft, Check, ChevronDown, MessageCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { RestTimer } from '@/components/workout/rest-timer'
+import { unlockAudio } from '@/lib/audio'
 import { useUIStore } from '@/stores/ui.store'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import {
@@ -92,6 +93,23 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
     setElapsedSeconds(resolved)
   }, [session?.started_at, sessionId])
 
+  // FB-R4-02 — recalculate elapsed time when tab regains focus (setInterval
+  // is throttled/killed by mobile browsers when the app is backgrounded).
+  useEffect(() => {
+    if (!session?.started_at || session.status !== 'in_progress') return
+    const onVisible = () => {
+      if (!document.hidden) {
+        const { elapsedSeconds: resolved } = resolveElapsedForSession(
+          session.started_at,
+          Date.now(),
+        )
+        setElapsedSeconds(resolved)
+      }
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [session?.started_at, session?.status])
+
   const saveExercises = useCallback((exercises: SessionExercise[]) => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
     saveTimeoutRef.current = setTimeout(() => {
@@ -113,6 +131,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
 
   const completeSet = (exIndex: number, setIndex: number) => {
     if (!session) return
+    unlockAudio()
     // FB-05 follow-up — delegate to pure helper so the three bug rules
     // (rest-timer on every non-final-exercise completion, rest_seconds=0 skip,
     // restKey bump even when duration is unchanged) are unit-tested in isolation.
