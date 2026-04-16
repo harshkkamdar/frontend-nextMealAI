@@ -140,9 +140,12 @@ export function SessionList({
           const displayTitle = titles[session.session_id] ?? session.title ?? 'Chat with Geo'
 
           return (
-            <button
+            <div
               key={sessionId}
+              role="button"
+              tabIndex={0}
               onClick={() => !isEditing && onSelect(session.session_id)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !isEditing) onSelect(session.session_id) }}
               className="w-full flex items-center gap-3 p-3 hover:bg-surface-hover rounded-xl transition-colors cursor-pointer text-left group"
             >
               <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
@@ -221,7 +224,7 @@ export function SessionList({
                   </p>
                 )}
               </div>
-            </button>
+            </div>
           )
         })}
       </div>
