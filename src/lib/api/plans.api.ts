@@ -19,35 +19,16 @@ export async function activatePlan(id: string): Promise<void> {
   await apiFetch(`/v1/plans/${id}/activate`, { method: 'POST' })
 }
 
-/**
- * FB-15: minimal createPlan wrapper used by the screenshot-to-program
- * accept flow. Matches the backend POST /v1/plans contract.
- */
-export async function createPlan(body: {
-  type: 'meal' | 'workout'
-  content: Record<string, unknown>
-  start_date?: string
-  end_date?: string
-  generated_by?: 'ai' | 'manual' | 'template'
-}): Promise<Plan> {
-  return apiFetch<Plan>('/v1/plans', { method: 'POST', body })
-}
-
 export async function generatePlans(): Promise<{ success: boolean; plans: Plan[] }> {
   return apiFetch('/v1/plans/generate', { method: 'POST' })
 }
-
-// FB-08 — manual plan create / customise wrappers.
-// The backend `CreatePlanSchema` uses a passthrough `content` field so these
-// wrappers can forward the typed Plan `content` shape directly. `generated_by`
-// defaults to 'manual' on the backend when omitted, but we send it explicitly
-// so server logs make the origin unambiguous.
 
 export type CreateMealPlanInput = {
   type: 'meal'
   content: MealPlan['content']
   start_date?: string
   end_date?: string
+  generated_by?: 'ai' | 'manual' | 'template'
 }
 
 export type CreateWorkoutPlanInput = {
@@ -55,6 +36,7 @@ export type CreateWorkoutPlanInput = {
   content: WorkoutPlan['content']
   start_date?: string
   end_date?: string
+  generated_by?: 'ai' | 'manual' | 'template'
 }
 
 export type CreatePlanInput = CreateMealPlanInput | CreateWorkoutPlanInput
@@ -62,7 +44,7 @@ export type CreatePlanInput = CreateMealPlanInput | CreateWorkoutPlanInput
 export async function createPlan(input: CreatePlanInput): Promise<Plan> {
   return apiFetch<Plan>('/v1/plans', {
     method: 'POST',
-    body: { ...input, generated_by: 'manual' },
+    body: { generated_by: 'manual', ...input },
   })
 }
 

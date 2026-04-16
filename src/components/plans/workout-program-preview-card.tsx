@@ -50,7 +50,7 @@ export function WorkoutProgramPreviewCard({
   const handleAccept = async () => {
     setBusy(true)
     try {
-      const plan = await createPlan({ type: 'workout', content: program as unknown as Record<string, unknown> })
+      const plan = await createPlan({ type: 'workout', content: program, generated_by: 'ai' })
       await activatePlan(plan.id)
       toast.success('Workout program saved', {
         description: 'Your new program is active.',
