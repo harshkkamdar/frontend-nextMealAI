@@ -14,6 +14,10 @@ import {
   completeWorkoutSession
 } from '@/lib/api/workout-sessions.api'
 import { cn } from '@/lib/utils'
+import {
+  resolveElapsedForSession,
+  computeCompleteSetResult,
+} from '@/lib/workout-session'
 import type { WorkoutSession, SessionExercise } from '@/types/workout-session.types'
 
 export default function WorkoutFollowPage({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -24,6 +28,10 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
   const [collapsedIndices, setCollapsedIndices] = useState<Set<number>>(new Set())
   const [showRestTimer, setShowRestTimer] = useState(false)
   const [restSeconds, setRestSeconds] = useState(90)
+  // FB-05 follow-up — bumped on every set completion so the RestTimer
+  // countdown resets to full duration even when duration itself is unchanged.
+  // Guards against the tick-ahead loophole.
+  const [restKey, setRestKey] = useState(0)
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [completing, setCompleting] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
@@ -63,11 +71,26 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
   }, [session])
 
   useEffect(() => {
-    if (session?.started_at) {
-      const elapsed = Math.floor((Date.now() - new Date(session.started_at).getTime()) / 1000)
-      setElapsedSeconds(Math.max(0, elapsed))
+    if (!session?.started_at) return
+    const { elapsedSeconds: resolved, needsReset } = resolveElapsedForSession(
+      session.started_at,
+      Date.now(),
+    )
+
+    if (needsReset) {
+      // FB-05 follow-up — resumed-stale session. The previous `started_at` is
+      // days old and would render a 10,000+ minute counter. Reset server-side
+      // best-effort and zero out the local display. Lost work time is already
+      // unrecoverable.
+      setElapsedSeconds(0)
+      const nowIso = new Date().toISOString()
+      updateWorkoutSession(sessionId, { started_at: nowIso }).catch(() => {})
+      setSession((prev) => (prev ? { ...prev, started_at: nowIso } : prev))
+      return
     }
-  }, [session?.started_at])
+
+    setElapsedSeconds(resolved)
+  }, [session?.started_at, sessionId])
 
   const saveExercises = useCallback((exercises: SessionExercise[]) => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
@@ -90,35 +113,25 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
 
   const completeSet = (exIndex: number, setIndex: number) => {
     if (!session) return
-    const updated = [...session.exercises]
-    const sets = [...updated[exIndex].sets]
-    const set = sets[setIndex]
+    // FB-05 follow-up — delegate to pure helper so the three bug rules
+    // (rest-timer on every non-final-exercise completion, rest_seconds=0 skip,
+    // restKey bump even when duration is unchanged) are unit-tested in isolation.
+    const result = computeCompleteSetResult(
+      session.exercises,
+      exIndex,
+      setIndex,
+      new Date().toISOString(),
+    )
+    setSession({ ...session, exercises: result.exercises })
+    saveExercises(result.exercises)
 
-    if (set.completed) {
-      sets[setIndex] = { ...set, completed: false, completed_at: null }
-    } else {
-      sets[setIndex] = { ...set, completed: true, completed_at: new Date().toISOString() }
-
-      if (updated[exIndex].status === 'pending') {
-        updated[exIndex] = { ...updated[exIndex], status: 'in_progress' }
-      }
-
-      const allDone = sets.every((s) => s.completed)
-      if (allDone) {
-        updated[exIndex] = { ...updated[exIndex], status: 'completed', sets }
-        setSession({ ...session, exercises: updated })
-        saveExercises(updated)
-        // All exercises stay expanded — no auto-collapse needed
-        return
-      }
-
-      setRestSeconds(updated[exIndex].rest_seconds || 90)
+    if (result.rest.show) {
+      setRestSeconds(result.rest.seconds)
       setShowRestTimer(true)
     }
-
-    updated[exIndex] = { ...updated[exIndex], sets }
-    setSession({ ...session, exercises: updated })
-    saveExercises(updated)
+    if (result.rest.bumpKey) {
+      setRestKey((k) => k + 1)
+    }
   }
 
   const handleComplete = async () => {
@@ -193,6 +206,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
       <RestTimer
         isActive={showRestTimer}
         duration={restSeconds}
+        resetToken={restKey}
         onSkip={() => setShowRestTimer(false)}
         onComplete={() => setShowRestTimer(false)}
       />
