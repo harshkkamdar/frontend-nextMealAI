@@ -20,6 +20,13 @@ export async function createLog(data: CreateLogInput): Promise<Log> {
   return apiFetch<Log>('/v1/logs', { method: 'POST', body: data })
 }
 
+export async function updateLog(
+  id: string,
+  payload: Partial<Log['payload']>
+): Promise<Log> {
+  return apiFetch<Log>(`/v1/logs/${id}`, { method: 'PATCH', body: { payload } })
+}
+
 export async function deleteLog(id: string): Promise<void> {
   await apiFetch(`/v1/logs/${id}`, { method: 'DELETE' })
 }
