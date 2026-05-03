@@ -36,6 +36,7 @@ function FoodRow({ food, onSelect, onToggleFavorite }: {
         <p className="text-sm text-text-primary truncate">{food.name}</p>
         <p className="text-[11px] text-text-tertiary">
           {formatMacroKcal(food.macros_per_serving.calories)} cal
+          {food.serving_size_g ? ` · per ${food.serving_size_g}g` : ''}
           {food.brand ? ` · ${food.brand}` : ''}
           {food.source === 'usda' && ' · USDA'}
         </p>

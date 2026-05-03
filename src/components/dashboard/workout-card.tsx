@@ -1,6 +1,6 @@
 'use client'
 
-import { Moon, Circle, Dumbbell } from 'lucide-react'
+import { Moon, Dumbbell } from 'lucide-react'
 import Link from 'next/link'
 import type { WorkoutPlan } from '@/types/plans.types'
 
@@ -74,26 +74,32 @@ export function WorkoutCard({ workoutPlan, today }: { workoutPlan: WorkoutPlan |
   }
 
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-2">
-        Today&apos;s Workout
-      </span>
-      <p className="text-base font-semibold text-text-primary mb-3">{todayWorkout.name}</p>
-      {todayWorkout.exercises && todayWorkout.exercises.length > 0 && (
-        <ul className="space-y-2">
-          {todayWorkout.exercises.map((exercise, i) => (
-            <li key={i} className="flex items-center gap-2">
-              <Circle className="w-4 h-4 text-text-tertiary shrink-0" />
-              <span className="text-sm text-text-primary">{exercise.name}</span>
-              {exercise.sets != null && exercise.reps != null && (
-                <span className="text-xs text-text-secondary tabular-nums ml-auto">
-                  {exercise.sets} &times; {exercise.reps}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <Link
+      href="/activity"
+      className="block active:scale-[0.98] transition-transform"
+      aria-label={`Open today's workout: ${todayWorkout.name}`}
+    >
+      <div className="bg-surface border border-border rounded-2xl p-4">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-2">
+          Today&apos;s Workout
+        </span>
+        <p className="text-base font-semibold text-text-primary mb-3">{todayWorkout.name}</p>
+        {todayWorkout.exercises && todayWorkout.exercises.length > 0 && (
+          <ul className="space-y-2">
+            {todayWorkout.exercises.map((exercise, i) => (
+              <li key={i} className="flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-text-tertiary shrink-0" aria-hidden="true" />
+                <span className="text-sm text-text-primary">{exercise.name}</span>
+                {exercise.sets != null && exercise.reps != null && (
+                  <span className="text-xs text-text-secondary tabular-nums ml-auto">
+                    {exercise.sets} &times; {exercise.reps}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Link>
   )
 }

@@ -17,12 +17,17 @@ interface MacroBarProps {
 
 function MacroBar({ label, macro, consumed, target, color, onDotClick }: MacroBarProps) {
   const pct = target > 0 ? Math.min((consumed / target) * 100, 100) : 0
+  const remaining = Math.max(0, target - consumed)
 
   return (
     <div className="flex-1">
       <div className="flex items-baseline justify-between mb-0.5">
         <span className="text-[10px] font-medium text-text-tertiary uppercase tracking-wide">{label}</span>
-        <span className="text-[10px] tabular-nums text-text-secondary">{formatMacroGrams(consumed)}</span>
+        <span className="text-[10px] tabular-nums text-text-secondary">
+          {target > 0
+            ? <>{formatMacroGrams(consumed)} &middot; {formatMacroGrams(remaining)} left</>
+            : formatMacroGrams(consumed)}
+        </span>
       </div>
       <div className="relative h-1.5 rounded-full bg-surface-hover">
         <div className={`h-1.5 rounded-full ${color}`} style={{ width: `${pct}%` }} />

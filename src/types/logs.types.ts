@@ -33,6 +33,13 @@ export interface FoodPayload {
   items?: FoodLogItem[]
 }
 
+export interface WorkoutLogExerciseEntry {
+  name: string
+  sets?: number
+  reps?: number
+  weight_kg?: number
+}
+
 export interface WorkoutPayload {
   // Optional because workout-session completion entries (inserted by
   // backend POST /v1/workout-sessions/:id/complete) do not include `exercise`
@@ -44,6 +51,9 @@ export interface WorkoutPayload {
   duration_min?: number
   difficulty_rating?: number
   notes?: string
+  // FB-D5 multi-exercise freestyle log
+  title?: string
+  exercises?: WorkoutLogExerciseEntry[]
   // Session-completion fields:
   session_id?: string
   day_name?: string
@@ -86,6 +96,9 @@ export interface Log {
   type: LogType
   payload: LogPayload
   source: LogSource
+  /** FB-12 — user-local calendar date the log was bucketed into. Null on
+   *  legacy rows until the backfill runs after a tz capture. */
+  local_date?: string | null
   created_at: string
   updated_at: string
 }

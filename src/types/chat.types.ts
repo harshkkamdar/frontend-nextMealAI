@@ -1,5 +1,17 @@
 export type MessageRole = 'user' | 'assistant'
 
+export interface ActionFailure {
+  tool: string
+  error: string
+  details?: unknown
+}
+
+export interface ChatMessageMetadata {
+  tools_used?: string[]
+  actions_taken?: Array<{ type: string; details: unknown }>
+  actions_failed?: ActionFailure[]
+}
+
 export interface ChatMessage {
   id?: string
   role: MessageRole
@@ -7,6 +19,7 @@ export interface ChatMessage {
   timestamp?: string
   tokens_used?: number
   image?: string // data URL or blob URL for local display
+  metadata?: ChatMessageMetadata
 }
 
 export interface ChatSession {
@@ -26,9 +39,11 @@ export interface ChatResponse {
     content: string
     role: MessageRole
     tokens_used?: number
+    metadata?: ChatMessageMetadata
   }
   tools_used?: string[]
-  actions_taken?: string[]
+  actions_taken?: Array<{ type: string; details: unknown }>
+  actions_failed?: ActionFailure[]
 }
 
 export interface SendMessageInput {

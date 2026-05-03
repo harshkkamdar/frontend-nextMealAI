@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -10,38 +9,42 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { login } from '@/lib/api/auth.api'
+import { forgotPassword } from '@/lib/api/auth.api'
 
-const loginSchema = z.object({
+const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email'),
-  password: z.string().min(1, 'Password is required'),
 })
 
-type LoginValues = z.infer<typeof loginSchema>
+type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>
 
-export function LoginForm() {
-  const router = useRouter()
+export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<ForgotPasswordValues>({
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   })
 
-  async function onSubmit(data: LoginValues) {
+  async function onSubmit(data: ForgotPasswordValues) {
     setIsLoading(true)
     try {
-      await login(data.email, data.password)
-      router.push('/dashboard')
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to sign in')
+      await forgotPassword(data.email)
+      // Generic success message — never reveal whether the email exists.
+      toast.success("If that email exists, we've sent you a reset link.")
+      reset()
+    } catch {
+      // Even on error, surface the same generic message so we don't leak
+      // account existence. The backend already returns 200 in normal cases;
+      // a non-2xx response here would typically be a rate-limit or network
+      // hiccup.
+      toast.success("If that email exists, we've sent you a reset link.")
     } finally {
       setIsLoading(false)
     }
@@ -51,10 +54,10 @@ export function LoginForm() {
     <div>
       <div className="mb-8 text-center">
         <h1 className="text-[22px] font-semibold text-text-primary">
-          Welcome back
+          Forgot your password?
         </h1>
         <p className="mt-1 text-sm text-text-secondary">
-          Sign in to your account
+          Enter your email and we&apos;ll send you a reset link
         </p>
       </div>
 
@@ -73,41 +76,18 @@ export function LoginForm() {
           )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            autoComplete="current-password"
-            {...register('password')}
-          />
-          {errors.password && (
-            <p className="text-xs text-red-500">{errors.password.message}</p>
-          )}
-          <div className="flex justify-end">
-            <Link
-              href="/forgot-password"
-              className="text-xs text-accent hover:text-accent-hover"
-            >
-              Forgot password?
-            </Link>
-          </div>
-        </div>
-
         <Button
           type="submit"
           disabled={isLoading}
           className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
         >
-          {isLoading ? 'Signing in...' : 'Sign in'}
+          {isLoading ? 'Sending...' : 'Send reset link'}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-text-secondary">
-        Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-medium text-accent hover:text-accent-hover">
-          Sign up
+        <Link href="/login" className="font-medium text-accent hover:text-accent-hover">
+          Back to sign in
         </Link>
       </p>
     </div>

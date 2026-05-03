@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,6 +8,7 @@ import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Loader2, MessageCircle } from 'lucide-react'
+import { computeAgeFromDob, computeDailyTargets } from '@/lib/tdee'
 import type { Profile, PrimaryGoal, ActivityLevel, DietaryStyle } from '@/types/profile.types'
 
 const GOAL_OPTIONS: { value: PrimaryGoal; label: string }[] = [
@@ -69,6 +70,20 @@ export function ProfileForm() {
   const [activity, setActivity] = useState<ActivityLevel | undefined>()
   const [diet, setDiet] = useState<DietaryStyle | undefined>()
   const [equipment, setEquipment] = useState<string[]>([])
+  // Daily target overrides — only sent on save if user touched the input
+  // (touchedTargets[field] = true). Untouched fields are omitted from the
+  // PUT body so the backend recomputes them from TDEE on every save.
+  const [dailyCalories, setDailyCalories] = useState('')
+  const [dailyProtein, setDailyProtein] = useState('')
+  const [dailyCarbs, setDailyCarbs] = useState('')
+  const [dailyFat, setDailyFat] = useState('')
+  const [touchedTargets, setTouchedTargets] = useState({
+    calories: false,
+    protein: false,
+    carbs: false,
+    fat: false,
+  })
+  const [resettingTargets, setResettingTargets] = useState(false)
 
   useEffect(() => {
     getProfile()
@@ -81,6 +96,10 @@ export function ProfileForm() {
         setActivity(normalizeActivityLevel(p.activity_level))
         setDiet(p.dietary_style)
         setEquipment(p.equipment ?? [])
+        setDailyCalories(p.daily_calorie_target?.toString() ?? '')
+        setDailyProtein(p.daily_protein_g?.toString() ?? '')
+        setDailyCarbs(p.daily_carbs_g?.toString() ?? '')
+        setDailyFat(p.daily_fat_g?.toString() ?? '')
       })
       .catch(() => toast.error('Failed to load profile'))
       .finally(() => setLoading(false))
@@ -111,8 +130,33 @@ export function ProfileForm() {
         dietary_style: diet,
         equipment,
       }
-      const updated = await updateProfile(data)
-      setProfile(updated)
+
+      // Only include daily_* targets the user actually touched. Untouched
+      // fields are omitted so the backend recomputes them from TDEE every
+      // save (so changing goal/weight propagates without you having to
+      // re-type any Daily Targets values).
+      if (touchedTargets.calories) {
+        data.daily_calorie_target = dailyCalories.trim() === '' ? null : Number(dailyCalories)
+      }
+      if (touchedTargets.protein) {
+        data.daily_protein_g = dailyProtein.trim() === '' ? null : Number(dailyProtein)
+      }
+      if (touchedTargets.carbs) {
+        data.daily_carbs_g = dailyCarbs.trim() === '' ? null : Number(dailyCarbs)
+      }
+      if (touchedTargets.fat) {
+        data.daily_fat_g = dailyFat.trim() === '' ? null : Number(dailyFat)
+      }
+
+      await updateProfile(data)
+      // Re-fetch so inputs reflect the backend's recomputed values.
+      const fresh = await getProfile()
+      setProfile(fresh)
+      setDailyCalories(fresh.daily_calorie_target?.toString() ?? '')
+      setDailyProtein(fresh.daily_protein_g?.toString() ?? '')
+      setDailyCarbs(fresh.daily_carbs_g?.toString() ?? '')
+      setDailyFat(fresh.daily_fat_g?.toString() ?? '')
+      setTouchedTargets({ calories: false, protein: false, carbs: false, fat: false })
       toast.success('Profile updated')
     } catch {
       toast.error('Failed to update profile')
@@ -120,6 +164,47 @@ export function ProfileForm() {
       setSaving(false)
     }
   }
+
+  const handleResetTargetsToBaseline = async () => {
+    setResettingTargets(true)
+    try {
+      await updateProfile({
+        daily_calorie_target: null,
+        daily_protein_g: null,
+        daily_carbs_g: null,
+        daily_fat_g: null,
+      })
+      const fresh = await getProfile()
+      setProfile(fresh)
+      setDailyCalories(fresh.daily_calorie_target?.toString() ?? '')
+      setDailyProtein(fresh.daily_protein_g?.toString() ?? '')
+      setDailyCarbs(fresh.daily_carbs_g?.toString() ?? '')
+      setDailyFat(fresh.daily_fat_g?.toString() ?? '')
+      toast.success('Reset to TDEE baseline')
+    } catch {
+      toast.error('Failed to reset targets')
+    } finally {
+      setResettingTargets(false)
+    }
+  }
+
+  // Live preview — recompute the projected daily targets as the user changes
+  // weight / height / goal / activity, BEFORE they hit Save. The placeholders
+  // and the "preview" line below show these so users can see their goal
+  // change instantly. The backend stays authoritative on save.
+  // Note: must be called BEFORE any conditional return below to satisfy
+  // React's Rules of Hooks.
+  const previewTargets = useMemo(() => {
+    return computeDailyTargets({
+      weightKg: currentWeight ? Number(currentWeight) : null,
+      heightCm: height ? Number(height) : null,
+      ageYears: computeAgeFromDob(profile?.dob ?? null),
+      sex: profile?.sex ?? null,
+      activityLevel: activity ?? null,
+      primaryGoal: goal ?? null,
+      targetWeightKg: targetWeight ? Number(targetWeight) : null,
+    })
+  }, [currentWeight, height, targetWeight, goal, activity, profile?.dob, profile?.sex])
 
   if (loading) {
     return (
@@ -135,8 +220,25 @@ export function ProfileForm() {
     return <p className="text-text-secondary text-sm">Unable to load profile.</p>
   }
 
+  // FB-tdee-baseline UX — surface the specific fields the user needs to
+  // fill before TDEE can compute, so the form input doesn't look "set" via
+  // a placeholder when it's actually empty.
+  const missingFields = profile.daily_targets_missing_fields ?? []
+  const heightMissing = missingFields.includes('height_cm')
+  const weightMissing = missingFields.includes('current_weight_kg')
+
   return (
     <div className="space-y-4">
+      {missingFields.length > 0 && (
+        <div className="bg-warning/10 border border-warning/30 rounded-2xl p-4">
+          <p className="text-sm font-semibold text-text-primary">Daily targets aren't computing yet</p>
+          <p className="text-xs text-text-secondary mt-1">
+            We still need: <span className="font-medium text-text-primary">{missingFields.join(', ')}</span>.
+            Fill these in and tap <span className="font-medium">Save changes</span> at the bottom.
+          </p>
+        </div>
+      )}
+
       {/* Measurements */}
       <div className="bg-surface border border-border rounded-2xl p-4">
         <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-3">
@@ -144,14 +246,17 @@ export function ProfileForm() {
         </p>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-text-secondary text-xs mb-1">Weight (kg)</Label>
+            <Label className="text-text-secondary text-xs mb-1">
+              Weight (kg) {weightMissing && <span className="text-warning">· required</span>}
+            </Label>
             <Input
               type="number"
               inputMode="decimal"
               step="0.1"
               value={currentWeight}
               onChange={(e) => setCurrentWeight(e.target.value)}
-              placeholder="75"
+              placeholder={weightMissing ? 'enter your weight' : 'e.g. 75'}
+              className={cn(weightMissing && 'border-warning')}
             />
           </div>
           <div>
@@ -162,19 +267,97 @@ export function ProfileForm() {
               step="0.1"
               value={targetWeight}
               onChange={(e) => setTargetWeight(e.target.value)}
-              placeholder="70"
+              placeholder="e.g. 70"
             />
           </div>
         </div>
         <div className="mt-3">
-          <Label className="text-text-secondary text-xs mb-1">Height (cm)</Label>
+          <Label className="text-text-secondary text-xs mb-1">
+            Height (cm) {heightMissing && <span className="text-warning">· required</span>}
+          </Label>
           <Input
             type="number"
+            inputMode="decimal"
+            step="0.1"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
-            placeholder="175"
+            placeholder={heightMissing ? 'enter your height' : 'e.g. 175'}
+            className={cn(heightMissing && 'border-warning')}
           />
         </div>
+      </div>
+
+      {/* Daily Targets — manual override of TDEE auto-compute */}
+      <div className="bg-surface border border-border rounded-2xl p-4">
+        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-1">
+          Daily Targets
+        </p>
+        <p className="text-xs text-text-secondary mb-2">
+          Auto-computed from your profile (weight, height, goal, etc.). Numbers update instantly as you change goal or measurements. Type your own number in any field to override just that one — the rest still recompute on save.
+        </p>
+        {previewTargets ? (
+          <div className="bg-accent-light/40 border border-accent/20 rounded-lg px-3 py-2 mb-3 text-xs">
+            <span className="text-text-tertiary">Live preview: </span>
+            <span className="font-medium text-text-primary tabular-nums">
+              {previewTargets.calories} cal · {previewTargets.protein}g P · {previewTargets.carbs}g C · {previewTargets.fat}g F
+            </span>
+          </div>
+        ) : null}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className="text-text-secondary text-xs mb-1">Calories</Label>
+            <Input
+              type="number"
+              inputMode="numeric"
+              value={dailyCalories}
+              onChange={(e) => { setDailyCalories(e.target.value); setTouchedTargets(t => ({ ...t, calories: true })) }}
+              placeholder={previewTargets ? String(previewTargets.calories) : (profile.daily_calorie_target ? String(profile.daily_calorie_target) : '—')}
+            />
+          </div>
+          <div>
+            <Label className="text-text-secondary text-xs mb-1">Protein (g)</Label>
+            <Input
+              type="number"
+              inputMode="numeric"
+              value={dailyProtein}
+              onChange={(e) => { setDailyProtein(e.target.value); setTouchedTargets(t => ({ ...t, protein: true })) }}
+              placeholder={previewTargets ? String(previewTargets.protein) : (profile.daily_protein_g ? String(profile.daily_protein_g) : '—')}
+            />
+          </div>
+          <div>
+            <Label className="text-text-secondary text-xs mb-1">Carbs (g)</Label>
+            <Input
+              type="number"
+              inputMode="numeric"
+              value={dailyCarbs}
+              onChange={(e) => { setDailyCarbs(e.target.value); setTouchedTargets(t => ({ ...t, carbs: true })) }}
+              placeholder={previewTargets ? String(previewTargets.carbs) : (profile.daily_carbs_g ? String(profile.daily_carbs_g) : '—')}
+            />
+          </div>
+          <div>
+            <Label className="text-text-secondary text-xs mb-1">Fat (g)</Label>
+            <Input
+              type="number"
+              inputMode="numeric"
+              value={dailyFat}
+              onChange={(e) => { setDailyFat(e.target.value); setTouchedTargets(t => ({ ...t, fat: true })) }}
+              placeholder={previewTargets ? String(previewTargets.fat) : (profile.daily_fat_g ? String(profile.daily_fat_g) : '—')}
+            />
+          </div>
+        </div>
+        {(profile.daily_calorie_target != null
+          || profile.daily_protein_g != null
+          || profile.daily_carbs_g != null
+          || profile.daily_fat_g != null) && (
+          <button
+            type="button"
+            onClick={handleResetTargetsToBaseline}
+            disabled={resettingTargets}
+            className="mt-3 text-xs text-accent hover:underline disabled:opacity-50"
+          >
+            {resettingTargets ? 'Resetting…' : 'Reset to TDEE baseline'}
+          </button>
+        )}
       </div>
 
       {/* Primary Goal */}

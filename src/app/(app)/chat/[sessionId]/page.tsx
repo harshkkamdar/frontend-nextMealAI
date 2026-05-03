@@ -97,6 +97,11 @@ export default function ActiveChatPage({
         role: res.response.role,
         content: res.response.content,
         timestamp: new Date().toISOString(),
+        metadata: {
+          tools_used: res.tools_used,
+          actions_taken: res.actions_taken,
+          actions_failed: res.actions_failed,
+        },
       }
       setMessages((prev) => [...prev, geoMessage])
 

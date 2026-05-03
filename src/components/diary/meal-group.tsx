@@ -14,14 +14,16 @@ interface MealGroupProps {
   items: Log[]
   onAddFood: () => void
   onDeleteLog: (id: string) => void
+  onUpdateLog?: (id: string, payload: FoodPayload) => void
 }
 
-export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroupProps) {
+export function MealGroup({ mealType, items, onAddFood, onDeleteLog, onUpdateLog }: MealGroupProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [confirmDeleteLog, setConfirmDeleteLog] = useState<Log | null>(null)
   // FB-10: expand state + per-child edit draft (keyed by `${logId}:${childIdx}`)
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set())
   const [editingChild, setEditingChild] = useState<{ logId: string; idx: number } | null>(null)
+  const [editingParent, setEditingParent] = useState<string | null>(null)
 
   const subtotals = items.reduce((acc, item) => {
     const payload = item.payload as FoodPayload
@@ -88,40 +90,72 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog }: MealGroup
               exit={{ opacity: 0, height: 0 }}
               className="border-b border-border/50 last:border-b-0"
             >
-              <div className="flex items-center gap-3 px-4 py-2.5">
-                {hasChildren ? (
-                  <button
-                    type="button"
-                    onClick={() => toggleExpand(item.id)}
-                    aria-expanded={isExpanded}
-                    aria-controls={childrenListId}
-                    aria-label="Expand items"
-                    className="p-1 -ml-1 rounded text-text-tertiary hover:text-text-primary transition-colors shrink-0"
-                  >
-                    <ChevronDown
-                      className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-                ) : null}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-text-primary truncate">{payload.food_name}</p>
-                  <p className="text-[11px] text-text-tertiary tabular-nums">
-                    {payload.quantity_g ? `${payload.quantity_g}g` : '1 serving'}
-                    {cals > 0 && ` · ${formatMacroKcal(cals)} cal`}
-                    {protein > 0 && <> · <span className="text-info">{formatMacroGrams(protein)} P</span></>}
-                    {carbsVal > 0 && <> · <span className="text-warning">{formatMacroGrams(carbsVal)} C</span></>}
-                    {fatVal > 0 && <> · <span className="text-purple-400">{formatMacroGrams(fatVal)} F</span></>}
-                  </p>
+              {editingParent === item.id && !hasChildren ? (
+                <div className="px-4 py-2.5">
+                  <ParentFoodEditForm
+                    payload={payload}
+                    onCancel={() => setEditingParent(null)}
+                    onSave={async (updated) => {
+                      const prevPayload = payload
+                      const nextPayload: FoodPayload = { ...payload, ...updated }
+                      onUpdateLog?.(item.id, nextPayload)
+                      try {
+                        await updateLog(item.id, updated)
+                        toast.success('Updated')
+                        setEditingParent(null)
+                      } catch {
+                        onUpdateLog?.(item.id, prevPayload)
+                        toast.error('Failed to update')
+                      }
+                    }}
+                  />
                 </div>
-                <button
-                  onClick={() => setConfirmDeleteLog(item)}
-                  disabled={deletingId === item.id}
-                  className="p-1.5 rounded-full text-text-tertiary hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                  aria-label="Remove food"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3 px-4 py-2.5">
+                  {hasChildren ? (
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(item.id)}
+                      aria-expanded={isExpanded}
+                      aria-controls={childrenListId}
+                      aria-label="Expand items"
+                      className="p-1 -ml-1 rounded text-text-tertiary hover:text-text-primary transition-colors shrink-0"
+                    >
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                  ) : null}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-text-primary truncate">{payload.food_name}</p>
+                    <p className="text-[11px] text-text-tertiary tabular-nums">
+                      {payload.quantity_g ? `${payload.quantity_g}g` : '1 serving'}
+                      {cals > 0 && ` · ${formatMacroKcal(cals)} cal`}
+                      {protein > 0 && <> · <span className="text-info">{formatMacroGrams(protein)} P</span></>}
+                      {carbsVal > 0 && <> · <span className="text-warning">{formatMacroGrams(carbsVal)} C</span></>}
+                      {fatVal > 0 && <> · <span className="text-purple-400">{formatMacroGrams(fatVal)} F</span></>}
+                    </p>
+                  </div>
+                  {!hasChildren ? (
+                    <button
+                      type="button"
+                      onClick={() => setEditingParent(item.id)}
+                      aria-label="Edit food"
+                      className="p-1.5 rounded-full text-text-tertiary hover:text-accent transition-colors shrink-0"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                  ) : null}
+                  <button
+                    onClick={() => setConfirmDeleteLog(item)}
+                    disabled={deletingId === item.id}
+                    className="p-1.5 rounded-full text-text-tertiary hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                    aria-label="Remove food"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
 
               {hasChildren && isExpanded ? (
                 <ul
@@ -272,6 +306,129 @@ function ChildEditForm({
     <div className="space-y-1.5">
       <p className="text-[11px] font-medium text-text-primary">{child.name}</p>
       <div className="grid grid-cols-4 gap-1.5 text-[10px]">
+        <label className="flex flex-col">
+          <span className="text-text-tertiary">Calories</span>
+          <input
+            type="number"
+            value={calories}
+            onChange={(e) => setCalories(e.target.value)}
+            className="px-1.5 py-1 rounded bg-background border border-border text-text-primary"
+          />
+        </label>
+        <label className="flex flex-col">
+          <span className="text-text-tertiary">Protein (g)</span>
+          <input
+            type="number"
+            value={protein}
+            onChange={(e) => setProtein(e.target.value)}
+            className="px-1.5 py-1 rounded bg-background border border-border text-text-primary"
+          />
+        </label>
+        <label className="flex flex-col">
+          <span className="text-text-tertiary">Carbs (g)</span>
+          <input
+            type="number"
+            value={carbs}
+            onChange={(e) => setCarbs(e.target.value)}
+            className="px-1.5 py-1 rounded bg-background border border-border text-text-primary"
+          />
+        </label>
+        <label className="flex flex-col">
+          <span className="text-text-tertiary">Fat (g)</span>
+          <input
+            type="number"
+            value={fat}
+            onChange={(e) => setFat(e.target.value)}
+            className="px-1.5 py-1 rounded bg-background border border-border text-text-primary"
+          />
+        </label>
+      </div>
+      <div className="flex items-center justify-end gap-1.5 pt-1">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={saving}
+          className="px-2 py-1 text-[10px] rounded text-text-tertiary hover:text-text-primary"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className="px-2 py-1 text-[10px] rounded bg-accent text-background font-medium"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function ParentFoodEditForm({
+  payload,
+  onCancel,
+  onSave,
+}: {
+  payload: FoodPayload
+  onCancel: () => void
+  onSave: (updated: Partial<FoodPayload>) => void | Promise<void>
+}) {
+  const [foodName, setFoodName] = useState(payload.food_name ?? '')
+  const [quantityG, setQuantityG] = useState(
+    payload.quantity_g != null ? String(payload.quantity_g) : ''
+  )
+  const [calories, setCalories] = useState(String(payload.est_macros?.calories ?? 0))
+  const [protein, setProtein] = useState(String(payload.est_macros?.protein ?? 0))
+  const [carbs, setCarbs] = useState(String(payload.est_macros?.carbs ?? 0))
+  const [fat, setFat] = useState(String(payload.est_macros?.fat ?? 0))
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const trimmedName = foodName.trim()
+      const updated: Partial<FoodPayload> = {
+        food_name: trimmedName.length > 0 ? trimmedName : payload.food_name,
+        est_macros: {
+          calories: Number(calories) || 0,
+          protein: Number(protein) || 0,
+          carbs: Number(carbs) || 0,
+          fat: Number(fat) || 0,
+        },
+      }
+      const qg = quantityG.trim()
+      if (qg.length > 0) {
+        const parsed = Number(qg)
+        if (Number.isFinite(parsed) && parsed >= 0) updated.quantity_g = parsed
+      }
+      await onSave(updated)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <label className="flex flex-col text-[10px]">
+        <span className="text-text-tertiary">Food name</span>
+        <input
+          type="text"
+          value={foodName}
+          onChange={(e) => setFoodName(e.target.value)}
+          className="px-1.5 py-1 rounded bg-background border border-border text-text-primary text-[11px]"
+        />
+      </label>
+      <div className="grid grid-cols-5 gap-1.5 text-[10px]">
+        <label className="flex flex-col">
+          <span className="text-text-tertiary">Qty (g)</span>
+          <input
+            type="number"
+            value={quantityG}
+            onChange={(e) => setQuantityG(e.target.value)}
+            className="px-1.5 py-1 rounded bg-background border border-border text-text-primary"
+          />
+        </label>
         <label className="flex flex-col">
           <span className="text-text-tertiary">Calories</span>
           <input

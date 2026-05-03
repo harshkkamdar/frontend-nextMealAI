@@ -48,10 +48,12 @@ export default function DiaryPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  // Filter logs for selected date
+  // Filter logs for selected date — FB-12: prefer the user-local bucket date
+  // so 7:21 AM logs land under "today" regardless of UTC offset. Falls back
+  // to UTC slicing for legacy rows where local_date is still NULL.
   const dayLogs = useMemo(() => {
     return logs.filter((log) => {
-      const logDate = new Date(log.created_at).toISOString().split('T')[0]
+      const logDate = log.local_date ?? new Date(log.created_at).toISOString().split('T')[0]
       return logDate === selectedDate && log.type === 'food'
     })
   }, [logs, selectedDate])
@@ -103,11 +105,11 @@ export default function DiaryPage() {
     return formatWeekMonthLabel(weekDates)
   }, [selectedDate])
 
-  // Calendar indicators
+  // Calendar indicators — FB-12: bucket the dot under the user's local date.
   const indicators = useMemo(() => {
     const map = new Map<string, { food?: boolean; workout?: boolean }>()
     for (const log of logs) {
-      const d = new Date(log.created_at).toISOString().split('T')[0]
+      const d = log.local_date ?? new Date(log.created_at).toISOString().split('T')[0]
       const existing = map.get(d) || {}
       existing.food = true
       map.set(d, existing)
@@ -122,6 +124,12 @@ export default function DiaryPage() {
 
   const handleDeleteLog = (logId: string) => {
     setLogs((prev) => prev.filter((l) => l.id !== logId))
+  }
+
+  const handleUpdateLog = (logId: string, payload: FoodPayload) => {
+    setLogs((prev) =>
+      prev.map((l) => (l.id === logId ? { ...l, payload } : l))
+    )
   }
 
   const handleFoodLogged = () => {
@@ -176,6 +184,7 @@ export default function DiaryPage() {
               items={groupedMeals[mealType] || []}
               onAddFood={() => handleAddFood(mealType)}
               onDeleteLog={handleDeleteLog}
+              onUpdateLog={handleUpdateLog}
             />
           ))}
         </div>

@@ -2,7 +2,8 @@
 
 import { use, useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Check, ChevronDown, MessageCircle } from 'lucide-react'
+import { ArrowLeft, Check, ChevronDown, MessageCircle, Trash2 } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { RestTimer } from '@/components/workout/rest-timer'
@@ -12,8 +13,11 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import {
   getWorkoutSession,
   updateWorkoutSession,
-  completeWorkoutSession
+  completeWorkoutSession,
+  abandonWorkoutSession
 } from '@/lib/api/workout-sessions.api'
+import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
+import { AddRowButton, NumberField, SearchablePicker } from '@/components/plans/plan-builder-shared'
 import { cn } from '@/lib/utils'
 import {
   resolveElapsedForSession,
@@ -36,6 +40,29 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [completing, setCompleting] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
+  const [showExitSheet, setShowExitSheet] = useState(false)
+  const [removeConfirmIndex, setRemoveConfirmIndex] = useState<number | null>(null)
+  // Dismiss the inline "Remove?" confirm on any outside tap so it doesn't
+  // linger as a permanent-looking label after an accidental trash tap.
+  useEffect(() => {
+    if (removeConfirmIndex === null) return
+    const onDocClick = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement | null
+      if (target && target.closest('[data-remove-confirm="true"]')) return
+      setRemoveConfirmIndex(null)
+    }
+    document.addEventListener('mousedown', onDocClick)
+    document.addEventListener('touchstart', onDocClick)
+    return () => {
+      document.removeEventListener('mousedown', onDocClick)
+      document.removeEventListener('touchstart', onDocClick)
+    }
+  }, [removeConfirmIndex])
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [addPick, setAddPick] = useState<ExerciseSearchResult | null>(null)
+  const [addSets, setAddSets] = useState<number | undefined>(3)
+  const [addReps, setAddReps] = useState<number | undefined>(10)
+  const [addRest, setAddRest] = useState<number | undefined>(90)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useSetGeoScreen('workout_follow', {
@@ -169,7 +196,81 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
 
   const handleBack = () => {
     if (showSummary || session?.status === 'completed') { router.push('/activity'); return }
-    if (confirm('End workout? Your progress is saved and you can resume later.')) router.push('/activity')
+    setShowExitSheet(true)
+  }
+
+  const handleSaveAndExit = () => {
+    // Session is already saved (debounced 500ms saves on every input). Just navigate.
+    router.push('/activity')
+  }
+
+  const handleDiscard = async () => {
+    try {
+      await abandonWorkoutSession(sessionId)
+      toast.success('Workout discarded')
+      router.push('/activity')
+    } catch {
+      toast.error('Failed to discard workout')
+    }
+  }
+
+  const handleRemoveExercise = (exIndex: number) => {
+    if (!session) return
+    const next = session.exercises.filter((_, i) => i !== exIndex)
+    setSession({ ...session, exercises: next })
+    setRemoveConfirmIndex(null)
+    // Also clear any collapsed indices that are now out of range / shifted
+    setCollapsedIndices((prev) => {
+      const updated = new Set<number>()
+      prev.forEach((idx) => {
+        if (idx < exIndex) updated.add(idx)
+        else if (idx > exIndex) updated.add(idx - 1)
+      })
+      return updated
+    })
+    updateWorkoutSession(sessionId, { exercises: next })
+      .then(() => toast.success('Exercise removed'))
+      .catch(() => toast.error('Failed to remove exercise'))
+  }
+
+  const resetAddForm = () => {
+    setShowAddForm(false)
+    setAddPick(null)
+    setAddSets(3)
+    setAddReps(10)
+    setAddRest(90)
+  }
+
+  const handleAddExercise = () => {
+    if (!session || !addPick) return
+    const sets = addSets ?? 3
+    const reps = addReps ?? 10
+    const restSeconds = addRest ?? 90
+    const newExercise: SessionExercise = {
+      name: addPick.name,
+      muscle_group: addPick.primary_muscles?.[0] ?? null,
+      planned_sets: sets,
+      planned_reps: reps,
+      rest_seconds: restSeconds,
+      instructions: [],
+      notes: null,
+      status: 'pending',
+      sets: Array.from({ length: sets }, (_, i) => ({
+        set_number: i + 1,
+        planned_reps: reps,
+        planned_weight_kg: null,
+        actual_reps: null,
+        actual_weight_kg: null,
+        completed: false,
+        completed_at: null,
+      })),
+    }
+    const next = [...session.exercises, newExercise]
+    setSession({ ...session, exercises: next })
+    resetAddForm()
+    updateWorkoutSession(sessionId, { exercises: next })
+      .then(() => toast.success('Exercise added'))
+      .catch(() => toast.error('Failed to add exercise'))
   }
 
   const formatTime = (secs: number) => {
@@ -269,46 +370,78 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
               )}
             >
               {/* Row header — tap to expand/collapse */}
-              <button
-                onClick={() => setCollapsedIndices(prev => {
-                  const next = new Set(prev)
-                  next.has(exIndex) ? next.delete(exIndex) : next.add(exIndex)
-                  return next
-                })}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left"
-              >
-                <div className={cn(
-                  'w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center',
-                  exercise.status === 'completed' ? 'bg-success border-success' :
-                  exercise.status === 'in_progress' ? 'border-accent' :
-                  'border-border'
-                )}>
-                  {exercise.status === 'completed' && <Check className="w-3 h-3 text-white" />}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    'text-sm font-medium truncate',
-                    exercise.status === 'completed' ? 'text-text-secondary line-through' : 'text-text-primary'
+              <div className="w-full flex items-center gap-1 pr-2">
+                <button
+                  onClick={() => setCollapsedIndices(prev => {
+                    const next = new Set(prev)
+                    next.has(exIndex) ? next.delete(exIndex) : next.add(exIndex)
+                    return next
+                  })}
+                  className="flex-1 flex items-center gap-3 px-4 py-3 text-left"
+                >
+                  <div className={cn(
+                    'w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center',
+                    exercise.status === 'completed' ? 'bg-success border-success' :
+                    exercise.status === 'in_progress' ? 'border-accent' :
+                    'border-border'
                   )}>
-                    {exercise.name}
-                  </p>
-                  <p className="text-[11px] text-text-tertiary mt-0.5">
-                    {exercise.muscle_group && (
-                      <span className="text-accent mr-2">{exercise.muscle_group}</span>
-                    )}
-                    {completedSets}/{totalSets} sets
-                    {exercise.rest_seconds && (
-                      <span className="ml-2 text-text-tertiary">{exercise.rest_seconds >= 60 ? `${Math.floor(exercise.rest_seconds / 60)}m${exercise.rest_seconds % 60 ? ` ${exercise.rest_seconds % 60}s` : ''}` : `${exercise.rest_seconds}s`} rest</span>
-                    )}
-                  </p>
-                </div>
+                    {exercise.status === 'completed' && <Check className="w-3 h-3 text-white" />}
+                  </div>
 
-                <ChevronDown className={cn(
-                  'w-4 h-4 text-text-tertiary flex-shrink-0 transition-transform duration-200',
-                  isExpanded && 'rotate-180'
-                )} />
-              </button>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn(
+                      'text-sm font-medium truncate',
+                      exercise.status === 'completed' ? 'text-text-secondary line-through' : 'text-text-primary'
+                    )}>
+                      {exercise.name}
+                    </p>
+                    <p className="text-[11px] text-text-tertiary mt-0.5">
+                      {exercise.muscle_group && (
+                        <span className="text-accent mr-2">{exercise.muscle_group}</span>
+                      )}
+                      {completedSets}/{totalSets} sets
+                      {exercise.rest_seconds && (
+                        <span className="ml-2 text-text-tertiary">{exercise.rest_seconds >= 60 ? `${Math.floor(exercise.rest_seconds / 60)}m${exercise.rest_seconds % 60 ? ` ${exercise.rest_seconds % 60}s` : ''}` : `${exercise.rest_seconds}s`} rest</span>
+                      )}
+                    </p>
+                  </div>
+
+                  <ChevronDown className={cn(
+                    'w-4 h-4 text-text-tertiary flex-shrink-0 transition-transform duration-200',
+                    isExpanded && 'rotate-180'
+                  )} />
+                </button>
+
+                {/* Inline remove confirm */}
+                {removeConfirmIndex === exIndex ? (
+                  <div data-remove-confirm="true" className="flex items-center gap-1 flex-shrink-0">
+                    <span className="text-[11px] text-text-secondary">Remove?</span>
+                    <button
+                      type="button"
+                      onClick={() => setRemoveConfirmIndex(null)}
+                      className="text-[11px] px-2 py-1 rounded-md text-text-secondary hover:bg-surface-hover"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveExercise(exIndex)}
+                      className="text-[11px] px-2 py-1 rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 font-medium"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setRemoveConfirmIndex(exIndex)}
+                    aria-label={`Remove ${exercise.name}`}
+                    className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md text-text-tertiary hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
 
               {/* Expanded: sets table + notes */}
               {isExpanded && (
@@ -398,6 +531,57 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
             </div>
           )
         })}
+
+        {/* Add exercise (mid-workout) */}
+        <div className="pt-2">
+          {showAddForm ? (
+            <div className="bg-surface border border-accent/40 rounded-xl p-4 space-y-3">
+              <SearchablePicker<ExerciseSearchResult>
+                label="Exercise"
+                placeholder="Search exercises…"
+                search={searchExercises}
+                renderItem={(item) => (
+                  <div className="flex flex-col">
+                    <span className="text-sm text-text-primary">{item.name}</span>
+                    {item.primary_muscles && item.primary_muscles.length > 0 ? (
+                      <span className="text-[11px] text-text-tertiary">{item.primary_muscles.join(', ')}</span>
+                    ) : null}
+                  </div>
+                )}
+                getItemKey={(item) => item.id}
+                onSelect={(item) => setAddPick(item)}
+                value={addPick?.name}
+                onClear={() => setAddPick(null)}
+              />
+              <div className="grid grid-cols-3 gap-2">
+                <NumberField label="Sets" value={addSets} onChange={setAddSets} min={1} max={20} step={1} />
+                <NumberField label="Reps" value={addReps} onChange={setAddReps} min={1} max={100} step={1} />
+                <NumberField label="Rest" value={addRest} onChange={setAddRest} min={0} max={600} step={5} suffix="s" />
+              </div>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={resetAddForm}
+                  className="flex-1 rounded-lg border border-border py-2 text-sm font-medium text-text-secondary hover:bg-surface-hover"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddExercise}
+                  disabled={!addPick}
+                  className="flex-1 rounded-lg bg-accent hover:bg-accent-hover py-2 text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <AddRowButton label="Add Exercise" onClick={() => setShowAddForm(true)} />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Floating Geo button */}
@@ -408,6 +592,57 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
       >
         <MessageCircle className="w-5 h-5 text-white" />
       </button>
+
+      {/* Exit confirmation sheet */}
+      <AnimatePresence>
+        {showExitSheet && (
+          <>
+            <motion.div
+              key="exit-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-black/40"
+              onClick={() => setShowExitSheet(false)}
+            />
+            <motion.div
+              key="exit-sheet"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl px-5 pt-3 pb-6 shadow-2xl"
+            >
+              <div className="flex justify-center mb-3">
+                <div className="w-10 h-1 rounded-full bg-border" />
+              </div>
+              <p className="text-base font-semibold text-text-primary text-center mb-1">End workout?</p>
+              <p className="text-xs text-text-secondary text-center mb-5">Pick what you&apos;d like to do with this session.</p>
+              <div className="space-y-2">
+                <button
+                  onClick={handleSaveAndExit}
+                  className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white"
+                >
+                  Save &amp; Exit
+                </button>
+                <button
+                  onClick={handleDiscard}
+                  className="w-full rounded-xl bg-destructive/10 hover:bg-destructive/20 text-destructive py-3 text-sm font-semibold"
+                >
+                  Discard Workout
+                </button>
+                <button
+                  onClick={() => setShowExitSheet(false)}
+                  className="w-full rounded-xl py-3 text-sm font-medium text-text-secondary hover:bg-surface-hover"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

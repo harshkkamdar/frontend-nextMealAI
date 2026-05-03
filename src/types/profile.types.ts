@@ -24,9 +24,26 @@ export interface Profile {
   preferred_cuisines?: string[]
   meals_per_day?: number
   workout_frequency?: number
+  timezone?: string | null
   onboarding_personal_complete?: boolean
   onboarding_fitness_complete?: boolean
   onboarding_nutrition_complete?: boolean
+  /**
+   * FB-tdee-baseline: backend-computed daily targets. NULL when profile inputs
+   * (weight/height/dob/sex/activity_level) are incomplete. The dashboard, the
+   * companion snapshot, and Geo all read these as the baseline. A meal plan, if
+   * active, may carry its own override under `content.daily_targets`.
+   */
+  daily_calorie_target?: number | null
+  daily_protein_g?: number | null
+  daily_carbs_g?: number | null
+  daily_fat_g?: number | null
+  /**
+   * FB-tdee-baseline: list of profile-input field names that are missing,
+   * keeping the daily targets unresolved. Use this to render a clear "Add your
+   * height" CTA instead of inventing default targets.
+   */
+  daily_targets_missing_fields?: string[]
   created_at: string
   updated_at: string
 }

@@ -45,8 +45,9 @@ function ProgressBar({
   onDotClick: () => void
 }) {
   const pct = target > 0 ? Math.min((consumed / target) * 100, 100) : 0
+  const remaining = Math.max(0, target - consumed)
   const consumedStr = kind === 'kcal' ? `${formatMacroKcal(consumed)} cal` : formatMacroGrams(consumed)
-  const targetStr = kind === 'kcal' ? `${formatMacroKcal(target)} cal` : formatMacroGrams(target)
+  const remainingStr = kind === 'kcal' ? `${formatMacroKcal(remaining)} cal` : formatMacroGrams(remaining)
   const label = MACRO_LABELS[macro]
 
   return (
@@ -54,7 +55,9 @@ function ProgressBar({
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs text-text-secondary">{label}</span>
         <span className="text-xs font-medium tabular-nums">
-          {consumedStr} / {targetStr}
+          {target > 0
+            ? <>{consumedStr} &middot; {remainingStr} left</>
+            : consumedStr}
         </span>
       </div>
       <div className="relative h-2 rounded-full bg-surface-hover">

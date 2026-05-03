@@ -6,8 +6,15 @@ export async function proxy(request: NextRequest) {
   const token = request.cookies.get('nextmealai-token')?.value
 
   // Allow public auth routes
-  if (pathname.startsWith('/login') || pathname.startsWith('/signup')) {
-    if (token) {
+  if (
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/signup') ||
+    pathname.startsWith('/forgot-password') ||
+    pathname.startsWith('/reset-password')
+  ) {
+    // /reset-password lands signed-in users via the Supabase magic link;
+    // don't bounce them to /dashboard — they need to set the new password first.
+    if (token && (pathname.startsWith('/login') || pathname.startsWith('/signup'))) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     return NextResponse.next()

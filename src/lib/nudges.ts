@@ -39,11 +39,16 @@ export function computeNudges(input: NudgeInput): Nudge[] {
     ? (now.getTime() - lastFoodLog.getTime()) / 3600000
     : hour >= 9 ? 999 : 0 // If no food logged and it's after 9am, treat as long ago
 
-  const caloriesTarget = mealPlan?.content?.daily_targets?.calories ?? 2000
+  // FB-tdee-baseline: targets come from meal-plan override → profile baseline.
+  // Never fall back to hardcoded numbers — if both are null the user's profile
+  // is incomplete and we suppress this nudge entirely so we don't lie.
+  const caloriesTarget = mealPlan?.content?.daily_targets?.calories
+    ?? profile?.daily_calorie_target
+    ?? 0
   const caloriesConsumed = summary?.daily_breakdown?.[0]?.calories ?? 0
   const remaining = caloriesTarget - caloriesConsumed
 
-  if (hoursSinceFood > 3 && remaining > 400 && hour >= 8 && hour <= 22) {
+  if (caloriesTarget > 0 && hoursSinceFood > 3 && remaining > 400 && hour >= 8 && hour <= 22) {
     const hoursText = lastFoodLog ? `${Math.floor(hoursSinceFood)}h` : 'a while'
     nudges.push({
       type: 'time_to_eat',
@@ -55,8 +60,18 @@ export function computeNudges(input: NudgeInput): Nudge[] {
   }
 
   // --- "Workout Today" ---
-  // Active workout plan has today's workout AND no workout session logged AND after 10am
-  if (workoutPlan?.content?.days && hour >= 10) {
+  // Active workout plan has today's workout AND no workout session logged AND after 10am.
+  // Suppressed if "Program Complete" already fires below (would be contradictory).
+  const programIsComplete = (() => {
+    if (!workoutPlan?.start_date || !workoutPlan?.content?.days) return false;
+    const planStart = new Date(workoutPlan.start_date);
+    const daysSinceStart = Math.floor((now.getTime() - planStart.getTime()) / 86400000);
+    // Plan is "complete" only after a full 6-week minimum cycle, not after one
+    // 7-day pass. Cyclic 7-day plans aren't meant to "end" after 7 days.
+    return daysSinceStart >= 42;
+  })();
+
+  if (workoutPlan?.content?.days && hour >= 10 && !programIsComplete) {
     const planStart = workoutPlan.start_date ? new Date(workoutPlan.start_date) : new Date(workoutPlan.created_at)
     const daysDiff = Math.floor((now.getTime() - planStart.getTime()) / 86400000)
     const totalDays = workoutPlan.content.days.length
@@ -82,11 +97,15 @@ export function computeNudges(input: NudgeInput): Nudge[] {
   // --- "Protein Check" ---
   // After 7pm AND protein < 70% of target
   if (hour >= 19) {
-    const proteinTarget = mealPlan?.content?.daily_targets?.protein ?? 150
+    // FB-tdee-baseline: same precedence as calories. Skip the nudge if both
+    // sources are null — we won't fabricate a 150g default.
+    const proteinTarget = mealPlan?.content?.daily_targets?.protein
+      ?? profile?.daily_protein_g
+      ?? 0
     const proteinConsumed = summary?.daily_breakdown?.[0]?.protein ?? 0
     const proteinPct = proteinTarget > 0 ? (proteinConsumed / proteinTarget) * 100 : 100
 
-    if (proteinPct < 70) {
+    if (proteinTarget > 0 && proteinPct < 70) {
       nudges.push({
         type: 'protein_check',
         title: 'Protein Check',
@@ -99,20 +118,17 @@ export function computeNudges(input: NudgeInput): Nudge[] {
   }
 
   // --- "Program Complete" ---
-  if (workoutPlan?.start_date && workoutPlan?.content?.days) {
-    const planStart = new Date(workoutPlan.start_date)
-    const daysDiff = Math.floor((now.getTime() - planStart.getTime()) / 86400000)
-    const totalDays = workoutPlan.content.days.length
-    // If we've cycled through the entire plan at least once (assume 4-6 week programs)
-    if (totalDays > 0 && daysDiff >= totalDays) {
-      nudges.push({
-        type: 'program_complete',
-        title: 'Program Complete',
-        message: "You've finished your workout program! Want Geo to create a new one?",
-        cta: 'Chat with Geo',
-        action: 'open_full_chat'
-      })
-    }
+  // Cyclic plans aren't "complete" after 7 days — they cycle. Treat completion
+  // as "at least 6 weeks elapsed since plan start" so the nudge actually means
+  // the user has done the program long enough to justify a refresh.
+  if (programIsComplete) {
+    nudges.push({
+      type: 'program_complete',
+      title: 'Program Complete',
+      message: "You've been on this program 6+ weeks! Want Geo to refresh it?",
+      cta: 'Chat with Geo',
+      action: 'open_full_chat'
+    })
   }
 
   // Return max 2 nudges

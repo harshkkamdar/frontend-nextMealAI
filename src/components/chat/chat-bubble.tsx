@@ -119,12 +119,50 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
     )
   }
 
+  const failures = message.metadata?.actions_failed ?? []
+  const hasFailures = message.role === 'assistant' && failures.length > 0
+
+  const describeFailure = (a: { tool: string; error?: string }) => {
+    // Friendly per-error overrides — the assistant text usually explains the
+    // why, so we keep this short and free of internal codes.
+    const errorCopy: Record<string, string> = {
+      duplicate_window: 'looks like a duplicate from the last minute',
+      not_found: "couldn't find that entry",
+      validation: "those numbers didn't look right",
+      missing_meal_plan_targets: 'meal plan needs daily targets',
+      profile_incomplete: 'profile is missing something',
+      image_analysis_failed: "couldn't read that image",
+    }
+    const base =
+      a.tool === 'create_log' ? "couldn't save that log" :
+      a.tool === 'update_log' ? "couldn't update that entry" :
+      a.tool === 'delete_log' ? "couldn't delete that entry" :
+      a.tool === 'create_plan' ? "couldn't create that plan" :
+      a.tool === 'update_plan' ? "couldn't update that plan" :
+      a.tool === 'deactivate_active_plan' ? "couldn't deactivate that plan" :
+      `${a.tool} failed`
+    if (!a.error || a.error === 'unknown') return base
+    const friendly = errorCopy[a.error]
+    return friendly ? `${base} — ${friendly}` : base
+  }
+
   return (
     <div className="flex flex-col items-start max-w-[85%]">
       <div className="flex items-end gap-2">
         <GeoAvatar state="default" size={28} />
         <div className="bg-surface border border-border rounded-2xl rounded-bl-sm px-4 py-2.5">
           <GeoMessageContent content={message.content} />
+          {hasFailures && (
+            <div className="mt-2 px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+              <span className="font-medium">Heads up:</span>{' '}
+              {failures.map((a, i) => (
+                <span key={i}>
+                  {i > 0 && '; '}
+                  {describeFailure(a)}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       {formattedTime && (

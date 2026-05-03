@@ -124,18 +124,23 @@ export function PersonalForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="height-cm">Height (cm)</Label>
-          <Input
-            id="height-cm"
-            type="number"
-            inputMode="numeric"
-            min={100}
-            max={250}
-            step="any"
-            placeholder="e.g. 175"
-            value={heightCm}
-            onChange={(e) => setHeightCm(e.target.value)}
-          />
+          <Label htmlFor="height-cm">Height</Label>
+          <p className="text-xs text-text-secondary">We&apos;ll use this to compute your daily calorie target.</p>
+          <div className="relative">
+            <Input
+              id="height-cm"
+              type="number"
+              inputMode="decimal"
+              min={100}
+              max={250}
+              step={0.1}
+              placeholder="e.g. 175"
+              value={heightCm}
+              onChange={(e) => setHeightCm(e.target.value)}
+              className="pr-12"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary pointer-events-none">cm</span>
+          </div>
         </div>
 
         <Button

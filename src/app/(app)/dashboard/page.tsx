@@ -263,11 +263,16 @@ export default function DashboardPage() {
   const carbsConsumed = dailyBreakdown?.carbs ?? 0
   const fatConsumed = dailyBreakdown?.fat ?? 0
 
-  const targets = mealPlan?.content?.daily_targets
-  const caloriesTarget = targets?.calories ?? 2000
-  const proteinTarget = targets?.protein ?? 150
-  const carbsTarget = targets?.carbs ?? 250
-  const fatTarget = targets?.fat ?? 65
+  // FB-tdee-baseline: profile.daily_*_target is the source of truth. A meal plan,
+  // if active, may carry an optional override under content.daily_targets.
+  // No hardcoded defaults — when the profile is incomplete, targets stay 0 and
+  // the macro-progress component drops the "left" suffix gracefully.
+  const planTargets = mealPlan?.content?.daily_targets
+  const caloriesTarget = planTargets?.calories ?? profile?.daily_calorie_target ?? 0
+  const proteinTarget = planTargets?.protein ?? profile?.daily_protein_g ?? 0
+  const carbsTarget = planTargets?.carbs ?? profile?.daily_carbs_g ?? 0
+  const fatTarget = planTargets?.fat ?? profile?.daily_fat_g ?? 0
+  const profileIncomplete = (profile?.daily_targets_missing_fields?.length ?? 0) > 0
 
   const waterLogs = todayLogs.filter((l) => l.type === 'water')
   const water = waterLogs.reduce((sum, l) => sum + ((l.payload as any)?.glasses ?? 0), 0)
@@ -287,9 +292,10 @@ export default function DashboardPage() {
     ? Math.round(energyLogs.reduce((sum, l) => sum + ((l.payload as any)?.rating ?? 0), 0) / energyLogs.length)
     : summary?.summary?.avg_energy_rating ?? 0
 
-  // Today's weight log
+  // Today's weight log — FB-12: prefer the user-local bucket so a morning
+  // weigh-in shows under today regardless of UTC offset.
   const todayWeightLog = weightLogs.find(
-    (l) => new Date(l.created_at).toISOString().split('T')[0] === today
+    (l) => (l.local_date ?? new Date(l.created_at).toISOString().split('T')[0]) === today
   )
   const displayWeight = todayWeightLog
     ? (todayWeightLog.payload as any)?.weight_kg
@@ -369,6 +375,18 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="space-y-4">
+          {profileIncomplete && (
+            <div className="bg-warning/10 border border-warning/20 rounded-xl p-4">
+              <p className="text-sm font-medium text-text-primary">Complete your profile to see daily targets</p>
+              <p className="text-xs text-text-secondary mt-1">We need: {profile?.daily_targets_missing_fields?.join(', ')}</p>
+              <button
+                onClick={() => router.push('/settings/profile')}
+                className="text-xs text-accent mt-2 underline"
+              >
+                Update profile →
+              </button>
+            </div>
+          )}
           {nudges.map((nudge) => (
             <NudgeCard key={nudge.type} nudge={nudge} onAction={handleNudgeAction} />
           ))}

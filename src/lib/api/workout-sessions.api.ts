@@ -20,6 +20,10 @@ export async function completeWorkoutSession(id: string): Promise<WorkoutSession
   return apiFetch<WorkoutSession>(`/v1/workout-sessions/${id}/complete`, { method: 'POST' })
 }
 
+export async function abandonWorkoutSession(id: string): Promise<WorkoutSession> {
+  return apiFetch<WorkoutSession>(`/v1/workout-sessions/${id}/abandon`, { method: 'POST' })
+}
+
 export async function getExerciseHistory(exercise: string, limit = 4): Promise<ExerciseHistory[]> {
   const res = await apiFetch<{ history: ExerciseHistory[] }>(
     `/v1/workout-sessions/history?exercise=${encodeURIComponent(exercise)}&limit=${limit}`
