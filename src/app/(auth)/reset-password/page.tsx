@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -29,7 +29,10 @@ type LinkState =
   | { status: 'invalid' }
   | { status: 'valid'; accessToken: string }
 
-export default function ResetPasswordPage() {
+// Inner client form. Reads useSearchParams, so it must live inside a
+// <Suspense> boundary — Next.js 16 prerender bails on CSR-only hooks at the
+// page root and refuses to build.
+function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [linkState, setLinkState] = useState<LinkState>({ status: 'pending' })
@@ -171,5 +174,17 @@ export default function ResetPasswordPage() {
         </Link>
       </p>
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="text-center text-sm text-text-secondary">Loading...</div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   )
 }
