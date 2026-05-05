@@ -41,3 +41,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+
+# Per-developer Claude Code config
+.claude/
+
+# Knowledge-graph artefacts (regenerable via /graphify)
+graphify-out/
