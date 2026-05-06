@@ -112,7 +112,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
         is_favorite: false,
         use_count: 0,
       })
-      if (typeof payload.servings === 'number') {
+      if (typeof payload.servings === 'number' && payload.servings > 0) {
         setInputMode('servings')
         setServings(payload.servings)
         setGrams(servingSize ?? payload.quantity_g ?? 100)
@@ -124,6 +124,12 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
       setQuery('')
       setResults([])
       setShowCustomForm(false)
+      setCustomName('')
+      setCustomCalories('')
+      setCustomProtein('')
+      setCustomCarbs('')
+      setCustomFat('')
+      setCustomServingG(100)
       return
     }
     // existing reset path for mode === 'log'
@@ -237,10 +243,11 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
     const quantity = inputMode === 'servings'
       ? Math.round((selectedFood.serving_size_g || 100) * servings)
       : Math.round((typeof grams === 'number' ? grams : 0))
+    const macros = calculatedMacros ?? (existingLog.payload as FoodPayload).est_macros ?? { calories: 0, protein: 0, carbs: 0, fat: 0 }
     const updated: Partial<FoodPayload> = {
       quantity_g: quantity,
       servings: inputMode === 'servings' ? servings : undefined,
-      est_macros: calculatedMacros!,
+      est_macros: macros,
     }
     try {
       await updateLog(existingLog.id, updated)
@@ -515,7 +522,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
               <div className="px-4 pb-20 pt-2 border-t border-border">
                 {mode === 'edit' ? (
                   <div className="flex gap-2">
-                    <Button variant="ghost" onClick={handleDeleteEdit} disabled={saving} className="flex-1">
+                    <Button variant="ghost" onClick={handleDeleteEdit} disabled={saving} className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10">
                       Delete
                     </Button>
                     <Button onClick={handleSaveEdit} disabled={saving || !selectedFood} className="flex-1 bg-accent hover:bg-accent-hover text-white">

@@ -63,7 +63,6 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
         mealType="Breakfast"
         items={[log]}
         onAddFood={() => {}}
-        onDeleteLog={() => {}}
       />
     )
     expect(screen.queryByRole('button', { name: /expand items/i })).toBeNull()
@@ -83,7 +82,6 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
         mealType="Snack"
         items={[log]}
         onAddFood={() => {}}
-        onDeleteLog={() => {}}
       />
     )
     expect(screen.queryByRole('button', { name: /expand items/i })).toBeNull()
@@ -95,7 +93,6 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
         mealType="Breakfast"
         items={[itemisedLog]}
         onAddFood={() => {}}
-        onDeleteLog={() => {}}
       />
     )
     const btn = screen.getByRole('button', { name: /expand items/i })
@@ -108,7 +105,6 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
         mealType="Breakfast"
         items={[itemisedLog]}
         onAddFood={() => {}}
-        onDeleteLog={() => {}}
       />
     )
     const btn = screen.getByRole('button', { name: /expand items/i })
@@ -127,7 +123,6 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
         mealType="Breakfast"
         items={[itemisedLog]}
         onAddFood={() => {}}
-        onDeleteLog={() => {}}
       />
     )
     const btn = screen.getByRole('button', { name: /expand items/i })
@@ -144,7 +139,6 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
         mealType="Breakfast"
         items={[itemisedLog]}
         onAddFood={() => {}}
-        onDeleteLog={() => {}}
       />
     )
     // Expand

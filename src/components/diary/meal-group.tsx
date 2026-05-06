@@ -12,12 +12,11 @@ interface MealGroupProps {
   mealType: string
   items: Log[]
   onAddFood: () => void
-  onDeleteLog: (id: string) => void
   /** FB-R5-03: open the log-style sheet in edit mode for this row. */
   onEditLog?: (log: Log) => void
 }
 
-export function MealGroup({ mealType, items, onAddFood, onDeleteLog, onEditLog }: MealGroupProps) {
+export function MealGroup({ mealType, items, onAddFood, onEditLog }: MealGroupProps) {
   // FB-10: expand state + per-child edit draft (keyed by `${logId}:${childIdx}`)
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set())
   const [editingChild, setEditingChild] = useState<{ logId: string; idx: number } | null>(null)
@@ -106,11 +105,12 @@ export function MealGroup({ mealType, items, onAddFood, onDeleteLog, onEditLog }
                 <button
                   type="button"
                   onClick={() => onEditLog?.(item)}
+                  aria-label={`Edit ${payload.food_name}`}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-surface-hover transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-text-primary truncate">{payload.food_name}</p>
-                    <p className="text-[11px] text-text-tertiary tabular-nums">
+                    <p aria-hidden="true" className="text-[11px] text-text-tertiary tabular-nums">
                       {/* FB-R5-03: render the unit the user logged in */}
                       {typeof payload.servings === 'number'
                         ? `${payload.servings} serving${payload.servings === 1 ? '' : 's'}`

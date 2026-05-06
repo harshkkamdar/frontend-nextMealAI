@@ -138,12 +138,9 @@ export default function DiaryPage() {
   }, [logs])
 
   const handleAddFood = (mealType: string) => {
+    setEditingLog(null)
     setSelectedMealType(mealType)
     setSearchOpen(true)
-  }
-
-  const handleDeleteLog = (logId: string) => {
-    setLogs((prev) => prev.filter((l) => l.id !== logId))
   }
 
   const handleFoodLogged = () => {
@@ -219,7 +216,6 @@ export default function DiaryPage() {
               mealType={mealType}
               items={groupedMeals[mealType] || []}
               onAddFood={() => handleAddFood(mealType)}
-              onDeleteLog={handleDeleteLog}
               onEditLog={handleEditLog}
             />
           ))}
