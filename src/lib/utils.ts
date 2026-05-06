@@ -20,6 +20,8 @@ export function formatDate(date: Date): string {
   })
 }
 
+/** @deprecated FB-R5-02: prefer todayLocalISO(tz) from @/lib/timezone for any
+ * user-visible date. Kept for callers that genuinely want UTC (none should). */
 export function todayISO(): string {
   return new Date().toISOString().split('T')[0]
 }

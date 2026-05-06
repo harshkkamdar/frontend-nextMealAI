@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { CalendarStrip } from '@/components/shared/calendar-strip'
@@ -12,7 +12,8 @@ import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
-import { todayISO } from '@/lib/utils'
+import { todayLocalISO } from '@/lib/timezone'
+import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { formatWeekMonthLabel } from '@/lib/month-label'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import type { MealPlan } from '@/types/plans.types'
@@ -20,7 +21,20 @@ import type { MealPlan } from '@/types/plans.types'
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
 export default function DiaryPage() {
-  const [selectedDate, setSelectedDate] = useState(todayISO())
+  const tz = useUserTimezone()
+  const [selectedDate, setSelectedDate] = useState(() => todayLocalISO(tz))
+
+  // FB-R5-02: when tz upgrades from device → profile, snap selectedDate forward
+  // IFF the user is still sitting on what was "today" at mount.
+  const initialTodayRef = useRef<string>(todayLocalISO(tz))
+  useEffect(() => {
+    const newToday = todayLocalISO(tz)
+    if (selectedDate === initialTodayRef.current && newToday !== initialTodayRef.current) {
+      setSelectedDate(newToday)
+      initialTodayRef.current = newToday
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tz])
   const [logs, setLogs] = useState<Log[]>([])
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
   const [loading, setLoading] = useState(true)
@@ -150,6 +164,7 @@ export default function DiaryPage() {
         indicators={indicators}
         label={weekLabel}
         onLabelClick={() => setMonthOpen(true)}
+        tz={tz}
       />
 
       {loading ? (
