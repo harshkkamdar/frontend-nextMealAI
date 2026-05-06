@@ -24,16 +24,21 @@ export default function DiaryPage() {
   const tz = useUserTimezone()
   const [selectedDate, setSelectedDate] = useState(() => todayLocalISO(tz))
 
-  // FB-R5-02: when tz upgrades from device → profile, snap selectedDate forward
-  // IFF the user is still sitting on what was "today" at mount.
-  const initialTodayRef = useRef<string>(todayLocalISO(tz))
+  // FB-R5-02: snap selectedDate forward when tz upgrades from device→profile,
+  // BUT only if the user is still sitting on what was "today" at mount.
+  // Reading selectedDate from closure (stale) is intentional — that's the
+  // pre-effect value we compare against todayAtMount. Don't add it to deps.
+  const todayAtMountRef = useRef<string | null>(null)
+  if (todayAtMountRef.current === null) {
+    todayAtMountRef.current = todayLocalISO(tz)
+  }
   useEffect(() => {
     const newToday = todayLocalISO(tz)
-    if (selectedDate === initialTodayRef.current && newToday !== initialTodayRef.current) {
+    if (selectedDate === todayAtMountRef.current && newToday !== todayAtMountRef.current) {
       setSelectedDate(newToday)
-      initialTodayRef.current = newToday
+      todayAtMountRef.current = newToday
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stale read of selectedDate; see comment above
   }, [tz])
   const [logs, setLogs] = useState<Log[]>([])
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)

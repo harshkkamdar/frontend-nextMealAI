@@ -30,6 +30,12 @@ describe('todayLocalISO', () => {
     expect(todayLocalISO(undefined, fixed)).toBe('2026-05-06')
     expect(todayLocalISO('', fixed)).toBe('2026-05-06')
   })
+
+  it('handles half-offset timezones correctly (Asia/Kolkata UTC+5:30)', () => {
+    // 2026-05-05T19:30:00Z = 2026-05-06 01:00 IST → next day
+    const fixed = new Date('2026-05-05T19:30:00Z')
+    expect(todayLocalISO('Asia/Kolkata', fixed)).toBe('2026-05-06')
+  })
 })
 
 describe('detectIanaTimezone', () => {

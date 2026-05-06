@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, memo } from 'react'
+import { useRef, useEffect, memo, useMemo } from 'react'
 import { CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { todayLocalISO } from '@/lib/timezone'
@@ -52,7 +52,8 @@ export const CalendarStrip = memo(function CalendarStrip({
   tz,
 }: CalendarStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const days = generateDays(selectedDate, todayLocalISO(tz))
+  const todayLocal = useMemo(() => todayLocalISO(tz), [tz])
+  const days = useMemo(() => generateDays(selectedDate, todayLocal), [selectedDate, todayLocal])
 
   // Center-scroll on mount
   useEffect(() => {
