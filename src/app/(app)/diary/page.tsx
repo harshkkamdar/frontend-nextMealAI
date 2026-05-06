@@ -242,6 +242,7 @@ export default function DiaryPage() {
         initialDate={selectedDate}
         onClose={() => setMonthOpen(false)}
         onSelectDate={setSelectedDate}
+        tz={tz}
       />
     </PageWrapper>
   )

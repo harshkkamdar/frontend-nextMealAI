@@ -69,10 +69,14 @@ function coerceWorkouts(raw: unknown): number {
  * - `inMonth = false` for pad cells (still renderable but muted).
  * - `calories` is null unless the breakdown row has a positive finite value.
  * - `workouts` defaults to 0.
+ * - `today` (YYYY-MM-DD) drives the `isToday` flag. Callers should pass
+ *   `todayLocalISO(tz)` so the highlight is correct for users off UTC.
+ *   Defaults to `toISO(new Date())` (UTC) only as a last-resort fallback.
  */
 export function buildMonthGrid(
   anchorISO: string,
-  breakdown: readonly DailyBreakdownRow[]
+  breakdown: readonly DailyBreakdownRow[],
+  today: string = toISO(new Date())
 ): MonthGridCell[][] {
   const anchor = parseLocalNoon(anchorISO)
   const year = anchor.getFullYear()
@@ -83,8 +87,6 @@ export function buildMonthGrid(
   for (const row of breakdown) {
     if (row && typeof row.date === 'string') byDate.set(row.date, row)
   }
-
-  const todayISO = toISO(new Date())
 
   // First day of the month, last day of the month.
   const first = new Date(year, month, 1, 12, 0, 0, 0)
@@ -109,7 +111,7 @@ export function buildMonthGrid(
         date: iso,
         dayNum: current.getDate(),
         inMonth: current.getMonth() === month,
-        isToday: iso === todayISO,
+        isToday: iso === today,
         calories: rowData ? coerceCalories(rowData.calories) : null,
         workouts: rowData ? coerceWorkouts(rowData.workouts) : 0,
       })
