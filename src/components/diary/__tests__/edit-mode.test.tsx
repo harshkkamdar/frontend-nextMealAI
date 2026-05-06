@@ -1,0 +1,65 @@
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { FoodSearchSheet } from '../food-search-sheet'
+import type { Log } from '@/types/logs.types'
+
+vi.mock('@/lib/api/foods.api', () => ({
+  searchFoods: vi.fn().mockResolvedValue([]),
+  getRecentFoods: vi.fn().mockResolvedValue([]),
+  updateFood: vi.fn(),
+  saveFood: vi.fn(),
+}))
+vi.mock('@/lib/api/logs.api', () => ({
+  createLog: vi.fn(),
+  updateLog: vi.fn(),
+  deleteLog: vi.fn(),
+}))
+
+describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
+  const baseLog: Log = {
+    id: 'log-1',
+    user_id: 'u',
+    type: 'food',
+    payload: {
+      food_name: 'Yopro vanilla yogurt',
+      quantity_g: 350,
+      servings: 1,
+      est_macros: { calories: 200, protein: 33.3, carbs: 13.3, fat: 1.8 },
+      meal_type: 'breakfast',
+      user_food_id: 'food-1',
+    },
+    source: 'manual',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+
+  it('opens in servings mode when log was logged as a serving', () => {
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={baseLog}
+        mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    expect(screen.getByDisplayValue('1')).toBeInTheDocument()
+    // The label "Servings" or its toggle should be active/visible
+    expect(screen.getByText(/servings/i)).toBeInTheDocument()
+  })
+
+  it('opens in grams mode when log has no `servings` field', () => {
+    const gramLog: Log = { ...baseLog, payload: { ...baseLog.payload, servings: undefined, quantity_g: 31 } as any }
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={gramLog}
+        mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    expect(screen.getByDisplayValue('31')).toBeInTheDocument()
+    expect(screen.getByText(/grams/i)).toBeInTheDocument()
+  })
+
+  it('shows Save and Delete buttons in edit mode (no Log button)', () => {
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={baseLog}
+        mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^log$/i })).not.toBeInTheDocument()
+  })
+})

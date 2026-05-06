@@ -41,6 +41,7 @@ export default function DiaryPage() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedMealType, setSelectedMealType] = useState<string>('Breakfast')
   const [monthOpen, setMonthOpen] = useState(false)
+  const [editingLog, setEditingLog] = useState<Log | null>(null)
 
   const router = useRouter()
   useSetGeoScreen('food_diary', { selectedDate })
@@ -140,16 +141,31 @@ export default function DiaryPage() {
     setLogs((prev) => prev.filter((l) => l.id !== logId))
   }
 
-  const handleUpdateLog = (logId: string, payload: FoodPayload) => {
-    setLogs((prev) =>
-      prev.map((l) => (l.id === logId ? { ...l, payload } : l))
-    )
-  }
-
   const handleFoodLogged = () => {
     // Refresh data after logging
     fetchData()
     setSearchOpen(false)
+  }
+
+  const handleEditLog = (log: Log) => {
+    setEditingLog(log)
+    const mealType = (log.payload as FoodPayload).meal_type
+    setSelectedMealType(
+      mealType
+        ? mealType.charAt(0).toUpperCase() + mealType.slice(1).toLowerCase()
+        : 'Snack'
+    )
+    setSearchOpen(true)
+  }
+
+  const handleLogUpdated = (logId: string, payload: FoodPayload) => {
+    setLogs((prev) => prev.map((l) => (l.id === logId ? { ...l, payload } : l)))
+    setEditingLog(null)
+  }
+
+  const handleLogDeleted = (logId: string) => {
+    setLogs((prev) => prev.filter((l) => l.id !== logId))
+    setEditingLog(null)
   }
 
   return (
@@ -199,7 +215,7 @@ export default function DiaryPage() {
               items={groupedMeals[mealType] || []}
               onAddFood={() => handleAddFood(mealType)}
               onDeleteLog={handleDeleteLog}
-              onUpdateLog={handleUpdateLog}
+              onEditLog={handleEditLog}
             />
           ))}
         </div>
@@ -207,9 +223,13 @@ export default function DiaryPage() {
 
       <FoodSearchSheet
         isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
+        onClose={() => { setSearchOpen(false); setEditingLog(null) }}
         mealType={selectedMealType}
+        mode={editingLog ? 'edit' : 'log'}
+        existingLog={editingLog ?? undefined}
         onFoodLogged={handleFoodLogged}
+        onLogUpdated={handleLogUpdated}
+        onLogDeleted={handleLogDeleted}
       />
 
       <MonthViewSheet
