@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { CalendarStrip } from '@/components/shared/calendar-strip'
@@ -12,7 +12,8 @@ import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
-import { todayISO } from '@/lib/utils'
+import { todayLocalISO } from '@/lib/timezone'
+import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { formatWeekMonthLabel } from '@/lib/month-label'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import type { MealPlan } from '@/types/plans.types'
@@ -20,13 +21,32 @@ import type { MealPlan } from '@/types/plans.types'
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
 export default function DiaryPage() {
-  const [selectedDate, setSelectedDate] = useState(todayISO())
+  const tz = useUserTimezone()
+  const [selectedDate, setSelectedDate] = useState(() => todayLocalISO(tz))
+
+  // FB-R5-02: snap selectedDate forward when tz upgrades from device→profile,
+  // BUT only if the user is still sitting on what was "today" at mount.
+  // Reading selectedDate from closure (stale) is intentional — that's the
+  // pre-effect value we compare against todayAtMount. Don't add it to deps.
+  const todayAtMountRef = useRef<string | null>(null)
+  if (todayAtMountRef.current === null) {
+    todayAtMountRef.current = todayLocalISO(tz)
+  }
+  useEffect(() => {
+    const newToday = todayLocalISO(tz)
+    if (selectedDate === todayAtMountRef.current && newToday !== todayAtMountRef.current) {
+      setSelectedDate(newToday)
+      todayAtMountRef.current = newToday
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stale read of selectedDate; see comment above
+  }, [tz])
   const [logs, setLogs] = useState<Log[]>([])
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedMealType, setSelectedMealType] = useState<string>('Breakfast')
   const [monthOpen, setMonthOpen] = useState(false)
+  const [editingLog, setEditingLog] = useState<Log | null>(null)
 
   const router = useRouter()
   useSetGeoScreen('food_diary', { selectedDate })
@@ -118,24 +138,36 @@ export default function DiaryPage() {
   }, [logs])
 
   const handleAddFood = (mealType: string) => {
+    setEditingLog(null)
     setSelectedMealType(mealType)
     setSearchOpen(true)
-  }
-
-  const handleDeleteLog = (logId: string) => {
-    setLogs((prev) => prev.filter((l) => l.id !== logId))
-  }
-
-  const handleUpdateLog = (logId: string, payload: FoodPayload) => {
-    setLogs((prev) =>
-      prev.map((l) => (l.id === logId ? { ...l, payload } : l))
-    )
   }
 
   const handleFoodLogged = () => {
     // Refresh data after logging
     fetchData()
     setSearchOpen(false)
+  }
+
+  const handleEditLog = (log: Log) => {
+    setEditingLog(log)
+    const mealType = (log.payload as FoodPayload).meal_type
+    setSelectedMealType(
+      mealType
+        ? mealType.charAt(0).toUpperCase() + mealType.slice(1).toLowerCase()
+        : 'Snack'
+    )
+    setSearchOpen(true)
+  }
+
+  const handleLogUpdated = (logId: string, payload: FoodPayload) => {
+    setLogs((prev) => prev.map((l) => (l.id === logId ? { ...l, payload } : l)))
+    setEditingLog(null)
+  }
+
+  const handleLogDeleted = (logId: string) => {
+    setLogs((prev) => prev.filter((l) => l.id !== logId))
+    setEditingLog(null)
   }
 
   return (
@@ -150,6 +182,7 @@ export default function DiaryPage() {
         indicators={indicators}
         label={weekLabel}
         onLabelClick={() => setMonthOpen(true)}
+        tz={tz}
       />
 
       {loading ? (
@@ -183,8 +216,7 @@ export default function DiaryPage() {
               mealType={mealType}
               items={groupedMeals[mealType] || []}
               onAddFood={() => handleAddFood(mealType)}
-              onDeleteLog={handleDeleteLog}
-              onUpdateLog={handleUpdateLog}
+              onEditLog={handleEditLog}
             />
           ))}
         </div>
@@ -192,9 +224,13 @@ export default function DiaryPage() {
 
       <FoodSearchSheet
         isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
+        onClose={() => { setSearchOpen(false); setEditingLog(null) }}
         mealType={selectedMealType}
+        mode={editingLog ? 'edit' : 'log'}
+        existingLog={editingLog ?? undefined}
         onFoodLogged={handleFoodLogged}
+        onLogUpdated={handleLogUpdated}
+        onLogDeleted={handleLogDeleted}
       />
 
       <MonthViewSheet
@@ -202,6 +238,7 @@ export default function DiaryPage() {
         initialDate={selectedDate}
         onClose={() => setMonthOpen(false)}
         onSelectDate={setSelectedDate}
+        tz={tz}
       />
     </PageWrapper>
   )

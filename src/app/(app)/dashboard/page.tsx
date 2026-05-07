@@ -7,7 +7,9 @@ import { getLogsSummary, getLogs, createLog } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getSuggestions } from '@/lib/api/suggestions.api'
 import { getProfile } from '@/lib/api/profile.api'
-import { getGreeting, formatDate, todayISO } from '@/lib/utils'
+import { getGreeting, formatDate } from '@/lib/utils'
+import { todayLocalISO } from '@/lib/timezone'
+import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { CalendarDays, ChevronRight, X, Minus, Plus } from 'lucide-react'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
@@ -216,6 +218,7 @@ function QuickLogSheet({ type, onDone, onClose, currentWeight }: {
 // ── Main page ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const tz = useUserTimezone()
   const user = useAuthStore((s) => s.user)
   const [loading, setLoading] = useState(true)
   const [summary, setSummary] = useState<LogsSummary | null>(null)
@@ -226,7 +229,7 @@ export default function DashboardPage() {
   const [weightLogs, setWeightLogs] = useState<Log[]>([])
   const [activeSheet, setActiveSheet] = useState<QuickLogType>(null)
 
-  const today = todayISO()
+  const today = todayLocalISO(tz)
 
   const fetchData = useCallback(async () => {
     try {

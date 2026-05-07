@@ -1,8 +1,9 @@
 'use client'
 
-import { useRef, useEffect, memo } from 'react'
+import { useRef, useEffect, memo, useMemo } from 'react'
 import { CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { todayLocalISO } from '@/lib/timezone'
 
 interface CalendarStripProps {
   selectedDate: string // ISO date string (YYYY-MM-DD)
@@ -12,15 +13,19 @@ interface CalendarStripProps {
   label?: string
   /** FB-07: fires when the user taps the label (to open the month-view sheet). */
   onLabelClick?: () => void
+  /** FB-R5-02: IANA timezone for the "today" indicator. */
+  tz?: string
 }
 
 function toISO(d: Date): string {
   return d.toISOString().split('T')[0]
 }
 
-function generateDays(centerDate: string): Array<{ date: string; dayName: string; dayNum: number; isToday: boolean }> {
+function generateDays(
+  centerDate: string,
+  todayLocal: string,
+): Array<{ date: string; dayName: string; dayNum: number; isToday: boolean }> {
   const center = new Date(centerDate + 'T12:00:00')
-  const today = toISO(new Date())
   const days: Array<{ date: string; dayName: string; dayNum: number; isToday: boolean }> = []
 
   for (let offset = -3; offset <= 3; offset++) {
@@ -31,7 +36,7 @@ function generateDays(centerDate: string): Array<{ date: string; dayName: string
       date: iso,
       dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
       dayNum: d.getDate(),
-      isToday: iso === today
+      isToday: iso === todayLocal,
     })
   }
 
@@ -43,10 +48,12 @@ export const CalendarStrip = memo(function CalendarStrip({
   onSelectDate,
   indicators,
   label,
-  onLabelClick
+  onLabelClick,
+  tz,
 }: CalendarStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const days = generateDays(selectedDate)
+  const todayLocal = useMemo(() => todayLocalISO(tz), [tz])
+  const days = useMemo(() => generateDays(selectedDate, todayLocal), [selectedDate, todayLocal])
 
   // Center-scroll on mount
   useEffect(() => {

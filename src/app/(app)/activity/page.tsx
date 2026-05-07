@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dumbbell, Play, Moon, MessageCircle, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
@@ -13,18 +13,37 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useUIStore } from '@/stores/ui.store'
 import { getPlans } from '@/lib/api/plans.api'
 import { startWorkoutSession, getInProgressSession, getWorkoutHistory } from '@/lib/api/workout-sessions.api'
-import { todayISO } from '@/lib/utils'
+import { todayLocalISO } from '@/lib/timezone'
+import { useUserTimezone } from '@/hooks/useUserTimezone'
 import type { WorkoutPlan } from '@/types/plans.types'
 import type { WorkoutSession } from '@/types/workout-session.types'
 
 export default function ActivityPage() {
   const router = useRouter()
-  const [selectedDate, setSelectedDate] = useState(todayISO())
+  const tz = useUserTimezone()
+  const [selectedDate, setSelectedDate] = useState(() => todayLocalISO(tz))
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null)
   const [inProgress, setInProgress] = useState<WorkoutSession | null>(null)
   const [history, setHistory] = useState<WorkoutSession[]>([])
   const [loading, setLoading] = useState(true)
   const [starting, setStarting] = useState(false)
+
+  // FB-R5-02: snap selectedDate forward when tz upgrades from device→profile,
+  // BUT only if the user is still sitting on what was "today" at mount.
+  // Reading selectedDate from closure (stale) is intentional — that's the
+  // pre-effect value we compare against todayAtMount. Don't add it to deps.
+  const todayAtMountRef = useRef<string | null>(null)
+  if (todayAtMountRef.current === null) {
+    todayAtMountRef.current = todayLocalISO(tz)
+  }
+  useEffect(() => {
+    const newToday = todayLocalISO(tz)
+    if (selectedDate === todayAtMountRef.current && newToday !== todayAtMountRef.current) {
+      setSelectedDate(newToday)
+      todayAtMountRef.current = newToday
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stale read of selectedDate; see comment above
+  }, [tz])
 
   useSetGeoScreen('activity', { selectedDate })
 
@@ -224,6 +243,7 @@ export default function ActivityPage() {
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
             indicators={indicators}
+            tz={tz}
           />
 
           {/* History for selected date */}

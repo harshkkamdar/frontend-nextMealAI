@@ -93,4 +93,29 @@ describe('buildMonthGrid', () => {
     // first row must start on Sunday (getDay=0) per our contract
     expect(new Date(grid[0][0].date + 'T12:00:00').getDay()).toBe(0)
   })
+
+  // FB-R5-03: isToday must come from the caller-supplied `today` param, NOT
+  // from new Date() inside the helper. This lets users in non-UTC zones see
+  // the correct day highlighted.
+  it('FB-R5-03 — isToday uses the supplied today param, not new Date()', () => {
+    // Suppose the user is in UTC+10 and it is already 2026-03-16 locally,
+    // but new Date() inside the helper (UTC) would return 2026-03-15.
+    const callerToday = '2026-03-16'
+    const grid = buildMonthGrid('2026-03-15', [], callerToday)
+    const day15 = grid.flat().find((c) => c.date === '2026-03-15')!
+    const day16 = grid.flat().find((c) => c.date === '2026-03-16')!
+    expect(day15.isToday).toBe(false)
+    expect(day16.isToday).toBe(true)
+  })
+
+  it('FB-R5-03 — isToday falls back gracefully when today param is omitted', () => {
+    // Two-arg call: the default is toISO(new Date()) — we just verify the
+    // function does not throw and returns a grid where exactly one cell can be
+    // isToday (the test doesn't assert *which* cell, since that depends on
+    // when the test suite runs).
+    const grid = buildMonthGrid('2026-03-15', [])
+    const todayCells = grid.flat().filter((c) => c.isToday)
+    // Either 0 cells (running in a month other than 2026-03) or 1. Never >1.
+    expect(todayCells.length).toBeLessThanOrEqual(1)
+  })
 })

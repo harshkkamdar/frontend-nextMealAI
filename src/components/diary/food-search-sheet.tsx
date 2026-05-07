@@ -9,9 +9,10 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
-import { createLog } from '@/lib/api/logs.api'
+import { createLog, updateLog, deleteLog } from '@/lib/api/logs.api'
 import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 import type { FoodSearchResult } from '@/types/foods.types'
+import type { Log, FoodPayload } from '@/types/logs.types'
 
 function FoodRow({ food, onSelect, onToggleFavorite }: {
   food: FoodSearchResult
@@ -65,9 +66,14 @@ interface FoodSearchSheetProps {
   onClose: () => void
   mealType: string
   onFoodLogged: () => void
+  /** FB-R5-03 — edit an existing log instead of creating one. */
+  mode?: 'log' | 'edit'
+  existingLog?: Log
+  onLogUpdated?: (logId: string, payload: FoodPayload) => void
+  onLogDeleted?: (logId: string) => void
 }
 
-export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: FoodSearchSheetProps) {
+export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode, existingLog, onLogUpdated, onLogDeleted }: FoodSearchSheetProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<FoodSearchResult[]>([])
   const [searching, setSearching] = useState(false)
@@ -87,15 +93,36 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Focus input on open
+  // Focus input on open / prefill state in edit mode
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return
+    if (mode === 'edit' && existingLog) {
+      const payload = existingLog.payload as FoodPayload
+      const servingSize = payload.servings && payload.quantity_g
+        ? Math.round(payload.quantity_g / payload.servings)
+        : null
+      setSelectedFood({
+        id: payload.user_food_id ?? null,
+        usda_fdc_id: undefined,
+        name: payload.food_name,
+        brand: undefined,
+        serving_size_g: servingSize ?? payload.quantity_g ?? 100,
+        macros_per_serving: payload.est_macros ?? { calories: 0, protein: 0, carbs: 0, fat: 0 },
+        source: 'personal',
+        is_favorite: false,
+        use_count: 0,
+      })
+      if (typeof payload.servings === 'number' && payload.servings > 0) {
+        setInputMode('servings')
+        setServings(payload.servings)
+        setGrams(servingSize ?? payload.quantity_g ?? 100)
+      } else {
+        setInputMode('grams')
+        setGrams(payload.quantity_g ?? 0)
+        setServings(1)
+      }
       setQuery('')
       setResults([])
-      setSelectedFood(null)
-      setServings(1)
-      setInputMode('servings')
-      setGrams(100)
       setShowCustomForm(false)
       setCustomName('')
       setCustomCalories('')
@@ -103,22 +130,37 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
       setCustomCarbs('')
       setCustomFat('')
       setCustomServingG(100)
-      setTimeout(() => inputRef.current?.focus(), 300)
-      getRecentFoods(8).then((foods) =>
-        setRecentFoods(foods.map((f) => ({
-          id: f.id,
-          usda_fdc_id: f.usda_fdc_id,
-          name: f.name,
-          brand: f.brand,
-          serving_size_g: f.serving_size_g,
-          macros_per_serving: f.macros_per_serving,
-          source: 'personal' as const,
-          is_favorite: f.is_favorite,
-          use_count: f.use_count,
-        })))
-      ).catch(() => {})
+      return
     }
-  }, [isOpen])
+    // existing reset path for mode === 'log'
+    setQuery('')
+    setResults([])
+    setSelectedFood(null)
+    setServings(1)
+    setInputMode('servings')
+    setGrams(100)
+    setShowCustomForm(false)
+    setCustomName('')
+    setCustomCalories('')
+    setCustomProtein('')
+    setCustomCarbs('')
+    setCustomFat('')
+    setCustomServingG(100)
+    setTimeout(() => inputRef.current?.focus(), 300)
+    getRecentFoods(8).then((foods) =>
+      setRecentFoods(foods.map((f) => ({
+        id: f.id,
+        usda_fdc_id: f.usda_fdc_id,
+        name: f.name,
+        brand: f.brand,
+        serving_size_g: f.serving_size_g,
+        macros_per_serving: f.macros_per_serving,
+        source: 'personal' as const,
+        is_favorite: f.is_favorite,
+        use_count: f.use_count,
+      })))
+    ).catch(() => {})
+  }, [isOpen, mode, existingLog])
 
   // Clean up debounce on unmount
   useEffect(() => {
@@ -190,6 +232,45 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
       onFoodLogged()
     } catch {
       toast.error('Failed to log food')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!existingLog || !selectedFood) return
+    setSaving(true)
+    const quantity = inputMode === 'servings'
+      ? Math.round((selectedFood.serving_size_g || 100) * servings)
+      : Math.round((typeof grams === 'number' ? grams : 0))
+    const macros = calculatedMacros ?? (existingLog.payload as FoodPayload).est_macros ?? { calories: 0, protein: 0, carbs: 0, fat: 0 }
+    const updated: Partial<FoodPayload> = {
+      quantity_g: quantity,
+      servings: inputMode === 'servings' ? servings : undefined,
+      est_macros: macros,
+    }
+    try {
+      await updateLog(existingLog.id, updated)
+      onLogUpdated?.(existingLog.id, { ...(existingLog.payload as FoodPayload), ...updated })
+      toast.success('Updated')
+      onClose()
+    } catch {
+      toast.error('Failed to update')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDeleteEdit = async () => {
+    if (!existingLog) return
+    setSaving(true)
+    try {
+      await deleteLog(existingLog.id)
+      onLogDeleted?.(existingLog.id)
+      toast.success('Removed')
+      onClose()
+    } catch {
+      toast.error('Failed to remove')
     } finally {
       setSaving(false)
     }
@@ -290,7 +371,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
               <h2 id="food-sheet-title" className="text-base font-semibold text-text-primary">
-                Add to {mealType}
+                {mode === 'edit' ? `Edit ${(existingLog?.payload as FoodPayload | undefined)?.food_name ?? 'food'}` : `Add to ${mealType}`}
               </h2>
               <button onClick={onClose} aria-label="Close" className="p-1.5 rounded-full hover:bg-surface-hover">
                 <X className="w-4 h-4 text-text-secondary" />
@@ -301,12 +382,14 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
               /* Confirmation view */
               <>
               <div className="flex-1 overflow-y-auto px-4 pb-6">
-                <button
-                  onClick={() => setSelectedFood(null)}
-                  className="text-xs text-accent mb-3 hover:underline"
-                >
-                  &larr; Back to search
-                </button>
+                {mode !== 'edit' && (
+                  <button
+                    onClick={() => setSelectedFood(null)}
+                    className="text-xs text-accent mb-3 hover:underline"
+                  >
+                    &larr; Back to search
+                  </button>
+                )}
 
                 <div className="bg-surface border border-border rounded-xl p-4 mb-4">
                   <p className="text-base font-semibold text-text-primary">{selectedFood.name}</p>
@@ -355,9 +438,19 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                       >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="text-xl font-semibold text-text-primary tabular-nums min-w-[48px] text-center">
-                        {servings}
-                      </span>
+                      <input
+                        type="number"
+                        value={servings}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          if (val === '') return
+                          const num = Number(val)
+                          if (!isNaN(num) && num > 0) setServings(Math.round(num * 4) / 4)
+                        }}
+                        onBlur={() => { if (!servings || servings < 0.25) setServings(0.25) }}
+                        aria-label="Servings"
+                        className="w-20 text-xl font-semibold text-text-primary tabular-nums text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
                       <button
                         onClick={() => setServings(servings + 0.25)}
                         aria-label="Increase servings"
@@ -425,15 +518,26 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged }: Foo
                 )}
 
               </div>
-              {/* Sticky log button */}
+              {/* Sticky footer button(s) */}
               <div className="px-4 pb-20 pt-2 border-t border-border">
-                <Button
-                  onClick={handleConfirmLog}
-                  disabled={saving || (inputMode === 'grams' && !grams)}
-                  className="w-full bg-accent hover:bg-accent-hover text-white"
-                >
-                  {saving ? 'Logging...' : 'Log Food'}
-                </Button>
+                {mode === 'edit' ? (
+                  <div className="flex gap-2">
+                    <Button variant="ghost" onClick={handleDeleteEdit} disabled={saving} className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10">
+                      Delete
+                    </Button>
+                    <Button onClick={handleSaveEdit} disabled={saving || !selectedFood} className="flex-1 bg-accent hover:bg-accent-hover text-white">
+                      Save
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleConfirmLog}
+                    disabled={saving || (inputMode === 'grams' && !grams)}
+                    className="w-full bg-accent hover:bg-accent-hover text-white"
+                  >
+                    {saving ? 'Logging...' : 'Log Food'}
+                  </Button>
+                )}
               </div>
               </>
             ) : (

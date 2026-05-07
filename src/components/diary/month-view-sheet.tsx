@@ -20,6 +20,7 @@ import {
   shiftMonth,
   type DailyBreakdownRow,
 } from '@/lib/month-grid'
+import { todayLocalISO } from '@/lib/timezone'
 import { cn } from '@/lib/utils'
 
 interface MonthViewSheetProps {
@@ -27,6 +28,8 @@ interface MonthViewSheetProps {
   initialDate: string // YYYY-MM-DD — diary's currently selected date
   onClose: () => void
   onSelectDate: (date: string) => void
+  /** IANA timezone string from useUserTimezone(). Drives the isToday highlight. */
+  tz?: string
 }
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] as const
@@ -52,6 +55,7 @@ export function MonthViewSheet({
   initialDate,
   onClose,
   onSelectDate,
+  tz,
 }: MonthViewSheetProps) {
   const [anchor, setAnchor] = useState<string>(() => firstOfMonth(initialDate))
   const [breakdown, setBreakdown] = useState<DailyBreakdownRow[]>([])
@@ -86,7 +90,10 @@ export function MonthViewSheet({
     }
   }, [isOpen, anchor])
 
-  const grid = useMemo(() => buildMonthGrid(anchor, breakdown), [anchor, breakdown])
+  const grid = useMemo(
+    () => buildMonthGrid(anchor, breakdown, todayLocalISO(tz)),
+    [anchor, breakdown, tz]
+  )
 
   const handlePrev = useCallback(() => setAnchor((a) => shiftMonth(a, -1)), [])
   const handleNext = useCallback(() => setAnchor((a) => shiftMonth(a, 1)), [])
