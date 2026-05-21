@@ -31,8 +31,9 @@ Status legend: ☐ not started · ◐ in progress · ✅ done · ⊘ blocked / o
 | FB-R6-13 FE | E6 | feat | P1 | FE | 4 | 2026-05-24 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | "Photo estimate" button on food-log screen. Two-step: estimate-from-photo → editable preview → log-from-estimate. |
 | FB-R6-15 | E5 | bug | P1 | FE | 5 | TBD | ☐ direction Q | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | **NEW from UAT 2026-05-21.** Calendar date → plan_day_index always returns 0. Direction options: (a) date-arithmetic `(selected_date - plan.start_date).days % plan.content.days.length`; (b) defer to BE FB-R6-12 cursor (calendar becomes status, not selector). **Open question — see below.** |
 | FB-R6-12 FE | E5 | feat | P1 | FE | 5 | TBD | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ⊘ BE | Train another day. Workout-start uses `current_position` when no `plan_day_index`; chat routes through `advance_to_workout` tool. BLOCKED on BE FB-R6-12 (still in flight per BE tracker). |
+| FB-R6-S2-v2 | E11 | feat | P1 | BE+FE | 2b | 2026-05-21 | ✅ | ✅ | inline in PRD | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | **NEW 2026-05-21 — Admin Dashboard.** Spec locked at `backend-nextMealAI/docs/spec/fb-r6-s2v2-admin-dashboard-contract.md`. BE shipped STUB mode day 0 — FE builds in parallel. New `/admin` page, 6 components, Recharts (no Tremor), shadcn/ui + Lucide + `app-color.md` tokens only. Design-system extraction done from `src/components/dashboard/`. PRD `docs/plans/FB-R6-S2-v2-FE-prd.md`. ADMIN_EMAILS = eng@oximy.com + Harsh + George (BE env var only — FE never hardcodes). UAT signoff goes in shared BE UAT log. |
 
-**Counts:** 13 FE items · 2 P0 (R6-02, R6-03) · 10 P1 · 1 P2 (R6-11) · 1 BE-blocked (R6-12) · 1 direction-pending (R6-15).
+**Counts:** 14 FE items (Wave 1 closed; +1 S2-v2 added 2026-05-21) · 2 P0 (R6-02, R6-03) · 11 P1 · 1 P2 (R6-11) · 1 BE-blocked (R6-12) · 1 direction-pending (R6-15).
 
 ---
 
@@ -100,6 +101,7 @@ If we discover an FE need that requires a BE contract change, pause, log under "
 
 - **2026-05-21** — Round 06 FE tracker opened. `feat/round-06` cut from `main` (`7228c71`). 9 FE items inventoried. Wave 1 (parallel via subagents): FE-A, FE-B, R6-11 copy sweep starting.
 - **2026-05-21** — Tracker updated: 4 new items added from BE UAT 2026-05-21 (FE-C paste image, FE-D lift composer state, R6-15 calendar mapping) + R6-16+17 FE (BE shipped `0f5365a`). Total now 13 items. Q2 (storage_path naming) resolved. Wave plan revised.
+- **2026-05-21** — **FB-R6-S2-v2 added to scope (between Waves 2 and 3).** Harsh asked for a real admin dashboard, not "go run SQL in Studio." BE shipped spec + stub endpoint (`backend-nextMealAI/docs/spec/fb-r6-s2v2-admin-dashboard-contract.md`). FE builds in parallel against stub. Direction confirmed Ved 2026-05-21: Recharts only (Tremor rescinded), shadcn/ui + Lucide + `app-color.md` tokens, design-system extraction from `src/components/dashboard/` required. ADMIN_EMAILS = eng@oximy.com + Harsh + George (BE env config only). PRD landed at `docs/plans/FB-R6-S2-v2-FE-prd.md`. Slotting as Wave 2b (parallel to R6-02 FE which is paused).
 - **2026-05-21** — **Wave 1 code complete, UAT pending.** 4 commits landed on `feat/round-06`:
   - `b69dd44` fix(FB-R6-FE-A): allow workout-frequency field to be cleared (3 tests)
   - `1366533` fix(FB-R6-FE-B): Slack-style keybinding in chat composer (7 tests)
