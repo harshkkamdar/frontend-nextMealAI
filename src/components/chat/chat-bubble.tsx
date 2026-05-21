@@ -1,6 +1,7 @@
 'use client'
 
 import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { safeImageUrl } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat.types'
 
 // Simple inline markdown renderer for Geo's responses
@@ -107,20 +108,21 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
         <div className="bg-accent hover:bg-accent-hover text-white rounded-2xl rounded-br-sm px-4 py-2.5">
           {hasPersisted ? (
             <div className={persistedAttachments.length > 1 ? 'grid grid-cols-2 gap-1 mb-2' : 'mb-2'}>
-              {persistedAttachments.map((att) =>
-                att.signed_url ? (
+              {persistedAttachments.map((att) => {
+                const safe = safeImageUrl(att.signed_url)
+                return safe ? (
                   <img
                     key={att.id}
-                    src={att.signed_url}
+                    src={safe}
                     alt="Uploaded"
                     className="rounded-xl max-w-[200px] max-h-[200px] object-cover"
                   />
                 ) : null
-              )}
+              })}
             </div>
-          ) : message.image ? (
+          ) : safeImageUrl(message.image) ? (
             <img
-              src={message.image}
+              src={safeImageUrl(message.image)!}
               alt="Uploaded food"
               className="rounded-xl max-w-[200px] max-h-[200px] object-cover mb-2"
             />

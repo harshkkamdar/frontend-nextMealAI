@@ -41,6 +41,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { getAdminUserSummary } from '@/lib/api/admin.api'
+import { safeImageUrl } from '@/lib/utils'
 import type { AdminUserSummary } from '@/types/admin.types'
 
 type State =
@@ -587,18 +588,21 @@ function PhotosCard({
             key={a.id}
             className="aspect-square rounded-lg overflow-hidden bg-background border border-border"
           >
-            {a.signed_url ? (
-              <img
-                src={a.signed_url}
-                alt="attachment"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <ImageIcon className="w-4 h-4 text-text-tertiary" />
-              </div>
-            )}
+            {(() => {
+              const safe = safeImageUrl(a.signed_url)
+              return safe ? (
+                <img
+                  src={safe}
+                  alt="attachment"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <ImageIcon className="w-4 h-4 text-text-tertiary" />
+                </div>
+              )
+            })()}
           </div>
         ))}
       </div>

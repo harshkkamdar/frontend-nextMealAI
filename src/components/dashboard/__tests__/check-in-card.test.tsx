@@ -7,6 +7,14 @@ import { render, screen } from '@testing-library/react'
 import { CheckInCard } from '@/components/dashboard/check-in-card'
 import type { DashboardCheckIn } from '@/lib/api/dashboard.api'
 
+// Polyfill crypto.randomUUID for jsdom — needed for the drilldown link.
+if (typeof globalThis.crypto === 'undefined' || typeof globalThis.crypto.randomUUID !== 'function') {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: { randomUUID: () => 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' },
+    configurable: true,
+  })
+}
+
 const FULL: DashboardCheckIn = {
   narrative: 'Strong week — macros hit target 5 of 7 days, weight trending down.',
   metrics: {
@@ -68,5 +76,27 @@ describe('CheckInCard — FB-R6-10', () => {
     expect(card.className).toContain('bg-surface')
     expect(card.className).toContain('border-border')
     expect(card.className).toContain('rounded-2xl')
+  })
+
+  it('drilldown UUID is stable across re-renders (/cso P1 — no orphan sessions)', () => {
+    const { rerender } = render(<CheckInCard checkIn={FULL} />)
+    const initialHref = (
+      screen.getByTestId('check-in-drilldown-link') as HTMLAnchorElement
+    ).getAttribute('href')
+    expect(initialHref).toBeTruthy()
+
+    // Re-render with the same props — UUID must NOT regenerate.
+    rerender(<CheckInCard checkIn={FULL} />)
+    const afterRerenderHref = (
+      screen.getByTestId('check-in-drilldown-link') as HTMLAnchorElement
+    ).getAttribute('href')
+    expect(afterRerenderHref).toBe(initialHref)
+
+    // Re-render with different props (metric update) — UUID still stable.
+    rerender(<CheckInCard checkIn={{ ...FULL, metrics: { ...FULL.metrics, workout_count_7d: 4 } }} />)
+    const afterPropChangeHref = (
+      screen.getByTestId('check-in-drilldown-link') as HTMLAnchorElement
+    ).getAttribute('href')
+    expect(afterPropChangeHref).toBe(initialHref)
   })
 })

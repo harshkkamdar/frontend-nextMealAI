@@ -13,6 +13,7 @@
 
 'use client'
 
+import { useMemo } from 'react'
 import Link from 'next/link'
 import { Sparkles, TrendingDown, TrendingUp, Activity as ActivityIcon, Calendar } from 'lucide-react'
 import type { DashboardCheckIn } from '@/lib/api/dashboard.api'
@@ -43,6 +44,14 @@ export function CheckInCard({ checkIn }: { checkIn: DashboardCheckIn }) {
     metrics.weight_delta_kg != null && metrics.weight_delta_kg < 0
       ? TrendingDown
       : TrendingUp
+
+  // /cso P1 — generate the drilldown session UUID once per mount. Previously
+  // this lived inline in the JSX `href` and ran on every render, leaking
+  // orphan session IDs to the chat-sessions table and breaking prefetching.
+  const drilldownHref = useMemo(
+    () => `/chat/${crypto.randomUUID()}?prefill=${PREFILL}`,
+    []
+  )
 
   return (
     <div
@@ -84,7 +93,7 @@ export function CheckInCard({ checkIn }: { checkIn: DashboardCheckIn }) {
       </div>
 
       <Link
-        href={`/chat/${crypto.randomUUID()}?prefill=${PREFILL}`}
+        href={drilldownHref}
         className="text-xs font-medium text-accent hover:underline"
         data-testid="check-in-drilldown-link"
       >
