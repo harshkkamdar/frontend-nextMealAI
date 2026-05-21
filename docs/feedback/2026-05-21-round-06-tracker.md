@@ -18,10 +18,10 @@ Status legend: ☐ not started · ◐ in progress · ✅ done · ⊘ blocked / o
 
 | ID | Epic | Sev | Pri | Repo | Wave | ETA | Refined | PRD | Plan | Test Red | Impl | QA | UAT | Reviewed | Shipped | Notes |
 |----|------|-----|-----|------|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|------|
-| FB-R6-FE-A | E10 | bug | P1 | FE | 1 | 2026-05-21 | ✅ | ◐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | Workout-frequency leading-zero. fitness-form.tsx:212-221. `Number('')` coerces to 0. Pure FE, no BE dep. |
-| FB-R6-FE-B | E10 | bug | P1 | FE | 1 | 2026-05-21 | ✅ | ◐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | Slack-style keybinding (Ved-confirmed 2026-05-21): Enter = newline, Cmd/Ctrl+Enter = send. chat-input.tsx:55-60. |
-| FB-R6-11 FE | E9 | feat | P2 | FE | 1 | 2026-05-21 | ✅ | ◐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | Copy sweep: 'meal plan' → 'nutrition plan' in user-facing strings only. Skip code identifiers + DB enum. ~14 files matched. |
-| FB-R6-16+17 FE | E5 | bug | P1 | FE | 1 | 2026-05-21 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | Resume label + state on "Start Workout". BE shipped today (`0f5365a` idempotent startSession). FE: inspect 200 vs 201, "Resume Workout" label when in-progress session exists for today's plan_day_index, no duplicate history rows. |
+| FB-R6-FE-A | E10 | bug | P1 | FE | 1 | 2026-05-21 | ✅ | ✅ | inline | ✅ | ✅ | self | ☐ Ved | self | ☐ UAT | Commit b69dd44. 3 vitest tests (AC01 RED→GREEN reproduced the bug exactly; AC02, AC07 regression locks). State widened to `number \| ''`. Live UAT pending Ved. |
+| FB-R6-FE-B | E10 | bug | P1 | FE | 1 | 2026-05-21 | ✅ | ✅ | inline | ✅ | ✅ | self | ☐ Ved | self | ☐ UAT | Commit 1366533. 7 vitest tests cover plain Enter no-send, Cmd+Enter macOS, Ctrl+Enter Win/Linux, empty/whitespace/disabled no-send, preventDefault on send. Live UAT pending Ved. |
+| FB-R6-11 FE | E9 | feat | P2 | FE | 1 | 2026-05-21 | ✅ | ✅ | inline | ✅ | ✅ | self | ☐ Ved | self | ☐ UAT | Commit e9c1e11. 28 user-facing strings swept across 14 files. New grep-style test `src/__tests__/copy/nutrition-plan-rename.test.ts` walks src/ for literal `meal plan` (space-separated) — 0 occurrences after sweep. File identifiers + DB enum unchanged. |
+| FB-R6-16+17 FE | E5 | bug | P1 | FE | 1 | 2026-05-21 | ✅ | ✅ | inline | ✅ | ✅ | self | ☐ Ved | self | ☐ UAT | Commit 4aaa0bb. New `deriveWorkoutEntryLabel` helper in lib/workout-session.ts + 6 vitest tests. Wired into activity/page.tsx — Start button label flips Start↔Resume; resume banner now only shows when in_progress matches today (was showing for any in_progress before). |
 | FB-R6-02 FE | E6 | bug | **P0** | FE | 2 | 2026-05-22 | ✅ Q2 resolved | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | Two-step upload. BE contract confirmed: `POST /v1/chat/attachments/upload` → `{ storage_path, expires_in_seconds: 3600 }`; chat send takes `image_paths: string[]` (1–5); history `attachments[]` carries `signed_url` (1h TTL). Replace base64 path in chat-input.tsx + chat.api.ts + chat-bubble.tsx. Foundational — unlocks 03, FE-C, FE-D, 13 (and reuses for FE-D shared store). |
 | FB-R6-03 FE | E6 | bug | **P0** | FE | 3 | 2026-05-23 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | Multi-image picker, cap 5. `multiple` on file input; thumbnail strip; >5 disabled w/ helper text. Depends on FB-R6-02 FE. |
 | FB-R6-FE-C | E6 | bug | P1 | FE | 3 | 2026-05-23 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | **NEW from UAT 2026-05-21.** Cmd+V paste images into chat composer. Intercept `paste` event; when `e.clipboardData.items` contains image, build File from blob, feed into FB-R6-02 upload flow. Mixed clipboard handles both. Depends on FB-R6-02. |
@@ -100,3 +100,10 @@ If we discover an FE need that requires a BE contract change, pause, log under "
 
 - **2026-05-21** — Round 06 FE tracker opened. `feat/round-06` cut from `main` (`7228c71`). 9 FE items inventoried. Wave 1 (parallel via subagents): FE-A, FE-B, R6-11 copy sweep starting.
 - **2026-05-21** — Tracker updated: 4 new items added from BE UAT 2026-05-21 (FE-C paste image, FE-D lift composer state, R6-15 calendar mapping) + R6-16+17 FE (BE shipped `0f5365a`). Total now 13 items. Q2 (storage_path naming) resolved. Wave plan revised.
+- **2026-05-21** — **Wave 1 code complete, UAT pending.** 4 commits landed on `feat/round-06`:
+  - `b69dd44` fix(FB-R6-FE-A): allow workout-frequency field to be cleared (3 tests)
+  - `1366533` fix(FB-R6-FE-B): Slack-style keybinding in chat composer (7 tests)
+  - `e9c1e11` feat(FB-R6-11 FE): meal plan → nutrition plan copy sweep (28 strings, 14 files, 1 sweep test)
+  - `4aaa0bb` fix(FB-R6-16+17 FE): Resume label + state on Start Workout (6 unit tests + activity page wiring)
+  
+  Full test suite green (177/177 across 24 files). tsc clean. FE UAT script opened at `docs/feedback/2026-05-21-round-06-uat-fe.md` with one row per AC across the 4 items — awaiting Ved live sign-off in browser at http://localhost:3010 ↔ BE :4010.
