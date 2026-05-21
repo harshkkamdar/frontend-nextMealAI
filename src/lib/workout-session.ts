@@ -1,9 +1,12 @@
 /**
  * FB-05 rest-timer-bugs — pure helpers extracted from the workout session page
  * so the bug-prone logic can be unit tested without mounting the Next.js page.
+ *
+ * FB-R6-16+17 (2026-05-21) extends this module with deriveWorkoutEntryLabel —
+ * a one-decision helper used by every Start Workout entry point.
  */
 
-import type { SessionExercise, SetData } from '@/types/workout-session.types'
+import type { SessionExercise, SetData, WorkoutSession } from '@/types/workout-session.types'
 
 export const STALE_SESSION_THRESHOLD_SECONDS = 6 * 60 * 60 // 6 hours
 
@@ -101,4 +104,31 @@ export function computeCompleteSetResult(
     exercises: updated,
     rest: { show: true, seconds: restSeconds, bumpKey: true },
   }
+}
+
+/**
+ * FB-R6-16+17 — Decide whether a Start Workout entry point should read
+ * "Start Workout" or "Resume Workout".
+ *
+ * The BE-side fix (commit 0f5365a) made POST /v1/workout-sessions idempotent:
+ * it returns the existing in-progress session for the same (user, plan,
+ * plan_day_index) instead of creating a duplicate. This helper lets the FE
+ * preview that behavior so the label matches what the action will actually do.
+ *
+ * "Resume" only fires when there is an in_progress session whose plan_day_index
+ * matches the day the entry point is offering. Off-plan sessions
+ * (plan_day_index === null) only match a null `todayPlanDayIndex`.
+ *
+ * Defaults conservatively to "Start Workout" — if the lookup fails or the
+ * caller passes null/undefined, the user sees a Start label and the BE's
+ * idempotency is the actual source of truth.
+ */
+export function deriveWorkoutEntryLabel(
+  inProgressSession: WorkoutSession | null | undefined,
+  todayPlanDayIndex: number | null
+): 'Start Workout' | 'Resume Workout' {
+  if (!inProgressSession) return 'Start Workout'
+  if (inProgressSession.status !== 'in_progress') return 'Start Workout'
+  if (inProgressSession.plan_day_index !== todayPlanDayIndex) return 'Start Workout'
+  return 'Resume Workout'
 }

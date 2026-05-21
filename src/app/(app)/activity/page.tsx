@@ -13,6 +13,7 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useUIStore } from '@/stores/ui.store'
 import { getPlans } from '@/lib/api/plans.api'
 import { startWorkoutSession, getInProgressSession, getWorkoutHistory } from '@/lib/api/workout-sessions.api'
+import { deriveWorkoutEntryLabel } from '@/lib/workout-session'
 import { todayLocalISO } from '@/lib/timezone'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import type { WorkoutPlan } from '@/types/plans.types'
@@ -80,6 +81,17 @@ export default function ActivityPage() {
   const todayWorkout = workoutPlan?.content?.days?.[todayDayIndex] ?? null
   const isRestDay = todayWorkout?.is_rest_day === true
 
+  // FB-R6-16+17: derive "Resume" vs "Start" label so the Start button and the
+  // resume banner agree on whether today's in-progress session is THE one to
+  // resume. Off-day in-progress sessions (e.g. yesterday's incomplete) stay
+  // reachable via the History list — not as a banner that would mis-imply
+  // "this is today's workout."
+  const entryLabel = deriveWorkoutEntryLabel(
+    inProgress,
+    todayDayIndex >= 0 ? todayDayIndex : null
+  )
+  const isResume = entryLabel === 'Resume Workout'
+
   // Calendar indicators from history
   const indicators = useMemo(() => {
     const map = new Map<string, { food?: boolean; workout?: boolean }>()
@@ -129,8 +141,9 @@ export default function ActivityPage() {
         Activity
       </h1>
 
-      {/* Resume banner — hide on rest days to avoid confusion */}
-      {inProgress && !isRestDay && (
+      {/* FB-R6-16+17: Resume banner only when the in-progress session matches
+          today's plan_day_index. Hide on rest days to avoid confusion. */}
+      {isResume && !isRestDay && (
         <button
           onClick={handleResume}
           className="w-full flex items-center justify-between bg-accent-light border border-accent/20 rounded-xl px-4 py-3 mb-4"
@@ -139,7 +152,7 @@ export default function ActivityPage() {
             <Play className="w-4 h-4 text-accent fill-accent" />
             <div className="text-left">
               <p className="text-sm font-semibold text-text-primary">Resume Workout</p>
-              <p className="text-[11px] text-text-secondary">{inProgress.day_name}</p>
+              <p className="text-[11px] text-text-secondary">{inProgress?.day_name}</p>
             </div>
           </div>
           <ChevronRight className="w-4 h-4 text-accent" />
@@ -219,12 +232,12 @@ export default function ActivityPage() {
                 </button>
 
                 <Button
-                  onClick={handleStartWorkout}
-                  disabled={starting || !!inProgress}
+                  onClick={isResume ? handleResume : handleStartWorkout}
+                  disabled={starting}
                   className="w-full bg-accent hover:bg-accent-hover text-white"
                 >
                   <Play className="w-4 h-4 mr-1 fill-white" />
-                  {starting ? 'Starting...' : 'Start Workout'}
+                  {starting ? 'Starting...' : entryLabel}
                 </Button>
               </div>
             ) : (

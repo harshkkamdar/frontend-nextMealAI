@@ -2,9 +2,10 @@ import { describe, it, expect } from 'vitest'
 import {
   resolveElapsedForSession,
   computeCompleteSetResult,
+  deriveWorkoutEntryLabel,
   STALE_SESSION_THRESHOLD_SECONDS,
 } from '../workout-session'
-import type { SessionExercise } from '@/types/workout-session.types'
+import type { SessionExercise, WorkoutSession } from '@/types/workout-session.types'
 
 function makeSet(overrides: Partial<SessionExercise['sets'][number]> = {}) {
   return {
@@ -192,5 +193,67 @@ describe('FB-05 computeCompleteSetResult (AC01.4, AC01.6, AC01.7, AC01.8, AC01.9
     const exercises = [makeExercise()]
     const result = computeCompleteSetResult(exercises, 0, 99, NOW_ISO)
     expect(result.rest.show).toBe(false)
+  })
+})
+
+// FB-R6-16+17 · Resume label + state on Start Workout
+//
+// BE shipped 2026-05-21 (0f5365a): POST /v1/workout-sessions returns 200 with
+// the existing session when an in_progress session for the same (user, plan,
+// plan_day_index) already exists; 201 with a new session otherwise.
+//
+// FE side: when the user has an in-progress session for today's plan_day_index,
+// the action label must read "Resume Workout" instead of "Start Workout".
+// `deriveWorkoutEntryLabel` is a pure helper so each entry point (activity
+// page, plan detail, dashboard quick-action) can reuse the same decision.
+function makeInProgressSession(planDayIndex: number | null): WorkoutSession {
+  return {
+    id: 'session-1',
+    user_id: 'user-1',
+    plan_id: 'plan-1',
+    plan_day_index: planDayIndex,
+    day_name: 'Day 1',
+    status: 'in_progress',
+    started_at: new Date().toISOString(),
+    completed_at: null,
+    exercises: [],
+    total_volume_kg: 0,
+    duration_minutes: 0,
+    notes: null,
+    created_at: new Date().toISOString(),
+  }
+}
+
+describe('FB-R6-16+17 · deriveWorkoutEntryLabel', () => {
+  it('AC01: returns "Resume Workout" when in-progress session matches today plan_day_index', () => {
+    const inProgress = makeInProgressSession(2)
+    expect(deriveWorkoutEntryLabel(inProgress, 2)).toBe('Resume Workout')
+  })
+
+  it('AC03: returns "Start Workout" when there is no in-progress session', () => {
+    expect(deriveWorkoutEntryLabel(null, 2)).toBe('Start Workout')
+  })
+
+  it('AC03b: returns "Start Workout" when in-progress session is for a different plan_day_index', () => {
+    const inProgress = makeInProgressSession(1)
+    expect(deriveWorkoutEntryLabel(inProgress, 2)).toBe('Start Workout')
+  })
+
+  it('AC09: returns "Start Workout" when today is unmapped (null plan_day_index) and no session exists', () => {
+    expect(deriveWorkoutEntryLabel(null, null)).toBe('Start Workout')
+  })
+
+  it('handles in-progress session with null plan_day_index — only matches when today is also null (off-plan workout)', () => {
+    const inProgress = makeInProgressSession(null)
+    expect(deriveWorkoutEntryLabel(inProgress, 2)).toBe('Start Workout')
+    expect(deriveWorkoutEntryLabel(inProgress, null)).toBe('Resume Workout')
+  })
+
+  it('ignores sessions that are not in_progress (already completed/abandoned)', () => {
+    const completed: WorkoutSession = {
+      ...makeInProgressSession(2),
+      status: 'completed',
+    }
+    expect(deriveWorkoutEntryLabel(completed, 2)).toBe('Start Workout')
   })
 })
