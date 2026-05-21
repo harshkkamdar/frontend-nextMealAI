@@ -113,6 +113,12 @@ export function GeoCompanionSheet() {
       if ((res.tools_used ?? []).includes('update_today_workout')) {
         window.dispatchEvent(new CustomEvent('workout:session-updated'))
       }
+
+      // FB-R6-08 — Geo deactivated the active plan via the chat tool.
+      // Dispatch an event so Activity + Dashboard refresh their cards.
+      if ((res.tools_used ?? []).includes('deactivate_active_plan')) {
+        window.dispatchEvent(new CustomEvent('workout:plan-deactivated'))
+      }
     } catch {
       toast.error('Failed to send message')
     } finally {

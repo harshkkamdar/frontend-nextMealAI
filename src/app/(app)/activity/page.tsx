@@ -67,6 +67,18 @@ export default function ActivityPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  // FB-R6-08 — refetch when Geo deactivates the active plan via chat. The
+  // chat consumers dispatch this event after they see the tool in tools_used.
+  useEffect(() => {
+    const handler = () => { fetchData() }
+    window.addEventListener('workout:plan-deactivated', handler)
+    window.addEventListener('workout:session-updated', handler)
+    return () => {
+      window.removeEventListener('workout:plan-deactivated', handler)
+      window.removeEventListener('workout:session-updated', handler)
+    }
+  }, [fetchData])
+
   // FB-R6-15 — cursor-aware mapping. Today's view honors plan.current_position
   // (the BE cursor that Geo's advance_to_workout tool moves); other dates add
   // the day-delta from today to the cursor base and wrap around days.length.

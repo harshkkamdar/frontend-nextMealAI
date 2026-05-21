@@ -135,6 +135,13 @@ export default function ActiveChatPage({
           action: { label: 'View Plans', onClick: () => router.push('/plans') },
         })
       }
+
+      // FB-R6-08 — Geo deactivated the active plan via the chat tool.
+      // Dispatch an event so Activity + Dashboard refresh their cards
+      // within the same round trip (no extra request from those pages).
+      if ((res.tools_used ?? []).includes('deactivate_active_plan')) {
+        window.dispatchEvent(new CustomEvent('workout:plan-deactivated'))
+      }
     } catch {
       toast.error('Failed to send message. Please try again.')
     } finally {

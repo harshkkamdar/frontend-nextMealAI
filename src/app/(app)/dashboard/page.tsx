@@ -254,6 +254,17 @@ export default function DashboardPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  // FB-R6-08 — refetch when Geo deactivates the active plan via chat so the
+  // dashboard cards (workout, next-up nutrition) reflect the new state
+  // without a manual reload.
+  useEffect(() => {
+    const handler = () => { fetchData() }
+    window.addEventListener('workout:plan-deactivated', handler)
+    return () => {
+      window.removeEventListener('workout:plan-deactivated', handler)
+    }
+  }, [fetchData])
+
   useSetGeoScreen('dashboard', { loading })
 
   const mealPlan = (plans.find((p) => p.type === 'meal') as MealPlan) ?? null
