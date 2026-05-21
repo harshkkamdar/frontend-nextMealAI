@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { ArrowUp, Camera, X } from 'lucide-react'
+import { ArrowUp, Camera, X, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { uploadChatAttachment } from '@/lib/api/chat.api'
+import type { AttachedImage } from '@/types/chat.types'
 
 export function ChatInput({
   onSend,
@@ -9,22 +12,26 @@ export function ChatInput({
   showCamera = false,
   defaultValue = '',
 }: {
-  onSend: (message: string, image?: string) => void
+  // FB-R6-02 — onSend now carries an array of fully-uploaded AttachedImage
+  // entries instead of an inline base64 string. The composer uploads each
+  // file the moment it's selected so the user can compose / retry / submit
+  // without re-uploading bytes.
+  onSend: (message: string, attachments?: AttachedImage[]) => void
   disabled?: boolean
   showCamera?: boolean
   defaultValue?: string
 }) {
   const [value, setValue] = useState(defaultValue)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [imageBase64, setImageBase64] = useState<string | null>(null)
+  const [attached, setAttached] = useState<AttachedImage | null>(null)
+  const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     return () => {
-      if (imagePreview) URL.revokeObjectURL(imagePreview)
+      if (attached?.preview_url) URL.revokeObjectURL(attached.preview_url)
     }
-  }, [imagePreview])
+  }, [attached])
 
   const adjustHeight = useCallback(() => {
     const textarea = textareaRef.current
@@ -41,12 +48,10 @@ export function ChatInput({
 
   const handleSend = () => {
     const trimmed = value.trim()
-    if ((!trimmed && !imageBase64) || disabled) return
-    onSend(trimmed || 'What is this?', imageBase64 || undefined)
+    if ((!trimmed && !attached) || disabled || uploading) return
+    onSend(trimmed || 'What is this?', attached ? [attached] : undefined)
     setValue('')
-    setImagePreview(null)
-    setImageBase64(null)
-    // Reset textarea height
+    setAttached(null)
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'
     }
@@ -55,59 +60,72 @@ export function ChatInput({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // FB-R6-FE-B: Slack-style binding (Ved-confirmed 2026-05-21).
     // Plain Enter inserts a newline (browser default). Cmd+Enter (macOS) or
-    // Ctrl+Enter (Win/Linux) sends. George wrote many multi-line messages
-    // that got prematurely sent under the old ChatGPT-style binding.
+    // Ctrl+Enter (Win/Linux) sends.
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       handleSend()
     }
   }
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Preview
-    const previewUrl = URL.createObjectURL(file)
-    setImagePreview(previewUrl)
-
-    // Base64
-    const reader = new FileReader()
-    reader.onload = () => {
-      const result = reader.result as string
-      // Strip data URL prefix to get raw base64
-      const base64 = result.split(',')[1]
-      setImageBase64(base64)
+    // FB-R6-02 — block parallel uploads to keep the composer state coherent.
+    if (uploading) {
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
     }
-    reader.readAsDataURL(file)
 
-    // Reset input
-    if (fileInputRef.current) fileInputRef.current.value = ''
+    // Optimistic preview from a blob URL — visible before the upload finishes.
+    const preview_url = URL.createObjectURL(file)
+    setUploading(true)
+    try {
+      const { storage_path } = await uploadChatAttachment(file)
+      setAttached({ storage_path, preview_url, file })
+    } catch (err) {
+      // Upload failed — revoke the preview so we don't leak a blob URL, and
+      // do not attach. User can retry by re-selecting.
+      URL.revokeObjectURL(preview_url)
+      toast.error(err instanceof Error ? err.message : 'Image upload failed')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
   }
 
   const clearImage = () => {
-    if (imagePreview) URL.revokeObjectURL(imagePreview)
-    setImagePreview(null)
-    setImageBase64(null)
+    if (attached?.preview_url) URL.revokeObjectURL(attached.preview_url)
+    setAttached(null)
   }
+
+  const sendDisabled = disabled || uploading || (!value.trim() && !attached)
 
   return (
     <div className="px-4 py-3 bg-background border-t border-border">
-      {/* Image preview */}
-      {imagePreview && (
+      {/* Image preview (or uploading placeholder) */}
+      {(attached || uploading) && (
         <div className="relative inline-block mb-2">
-          <img
-            src={imagePreview}
-            alt="Attached"
-            className="h-16 w-16 object-cover rounded-lg border border-border"
-          />
-          <button
-            onClick={clearImage}
-            aria-label="Remove attached image"
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-text-primary text-background flex items-center justify-center"
-          >
-            <X className="w-3 h-3" />
-          </button>
+          {attached ? (
+            <img
+              src={attached.preview_url}
+              alt="Attached"
+              className="h-16 w-16 object-cover rounded-lg border border-border"
+            />
+          ) : (
+            <div className="h-16 w-16 flex items-center justify-center rounded-lg border border-border bg-surface">
+              <Loader2 className="w-5 h-5 text-text-secondary animate-spin" />
+            </div>
+          )}
+          {attached && (
+            <button
+              onClick={clearImage}
+              aria-label="Remove attached image"
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-text-primary text-background flex items-center justify-center"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
         </div>
       )}
 
@@ -117,7 +135,7 @@ export function ChatInput({
           <>
             <button
               onClick={() => fileInputRef.current?.click()}
-              disabled={disabled}
+              disabled={disabled || uploading}
               className="p-1 mb-0.5 text-text-tertiary hover:text-accent transition-colors disabled:opacity-50 shrink-0"
               aria-label="Attach photo"
             >
@@ -146,7 +164,7 @@ export function ChatInput({
         />
         <button
           onClick={handleSend}
-          disabled={disabled || (!value.trim() && !imageBase64)}
+          disabled={sendDisabled}
           className="flex items-center justify-center w-8 h-8 rounded-full bg-accent hover:bg-accent-hover text-white disabled:opacity-40 transition-opacity shrink-0 mb-0.5"
           aria-label="Send message"
         >

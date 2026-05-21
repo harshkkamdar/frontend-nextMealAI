@@ -17,7 +17,7 @@ import {
   sendMessage,
   extractSessionMemories,
 } from '@/lib/api/chat.api'
-import type { ChatMessage } from '@/types/chat.types'
+import type { AttachedImage, ChatMessage } from '@/types/chat.types'
 
 export function GeoCompanionSheet() {
   const activeSheet = useUIStore((s) => s.activeSheet)
@@ -76,15 +76,16 @@ export function GeoCompanionSheet() {
     closeSheet()
   }, [sessionId, closeSheet])
 
-  const handleSend = async (message: string, image?: string) => {
+  const handleSend = async (message: string, attachments?: AttachedImage[]) => {
     if (!sessionId) return
 
+    const firstPreview = attachments?.[0]?.preview_url
     const userMsg: ChatMessage = {
       id: `temp-${Date.now()}`,
       role: 'user',
       content: message,
       timestamp: new Date().toISOString(),
-      image: image ? `data:image/jpeg;base64,${image}` : undefined,
+      image: firstPreview,
     }
 
     setMessages((prev) => [...prev, userMsg])
@@ -92,7 +93,8 @@ export function GeoCompanionSheet() {
     setIsTyping(true)
 
     try {
-      const res = await sendMessage({ message, session_id: sessionId, image })
+      const image_paths = attachments?.map((a) => a.storage_path)
+      const res = await sendMessage({ message, session_id: sessionId, image_paths })
       const geoMsg: ChatMessage = {
         id: `geo-${Date.now()}`,
         role: res.response.role,

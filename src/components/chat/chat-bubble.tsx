@@ -96,16 +96,35 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
     // Strip "[Photo attached]" from content (legacy messages stored it in text)
     const displayContent = message.content.replace(/\s*\[Photo attached\]\s*/g, '').trim()
 
+    // FB-R6-02 — render persisted attachments[] first (signed URLs from BE).
+    // Fall back to the local-only `image` blob URL for the optimistic temp
+    // message between submit and the next history refetch.
+    const persistedAttachments = message.attachments ?? []
+    const hasPersisted = persistedAttachments.length > 0
+
     return (
       <div className="flex flex-col items-end max-w-[85%] ml-auto">
         <div className="bg-accent hover:bg-accent-hover text-white rounded-2xl rounded-br-sm px-4 py-2.5">
-          {message.image && (
+          {hasPersisted ? (
+            <div className={persistedAttachments.length > 1 ? 'grid grid-cols-2 gap-1 mb-2' : 'mb-2'}>
+              {persistedAttachments.map((att) =>
+                att.signed_url ? (
+                  <img
+                    key={att.id}
+                    src={att.signed_url}
+                    alt="Uploaded"
+                    className="rounded-xl max-w-[200px] max-h-[200px] object-cover"
+                  />
+                ) : null
+              )}
+            </div>
+          ) : message.image ? (
             <img
               src={message.image}
               alt="Uploaded food"
               className="rounded-xl max-w-[200px] max-h-[200px] object-cover mb-2"
             />
-          )}
+          ) : null}
           {displayContent && (
             <p className="text-sm whitespace-pre-wrap break-words">{displayContent}</p>
           )}

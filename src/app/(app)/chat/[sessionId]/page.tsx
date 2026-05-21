@@ -10,8 +10,24 @@ import { getChatSession, getChatSessions, sendMessage } from '@/lib/api/chat.api
 import { extractWorkoutProgram, isLikelyWorkoutProgramPrompt } from '@/lib/api/vision.api'
 import { WorkoutProgramPreviewCard } from '@/components/plans/workout-program-preview-card'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
-import type { ChatMessage } from '@/types/chat.types'
+import type { AttachedImage, ChatMessage } from '@/types/chat.types'
 import type { WorkoutProgramContent } from '@/types/plans.types'
+
+// FB-R6-02 — FB-15 (program extraction) still wants a base64 payload. The
+// chat-input no longer keeps base64 around (it has a File + storage_path
+// instead), so we convert on demand only when FB-15 fires.
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result as string
+      const base64 = result.split(',')[1] ?? ''
+      resolve(base64)
+    }
+    reader.onerror = () => reject(reader.error ?? new Error('FileReader failed'))
+    reader.readAsDataURL(file)
+  })
+}
 
 function PrefillReader({ onPrefill }: { onPrefill: (v: string) => void }) {
   const searchParams = useSearchParams()
@@ -64,24 +80,29 @@ export default function ActiveChatPage({
     return () => { cancelled = true; clearTimeout(timer) }
   }, [sessionId])
 
-  const handleSend = async (message: string, image?: string) => {
+  const handleSend = async (message: string, attachments?: AttachedImage[]) => {
+    // FB-R6-02 — optimistic local user bubble uses the blob preview URL.
+    // After the next chat-session refetch the message comes back from BE with
+    // attachments[] (signed URLs), which ChatBubble prefers over `image`.
+    const firstPreview = attachments?.[0]?.preview_url
     const userMessage: ChatMessage = {
       id: `temp-${Date.now()}`,
       role: 'user',
       content: message,
       timestamp: new Date().toISOString(),
-      image: image ? `data:image/jpeg;base64,${image}` : undefined,
+      image: firstPreview,
     }
 
     setMessages((prev) => [...prev, userMessage])
     setIsTyping(true)
 
-    // FB-15: if the user attached an image with a workout-programmy
-    // message, try to extract a program first and show the preview
-    // card. Failures fall through to Geo's normal flow silently.
-    if (image && isLikelyWorkoutProgramPrompt(message)) {
+    // FB-15: if the user attached an image with a workout-programmy message,
+    // try to extract a program first and show the preview card. Failures
+    // fall through to Geo's normal flow silently.
+    if (attachments?.length && isLikelyWorkoutProgramPrompt(message)) {
       try {
-        const extracted = await extractWorkoutProgram(image)
+        const base64 = await fileToBase64(attachments[0].file)
+        const extracted = await extractWorkoutProgram(base64)
         if (extracted?.program?.days?.length) {
           setProgramPreview(extracted)
         }
@@ -91,7 +112,8 @@ export default function ActiveChatPage({
     }
 
     try {
-      const res = await sendMessage({ message, session_id: sessionId, image })
+      const image_paths = attachments?.map((a) => a.storage_path)
+      const res = await sendMessage({ message, session_id: sessionId, image_paths })
       const geoMessage: ChatMessage = {
         id: `geo-${Date.now()}`,
         role: res.response.role,
