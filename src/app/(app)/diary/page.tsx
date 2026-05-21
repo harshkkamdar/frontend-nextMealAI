@@ -206,7 +206,7 @@ export default function DiaryPage() {
               onClick={() => router.push(`/plans/${mealPlan.id}`)}
               className="text-xs text-accent hover:underline"
             >
-              View meal plan &rarr;
+              View nutrition plan &rarr;
             </button>
           )}
 

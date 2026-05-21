@@ -31,7 +31,7 @@ export interface Profile {
   /**
    * FB-tdee-baseline: backend-computed daily targets. NULL when profile inputs
    * (weight/height/dob/sex/activity_level) are incomplete. The dashboard, the
-   * companion snapshot, and Geo all read these as the baseline. A meal plan, if
+   * companion snapshot, and Geo all read these as the baseline. A nutrition plan, if
    * active, may carry its own override under `content.daily_targets`.
    */
   daily_calorie_target?: number | null

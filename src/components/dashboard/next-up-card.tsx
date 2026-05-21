@@ -16,13 +16,13 @@ export function NextUpCard({
   loggedMealTypes?: string[]
   onCreatePlan?: () => void
 }) {
-  // No meal plan — compact prompt
+  // No nutrition plan — compact prompt
   if (!mealPlan) {
     return (
       <div className="bg-surface border border-border rounded-xl px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <UtensilsCrossed className="w-4 h-4 text-text-tertiary" />
-          <p className="text-sm text-text-secondary">No meal plan yet</p>
+          <p className="text-sm text-text-secondary">No nutrition plan yet</p>
         </div>
         <button
           type="button"

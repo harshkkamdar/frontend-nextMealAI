@@ -129,7 +129,7 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
       duplicate_window: 'looks like a duplicate from the last minute',
       not_found: "couldn't find that entry",
       validation: "those numbers didn't look right",
-      missing_meal_plan_targets: 'meal plan needs daily targets',
+      missing_meal_plan_targets: 'nutrition plan needs daily targets',
       profile_incomplete: 'profile is missing something',
       image_analysis_failed: "couldn't read that image",
     }

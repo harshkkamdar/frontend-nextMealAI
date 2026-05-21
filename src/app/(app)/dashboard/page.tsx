@@ -266,7 +266,7 @@ export default function DashboardPage() {
   const carbsConsumed = dailyBreakdown?.carbs ?? 0
   const fatConsumed = dailyBreakdown?.fat ?? 0
 
-  // FB-tdee-baseline: profile.daily_*_target is the source of truth. A meal plan,
+  // FB-tdee-baseline: profile.daily_*_target is the source of truth. A nutrition plan,
   // if active, may carry an optional override under content.daily_targets.
   // No hardcoded defaults — when the profile is incomplete, targets stay 0 and
   // the macro-progress component drops the "left" suffix gracefully.
@@ -399,7 +399,7 @@ export default function DashboardPage() {
             loggedMealTypes={todayLogs.filter((l) => l.type === 'food').map((l) => (l.payload as any)?.meal_type?.toLowerCase?.() ?? '')}
             onCreatePlan={() => {
               const id = crypto.randomUUID()
-              router.push(`/chat/${id}?prefill=${encodeURIComponent('Can you create a 7-day meal plan for me based on my goals and preferences?')}`)
+              router.push(`/chat/${id}?prefill=${encodeURIComponent('Can you create a 7-day nutrition plan for me based on my goals and preferences?')}`)
             }}
           />
           <WorkoutCard workoutPlan={workoutPlan} today={today} />

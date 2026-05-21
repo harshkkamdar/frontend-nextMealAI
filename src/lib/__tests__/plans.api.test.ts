@@ -55,7 +55,7 @@ describe('plans.api — FB-08 manual create / customise wrappers', () => {
       })
     })
 
-    it('POSTs a meal plan with generated_by forced to "manual"', async () => {
+    it('POSTs a nutrition plan with generated_by forced to "manual"', async () => {
       apiFetchMock.mockResolvedValueOnce({ id: 'plan-2', type: 'meal' })
       const input: CreateMealPlanInput = {
         type: 'meal',

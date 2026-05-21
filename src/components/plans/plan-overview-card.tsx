@@ -33,7 +33,7 @@ function getPreview(plan: Plan): string {
 export function PlanOverviewCard({ plan, onClick }: { plan: Plan; onClick: () => void }) {
   const isMeal = plan.type === 'meal'
   const Icon = isMeal ? UtensilsCrossed : Dumbbell
-  const label = isMeal ? 'Meal Plan' : 'Workout Plan'
+  const label = isMeal ? 'Nutrition Plan' : 'Workout Plan'
 
   return (
     <button

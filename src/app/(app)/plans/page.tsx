@@ -68,17 +68,17 @@ export default function PlansPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Meal Plan section */}
+          {/* Nutrition Plan section */}
           <section>
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-medium text-text-secondary">Meal Plan</h2>
+              <h2 className="text-sm font-medium text-text-secondary">Nutrition Plan</h2>
               <button
                 type="button"
                 onClick={() => router.push('/plans/new/meal')}
                 className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80"
               >
                 <Plus className="w-3.5 h-3.5" />
-                New Meal Plan
+                New Nutrition Plan
               </button>
             </div>
             {mealPlan ? (
@@ -93,7 +93,7 @@ export default function PlansPage() {
                     e.stopPropagation()
                     router.push(`/plans/${mealPlan.id}/edit`)
                   }}
-                  aria-label="Edit meal plan"
+                  aria-label="Edit nutrition plan"
                   className="absolute top-3 right-14 p-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-hover"
                 >
                   <Pencil className="w-3.5 h-3.5" />
@@ -102,7 +102,7 @@ export default function PlansPage() {
             ) : (
               <EmptyState
                 icon={MessageCircle}
-                title="No meal plan"
+                title="No nutrition plan"
                 description="Chat with Geo or build one manually"
               />
             )}

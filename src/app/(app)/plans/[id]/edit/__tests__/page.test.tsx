@@ -45,7 +45,7 @@ describe('EditPlanPage', () => {
     await waitFor(() => expect(screen.getByText('Edit Workout Plan')).toBeInTheDocument())
   })
 
-  it('routes to MealPlanBuilder for meal plans', async () => {
+  it('routes to MealPlanBuilder for nutrition plans', async () => {
     getPlanMock.mockResolvedValue({
       id: 'p2',
       user_id: 'u1',
@@ -59,7 +59,7 @@ describe('EditPlanPage', () => {
       updated_at: 'n',
     })
     render(<EditPlanView id="p2" />)
-    await waitFor(() => expect(screen.getByText('Edit Meal Plan')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Edit Nutrition Plan')).toBeInTheDocument())
   })
 
   it('redirects to /plans on load failure', async () => {
