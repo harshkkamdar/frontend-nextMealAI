@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, createEvent } from '@testing-library/react'
 import { ChatInput } from '@/components/chat/chat-input'
 
 // FB-01 — Gallery picker alongside camera
@@ -91,5 +91,97 @@ describe('ChatInput — FB-01 gallery picker', () => {
     } finally {
       globalThis.FileReader = originalFileReader
     }
+  })
+})
+
+// FB-R6-FE-B — Slack-style keybinding (Ved 2026-05-21):
+// Plain Enter = newline. Cmd/Ctrl+Enter = send. Replaces today's ChatGPT-style
+// binding where Enter sends and Shift+Enter inserts a newline. George wrote
+// many multi-line messages that got sent half-typed under the old behavior.
+describe('ChatInput — FB-R6-FE-B Slack-style keybinding', () => {
+  function getTextarea(): HTMLTextAreaElement {
+    return screen.getByLabelText(/type a message/i) as HTMLTextAreaElement
+  }
+
+  it('AC01: plain Enter does NOT send and does NOT preventDefault (lets browser insert newline)', () => {
+    const onSend = vi.fn()
+    render(<ChatInput onSend={onSend} />)
+    const textarea = getTextarea()
+    fireEvent.change(textarea, { target: { value: 'hello' } })
+
+    const event = createEvent.keyDown(textarea, { key: 'Enter' })
+    fireEvent(textarea, event)
+
+    expect(onSend).not.toHaveBeenCalled()
+    expect(event.defaultPrevented).toBe(false)
+  })
+
+  it('AC02 (macOS): Cmd+Enter sends the message and clears the composer', () => {
+    const onSend = vi.fn()
+    render(<ChatInput onSend={onSend} />)
+    const textarea = getTextarea()
+    fireEvent.change(textarea, { target: { value: 'hello' } })
+
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+
+    expect(onSend).toHaveBeenCalledTimes(1)
+    expect(onSend).toHaveBeenCalledWith('hello', undefined)
+    expect(textarea.value).toBe('')
+  })
+
+  it('AC02 (Win/Linux): Ctrl+Enter sends the message', () => {
+    const onSend = vi.fn()
+    render(<ChatInput onSend={onSend} />)
+    const textarea = getTextarea()
+    fireEvent.change(textarea, { target: { value: 'hello' } })
+
+    fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true })
+
+    expect(onSend).toHaveBeenCalledTimes(1)
+    expect(onSend).toHaveBeenCalledWith('hello', undefined)
+  })
+
+  it('AC03: Cmd+Enter on an empty composer does NOT send', () => {
+    const onSend = vi.fn()
+    render(<ChatInput onSend={onSend} />)
+    const textarea = getTextarea()
+
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+
+    expect(onSend).not.toHaveBeenCalled()
+  })
+
+  it('AC07: Cmd+Enter on whitespace-only composer does NOT send', () => {
+    const onSend = vi.fn()
+    render(<ChatInput onSend={onSend} />)
+    const textarea = getTextarea()
+    fireEvent.change(textarea, { target: { value: '   ' } })
+
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+
+    expect(onSend).not.toHaveBeenCalled()
+  })
+
+  it('AC11: Cmd+Enter while disabled does NOT send', () => {
+    const onSend = vi.fn()
+    render(<ChatInput onSend={onSend} disabled />)
+    const textarea = getTextarea()
+    fireEvent.change(textarea, { target: { value: 'hello' } })
+
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+
+    expect(onSend).not.toHaveBeenCalled()
+  })
+
+  it('AC02b: send preventsDefault so the textarea does not also insert a newline', () => {
+    const onSend = vi.fn()
+    render(<ChatInput onSend={onSend} />)
+    const textarea = getTextarea()
+    fireEvent.change(textarea, { target: { value: 'hello' } })
+
+    const event = createEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+    fireEvent(textarea, event)
+
+    expect(event.defaultPrevented).toBe(true)
   })
 })

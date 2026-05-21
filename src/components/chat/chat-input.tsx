@@ -53,7 +53,11 @@ export function ChatInput({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // FB-R6-FE-B: Slack-style binding (Ved-confirmed 2026-05-21).
+    // Plain Enter inserts a newline (browser default). Cmd+Enter (macOS) or
+    // Ctrl+Enter (Win/Linux) sends. George wrote many multi-line messages
+    // that got prematurely sent under the old ChatGPT-style binding.
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       handleSend()
     }
