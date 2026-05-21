@@ -13,7 +13,7 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useUIStore } from '@/stores/ui.store'
 import { getPlans } from '@/lib/api/plans.api'
 import { startWorkoutSession, getInProgressSession, getWorkoutHistory } from '@/lib/api/workout-sessions.api'
-import { deriveWorkoutEntryLabel } from '@/lib/workout-session'
+import { deriveWorkoutEntryLabel, computeSelectedPlanDayIndex } from '@/lib/workout-session'
 import { todayLocalISO } from '@/lib/timezone'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import type { WorkoutPlan } from '@/types/plans.types'
@@ -67,18 +67,15 @@ export default function ActivityPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  // Figure out today's scheduled workout from plan
-  const todayDayIndex = useMemo(() => {
-    if (!workoutPlan?.content?.days) return -1
-    const planStart = workoutPlan.start_date ? new Date(workoutPlan.start_date) : new Date(workoutPlan.created_at)
-    const today = new Date()
-    const daysDiff = Math.floor((today.getTime() - planStart.getTime()) / 86400000)
-    const totalDays = workoutPlan.content.days.length
-    if (totalDays === 0) return -1
-    return daysDiff % totalDays
-  }, [workoutPlan])
+  // FB-R6-15 — cursor-aware mapping. Today's view honors plan.current_position
+  // (the BE cursor that Geo's advance_to_workout tool moves); other dates add
+  // the day-delta from today to the cursor base and wrap around days.length.
+  const selectedDayIndex = useMemo(
+    () => computeSelectedPlanDayIndex(workoutPlan, selectedDate, todayLocalISO(tz)),
+    [workoutPlan, selectedDate, tz]
+  )
 
-  const todayWorkout = workoutPlan?.content?.days?.[todayDayIndex] ?? null
+  const todayWorkout = workoutPlan?.content?.days?.[selectedDayIndex] ?? null
   const isRestDay = todayWorkout?.is_rest_day === true
 
   // FB-R6-16+17: derive "Resume" vs "Start" label so the Start button and the
@@ -88,7 +85,7 @@ export default function ActivityPage() {
   // "this is today's workout."
   const entryLabel = deriveWorkoutEntryLabel(
     inProgress,
-    todayDayIndex >= 0 ? todayDayIndex : null
+    selectedDayIndex >= 0 ? selectedDayIndex : null
   )
   const isResume = entryLabel === 'Resume Workout'
 
@@ -112,7 +109,7 @@ export default function ActivityPage() {
     try {
       const session = await startWorkoutSession({
         plan_id: workoutPlan?.id,
-        plan_day_index: todayDayIndex >= 0 ? todayDayIndex : undefined,
+        plan_day_index: selectedDayIndex >= 0 ? selectedDayIndex : undefined,
         day_name: todayWorkout?.name
       })
       router.push(`/activity/workout/${session.id}`)
@@ -199,7 +196,7 @@ export default function ActivityPage() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-base font-semibold text-text-primary">{todayWorkout.name || `Day ${todayDayIndex + 1}`}</p>
+                    <p className="text-base font-semibold text-text-primary">{todayWorkout.name || `Day ${selectedDayIndex + 1}`}</p>
                     <p className="text-xs text-text-secondary">
                       {todayWorkout.exercises?.length ?? 0} exercises
                     </p>

@@ -78,6 +78,13 @@ export interface WorkoutPlan {
   version?: number
   start_date?: string
   end_date?: string
+  /**
+   * FB-R6-12 — 0-indexed cursor into content.days[]. Advances when the user
+   * completes a workout session; can be jumped via Geo's `advance_to_workout`
+   * tool. Added in BE migration 025. Optional only for backward compatibility
+   * with pre-25 plan rows; new plans always carry it.
+   */
+  current_position?: number
   content: {
     name?: string
     days?: WorkoutPlanDay[]

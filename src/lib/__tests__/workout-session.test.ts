@@ -2,10 +2,12 @@ import { describe, it, expect } from 'vitest'
 import {
   resolveElapsedForSession,
   computeCompleteSetResult,
+  computeSelectedPlanDayIndex,
   deriveWorkoutEntryLabel,
   STALE_SESSION_THRESHOLD_SECONDS,
 } from '../workout-session'
 import type { SessionExercise, WorkoutSession } from '@/types/workout-session.types'
+import type { WorkoutPlan } from '@/types/plans.types'
 
 function makeSet(overrides: Partial<SessionExercise['sets'][number]> = {}) {
   return {
@@ -255,5 +257,99 @@ describe('FB-R6-16+17 · deriveWorkoutEntryLabel', () => {
       status: 'completed',
     }
     expect(deriveWorkoutEntryLabel(completed, 2)).toBe('Start Workout')
+  })
+})
+
+// FB-R6-15 — Calendar date → plan_day_index mapping.
+// Repro Ved confirmed 2026-05-21: tapping different dates on the Activity
+// calendar all showed the same workout (today's Push 1). Root cause: previous
+// implementation used `new Date()` as anchor instead of the user-tapped date.
+// Direction confirmed Ved: cursor-aware (uses plan.current_position from
+// migration 025 / FB-R6-12) + day-delta from today.
+function makePlan(opts: {
+  cursor?: number
+  dayNames?: string[]
+}): WorkoutPlan {
+  const days = (opts.dayNames ?? ['Push 1', 'Pull 1', 'Legs 1', 'Push 2', 'Pull 2', 'Legs 2', 'Rest']).map(
+    (name) => ({ date: '', name, is_rest_day: name === 'Rest' })
+  )
+  return {
+    id: 'p1',
+    user_id: 'u1',
+    type: 'workout',
+    status: 'active',
+    current_position: opts.cursor ?? 0,
+    content: { name: '6-day PPL', days },
+    created_at: '2026-05-21T00:00:00Z',
+    updated_at: '2026-05-21T00:00:00Z',
+  }
+}
+
+describe('FB-R6-15 · computeSelectedPlanDayIndex', () => {
+  const TODAY = '2026-05-21'
+
+  it('returns cursor for today (delta = 0)', () => {
+    const plan = makePlan({ cursor: 0 })
+    expect(computeSelectedPlanDayIndex(plan, TODAY, TODAY)).toBe(0)
+  })
+
+  it('cursor=0: tomorrow → day 1', () => {
+    const plan = makePlan({ cursor: 0 })
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-22', TODAY)).toBe(1)
+  })
+
+  it('cursor=0: 2 days from today → day 2', () => {
+    const plan = makePlan({ cursor: 0 })
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-23', TODAY)).toBe(2)
+  })
+
+  it('Ved repro: 6-day PPL with cursor=0, Thu/Fri/Sat = Push 1 / Pull 1 / Legs 1', () => {
+    const plan = makePlan({ cursor: 0 })
+    const days = plan.content.days!
+    expect(days[computeSelectedPlanDayIndex(plan, '2026-05-21', TODAY)].name).toBe('Push 1')
+    expect(days[computeSelectedPlanDayIndex(plan, '2026-05-22', TODAY)].name).toBe('Pull 1')
+    expect(days[computeSelectedPlanDayIndex(plan, '2026-05-23', TODAY)].name).toBe('Legs 1')
+  })
+
+  it('respects cursor=2 (FB-R6-12 already advanced): today shows Legs 1', () => {
+    const plan = makePlan({ cursor: 2 })
+    expect(plan.content.days![computeSelectedPlanDayIndex(plan, TODAY, TODAY)].name).toBe('Legs 1')
+  })
+
+  it('cursor=2: tomorrow → Push 2 (cursor + 1)', () => {
+    const plan = makePlan({ cursor: 2 })
+    expect(plan.content.days![computeSelectedPlanDayIndex(plan, '2026-05-22', TODAY)].name).toBe('Push 2')
+  })
+
+  it('wraps via positive modulo across the week boundary', () => {
+    const plan = makePlan({ cursor: 0 }) // 7 days
+    // 7 days out → wraps back to day 0
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-28', TODAY)).toBe(0)
+    // 8 days out → day 1
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-29', TODAY)).toBe(1)
+  })
+
+  it('handles past dates (negative delta) via positive modulo', () => {
+    const plan = makePlan({ cursor: 0 })
+    // Yesterday → wraps to last day
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-20', TODAY)).toBe(6)
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-19', TODAY)).toBe(5)
+  })
+
+  it('returns -1 when the plan has no days', () => {
+    const plan = { content: { days: [] }, current_position: 0 } as unknown as WorkoutPlan
+    expect(computeSelectedPlanDayIndex(plan, TODAY, TODAY)).toBe(-1)
+  })
+
+  it('returns -1 when plan is null/undefined', () => {
+    expect(computeSelectedPlanDayIndex(null, TODAY, TODAY)).toBe(-1)
+    expect(computeSelectedPlanDayIndex(undefined, TODAY, TODAY)).toBe(-1)
+  })
+
+  it('falls back to cursor when current_position is missing (pre-migration-025 plans)', () => {
+    const plan = makePlan({})
+    delete plan.current_position
+    // current_position undefined → defaults to 0
+    expect(computeSelectedPlanDayIndex(plan, TODAY, TODAY)).toBe(0)
   })
 })
