@@ -20,6 +20,7 @@ import { SignupsBarChart } from '@/components/admin/SignupsBarChart'
 import { TopToolsChart } from '@/components/admin/TopToolsChart'
 import { ActiveUsersTable } from '@/components/admin/ActiveUsersTable'
 import { CsvExportButton } from '@/components/admin/CsvExportButton'
+import { UserDetailSheet } from '@/components/admin/UserDetailSheet'
 import { getAdminMetrics } from '@/lib/api/admin.api'
 import type { AdminMetricsResponse } from '@/types/admin.types'
 
@@ -31,6 +32,8 @@ type State =
 
 export default function AdminPage() {
   const [state, setState] = useState<State>({ kind: 'loading' })
+  // FB-R6-S2-v2.5 — selected user for the drilldown sheet.
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
 
   async function load() {
     setState({ kind: 'loading' })
@@ -150,8 +153,16 @@ export default function AdminPage() {
           </span>
           <CsvExportButton />
         </div>
-        <ActiveUsersTable users={data.active_users_30d} />
+        <ActiveUsersTable
+          users={data.active_users_30d}
+          onRowClick={(u) => setSelectedUserId(u.user_id)}
+        />
       </div>
+
+      <UserDetailSheet
+        userId={selectedUserId}
+        onClose={() => setSelectedUserId(null)}
+      />
     </main>
   )
 }

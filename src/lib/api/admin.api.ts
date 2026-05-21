@@ -11,10 +11,15 @@
 
 import { apiFetch } from './client'
 import { useAuthStore } from '@/stores/auth.store'
-import type { AdminMetricsResponse } from '@/types/admin.types'
+import type { AdminMetricsResponse, AdminUserSummary } from '@/types/admin.types'
 
 export async function getAdminMetrics(): Promise<AdminMetricsResponse> {
   return apiFetch<AdminMetricsResponse>('/v1/admin/metrics')
+}
+
+// FB-R6-S2-v2.5 — per-user drilldown.
+export async function getAdminUserSummary(userId: string): Promise<AdminUserSummary> {
+  return apiFetch<AdminUserSummary>(`/v1/admin/users/${encodeURIComponent(userId)}/summary`)
 }
 
 export async function exportActiveUsersCsv(): Promise<{ blob: Blob; filename: string }> {

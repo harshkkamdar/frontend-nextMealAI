@@ -40,6 +40,8 @@ export const ADMIN_METRICS_STUB: AdminMetricsResponse = {
   active_users_30d: [
     {
       user_id: 'stub-user-1',
+      email: 'alice@stub.local',
+      display_name: 'Alice Stubbins',
       last_active: '2026-05-21',
       food_log_count: 42,
       workout_session_count: 8,
@@ -47,6 +49,8 @@ export const ADMIN_METRICS_STUB: AdminMetricsResponse = {
     },
     {
       user_id: 'stub-user-2',
+      email: 'bob@stub.local',
+      display_name: 'Bob Stubbins',
       last_active: '2026-05-21',
       food_log_count: 28,
       workout_session_count: 12,
@@ -54,6 +58,8 @@ export const ADMIN_METRICS_STUB: AdminMetricsResponse = {
     },
     {
       user_id: 'stub-user-3',
+      email: 'carol@stub.local',
+      display_name: null,
       last_active: '2026-05-20',
       food_log_count: 19,
       workout_session_count: 3,

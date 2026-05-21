@@ -16,7 +16,14 @@ import type { ActiveUserEntry } from '@/types/admin.types'
 type SortKey = 'food_log_count' | 'workout_session_count' | 'chat_turn_count' | null
 type SortDir = 'asc' | 'desc'
 
-export function ActiveUsersTable({ users }: { users: ActiveUserEntry[] }) {
+export function ActiveUsersTable({
+  users,
+  onRowClick,
+}: {
+  users: ActiveUserEntry[]
+  /** FB-R6-S2-v2.5: invoked when an admin clicks a row to drill into a user. */
+  onRowClick?: (user: ActiveUserEntry) => void
+}) {
   const [sortKey, setSortKey] = useState<SortKey>(null)
   const [sortDir, setSortDir] = useState<SortDir>('desc')
 
@@ -60,7 +67,7 @@ export function ActiveUsersTable({ users }: { users: ActiveUserEntry[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs font-semibold text-text-secondary border-b border-border">
-              <th className="py-2 pr-4 font-semibold">User</th>
+              <th className="py-2 pr-4 font-semibold">Email</th>
               <th className="py-2 pr-4 font-semibold">Last active</th>
               <SortableHeader
                 label="Food log count"
@@ -83,21 +90,36 @@ export function ActiveUsersTable({ users }: { users: ActiveUserEntry[] }) {
             </tr>
           </thead>
           <tbody>
-            {sorted.map((u) => (
-              <tr
-                key={u.user_id}
-                data-testid="active-user-row"
-                className="border-b border-border/50 last:border-b-0"
-              >
-                <td className="py-2 pr-4 font-mono text-xs text-text-primary" data-testid="user-id">
-                  {u.user_id}
-                </td>
-                <td className="py-2 pr-4 text-text-secondary tabular-nums">{u.last_active}</td>
-                <td className="py-2 pr-4 text-text-primary tabular-nums">{u.food_log_count}</td>
-                <td className="py-2 pr-4 text-text-primary tabular-nums">{u.workout_session_count}</td>
-                <td className="py-2 pr-4 text-text-primary tabular-nums">{u.chat_turn_count}</td>
-              </tr>
-            ))}
+            {sorted.map((u) => {
+              const label = u.email || `${u.user_id.slice(0, 8)}…`
+              const interactive = Boolean(onRowClick)
+              return (
+                <tr
+                  key={u.user_id}
+                  data-testid="active-user-row"
+                  data-user-id={u.user_id}
+                  onClick={interactive ? () => onRowClick?.(u) : undefined}
+                  className={`border-b border-border/50 last:border-b-0 ${
+                    interactive ? 'cursor-pointer hover:bg-surface-hover transition-colors' : ''
+                  }`}
+                >
+                  <td className="py-2 pr-4" data-testid="user-email">
+                    <div className="flex flex-col">
+                      <span className="text-text-primary">{label}</span>
+                      {u.display_name && (
+                        <span className="text-[10px] text-text-tertiary">
+                          {u.display_name}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="py-2 pr-4 text-text-secondary tabular-nums">{u.last_active}</td>
+                  <td className="py-2 pr-4 text-text-primary tabular-nums">{u.food_log_count}</td>
+                  <td className="py-2 pr-4 text-text-primary tabular-nums">{u.workout_session_count}</td>
+                  <td className="py-2 pr-4 text-text-primary tabular-nums">{u.chat_turn_count}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
