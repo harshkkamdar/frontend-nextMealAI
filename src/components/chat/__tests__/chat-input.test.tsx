@@ -135,33 +135,9 @@ describe('ChatInput — FB-R6-02 two-step image upload', () => {
     expect(sendButton.disabled).toBe(true)
   })
 
-  it('AC07: parallel file picks are blocked while upload is in flight', async () => {
-    // Hold the first upload open so the second select hits the busy guard.
-    let resolveFirst: ((v: { storage_path: string; expires_in_seconds: number }) => void) | null = null
-    mocks.upload.mockReturnValueOnce(
-      new Promise<{ storage_path: string; expires_in_seconds: number }>((res) => {
-        resolveFirst = res
-      })
-    )
-    const { container } = render(<ChatInput onSend={() => {}} showCamera />)
-
-    await selectFile(container)
-    expect(mocks.upload).toHaveBeenCalledTimes(1)
-
-    // Second select while first is pending — should NOT trigger a second upload.
-    await selectFile(container)
-    expect(mocks.upload).toHaveBeenCalledTimes(1)
-
-    // Resolve and confirm flow stabilizes.
-    resolveFirst?.({ storage_path: 'u/1.png', expires_in_seconds: 3600 })
-    await waitFor(() => {
-      const sendBtn = screen.getByRole('button', { name: /send message/i }) as HTMLButtonElement
-      expect(sendBtn.disabled).toBe(false)
-    })
-  })
-
   it('AC11: send is blocked while an upload is in flight (no half-attached submit)', async () => {
-    let resolveUpload: ((v: { storage_path: string; expires_in_seconds: number }) => void) | null = null
+    type Resolver = (v: { storage_path: string; expires_in_seconds: number }) => void
+    let resolveUpload: Resolver = () => {}
     mocks.upload.mockReturnValueOnce(
       new Promise<{ storage_path: string; expires_in_seconds: number }>((res) => {
         resolveUpload = res
@@ -185,7 +161,7 @@ describe('ChatInput — FB-R6-02 two-step image upload', () => {
     expect(onSend).not.toHaveBeenCalled()
 
     // After upload completes, send works.
-    resolveUpload?.({ storage_path: 'u/2.png', expires_in_seconds: 3600 })
+    resolveUpload({ storage_path: 'u/2.png', expires_in_seconds: 3600 })
     await waitFor(() => expect(sendButton.disabled).toBe(false))
   })
 
@@ -207,6 +183,160 @@ describe('ChatInput — FB-R6-02 two-step image upload', () => {
     expect(onSend).toHaveBeenCalledTimes(1)
     const [, attachments] = onSend.mock.calls[0]
     expect(attachments).toBeUndefined()
+  })
+})
+
+// FB-R6-03 — Multi-image picker (cap 5)
+// FB-R6-FE-C — Cmd+V paste image into composer
+//
+// One refactor, two AC sets. After R6-02 landed, attached state is array
+// shaped, the file input gets `multiple`, the paste handler intercepts image
+// items from the clipboard, and both paths share the same cap (5) and the
+// same upload pipeline.
+describe('ChatInput — FB-R6-03 multi-image + FB-R6-FE-C paste', () => {
+  beforeEach(() => {
+    mocks.upload.mockReset()
+    mocks.toastError.mockReset()
+  })
+
+  function makeImageFile(name = 'photo.png') {
+    const pngBytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+    return new File([pngBytes], name, { type: 'image/png' })
+  }
+
+  it('R6-03 AC03: file input has the `multiple` attribute (gallery picker accepts multi-select)', () => {
+    const { container } = render(<ChatInput onSend={() => {}} showCamera />)
+    const input = getFileInput(container)
+    expect(input.multiple).toBe(true)
+  })
+
+  it('R6-03 AC01: selecting 3 files uploads all 3 and onSend carries 3 attachments', async () => {
+    mocks.upload
+      .mockResolvedValueOnce({ storage_path: 'u/a.png', expires_in_seconds: 3600 })
+      .mockResolvedValueOnce({ storage_path: 'u/b.png', expires_in_seconds: 3600 })
+      .mockResolvedValueOnce({ storage_path: 'u/c.png', expires_in_seconds: 3600 })
+    const onSend = vi.fn()
+    const { container } = render(<ChatInput onSend={onSend} showCamera />)
+    const input = getFileInput(container)
+    const files = [makeImageFile('a.png'), makeImageFile('b.png'), makeImageFile('c.png')]
+
+    Object.defineProperty(input, 'files', { value: files, configurable: true })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+
+    await waitFor(() => expect(mocks.upload).toHaveBeenCalledTimes(3))
+    await waitFor(() => expect(screen.getAllByTestId('attached-thumb')).toHaveLength(3))
+
+    screen.getByRole('button', { name: /send message/i }).click()
+    expect(onSend).toHaveBeenCalledTimes(1)
+    const [, attachments] = onSend.mock.calls[0]
+    expect(attachments).toHaveLength(3)
+    expect(attachments.map((a: { storage_path: string }) => a.storage_path).sort()).toEqual(
+      ['u/a.png', 'u/b.png', 'u/c.png']
+    )
+  })
+
+  it('R6-03 AC02: selecting 7 files attaches only 5 and surfaces a cap toast', async () => {
+    mocks.upload.mockResolvedValue({ storage_path: 'u/x.png', expires_in_seconds: 3600 })
+    const onSend = vi.fn()
+    const { container } = render(<ChatInput onSend={onSend} showCamera />)
+    const input = getFileInput(container)
+    const files = Array.from({ length: 7 }, (_, i) => makeImageFile(`f${i}.png`))
+
+    Object.defineProperty(input, 'files', { value: files, configurable: true })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+
+    await waitFor(() => expect(mocks.upload).toHaveBeenCalledTimes(5))
+    expect(mocks.toastError).toHaveBeenCalled()
+    await waitFor(() => expect(screen.getAllByTestId('attached-thumb')).toHaveLength(5))
+  })
+
+  it('R6-03: camera button disables when 5 images are attached', async () => {
+    mocks.upload.mockResolvedValue({ storage_path: 'u/x.png', expires_in_seconds: 3600 })
+    const { container } = render(<ChatInput onSend={() => {}} showCamera />)
+    const input = getFileInput(container)
+    const files = Array.from({ length: 5 }, (_, i) => makeImageFile(`f${i}.png`))
+
+    Object.defineProperty(input, 'files', { value: files, configurable: true })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+
+    await waitFor(() => expect(screen.getAllByTestId('attached-thumb')).toHaveLength(5))
+    const cameraBtn = screen.getByRole('button', { name: /attach photo|max .* images/i }) as HTMLButtonElement
+    expect(cameraBtn.disabled).toBe(true)
+  })
+
+  it('FE-C AC01: pasting an image into the composer triggers upload', async () => {
+    mocks.upload.mockResolvedValueOnce({ storage_path: 'u/pasted.png', expires_in_seconds: 3600 })
+    render(<ChatInput onSend={() => {}} showCamera />)
+    const textarea = screen.getByLabelText(/type a message/i)
+    const file = makeImageFile('pasted.png')
+
+    const pasteEvent = new Event('paste', { bubbles: true, cancelable: true }) as Event & {
+      clipboardData: DataTransfer
+    }
+    // Synthesize a minimal clipboardData with .files; jsdom DataTransfer is thin
+    // so we attach a hand-rolled object with the shape the handler reads.
+    Object.defineProperty(pasteEvent, 'clipboardData', {
+      value: { files: [file], items: [], getData: () => '' },
+    })
+    textarea.dispatchEvent(pasteEvent)
+
+    await waitFor(() => expect(mocks.upload).toHaveBeenCalledTimes(1))
+    expect(mocks.upload.mock.calls[0][0]).toBeInstanceOf(File)
+  })
+
+  it('FE-C AC02: pasting plain text only does NOT trigger upload', () => {
+    render(<ChatInput onSend={() => {}} showCamera />)
+    const textarea = screen.getByLabelText(/type a message/i)
+
+    const pasteEvent = new Event('paste', { bubbles: true, cancelable: true })
+    Object.defineProperty(pasteEvent, 'clipboardData', {
+      value: { files: [], items: [], getData: () => 'hello world' },
+    })
+    textarea.dispatchEvent(pasteEvent)
+
+    expect(mocks.upload).not.toHaveBeenCalled()
+  })
+
+  it('FE-C AC03: pasting multiple images uploads all (up to cap)', async () => {
+    mocks.upload
+      .mockResolvedValueOnce({ storage_path: 'u/p1.png', expires_in_seconds: 3600 })
+      .mockResolvedValueOnce({ storage_path: 'u/p2.png', expires_in_seconds: 3600 })
+    render(<ChatInput onSend={() => {}} showCamera />)
+    const textarea = screen.getByLabelText(/type a message/i)
+    const files = [makeImageFile('p1.png'), makeImageFile('p2.png')]
+
+    const pasteEvent = new Event('paste', { bubbles: true, cancelable: true })
+    Object.defineProperty(pasteEvent, 'clipboardData', {
+      value: { files, items: [], getData: () => '' },
+    })
+    textarea.dispatchEvent(pasteEvent)
+
+    await waitFor(() => expect(mocks.upload).toHaveBeenCalledTimes(2))
+  })
+
+  it('FE-C: pasting an image when cap is full surfaces the cap toast and does not upload', async () => {
+    // Fill the composer to the cap first.
+    mocks.upload.mockResolvedValue({ storage_path: 'u/x.png', expires_in_seconds: 3600 })
+    const { container } = render(<ChatInput onSend={() => {}} showCamera />)
+    const input = getFileInput(container)
+    const fillFiles = Array.from({ length: 5 }, (_, i) => makeImageFile(`fill${i}.png`))
+    Object.defineProperty(input, 'files', { value: fillFiles, configurable: true })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+    await waitFor(() => expect(screen.getAllByTestId('attached-thumb')).toHaveLength(5))
+
+    mocks.upload.mockClear()
+    mocks.toastError.mockClear()
+
+    // Now paste one more — should be rejected.
+    const textarea = screen.getByLabelText(/type a message/i)
+    const pasteEvent = new Event('paste', { bubbles: true, cancelable: true })
+    Object.defineProperty(pasteEvent, 'clipboardData', {
+      value: { files: [makeImageFile('overflow.png')], items: [], getData: () => '' },
+    })
+    textarea.dispatchEvent(pasteEvent)
+
+    expect(mocks.toastError).toHaveBeenCalled()
+    expect(mocks.upload).not.toHaveBeenCalled()
   })
 })
 
