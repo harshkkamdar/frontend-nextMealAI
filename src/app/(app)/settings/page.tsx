@@ -21,10 +21,12 @@ import {
   Moon,
   Zap,
   Scale,
+  ShieldCheck,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTheme } from 'next-themes'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useIsAdmin } from '@/hooks/useIsAdmin'
 import type { Settings, GeoPersonality, Theme, RestTimerDuration } from '@/types/settings.types'
 
 const PERSONALITY_OPTIONS: { value: GeoPersonality; label: string }[] = [
@@ -76,6 +78,9 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null)
   const [loading, setLoading] = useState(true)
   const [loggingOut, setLoggingOut] = useState(false)
+  // FB-R6-S2-v2: probe /v1/admin/metrics once per session; render the Admin
+  // link only when the probe returns 200 (admin allow-listed).
+  const isAdmin = useIsAdmin()
 
   useEffect(() => {
     getSettings()
@@ -160,6 +165,26 @@ export default function SettingsPage() {
           </div>
           <ChevronRight className="ml-auto w-4 h-4 shrink-0 text-text-tertiary" />
         </button>
+
+        {/* FB-R6-S2-v2: Admin link — only renders for ADMIN_EMAILS allow-listed users. */}
+        {isAdmin && (
+          <SettingsSection title="Admin">
+            <button
+              type="button"
+              onClick={() => router.push('/admin')}
+              className="flex w-full items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-surface-hover"
+            >
+              <div
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                style={{ backgroundColor: '#E8663C14' }}
+              >
+                <ShieldCheck className="w-4 h-4 text-accent" />
+              </div>
+              <span className="font-medium text-text-primary">Admin Dashboard</span>
+              <ChevronRight className="ml-auto w-4 h-4 text-text-tertiary" />
+            </button>
+          </SettingsSection>
+        )}
 
         {/* Features */}
         <SettingsSection title="Features">
