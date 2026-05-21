@@ -40,6 +40,14 @@ export interface ActiveUserEntry {
 
 export interface AdminMetricsResponse {
   generated_at: string // ISO 8601
+  /**
+   * BE-side additive flag (2026-05-21). `true` when the response is the
+   * deterministic stub from spec § 2; `false` when from the real view
+   * query. FE renders a "STUB DATA" banner when this is true so operators
+   * never get fooled by the fake numbers.
+   * Optional for backwards-compat with older BE versions that didn't set it.
+   */
+  is_stub?: boolean
   summary: AdminMetricsSummary
   dau: DauPoint[]
   signups: SignupPoint[]

@@ -10,6 +10,7 @@ import type { AdminMetricsResponse } from '@/types/admin.types'
 
 export const ADMIN_METRICS_STUB: AdminMetricsResponse = {
   generated_at: '2026-05-21T20:35:00.000Z',
+  is_stub: true,
   summary: { users_total: 47, dau_today: 12, wau_this_week: 28, new_signups_7d: 5 },
   dau: [
     { day: '2026-05-15', active_users: 10 },

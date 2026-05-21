@@ -12,7 +12,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ShieldOff, AlertCircle, RefreshCw } from 'lucide-react'
+import { ShieldOff, AlertCircle, RefreshCw, Beaker } from 'lucide-react'
 import { ApiException } from '@/types/api.types'
 import { AdminMetricsCards } from '@/components/admin/AdminMetricsCards'
 import { DauLineChart } from '@/components/admin/DauLineChart'
@@ -113,6 +113,26 @@ export default function AdminPage() {
           Generated {generated}
         </span>
       </div>
+
+      {data.is_stub && (
+        <div
+          role="status"
+          className="flex items-start gap-3 rounded-2xl border border-warning/30 bg-warning/10 p-4"
+        >
+          <Beaker className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-semibold text-text-primary mb-0.5">Stub data</p>
+            <p className="text-text-secondary">
+              These numbers (47 / 12 / 28 / 5, three test users) are deterministic
+              fixtures, not real usage. Set{' '}
+              <code className="px-1 py-0.5 rounded bg-surface text-text-primary font-mono text-xs">
+                ADMIN_DASHBOARD_STUB=false
+              </code>{' '}
+              in the backend <code className="px-1 py-0.5 rounded bg-surface text-text-primary font-mono text-xs">.env</code> and restart to query real data.
+            </p>
+          </div>
+        </div>
+      )}
 
       <AdminMetricsCards summary={data.summary} />
 
