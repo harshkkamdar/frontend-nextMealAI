@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, createEvent, waitFor } from '@testing-library/react'
+import { __resetComposerStoreForTests, useComposerStore } from '@/stores/composer.store'
 
 // FB-R6-02 — mock uploadChatAttachment so we can drive the two-step flow
 // deterministically and assert what gets passed to onSend.
@@ -312,6 +313,67 @@ describe('ChatInput — FB-R6-03 multi-image + FB-R6-FE-C paste', () => {
     textarea.dispatchEvent(pasteEvent)
 
     await waitFor(() => expect(mocks.upload).toHaveBeenCalledTimes(2))
+  })
+
+  it('FE-D AC01: text typed in ChatInput[sessionId=A] persists when the component remounts with the same sessionId', async () => {
+    __resetComposerStoreForTests()
+
+    const { unmount } = render(<ChatInput onSend={() => {}} showCamera sessionId="session-A" />)
+    const textarea = screen.getByLabelText(/type a message/i) as HTMLTextAreaElement
+    fireEvent.change(textarea, { target: { value: 'half-typed thought' } })
+    unmount()
+
+    // Remount with the same sessionId (simulates the widget → full-chat
+    // navigation; both views render their own ChatInput against the same key).
+    render(<ChatInput onSend={() => {}} showCamera sessionId="session-A" />)
+    const textareaAgain = screen.getByLabelText(/type a message/i) as HTMLTextAreaElement
+    expect(textareaAgain.value).toBe('half-typed thought')
+  })
+
+  it('FE-D: different sessionIds keep separate drafts (no cross-contamination)', async () => {
+    __resetComposerStoreForTests()
+
+    const { unmount } = render(<ChatInput onSend={() => {}} showCamera sessionId="A" />)
+    fireEvent.change(screen.getByLabelText(/type a message/i), { target: { value: 'A-draft' } })
+    unmount()
+
+    render(<ChatInput onSend={() => {}} showCamera sessionId="B" />)
+    expect((screen.getByLabelText(/type a message/i) as HTMLTextAreaElement).value).toBe('')
+  })
+
+  it('FE-D: an upload that started in widget session is still attached after remount in full-chat', async () => {
+    __resetComposerStoreForTests()
+    mocks.upload.mockResolvedValueOnce({
+      storage_path: 'u/cross-view.png',
+      expires_in_seconds: 3600,
+    })
+
+    const { container, unmount } = render(<ChatInput onSend={() => {}} showCamera sessionId="cross-A" />)
+    const input = getFileInput(container)
+    const file = makeImageFile('cross-view.png')
+    Object.defineProperty(input, 'files', { value: [file], configurable: true })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+    await waitFor(() => expect(screen.getAllByTestId('attached-thumb')).toHaveLength(1))
+    unmount()
+
+    render(<ChatInput onSend={() => {}} showCamera sessionId="cross-A" />)
+    expect(screen.getAllByTestId('attached-thumb')).toHaveLength(1)
+  })
+
+  it('FE-D: send clears the draft for that sessionId', async () => {
+    __resetComposerStoreForTests()
+
+    const onSend = vi.fn()
+    render(<ChatInput onSend={onSend} showCamera sessionId="clear-A" />)
+    const textarea = screen.getByLabelText(/type a message/i) as HTMLTextAreaElement
+    fireEvent.change(textarea, { target: { value: 'send and clear' } })
+
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+    expect(onSend).toHaveBeenCalledTimes(1)
+
+    // Draft for "clear-A" should be gone from the store.
+    const draft = useComposerStore.getState().drafts['clear-A']
+    expect(draft).toBeUndefined()
   })
 
   it('FE-C: pasting an image when cap is full surfaces the cap toast and does not upload', async () => {

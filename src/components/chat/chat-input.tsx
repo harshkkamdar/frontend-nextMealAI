@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, useState } from 'react'
 import { ArrowUp, Camera, X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { uploadChatAttachment } from '@/lib/api/chat.api'
+import { useComposerStore } from '@/stores/composer.store'
 import type { AttachedImage } from '@/types/chat.types'
 
 // FB-R6-03 — BE caps image_paths at 5 per message. Mirror that on the FE so
@@ -15,6 +16,7 @@ export function ChatInput({
   disabled,
   showCamera = false,
   defaultValue = '',
+  sessionId,
 }: {
   // FB-R6-02 — onSend carries an array of fully-uploaded AttachedImage entries.
   // FB-R6-03 — array length 1..MAX_IMAGES.
@@ -22,19 +24,69 @@ export function ChatInput({
   disabled?: boolean
   showCamera?: boolean
   defaultValue?: string
+  /**
+   * FB-R6-FE-D — when provided, draft state (text + attachments) syncs to
+   * the shared composer store so the same draft persists when the user
+   * navigates from the floating Geo widget to the full chat page. Without
+   * a sessionId, the composer keeps state locally (current default).
+   */
+  sessionId?: string
 }) {
-  const [value, setValue] = useState(defaultValue)
-  const [attached, setAttached] = useState<AttachedImage[]>([])
-  const [uploadingCount, setUploadingCount] = useState(0)
+  const storeMode = Boolean(sessionId)
+
+  // Store-backed slices (read only when sessionId is set).
+  const storeDraft = useComposerStore((s) => (sessionId ? s.drafts[sessionId] : undefined))
+  const setStoreText = useComposerStore((s) => s.setText)
+  const addStoreAttached = useComposerStore((s) => s.addAttached)
+  const removeStoreAttached = useComposerStore((s) => s.removeAttached)
+  const incrementStoreUploading = useComposerStore((s) => s.incrementUploading)
+  const decrementStoreUploading = useComposerStore((s) => s.decrementUploading)
+  const clearStoreDraft = useComposerStore((s) => s.clearDraft)
+
+  // Local fallback when no sessionId — preserves behavior for tests + any
+  // future consumer that doesn't want to opt into the shared store.
+  const [localValue, setLocalValue] = useState(defaultValue)
+  const [localAttached, setLocalAttached] = useState<AttachedImage[]>([])
+  const [localUploadingCount, setLocalUploadingCount] = useState(0)
+
+  const value = storeMode ? (storeDraft?.text ?? defaultValue) : localValue
+  const attached = storeMode ? (storeDraft?.attached ?? []) : localAttached
+  const uploadingCount = storeMode
+    ? (storeDraft?.uploadingCount ?? 0)
+    : localUploadingCount
+
+  const setValue = useCallback(
+    (next: string) => {
+      if (storeMode && sessionId) setStoreText(sessionId, next)
+      else setLocalValue(next)
+    },
+    [storeMode, sessionId, setStoreText]
+  )
+
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // Revoke blob URLs on unmount to avoid leaking them.
+  // Cleanup blob URLs at unmount for the LOCAL state path. Store path is
+  // owned by the store and intentionally outlives this component.
   useEffect(() => {
     return () => {
-      for (const a of attached) URL.revokeObjectURL(a.preview_url)
+      if (storeMode) return
+      for (const a of localAttached) {
+        try {
+          URL.revokeObjectURL(a.preview_url)
+        } catch {
+          /* noop */
+        }
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run cleanup with final value of `attached` at unmount only
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: cleanup with final value
+  }, [])
+
+  // Seed initial defaultValue → local state (one-time).
+  useEffect(() => {
+    if (storeMode) return
+    if (defaultValue && localValue === '') setLocalValue(defaultValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once at mount
   }, [])
 
   const adjustHeight = useCallback(() => {
@@ -53,11 +105,6 @@ export function ChatInput({
   const totalPending = attached.length + uploadingCount
   const capReached = totalPending >= MAX_IMAGES
 
-  /**
-   * Shared image-ingestion path used by the file picker AND the paste handler.
-   * Caps at MAX_IMAGES total (attached + in-flight). Uploads run in parallel
-   * so multiple selected/pasted images don't queue serially.
-   */
   const addImages = useCallback(
     async (files: File[]) => {
       const room = MAX_IMAGES - (attached.length + uploadingCount)
@@ -71,23 +118,40 @@ export function ChatInput({
           `Only ${accepted.length} of ${files.length} added (max ${MAX_IMAGES} per message)`
         )
       }
-      setUploadingCount((c) => c + accepted.length)
+      if (storeMode && sessionId) incrementStoreUploading(sessionId, accepted.length)
+      else setLocalUploadingCount((c) => c + accepted.length)
+
       for (const file of accepted) {
         const preview_url = URL.createObjectURL(file)
         uploadChatAttachment(file)
           .then(({ storage_path }) => {
-            setAttached((prev) => [...prev, { storage_path, preview_url, file }])
+            const item: AttachedImage = { storage_path, preview_url, file }
+            if (storeMode && sessionId) addStoreAttached(sessionId, item)
+            else setLocalAttached((prev) => [...prev, item])
           })
           .catch((err) => {
-            URL.revokeObjectURL(preview_url)
+            try {
+              URL.revokeObjectURL(preview_url)
+            } catch {
+              /* noop */
+            }
             toast.error(err instanceof Error ? err.message : 'Image upload failed')
           })
           .finally(() => {
-            setUploadingCount((c) => c - 1)
+            if (storeMode && sessionId) decrementStoreUploading(sessionId)
+            else setLocalUploadingCount((c) => Math.max(0, c - 1))
           })
       }
     },
-    [attached.length, uploadingCount]
+    [
+      attached.length,
+      uploadingCount,
+      storeMode,
+      sessionId,
+      addStoreAttached,
+      incrementStoreUploading,
+      decrementStoreUploading,
+    ]
   )
 
   const handleSend = () => {
@@ -95,18 +159,19 @@ export function ChatInput({
     const hasAttachment = attached.length > 0
     if ((!trimmed && !hasAttachment) || disabled || uploadingCount > 0) return
     onSend(trimmed || 'What is this?', hasAttachment ? attached : undefined)
-    setValue('')
-    setAttached([])
-    // Note: NOT revoking blob URLs here — the optimistic ChatBubble uses the
-    // first preview_url until the next history refresh. The cleanup effect
-    // handles them on unmount.
+    if (storeMode && sessionId) {
+      clearStoreDraft(sessionId)
+    } else {
+      setLocalValue('')
+      setLocalAttached([])
+    }
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'
     }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // FB-R6-FE-B: Slack-style binding (Ved-confirmed 2026-05-21).
+    // FB-R6-FE-B: Slack-style binding.
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       handleSend()
@@ -114,12 +179,6 @@ export function ChatInput({
   }
 
   // FB-R6-FE-C — Cmd+V paste image support.
-  //
-  // We pull image files out of clipboardData.files (populated for "paste an
-  // image" from a screenshot tool, browser, or another app). Pure text pastes
-  // have an empty .files list and fall through to the default handler.
-  // Mixed clipboard (e.g. screenshot + caption) is handled too: we take the
-  // image, and we DO NOT preventDefault so any text payload pastes normally.
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
       const files = Array.from(e.clipboardData?.files ?? []).filter((f) =>
@@ -138,12 +197,21 @@ export function ChatInput({
   }
 
   const removeAttachment = (storage_path: string) => {
-    setAttached((prev) => {
-      const next = prev.filter((a) => a.storage_path !== storage_path)
-      const removed = prev.find((a) => a.storage_path === storage_path)
-      if (removed) URL.revokeObjectURL(removed.preview_url)
-      return next
-    })
+    if (storeMode && sessionId) {
+      removeStoreAttached(sessionId, storage_path)
+    } else {
+      setLocalAttached((prev) => {
+        const target = prev.find((a) => a.storage_path === storage_path)
+        if (target) {
+          try {
+            URL.revokeObjectURL(target.preview_url)
+          } catch {
+            /* noop */
+          }
+        }
+        return prev.filter((a) => a.storage_path !== storage_path)
+      })
+    }
   }
 
   const sendDisabled =
@@ -188,7 +256,6 @@ export function ChatInput({
       )}
 
       <div className="flex items-end gap-2 bg-surface border border-border rounded-2xl px-4 py-2">
-        {/* Camera button */}
         {showCamera && (
           <>
             <button

@@ -170,7 +170,15 @@ export default function ActiveChatPage({
         </div>
       )}
       <ChatThread messages={messages} isTyping={isTyping} />
-      <ChatInput onSend={handleSend} disabled={isTyping} showCamera defaultValue={prefill} />
+      {/* FB-R6-FE-D: pass sessionId so a draft started in the floating Geo
+          widget survives the navigation here. */}
+      <ChatInput
+        onSend={handleSend}
+        disabled={isTyping}
+        showCamera
+        defaultValue={prefill}
+        sessionId={sessionId}
+      />
     </div>
   )
 }

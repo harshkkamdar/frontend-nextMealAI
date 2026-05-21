@@ -225,8 +225,14 @@ export function GeoCompanionSheet() {
               </button>
             </div>
 
-            {/* Input */}
-            <ChatInput onSend={handleSend} disabled={isTyping || initializing || !sessionId} showCamera />
+            {/* Input — FB-R6-FE-D: passes sessionId so the composer draft
+                survives the navigation to /chat/[sessionId]. */}
+            <ChatInput
+              onSend={handleSend}
+              disabled={isTyping || initializing || !sessionId}
+              showCamera
+              sessionId={sessionId ?? undefined}
+            />
           </motion.div>
         </>
       )}
