@@ -79,13 +79,20 @@ export function GeoCompanionSheet() {
   const handleSend = async (message: string, attachments?: AttachedImage[]) => {
     if (!sessionId) return
 
-    const firstPreview = attachments?.[0]?.preview_url
+    // FB-R6-UAT-A — populate attachments[] with every AttachedImage so the
+    // multi-image optimistic bubble renders all images, not just the first.
     const userMsg: ChatMessage = {
       id: `temp-${Date.now()}`,
       role: 'user',
       content: message,
       timestamp: new Date().toISOString(),
-      image: firstPreview,
+      attachments: attachments?.map((a, i) => ({
+        id: `temp-att-${i}`,
+        signed_url: a.preview_url,
+        mime_type: a.file.type,
+        width: a.width ?? null,
+        height: a.height ?? null,
+      })),
     }
 
     setMessages((prev) => [...prev, userMsg])

@@ -81,16 +81,22 @@ export default function ActiveChatPage({
   }, [sessionId])
 
   const handleSend = async (message: string, attachments?: AttachedImage[]) => {
-    // FB-R6-02 — optimistic local user bubble uses the blob preview URL.
-    // After the next chat-session refetch the message comes back from BE with
-    // attachments[] (signed URLs), which ChatBubble prefers over `image`.
-    const firstPreview = attachments?.[0]?.preview_url
+    // FB-R6-UAT-A — hand the optimistic bubble the FULL attachment set so
+    // multi-image messages render every image before the BE refetch swaps
+    // in signed URLs. `preview_url` is a blob URL — works as <img src> just
+    // like a signed https URL.
     const userMessage: ChatMessage = {
       id: `temp-${Date.now()}`,
       role: 'user',
       content: message,
       timestamp: new Date().toISOString(),
-      image: firstPreview,
+      attachments: attachments?.map((a, i) => ({
+        id: `temp-att-${i}`,
+        signed_url: a.preview_url,
+        mime_type: a.file.type,
+        width: a.width ?? null,
+        height: a.height ?? null,
+      })),
     }
 
     setMessages((prev) => [...prev, userMessage])
