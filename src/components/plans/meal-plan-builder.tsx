@@ -20,7 +20,7 @@ import { searchFoods } from '@/lib/api/foods.api'
 import type { FoodSearchResult } from '@/types/foods.types'
 import type { MealPlan, MealPlanDay, MealPlanMeal } from '@/types/plans.types'
 
-// FB-08 — Meal plan manual builder. Symmetric with the workout builder.
+// FB-08 — Nutrition plan manual builder. Symmetric with the workout builder.
 // Users set daily macro targets, then build out day-by-day meals. Meal
 // names are searchable via the foods endpoint; macros auto-fill on select
 // but stay editable.
@@ -187,11 +187,11 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
             // non-fatal
           }
         }
-        toast.success('Meal plan created')
+        toast.success('Nutrition plan created')
         router.push(`/plans/${plan.id}`)
       } else if (initialPlan) {
         await updatePlan(initialPlan.id, { content })
-        toast.success('Meal plan updated')
+        toast.success('Nutrition plan updated')
         router.push(`/plans/${initialPlan.id}`)
       }
     } catch (err) {
@@ -215,7 +215,7 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
         </button>
         <h1 className="text-[22px] font-semibold tracking-tight text-text-primary flex items-center gap-2">
           <UtensilsCrossed className="w-5 h-5 text-accent" />
-          {mode === 'create' ? 'New Meal Plan' : 'Edit Meal Plan'}
+          {mode === 'create' ? 'New Nutrition Plan' : 'Edit Nutrition Plan'}
         </h1>
       </div>
 

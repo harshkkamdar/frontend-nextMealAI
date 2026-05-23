@@ -25,3 +25,21 @@ export function formatDate(date: Date): string {
 export function todayISO(): string {
   return new Date().toISOString().split('T')[0]
 }
+
+/**
+ * Defense-in-depth guard for `<img src={url}>` when `url` comes from outside
+ * the renderer (BE-signed URLs, attachments, etc). React does NOT block
+ * `javascript:` URLs in `src` (only in `href`), so a compromised BE could
+ * serve `javascript:alert(1)` and the browser would execute it.
+ *
+ * Allowlist the schemes we actually use:
+ *   - https:/http: for BE-signed Storage URLs
+ *   - blob: for optimistic local previews
+ *   - // (protocol-relative) — browser resolves to the page's scheme
+ *
+ * Returns the URL if safe, or `null` if the caller should skip rendering.
+ */
+export function safeImageUrl(url: string | null | undefined): string | null {
+  if (!url) return null
+  return /^(https?:\/\/|blob:|\/\/)/i.test(url) ? url : null
+}

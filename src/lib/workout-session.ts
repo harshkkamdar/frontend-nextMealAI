@@ -1,9 +1,13 @@
 /**
  * FB-05 rest-timer-bugs — pure helpers extracted from the workout session page
  * so the bug-prone logic can be unit tested without mounting the Next.js page.
+ *
+ * FB-R6-16+17 (2026-05-21) extends this module with deriveWorkoutEntryLabel —
+ * a one-decision helper used by every Start Workout entry point.
  */
 
-import type { SessionExercise, SetData } from '@/types/workout-session.types'
+import type { SessionExercise, SetData, WorkoutSession } from '@/types/workout-session.types'
+import type { WorkoutPlan } from '@/types/plans.types'
 
 export const STALE_SESSION_THRESHOLD_SECONDS = 6 * 60 * 60 // 6 hours
 
@@ -101,4 +105,70 @@ export function computeCompleteSetResult(
     exercises: updated,
     rest: { show: true, seconds: restSeconds, bumpKey: true },
   }
+}
+
+/**
+ * FB-R6-15 — Compute which plan_day_index a calendar date should resolve to.
+ *
+ * The bug we're fixing: tapping different dates on the Activity calendar all
+ * showed the same workout (today's plan_day_index) because the previous
+ * implementation used `new Date()` as the anchor instead of the user's
+ * tapped date.
+ *
+ * Direction confirmed by Ved 2026-05-21: cursor-aware date mapping. We
+ * anchor on `plan.current_position` (the BE cursor — set by Geo's
+ * `advance_to_workout` tool or auto-advanced when sessions complete) for
+ * "today" and add the delta in days from today to the selected date. The
+ * result wraps around `content.days.length` so multi-week cycles work.
+ *
+ * Returns -1 when the plan has no days.
+ *
+ * Pure helper for unit testability. Both args are local-date ISO strings
+ * (YYYY-MM-DD) — typically from `todayLocalISO(tz)` and the CalendarStrip's
+ * `selectedDate` state, both in the user's IANA timezone (FB-12 convention).
+ */
+export function computeSelectedPlanDayIndex(
+  plan: Pick<WorkoutPlan, 'content' | 'current_position'> | null | undefined,
+  selectedDateIso: string,
+  todayIso: string
+): number {
+  const days = plan?.content?.days
+  if (!days || days.length === 0) return -1
+  const totalDays = days.length
+  const cursorBase = plan?.current_position ?? 0
+  const selectedMs = new Date(selectedDateIso).getTime()
+  const todayMs = new Date(todayIso).getTime()
+  if (!Number.isFinite(selectedMs) || !Number.isFinite(todayMs)) {
+    // Bad input — fall back to cursor.
+    return ((cursorBase % totalDays) + totalDays) % totalDays
+  }
+  const deltaDays = Math.round((selectedMs - todayMs) / 86400000)
+  return ((cursorBase + deltaDays) % totalDays + totalDays) % totalDays
+}
+
+/**
+ * FB-R6-16+17 — Decide whether a Start Workout entry point should read
+ * "Start Workout" or "Resume Workout".
+ *
+ * The BE-side fix (commit 0f5365a) made POST /v1/workout-sessions idempotent:
+ * it returns the existing in-progress session for the same (user, plan,
+ * plan_day_index) instead of creating a duplicate. This helper lets the FE
+ * preview that behavior so the label matches what the action will actually do.
+ *
+ * "Resume" only fires when there is an in_progress session whose plan_day_index
+ * matches the day the entry point is offering. Off-plan sessions
+ * (plan_day_index === null) only match a null `todayPlanDayIndex`.
+ *
+ * Defaults conservatively to "Start Workout" — if the lookup fails or the
+ * caller passes null/undefined, the user sees a Start label and the BE's
+ * idempotency is the actual source of truth.
+ */
+export function deriveWorkoutEntryLabel(
+  inProgressSession: WorkoutSession | null | undefined,
+  todayPlanDayIndex: number | null
+): 'Start Workout' | 'Resume Workout' {
+  if (!inProgressSession) return 'Start Workout'
+  if (inProgressSession.status !== 'in_progress') return 'Start Workout'
+  if (inProgressSession.plan_day_index !== todayPlanDayIndex) return 'Start Workout'
+  return 'Resume Workout'
 }

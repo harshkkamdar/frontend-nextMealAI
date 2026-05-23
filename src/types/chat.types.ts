@@ -12,13 +12,33 @@ export interface ChatMessageMetadata {
   actions_failed?: ActionFailure[]
 }
 
+// FB-R6-02 — chat image attachments persisted via the BE message_attachments
+// table. Each message comes back with a `signed_url` good for 1 hour.
+export interface ChatAttachment {
+  id: string
+  signed_url: string | null
+  mime_type: string
+  width: number | null
+  height: number | null
+}
+
 export interface ChatMessage {
   id?: string
   role: MessageRole
   content: string
   timestamp?: string
   tokens_used?: number
-  image?: string // data URL or blob URL for local display
+  /**
+   * Local-only image for the optimistic user-message bubble between submit
+   * and the next history refetch. Blob URL or data URL.
+   * Persisted attachments live in `attachments[]` instead.
+   */
+  image?: string
+  /**
+   * Server-persisted attachments from message_attachments. Empty array when
+   * the message has no attachments.
+   */
+  attachments?: ChatAttachment[]
   metadata?: ChatMessageMetadata
 }
 
@@ -49,5 +69,27 @@ export interface ChatResponse {
 export interface SendMessageInput {
   message: string
   session_id?: string
-  image?: string // base64 encoded image
+  /**
+   * @deprecated FB-R6-02 — use `image_paths` instead. The BE still accepts
+   * this base64 field for backwards compat, but it does NOT persist the
+   * image. Kept only for the FB-15 program-extraction fallback during
+   * the transition.
+   */
+  image?: string
+  /**
+   * FB-R6-02 — array of storage paths returned from
+   * POST /v1/chat/attachments/upload. BE enforces 0–5 entries.
+   */
+  image_paths?: string[]
+}
+
+// FB-R6-02 — chat-input emits this when an image is attached. The composer
+// uploads the file the moment it's selected (separating bytes from message)
+// so the user can compose / retry / multi-attach without re-uploading.
+export interface AttachedImage {
+  storage_path: string
+  preview_url: string // browser blob URL for thumbnail
+  file: File          // kept so the chat page can convert to base64 for FB-15
+  width?: number
+  height?: number
 }

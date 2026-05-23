@@ -34,16 +34,16 @@ describe('MealPlanDetail — plan name in header', () => {
   })
 
   // AC01.3 meal variant
-  it('falls back to "Meal Plan" when content.name is undefined', () => {
+  it('falls back to "Nutrition Plan" when content.name is undefined', () => {
     const plan = makePlan({ content: { days: [] } })
     render(<MealPlanDetail plan={plan} />)
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Meal Plan')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Nutrition Plan')
   })
 
   // AC01.4
-  it('falls back to "Meal Plan" when content.name is empty string', () => {
+  it('falls back to "Nutrition Plan" when content.name is empty string', () => {
     const plan = makePlan({ content: { name: '', days: [] } })
     render(<MealPlanDetail plan={plan} />)
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Meal Plan')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Nutrition Plan')
   })
 })

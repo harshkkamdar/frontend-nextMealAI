@@ -2,9 +2,12 @@ import { describe, it, expect } from 'vitest'
 import {
   resolveElapsedForSession,
   computeCompleteSetResult,
+  computeSelectedPlanDayIndex,
+  deriveWorkoutEntryLabel,
   STALE_SESSION_THRESHOLD_SECONDS,
 } from '../workout-session'
-import type { SessionExercise } from '@/types/workout-session.types'
+import type { SessionExercise, WorkoutSession } from '@/types/workout-session.types'
+import type { WorkoutPlan } from '@/types/plans.types'
 
 function makeSet(overrides: Partial<SessionExercise['sets'][number]> = {}) {
   return {
@@ -192,5 +195,161 @@ describe('FB-05 computeCompleteSetResult (AC01.4, AC01.6, AC01.7, AC01.8, AC01.9
     const exercises = [makeExercise()]
     const result = computeCompleteSetResult(exercises, 0, 99, NOW_ISO)
     expect(result.rest.show).toBe(false)
+  })
+})
+
+// FB-R6-16+17 · Resume label + state on Start Workout
+//
+// BE shipped 2026-05-21 (0f5365a): POST /v1/workout-sessions returns 200 with
+// the existing session when an in_progress session for the same (user, plan,
+// plan_day_index) already exists; 201 with a new session otherwise.
+//
+// FE side: when the user has an in-progress session for today's plan_day_index,
+// the action label must read "Resume Workout" instead of "Start Workout".
+// `deriveWorkoutEntryLabel` is a pure helper so each entry point (activity
+// page, plan detail, dashboard quick-action) can reuse the same decision.
+function makeInProgressSession(planDayIndex: number | null): WorkoutSession {
+  return {
+    id: 'session-1',
+    user_id: 'user-1',
+    plan_id: 'plan-1',
+    plan_day_index: planDayIndex,
+    day_name: 'Day 1',
+    status: 'in_progress',
+    started_at: new Date().toISOString(),
+    completed_at: null,
+    exercises: [],
+    total_volume_kg: 0,
+    duration_minutes: 0,
+    notes: null,
+    created_at: new Date().toISOString(),
+  }
+}
+
+describe('FB-R6-16+17 · deriveWorkoutEntryLabel', () => {
+  it('AC01: returns "Resume Workout" when in-progress session matches today plan_day_index', () => {
+    const inProgress = makeInProgressSession(2)
+    expect(deriveWorkoutEntryLabel(inProgress, 2)).toBe('Resume Workout')
+  })
+
+  it('AC03: returns "Start Workout" when there is no in-progress session', () => {
+    expect(deriveWorkoutEntryLabel(null, 2)).toBe('Start Workout')
+  })
+
+  it('AC03b: returns "Start Workout" when in-progress session is for a different plan_day_index', () => {
+    const inProgress = makeInProgressSession(1)
+    expect(deriveWorkoutEntryLabel(inProgress, 2)).toBe('Start Workout')
+  })
+
+  it('AC09: returns "Start Workout" when today is unmapped (null plan_day_index) and no session exists', () => {
+    expect(deriveWorkoutEntryLabel(null, null)).toBe('Start Workout')
+  })
+
+  it('handles in-progress session with null plan_day_index — only matches when today is also null (off-plan workout)', () => {
+    const inProgress = makeInProgressSession(null)
+    expect(deriveWorkoutEntryLabel(inProgress, 2)).toBe('Start Workout')
+    expect(deriveWorkoutEntryLabel(inProgress, null)).toBe('Resume Workout')
+  })
+
+  it('ignores sessions that are not in_progress (already completed/abandoned)', () => {
+    const completed: WorkoutSession = {
+      ...makeInProgressSession(2),
+      status: 'completed',
+    }
+    expect(deriveWorkoutEntryLabel(completed, 2)).toBe('Start Workout')
+  })
+})
+
+// FB-R6-15 — Calendar date → plan_day_index mapping.
+// Repro Ved confirmed 2026-05-21: tapping different dates on the Activity
+// calendar all showed the same workout (today's Push 1). Root cause: previous
+// implementation used `new Date()` as anchor instead of the user-tapped date.
+// Direction confirmed Ved: cursor-aware (uses plan.current_position from
+// migration 025 / FB-R6-12) + day-delta from today.
+function makePlan(opts: {
+  cursor?: number
+  dayNames?: string[]
+}): WorkoutPlan {
+  const days = (opts.dayNames ?? ['Push 1', 'Pull 1', 'Legs 1', 'Push 2', 'Pull 2', 'Legs 2', 'Rest']).map(
+    (name) => ({ date: '', name, is_rest_day: name === 'Rest' })
+  )
+  return {
+    id: 'p1',
+    user_id: 'u1',
+    type: 'workout',
+    status: 'active',
+    current_position: opts.cursor ?? 0,
+    content: { name: '6-day PPL', days },
+    created_at: '2026-05-21T00:00:00Z',
+    updated_at: '2026-05-21T00:00:00Z',
+  }
+}
+
+describe('FB-R6-15 · computeSelectedPlanDayIndex', () => {
+  const TODAY = '2026-05-21'
+
+  it('returns cursor for today (delta = 0)', () => {
+    const plan = makePlan({ cursor: 0 })
+    expect(computeSelectedPlanDayIndex(plan, TODAY, TODAY)).toBe(0)
+  })
+
+  it('cursor=0: tomorrow → day 1', () => {
+    const plan = makePlan({ cursor: 0 })
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-22', TODAY)).toBe(1)
+  })
+
+  it('cursor=0: 2 days from today → day 2', () => {
+    const plan = makePlan({ cursor: 0 })
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-23', TODAY)).toBe(2)
+  })
+
+  it('Ved repro: 6-day PPL with cursor=0, Thu/Fri/Sat = Push 1 / Pull 1 / Legs 1', () => {
+    const plan = makePlan({ cursor: 0 })
+    const days = plan.content.days!
+    expect(days[computeSelectedPlanDayIndex(plan, '2026-05-21', TODAY)].name).toBe('Push 1')
+    expect(days[computeSelectedPlanDayIndex(plan, '2026-05-22', TODAY)].name).toBe('Pull 1')
+    expect(days[computeSelectedPlanDayIndex(plan, '2026-05-23', TODAY)].name).toBe('Legs 1')
+  })
+
+  it('respects cursor=2 (FB-R6-12 already advanced): today shows Legs 1', () => {
+    const plan = makePlan({ cursor: 2 })
+    expect(plan.content.days![computeSelectedPlanDayIndex(plan, TODAY, TODAY)].name).toBe('Legs 1')
+  })
+
+  it('cursor=2: tomorrow → Push 2 (cursor + 1)', () => {
+    const plan = makePlan({ cursor: 2 })
+    expect(plan.content.days![computeSelectedPlanDayIndex(plan, '2026-05-22', TODAY)].name).toBe('Push 2')
+  })
+
+  it('wraps via positive modulo across the week boundary', () => {
+    const plan = makePlan({ cursor: 0 }) // 7 days
+    // 7 days out → wraps back to day 0
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-28', TODAY)).toBe(0)
+    // 8 days out → day 1
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-29', TODAY)).toBe(1)
+  })
+
+  it('handles past dates (negative delta) via positive modulo', () => {
+    const plan = makePlan({ cursor: 0 })
+    // Yesterday → wraps to last day
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-20', TODAY)).toBe(6)
+    expect(computeSelectedPlanDayIndex(plan, '2026-05-19', TODAY)).toBe(5)
+  })
+
+  it('returns -1 when the plan has no days', () => {
+    const plan = { content: { days: [] }, current_position: 0 } as unknown as WorkoutPlan
+    expect(computeSelectedPlanDayIndex(plan, TODAY, TODAY)).toBe(-1)
+  })
+
+  it('returns -1 when plan is null/undefined', () => {
+    expect(computeSelectedPlanDayIndex(null, TODAY, TODAY)).toBe(-1)
+    expect(computeSelectedPlanDayIndex(undefined, TODAY, TODAY)).toBe(-1)
+  })
+
+  it('falls back to cursor when current_position is missing (pre-migration-025 plans)', () => {
+    const plan = makePlan({})
+    delete plan.current_position
+    // current_position undefined → defaults to 0
+    expect(computeSelectedPlanDayIndex(plan, TODAY, TODAY)).toBe(0)
   })
 })

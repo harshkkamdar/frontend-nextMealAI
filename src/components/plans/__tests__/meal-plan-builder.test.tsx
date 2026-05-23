@@ -126,7 +126,7 @@ describe('MealPlanBuilder component', () => {
 
     await waitFor(() => expect(activatePlanMock).toHaveBeenCalledWith('plan-9'))
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/plan-9'))
-    expect(toastSuccess).toHaveBeenCalledWith('Meal plan created')
+    expect(toastSuccess).toHaveBeenCalledWith('Nutrition plan created')
   })
 
   it('shows toast on create failure', async () => {

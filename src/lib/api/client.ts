@@ -7,6 +7,12 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown
 }
 
+// FB-R6-02 — detect FormData so multipart uploads bypass JSON.stringify and
+// let the browser set the multipart boundary automatically.
+function isFormData(body: unknown): body is FormData {
+  return typeof FormData !== 'undefined' && body instanceof FormData
+}
+
 // In-flight refresh promise to prevent concurrent refresh races
 let refreshPromise: Promise<string | null> | null = null
 
@@ -48,8 +54,12 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     throw new ApiException(401, 'Not authenticated', 'NO_TOKEN', 'No access token')
   }
 
+  // FB-R6-02 — FormData bodies skip the JSON Content-Type and the
+  // JSON.stringify call so multipart uploads work end-to-end. Header overrides
+  // from the caller still take precedence.
+  const bodyIsForm = isFormData(options.body)
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(bodyIsForm ? {} : { 'Content-Type': 'application/json' }),
     ...(options.headers as Record<string, string>),
   }
 
@@ -60,7 +70,12 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
   const response = await fetch(`/api${path}`, {
     ...options,
     headers,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    body:
+      options.body === undefined
+        ? undefined
+        : bodyIsForm
+          ? (options.body as FormData)
+          : JSON.stringify(options.body),
   })
 
   if (!response.ok) {
@@ -72,7 +87,12 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
         const retryRes = await fetch(`/api${path}`, {
           ...options,
           headers: retryHeaders,
-          body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+          body:
+            options.body === undefined
+              ? undefined
+              : bodyIsForm
+                ? (options.body as FormData)
+                : JSON.stringify(options.body),
         })
         if (retryRes.ok) {
           if (retryRes.status === 204) return undefined as T

@@ -21,6 +21,8 @@ import { WorkoutCard } from '@/components/dashboard/workout-card'
 import { SuggestionCard } from '@/components/dashboard/suggestion-card'
 import { WeightChart } from '@/components/dashboard/weight-chart'
 import { NudgeCard } from '@/components/dashboard/nudge-card'
+import { CheckInCard } from '@/components/dashboard/check-in-card'
+import { getDashboardCheckIn, type DashboardCheckIn } from '@/lib/api/dashboard.api'
 import { computeNudges, type Nudge } from '@/lib/nudges'
 import { useUIStore } from '@/stores/ui.store'
 import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
@@ -228,18 +230,24 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [weightLogs, setWeightLogs] = useState<Log[]>([])
   const [activeSheet, setActiveSheet] = useState<QuickLogType>(null)
+  // FB-R6-10 — check-in card; null when user has <7 days of data (BE gate)
+  // or while loading. Falls back silently to existing onboarding cards.
+  const [checkIn, setCheckIn] = useState<DashboardCheckIn | null>(null)
 
   const today = todayLocalISO(tz)
 
   const fetchData = useCallback(async () => {
     try {
-      const [summaryRes, plansRes, suggestionsRes, logsRes, profileRes, weightRes] = await Promise.all([
+      const [summaryRes, plansRes, suggestionsRes, logsRes, profileRes, weightRes, checkInRes] = await Promise.all([
         getLogsSummary('day').catch(() => null),
         getPlans({ active_only: true }).catch(() => [] as Plan[]),
         getSuggestions({ status: 'pending' }).catch(() => [] as Suggestion[]),
         getLogs({ days: 1 }).catch(() => [] as Log[]),
         getProfile().catch(() => null),
         getLogs({ type: 'weight', limit: 100 }).catch(() => [] as Log[]),
+        // FB-R6-10: optional, gracefully nulls out on any failure (incl. 404
+        // if the BE endpoint isn't shipped on this branch yet).
+        getDashboardCheckIn().catch(() => ({ check_in: null })),
       ])
       setSummary(summaryRes)
       setPlans(plansRes)
@@ -247,12 +255,24 @@ export default function DashboardPage() {
       setTodayLogs(logsRes)
       setProfile(profileRes)
       setWeightLogs(weightRes)
+      setCheckIn(checkInRes.check_in)
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  // FB-R6-08 — refetch when Geo deactivates the active plan via chat so the
+  // dashboard cards (workout, next-up nutrition) reflect the new state
+  // without a manual reload.
+  useEffect(() => {
+    const handler = () => { fetchData() }
+    window.addEventListener('workout:plan-deactivated', handler)
+    return () => {
+      window.removeEventListener('workout:plan-deactivated', handler)
+    }
+  }, [fetchData])
 
   useSetGeoScreen('dashboard', { loading })
 
@@ -266,7 +286,7 @@ export default function DashboardPage() {
   const carbsConsumed = dailyBreakdown?.carbs ?? 0
   const fatConsumed = dailyBreakdown?.fat ?? 0
 
-  // FB-tdee-baseline: profile.daily_*_target is the source of truth. A meal plan,
+  // FB-tdee-baseline: profile.daily_*_target is the source of truth. A nutrition plan,
   // if active, may carry an optional override under content.daily_targets.
   // No hardcoded defaults — when the profile is incomplete, targets stay 0 and
   // the macro-progress component drops the "left" suffix gracefully.
@@ -390,6 +410,11 @@ export default function DashboardPage() {
               </button>
             </div>
           )}
+          {/* FB-R6-10 — When the BE returns a check-in (≥7 days of activity
+              across ≥2 of food/weight/workout), it leads the dashboard.
+              When null, the existing nudge + next-up + empty-state cards
+              run unchanged. */}
+          {checkIn && <CheckInCard checkIn={checkIn} />}
           {nudges.map((nudge) => (
             <NudgeCard key={nudge.type} nudge={nudge} onAction={handleNudgeAction} />
           ))}
@@ -399,7 +424,7 @@ export default function DashboardPage() {
             loggedMealTypes={todayLogs.filter((l) => l.type === 'food').map((l) => (l.payload as any)?.meal_type?.toLowerCase?.() ?? '')}
             onCreatePlan={() => {
               const id = crypto.randomUUID()
-              router.push(`/chat/${id}?prefill=${encodeURIComponent('Can you create a 7-day meal plan for me based on my goals and preferences?')}`)
+              router.push(`/chat/${id}?prefill=${encodeURIComponent('Can you create a 7-day nutrition plan for me based on my goals and preferences?')}`)
             }}
           />
           <WorkoutCard workoutPlan={workoutPlan} today={today} />

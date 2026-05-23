@@ -54,7 +54,10 @@ export function FitnessForm() {
   const [injuryInput, setInjuryInput] = useState('')
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | null>(null)
   const [activityLevel, setActivityLevel] = useState<ActivityLevel | null>(null)
-  const [workoutFrequency, setWorkoutFrequency] = useState<number>(3)
+  // FB-R6-FE-A: widen to allow empty string so the user can backspace through
+  // the value without React's controlled input reasserting `0` (which is what
+  // Number('') returns and what blocked George at onboarding).
+  const [workoutFrequency, setWorkoutFrequency] = useState<number | ''>(3)
   const [primaryGoal, setPrimaryGoal] = useState<PrimaryGoal | null>(null)
   const [waistCm, setWaistCm] = useState<string>('')
   const [chestCm, setChestCm] = useState<string>('')
@@ -92,7 +95,8 @@ export function FitnessForm() {
         injuries,
         ...(experienceLevel ? { experience_level: experienceLevel } : {}),
         activity_level: activityLevel,
-        workout_frequency: workoutFrequency,
+        // FB-R6-FE-A: if the user left the field empty, fall back to the initial 3.
+        workout_frequency: workoutFrequency === '' ? 3 : workoutFrequency,
         primary_goal: primaryGoal,
         ...(waistCm ? { waist_cm: Number(waistCm) } : {}),
         ...(chestCm ? { chest_cm: Number(chestCm) } : {}),
@@ -216,7 +220,12 @@ export function FitnessForm() {
             min={0}
             max={7}
             value={workoutFrequency}
-            onChange={(e) => setWorkoutFrequency(Number(e.target.value))}
+            onChange={(e) => {
+              // FB-R6-FE-A: preserve empty string instead of coercing to 0 so
+              // the user can clear the value and re-type freely.
+              const raw = e.target.value
+              setWorkoutFrequency(raw === '' ? '' : Number(raw))
+            }}
           />
         </div>
 

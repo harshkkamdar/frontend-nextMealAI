@@ -1,6 +1,7 @@
 'use client'
 
 import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { safeImageUrl } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat.types'
 
 // Simple inline markdown renderer for Geo's responses
@@ -96,16 +97,36 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
     // Strip "[Photo attached]" from content (legacy messages stored it in text)
     const displayContent = message.content.replace(/\s*\[Photo attached\]\s*/g, '').trim()
 
+    // FB-R6-02 — render persisted attachments[] first (signed URLs from BE).
+    // Fall back to the local-only `image` blob URL for the optimistic temp
+    // message between submit and the next history refetch.
+    const persistedAttachments = message.attachments ?? []
+    const hasPersisted = persistedAttachments.length > 0
+
     return (
       <div className="flex flex-col items-end max-w-[85%] ml-auto">
         <div className="bg-accent hover:bg-accent-hover text-white rounded-2xl rounded-br-sm px-4 py-2.5">
-          {message.image && (
+          {hasPersisted ? (
+            <div className={persistedAttachments.length > 1 ? 'grid grid-cols-2 gap-1 mb-2' : 'mb-2'}>
+              {persistedAttachments.map((att) => {
+                const safe = safeImageUrl(att.signed_url)
+                return safe ? (
+                  <img
+                    key={att.id}
+                    src={safe}
+                    alt="Uploaded"
+                    className="rounded-xl max-w-[200px] max-h-[200px] object-cover"
+                  />
+                ) : null
+              })}
+            </div>
+          ) : safeImageUrl(message.image) ? (
             <img
-              src={message.image}
+              src={safeImageUrl(message.image)!}
               alt="Uploaded food"
               className="rounded-xl max-w-[200px] max-h-[200px] object-cover mb-2"
             />
-          )}
+          ) : null}
           {displayContent && (
             <p className="text-sm whitespace-pre-wrap break-words">{displayContent}</p>
           )}
@@ -129,7 +150,7 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
       duplicate_window: 'looks like a duplicate from the last minute',
       not_found: "couldn't find that entry",
       validation: "those numbers didn't look right",
-      missing_meal_plan_targets: 'meal plan needs daily targets',
+      missing_meal_plan_targets: 'nutrition plan needs daily targets',
       profile_incomplete: 'profile is missing something',
       image_analysis_failed: "couldn't read that image",
     }

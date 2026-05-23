@@ -27,12 +27,12 @@ beforeEach(() => {
 })
 
 describe('PlansPage CTAs', () => {
-  it('renders New Meal Plan and New Workout Plan buttons that navigate correctly', async () => {
+  it('renders New Nutrition Plan and New Workout Plan buttons that navigate correctly', async () => {
     getPlansMock.mockResolvedValue([])
     render(<PlansPage />)
-    await waitFor(() => screen.getByText('New Meal Plan'))
+    await waitFor(() => screen.getByText('New Nutrition Plan'))
 
-    fireEvent.click(screen.getByText('New Meal Plan'))
+    fireEvent.click(screen.getByText('New Nutrition Plan'))
     expect(pushMock).toHaveBeenCalledWith('/plans/new/meal')
 
     fireEvent.click(screen.getByText('New Workout Plan'))
@@ -62,8 +62,8 @@ describe('PlansPage CTAs', () => {
     ])
     render(<PlansPage />)
 
-    await waitFor(() => screen.getByLabelText('Edit meal plan'))
-    fireEvent.click(screen.getByLabelText('Edit meal plan'))
+    await waitFor(() => screen.getByLabelText('Edit nutrition plan'))
+    fireEvent.click(screen.getByLabelText('Edit nutrition plan'))
     expect(pushMock).toHaveBeenCalledWith('/plans/meal-1/edit')
 
     fireEvent.click(screen.getByLabelText('Edit workout plan'))
