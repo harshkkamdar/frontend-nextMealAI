@@ -110,14 +110,24 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
             <div className={persistedAttachments.length > 1 ? 'grid grid-cols-2 gap-1 mb-2' : 'mb-2'}>
               {persistedAttachments.map((att) => {
                 const safe = safeImageUrl(att.signed_url)
-                return safe ? (
+                if (!safe) return null
+                // FB-R6-UAT-A follow-up — grid items must fit the column,
+                // not a fixed 200px width, otherwise two images at 200px +
+                // gap (~404px) overflow the ~300px mobile bubble. Single
+                // image keeps the 200px cap so it doesn't fill the bubble.
+                const isMulti = persistedAttachments.length > 1
+                return (
                   <img
                     key={att.id}
                     src={safe}
                     alt="Uploaded"
-                    className="rounded-xl max-w-[200px] max-h-[200px] object-cover"
+                    className={
+                      isMulti
+                        ? 'rounded-xl w-full aspect-square object-cover'
+                        : 'rounded-xl max-w-[200px] max-h-[200px] object-cover'
+                    }
                   />
-                ) : null
+                )
               })}
             </div>
           ) : safeImageUrl(message.image) ? (
