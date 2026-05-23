@@ -65,6 +65,48 @@ describe('ChatBubble — FB-R6-UAT-A multi-image rendering', () => {
     expect(imgs[0].getAttribute('src')).toBe('https://example.com/legacy.jpg')
   })
 
+  it('AC05: multi-image grid uses w-full + aspect-square (not max-w-[200px]) so it fits the bubble on mobile', () => {
+    // Regression lock for the UAT 2026-05-23 13:41 overflow bug:
+    // max-w-[200px] per img + grid-cols-2 + gap-1 = ~404px, which
+    // overflows the ~300px mobile bubble. Grid items must size to
+    // the column instead of a fixed pixel width.
+    render(
+      <ChatBubble
+        message={userMessage({
+          attachments: [
+            { id: 'a1', signed_url: 'blob:m-1', mime_type: 'image/jpeg', width: null, height: null },
+            { id: 'a2', signed_url: 'blob:m-2', mime_type: 'image/jpeg', width: null, height: null },
+            { id: 'a3', signed_url: 'blob:m-3', mime_type: 'image/jpeg', width: null, height: null },
+          ],
+        })}
+      />,
+    )
+    const imgs = screen.getAllByRole('img')
+    expect(imgs).toHaveLength(3)
+    for (const img of imgs) {
+      const cls = img.className
+      expect(cls).toContain('w-full')
+      expect(cls).toContain('aspect-square')
+      expect(cls).not.toContain('max-w-[200px]')
+    }
+  })
+
+  it('AC06: single-image bubble keeps the 200px cap (no full-bleed)', () => {
+    render(
+      <ChatBubble
+        message={userMessage({
+          attachments: [
+            { id: 'a1', signed_url: 'blob:s-1', mime_type: 'image/jpeg', width: null, height: null },
+          ],
+        })}
+      />,
+    )
+    const img = screen.getByRole('img')
+    expect(img.className).toContain('max-w-[200px]')
+    expect(img.className).not.toContain('w-full')
+    expect(img.className).not.toContain('aspect-square')
+  })
+
   it('AC04: attachment with a null signed_url is skipped (no broken <img> rendered)', () => {
     render(
       <ChatBubble
