@@ -1,96 +1,80 @@
 /**
- * FB-R6-10 — Dashboard Check-In Card
+ * FB-R6.7 Build C — Dashboard Check-In Card
  *
- * Renders the BE-composed daily narrative + 4 structured metrics so a
- * data-loaded user sees "this is how you're tracking" instead of empty-state
- * nags ("no meal logged today"). Visual contract matches the rest of
- * src/components/dashboard/ — `bg-surface border border-border rounded-2xl`,
- * 10px uppercase section label, tabular-nums metric numbers.
+ * Replaces the per-meal-average narrative + 4-metric grid with George's locked
+ * format: compact 7-day daily table + 1-line "Focus this week:" takeaway.
+ *
+ *   Day      Cal       P     C     F
+ *   Mon    1900/2200  140  195  55
+ *   Tue    2180/2200  198  218  58  ✓
+ *   ...
+ *   → Focus this week: protein. You're 30g/day short on avg.
  *
  * Tap → opens Geo chat with a prefill asking for a deeper trends discussion.
- * That's the v2 drill-down. Future: dedicated /trends page.
+ * Visual contract preserved: `bg-surface border border-border rounded-2xl`.
+ *
+ * Back-compat: handles older payloads (v=1, with `narrative` and no `days`)
+ * by falling through to the legacy paragraph until the BE cache rolls over.
  */
 
 'use client'
 
 import { useMemo } from 'react'
 import Link from 'next/link'
-import { Sparkles, TrendingDown, TrendingUp, Activity as ActivityIcon, Calendar } from 'lucide-react'
-import type { DashboardCheckIn } from '@/lib/api/dashboard.api'
+import { Sparkles } from 'lucide-react'
+import type {
+  DashboardCheckIn,
+  DashboardCheckInDay,
+} from '@/lib/api/dashboard.api'
 
 const PREFILL = encodeURIComponent(
   'Walk me through my trends from this week — what should I focus on?'
 )
 
-function fmtPct(v: number | null): string {
-  if (v == null) return '—'
-  return `${Math.round(v)}%`
-}
-
-function fmtKg(v: number | null): string {
-  if (v == null) return '—'
-  const sign = v > 0 ? '+' : ''
-  return `${sign}${v.toFixed(1)} kg`
-}
-
-function fmtCount(v: number | null): string {
-  if (v == null) return '—'
-  return String(v)
+function shortMacro(cell: { actual: number; target: number }): string {
+  return `${Math.round(cell.actual)}/${Math.round(cell.target)}`
 }
 
 export function CheckInCard({ checkIn }: { checkIn: DashboardCheckIn }) {
-  const { narrative, metrics } = checkIn
-  const weightTrendIcon =
-    metrics.weight_delta_kg != null && metrics.weight_delta_kg < 0
-      ? TrendingDown
-      : TrendingUp
-
-  // /cso P1 — generate the drilldown session UUID once per mount. Previously
-  // this lived inline in the JSX `href` and ran on every render, leaking
-  // orphan session IDs to the chat-sessions table and breaking prefetching.
+  // /cso P1 — stable UUID across re-renders so we don't leak orphan session IDs.
   const drilldownHref = useMemo(
     () => `/chat/${crypto.randomUUID()}?prefill=${PREFILL}`,
     []
   )
+
+  const hasDays =
+    Array.isArray(checkIn.days) && checkIn.days.length > 0
 
   return (
     <div
       className="bg-surface border border-border rounded-2xl p-4"
       data-testid="check-in-card"
     >
-      <div className="flex items-center gap-1.5 mb-2">
+      <div className="flex items-center gap-1.5 mb-3">
         <Sparkles className="w-4 h-4 text-accent" />
         <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
           Check-in
         </span>
       </div>
 
-      <p className="text-sm text-text-primary leading-relaxed mb-4">{narrative}</p>
+      {hasDays ? (
+        <DaysTable days={checkIn.days} />
+      ) : checkIn.narrative ? (
+        // v=1 back-compat: a stale cache row from before Build C deployed.
+        <p className="text-sm text-text-primary leading-relaxed mb-3">
+          {checkIn.narrative}
+        </p>
+      ) : null}
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-        <Metric
-          icon={ActivityIcon}
-          label="Macros"
-          value={fmtPct(metrics.macro_adherence_pct)}
-        />
-        <Metric
-          icon={weightTrendIcon}
-          label="Weight Δ"
-          value={fmtKg(metrics.weight_delta_kg)}
-        />
-        <Metric
-          icon={ActivityIcon}
-          label="Workouts"
-          value={fmtCount(metrics.workout_count_7d)}
-          suffix="/ 7d"
-        />
-        <Metric
-          icon={Calendar}
-          label="Logged"
-          value={fmtCount(metrics.data_days)}
-          suffix="days"
-        />
-      </div>
+      <p
+        className="text-sm text-text-primary leading-relaxed mb-3 mt-3"
+        data-testid="check-in-takeaway"
+      >
+        <span className="text-accent" aria-hidden>
+          →{' '}
+        </span>
+        {checkIn.takeaway}
+      </p>
 
       <Link
         href={drilldownHref}
@@ -103,25 +87,67 @@ export function CheckInCard({ checkIn }: { checkIn: DashboardCheckIn }) {
   )
 }
 
-function Metric({
-  icon: Icon,
-  label,
-  value,
-  suffix,
-}: {
-  icon: typeof Sparkles
-  label: string
-  value: string
-  suffix?: string
-}) {
+function DaysTable({ days }: { days: DashboardCheckInDay[] }) {
   return (
-    <div className="text-center">
-      <div className="flex items-center justify-center gap-1 mb-1">
-        <Icon className="w-3 h-3 text-text-tertiary" />
-        <p className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary">{label}</p>
+    <div
+      className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-x-2 gap-y-0.5 text-xs tabular-nums"
+      data-testid="check-in-days-table"
+      role="table"
+      aria-label="7-day adherence"
+    >
+      {/* Header row */}
+      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary" role="columnheader">
+        Day
       </div>
-      <p className="text-base font-semibold tabular-nums text-text-primary">{value}</p>
-      {suffix && <p className="text-[10px] text-text-tertiary">{suffix}</p>}
+      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary" role="columnheader">
+        Cal
+      </div>
+      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary text-right" role="columnheader">
+        P
+      </div>
+      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary text-right" role="columnheader">
+        C
+      </div>
+      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary text-right" role="columnheader">
+        F
+      </div>
+      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary text-right w-3" role="columnheader" aria-label="hit">
+        ✓
+      </div>
+
+      {/* Day rows */}
+      {days.map((d) => (
+        <DayRow key={d.date} day={d} />
+      ))}
     </div>
+  )
+}
+
+function DayRow({ day: d }: { day: DashboardCheckInDay }) {
+  return (
+    <>
+      <div className="text-text-secondary" role="cell">
+        {d.day_of_week}
+      </div>
+      <div className="text-text-primary" role="cell">
+        {shortMacro(d.calories)}
+      </div>
+      <div className="text-text-primary text-right" role="cell">
+        {Math.round(d.protein.actual)}
+      </div>
+      <div className="text-text-primary text-right" role="cell">
+        {Math.round(d.carbs.actual)}
+      </div>
+      <div className="text-text-primary text-right" role="cell">
+        {Math.round(d.fat.actual)}
+      </div>
+      <div
+        className="text-right w-3 text-accent"
+        role="cell"
+        aria-label={d.hit ? 'hit target' : 'missed target'}
+      >
+        {d.hit ? '✓' : ''}
+      </div>
+    </>
   )
 }

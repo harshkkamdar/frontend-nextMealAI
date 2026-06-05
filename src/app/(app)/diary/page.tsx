@@ -10,6 +10,7 @@ import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { todayLocalISO } from '@/lib/timezone'
@@ -67,6 +68,11 @@ export default function DiaryPage() {
   }, [])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  // FB-R6.7 Build B — chat→UI sync. When Geo logs/edits/deletes a meal OR
+  // updates the active nutrition plan via chat, the diary reflects it
+  // (logs list + macro bar targets) without a manual refresh.
+  useSyncRefetch(['logs:*', 'plans:updated'], fetchData)
 
   // Filter logs for selected date — FB-12: prefer the user-local bucket date
   // so 7:21 AM logs land under "today" regardless of UTC offset. Falls back

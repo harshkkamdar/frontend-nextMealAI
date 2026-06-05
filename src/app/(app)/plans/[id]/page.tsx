@@ -1,11 +1,12 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useState } from 'react'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { MealPlanDetail } from '@/components/plans/meal-plan-detail'
 import { WorkoutPlanDetail } from '@/components/plans/workout-plan-detail'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { getPlan } from '@/lib/api/plans.api'
 import { toast } from 'sonner'
 import type { Plan, MealPlan, WorkoutPlan } from '@/types/plans.types'
@@ -17,20 +18,23 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
 
   useSetGeoScreen('plan_detail', { planId: id })
 
-  useEffect(() => {
-    const fetchPlan = async () => {
-      try {
-        const data = await getPlan(id)
-        setPlan(data)
-      } catch {
-        setPlan(null)
-        toast.error('Failed to load plan')
-      } finally {
-        setLoading(false)
-      }
+  const fetchPlan = useCallback(async () => {
+    try {
+      const data = await getPlan(id)
+      setPlan(data)
+    } catch {
+      setPlan(null)
+      toast.error('Failed to load plan')
+    } finally {
+      setLoading(false)
     }
-    fetchPlan()
   }, [id])
+
+  useEffect(() => { fetchPlan() }, [fetchPlan])
+
+  // FB-R6.7 Build B — chat→UI sync. Geo edits this plan in chat → detail
+  // view shows the new state without a manual refresh.
+  useSyncRefetch(['plans:updated', 'plans:deactivated'], fetchPlan)
 
   return (
     <PageWrapper>

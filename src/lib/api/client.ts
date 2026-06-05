@@ -67,6 +67,20 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     headers['Authorization'] = `Bearer ${accessToken}`
   }
 
+  // FB-R6.7 Build E — attach the browser's IANA timezone on every request so
+  // the BE can bucket `local_date` in the user's actual zone without depending
+  // on a profile.timezone row that may be stale or NULL. The header overrides
+  // anything stale on the server side; profile.timezone remains the warm-path
+  // default.
+  if (typeof window !== 'undefined' && !headers['X-Timezone'] && !headers['x-timezone']) {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+      if (tz) headers['X-Timezone'] = tz
+    } catch {
+      // Older browsers / odd environments: silently skip; BE falls back to profile.
+    }
+  }
+
   const response = await fetch(`/api${path}`, {
     ...options,
     headers,

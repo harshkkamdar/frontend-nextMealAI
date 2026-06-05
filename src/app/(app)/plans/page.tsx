@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { getPlans } from '@/lib/api/plans.api'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import type { Plan, MealPlan, WorkoutPlan } from '@/types/plans.types'
 
 export default function PlansPage() {
@@ -43,6 +44,10 @@ export default function PlansPage() {
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [fetchPlans])
+
+  // FB-R6.7 Build B — chat→UI sync. When Geo creates/updates/deactivates a
+  // plan via chat, the plans page reflects it without a manual refresh.
+  useSyncRefetch(['plans:*'], fetchPlans)
 
   const mealPlan = (plans.find((p) => p.type === 'meal') as MealPlan) ?? null
   const workoutPlan = (plans.find((p) => p.type === 'workout') as WorkoutPlan) ?? null

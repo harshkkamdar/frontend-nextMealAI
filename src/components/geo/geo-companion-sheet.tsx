@@ -17,6 +17,7 @@ import {
   sendMessage,
   extractSessionMemories,
 } from '@/lib/api/chat.api'
+import { handleGeoToolResults } from '@/lib/sync/dispatch-from-chat'
 import type { AttachedImage, ChatMessage } from '@/types/chat.types'
 
 export function GeoCompanionSheet() {
@@ -116,16 +117,10 @@ export function GeoCompanionSheet() {
       setMessages((prev) => [...prev, geoMsg])
       messageCountRef.current += 1
 
-      // Notify workout page if session exercises were updated
-      if ((res.tools_used ?? []).includes('update_today_workout')) {
-        window.dispatchEvent(new CustomEvent('workout:session-updated'))
-      }
-
-      // FB-R6-08 — Geo deactivated the active plan via the chat tool.
-      // Dispatch an event so Activity + Dashboard refresh their cards.
-      if ((res.tools_used ?? []).includes('deactivate_active_plan')) {
-        window.dispatchEvent(new CustomEvent('workout:plan-deactivated'))
-      }
+      // FB-R6.7 Build B — centralized chat→UI sync (emits syncBus topics
+      // and bridges legacy DOM events). The actions_failed cross-reference
+      // means failed tools no longer trigger a phantom refetch.
+      handleGeoToolResults(res)
     } catch {
       toast.error('Failed to send message')
     } finally {

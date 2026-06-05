@@ -11,6 +11,7 @@ import { getGreeting, formatDate } from '@/lib/utils'
 import { todayLocalISO } from '@/lib/timezone'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { CalendarDays, ChevronRight, X, Minus, Plus } from 'lucide-react'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { PageWrapper } from '@/components/layout/page-wrapper'
@@ -265,7 +266,8 @@ export default function DashboardPage() {
 
   // FB-R6-08 — refetch when Geo deactivates the active plan via chat so the
   // dashboard cards (workout, next-up nutrition) reflect the new state
-  // without a manual reload.
+  // without a manual reload. Legacy DOM-event listener kept ONE release
+  // while syncBus rolls out.
   useEffect(() => {
     const handler = () => { fetchData() }
     window.addEventListener('workout:plan-deactivated', handler)
@@ -273,6 +275,9 @@ export default function DashboardPage() {
       window.removeEventListener('workout:plan-deactivated', handler)
     }
   }, [fetchData])
+
+  // FB-R6.7 Build B — chat→UI sync. Plans + logs both feed dashboard cards.
+  useSyncRefetch(['plans:*', 'logs:*'], fetchData)
 
   useSetGeoScreen('dashboard', { loading })
 
