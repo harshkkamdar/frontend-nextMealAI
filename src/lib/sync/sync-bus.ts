@@ -39,9 +39,26 @@ class SyncBus {
   private wildcard = new Map<string, Set<Handler>>() // key = prefix before ':*'
 
   emit(topic: SyncTopic, payload?: unknown): void {
-    for (const h of this.exact.get(topic) ?? []) h(topic, payload)
+    // FB-R6.7 /review follow-up - isolate handler failures. A single page
+    // listener that throws shouldn't take down every other listener on the
+    // same topic. Log to console so the bad observer is still visible.
+    for (const h of this.exact.get(topic) ?? []) {
+      try {
+        h(topic, payload)
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('syncBus handler threw', { topic, err })
+      }
+    }
     const prefix = topic.split(':')[0]
-    for (const h of this.wildcard.get(prefix) ?? []) h(topic, payload)
+    for (const h of this.wildcard.get(prefix) ?? []) {
+      try {
+        h(topic, payload)
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('syncBus wildcard handler threw', { topic, prefix, err })
+      }
+    }
   }
 
   on(topic: SyncTopicOrWildcard, handler: Handler): () => void {
