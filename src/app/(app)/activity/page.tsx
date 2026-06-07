@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/shared/empty-state'
 import { Button } from '@/components/ui/button'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useUIStore } from '@/stores/ui.store'
+import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { getPlans } from '@/lib/api/plans.api'
 import { startWorkoutSession, getInProgressSession, getWorkoutHistory } from '@/lib/api/workout-sessions.api'
 import { deriveWorkoutEntryLabel, computeSelectedPlanDayIndex } from '@/lib/workout-session'
@@ -69,6 +70,7 @@ export default function ActivityPage() {
 
   // FB-R6-08 — refetch when Geo deactivates the active plan via chat. The
   // chat consumers dispatch this event after they see the tool in tools_used.
+  // Legacy DOM-event listener kept ONE release while syncBus rolls out.
   useEffect(() => {
     const handler = () => { fetchData() }
     window.addEventListener('workout:plan-deactivated', handler)
@@ -78,6 +80,10 @@ export default function ActivityPage() {
       window.removeEventListener('workout:session-updated', handler)
     }
   }, [fetchData])
+
+  // FB-R6.7 Build B — chat→UI sync. Covers plan create/update/deactivate AND
+  // the workout-specific cursor advance + today's-session update events.
+  useSyncRefetch(['plans:*', 'workout:advanced', 'workout:session-updated'], fetchData)
 
   // FB-R6-15 — cursor-aware mapping. Today's view honors plan.current_position
   // (the BE cursor that Geo's advance_to_workout tool moves); other dates add
@@ -101,19 +107,33 @@ export default function ActivityPage() {
   )
   const isResume = entryLabel === 'Resume Workout'
 
-  // Calendar indicators from history
+  // FB-R6.7 Build F - guard Start Workout to today only. Past/future-date
+  // Start was creating in-progress sessions with `started_at = now` even
+  // when the user had scrolled the calendar to a different day, which led
+  // to confusing rollup ("I tapped Jun 3, why did it land on Jun 5?").
+  // Resume Workout is unaffected - in-progress sessions are independent of
+  // the calendar selection.
+  const isToday = selectedDate === todayLocalISO(tz)
+  const canStart = isToday || isResume
+  const showPastDateCaption = !canStart && !isRestDay && !!todayWorkout
+
+  // Calendar indicators from history.
+  // FB-R6.7 Build F - bucket completed sessions by the user's LOCAL date,
+  // not UTC. Previously `new Date(s.completed_at).toISOString().split('T')[0]`
+  // put a workout completed at 19:16 UTC under Jun 5 even when the user was
+  // in Asia/Kolkata where it was 00:46 Jun 6.
   const indicators = useMemo(() => {
     const map = new Map<string, { food?: boolean; workout?: boolean }>()
     for (const s of history) {
       if (s.completed_at) {
-        const d = new Date(s.completed_at).toISOString().split('T')[0]
+        const d = todayLocalISO(tz, new Date(s.completed_at))
         const existing = map.get(d) || {}
         existing.workout = true
         map.set(d, existing)
       }
     }
     return map
-  }, [history])
+  }, [history, tz])
 
   const handleStartWorkout = async () => {
     if (starting) return
@@ -136,13 +156,16 @@ export default function ActivityPage() {
     if (inProgress) router.push(`/activity/workout/${inProgress.id}`)
   }
 
-  // History for selected date
+  // History for selected date.
+  // FB-R6.7 Build F - match by LOCAL date so the history list and the
+  // calendar dots agree. The old UTC slice could hide a session from the
+  // list it was indicating on (e.g. 19:16 UTC completion in IST).
   const selectedDateHistory = useMemo(() => {
     return history.filter((s) => {
       if (!s.completed_at) return false
-      return new Date(s.completed_at).toISOString().split('T')[0] === selectedDate
+      return todayLocalISO(tz, new Date(s.completed_at)) === selectedDate
     })
-  }, [history, selectedDate])
+  }, [history, selectedDate, tz])
 
   return (
     <PageWrapper>
@@ -242,12 +265,21 @@ export default function ActivityPage() {
 
                 <Button
                   onClick={isResume ? handleResume : handleStartWorkout}
-                  disabled={starting}
+                  disabled={starting || !canStart}
                   className="w-full bg-accent hover:bg-accent-hover text-white"
+                  data-testid="activity-start-workout-button"
                 >
                   <Play className="w-4 h-4 mr-1 fill-white" />
                   {starting ? 'Starting...' : entryLabel}
                 </Button>
+                {showPastDateCaption && (
+                  <p
+                    className="text-xs text-text-tertiary text-center mt-2"
+                    data-testid="activity-past-date-caption"
+                  >
+                    Workouts can only be started for today. Use &ldquo;Log freestyle workout&rdquo; below to record a past session.
+                  </p>
+                )}
               </div>
             ) : (
               <p className="text-sm text-text-tertiary text-center py-4">No workout data for today</p>

@@ -32,18 +32,23 @@ function formatDateRange(start?: string, end?: string): string {
 }
 
 function formatExerciseDetail(exercise: { sets?: number; reps?: number; weight?: number; duration_seconds?: number }): string {
+  // FB-R6.7 — reps can land as a sentinel `-1` for duration-based exercises
+  // (plank holds etc.) from older AI-generated plans before the BE validator
+  // tightened to .positive(). Treat reps <= 0 as missing.
   const parts: string[] = []
-  if (exercise.sets != null && exercise.reps != null) {
+  const validReps = typeof exercise.reps === 'number' && exercise.reps > 0
+  const validSets = typeof exercise.sets === 'number' && exercise.sets > 0
+  if (validSets && validReps) {
     parts.push(`${exercise.sets}x${exercise.reps}`)
-  } else if (exercise.sets != null) {
+  } else if (validSets) {
     parts.push(`${exercise.sets} sets`)
-  } else if (exercise.reps != null) {
+  } else if (validReps) {
     parts.push(`${exercise.reps} reps`)
   }
   if (exercise.weight != null) {
     parts.push(`${exercise.weight} kg`)
   }
-  if (exercise.duration_seconds != null) {
+  if (exercise.duration_seconds != null && exercise.duration_seconds > 0) {
     const mins = Math.floor(exercise.duration_seconds / 60)
     const secs = exercise.duration_seconds % 60
     parts.push(mins > 0 ? `${mins}m${secs > 0 ? ` ${secs}s` : ''}` : `${secs}s`)

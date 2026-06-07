@@ -1,13 +1,16 @@
 /**
- * FB-R6-10 — CheckInCard
+ * FB-R6.7 Build C — CheckInCard tests
+ *
+ * New shape: 7-day table + 1-line takeaway. Legacy narrative path retained for
+ * back-compat during cutover and tested separately.
  */
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { CheckInCard } from '@/components/dashboard/check-in-card'
-import type { DashboardCheckIn } from '@/lib/api/dashboard.api'
+import type { DashboardCheckIn, DashboardCheckInDay } from '@/lib/api/dashboard.api'
 
-// Polyfill crypto.randomUUID for jsdom — needed for the drilldown link.
+// jsdom polyfill for crypto.randomUUID — drilldown link needs it.
 if (typeof globalThis.crypto === 'undefined' || typeof globalThis.crypto.randomUUID !== 'function') {
   Object.defineProperty(globalThis, 'crypto', {
     value: { randomUUID: () => 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' },
@@ -15,53 +18,76 @@ if (typeof globalThis.crypto === 'undefined' || typeof globalThis.crypto.randomU
   })
 }
 
+function makeDay(overrides: Partial<DashboardCheckInDay>): DashboardCheckInDay {
+  return {
+    date: '2026-05-15',
+    day_of_week: 'Mon',
+    calories: { actual: 1900, target: 2000 },
+    protein: { actual: 145, target: 150 },
+    carbs: { actual: 195, target: 200 },
+    fat: { actual: 68, target: 70 },
+    hit: true,
+    ...overrides,
+  }
+}
+
 const FULL: DashboardCheckIn = {
-  narrative: 'Strong week — macros hit target 5 of 7 days, weight trending down.',
+  days: [
+    makeDay({ date: '2026-05-09', day_of_week: 'Sat', hit: false, protein: { actual: 90, target: 150 } }),
+    makeDay({ date: '2026-05-10', day_of_week: 'Sun', hit: true }),
+    makeDay({ date: '2026-05-11', day_of_week: 'Mon', hit: true }),
+    makeDay({ date: '2026-05-12', day_of_week: 'Tue', hit: false, calories: { actual: 1500, target: 2000 } }),
+    makeDay({ date: '2026-05-13', day_of_week: 'Wed', hit: true }),
+    makeDay({ date: '2026-05-14', day_of_week: 'Thu', hit: false, carbs: { actual: 100, target: 200 } }),
+    makeDay({ date: '2026-05-15', day_of_week: 'Fri', hit: true }),
+  ],
+  takeaway: "Focus this week: protein. You're 30g/day short on average.",
   metrics: {
-    macro_adherence_pct: 71,
-    weight_delta_kg: -0.6,
+    macro_adherence_pct: 57,
+    weight_delta_kg: null,
     workout_count_7d: 3,
     data_days: 7,
   },
-  generated_at: '2026-05-21T20:00:00.000Z',
+  generated_at: '2026-05-15T20:00:00.000Z',
+  v: 2,
 }
 
-describe('CheckInCard — FB-R6-10', () => {
-  it('renders the narrative verbatim', () => {
+describe('CheckInCard — FB-R6.7 Build C', () => {
+  it('renders the 7-row daily table with day_of_week labels', () => {
     render(<CheckInCard checkIn={FULL} />)
-    expect(screen.getByText(FULL.narrative)).toBeInTheDocument()
+    expect(screen.getByTestId('check-in-days-table')).toBeInTheDocument()
+    for (const d of FULL.days) {
+      expect(screen.getByText(d.day_of_week)).toBeInTheDocument()
+    }
   })
 
-  it('renders all 4 metrics with formatted values', () => {
+  it('renders the takeaway sentence verbatim', () => {
     render(<CheckInCard checkIn={FULL} />)
-    expect(screen.getByText('71%')).toBeInTheDocument()
-    expect(screen.getByText('-0.6 kg')).toBeInTheDocument()
-    expect(screen.getByText('3')).toBeInTheDocument()
-    expect(screen.getByText('7')).toBeInTheDocument()
+    expect(
+      screen.getByText((content) => content.includes(FULL.takeaway))
+    ).toBeInTheDocument()
   })
 
-  it('positive weight delta shows + prefix', () => {
-    const positive: DashboardCheckIn = {
-      ...FULL,
-      metrics: { ...FULL.metrics, weight_delta_kg: 0.4 },
-    }
-    render(<CheckInCard checkIn={positive} />)
-    expect(screen.getByText('+0.4 kg')).toBeInTheDocument()
+  it('renders ✓ only on days with hit=true', () => {
+    render(<CheckInCard checkIn={FULL} />)
+    const checks = screen.getAllByLabelText('hit target')
+    // 4 hits in FULL fixture.
+    expect(checks.length).toBe(4)
+    const misses = screen.getAllByLabelText('missed target')
+    expect(misses.length).toBe(3)
   })
 
-  it('null metrics render as em-dash placeholder', () => {
-    const sparse: DashboardCheckIn = {
-      ...FULL,
-      metrics: {
-        macro_adherence_pct: null,
-        weight_delta_kg: null,
-        workout_count_7d: null,
-        data_days: null,
-      },
+  it('falls back to legacy narrative when days[] is missing (v=1 cutover)', () => {
+    const legacy: DashboardCheckIn = {
+      days: [],
+      takeaway: 'Focus this week: protein. Up your protein by 20g/day.',
+      metrics: FULL.metrics,
+      generated_at: FULL.generated_at,
+      narrative: 'Legacy paragraph from v=1 cache row.',
     }
-    render(<CheckInCard checkIn={sparse} />)
-    // 4 metrics each rendered as '—'
-    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(4)
+    render(<CheckInCard checkIn={legacy} />)
+    expect(screen.getByText('Legacy paragraph from v=1 cache row.')).toBeInTheDocument()
+    expect(screen.queryByTestId('check-in-days-table')).not.toBeInTheDocument()
   })
 
   it('drill-down link prefills the Geo chat', () => {
@@ -85,15 +111,20 @@ describe('CheckInCard — FB-R6-10', () => {
     ).getAttribute('href')
     expect(initialHref).toBeTruthy()
 
-    // Re-render with the same props — UUID must NOT regenerate.
     rerender(<CheckInCard checkIn={FULL} />)
     const afterRerenderHref = (
       screen.getByTestId('check-in-drilldown-link') as HTMLAnchorElement
     ).getAttribute('href')
     expect(afterRerenderHref).toBe(initialHref)
 
-    // Re-render with different props (metric update) — UUID still stable.
-    rerender(<CheckInCard checkIn={{ ...FULL, metrics: { ...FULL.metrics, workout_count_7d: 4 } }} />)
+    rerender(
+      <CheckInCard
+        checkIn={{
+          ...FULL,
+          takeaway: 'Focus this week: calories. 200kcal under daily.',
+        }}
+      />
+    )
     const afterPropChangeHref = (
       screen.getByTestId('check-in-drilldown-link') as HTMLAnchorElement
     ).getAttribute('href')

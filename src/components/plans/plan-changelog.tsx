@@ -28,7 +28,7 @@ interface VersionsResponse {
   versions: Array<{
     id: string
     version: number
-    status: string
+    status: 'draft' | 'active' | 'completed' | 'superseded'
     created_at: string
   }>
 }
@@ -131,7 +131,11 @@ export function PlanChangelog({ planId }: { planId: string }) {
                     Version {version.version}
                   </span>
                   <span className="text-xs text-text-tertiary ml-2">{date}</span>
-                  {idx === 0 && (
+                  {/* FB-R6.7 Build G - "Current" badge now reflects actual
+                      status, not list position. Old logic was idx===0 which
+                      put "Current" on whichever row sorted first - frequently
+                      a superseded one when the chain was broken. */}
+                  {version.status === 'active' && (
                     <span className="ml-2 text-[10px] bg-[#34C759]/10 text-[#34C759] px-1.5 py-0.5 rounded-full">
                       Current
                     </span>
@@ -139,6 +143,11 @@ export function PlanChangelog({ planId }: { planId: string }) {
                   {version.status === 'superseded' && (
                     <span className="ml-2 text-[10px] bg-surface text-text-tertiary px-1.5 py-0.5 rounded-full">
                       Superseded
+                    </span>
+                  )}
+                  {version.status === 'draft' && (
+                    <span className="ml-2 text-[10px] bg-[#FF9500]/10 text-[#FF9500] px-1.5 py-0.5 rounded-full">
+                      Draft
                     </span>
                   )}
                 </div>

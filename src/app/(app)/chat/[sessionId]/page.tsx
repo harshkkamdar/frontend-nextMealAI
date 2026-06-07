@@ -10,6 +10,7 @@ import { getChatSession, getChatSessions, sendMessage } from '@/lib/api/chat.api
 import { extractWorkoutProgram, isLikelyWorkoutProgramPrompt } from '@/lib/api/vision.api'
 import { WorkoutProgramPreviewCard } from '@/components/plans/workout-program-preview-card'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { handleGeoToolResults } from '@/lib/sync/dispatch-from-chat'
 import type { AttachedImage, ChatMessage } from '@/types/chat.types'
 import type { WorkoutProgramContent } from '@/types/plans.types'
 
@@ -133,20 +134,20 @@ export default function ActiveChatPage({
       }
       setMessages((prev) => [...prev, geoMessage])
 
-      // Notify if Geo created or updated a plan
-      const planTools = (res.tools_used ?? []).filter(t => t === 'create_plan' || t === 'update_plan')
-      if (planTools.length > 0) {
+      // FB-R6.7 Build B — centralized chat→UI sync. Emits invalidation
+      // topics on syncBus (consuming pages refetch automatically) and
+      // bridges the legacy DOM CustomEvents during the rollout.
+      const { topics, anyFailed } = handleGeoToolResults(res)
+
+      // Suppress the success toast if any tool failed — actions_failed
+      // already surfaces inline in the chat bubble (chat-bubble.tsx:153).
+      const planToolsFired =
+        topics.includes('plans:created') || topics.includes('plans:updated')
+      if (planToolsFired && !anyFailed) {
         toast.success('Plan saved!', {
           description: 'Your plan is ready to view.',
           action: { label: 'View Plans', onClick: () => router.push('/plans') },
         })
-      }
-
-      // FB-R6-08 — Geo deactivated the active plan via the chat tool.
-      // Dispatch an event so Activity + Dashboard refresh their cards
-      // within the same round trip (no extra request from those pages).
-      if ((res.tools_used ?? []).includes('deactivate_active_plan')) {
-        window.dispatchEvent(new CustomEvent('workout:plan-deactivated'))
       }
     } catch {
       toast.error('Failed to send message. Please try again.')

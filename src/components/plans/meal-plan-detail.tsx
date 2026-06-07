@@ -59,8 +59,12 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
         </span>
       </div>
 
-      {/* Daily targets */}
-      {targets && (
+      {/* Daily targets — FB-R6.7 Build B: explicit empty state when targets
+          are missing/zero so the planner never silently renders "0 cal" and
+          fakes a working plan. George's F1(d) reproducer: planner showed
+          calories but macros looked blank — that was the conditional render
+          on `targets && …` returning falsy on partial data. */}
+      {targets && targets.calories > 0 ? (
         <div className="mb-8">
           {/* Calories — hero number */}
           <div className="bg-surface border border-border rounded-2xl p-6 text-center mb-4">
@@ -68,21 +72,19 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
             <p className="text-xs text-text-tertiary mt-1 uppercase tracking-wider">kcal / day</p>
           </div>
 
-          {/* Macros row */}
+          {/* Macros row — show "set this" placeholder per macro if 0/missing */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-surface border border-border rounded-2xl p-5 text-center">
-              <p className="text-2xl font-semibold text-text-primary">{formatMacroGrams(targets.protein)}</p>
-              <p className="text-xs text-text-tertiary mt-1">protein</p>
-            </div>
-            <div className="bg-surface border border-border rounded-2xl p-5 text-center">
-              <p className="text-2xl font-semibold text-text-primary">{formatMacroGrams(targets.carbs)}</p>
-              <p className="text-xs text-text-tertiary mt-1">carbs</p>
-            </div>
-            <div className="bg-surface border border-border rounded-2xl p-5 text-center">
-              <p className="text-2xl font-semibold text-text-primary">{formatMacroGrams(targets.fat)}</p>
-              <p className="text-xs text-text-tertiary mt-1">fat</p>
-            </div>
+            <MacroTile label="protein" value={targets.protein} />
+            <MacroTile label="carbs" value={targets.carbs} />
+            <MacroTile label="fat" value={targets.fat} />
           </div>
+        </div>
+      ) : (
+        <div className="mb-8 bg-surface border border-border rounded-2xl p-6 text-center">
+          <p className="text-sm font-medium text-text-primary mb-1">Targets not set</p>
+          <p className="text-xs text-text-secondary">
+            Ask Geo to set your daily calorie and macro targets.
+          </p>
         </div>
       )}
 
@@ -151,6 +153,20 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
       )}
 
       <PlanChangelog planId={plan.id} />
+    </div>
+  )
+}
+
+function MacroTile({ label, value }: { label: string; value: number | null | undefined }) {
+  const isSet = typeof value === 'number' && value > 0
+  return (
+    <div className="bg-surface border border-border rounded-2xl p-5 text-center">
+      {isSet ? (
+        <p className="text-2xl font-semibold text-text-primary">{formatMacroGrams(value)}</p>
+      ) : (
+        <p className="text-sm font-medium text-text-tertiary">not set</p>
+      )}
+      <p className="text-xs text-text-tertiary mt-1">{label}</p>
     </div>
   )
 }

@@ -1,17 +1,34 @@
 /**
- * FB-R6-10 — Dashboard check-in endpoint.
+ * FB-R6.7 Build C — Dashboard check-in endpoint.
  *
- * BE composes a daily check-in narrative + structured metrics (macro
- * adherence, weight delta, workout count, data days) gated on ≥7 days of
- * activity across ≥2 of (food, weight, workout). Below the gate the BE
- * returns `{ check_in: null }` and the FE falls back to existing
- * onboarding/empty-state cards.
+ * Build C reshape: per-meal-average narrative replaced with a 7-day daily
+ * table + 1-line "Focus this week:" takeaway. Backend payload is v=2.
  *
- * See backend-nextMealAI/docs/feedback/2026-05-20-round-06-plan.md § FB-R6-10.
+ * Back-compat: `metrics` block + optional `narrative` field are kept for one
+ * release so a stale BE cache or older deploy doesn't break the FE.
  */
 
 import { apiFetch } from './client'
 
+export interface DashboardCheckInMacroCell {
+  actual: number
+  target: number
+}
+
+export interface DashboardCheckInDay {
+  /** YYYY-MM-DD in the user's local timezone, oldest → newest. */
+  date: string
+  /** 'Sun' | 'Mon' | … */
+  day_of_week: string
+  calories: DashboardCheckInMacroCell
+  protein: DashboardCheckInMacroCell
+  carbs: DashboardCheckInMacroCell
+  fat: DashboardCheckInMacroCell
+  /** True iff every macro target is positive AND actual is within ±10%. */
+  hit: boolean
+}
+
+/** @deprecated kept one release for FE back-compat. Drop after Build C is live. */
 export interface DashboardCheckInMetrics {
   macro_adherence_pct: number | null
   weight_delta_kg: number | null
@@ -20,9 +37,17 @@ export interface DashboardCheckInMetrics {
 }
 
 export interface DashboardCheckIn {
-  narrative: string
+  /** Build C structured table data. */
+  days: DashboardCheckInDay[]
+  /** Build C ≤25-word focus sentence. */
+  takeaway: string
+  /** Legacy block — present during cutover, drop after Build C is live. */
   metrics: DashboardCheckInMetrics
   generated_at: string
+  /** @deprecated v1 cache rows still flowing through during cutover. */
+  narrative?: string | null
+  /** Cache schema version. Always 2 in Build C. */
+  v?: number
 }
 
 export interface DashboardCheckInResponse {
