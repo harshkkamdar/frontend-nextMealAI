@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { updatePassword } from '@/lib/api/auth.api'
+import { probeResetPasswordLinkLoad } from '@/lib/auth-telemetry'
 
 const resetPasswordSchema = z
   .object({
@@ -61,6 +62,28 @@ function ResetPasswordForm() {
     const accessToken =
       hashParams.get('access_token') ?? searchParams.get('access_token')
     const type = hashParams.get('type') ?? searchParams.get('type')
+
+    // FE-RCA F5 — probe the link-load outcome. The chain (BE env var +
+    // Supabase Redirect URLs allowlist) is invisible from FE code; this
+    // beacon is the only way to detect "user clicked the email link but no
+    // recovery token landed" — the silent-misconfig case Harsh hit twice.
+    const hasHash = hash.length > 0
+    const hasQuery = Array.from(searchParams.keys()).length > 0
+    const noTokenAtAll = !accessToken
+    let outcome: 'valid' | 'invalid' | 'missing'
+    if (accessToken && (type === 'recovery' || type === 'magiclink')) {
+      outcome = 'valid'
+    } else if (noTokenAtAll) {
+      outcome = 'missing'
+    } else {
+      outcome = 'invalid'
+    }
+    probeResetPasswordLinkLoad({
+      outcome,
+      noTokenAtAll,
+      hasHash,
+      hasQuery,
+    })
 
     if (accessToken && (type === 'recovery' || type === 'magiclink')) {
       setLinkState({ status: 'valid', accessToken })
