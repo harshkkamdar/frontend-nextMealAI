@@ -16,9 +16,61 @@ import {
   startCompanionSession,
   sendMessage,
   extractSessionMemories,
+  getChatSession,
 } from '@/lib/api/chat.api'
 import { handleGeoToolResults } from '@/lib/sync/dispatch-from-chat'
 import type { AttachedImage, ChatMessage } from '@/types/chat.types'
+
+// FE-RCA F2 — Companion sheet persistence.
+// Previously, each open of the sheet called setMessages([])+setSessionId(null)
+// and synthesised a fresh BE session, so prior images/messages vanished
+// (Harsh, 2026-05-12: "images disappear in chat after clicking out"). We now
+// stash the most-recent companion session id in localStorage with a 24h TTL
+// and restore it on open. Closing the sheet only unmounts UI — the BE row
+// remains, and reopening rehydrates from the server's signed-URL refresh.
+const COMPANION_SESSION_LS_KEY = 'nextmealai:companion:current-session-id'
+const COMPANION_SESSION_TTL_MS = 24 * 60 * 60 * 1000
+
+interface StoredCompanionSession {
+  session_id: string
+  ts: number
+}
+
+function readStoredCompanionSession(): StoredCompanionSession | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(COMPANION_SESSION_LS_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Partial<StoredCompanionSession>
+    if (!parsed || typeof parsed.session_id !== 'string' || typeof parsed.ts !== 'number') {
+      return null
+    }
+    return { session_id: parsed.session_id, ts: parsed.ts }
+  } catch {
+    return null
+  }
+}
+
+function writeStoredCompanionSession(session_id: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(
+      COMPANION_SESSION_LS_KEY,
+      JSON.stringify({ session_id, ts: Date.now() } satisfies StoredCompanionSession),
+    )
+  } catch {
+    // private mode / quota — silent
+  }
+}
+
+function clearStoredCompanionSession(): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(COMPANION_SESSION_LS_KEY)
+  } catch {
+    // silent
+  }
+}
 
 export function GeoCompanionSheet() {
   const activeSheet = useUIStore((s) => s.activeSheet)
@@ -40,7 +92,10 @@ export function GeoCompanionSheet() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
 
-  // Initialize companion session when sheet opens
+  // Initialize companion session when sheet opens.
+  // FE-RCA F2 — try to restore prior session from localStorage before
+  // creating a new one. If a stored session is fresh (<24h) and the BE
+  // returns its messages, hydrate; otherwise fall through to a new session.
   useEffect(() => {
     if (!isOpen) return
 
@@ -54,9 +109,28 @@ export function GeoCompanionSheet() {
       messageCountRef.current = 0
 
       try {
+        const stored = readStoredCompanionSession()
+        if (stored && Date.now() - stored.ts < COMPANION_SESSION_TTL_MS) {
+          try {
+            const { messages: priorMessages } = await getChatSession(stored.session_id)
+            if (Array.isArray(priorMessages) && priorMessages.length > 0) {
+              setSessionId(stored.session_id)
+              setMessages(priorMessages)
+              messageCountRef.current = priorMessages.length
+              // Refresh the timestamp so an active user keeps their thread.
+              writeStoredCompanionSession(stored.session_id)
+              return
+            }
+          } catch {
+            // BE rejected (session deleted, 404, etc.) — fall through to new
+            clearStoredCompanionSession()
+          }
+        }
+
         const { screen, context } = getScreenContext()
         const res = await startCompanionSession(screen, context)
         setSessionId(res.session_id)
+        writeStoredCompanionSession(res.session_id)
       } catch {
         toast.error('Failed to connect to Geo')
         closeSheet()
@@ -68,6 +142,18 @@ export function GeoCompanionSheet() {
 
     init()
   }, [isOpen, getScreenContext, closeSheet])
+
+  // Explicit "new chat" — clears the persisted session id so the next open
+  // starts fresh. Kept as a local handler in case future UI surfaces wire it.
+  const handleStartNewChat = useCallback(() => {
+    clearStoredCompanionSession()
+    setMessages([])
+    setSessionId(null)
+    messageCountRef.current = 0
+  }, [])
+  // Touch the handler so dead-code lint doesn't flag it; can be wired to a
+  // visible "+ New chat" button in a follow-up UI iteration.
+  void handleStartNewChat
 
   // Extract memories when sheet closes
   const handleClose = useCallback(() => {
