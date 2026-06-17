@@ -3,6 +3,7 @@ import {
   resolveElapsedForSession,
   computeCompleteSetResult,
   computeSelectedPlanDayIndex,
+  nextWorkoutDayIndex,
   deriveWorkoutEntryLabel,
   STALE_SESSION_THRESHOLD_SECONDS,
 } from '../workout-session'
@@ -351,5 +352,34 @@ describe('FB-R6-15 · computeSelectedPlanDayIndex', () => {
     delete plan.current_position
     // current_position undefined → defaults to 0
     expect(computeSelectedPlanDayIndex(plan, TODAY, TODAY)).toBe(0)
+  })
+})
+
+// QA-iter8 (BUG-007) — the Next-up workout is the cursor, DECOUPLED from any
+// calendar date. Unlike computeSelectedPlanDayIndex it takes no date at all:
+// "what should I do next" never depends on what day it is.
+describe('QA-iter8 · nextWorkoutDayIndex (BUG-007 decouple)', () => {
+  it('returns the cursor regardless of date', () => {
+    expect(nextWorkoutDayIndex(makePlan({ cursor: 0 }))).toBe(0)
+    expect(nextWorkoutDayIndex(makePlan({ cursor: 2 }))).toBe(2)
+    expect(nextWorkoutDayIndex(makePlan({ cursor: 5 }))).toBe(5)
+  })
+
+  it('wraps a cursor that exceeds days.length via positive modulo', () => {
+    // 7-day plan, cursor 9 → 9 % 7 = 2
+    expect(nextWorkoutDayIndex(makePlan({ cursor: 9 }))).toBe(2)
+  })
+
+  it('defaults to 0 when current_position is missing (pre-migration-025 plans)', () => {
+    const plan = makePlan({})
+    delete plan.current_position
+    expect(nextWorkoutDayIndex(plan)).toBe(0)
+  })
+
+  it('returns -1 for a plan with no days, or null/undefined', () => {
+    const empty = { content: { days: [] }, current_position: 0 } as unknown as WorkoutPlan
+    expect(nextWorkoutDayIndex(empty)).toBe(-1)
+    expect(nextWorkoutDayIndex(null)).toBe(-1)
+    expect(nextWorkoutDayIndex(undefined)).toBe(-1)
   })
 })
