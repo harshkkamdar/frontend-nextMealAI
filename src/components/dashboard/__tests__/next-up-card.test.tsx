@@ -2,7 +2,7 @@
  * FE-RCA F7 — NextUpCard no longer renders "No meals scheduled today".
  *
  * George (2026-05-20): remove the "No meals scheduled today" empty state.
- * The meal plan only provides daily targets, not per-meal scheduling, so
+ * The nutrition plan only provides daily targets, not per-meal scheduling, so
  * the card was promising a capability the system doesn't deliver.
  *
  * Post-fix: when the plan exists but has no meals scheduled for today, the
@@ -60,11 +60,11 @@ describe('FE-RCA F7 — NextUpCard empty-state removal', () => {
     expect(screen.getByText('Oats with whey')).toBeInTheDocument()
   })
 
-  it('still renders the "no meal plan yet" compact prompt when mealPlan is null', () => {
+  it('still renders the "no nutrition plan yet" compact prompt when mealPlan is null', () => {
     // The prompt to create a plan is a different surface — this is correct UX
     // since the user has no plan at all.
     render(<NextUpCard mealPlan={null} today={TODAY} loggedMealTypes={[]} />)
-    expect(screen.getByText(/No meal plan yet/i)).toBeInTheDocument()
+    expect(screen.getByText(/No nutrition plan yet/i)).toBeInTheDocument()
   })
 
   it('renders the "all meals logged" success state when applicable', () => {

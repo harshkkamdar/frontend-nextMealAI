@@ -74,7 +74,7 @@ export function NextUpCard({
   if (!meal) {
     // FE-RCA F7 — Plan exists but no meal scheduled today.
     // Removed the "No meals scheduled today" empty state per George
-    // (2026-05-20). The meal plan only provides daily targets, not per-meal
+    // (2026-05-20). The nutrition plan only provides daily targets, not per-meal
     // scheduling, so the card was promising capability we don't have.
     // Render nothing — the macros target is already visible in ProgressCard.
     return null
