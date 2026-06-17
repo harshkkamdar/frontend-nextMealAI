@@ -28,10 +28,15 @@ vi.mock('sonner', () => ({
 vi.mock('@/lib/api/foods.api', () => ({
   estimateFoodFromPhoto: (...args: unknown[]) => mocks.estimate(...args),
   logFromEstimate: (...args: unknown[]) => mocks.logFromEstimate(...args),
+  // BUG-009 — the page now searches the food DB; tests never type so this
+  // resolves to no results, but the export must exist on the mocked module.
+  searchFoods: () => Promise.resolve([]),
 }))
 
 vi.mock('@/lib/api/logs.api', () => ({
   createLog: (...args: unknown[]) => mocks.createLog(...args),
+  // BUG-009 — multi-add commit fans out via createLogs; present for shape.
+  createLogs: (...args: unknown[]) => mocks.createLog(...args),
 }))
 
 import { FoodLogForm } from '@/components/logs/food-log-form'
