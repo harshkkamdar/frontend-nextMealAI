@@ -119,13 +119,25 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
       const servingSize = payload.servings && payload.quantity_g
         ? Math.round(payload.quantity_g / payload.servings)
         : null
+      // payload.est_macros is the TOTAL for the logged amount, but the
+      // confirmation view multiplies macros_per_serving × servings. So for a
+      // multi-serving entry we must store the PER-SERVING macros here, else
+      // opening the editor (and re-saving) doubles/compounds the calories.
+      const editServings =
+        typeof payload.servings === 'number' && payload.servings > 0 ? payload.servings : 1
+      const totalMacros = payload.est_macros ?? { calories: 0, protein: 0, carbs: 0, fat: 0 }
       setSelectedFood({
         id: payload.user_food_id ?? null,
         usda_fdc_id: undefined,
         name: payload.food_name,
         brand: undefined,
         serving_size_g: servingSize ?? payload.quantity_g ?? 100,
-        macros_per_serving: payload.est_macros ?? { calories: 0, protein: 0, carbs: 0, fat: 0 },
+        macros_per_serving: {
+          calories: (totalMacros.calories ?? 0) / editServings,
+          protein: (totalMacros.protein ?? 0) / editServings,
+          carbs: (totalMacros.carbs ?? 0) / editServings,
+          fat: (totalMacros.fat ?? 0) / editServings,
+        },
         source: 'personal',
         is_favorite: false,
         use_count: 0,
