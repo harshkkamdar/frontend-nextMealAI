@@ -13,11 +13,13 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
+import { getProfile } from '@/lib/api/profile.api'
 import { todayLocalISO } from '@/lib/timezone'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { formatWeekMonthLabel } from '@/lib/month-label'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import type { MealPlan } from '@/types/plans.types'
+import type { Profile } from '@/types/profile.types'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
@@ -43,6 +45,7 @@ export default function DiaryPage() {
   }, [tz])
   const [logs, setLogs] = useState<Log[]>([])
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedMealType, setSelectedMealType] = useState<string>('Breakfast')
@@ -52,20 +55,36 @@ export default function DiaryPage() {
   const router = useRouter()
   useSetGeoScreen('food_diary', { selectedDate })
 
+  // How many days back to load so the SELECTED date's logs are included.
+  // getLogs only does lookback-from-now, so the old fixed 7-day window made
+  // any date older than a week render empty even when the user logged then
+  // (you could scroll/jump the calendar back but the data was never fetched).
+  // Floor at 30 so ordinary week-to-week navigation never refetches (no
+  // skeleton flash); the window only grows when the user jumps further back.
+  const today = todayLocalISO(tz)
+  const neededDays = useMemo(() => {
+    const diff = Math.round((Date.parse(today) - Date.parse(selectedDate)) / 86_400_000)
+    return Math.max(30, (Number.isFinite(diff) ? diff : 0) + 7)
+  }, [today, selectedDate])
+  const firstLoadRef = useRef(true)
+
   const fetchData = useCallback(async () => {
-    setLoading(true)
+    if (firstLoadRef.current) setLoading(true)
     try {
-      const [logsRes, plansRes] = await Promise.all([
-        getLogs({ type: 'food', days: 7 }).catch(() => [] as Log[]),
-        getPlans({ type: 'meal', active_only: true }).catch(() => [])
+      const [logsRes, plansRes, profileRes] = await Promise.all([
+        getLogs({ type: 'food', days: neededDays }).catch(() => [] as Log[]),
+        getPlans({ type: 'meal', active_only: true }).catch(() => []),
+        getProfile().catch(() => null)
       ])
       setLogs(logsRes)
       const meal = plansRes.find((p) => p.type === 'meal') as MealPlan | undefined
       setMealPlan(meal ?? null)
+      setProfile(profileRes)
     } finally {
       setLoading(false)
+      firstLoadRef.current = false
     }
-  }, [])
+  }, [neededDays])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -117,7 +136,16 @@ export default function DiaryPage() {
     return { calories, protein, carbs, fat }
   }, [dayLogs])
 
-  const targets = mealPlan?.content?.daily_targets ?? { calories: 2000, protein: 150, carbs: 250, fat: 65 }
+  // Targets: active nutrition plan first, then the user's profile targets, then
+  // 0 (MacroProgress drops the "left" suffix gracefully). No hardcoded numbers —
+  // a 2000-cal default was wrong for anyone whose real target differs.
+  const planTargets = mealPlan?.content?.daily_targets
+  const targets = {
+    calories: planTargets?.calories ?? profile?.daily_calorie_target ?? 0,
+    protein: planTargets?.protein ?? profile?.daily_protein_g ?? 0,
+    carbs: planTargets?.carbs ?? profile?.daily_carbs_g ?? 0,
+    fat: planTargets?.fat ?? profile?.daily_fat_g ?? 0,
+  }
 
   // FB-07: month label for the current ±3 day window
   const weekLabel = useMemo(() => {
