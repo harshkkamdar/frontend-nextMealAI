@@ -38,6 +38,10 @@ export function FoodLogForm() {
   const [results, setResults] = useState<FoodSearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [pending, setPending] = useState<FoodDraft[]>([])
+  // Personal-food id of the currently-selected search result, so a DB-sourced
+  // food stays linked (enables recents/favorites/dedup) instead of being logged
+  // as free text. Cleared when the user manually edits the name (decouples).
+  const [userFoodId, setUserFoodId] = useState<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // FB-R6-13 — Photo estimate flow. When estimateId is set, Save calls
@@ -74,6 +78,7 @@ export function FoodLogForm() {
     setProtein('')
     setCarbs('')
     setFat('')
+    setUserFoodId(null)
     clearEstimate()
   }
 
@@ -88,6 +93,9 @@ export function FoodLogForm() {
     setProtein(m.protein ? Math.round(m.protein) : '')
     setCarbs(m.carbs ? Math.round(m.carbs) : '')
     setFat(m.fat ? Math.round(m.fat) : '')
+    // Link to the personal food DB when this is a saved food (USDA results
+    // have no personal id → stays null and logs as free text, as before).
+    setUserFoodId(food.source === 'personal' ? food.id ?? null : null)
     clearEstimate()
     setQuery('')
     setResults([])
@@ -103,6 +111,7 @@ export function FoodLogForm() {
       fat: typeof fat === 'number' ? fat : undefined,
     },
     meal_type: mealType || undefined,
+    user_food_id: userFoodId || undefined,
   })
 
   // Stage the current form as one item and reset for the next (keep meal type).
@@ -231,6 +240,7 @@ export function FoodLogForm() {
               fat: fat || undefined,
             },
             meal_type: mealType || undefined,
+            user_food_id: userFoodId || undefined,
           },
           source: 'manual',
         })
@@ -384,7 +394,7 @@ export function FoodLogForm() {
             type="text"
             placeholder="e.g. Grilled chicken breast"
             value={foodName}
-            onChange={(e) => setFoodName(e.target.value)}
+            onChange={(e) => { setFoodName(e.target.value); setUserFoodId(null) }}
           />
         </div>
 

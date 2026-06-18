@@ -144,8 +144,13 @@ export default function ActivityPage() {
   }, [history, selectedDate, tz])
 
   // Most recent completed session — a quick "last time" glance above history.
+  // Sort by completed_at desc rather than trusting the endpoint's order.
   const lastSession = useMemo(
-    () => history.filter((s) => s.status === 'completed' && s.completed_at)[0] ?? null,
+    () =>
+      history
+        .filter((s) => s.status === 'completed' && s.completed_at)
+        .sort((a, b) => new Date(b.completed_at!).getTime() - new Date(a.completed_at!).getTime())[0] ??
+      null,
     [history]
   )
 
