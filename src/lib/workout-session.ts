@@ -147,6 +147,31 @@ export function computeSelectedPlanDayIndex(
 }
 
 /**
+ * QA-iter8 (BUG-007 "workouts still tied to days") — the next workout in the
+ * program, DECOUPLED from the calendar.
+ *
+ * Returns the normalized cursor `plan.current_position mod days.length`: the
+ * day the user should do NEXT, regardless of today's date. Workouts are a
+ * sequence you progress through at your own pace — not a fixed weekly calendar.
+ * The Activity "Next up" card uses THIS so the workout shown never changes as
+ * the user scrolls the history calendar (the prior bug:
+ * computeSelectedPlanDayIndex projected the sequence onto calendar dates, so
+ * tomorrow appeared to have a different "scheduled" workout — exactly the
+ * day-coupling testers flagged).
+ *
+ * Returns -1 when the plan has no days. Pure helper for unit testability.
+ */
+export function nextWorkoutDayIndex(
+  plan: Pick<WorkoutPlan, 'content' | 'current_position'> | null | undefined
+): number {
+  const days = plan?.content?.days
+  if (!days || days.length === 0) return -1
+  const total = days.length
+  const cursor = plan?.current_position ?? 0
+  return ((cursor % total) + total) % total
+}
+
+/**
  * FB-R6-16+17 — Decide whether a Start Workout entry point should read
  * "Start Workout" or "Resume Workout".
  *

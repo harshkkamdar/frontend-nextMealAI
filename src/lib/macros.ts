@@ -34,6 +34,30 @@ export function formatMacroKcal(value: number | null | undefined): string {
   return String(roundMacroKcalNumber(value))
 }
 
+/**
+ * FE-RCA F4 — quantize a macro tuple at the persistence boundary so the DB
+ * never sees the unrounded multiplication artifact (e.g. 117.99999999999999
+ * from a 1.0-serving edit round-trip). Mirrors the render-side rounding rules
+ * exactly: kcal → integer, protein/carbs/fat → 1 decimal. Pairs with the
+ * backend `roundMacros` helper for defense-in-depth.
+ */
+export interface MacroTuple {
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+}
+
+export function quantizeMacros(m: Partial<MacroTuple> | null | undefined): MacroTuple {
+  const src = m ?? {}
+  return {
+    calories: roundMacroKcalNumber(src.calories),
+    protein: roundMacroGramsNumber(src.protein),
+    carbs: roundMacroGramsNumber(src.carbs),
+    fat: roundMacroGramsNumber(src.fat),
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // FB-06 — per-macro contribution aggregator for the drill-in breakdown sheet.
 //

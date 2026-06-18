@@ -284,10 +284,17 @@ export default function DashboardPage() {
   const mealPlan = (plans.find((p) => p.type === 'meal') as MealPlan) ?? null
   const workoutPlan = (plans.find((p) => p.type === 'workout') as WorkoutPlan) ?? null
 
+  // FE-RCA F1 — Dashboard/Diary divergence fix.
+  // Previous: fell back to `summary?.daily_breakdown?.[0]` when today had no
+  // bucket. Because the BE orders daily_breakdown by created_at ASC ([0] is
+  // the EARLIEST day), this rendered yesterday's calories as if they were
+  // today's. Diary, correctly filtering by local_date, showed 0. The user
+  // saw two different answers and trust collapsed.
+  // Cure: only the today-bucket counts. No row → zero. Matches Diary's
+  // strict-equality filter exactly.
   const dailyBreakdown = summary?.daily_breakdown?.find((d) => d.date === today)
-    ?? summary?.daily_breakdown?.[0]
-  const caloriesConsumed = dailyBreakdown?.calories ?? summary?.summary?.avg_daily_calories ?? 0
-  const proteinConsumed = dailyBreakdown?.protein ?? summary?.summary?.avg_daily_protein ?? 0
+  const caloriesConsumed = dailyBreakdown?.calories ?? 0
+  const proteinConsumed = dailyBreakdown?.protein ?? 0
   const carbsConsumed = dailyBreakdown?.carbs ?? 0
   const fatConsumed = dailyBreakdown?.fat ?? 0
 
@@ -423,6 +430,14 @@ export default function DashboardPage() {
           {nudges.map((nudge) => (
             <NudgeCard key={nudge.type} nudge={nudge} onAction={handleNudgeAction} />
           ))}
+          {/* FE-RCA F8 — macros above training, per George (2026-06-09). */}
+          <ProgressCard
+            calories={{ consumed: caloriesConsumed, target: caloriesTarget }}
+            protein={{ consumed: proteinConsumed, target: proteinTarget }}
+            carbs={{ consumed: carbsConsumed, target: carbsTarget }}
+            fat={{ consumed: fatConsumed, target: fatTarget }}
+            foodLogs={todayLogs.filter((l) => l.type === 'food')}
+          />
           <NextUpCard
             mealPlan={mealPlan}
             today={today}
@@ -433,13 +448,6 @@ export default function DashboardPage() {
             }}
           />
           <WorkoutCard workoutPlan={workoutPlan} today={today} />
-          <ProgressCard
-            calories={{ consumed: caloriesConsumed, target: caloriesTarget }}
-            protein={{ consumed: proteinConsumed, target: proteinTarget }}
-            carbs={{ consumed: carbsConsumed, target: carbsTarget }}
-            fat={{ consumed: fatConsumed, target: fatTarget }}
-            foodLogs={todayLogs.filter((l) => l.type === 'food')}
-          />
           <QuickStats
             water={water}
             mood={mood}

@@ -1,18 +1,22 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, MessageCircle, Camera, Loader2, Sparkles } from 'lucide-react'
+import { X, MessageCircle, Camera, Loader2, Sparkles, Search, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { createLog } from '@/lib/api/logs.api'
+import { createLog, createLogs } from '@/lib/api/logs.api'
 import {
   estimateFoodFromPhoto,
   logFromEstimate,
+  searchFoods,
   type FoodEstimate,
 } from '@/lib/api/foods.api'
+import { buildFoodLogItems, type FoodDraft } from '@/lib/food-log'
+import { formatMacroKcal } from '@/lib/macros'
+import type { FoodSearchResult } from '@/types/foods.types'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
 
@@ -27,12 +31,101 @@ export function FoodLogForm() {
   const [carbs, setCarbs] = useState<number | ''>('')
   const [fat, setFat] = useState<number | ''>('')
 
+  // BUG-009 — database search + multi-add. The dedicated Log Food page now
+  // searches the food DB (so users don't have to type macros by hand) and lets
+  // them stage SEVERAL items before committing them as one meal via createLogs.
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<FoodSearchResult[]>([])
+  const [searching, setSearching] = useState(false)
+  const [pending, setPending] = useState<FoodDraft[]>([])
+  // Personal-food id of the currently-selected search result, so a DB-sourced
+  // food stays linked (enables recents/favorites/dedup) instead of being logged
+  // as free text. Cleared when the user manually edits the name (decouples).
+  const [userFoodId, setUserFoodId] = useState<string | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   // FB-R6-13 — Photo estimate flow. When estimateId is set, Save calls
   // log-from-estimate (with edits) instead of the regular createLog path.
   const [estimating, setEstimating] = useState(false)
   const [estimateId, setEstimateId] = useState<string | null>(null)
   const [estimateConfidence, setEstimateConfidence] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [])
+
+  const handleSearch = useCallback((q: string) => {
+    setQuery(q)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (q.trim().length < 2) { setResults([]); return }
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true)
+      try {
+        setResults(await searchFoods(q.trim()))
+      } catch {
+        setResults([])
+      } finally {
+        setSearching(false)
+      }
+    }, 300)
+  }, [])
+
+  const clearForm = () => {
+    setFoodName('')
+    setQuantityG('')
+    setCalories('')
+    setProtein('')
+    setCarbs('')
+    setFat('')
+    setUserFoodId(null)
+    clearEstimate()
+  }
+
+  // Tap a search result → prefill the form with its per-serving values so the
+  // user can adjust quantity/macros or log immediately. Macros correspond to
+  // serving_size_g (absolute for that quantity), matching the createLog shape.
+  const handleSelectResult = (food: FoodSearchResult) => {
+    const m = food.macros_per_serving
+    setFoodName(food.name)
+    setQuantityG(food.serving_size_g || 100)
+    setCalories(m.calories ? Math.round(m.calories) : '')
+    setProtein(m.protein ? Math.round(m.protein) : '')
+    setCarbs(m.carbs ? Math.round(m.carbs) : '')
+    setFat(m.fat ? Math.round(m.fat) : '')
+    // Link to the personal food DB when this is a saved food (USDA results
+    // have no personal id → stays null and logs as free text, as before).
+    setUserFoodId(food.source === 'personal' ? food.id ?? null : null)
+    clearEstimate()
+    setQuery('')
+    setResults([])
+  }
+
+  const currentDraft = (): FoodDraft => ({
+    food_name: foodName.trim(),
+    quantity_g: typeof quantityG === 'number' ? quantityG : undefined,
+    est_macros: {
+      calories: typeof calories === 'number' ? calories : undefined,
+      protein: typeof protein === 'number' ? protein : undefined,
+      carbs: typeof carbs === 'number' ? carbs : undefined,
+      fat: typeof fat === 'number' ? fat : undefined,
+    },
+    meal_type: mealType || undefined,
+    user_food_id: userFoodId || undefined,
+  })
+
+  // Stage the current form as one item and reset for the next (keep meal type).
+  const handleAddAnother = () => {
+    if (!foodName.trim()) { toast.error('Add a food first'); return }
+    setPending((p) => [...p, currentDraft()])
+    clearForm()
+    setQuery('')
+    setResults([])
+  }
+
+  const handleRemovePending = (idx: number) => {
+    setPending((p) => p.filter((_, i) => i !== idx))
+  }
 
   const populateFromEstimate = (est: FoodEstimate) => {
     if (est.error === 'no_food_identified' || est.items.length === 0) {
@@ -73,6 +166,31 @@ export function FoodLogForm() {
   }
 
   const handleSave = async () => {
+    // BUG-009 — multi-add commit. When items are staged (and we're not in the
+    // photo-estimate path), log the whole meal in one batch.
+    if (!estimateId && pending.length > 0) {
+      const items = buildFoodLogItems(pending, foodName.trim() ? currentDraft() : null)
+      if (items.length === 0) { toast.error('Nothing to log'); return }
+      setSaving(true)
+      try {
+        const { created, failures } = await createLogs(items)
+        if (failures.length === 0) {
+          toast.success(items.length === 1 ? 'Food logged' : `Logged ${created.length} items`)
+        } else if (created.length > 0) {
+          toast.error(`Logged ${created.length} of ${items.length} items — some failed`)
+        } else {
+          toast.error('Failed to log meal')
+          return
+        }
+        router.back()
+      } catch {
+        toast.error('Failed to log food')
+      } finally {
+        setSaving(false)
+      }
+      return
+    }
+
     if (!foodName.trim()) {
       toast.error('Food name is required')
       return
@@ -122,6 +240,7 @@ export function FoodLogForm() {
               fat: fat || undefined,
             },
             meal_type: mealType || undefined,
+            user_food_id: userFoodId || undefined,
           },
           source: 'manual',
         })
@@ -134,6 +253,9 @@ export function FoodLogForm() {
       setSaving(false)
     }
   }
+
+  const hasCurrent = foodName.trim().length > 0
+  const totalCount = pending.length + (hasCurrent ? 1 : 0)
 
   return (
     <div>
@@ -202,6 +324,51 @@ export function FoodLogForm() {
         </div>
       )}
 
+      {/* BUG-009 — food database search. Tap a result to prefill the form. */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
+          <Input
+            type="text"
+            value={query}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Search foods…"
+            className="pl-9"
+            data-testid="food-search-input"
+          />
+        </div>
+        {(searching || results.length > 0) && (
+          <div className="mt-2 rounded-xl border border-border bg-surface overflow-hidden">
+            {searching && (
+              <div className="flex justify-center py-4">
+                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+            {!searching && results.map((food, i) => (
+              <button
+                key={food.id ?? `usda-${food.usda_fdc_id ?? i}`}
+                type="button"
+                onClick={() => handleSelectResult(food)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-surface-hover transition-colors border-b border-border last:border-b-0"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-text-primary truncate">{food.name}</p>
+                  <p className="text-[11px] text-text-tertiary">
+                    {formatMacroKcal(food.macros_per_serving.calories)} cal
+                    {food.serving_size_g ? ` · per ${food.serving_size_g}g` : ''}
+                    {food.brand ? ` · ${food.brand}` : ''}
+                    {food.source === 'usda' && ' · USDA'}
+                  </p>
+                </div>
+                <div className="w-7 h-7 rounded-full bg-accent-light flex items-center justify-center shrink-0">
+                  <Plus className="w-4 h-4 text-accent" />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Meal type chips */}
       <div className="flex gap-2 mb-6 overflow-x-auto">
         {MEAL_TYPES.map((type) => (
@@ -227,7 +394,7 @@ export function FoodLogForm() {
             type="text"
             placeholder="e.g. Grilled chicken breast"
             value={foodName}
-            onChange={(e) => setFoodName(e.target.value)}
+            onChange={(e) => { setFoodName(e.target.value); setUserFoodId(null) }}
           />
         </div>
 
@@ -291,14 +458,62 @@ export function FoodLogForm() {
         </button>
       </div>
 
-      {/* Save */}
-      <Button
-        onClick={handleSave}
-        disabled={saving}
-        className="w-full bg-accent hover:bg-accent-hover text-white mt-6"
-      >
-        {saving ? 'Saving...' : 'Save'}
-      </Button>
+      {/* BUG-009 — staged meal tray (multi-select). Review/remove before logging. */}
+      {pending.length > 0 && (
+        <div className="mt-5 bg-surface border border-border rounded-xl p-3 space-y-2" data-testid="food-meal-tray">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary">
+            In this meal · {pending.length}
+          </p>
+          <ul className="space-y-1.5">
+            {pending.map((item, idx) => (
+              <li key={`pending-${idx}-${item.food_name}`} className="flex items-center justify-between gap-2 text-sm">
+                <div className="min-w-0 flex-1">
+                  <p className="text-text-primary truncate">{item.food_name}</p>
+                  <p className="text-[11px] text-text-tertiary tabular-nums">
+                    {item.quantity_g ? `${item.quantity_g}g` : 'qty —'}
+                    {item.est_macros.calories ? ` · ${formatMacroKcal(item.est_macros.calories)} cal` : ''}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemovePending(idx)}
+                  aria-label={`Remove ${item.food_name}`}
+                  className="p-1 text-text-tertiary hover:text-destructive shrink-0"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Actions — "Add another" stages the current item; Save logs everything.
+          Add another is hidden in the photo-estimate path (single compound log). */}
+      <div className="flex gap-2 mt-6">
+        {!estimateId && (
+          <Button
+            variant="outline"
+            onClick={handleAddAnother}
+            disabled={saving || !hasCurrent}
+            className="flex-1"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Add another
+          </Button>
+        )}
+        <Button
+          onClick={handleSave}
+          disabled={saving || (totalCount === 0)}
+          className="flex-1 bg-accent hover:bg-accent-hover text-white"
+        >
+          {saving
+            ? 'Saving...'
+            : pending.length > 0
+              ? `Log meal (${totalCount})`
+              : 'Save'}
+        </Button>
+      </div>
     </div>
   )
 }

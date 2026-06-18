@@ -5,6 +5,7 @@ import {
   roundMacroGramsNumber,
   roundMacroKcalNumber,
   computeMacroContributions,
+  quantizeMacros,
 } from '@/lib/macros'
 import type { Log } from '@/types/logs.types'
 
@@ -180,5 +181,64 @@ describe('computeMacroContributions', () => {
     // total = 240 + 200 + 120 + 95 = 655 → 37, 31, 18, 15 (rounded)
     expect(rows[0]).toEqual({ id: 'a', name: 'Chicken breast', value: 240, pct: 37 })
     expect(rows.map((r) => r.name)).toEqual(['Chicken breast', 'Rice', 'Olive oil', 'Apple'])
+  })
+})
+
+// FE-RCA F4 — quantizeMacros at the persistence boundary
+describe('quantizeMacros', () => {
+  it('rounds the classic 0.1 + 0.2 float artifact cleanly', () => {
+    // The literal float drift case from the RCA repro.
+    const raw = { calories: 0.1 + 0.2, protein: 24, carbs: 2, fat: 1 }
+    expect(quantizeMacros(raw)).toEqual({
+      calories: 0,         // 0.30… rounds to 0 for kcal (integer)
+      protein: 24,
+      carbs: 2,
+      fat: 1,
+    })
+  })
+
+  it('eliminates the 117.99999999999999 round-trip artifact', () => {
+    // The exact pattern the RCA called out: a 1.0-serving edit re-multiplies
+    // the per-serving macros and the unrounded product replaces the prior
+    // (clean) DB value.
+    const perServing = { calories: 117.99999999999999, protein: 24, carbs: 2, fat: 1 }
+    const recomputed = {
+      calories: perServing.calories * 1,
+      protein: perServing.protein * 1,
+      carbs: perServing.carbs * 1,
+      fat: perServing.fat * 1,
+    }
+    expect(quantizeMacros(recomputed)).toEqual({
+      calories: 118,
+      protein: 24,
+      carbs: 2,
+      fat: 1,
+    })
+  })
+
+  it('keeps protein/carbs/fat at one decimal place', () => {
+    expect(quantizeMacros({ calories: 100, protein: 24.55, carbs: 30.04, fat: 5.45 }))
+      .toEqual({ calories: 100, protein: 24.6, carbs: 30, fat: 5.5 })
+  })
+
+  it('coerces null, undefined, NaN, Infinity, negative to 0', () => {
+    expect(quantizeMacros(null)).toEqual({ calories: 0, protein: 0, carbs: 0, fat: 0 })
+    expect(quantizeMacros(undefined)).toEqual({ calories: 0, protein: 0, carbs: 0, fat: 0 })
+    expect(quantizeMacros({
+      calories: Number.NaN,
+      protein: Number.POSITIVE_INFINITY,
+      carbs: -5,
+      fat: undefined as unknown as number,
+    })).toEqual({ calories: 0, protein: 0, carbs: 0, fat: 0 })
+  })
+
+  it('agrees with the render layer (formatMacroKcal, formatMacroGrams)', () => {
+    // Defense in depth: the render layer rounds and the persistence
+    // boundary rounds — both must agree. Otherwise the DB and the UI
+    // can still drift.
+    const raw = { calories: 117.9999, protein: 24.55, carbs: 30.04, fat: 5.45 }
+    const q = quantizeMacros(raw)
+    expect(formatMacroKcal(q.calories)).toBe(String(q.calories))
+    expect(formatMacroGrams(q.protein)).toContain(String(q.protein))
   })
 })

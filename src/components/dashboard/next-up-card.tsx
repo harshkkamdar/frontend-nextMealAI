@@ -5,6 +5,11 @@ import Link from 'next/link'
 import type { MealPlan } from '@/types/plans.types'
 import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 
+// FE-RCA F7 — "No meals scheduled today" empty state removed per George
+// (2026-05-20). The card silently renders nothing when the plan has no
+// meals for today instead of promising a capability the product doesn't
+// deliver (per-meal scheduling).
+
 export function NextUpCard({
   mealPlan,
   today,
@@ -67,27 +72,12 @@ export function NextUpCard({
   }
 
   if (!meal) {
-    // Plan exists but no meal scheduled today
-    const targets = mealPlan.content?.daily_targets
-    return (
-      <div className="bg-gradient-to-br from-accent-light via-[#FEE8DE] to-accent-light rounded-2xl p-5">
-        <div className="flex items-center gap-1.5 mb-2">
-          <UtensilsCrossed className="w-4 h-4 text-accent" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">Next up</span>
-        </div>
-        <p className="text-[17px] font-semibold text-text-primary mb-1">No meals scheduled today</p>
-        <p className="text-xs text-text-secondary mb-3">
-          {targets ? `Target: ${formatMacroKcal(targets.calories)} cal · ${formatMacroGrams(targets.protein)} protein` : 'Log your meals manually.'}
-        </p>
-        <Link
-          href="/logs/new/food"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
-        >
-          <Check className="w-4 h-4" />
-          Log a meal
-        </Link>
-      </div>
-    )
+    // FE-RCA F7 — Plan exists but no meal scheduled today.
+    // Removed the "No meals scheduled today" empty state per George
+    // (2026-05-20). The nutrition plan only provides daily targets, not per-meal
+    // scheduling, so the card was promising capability we don't have.
+    // Render nothing — the macros target is already visible in ProgressCard.
+    return null
   }
 
   return (

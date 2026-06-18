@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Search, Star, X, Plus, Minus, MessageCircle } from 'lucide-react'
+import { Search, Star, X, Plus, Minus, MessageCircle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
-import { createLog, updateLog, deleteLog } from '@/lib/api/logs.api'
-import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
+import { createLog, createLogs, updateLog, deleteLog } from '@/lib/api/logs.api'
+import type { CreateLogInput } from '@/types/logs.types'
+import { formatMacroGrams, formatMacroKcal, quantizeMacros } from '@/lib/macros'
 import type { FoodSearchResult } from '@/types/foods.types'
 import type { Log, FoodPayload } from '@/types/logs.types'
 
@@ -90,6 +91,17 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
   const [customFat, setCustomFat] = useState<number | ''>('')
   const [customServingG, setCustomServingG] = useState<number | ''>(100)
   const [recentFoods, setRecentFoods] = useState<FoodSearchResult[]>([])
+  // FE-RCA F3 — multi-select pending tray. Each entry carries enough state
+  // to reconstruct a CreateLogInput at commit time. The atom of work the
+  // user expresses ("log breakfast") commits as N rows via createLogs().
+  const [pending, setPending] = useState<Array<{
+    food: FoodSearchResult
+    inputMode: 'servings' | 'grams'
+    servings: number
+    grams: number
+    quantity_g: number
+    est_macros: { calories: number; protein: number; carbs: number; fat: number }
+  }>>([])
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -146,6 +158,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
     setCustomCarbs('')
     setCustomFat('')
     setCustomServingG(100)
+    setPending([])  // FE-RCA F3 — clear pending tray on each fresh open
     setTimeout(() => inputRef.current?.focus(), 300)
     getRecentFoods(8).then((foods) =>
       setRecentFoods(foods.map((f) => ({
@@ -207,31 +220,122 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
     setInputMode('servings')
   }
 
-  const handleConfirmLog = async () => {
-    if (!selectedFood) return
-    setSaving(true)
-
+  // Shared payload builder used by handleConfirmLog, handleAddToMeal, and
+  // handleCommitMeal so the three paths cannot diverge.
+  const buildFoodPayload = (): FoodPayload | null => {
+    if (!selectedFood || !calculatedMacros) return null
     const quantity = inputMode === 'servings'
       ? Math.round((selectedFood.serving_size_g || 100) * servings)
       : Math.round(grams || 0)
+    return {
+      food_name: selectedFood.name,
+      quantity_g: quantity,
+      // FE-RCA F4 — quantize at the persistence boundary, not just at render.
+      est_macros: quantizeMacros(calculatedMacros),
+      meal_type: mealType.toLowerCase(),
+      user_food_id: selectedFood.id || undefined,
+      servings: inputMode === 'servings' ? servings : undefined,
+    }
+  }
 
+  const handleConfirmLog = async () => {
+    // FE-RCA F3 — if there's a non-empty pending tray, the user wants the
+    // multi-item meal commit. Otherwise (or if they just searched + tapped
+    // one food), commit the single selection.
+    if (pending.length > 0) {
+      return handleCommitMeal()
+    }
+    if (!selectedFood) return
+    const payload = buildFoodPayload()
+    if (!payload) return
+
+    setSaving(true)
     try {
-      await createLog({
-        type: 'food',
-        payload: {
-          food_name: selectedFood.name,
-          quantity_g: quantity,
-          est_macros: calculatedMacros!,
-          meal_type: mealType.toLowerCase(),
-          user_food_id: selectedFood.id || undefined,
-          servings: inputMode === 'servings' ? servings : undefined,
-        },
-        source: 'manual',
-      })
+      await createLog({ type: 'food', payload, source: 'manual' })
       toast.success(`${selectedFood.name} logged`)
       onFoodLogged()
     } catch {
       toast.error('Failed to log food')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // FE-RCA F3 — adds the current confirmation view's food to the pending tray
+  // and returns to the search view so the user can keep adding. Does NOT
+  // commit to the BE.
+  const handleAddToMeal = () => {
+    if (!selectedFood || !calculatedMacros) return
+    const quantity = inputMode === 'servings'
+      ? Math.round((selectedFood.serving_size_g || 100) * servings)
+      : Math.round(grams || 0)
+    setPending((prev) => [
+      ...prev,
+      {
+        food: selectedFood,
+        inputMode,
+        servings,
+        grams: typeof grams === 'number' ? grams : selectedFood.serving_size_g || 100,
+        quantity_g: quantity,
+        est_macros: quantizeMacros(calculatedMacros),
+      },
+    ])
+    // Return to search for the next item.
+    setSelectedFood(null)
+    setQuery('')
+    setResults([])
+    setServings(1)
+    setInputMode('servings')
+    setGrams(100)
+    setTimeout(() => inputRef.current?.focus(), 50)
+  }
+
+  const handleRemovePendingItem = (idx: number) => {
+    setPending((prev) => prev.filter((_, i) => i !== idx))
+  }
+
+  // FE-RCA F3 — commits all pending tray items plus the currently-selected
+  // food (if any) as one batch via createLogs(). Uses the API client's batch
+  // surface, which today fans out to N parallel createLog calls but will
+  // switch to BE Phase 6a `/v1/logs/batch` once the plural endpoint ships
+  // without changing any caller.
+  const handleCommitMeal = async () => {
+    const items: CreateLogInput[] = pending.map((p) => ({
+      type: 'food',
+      payload: {
+        food_name: p.food.name,
+        quantity_g: p.quantity_g,
+        est_macros: p.est_macros,
+        meal_type: mealType.toLowerCase(),
+        user_food_id: p.food.id || undefined,
+        servings: p.inputMode === 'servings' ? p.servings : undefined,
+      },
+      source: 'manual',
+    }))
+    // Include the currently-selected (un-added) food if present.
+    const selectedPayload = buildFoodPayload()
+    if (selectedPayload) {
+      items.push({ type: 'food', payload: selectedPayload, source: 'manual' })
+    }
+    if (items.length === 0) return
+
+    setSaving(true)
+    try {
+      const { created, failures } = await createLogs(items)
+      if (failures.length === 0) {
+        toast.success(
+          items.length === 1
+            ? `${(items[0].payload as FoodPayload).food_name} logged`
+            : `Logged ${created.length} items`,
+        )
+      } else if (created.length > 0) {
+        toast.error(`Logged ${created.length} of ${items.length} items — some failed`)
+      } else {
+        toast.error('Failed to log meal')
+      }
+      onFoodLogged()
+    } catch {
+      toast.error('Failed to log meal')
     } finally {
       setSaving(false)
     }
@@ -243,7 +347,14 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
     const quantity = inputMode === 'servings'
       ? Math.round((selectedFood.serving_size_g || 100) * servings)
       : Math.round((typeof grams === 'number' ? grams : 0))
-    const macros = calculatedMacros ?? (existingLog.payload as FoodPayload).est_macros ?? { calories: 0, protein: 0, carbs: 0, fat: 0 }
+    // FE-RCA F4 — quantize at the persistence boundary. Previously a no-op edit
+    // wrote `calculatedMacros` directly (unrounded floats), so a 1.0-serving
+    // re-save round-tripped `118` as `117.99999999999999` in the DB while the
+    // render layer rounded it back to 118. Dashboards aggregating the noisy
+    // float diverged from the display.
+    const macros = quantizeMacros(
+      calculatedMacros ?? (existingLog.payload as FoodPayload).est_macros ?? null
+    )
     const updated: Partial<FoodPayload> = {
       quantity_g: quantity,
       servings: inputMode === 'servings' ? servings : undefined,
@@ -284,12 +395,14 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
     }
     setSaving(true)
     try {
-      const macros = {
-        calories: customCalories || 0,
-        protein: customProtein || 0,
-        carbs: customCarbs || 0,
-        fat: customFat || 0,
-      }
+      // FE-RCA F4 — quantize custom-food macros too so direct user input
+      // (e.g. 24.5g protein) round-trips cleanly.
+      const macros = quantizeMacros({
+        calories: typeof customCalories === 'number' ? customCalories : 0,
+        protein: typeof customProtein === 'number' ? customProtein : 0,
+        carbs: typeof customCarbs === 'number' ? customCarbs : 0,
+        fat: typeof customFat === 'number' ? customFat : 0,
+      })
       // Save to personal food database
       await saveFood({
         name: customName.trim(),
@@ -371,7 +484,11 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
               <h2 id="food-sheet-title" className="text-base font-semibold text-text-primary">
-                {mode === 'edit' ? `Edit ${(existingLog?.payload as FoodPayload | undefined)?.food_name ?? 'food'}` : `Add to ${mealType}`}
+                {mode === 'edit'
+                  ? `Edit ${(existingLog?.payload as FoodPayload | undefined)?.food_name ?? 'food'}`
+                  : pending.length > 0
+                    ? `Add to ${mealType} · ${pending.length} in meal`
+                    : `Add to ${mealType}`}
               </h2>
               <button onClick={onClose} aria-label="Close" className="p-1.5 rounded-full hover:bg-surface-hover">
                 <X className="w-4 h-4 text-text-secondary" />
@@ -530,13 +647,33 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
                     </Button>
                   </div>
                 ) : (
-                  <Button
-                    onClick={handleConfirmLog}
-                    disabled={saving || (inputMode === 'grams' && !grams)}
-                    className="w-full bg-accent hover:bg-accent-hover text-white"
-                  >
-                    {saving ? 'Logging...' : 'Log Food'}
-                  </Button>
+                  /* FE-RCA F3 — multi-select footer.
+                     "+ Add to meal" stages the current selection in the pending tray
+                     and returns to search so the user can add another item without
+                     re-opening the sheet. "Log meal (N)" / "Log Food" commits via
+                     the batch createLogs() surface. */
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={handleAddToMeal}
+                      disabled={saving || (inputMode === 'grams' && !grams)}
+                      className="flex-1"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add to meal
+                    </Button>
+                    <Button
+                      onClick={handleConfirmLog}
+                      disabled={saving || (inputMode === 'grams' && !grams)}
+                      className="flex-1 bg-accent hover:bg-accent-hover text-white"
+                    >
+                      {saving
+                        ? 'Logging...'
+                        : pending.length > 0
+                          ? `Log meal (${pending.length + 1})`
+                          : 'Log Food'}
+                    </Button>
+                  </div>
                 )}
               </div>
               </>
@@ -557,6 +694,53 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
                     />
                   </div>
                 </div>
+
+                {/* FE-RCA F3 — pending tray summary. Only visible in log mode
+                    and only when at least one item has been staged. Lets the
+                    user review/remove items before committing the meal. */}
+                {mode !== 'edit' && pending.length > 0 && (
+                  <div className="px-4 pb-3">
+                    <div className="bg-surface border border-border rounded-xl p-3 space-y-2">
+                      <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide">
+                        In this meal · {pending.length}
+                      </p>
+                      <ul className="space-y-1.5">
+                        {pending.map((item, idx) => (
+                          <li
+                            key={`pending-${idx}-${item.food.id ?? item.food.name}`}
+                            className="flex items-center justify-between gap-2 text-sm"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="text-text-primary truncate">{item.food.name}</p>
+                              <p className="text-[11px] text-text-tertiary tabular-nums">
+                                {item.inputMode === 'servings'
+                                  ? `${item.servings} × ${item.food.serving_size_g ?? 100}g`
+                                  : `${item.quantity_g}g`}
+                                {' · '}
+                                {formatMacroKcal(item.est_macros.calories)} cal
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemovePendingItem(idx)}
+                              aria-label={`Remove ${item.food.name}`}
+                              className="p-1 text-text-tertiary hover:text-destructive shrink-0"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button
+                        onClick={handleCommitMeal}
+                        disabled={saving}
+                        className="w-full bg-accent hover:bg-accent-hover text-white"
+                      >
+                        {saving ? 'Logging...' : `Log meal (${pending.length})`}
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Results */}
                 <div className="flex-1 overflow-y-auto px-4 pb-4 min-h-0">
