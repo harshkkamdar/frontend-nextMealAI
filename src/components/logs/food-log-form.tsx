@@ -42,6 +42,12 @@ export function FoodLogForm() {
   // food stays linked (enables recents/favorites/dedup) instead of being logged
   // as free text. Cleared when the user manually edits the name (decouples).
   const [userFoodId, setUserFoodId] = useState<string | null>(null)
+  // Per-gram macros of the selected search result, so changing the quantity
+  // rescales the macros instead of leaving stale per-serving numbers (#8). Any
+  // manual macro edit clears it — the user has taken control of the values.
+  const [macroBasisPerG, setMacroBasisPerG] = useState<
+    { calories: number; protein: number; carbs: number; fat: number } | null
+  >(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // FB-R6-13 — Photo estimate flow. When estimateId is set, Save calls
@@ -79,7 +85,20 @@ export function FoodLogForm() {
     setCarbs('')
     setFat('')
     setUserFoodId(null)
+    setMacroBasisPerG(null)
     clearEstimate()
+  }
+
+  // Set quantity and, when a search result is the source (basis known), rescale
+  // the macros to the new amount so they never disagree with the quantity.
+  const handleQuantityChange = (val: number | '') => {
+    setQuantityG(val)
+    if (macroBasisPerG && typeof val === 'number' && val > 0) {
+      setCalories(Math.round(macroBasisPerG.calories * val))
+      setProtein(Math.round(macroBasisPerG.protein * val * 10) / 10)
+      setCarbs(Math.round(macroBasisPerG.carbs * val * 10) / 10)
+      setFat(Math.round(macroBasisPerG.fat * val * 10) / 10)
+    }
   }
 
   // Tap a search result → prefill the form with its per-serving values so the
@@ -93,6 +112,14 @@ export function FoodLogForm() {
     setProtein(m.protein ? Math.round(m.protein) : '')
     setCarbs(m.carbs ? Math.round(m.carbs) : '')
     setFat(m.fat ? Math.round(m.fat) : '')
+    // Per-gram basis so editing the quantity rescales the macros (#8).
+    const serving = food.serving_size_g || 100
+    setMacroBasisPerG({
+      calories: (m.calories ?? 0) / serving,
+      protein: (m.protein ?? 0) / serving,
+      carbs: (m.carbs ?? 0) / serving,
+      fat: (m.fat ?? 0) / serving,
+    })
     // Link to the personal food DB when this is a saved food (USDA results
     // have no personal id → stays null and logs as free text, as before).
     setUserFoodId(food.source === 'personal' ? food.id ?? null : null)
@@ -394,7 +421,7 @@ export function FoodLogForm() {
             type="text"
             placeholder="e.g. Grilled chicken breast"
             value={foodName}
-            onChange={(e) => { setFoodName(e.target.value); setUserFoodId(null) }}
+            onChange={(e) => { setFoodName(e.target.value); setUserFoodId(null); setMacroBasisPerG(null) }}
           />
         </div>
 
@@ -404,7 +431,7 @@ export function FoodLogForm() {
             type="number"
             placeholder="Optional"
             value={quantityG}
-            onChange={(e) => setQuantityG(e.target.value ? Number(e.target.value) : '')}
+            onChange={(e) => handleQuantityChange(e.target.value ? Number(e.target.value) : '')}
           />
         </div>
 
@@ -416,7 +443,7 @@ export function FoodLogForm() {
               type="number"
               placeholder="kcal"
               value={calories}
-              onChange={(e) => setCalories(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => { setCalories(e.target.value ? Number(e.target.value) : ''); setMacroBasisPerG(null) }}
             />
           </div>
           <div className="space-y-1">
@@ -425,7 +452,7 @@ export function FoodLogForm() {
               type="number"
               placeholder="g"
               value={protein}
-              onChange={(e) => setProtein(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => { setProtein(e.target.value ? Number(e.target.value) : ''); setMacroBasisPerG(null) }}
             />
           </div>
           <div className="space-y-1">
@@ -434,7 +461,7 @@ export function FoodLogForm() {
               type="number"
               placeholder="g"
               value={carbs}
-              onChange={(e) => setCarbs(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => { setCarbs(e.target.value ? Number(e.target.value) : ''); setMacroBasisPerG(null) }}
             />
           </div>
           <div className="space-y-1">
@@ -443,7 +470,7 @@ export function FoodLogForm() {
               type="number"
               placeholder="g"
               value={fat}
-              onChange={(e) => setFat(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => { setFat(e.target.value ? Number(e.target.value) : ''); setMacroBasisPerG(null) }}
             />
           </div>
         </div>
