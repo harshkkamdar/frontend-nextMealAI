@@ -67,6 +67,12 @@ interface FoodSearchSheetProps {
   onClose: () => void
   mealType: string
   onFoodLogged: () => void
+  /** The calendar date being viewed (YYYY-MM-DD). Logs land on THIS date, not
+   *  "today" (fixes adding food while viewing a past day landing on today). */
+  logDate?: string
+  /** Existing food logs for this meal+day — used to MERGE a re-added food into
+   *  the existing entry (servings + macros) instead of creating a duplicate. */
+  existingMealLogs?: Log[]
   /** FB-R5-03 — edit an existing log instead of creating one. */
   mode?: 'log' | 'edit'
   existingLog?: Log
@@ -74,7 +80,7 @@ interface FoodSearchSheetProps {
   onLogDeleted?: (logId: string) => void
 }
 
-export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode, existingLog, onLogUpdated, onLogDeleted }: FoodSearchSheetProps) {
+export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDate, existingMealLogs, mode, existingLog, onLogUpdated, onLogDeleted }: FoodSearchSheetProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<FoodSearchResult[]>([])
   const [searching, setSearching] = useState(false)
@@ -238,6 +244,39 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
     }
   }
 
+  // BUG-C (merge) — find an existing entry for the SAME food in this meal+day
+  // (matched by user_food_id when both have one, else by case-insensitive
+  // name) so a re-add combines instead of creating a duplicate row.
+  const findMergeTarget = (payload: FoodPayload): Log | null => {
+    if (!existingMealLogs?.length) return null
+    const wantId = payload.user_food_id
+    const wantName = (payload.food_name ?? '').trim().toLowerCase()
+    return (
+      existingMealLogs.find((l) => {
+        const ep = l.payload as FoodPayload | undefined
+        if (!ep) return false
+        if (wantId && ep.user_food_id) return ep.user_food_id === wantId
+        return (ep.food_name ?? '').trim().toLowerCase() === wantName
+      }) ?? null
+    )
+  }
+
+  const mergeFoodPayloads = (existing: FoodPayload, added: FoodPayload): Partial<FoodPayload> => {
+    const em = existing.est_macros ?? {}
+    const am = added.est_macros ?? {}
+    const bothServings = typeof existing.servings === 'number' && typeof added.servings === 'number'
+    return {
+      quantity_g: Math.round((existing.quantity_g ?? 0) + (added.quantity_g ?? 0)),
+      servings: bothServings ? (existing.servings as number) + (added.servings as number) : undefined,
+      est_macros: quantizeMacros({
+        calories: (em.calories ?? 0) + (am.calories ?? 0),
+        protein: (em.protein ?? 0) + (am.protein ?? 0),
+        carbs: (em.carbs ?? 0) + (am.carbs ?? 0),
+        fat: (em.fat ?? 0) + (am.fat ?? 0),
+      }),
+    }
+  }
+
   const handleConfirmLog = async () => {
     // FE-RCA F3 — if there's a non-empty pending tray, the user wants the
     // multi-item meal commit. Otherwise (or if they just searched + tapped
@@ -251,7 +290,18 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
 
     setSaving(true)
     try {
-      await createLog({ type: 'food', payload, source: 'manual' })
+      // BUG-C — combine into the existing entry when the same food is already
+      // logged for this meal+day.
+      const match = findMergeTarget(payload)
+      if (match) {
+        const merged = mergeFoodPayloads(match.payload as FoodPayload, payload)
+        await updateLog(match.id, merged)
+        toast.success(`${selectedFood.name} — combined into one entry`)
+        onFoodLogged()
+        return
+      }
+      // BUG-A — stamp the viewed date so it doesn't land on "today".
+      await createLog({ type: 'food', payload, source: 'manual', local_date: logDate })
       toast.success(`${selectedFood.name} logged`)
       onFoodLogged()
     } catch {
@@ -311,11 +361,12 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
         servings: p.inputMode === 'servings' ? p.servings : undefined,
       },
       source: 'manual',
+      local_date: logDate, // BUG-A — bucket onto the viewed date
     }))
     // Include the currently-selected (un-added) food if present.
     const selectedPayload = buildFoodPayload()
     if (selectedPayload) {
-      items.push({ type: 'food', payload: selectedPayload, source: 'manual' })
+      items.push({ type: 'food', payload: selectedPayload, source: 'manual', local_date: logDate })
     }
     if (items.length === 0) return
 
@@ -420,6 +471,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, mode,
           meal_type: mealType.toLowerCase(),
         },
         source: 'manual',
+        local_date: logDate, // BUG-A — bucket onto the viewed date
       })
       toast.success(`${customName.trim()} saved & logged`)
       onFoodLogged()

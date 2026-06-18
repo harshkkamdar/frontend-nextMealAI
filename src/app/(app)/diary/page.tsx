@@ -232,6 +232,8 @@ export default function DiaryPage() {
         isOpen={searchOpen}
         onClose={() => { setSearchOpen(false); setEditingLog(null) }}
         mealType={selectedMealType}
+        logDate={selectedDate}
+        existingMealLogs={dayLogs.filter((l) => (l.payload as FoodPayload)?.meal_type?.toLowerCase?.() === selectedMealType.toLowerCase())}
         mode={editingLog ? 'edit' : 'log'}
         existingLog={editingLog ?? undefined}
         onFoodLogged={handleFoodLogged}
