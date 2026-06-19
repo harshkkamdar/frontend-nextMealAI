@@ -60,7 +60,12 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
   const [addRest, setAddRest] = useState<number | undefined>(90)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useSetGeoScreen('workout_follow', { sessionId, currentExercise: null, exerciseIndex: currentIndex })
+  const exercises = session?.exercises ?? []
+  const current = exercises[currentIndex] ?? null
+
+  // Give Geo the exercise the user is looking at so "swap this" / "this is too
+  // heavy" resolve to the right one.
+  useSetGeoScreen('workout_follow', { sessionId, currentExercise: current?.name ?? null, exerciseIndex: currentIndex })
 
   const loadSession = useCallback((showToast = false) => {
     return getWorkoutSession(sessionId)
@@ -136,9 +141,6 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
       updateWorkoutSession(sessionId, { exercises }).catch(() => {})
     }, 500)
   }, [sessionId])
-
-  const exercises = session?.exercises ?? []
-  const current = exercises[currentIndex] ?? null
 
   const updateSet = (exIndex: number, setIndex: number, field: string, value: any) => {
     if (!session) return

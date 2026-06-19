@@ -98,15 +98,15 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
 
   // Extend / trim the rest. Anchor start so elapsed math stays consistent with
   // the new target; never let -15 instantly complete (floor remaining at 1).
+  // Compute the new value once, then set both states (no side-effects inside a
+  // state updater — that would double-run under React StrictMode).
   const adjust = (delta: number) => {
     timerStartedRef.current = true
     startedAtRef.current = Date.now()
-    setRemaining((r) => {
-      const nr = Math.max(1, r + delta)
-      setTarget(nr)
-      targetRef.current = nr
-      return nr
-    })
+    const nr = Math.max(1, remaining + delta)
+    targetRef.current = nr
+    setRemaining(nr)
+    setTarget(nr)
   }
 
   const toggleMute = () => {
