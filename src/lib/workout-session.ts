@@ -197,3 +197,36 @@ export function deriveWorkoutEntryLabel(
   if (inProgressSession.plan_day_index !== todayPlanDayIndex) return 'Start Workout'
   return 'Resume Workout'
 }
+
+/**
+ * QA-iter-redesign — guided one-exercise-at-a-time navigation.
+ *
+ * True when an exercise has at least one set and EVERY set is marked complete.
+ */
+export function isExerciseComplete(ex: Pick<SessionExercise, 'sets'>): boolean {
+  return ex.sets.length > 0 && ex.sets.every((s) => s.completed)
+}
+
+/**
+ * Index of the next exercise (after `from`) that still has an incomplete set —
+ * search forward, then wrap to the start. Returns -1 when every exercise is
+ * complete (→ the guided view offers to finish). Drives auto-advance.
+ */
+export function nextIncompleteExerciseIndex(
+  exercises: Pick<SessionExercise, 'sets'>[],
+  from: number,
+): number {
+  const n = exercises.length
+  if (n === 0) return -1
+  for (let step = 1; step <= n; step++) {
+    const i = ((from + step) % n + n) % n
+    if (!isExerciseComplete(exercises[i])) return i
+  }
+  return -1
+}
+
+/** Where a (re)opened guided session should land: the first incomplete exercise, else 0. */
+export function firstIncompleteExerciseIndex(exercises: Pick<SessionExercise, 'sets'>[]): number {
+  const i = exercises.findIndex((e) => !isExerciseComplete(e))
+  return i === -1 ? 0 : i
+}

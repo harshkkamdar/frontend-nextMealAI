@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { Timer, X } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { X } from 'lucide-react'
 import { playBell } from '@/lib/audio'
 
 interface RestTimerProps {
@@ -87,36 +88,57 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
 
   if (!isActive) return null
 
-  const progress = remaining / duration
+  const progress = duration > 0 ? remaining / duration : 0
   const minutes = Math.floor(remaining / 60)
   const seconds = remaining % 60
+  const R = 54
+  const CIRC = 2 * Math.PI * R
 
+  // Full-screen orange "rest" takeover (pomodoro-style). The whole screen goes
+  // accent-orange with a big ring countdown; the user can Skip at any time.
   return (
-    <div className="sticky top-0 z-30 bg-bg-secondary border-b border-border">
-      <div className="flex items-center justify-between px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <Timer className="w-4 h-4 text-accent" />
-          <span className="text-xs font-medium text-text-secondary">Rest</span>
-          <span className="text-base font-semibold text-text-primary tabular-nums" aria-live="polite">
-            {minutes}:{seconds.toString().padStart(2, '0')}
-          </span>
-        </div>
-        <button
-          onClick={onSkip}
-          aria-label="Skip rest timer"
-          className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-text-secondary hover:text-text-primary rounded-full bg-surface border border-border transition-colors"
-        >
-          Skip
-          <X className="w-3 h-3" />
-        </button>
+    <motion.div
+      key="rest-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Rest timer"
+      className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-accent text-white px-6"
+    >
+      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/80 mb-8">Rest</p>
+
+      <div className="relative w-48 h-48 flex items-center justify-center mb-10">
+        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="7" />
+          <circle
+            cx="60"
+            cy="60"
+            r={R}
+            fill="none"
+            stroke="white"
+            strokeWidth="7"
+            strokeLinecap="round"
+            strokeDasharray={CIRC}
+            strokeDashoffset={CIRC * (1 - progress)}
+            style={{ transition: 'stroke-dashoffset 1s linear' }}
+          />
+        </svg>
+        <span className="text-[3.25rem] font-bold tabular-nums leading-none" aria-live="polite">
+          {minutes}:{seconds.toString().padStart(2, '0')}
+        </span>
       </div>
-      {/* Progress bar */}
-      <div className="h-0.5 bg-border">
-        <div
-          className="h-full bg-accent transition-all duration-1000 ease-linear"
-          style={{ width: `${progress * 100}%` }}
-        />
-      </div>
-    </div>
+
+      <button
+        onClick={onSkip}
+        aria-label="Skip rest timer"
+        className="flex items-center gap-2 px-10 py-3.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white text-sm font-semibold transition-all"
+      >
+        Skip rest
+        <X className="w-4 h-4" />
+      </button>
+    </motion.div>
   )
 }
