@@ -202,7 +202,7 @@ export default function ActivityPage() {
             onClick={() => router.push('/logs/new/workout')}
             className="w-full text-center text-xs text-text-secondary hover:text-accent py-2 mt-2"
           >
-            Or log a freestyle workout
+            Or start a freestyle workout
           </button>
         </div>
       ) : (
@@ -308,7 +308,7 @@ export default function ActivityPage() {
             onClick={() => router.push('/logs/new/workout')}
             className="w-full text-center text-xs text-text-secondary hover:text-accent py-2"
           >
-            Or log a freestyle workout
+            Or start a freestyle workout
           </button>
 
           {/* History — browse past sessions by date. The calendar drives ONLY
