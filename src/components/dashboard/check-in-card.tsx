@@ -87,66 +87,79 @@ export function CheckInCard({ checkIn }: { checkIn: DashboardCheckIn }) {
   )
 }
 
+// Header labels share a column count with the rows so the zebra stripes line up.
+const HEAD_CLS =
+  'text-[10px] uppercase tracking-[0.04em] text-text-tertiary py-1 px-1.5'
+
 function DaysTable({ days }: { days: DashboardCheckInDay[] }) {
   return (
     <div
-      className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-x-2 gap-y-0.5 text-xs tabular-nums"
+      className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] text-xs tabular-nums overflow-hidden rounded-lg border border-border/60"
       data-testid="check-in-days-table"
       role="table"
       aria-label="7-day adherence"
     >
       {/* Header row */}
-      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary" role="columnheader">
+      <div className={`${HEAD_CLS} bg-surface-hover/60`} role="columnheader">
         Day
       </div>
-      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary" role="columnheader">
+      <div className={`${HEAD_CLS} bg-surface-hover/60`} role="columnheader">
         Cal
       </div>
-      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary text-right" role="columnheader">
+      <div className={`${HEAD_CLS} bg-surface-hover/60 text-right`} role="columnheader">
         P
       </div>
-      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary text-right" role="columnheader">
+      <div className={`${HEAD_CLS} bg-surface-hover/60 text-right`} role="columnheader">
         C
       </div>
-      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary text-right" role="columnheader">
+      <div className={`${HEAD_CLS} bg-surface-hover/60 text-right`} role="columnheader">
         F
       </div>
-      <div className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary text-right w-3" role="columnheader" aria-label="hit">
+      <div className={`${HEAD_CLS} bg-surface-hover/60 text-right`} role="columnheader" aria-label="hit">
         ✓
       </div>
 
       {/* Day rows */}
-      {days.map((d) => (
-        <DayRow key={d.date} day={d} />
+      {days.map((d, i) => (
+        <DayRow key={d.date} day={d} index={i} />
       ))}
     </div>
   )
 }
 
-function DayRow({ day: d }: { day: DashboardCheckInDay }) {
+function DayRow({ day: d, index }: { day: DashboardCheckInDay; index: number }) {
+  // Zebra striping + per-row padding turns a cramped wall of numbers into
+  // scannable rows (Harsh: dashboard table "looks like an eye sore"). Hit days
+  // get a faint success tint so adherence reads at a glance.
+  const rowBg = d.hit
+    ? 'bg-success/[0.07]'
+    : index % 2 === 1
+      ? 'bg-text-primary/[0.025]'
+      : ''
+  const cell = `py-1.5 px-1.5 ${rowBg}`
   return (
     <>
-      <div className="text-text-secondary" role="cell">
+      <div className={`${cell} text-text-secondary font-medium`} role="cell">
         {d.day_of_week}
       </div>
-      <div className="text-text-primary" role="cell">
+      <div className={`${cell} text-text-primary`} role="cell">
         {shortMacro(d.calories)}
       </div>
-      <div className="text-text-primary text-right" role="cell">
+      <div className={`${cell} text-text-primary text-right`} role="cell">
         {Math.round(d.protein.actual)}
       </div>
-      <div className="text-text-primary text-right" role="cell">
+      <div className={`${cell} text-text-primary text-right`} role="cell">
         {Math.round(d.carbs.actual)}
       </div>
-      <div className="text-text-primary text-right" role="cell">
+      <div className={`${cell} text-text-primary text-right`} role="cell">
         {Math.round(d.fat.actual)}
       </div>
       <div
-        className="text-right w-3 text-accent"
+        className={`${cell} text-right text-success font-semibold`}
         role="cell"
         aria-label={d.hit ? 'hit target' : 'missed target'}
       >
-        {d.hit ? '✓' : ''}
+        {d.hit ? '✓' : <span className="text-text-tertiary">·</span>}
       </div>
     </>
   )

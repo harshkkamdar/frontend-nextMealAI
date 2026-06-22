@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, ExternalLink } from 'lucide-react'
+import { X, ExternalLink, SquarePen } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUIStore } from '@/stores/ui.store'
 import { useGeoScreenContext } from '@/contexts/geo-screen-context'
@@ -25,11 +25,18 @@ import type { AttachedImage, ChatMessage } from '@/types/chat.types'
 // Previously, each open of the sheet called setMessages([])+setSessionId(null)
 // and synthesised a fresh BE session, so prior images/messages vanished
 // (Harsh, 2026-05-12: "images disappear in chat after clicking out"). We now
-// stash the most-recent companion session id in localStorage with a 24h TTL
-// and restore it on open. Closing the sheet only unmounts UI — the BE row
-// remains, and reopening rehydrates from the server's signed-URL refresh.
+// stash the most-recent companion session id in localStorage and restore it on
+// open. Closing the sheet only unmounts UI — the BE row remains, and reopening
+// rehydrates from the server's signed-URL refresh.
+//
+// 2026-06-22 (Harsh: "geo chat always reverts to the last chat instead of
+// starting a new one") — the resume window was 24h, so opening the sheet hours
+// later dropped you back into a stale thread. Shortened to 30min: long enough to
+// survive an accidental click-out + reopen (the original image bug), short enough
+// that a later visit starts fresh. A visible "New chat" button gives explicit
+// control regardless of the window.
 const COMPANION_SESSION_LS_KEY = 'nextmealai:companion:current-session-id'
-const COMPANION_SESSION_TTL_MS = 24 * 60 * 60 * 1000
+const COMPANION_SESSION_TTL_MS = 30 * 60 * 1000
 
 interface StoredCompanionSession {
   session_id: string
@@ -92,14 +99,12 @@ export function GeoCompanionSheet() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
 
-  // Initialize companion session when sheet opens.
-  // FE-RCA F2 — try to restore prior session from localStorage before
-  // creating a new one. If a stored session is fresh (<24h) and the BE
-  // returns its messages, hydrate; otherwise fall through to a new session.
-  useEffect(() => {
-    if (!isOpen) return
-
-    const init = async () => {
+  // Initialize a companion session. FE-RCA F2 — when forceNew is false, try to
+  // restore a recent prior session from localStorage before creating a new one
+  // (survives accidental click-out + reopen). When forceNew is true ("New chat"),
+  // skip restore and always mint a fresh BE session.
+  const initCompanion = useCallback(
+    async (forceNew: boolean) => {
       if (initializingRef.current) return
       initializingRef.current = true
 
@@ -109,21 +114,25 @@ export function GeoCompanionSheet() {
       messageCountRef.current = 0
 
       try {
-        const stored = readStoredCompanionSession()
-        if (stored && Date.now() - stored.ts < COMPANION_SESSION_TTL_MS) {
-          try {
-            const { messages: priorMessages } = await getChatSession(stored.session_id)
-            if (Array.isArray(priorMessages) && priorMessages.length > 0) {
-              setSessionId(stored.session_id)
-              setMessages(priorMessages)
-              messageCountRef.current = priorMessages.length
-              // Refresh the timestamp so an active user keeps their thread.
-              writeStoredCompanionSession(stored.session_id)
-              return
+        if (forceNew) {
+          clearStoredCompanionSession()
+        } else {
+          const stored = readStoredCompanionSession()
+          if (stored && Date.now() - stored.ts < COMPANION_SESSION_TTL_MS) {
+            try {
+              const { messages: priorMessages } = await getChatSession(stored.session_id)
+              if (Array.isArray(priorMessages) && priorMessages.length > 0) {
+                setSessionId(stored.session_id)
+                setMessages(priorMessages)
+                messageCountRef.current = priorMessages.length
+                // Refresh the timestamp so an active user keeps their thread.
+                writeStoredCompanionSession(stored.session_id)
+                return
+              }
+            } catch {
+              // BE rejected (session deleted, 404, etc.) — fall through to new
+              clearStoredCompanionSession()
             }
-          } catch {
-            // BE rejected (session deleted, 404, etc.) — fall through to new
-            clearStoredCompanionSession()
           }
         }
 
@@ -138,22 +147,25 @@ export function GeoCompanionSheet() {
         setInitializing(false)
         initializingRef.current = false
       }
-    }
+    },
+    [getScreenContext, closeSheet],
+  )
 
-    init()
-  }, [isOpen, getScreenContext, closeSheet])
+  // Initialize companion session when the sheet opens (restore if recent).
+  useEffect(() => {
+    if (!isOpen) return
+    initCompanion(false)
+  }, [isOpen, initCompanion])
 
-  // Explicit "new chat" — clears the persisted session id so the next open
-  // starts fresh. Kept as a local handler in case future UI surfaces wire it.
+  // Explicit "New chat" — extract memories from the current thread (if any),
+  // then mint a brand-new session immediately so the user sees a blank thread.
   const handleStartNewChat = useCallback(() => {
-    clearStoredCompanionSession()
-    setMessages([])
-    setSessionId(null)
-    messageCountRef.current = 0
-  }, [])
-  // Touch the handler so dead-code lint doesn't flag it; can be wired to a
-  // visible "+ New chat" button in a follow-up UI iteration.
-  void handleStartNewChat
+    if (initializingRef.current) return
+    if (sessionId && messageCountRef.current >= 2) {
+      extractSessionMemories(sessionId).catch(() => {})
+    }
+    initCompanion(true)
+  }, [sessionId, initCompanion])
 
   // Extract memories when sheet closes
   const handleClose = useCallback(() => {
@@ -269,13 +281,24 @@ export function GeoCompanionSheet() {
                   </div>
                 </div>
               </div>
-              <button
-                onClick={handleClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-hover transition-colors"
-                aria-label="Close"
-              >
-                <X className="w-4 h-4 text-text-secondary" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={handleStartNewChat}
+                  disabled={initializing || messages.length === 0}
+                  className="flex items-center gap-1 h-8 px-2.5 rounded-full text-xs font-medium text-text-secondary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                  aria-label="Start a new chat"
+                >
+                  <SquarePen className="w-3.5 h-3.5" />
+                  New
+                </button>
+                <button
+                  onClick={handleClose}
+                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-hover transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4 text-text-secondary" />
+                </button>
+              </div>
             </div>
 
             {/* Chat area */}
