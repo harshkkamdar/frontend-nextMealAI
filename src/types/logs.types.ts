@@ -127,4 +127,8 @@ export interface CreateLogInput {
   type: LogType
   payload: LogPayload
   source?: LogSource
+  /** Optional user-local calendar date (YYYY-MM-DD). When set, the row buckets
+   *  onto this date instead of "today" — lets the diary log onto the date the
+   *  user is viewing. */
+  local_date?: string
 }

@@ -81,6 +81,11 @@ function fromInitial(plan: MealPlan | undefined): {
       notes: '',
       startDate: '',
       endDate: '',
+      // NOTE: the builder's validate() requires a positive calorie target, so
+      // these are starting placeholders the user adjusts (not a display of their
+      // own data). The impactful hardcoded-target bug — the DIARY showing 2000
+      // instead of the user's real target — is fixed separately (diary now
+      // resolves plan→profile→0). A profile-aware default here is deferred.
       targets: { calories: 2000, protein: 150, carbs: 200, fat: 60 },
       days: [emptyDay(0)],
     }

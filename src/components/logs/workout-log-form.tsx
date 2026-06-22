@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { X } from 'lucide-react'
+import { X, Play } from 'lucide-react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,16 +13,16 @@ import {
   AddRowButton,
   RemoveRowButton,
 } from '@/components/plans/plan-builder-shared'
-import { createLog } from '@/lib/api/logs.api'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
-import { startWorkoutSession, completeWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
 
 interface DraftExercise {
   key: string
   name: string
+  muscle: string | null
   sets: number | undefined
   reps: number | undefined
-  weightKg: number | undefined
+  rest: number | undefined
 }
 
 let keySeed = 0
@@ -31,107 +31,81 @@ const nextKey = () => `ex-${++keySeed}-${Date.now()}`
 const emptyExercise = (): DraftExercise => ({
   key: nextKey(),
   name: '',
-  sets: undefined,
-  reps: undefined,
-  weightKg: undefined,
+  muscle: null,
+  sets: 3,
+  reps: 10,
+  rest: 90,
 })
 
+/**
+ * Freestyle workout — build a quick exercise list, then START a live guided
+ * session (the same one-exercise-at-a-time flow as a plan workout). You can
+ * also start with nothing and add exercises as you go in the session.
+ */
 export function WorkoutLogForm() {
   const router = useRouter()
-  const [saving, setSaving] = useState(false)
+  const [starting, setStarting] = useState(false)
   const [title, setTitle] = useState('')
   const [exercises, setExercises] = useState<DraftExercise[]>([emptyExercise()])
-  const [durationMin, setDurationMin] = useState<number | undefined>(undefined)
-  const [difficultyRating, setDifficultyRating] = useState<number>(0)
-  const [notes, setNotes] = useState('')
 
   const addExercise = () => setExercises((prev) => [...prev, emptyExercise()])
-
   const removeExercise = (key: string) =>
     setExercises((prev) => (prev.length <= 1 ? prev : prev.filter((e) => e.key !== key)))
-
   const patchExercise = (key: string, patch: Partial<DraftExercise>) =>
     setExercises((prev) => prev.map((e) => (e.key === key ? { ...e, ...patch } : e)))
 
-  const handleSave = async () => {
-    const validExercises = exercises.filter((e) => e.name.trim())
-    if (validExercises.length === 0) {
-      toast.error('Add at least one exercise')
-      return
-    }
-
-    setSaving(true)
+  const handleStart = async () => {
+    if (starting) return
+    const named = exercises.filter((e) => e.name.trim())
+    setStarting(true)
     try {
-      await createLog({
-        type: 'workout',
-        payload: {
-          title: title.trim() || undefined,
-          exercises: validExercises.map((e) => ({
-            name: e.name.trim(),
-            sets: typeof e.sets === 'number' ? e.sets : undefined,
-            reps: typeof e.reps === 'number' ? e.reps : undefined,
-            weight_kg: typeof e.weightKg === 'number' ? e.weightKg : undefined,
-          })),
-          duration_min: typeof durationMin === 'number' ? durationMin : undefined,
-          difficulty_rating: difficultyRating || undefined,
-          notes: notes.trim() || undefined,
-        },
-        source: 'manual',
+      const session = await startWorkoutSession({
+        day_name: title.trim() || 'Freestyle Workout',
+        exercises: named.map((e) => ({
+          name: e.name.trim(),
+          muscle_group: e.muscle || undefined,
+          planned_sets: typeof e.sets === 'number' ? e.sets : 3,
+          planned_reps: typeof e.reps === 'number' ? e.reps : 10,
+          rest_seconds: typeof e.rest === 'number' ? e.rest : 90,
+        })),
       })
-      // Also surface this freestyle workout in Activity history. The
-      // history feed reads from workout_sessions, not from logs, so
-      // without this round-trip the entry is invisible to the user.
-      try {
-        const session = await startWorkoutSession({
-          day_name: title.trim() || 'Freestyle Workout',
-          exercises: validExercises.map((e) => ({
-            name: e.name.trim(),
-            planned_sets: typeof e.sets === 'number' ? e.sets : undefined,
-            planned_reps: typeof e.reps === 'number' ? e.reps : undefined,
-          })),
-        })
-        await completeWorkoutSession(session.id)
-      } catch (sessErr) {
-        console.warn('Freestyle workout_sessions write failed (log itself succeeded)', sessErr)
-      }
-      toast.success('Workout logged')
-      router.back()
+      // replace() so Back from the session doesn't return to this builder.
+      router.replace(`/activity/workout/${session.id}`)
     } catch {
-      toast.error('Failed to log workout')
-    } finally {
-      setSaving(false)
+      toast.error('Failed to start workout')
+      setStarting(false)
     }
   }
 
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <button onClick={() => router.back()} className="p-1">
+      <div className="flex items-center justify-between mb-1">
+        <button onClick={() => router.back()} className="p-1" aria-label="Close">
           <X className="w-5 h-5 text-text-secondary" />
         </button>
-        <h2 className="text-[17px] font-semibold text-text-primary">Log Workout</h2>
+        <h2 className="text-[17px] font-semibold text-text-primary">Freestyle Workout</h2>
         <div className="w-5" />
       </div>
+      <p className="text-xs text-text-secondary text-center mb-6">
+        Add exercises, then start — log each set as you go.
+      </p>
 
-      {/* Form fields */}
       <div className="space-y-4">
-        {/* Optional title */}
         <div className="space-y-1">
-          <Label className="text-xs text-text-secondary">Workout Title (optional)</Label>
+          <Label className="text-xs text-text-secondary">Workout title (optional)</Label>
           <Input
             type="text"
-            placeholder="e.g. Chest day"
+            placeholder="e.g. Push day"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
-        {/* Exercise rows */}
         <div className="space-y-3">
           <Label className="text-xs text-text-secondary">Exercises</Label>
           {exercises.map((ex, i) => (
-            <ExerciseLogRow
+            <ExerciseRow
               key={ex.key}
               exercise={ex}
               index={i}
@@ -142,62 +116,24 @@ export function WorkoutLogForm() {
           ))}
           <AddRowButton label="Add exercise" onClick={addExercise} />
         </div>
-
-        {/* Total Duration */}
-        <NumberField
-          label="Total Duration"
-          suffix="min"
-          value={durationMin}
-          onChange={(v) => setDurationMin(v)}
-          min={0}
-          placeholder="0"
-        />
-
-        {/* Difficulty rating */}
-        <div className="space-y-2">
-          <Label className="text-xs text-text-secondary">Difficulty</Label>
-          <div className="flex gap-2 justify-between">
-            {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setDifficultyRating(n)}
-                className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${
-                  n <= difficultyRating
-                    ? 'bg-accent text-white'
-                    : 'bg-surface-hover text-text-secondary'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-1">
-          <Label className="text-xs text-text-secondary">Notes</Label>
-          <textarea
-            className="w-full min-h-[80px] rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 outline-none resize-none"
-            placeholder="How did it go?"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-          />
-        </div>
       </div>
 
-      {/* Save */}
       <Button
-        onClick={handleSave}
-        disabled={saving}
+        onClick={handleStart}
+        disabled={starting}
         className="w-full bg-accent hover:bg-accent-hover text-white mt-6"
       >
-        {saving ? 'Saving...' : 'Save'}
+        <Play className="w-4 h-4 mr-1 fill-white" />
+        {starting ? 'Starting…' : 'Start workout'}
       </Button>
+      <p className="text-[11px] text-text-tertiary text-center mt-2">
+        You can add or remove exercises during the workout too.
+      </p>
     </div>
   )
 }
 
-function ExerciseLogRow({
+function ExerciseRow({
   exercise,
   index,
   canRemove,
@@ -222,47 +158,22 @@ function ExerciseLogRow({
               <div>
                 <div className="text-text-primary">{item.name}</div>
                 {item.primary_muscles && item.primary_muscles.length > 0 ? (
-                  <div className="text-[11px] text-text-tertiary">
-                    {item.primary_muscles.join(', ')}
-                  </div>
+                  <div className="text-[11px] text-text-tertiary">{item.primary_muscles.join(', ')}</div>
                 ) : null}
               </div>
             )}
             getItemKey={(item) => item.id}
-            onSelect={(item) => onPatch({ name: item.name })}
+            onSelect={(item) => onPatch({ name: item.name, muscle: item.primary_muscles?.[0] ?? null })}
             value={exercise.name || undefined}
-            onClear={() => onPatch({ name: '' })}
+            onClear={() => onPatch({ name: '', muscle: null })}
           />
         </div>
-        {canRemove ? (
-          <RemoveRowButton label={`Remove exercise ${index + 1}`} onClick={onRemove} />
-        ) : null}
+        {canRemove ? <RemoveRowButton label={`Remove exercise ${index + 1}`} onClick={onRemove} /> : null}
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <NumberField
-          label="Sets"
-          value={exercise.sets}
-          onChange={(v) => onPatch({ sets: v })}
-          min={1}
-          max={20}
-          placeholder="0"
-        />
-        <NumberField
-          label="Reps"
-          value={exercise.reps}
-          onChange={(v) => onPatch({ reps: v })}
-          min={1}
-          max={200}
-          placeholder="0"
-        />
-        <NumberField
-          label="Weight"
-          suffix="kg"
-          value={exercise.weightKg}
-          onChange={(v) => onPatch({ weightKg: v })}
-          min={0}
-          placeholder="0"
-        />
+        <NumberField label="Sets" value={exercise.sets} onChange={(v) => onPatch({ sets: v })} min={1} max={20} placeholder="3" />
+        <NumberField label="Reps" value={exercise.reps} onChange={(v) => onPatch({ reps: v })} min={1} max={200} placeholder="10" />
+        <NumberField label="Rest" suffix="s" value={exercise.rest} onChange={(v) => onPatch({ rest: v })} min={0} max={600} step={5} placeholder="90" />
       </div>
     </div>
   )

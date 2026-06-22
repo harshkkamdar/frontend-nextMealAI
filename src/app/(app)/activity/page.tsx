@@ -54,7 +54,10 @@ export default function ActivityPage() {
       const [plansRes, ipRes, histRes] = await Promise.all([
         getPlans({ type: 'workout', active_only: true }).catch(() => []),
         getInProgressSession().catch(() => null),
-        getWorkoutHistory(10).catch(() => [])
+        // 50 (not 10) so the history calendar can surface older sessions when
+        // the user browses back — workouts are infrequent, so this covers
+        // months of history cheaply (small session rows).
+        getWorkoutHistory(50).catch(() => [])
       ])
       const wp = plansRes.find((p) => p.type === 'workout') as WorkoutPlan | undefined
       setWorkoutPlan(wp ?? null)
@@ -199,7 +202,7 @@ export default function ActivityPage() {
             onClick={() => router.push('/logs/new/workout')}
             className="w-full text-center text-xs text-text-secondary hover:text-accent py-2 mt-2"
           >
-            Or log a freestyle workout
+            Or start a freestyle workout
           </button>
         </div>
       ) : (
@@ -305,7 +308,7 @@ export default function ActivityPage() {
             onClick={() => router.push('/logs/new/workout')}
             className="w-full text-center text-xs text-text-secondary hover:text-accent py-2"
           >
-            Or log a freestyle workout
+            Or start a freestyle workout
           </button>
 
           {/* History — browse past sessions by date. The calendar drives ONLY

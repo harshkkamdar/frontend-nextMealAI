@@ -14,7 +14,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
-import { getLogsSummary } from '@/lib/api/logs.api'
+import { getLogs } from '@/lib/api/logs.api'
 import {
   buildMonthGrid,
   shiftMonth,
@@ -22,6 +22,7 @@ import {
 } from '@/lib/month-grid'
 import { todayLocalISO } from '@/lib/timezone'
 import { cn } from '@/lib/utils'
+import type { Log, FoodPayload } from '@/types/logs.types'
 
 interface MonthViewSheetProps {
   isOpen: boolean
@@ -68,16 +69,50 @@ export function MonthViewSheet({
     }
   }, [isOpen, initialDate])
 
-  // Fetch month summary on open + on anchor change.
+  // Fetch + aggregate the ANCHORED month on open + on anchor change.
+  // The /v1/logs/summary?period=month endpoint only ever returns the CURRENT
+  // month (no month param), so navigating to a past month rendered every cell
+  // empty. Instead we pull logs covering the anchor month via getLogs (which
+  // does lookback-from-now) and bucket per local day client-side.
   useEffect(() => {
     if (!isOpen) return
     let cancelled = false
     setLoading(true)
-    getLogsSummary('month')
-      .then((res) => {
+    const today = todayLocalISO(tz)
+    const daysBack = Math.max(
+      31,
+      Math.round((Date.parse(today) - Date.parse(anchor)) / 86_400_000) + 32
+    )
+    const dayOf = (l: Log) =>
+      l.local_date ?? new Date(l.created_at).toISOString().split('T')[0]
+    Promise.all([
+      getLogs({ type: 'food', days: daysBack }).catch(() => [] as Log[]),
+      getLogs({ type: 'workout', days: daysBack }).catch(() => [] as Log[]),
+    ])
+      .then(([foodLogs, workoutLogs]) => {
         if (cancelled) return
-        const rows = Array.isArray(res?.daily_breakdown) ? res.daily_breakdown : []
-        setBreakdown(rows as DailyBreakdownRow[])
+        const byDate = new Map<string, DailyBreakdownRow>()
+        const get = (d: string) =>
+          byDate.get(d) ?? { date: d, calories: 0, protein: 0, carbs: 0, fat: 0, workouts: 0 }
+        for (const l of foodLogs) {
+          const d = dayOf(l)
+          const m = (l.payload as FoodPayload)?.est_macros
+          const row = get(d)
+          row.calories += m?.calories ?? 0
+          row.protein += m?.protein ?? 0
+          row.carbs += m?.carbs ?? 0
+          row.fat += m?.fat ?? 0
+          byDate.set(d, row)
+        }
+        for (const l of workoutLogs) {
+          const d = dayOf(l)
+          const row = get(d)
+          row.workouts += 1
+          byDate.set(d, row)
+        }
+        setBreakdown(
+          [...byDate.values()].map((r) => ({ ...r, calories: Math.round(r.calories) }))
+        )
       })
       .catch(() => {
         if (!cancelled) setBreakdown([])
@@ -88,7 +123,7 @@ export function MonthViewSheet({
     return () => {
       cancelled = true
     }
-  }, [isOpen, anchor])
+  }, [isOpen, anchor, tz])
 
   const grid = useMemo(
     () => buildMonthGrid(anchor, breakdown, todayLocalISO(tz)),

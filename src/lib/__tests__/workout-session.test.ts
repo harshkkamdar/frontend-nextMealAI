@@ -383,3 +383,38 @@ describe('QA-iter8 · nextWorkoutDayIndex (BUG-007 decouple)', () => {
     expect(nextWorkoutDayIndex(undefined)).toBe(-1)
   })
 })
+
+// QA-iter-redesign — guided one-exercise-at-a-time navigation helpers.
+import {
+  isExerciseComplete,
+  nextIncompleteExerciseIndex,
+  firstIncompleteExerciseIndex,
+} from '../workout-session'
+
+const ex = (completes: boolean[]) =>
+  ({ sets: completes.map((c) => ({ completed: c })) }) as any
+
+describe('guided workout navigation', () => {
+  it('isExerciseComplete: all sets done (and non-empty)', () => {
+    expect(isExerciseComplete(ex([true, true]))).toBe(true)
+    expect(isExerciseComplete(ex([true, false]))).toBe(false)
+    expect(isExerciseComplete(ex([]))).toBe(false)
+  })
+
+  it('nextIncompleteExerciseIndex: searches forward then wraps', () => {
+    const list = [ex([true]), ex([false]), ex([true]), ex([false])]
+    expect(nextIncompleteExerciseIndex(list, 0)).toBe(1) // forward
+    expect(nextIncompleteExerciseIndex(list, 1)).toBe(3) // skip complete #2
+    expect(nextIncompleteExerciseIndex(list, 3)).toBe(1) // wrap to #1
+  })
+
+  it('nextIncompleteExerciseIndex: -1 when all complete', () => {
+    expect(nextIncompleteExerciseIndex([ex([true]), ex([true])], 0)).toBe(-1)
+    expect(nextIncompleteExerciseIndex([], 0)).toBe(-1)
+  })
+
+  it('firstIncompleteExerciseIndex: first incomplete, else 0', () => {
+    expect(firstIncompleteExerciseIndex([ex([true]), ex([false])])).toBe(1)
+    expect(firstIncompleteExerciseIndex([ex([true]), ex([true])])).toBe(0)
+  })
+})

@@ -7,8 +7,11 @@
  * new BE session, orphaning any uploaded images from the prior session.
  *
  * Post-fix: the sheet stores the most-recent companion session id in
- * localStorage with a 24h TTL. On open it tries to restore the prior
- * session via getChatSession() before falling back to creating a new one.
+ * localStorage with a 30-minute resume window. On open it tries to restore the
+ * prior session via getChatSession() before falling back to creating a new one.
+ * (The window was 24h originally but that made the sheet "always revert to the
+ * last chat" — shortened so a later visit starts fresh; a "New chat" button
+ * gives explicit control regardless.)
  *
  * The full component lifecycle (Framer Motion + Zustand store + Next.js
  * router) is awkward to mount in jsdom, so this test exercises the
@@ -20,7 +23,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const COMPANION_SESSION_LS_KEY = 'nextmealai:companion:current-session-id'
-const COMPANION_SESSION_TTL_MS = 24 * 60 * 60 * 1000
+const COMPANION_SESSION_TTL_MS = 30 * 60 * 1000
 
 interface StoredCompanionSession {
   session_id: string
@@ -127,7 +130,7 @@ describe('FE-RCA F2 — companion session persistence', () => {
     expect(readStored()?.session_id).toBe('sess-B')
   })
 
-  it('when the prior session is older than the 24h TTL, mints a new one', async () => {
+  it('when the prior session is older than the 30-minute window, mints a new one', async () => {
     const STALE_TS = Date.now() - COMPANION_SESSION_TTL_MS - 1000
     window.localStorage.setItem(
       COMPANION_SESSION_LS_KEY,
@@ -157,7 +160,8 @@ describe('FE-RCA F2 — companion session persistence', () => {
 
   it('on restore, refreshes the timestamp so active users keep their thread', async () => {
     // Use real time and a frozen-into-past timestamp to verify ts updates.
-    const ORIGINAL_TS = Date.now() - 60 * 60 * 1000  // 1h ago
+    // Must be inside the 30-minute resume window so restore (not mint) runs.
+    const ORIGINAL_TS = Date.now() - 5 * 60 * 1000  // 5m ago
     window.localStorage.setItem(
       COMPANION_SESSION_LS_KEY,
       JSON.stringify({ session_id: 'sess-A', ts: ORIGINAL_TS }),

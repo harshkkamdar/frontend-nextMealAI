@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { FoodSearchSheet } from '../food-search-sheet'
 import type { Log, FoodPayload } from '@/types/logs.types'
@@ -17,6 +17,12 @@ vi.mock('@/lib/api/logs.api', () => ({
 }))
 
 describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
+  // Each test reads updateLog.mock.calls[0]; clear call history so one test's
+  // call doesn't shift another's index.
+  beforeEach(() => {
+    vi.mocked(updateLog).mockClear()
+  })
+
   const baseLog: Log = {
     id: 'log-1',
     user_id: 'u',
@@ -62,6 +68,32 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^log$/i })).not.toBeInTheDocument()
+  })
+
+  it('re-saving a MULTI-serving entry unchanged does NOT double its macros', async () => {
+    // Regression: est_macros is the TOTAL (472 for 2 servings). The editor must
+    // treat it as per-serving=236 so 236×2 re-saves 472, not 944.
+    const twoServingLog: Log = {
+      ...baseLog,
+      payload: {
+        ...baseLog.payload,
+        servings: 2,
+        quantity_g: 200,
+        est_macros: { calories: 472, protein: 20, carbs: 60, fat: 12 },
+      } as FoodPayload,
+    }
+    const updateLogMock = vi.mocked(updateLog)
+    updateLogMock.mockResolvedValue({} as any)
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={twoServingLog}
+        mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    fireEvent.click(screen.getByRole('button', { name: /save/i }))
+    await waitFor(() => expect(updateLogMock).toHaveBeenCalled())
+    const arg = updateLogMock.mock.calls[0][1] as Partial<FoodPayload>
+    expect(arg.servings).toBe(2)
+    expect(arg.est_macros?.calories).toBe(472) // not 944
+    expect(arg.quantity_g).toBe(200)
   })
 
   it('save flow updates the log with recomputed quantity_g when servings change', async () => {
