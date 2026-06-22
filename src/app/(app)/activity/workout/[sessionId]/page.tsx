@@ -101,6 +101,14 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
     if (n > 0 && currentIndex > n - 1) setCurrentIndex(n - 1)
   }, [session, currentIndex])
 
+  // Reset the inline "Remove?" confirm whenever the visible exercise changes.
+  // removeConfirm is a single boolean (not keyed to an index), so without this
+  // a pending confirm on exercise A would carry over to exercise B after
+  // navigation/auto-advance and remove the WRONG exercise on the next tap.
+  useEffect(() => {
+    setRemoveConfirm(false)
+  }, [currentIndex])
+
   useEffect(() => () => { if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current) }, [])
 
   useEffect(() => {
