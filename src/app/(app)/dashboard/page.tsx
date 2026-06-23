@@ -230,6 +230,10 @@ export default function DashboardPage() {
   const [todayLogs, setTodayLogs] = useState<Log[]>([])
   const [profile, setProfile] = useState<Profile | null>(null)
   const [weightLogs, setWeightLogs] = useState<Log[]>([])
+  // Sleep is a "last night" metric — log it for yesterday and it still belongs on
+  // today's card. todayLogs (days:1) can't see a yesterday-stamped row, so fetch
+  // the single most-recent sleep log regardless of date.
+  const [recentSleepLogs, setRecentSleepLogs] = useState<Log[]>([])
   const [activeSheet, setActiveSheet] = useState<QuickLogType>(null)
   // FB-R6-10 — check-in card; null when user has <7 days of data (BE gate)
   // or while loading. Falls back silently to existing onboarding cards.
@@ -239,7 +243,7 @@ export default function DashboardPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [summaryRes, plansRes, suggestionsRes, logsRes, profileRes, weightRes, checkInRes] = await Promise.all([
+      const [summaryRes, plansRes, suggestionsRes, logsRes, profileRes, weightRes, checkInRes, sleepRes] = await Promise.all([
         getLogsSummary('day').catch(() => null),
         getPlans({ active_only: true }).catch(() => [] as Plan[]),
         getSuggestions({ status: 'pending' }).catch(() => [] as Suggestion[]),
@@ -249,6 +253,7 @@ export default function DashboardPage() {
         // FB-R6-10: optional, gracefully nulls out on any failure (incl. 404
         // if the BE endpoint isn't shipped on this branch yet).
         getDashboardCheckIn().catch(() => ({ check_in: null })),
+        getLogs({ type: 'sleep', limit: 1 }).catch(() => [] as Log[]),
       ])
       setSummary(summaryRes)
       setPlans(plansRes)
@@ -257,6 +262,7 @@ export default function DashboardPage() {
       setProfile(profileRes)
       setWeightLogs(weightRes)
       setCheckIn(checkInRes.check_in)
+      setRecentSleepLogs(sleepRes)
     } finally {
       setLoading(false)
     }
@@ -317,10 +323,14 @@ export default function DashboardPage() {
     ? Math.round(moodLogs.reduce((sum, l) => sum + ((l.payload as any)?.rating ?? 0), 0) / moodLogs.length)
     : 0
 
+  // Prefer a sleep log from today; otherwise show the most recent night's sleep
+  // (sleep is logged for "last night", which is yesterday's local_date).
   const sleepLogs = todayLogs.filter((l) => l.type === 'sleep')
   const sleep = sleepLogs.length > 0
     ? (sleepLogs[sleepLogs.length - 1].payload as any)?.hours ?? 0
-    : summary?.summary?.avg_sleep_hours ?? 0
+    : recentSleepLogs.length > 0
+      ? (recentSleepLogs[0].payload as any)?.hours ?? 0
+      : summary?.summary?.avg_sleep_hours ?? 0
 
   const energyLogs = todayLogs.filter((l) => l.type === 'energy')
   const energy = energyLogs.length > 0

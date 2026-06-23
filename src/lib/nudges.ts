@@ -2,6 +2,7 @@ import type { Log, LogsSummary, FoodPayload } from '@/types/logs.types'
 import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 import type { Profile } from '@/types/profile.types'
 import { formatMacroGrams } from '@/lib/macros'
+import { nextWorkoutDayIndex } from '@/lib/workout-session'
 
 export type NudgeType = 'time_to_eat' | 'workout_today' | 'protein_check' | 'program_complete'
 
@@ -72,11 +73,13 @@ export function computeNudges(input: NudgeInput): Nudge[] {
   })();
 
   if (workoutPlan?.content?.days && hour >= 10 && !programIsComplete) {
-    const planStart = workoutPlan.start_date ? new Date(workoutPlan.start_date) : new Date(workoutPlan.created_at)
-    const daysDiff = Math.floor((now.getTime() - planStart.getTime()) / 86400000)
     const totalDays = workoutPlan.content.days.length
-    if (totalDays > 0) {
-      const dayIndex = daysDiff % totalDays
+    // Use the SAME cursor source as Activity + WorkoutCard (plan.current_position),
+    // not calendar arithmetic. The old `daysDiff % totalDays` ignored the cursor,
+    // so the nudge named a different day than every other surface (and tapping it
+    // started the wrong day's session). nextWorkoutDayIndex reads current_position.
+    const dayIndex = nextWorkoutDayIndex(workoutPlan)
+    if (totalDays > 0 && dayIndex >= 0) {
       const todayDay = workoutPlan.content.days[dayIndex]
       const hasWorkoutToday = todayDay && !todayDay.is_rest_day
       const workoutLoggedToday = todayLogs.some((l) => l.type === 'workout')

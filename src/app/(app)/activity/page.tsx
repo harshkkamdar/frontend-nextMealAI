@@ -270,50 +270,10 @@ export default function ActivityPage() {
             )}
           </div>
 
-          {/* Program overview — the full sequence with the next day highlighted.
-              Makes the self-paced (non-calendar) model explicit (BUG-007). */}
-          {days.length > 1 && (
-            <div className="bg-surface border border-border rounded-xl p-4 mb-4" data-testid="activity-program-overview">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-text-primary">Your program</h2>
-                <span className="text-[11px] text-text-tertiary">{workoutPlan.content?.name || `${days.length} days`}</span>
-              </div>
-              <div className="space-y-1.5">
-                {days.map((d, i) => {
-                  const isNext = i === nextIdx
-                  return (
-                    <div
-                      key={i}
-                      className={`flex items-center justify-between rounded-lg px-3 py-2 border ${isNext ? 'bg-accent-light border-accent/30' : 'border-border'}`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`text-[11px] tabular-nums ${isNext ? 'text-accent font-semibold' : 'text-text-tertiary'}`}>{i + 1}</span>
-                        <span className={`text-sm truncate ${isNext ? 'text-text-primary font-medium' : 'text-text-secondary'}`}>
-                          {d.is_rest_day ? 'Rest' : (d.name || `Day ${i + 1}`)}
-                        </span>
-                      </div>
-                      {isNext ? (
-                        <span className="text-[10px] bg-accent text-white px-2 py-0.5 rounded-full shrink-0">Next</span>
-                      ) : (
-                        <span className="text-[11px] text-text-tertiary shrink-0">{d.is_rest_day ? '—' : `${d.exercises?.length ?? 0} ex`}</span>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          <button
-            onClick={() => router.push('/logs/new/workout')}
-            className="w-full text-center text-xs text-text-secondary hover:text-accent py-2"
-          >
-            Or start a freestyle workout
-          </button>
-
-          {/* History — browse past sessions by date. The calendar drives ONLY
-              this section now (it no longer changes the Next-up workout). */}
-          <div className="mt-4">
+          {/* History FIRST (after today's status) — the date strip + today's
+              workouts are the focus; "Your program" + freestyle live below.
+              The calendar drives ONLY this section (not the Next-up workout). */}
+          <div className="mb-4">
             <h2 className="text-sm font-medium text-text-secondary mb-2">History</h2>
 
             {lastSession && (
@@ -374,6 +334,47 @@ export default function ActivityPage() {
               )}
             </div>
           </div>
+
+          {/* Program overview — the full sequence with the next day highlighted.
+              Below the calendar now (BUG-007: self-paced, non-calendar model). */}
+          {days.length > 1 && (
+            <div className="bg-surface border border-border rounded-xl p-4 mb-4" data-testid="activity-program-overview">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-semibold text-text-primary">Your program</h2>
+                <span className="text-[11px] text-text-tertiary">{workoutPlan.content?.name || `${days.length} days`}</span>
+              </div>
+              <div className="space-y-1.5">
+                {days.map((d, i) => {
+                  const isNext = i === nextIdx
+                  return (
+                    <div
+                      key={i}
+                      className={`flex items-center justify-between rounded-lg px-3 py-2 border ${isNext ? 'bg-accent-light border-accent/30' : 'border-border'}`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className={`text-[11px] tabular-nums ${isNext ? 'text-accent font-semibold' : 'text-text-tertiary'}`}>{i + 1}</span>
+                        <span className={`text-sm truncate ${isNext ? 'text-text-primary font-medium' : 'text-text-secondary'}`}>
+                          {d.is_rest_day ? 'Rest' : (d.name || `Day ${i + 1}`)}
+                        </span>
+                      </div>
+                      {isNext ? (
+                        <span className="text-[10px] bg-accent text-white px-2 py-0.5 rounded-full shrink-0">Next</span>
+                      ) : (
+                        <span className="text-[11px] text-text-tertiary shrink-0">{d.is_rest_day ? '—' : `${d.exercises?.length ?? 0} ex`}</span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={() => router.push('/logs/new/workout')}
+            className="w-full text-center text-xs text-text-secondary hover:text-accent py-2"
+          >
+            Or start a freestyle workout
+          </button>
         </>
       )}
     </PageWrapper>
