@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, Pencil, Plus } from 'lucide-react'
+import { ChevronDown, Pencil, Plus, CopyPlus, Star } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { updateLog } from '@/lib/api/logs.api'
@@ -14,9 +14,15 @@ interface MealGroupProps {
   onAddFood: () => void
   /** FB-R5-03: open the log-style sheet in edit mode for this row. */
   onEditLog?: (log: Log) => void
+  /** True when the diary is showing today (hides "Copy to today"). */
+  isToday?: boolean
+  /** Copy this meal's items onto today. */
+  onCopyToToday?: () => void
+  /** Save this meal as a reusable favourite. */
+  onSaveFavourite?: () => void
 }
 
-export function MealGroup({ mealType, items, onAddFood, onEditLog }: MealGroupProps) {
+export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = true, onCopyToToday, onSaveFavourite }: MealGroupProps) {
   // FB-10: expand state + per-child edit draft (keyed by `${logId}:${childIdx}`)
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set())
   const [editingChild, setEditingChild] = useState<{ logId: string; idx: number } | null>(null)
@@ -202,13 +208,37 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog }: MealGroupPr
           No {mealType.toLowerCase()} logged — tap to add
         </button>
       ) : (
-        <button
-          onClick={onAddFood}
-          className="flex items-center gap-1.5 px-4 py-2.5 text-xs text-accent hover:underline"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add to {mealType}
-        </button>
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <button
+            onClick={onAddFood}
+            className="flex items-center gap-1.5 text-xs text-accent hover:underline"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add to {mealType}
+          </button>
+          <div className="flex items-center gap-1">
+            {!isToday && onCopyToToday && (
+              <button
+                onClick={onCopyToToday}
+                className="flex items-center gap-1 text-[11px] text-text-secondary hover:text-accent px-2 py-1 rounded-md hover:bg-surface-hover transition-colors"
+                aria-label={`Copy ${mealType} to today`}
+              >
+                <CopyPlus className="w-3.5 h-3.5" />
+                Copy to today
+              </button>
+            )}
+            {onSaveFavourite && (
+              <button
+                onClick={onSaveFavourite}
+                className="flex items-center justify-center w-7 h-7 rounded-md text-text-tertiary hover:text-accent hover:bg-surface-hover transition-colors"
+                aria-label={`Save ${mealType} as a favourite`}
+                title="Save as favourite"
+              >
+                <Star className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </div>
   )
