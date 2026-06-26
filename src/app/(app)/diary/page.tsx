@@ -6,12 +6,16 @@ import { PageWrapper } from '@/components/layout/page-wrapper'
 import { CalendarStrip } from '@/components/shared/calendar-strip'
 import { MacroProgress } from '@/components/shared/macro-progress'
 import { MealGroup } from '@/components/diary/meal-group'
+import { FavouritesRow } from '@/components/diary/favourites-row'
 import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
+import { toast } from 'sonner'
 import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
+import { copyMeal } from '@/lib/api/meals.api'
+import { createFavourite } from '@/lib/api/favourites.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { todayLocalISO } from '@/lib/timezone'
@@ -44,6 +48,7 @@ export default function DiaryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stale read of selectedDate; see comment above
   }, [tz])
   const [logs, setLogs] = useState<Log[]>([])
+  const [favReload, setFavReload] = useState(0)
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -177,6 +182,32 @@ export default function DiaryPage() {
     setSearchOpen(true)
   }
 
+  // Copy the selected day's <mealType> onto today.
+  const handleCopyToToday = async (mealType: string) => {
+    try {
+      const r = await copyMeal({ source_date: selectedDate, source_meal_type: mealType.toLowerCase() })
+      toast.success(`Copied ${mealType} to today — ${r.copied} item${r.copied === 1 ? '' : 's'}`)
+      fetchData()
+    } catch {
+      toast.error('Failed to copy meal')
+    }
+  }
+
+  // Save the selected day's <mealType> as a reusable favourite.
+  const handleSaveFavourite = async (mealType: string) => {
+    const name = typeof window !== 'undefined'
+      ? window.prompt(`Name this favourite (${mealType}):`, mealType)?.trim()
+      : null
+    if (!name) return
+    try {
+      await createFavourite({ name, source_date: selectedDate, source_meal_type: mealType.toLowerCase(), default_meal_type: mealType.toLowerCase() })
+      toast.success(`Saved "${name}" to favourites`)
+      setFavReload((n) => n + 1)
+    } catch (e) {
+      toast.error((e as Error)?.message?.includes('exists') ? 'A favourite with that name already exists' : 'Failed to save favourite')
+    }
+  }
+
   const handleFoodLogged = () => {
     // Refresh data after logging
     fetchData()
@@ -244,6 +275,8 @@ export default function DiaryPage() {
             </button>
           )}
 
+          <FavouritesRow reloadSignal={favReload} onLogged={fetchData} />
+
           {MEAL_TYPES.map((mealType) => (
             <MealGroup
               key={mealType}
@@ -251,6 +284,9 @@ export default function DiaryPage() {
               items={groupedMeals[mealType] || []}
               onAddFood={() => handleAddFood(mealType)}
               onEditLog={handleEditLog}
+              isToday={selectedDate === today}
+              onCopyToToday={() => handleCopyToToday(mealType)}
+              onSaveFavourite={() => handleSaveFavourite(mealType)}
             />
           ))}
         </div>
