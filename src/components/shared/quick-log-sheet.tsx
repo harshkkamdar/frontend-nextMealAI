@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { AnimatePresence, motion } from 'framer-motion'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import {
   UtensilsCrossed,
   Dumbbell,
@@ -46,62 +46,34 @@ export function QuickLogSheet() {
   }
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            key="backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/40"
-            onClick={closeSheet}
-          />
+    <BottomSheet open={isOpen} onClose={closeSheet} ariaLabel="Quick log">
+      <div className="px-6 pb-8">
+        {/* Title */}
+        <h2 className="text-base font-semibold text-text-primary mb-5">
+          Quick Log
+        </h2>
 
-          {/* Sheet */}
-          <motion.div
-            key="sheet"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl px-6 pt-3 pb-8"
-          >
-            {/* Handle */}
-            <div className="flex justify-center mb-4">
-              <div className="w-10 h-1 rounded-full bg-border" />
-            </div>
-
-            {/* Title */}
-            <h2 className="text-base font-semibold text-text-primary mb-5">
-              Quick Log
-            </h2>
-
-            {/* Grid */}
-            <div className="grid grid-cols-4 gap-4">
-              {logTypes.map((item) => {
-                const Icon = item.icon
-                return (
-                  <button
-                    key={item.label}
-                    onClick={() => handleSelect(item.route)}
-                    className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-                  >
-                    <div
-                      className={`w-10 h-10 rounded-full ${item.bgColor} flex items-center justify-center`}
-                    >
-                      <Icon className="w-5 h-5" style={{ color: item.color }} />
-                    </div>
-                    <span className="text-xs text-text-primary">{item.label}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        {/* Grid */}
+        <div className="grid grid-cols-4 gap-4">
+          {logTypes.map((item) => {
+            const Icon = item.icon
+            return (
+              <button
+                key={item.label}
+                onClick={() => handleSelect(item.route)}
+                className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+              >
+                <div
+                  className={`w-10 h-10 rounded-full ${item.bgColor} flex items-center justify-center`}
+                >
+                  <Icon className="w-5 h-5" style={{ color: item.color }} />
+                </div>
+                <span className="text-xs text-text-primary">{item.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    </BottomSheet>
   )
 }
