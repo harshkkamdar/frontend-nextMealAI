@@ -9,6 +9,7 @@ import { MealGroup } from '@/components/diary/meal-group'
 import { FavouritesRow } from '@/components/diary/favourites-row'
 import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
+import { NameFavouriteDialog } from '@/components/shared/name-favourite-dialog'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
@@ -49,6 +50,7 @@ export default function DiaryPage() {
   }, [tz])
   const [logs, setLogs] = useState<Log[]>([])
   const [favReload, setFavReload] = useState(0)
+  const [nameFavFor, setNameFavFor] = useState<string | null>(null)
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -193,16 +195,18 @@ export default function DiaryPage() {
     }
   }
 
-  // Save the selected day's <mealType> as a reusable favourite.
-  const handleSaveFavourite = async (mealType: string) => {
-    const name = typeof window !== 'undefined'
-      ? window.prompt(`Name this favourite (${mealType}):`, mealType)?.trim()
-      : null
-    if (!name) return
+  // Save the selected day's <mealType> as a reusable favourite. Opens a custom
+  // in-app dialog (no native window.prompt) to name it.
+  const handleSaveFavourite = (mealType: string) => setNameFavFor(mealType)
+
+  const submitFavourite = async (name: string) => {
+    const mealType = nameFavFor
+    if (!mealType) return
     try {
       await createFavourite({ name, source_date: selectedDate, source_meal_type: mealType.toLowerCase(), default_meal_type: mealType.toLowerCase() })
       toast.success(`Saved "${name}" to favourites`)
       setFavReload((n) => n + 1)
+      setNameFavFor(null)
     } catch (e) {
       toast.error((e as Error)?.message?.includes('exists') ? 'A favourite with that name already exists' : 'Failed to save favourite')
     }
@@ -311,6 +315,13 @@ export default function DiaryPage() {
         onClose={() => setMonthOpen(false)}
         onSelectDate={setSelectedDate}
         tz={tz}
+      />
+
+      <NameFavouriteDialog
+        open={nameFavFor !== null}
+        onClose={() => setNameFavFor(null)}
+        onSubmit={submitFavourite}
+        mealType={nameFavFor ?? undefined}
       />
     </PageWrapper>
   )

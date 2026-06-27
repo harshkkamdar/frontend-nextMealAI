@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
+import { getFavourites, logFavourite, type Favourite } from '@/lib/api/favourites.api'
 import { createLog, createLogs, updateLog, deleteLog } from '@/lib/api/logs.api'
 import type { CreateLogInput } from '@/types/logs.types'
 import { formatMacroGrams, formatMacroKcal, quantizeMacros } from '@/lib/macros'
@@ -97,6 +98,11 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   const [customFat, setCustomFat] = useState<number | ''>('')
   const [customServingG, setCustomServingG] = useState<number | ''>(100)
   const [recentFoods, setRecentFoods] = useState<FoodSearchResult[]>([])
+  // Favourites surfaced right where the user adds food (the #1 place they look
+  // for a saved meal). Tapping one logs the whole favourite onto the viewed
+  // day + this meal in one go.
+  const [favourites, setFavourites] = useState<Favourite[]>([])
+  const [loggingFav, setLoggingFav] = useState<string | null>(null)
   // FE-RCA F3 — multi-select pending tray. Each entry carries enough state
   // to reconstruct a CreateLogInput at commit time. The atom of work the
   // user expresses ("log breakfast") commits as N rows via createLogs().
@@ -191,12 +197,36 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
         use_count: f.use_count,
       })))
     ).catch(() => {})
-  }, [isOpen, mode, existingLog])
+    getFavourites()
+      .then((f) => {
+        // Favourites whose saved meal matches THIS meal float to the top.
+        const meal = mealType.toLowerCase()
+        setFavourites(
+          [...f].sort((a, b) => Number((b.default_meal_type ?? '') === meal) - Number((a.default_meal_type ?? '') === meal)),
+        )
+      })
+      .catch(() => setFavourites([]))
+  }, [isOpen, mode, existingLog, mealType])
 
   // Clean up debounce on unmount
   useEffect(() => {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [])
+
+  // One-tap log a whole favourite onto the viewed day + this meal.
+  const handleLogFavourite = async (f: Favourite) => {
+    setLoggingFav(f.id)
+    try {
+      const r = await logFavourite(f.id, { target_date: logDate, target_meal_type: mealType.toLowerCase() })
+      toast.success(`Logged ${f.name} — ${r.logged} item${r.logged === 1 ? '' : 's'}`)
+      onFoodLogged()
+      onClose()
+    } catch {
+      toast.error('Failed to log favourite')
+    } finally {
+      setLoggingFav(null)
+    }
+  }
 
   // Debounced search
   const handleSearch = useCallback((q: string) => {
@@ -837,6 +867,37 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                         <Plus className="w-3.5 h-3.5" />
                         Add &ldquo;{query}&rdquo; as custom food
                       </button>
+                    </div>
+                  )}
+
+                  {/* Favourites — saved meals, surfaced right where you add food */}
+                  {!searching && query.length < 2 && mode !== 'edit' && favourites.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide mb-2 flex items-center gap-1">
+                        <Star className="w-3 h-3 text-accent fill-accent" /> Your favourites
+                      </p>
+                      <div className="space-y-1" role="listbox" aria-label="Favourite meals">
+                        {favourites.map((f) => (
+                          <button
+                            key={f.id}
+                            onClick={() => handleLogFavourite(f)}
+                            disabled={loggingFav === f.id}
+                            className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl bg-surface border border-border hover:bg-surface-hover transition-colors disabled:opacity-50 text-left"
+                          >
+                            <span className="min-w-0">
+                              <span className="block text-sm font-medium text-text-primary truncate">{f.name}</span>
+                              <span className="block text-[11px] text-text-tertiary truncate">
+                                {f.items.length} item{f.items.length === 1 ? '' : 's'}
+                                {f.items.length > 0 ? ` · ${f.items.map((it) => it.food_name).slice(0, 3).join(', ')}${f.items.length > 3 ? '…' : ''}` : ''}
+                              </span>
+                            </span>
+                            <span className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-accent">
+                              <Plus className="w-3.5 h-3.5" />
+                              {loggingFav === f.id ? 'Logging…' : 'Log'}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
 
