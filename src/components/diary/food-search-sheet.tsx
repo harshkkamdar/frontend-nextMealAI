@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useDragControls } from 'framer-motion'
 import { Search, Star, X, Plus, Minus, MessageCircle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
@@ -106,6 +106,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   const [confirmDeleteFav, setConfirmDeleteFav] = useState<string | null>(null)
   // Add-food sheet has two tabs: search individual Foods, or log a saved Meal.
   const [activeTab, setActiveTab] = useState<'food' | 'meals'>('food')
+  // Drag-to-dismiss: drag starts ONLY from the handle (dragListener=false), so
+  // the inner scroll areas are never hijacked by the sheet drag.
+  const dragControls = useDragControls()
   // FE-RCA F3 — multi-select pending tray. Each entry carries enough state
   // to reconstruct a CreateLogInput at commit time. The atom of work the
   // user expresses ("log breakfast") commits as N rows via createLogs().
@@ -570,7 +573,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/40"
+            className="fixed inset-0 z-[60] bg-black/40"
             onClick={onClose}
           />
 
@@ -583,13 +586,22 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
             role="dialog"
             aria-modal="true"
             aria-labelledby="food-sheet-title"
-            className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl flex flex-col"
-            style={{ maxHeight: '85vh' }}
+            className="fixed bottom-0 left-0 right-0 z-[70] bg-background rounded-t-3xl flex flex-col"
+            style={{ height: '85vh' }}
             onClick={(e) => e.stopPropagation()}
+            drag="y"
+            dragListener={false}
+            dragControls={dragControls}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.4 }}
+            onDragEnd={(_, info) => { if (info.offset.y > 120 || info.velocity.y > 600) onClose() }}
           >
-            {/* Handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-border" />
+            {/* Handle — drag it down to dismiss */}
+            <div
+              onPointerDown={(e) => dragControls.start(e)}
+              className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none shrink-0"
+            >
+              <div className="w-10 h-1.5 rounded-full bg-border" />
             </div>
 
             {/* Header */}
@@ -866,7 +878,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                       value={query}
                       onChange={(e) => handleSearch(e.target.value)}
                       placeholder="Search foods..."
-                      className="pl-9"
+                      className="pl-9 h-10 rounded-xl border-border bg-surface focus-visible:ring-1 focus-visible:ring-accent/40 focus-visible:border-accent"
                     />
                   </div>
                 </div>
