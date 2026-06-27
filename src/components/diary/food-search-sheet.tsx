@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
-import { getFavourites, logFavourite, type Favourite } from '@/lib/api/favourites.api'
+import { getFavourites, logFavourite, deleteFavourite, type Favourite } from '@/lib/api/favourites.api'
 import { createLog, createLogs, updateLog, deleteLog } from '@/lib/api/logs.api'
 import type { CreateLogInput } from '@/types/logs.types'
 import { formatMacroGrams, formatMacroKcal, quantizeMacros } from '@/lib/macros'
@@ -103,6 +103,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   // day + this meal in one go.
   const [favourites, setFavourites] = useState<Favourite[]>([])
   const [loggingFav, setLoggingFav] = useState<string | null>(null)
+  const [confirmDeleteFav, setConfirmDeleteFav] = useState<string | null>(null)
+  // Add-food sheet has two tabs: search individual Foods, or log a saved Meal.
+  const [activeTab, setActiveTab] = useState<'food' | 'meals'>('food')
   // FE-RCA F3 — multi-select pending tray. Each entry carries enough state
   // to reconstruct a CreateLogInput at commit time. The atom of work the
   // user expresses ("log breakfast") commits as N rows via createLogs().
@@ -183,6 +186,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     setCustomFat('')
     setCustomServingG(100)
     setPending([])  // FE-RCA F3 — clear pending tray on each fresh open
+    setActiveTab('food')
+    setConfirmDeleteFav(null)
     setTimeout(() => inputRef.current?.focus(), 300)
     getRecentFoods(8).then((foods) =>
       setRecentFoods(foods.map((f) => ({
@@ -213,7 +218,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [])
 
-  // One-tap log a whole favourite onto the viewed day + this meal.
+  // One-tap log a whole saved meal onto the viewed day + this meal slot.
   const handleLogFavourite = async (f: Favourite) => {
     setLoggingFav(f.id)
     try {
@@ -222,9 +227,21 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
       onFoodLogged()
       onClose()
     } catch {
-      toast.error('Failed to log favourite')
+      toast.error('Failed to log meal')
     } finally {
       setLoggingFav(null)
+    }
+  }
+
+  const handleDeleteFavourite = async (f: Favourite) => {
+    try {
+      await deleteFavourite(f.id)
+      setFavourites((prev) => prev.filter((x) => x.id !== f.id))
+      toast.success(`Removed ${f.name}`)
+    } catch {
+      toast.error('Failed to remove meal')
+    } finally {
+      setConfirmDeleteFav(null)
     }
   }
 
@@ -774,6 +791,71 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
             ) : (
               /* Search view */
               <>
+                {/* Food | Meals tabs (log mode only) */}
+                {mode !== 'edit' && (
+                  <div className="px-4 pb-3">
+                    <div className="flex rounded-lg bg-surface border border-border p-0.5">
+                      <button
+                        onClick={() => setActiveTab('food')}
+                        className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === 'food' ? 'bg-accent text-white' : 'text-text-secondary hover:text-text-primary'}`}
+                      >
+                        Food
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('meals')}
+                        className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 ${activeTab === 'meals' ? 'bg-accent text-white' : 'text-text-secondary hover:text-text-primary'}`}
+                      >
+                        Meals{favourites.length > 0 ? ` · ${favourites.length}` : ''}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'meals' && mode !== 'edit' ? (
+                  /* Meals tab — your saved meals, one tap to log the whole thing */
+                  <div className="flex-1 overflow-y-auto px-4 pb-6 min-h-0">
+                    {favourites.length === 0 ? (
+                      <div className="text-center py-12 space-y-1.5">
+                        <Star className="w-6 h-6 text-text-tertiary mx-auto" />
+                        <p className="text-sm text-text-secondary">No saved meals yet</p>
+                        <p className="text-xs text-text-tertiary px-6">Log a meal, then tap &ldquo;Save as meal&rdquo; on it in your diary to reuse it here.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-1.5" role="listbox" aria-label="Saved meals">
+                        {favourites.map((f) => (
+                          <div key={f.id} className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface border border-border">
+                            <button
+                              onClick={() => handleLogFavourite(f)}
+                              disabled={loggingFav === f.id}
+                              className="flex-1 min-w-0 flex items-center justify-between gap-2 disabled:opacity-50 text-left"
+                              aria-label={`Log ${f.name}`}
+                            >
+                              <span className="min-w-0">
+                                <span className="block text-sm font-medium text-text-primary truncate">{f.name}</span>
+                                <span className="block text-[11px] text-text-tertiary truncate">
+                                  {f.items.length} item{f.items.length === 1 ? '' : 's'}
+                                  {f.items.length > 0 ? ` · ${f.items.map((it) => it.food_name).slice(0, 3).join(', ')}${f.items.length > 3 ? '…' : ''}` : ''}
+                                </span>
+                              </span>
+                              <span className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-accent">
+                                <Plus className="w-3.5 h-3.5" />
+                                {loggingFav === f.id ? 'Logging…' : 'Log'}
+                              </span>
+                            </button>
+                            {confirmDeleteFav === f.id ? (
+                              <button onClick={() => handleDeleteFavourite(f)} className="shrink-0 text-[10px] text-destructive font-medium px-1.5" aria-label={`Confirm remove ${f.name}`}>Remove?</button>
+                            ) : (
+                              <button onClick={() => setConfirmDeleteFav(f.id)} aria-label={`Remove ${f.name}`} className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-text-tertiary hover:text-destructive hover:bg-surface-hover transition-colors">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                <>
                 {/* Search input */}
                 <div className="px-4 pb-3">
                   <div className="relative">
@@ -870,37 +952,6 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     </div>
                   )}
 
-                  {/* Favourites — saved meals, surfaced right where you add food */}
-                  {!searching && query.length < 2 && mode !== 'edit' && favourites.length > 0 && (
-                    <div className="mb-4">
-                      <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide mb-2 flex items-center gap-1">
-                        <Star className="w-3 h-3 text-accent fill-accent" /> Your favourites
-                      </p>
-                      <div className="space-y-1" role="listbox" aria-label="Favourite meals">
-                        {favourites.map((f) => (
-                          <button
-                            key={f.id}
-                            onClick={() => handleLogFavourite(f)}
-                            disabled={loggingFav === f.id}
-                            className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl bg-surface border border-border hover:bg-surface-hover transition-colors disabled:opacity-50 text-left"
-                          >
-                            <span className="min-w-0">
-                              <span className="block text-sm font-medium text-text-primary truncate">{f.name}</span>
-                              <span className="block text-[11px] text-text-tertiary truncate">
-                                {f.items.length} item{f.items.length === 1 ? '' : 's'}
-                                {f.items.length > 0 ? ` · ${f.items.map((it) => it.food_name).slice(0, 3).join(', ')}${f.items.length > 3 ? '…' : ''}` : ''}
-                              </span>
-                            </span>
-                            <span className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-accent">
-                              <Plus className="w-3.5 h-3.5" />
-                              {loggingFav === f.id ? 'Logging…' : 'Log'}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   {!searching && query.length < 2 && recentFoods.length > 0 ? (
                     <div>
                       <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide mb-2">Recent</p>
@@ -939,6 +990,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     Add custom food
                   </button>
                 </div>
+                </>
+                )}
               </>
             )}
 

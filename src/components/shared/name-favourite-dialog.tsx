@@ -59,11 +59,11 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
         aria-labelledby="name-fav-title"
         className="relative z-10 w-[90%] max-w-sm bg-surface border border-border rounded-2xl p-5 shadow-xl animate-in fade-in zoom-in-95 duration-150"
       >
-        <h2 id="name-fav-title" className="text-base font-semibold text-text-primary">Save as favourite</h2>
+        <h2 id="name-fav-title" className="text-base font-semibold text-text-primary">Save as a meal</h2>
         <p className="text-sm text-text-secondary mt-1.5">
           {mealType
-            ? `Save your ${mealType} as a reusable meal — log it in one tap next time.`
-            : 'Name this favourite meal.'}
+            ? `Save your ${mealType} as a reusable meal — find it under the Meals tab and log it in one tap next time.`
+            : 'Name this meal so you can reuse it later.'}
         </p>
         <input
           ref={inputRef}
@@ -72,7 +72,7 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
           onKeyDown={(e) => { if (e.key === 'Enter') submit() }}
           placeholder="e.g. Usual Lunch"
           maxLength={60}
-          aria-label="Favourite name"
+          aria-label="Meal name"
           className="mt-4 w-full px-3 py-2.5 text-sm bg-background border border-border rounded-xl text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/40"
         />
         <div className="flex items-center justify-end gap-2.5 mt-5">
