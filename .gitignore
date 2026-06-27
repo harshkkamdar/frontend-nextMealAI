@@ -47,3 +47,4 @@ next-env.d.ts
 
 # Knowledge-graph artefacts (regenerable via /graphify)
 graphify-out/
+/visual-check

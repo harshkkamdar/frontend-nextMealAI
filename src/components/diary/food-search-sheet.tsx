@@ -106,6 +106,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   const [confirmDeleteFav, setConfirmDeleteFav] = useState<string | null>(null)
   // Add-food sheet has two tabs: search individual Foods, or log a saved Meal.
   const [activeTab, setActiveTab] = useState<'food' | 'meals'>('food')
+  const [mealQuery, setMealQuery] = useState('')
   // FE-RCA F3 — multi-select pending tray. Each entry carries enough state
   // to reconstruct a CreateLogInput at commit time. The atom of work the
   // user expresses ("log breakfast") commits as N rows via createLogs().
@@ -187,6 +188,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     setCustomServingG(100)
     setPending([])  // FE-RCA F3 — clear pending tray on each fresh open
     setActiveTab('food')
+    setMealQuery('')
     setConfirmDeleteFav(null)
     setTimeout(() => inputRef.current?.focus(), 300)
     getRecentFoods(8).then((foods) =>
@@ -562,7 +564,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   } : null
 
   return (
-    <BottomSheet open={isOpen} onClose={onClose} snapPoints={[0.5, 0.92]} ariaLabel="Add food">
+    <BottomSheet open={isOpen} onClose={onClose} ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'}>
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
               <h2 id="food-sheet-title" className="text-base font-semibold text-text-primary">
@@ -784,6 +786,21 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
 
                 {activeTab === 'meals' && mode !== 'edit' ? (
                   /* Meals tab — your saved meals, one tap to log the whole thing */
+                  <>
+                  {favourites.length > 0 && (
+                    <div className="px-4 pb-3">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
+                        <Input
+                          type="text"
+                          value={mealQuery}
+                          onChange={(e) => setMealQuery(e.target.value)}
+                          placeholder="Search saved meals..."
+                          className="pl-9 h-10 rounded-xl border-border bg-surface focus-visible:ring-1 focus-visible:ring-accent/40 focus-visible:border-accent"
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="flex-1 overflow-y-auto px-4 pb-6 min-h-0">
                     {favourites.length === 0 ? (
                       <div className="text-center py-12 space-y-1.5">
@@ -791,9 +808,17 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                         <p className="text-sm text-text-secondary">No saved meals yet</p>
                         <p className="text-xs text-text-tertiary px-6">Log a meal, then tap &ldquo;Save as meal&rdquo; on it in your diary to reuse it here.</p>
                       </div>
-                    ) : (
+                    ) : (() => {
+                      const q = mealQuery.trim().toLowerCase()
+                      const shown = q
+                        ? favourites.filter((f) => f.name.toLowerCase().includes(q) || f.items.some((it) => (it.food_name ?? '').toLowerCase().includes(q)))
+                        : favourites
+                      if (shown.length === 0) {
+                        return <p className="text-center text-sm text-text-tertiary py-10">No saved meals match &ldquo;{mealQuery}&rdquo;</p>
+                      }
+                      return (
                       <div className="space-y-1.5" role="listbox" aria-label="Saved meals">
-                        {favourites.map((f) => (
+                        {shown.map((f) => (
                           <div key={f.id} className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface border border-border">
                             <button
                               onClick={() => handleLogFavourite(f)}
@@ -823,8 +848,10 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                           </div>
                         ))}
                       </div>
-                    )}
+                      )
+                    })()}
                   </div>
+                  </>
                 ) : (
                 <>
                 {/* Search input */}
