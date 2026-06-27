@@ -25,7 +25,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/92 backdrop-blur-xl border-t border-border">
+    <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-background/92 backdrop-blur-xl border-t border-border">
       <div className="max-w-md mx-auto flex items-end justify-around px-2 pt-2 pb-2">
         {navItems.map((item) => {
           if ('type' in item && item.type === 'geo') {

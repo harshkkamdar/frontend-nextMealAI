@@ -239,7 +239,7 @@ export function GeoCompanionSheet() {
   }
 
   return (
-    <BottomSheet open={isOpen} onClose={handleClose} snapPoints={[0.55, 0.92]} defaultSnapIndex={1} ariaLabel="Geo chat">
+    <BottomSheet open={isOpen} onClose={handleClose} ariaLabel="Geo chat" className="h-[80vh]">
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3 border-b border-border">
               <div className="flex items-center gap-2.5">
