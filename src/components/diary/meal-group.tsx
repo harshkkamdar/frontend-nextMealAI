@@ -230,11 +230,12 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
             {onSaveFavourite && (
               <button
                 onClick={onSaveFavourite}
-                className="flex items-center justify-center w-7 h-7 rounded-md text-text-tertiary hover:text-accent hover:bg-surface-hover transition-colors"
-                aria-label={`Save ${mealType} as a favourite`}
-                title="Save as favourite"
+                className="flex items-center gap-1 text-[11px] text-text-secondary hover:text-accent px-2 py-1 rounded-md hover:bg-surface-hover transition-colors"
+                aria-label={`Save ${mealType} as a meal`}
+                title="Save this meal to reuse later"
               >
                 <Star className="w-3.5 h-3.5" />
+                Save as meal
               </button>
             )}
           </div>

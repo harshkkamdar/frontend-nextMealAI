@@ -6,7 +6,6 @@ import { PageWrapper } from '@/components/layout/page-wrapper'
 import { CalendarStrip } from '@/components/shared/calendar-strip'
 import { MacroProgress } from '@/components/shared/macro-progress'
 import { MealGroup } from '@/components/diary/meal-group'
-import { FavouritesRow } from '@/components/diary/favourites-row'
 import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
 import { NameFavouriteDialog } from '@/components/shared/name-favourite-dialog'
@@ -49,7 +48,6 @@ export default function DiaryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stale read of selectedDate; see comment above
   }, [tz])
   const [logs, setLogs] = useState<Log[]>([])
-  const [favReload, setFavReload] = useState(0)
   const [nameFavFor, setNameFavFor] = useState<string | null>(null)
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -204,11 +202,10 @@ export default function DiaryPage() {
     if (!mealType) return
     try {
       await createFavourite({ name, source_date: selectedDate, source_meal_type: mealType.toLowerCase(), default_meal_type: mealType.toLowerCase() })
-      toast.success(`Saved "${name}" to favourites`)
-      setFavReload((n) => n + 1)
+      toast.success(`Saved "${name}" as a meal — find it under the Meals tab when adding food`)
       setNameFavFor(null)
     } catch (e) {
-      toast.error((e as Error)?.message?.includes('exists') ? 'A favourite with that name already exists' : 'Failed to save favourite')
+      toast.error((e as Error)?.message?.includes('exists') ? 'A meal with that name already exists' : 'Failed to save meal')
     }
   }
 
@@ -278,8 +275,6 @@ export default function DiaryPage() {
               View nutrition plan &rarr;
             </button>
           )}
-
-          <FavouritesRow reloadSignal={favReload} onLogged={fetchData} />
 
           {MEAL_TYPES.map((mealType) => (
             <MealGroup
