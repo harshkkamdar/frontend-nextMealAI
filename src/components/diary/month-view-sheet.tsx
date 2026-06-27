@@ -12,8 +12,8 @@
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { getLogs } from '@/lib/api/logs.api'
 import {
   buildMonthGrid,
@@ -142,36 +142,7 @@ export function MonthViewSheet({
   )
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            key="month-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/40"
-            onClick={onClose}
-          />
-
-          <motion.div
-            key="month-sheet"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="month-sheet-title"
-            className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl flex flex-col"
-            style={{ maxHeight: '85vh' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-border" />
-            </div>
-
+    <BottomSheet open={isOpen} onClose={onClose} ariaLabel="Select date">
             {/* Header: prev | title | next | close */}
             <div className="flex items-center justify-between px-4 pb-3">
               <button
@@ -224,7 +195,7 @@ export function MonthViewSheet({
 
             {/* Grid body */}
             <div
-              className="flex-1 overflow-y-auto px-4 pb-6"
+              className="flex-1 min-h-0 overflow-y-auto px-4 pb-6"
               aria-busy={loading || undefined}
             >
               <div className="grid grid-cols-7 gap-1">
@@ -282,9 +253,6 @@ export function MonthViewSheet({
                 })}
               </div>
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+    </BottomSheet>
   )
 }

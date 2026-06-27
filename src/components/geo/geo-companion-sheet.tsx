@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { useRouter } from 'next/navigation'
-import { AnimatePresence, motion } from 'framer-motion'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { X, ExternalLink, SquarePen } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUIStore } from '@/stores/ui.store'
@@ -239,36 +239,7 @@ export function GeoCompanionSheet() {
   }
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            key="companion-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/40"
-            onClick={handleClose}
-          />
-
-          {/* Sheet */}
-          <motion.div
-            key="companion-sheet"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl flex flex-col"
-            style={{ maxHeight: '70vh' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-border" />
-            </div>
-
+    <BottomSheet open={isOpen} onClose={handleClose} snapPoints={[0.55, 0.92]} defaultSnapIndex={1} ariaLabel="Geo chat">
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3 border-b border-border">
               <div className="flex items-center gap-2.5">
@@ -350,9 +321,6 @@ export function GeoCompanionSheet() {
               showCamera
               sessionId={sessionId ?? undefined}
             />
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+    </BottomSheet>
   )
 }

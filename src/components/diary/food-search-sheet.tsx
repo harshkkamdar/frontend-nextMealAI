@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { AnimatePresence, motion, useDragControls } from 'framer-motion'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Search, Star, X, Plus, Minus, MessageCircle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
@@ -106,9 +106,6 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   const [confirmDeleteFav, setConfirmDeleteFav] = useState<string | null>(null)
   // Add-food sheet has two tabs: search individual Foods, or log a saved Meal.
   const [activeTab, setActiveTab] = useState<'food' | 'meals'>('food')
-  // Drag-to-dismiss: drag starts ONLY from the handle (dragListener=false), so
-  // the inner scroll areas are never hijacked by the sheet drag.
-  const dragControls = useDragControls()
   // FE-RCA F3 — multi-select pending tray. Each entry carries enough state
   // to reconstruct a CreateLogInput at commit time. The atom of work the
   // user expresses ("log breakfast") commits as N rows via createLogs().
@@ -565,45 +562,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   } : null
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            key="food-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-black/40"
-            onClick={onClose}
-          />
-
-          <motion.div
-            key="food-sheet"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="food-sheet-title"
-            className="fixed bottom-0 left-0 right-0 z-[70] bg-background rounded-t-3xl flex flex-col"
-            style={{ height: '85vh' }}
-            onClick={(e) => e.stopPropagation()}
-            drag="y"
-            dragListener={false}
-            dragControls={dragControls}
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.4 }}
-            onDragEnd={(_, info) => { if (info.offset.y > 120 || info.velocity.y > 600) onClose() }}
-          >
-            {/* Handle — drag it down to dismiss */}
-            <div
-              onPointerDown={(e) => dragControls.start(e)}
-              className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none shrink-0"
-            >
-              <div className="w-10 h-1.5 rounded-full bg-border" />
-            </div>
-
+    <BottomSheet open={isOpen} onClose={onClose} snapPoints={[0.5, 0.92]} ariaLabel="Add food">
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
               <h2 id="food-sheet-title" className="text-base font-semibold text-text-primary">
@@ -1076,9 +1035,6 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 </p>
               </div>
             )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+    </BottomSheet>
   )
 }
