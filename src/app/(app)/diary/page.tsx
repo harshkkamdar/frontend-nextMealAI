@@ -9,6 +9,7 @@ import { MealGroup } from '@/components/diary/meal-group'
 import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
 import { NameFavouriteDialog } from '@/components/shared/name-favourite-dialog'
+import { CopyMealDialog } from '@/components/diary/copy-meal-dialog'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
@@ -49,6 +50,7 @@ export default function DiaryPage() {
   }, [tz])
   const [logs, setLogs] = useState<Log[]>([])
   const [nameFavFor, setNameFavFor] = useState<string | null>(null)
+  const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -183,11 +185,26 @@ export default function DiaryPage() {
   }
 
   // Copy the selected day's <mealType> onto today.
-  const handleCopyToToday = async (mealType: string) => {
+  // Open the meal picker so the user chooses which slot to copy INTO (a lunch
+  // they ate for breakfast can go to Breakfast). Defaults to the source meal.
+  const handleCopyToToday = (mealType: string) => setCopyFrom(mealType)
+
+  const doCopyToToday = async (targetMeal: string) => {
+    const source = copyFrom
+    if (!source) return
+    setCopyFrom(null)
     try {
-      const r = await copyMeal({ source_date: selectedDate, source_meal_type: mealType.toLowerCase() })
-      toast.success(`Copied ${mealType} to today — ${r.copied} item${r.copied === 1 ? '' : 's'}`)
-      fetchData()
+      const r = await copyMeal({
+        source_date: selectedDate,
+        source_meal_type: source.toLowerCase(),
+        target_meal_type: targetMeal.toLowerCase(),
+      })
+      toast[r.copied > 0 ? 'success' : 'error'](
+        r.copied > 0
+          ? `Copied ${source} to today's ${targetMeal} — ${r.copied} item${r.copied === 1 ? '' : 's'}`
+          : `Nothing to copy from ${source}`,
+      )
+      if (r.copied > 0) fetchData()
     } catch {
       toast.error('Failed to copy meal')
     }
@@ -317,6 +334,13 @@ export default function DiaryPage() {
         onClose={() => setNameFavFor(null)}
         onSubmit={submitFavourite}
         mealType={nameFavFor ?? undefined}
+      />
+
+      <CopyMealDialog
+        open={copyFrom !== null}
+        sourceMeal={copyFrom}
+        onClose={() => setCopyFrom(null)}
+        onPick={doCopyToToday}
       />
     </PageWrapper>
   )
