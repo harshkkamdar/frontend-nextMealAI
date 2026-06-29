@@ -564,7 +564,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   } : null
 
   return (
-    <BottomSheet open={isOpen} onClose={onClose} ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'}>
+    <BottomSheet open={isOpen} onClose={onClose} ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'} className={mode === 'edit' ? '' : 'h-[85vh]'}>
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
               <h2 id="food-sheet-title" className="text-base font-semibold text-text-primary">
