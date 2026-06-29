@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { useRouter } from 'next/navigation'
-import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { ResizableSheet } from '@/components/ui/resizable-sheet'
 import { X, ExternalLink, SquarePen } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUIStore } from '@/stores/ui.store'
@@ -239,7 +239,7 @@ export function GeoCompanionSheet() {
   }
 
   return (
-    <BottomSheet open={isOpen} onClose={handleClose} ariaLabel="Geo chat" className="h-[80vh]">
+    <ResizableSheet open={isOpen} onClose={handleClose} ariaLabel="Geo chat" levels={[0.55, 0.94]} defaultLevelIndex={1}>
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3 border-b border-border">
               <div className="flex items-center gap-2.5">
@@ -321,6 +321,6 @@ export function GeoCompanionSheet() {
               showCamera
               sessionId={sessionId ?? undefined}
             />
-    </BottomSheet>
+    </ResizableSheet>
   )
 }
