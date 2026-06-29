@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { ResizableSheet } from '@/components/ui/resizable-sheet'
 import { Search, Star, X, Plus, Minus, MessageCircle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
@@ -564,7 +564,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   } : null
 
   return (
-    <BottomSheet open={isOpen} onClose={onClose} ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'} className={mode === 'edit' ? '' : 'h-[85vh]'}>
+    <ResizableSheet open={isOpen} onClose={onClose} ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'} levels={[0.4, 0.7, 0.94]} defaultLevelIndex={mode === 'edit' ? 0 : 1}>
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
               <h2 id="food-sheet-title" className="text-base font-semibold text-text-primary">
@@ -1062,6 +1062,6 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 </p>
               </div>
             )}
-    </BottomSheet>
+    </ResizableSheet>
   )
 }
