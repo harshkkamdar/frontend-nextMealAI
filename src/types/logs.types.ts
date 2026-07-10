@@ -28,6 +28,15 @@ export interface FoodPayload {
   meal_type?: string
   user_food_id?: string
   servings?: number
+  /**
+   * Natural serving unit noun (singular), e.g. "egg", "slice", "roll", "bar".
+   * When present with `servings`, the diary renders "3 eggs" / "2 slices"
+   * instead of grams (George, 2026-07-10 — countable single-serve foods should
+   * read as servings, not grams).
+   */
+  serving_label?: string
+  /** Grams in ONE serving (servings × serving_size_g === quantity_g). */
+  serving_size_g?: number
   notes?: string
   /** FB-10 — optional per-component breakdown for image estimates */
   items?: FoodLogItem[]

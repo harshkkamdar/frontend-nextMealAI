@@ -105,7 +105,11 @@ export default function DiaryPage() {
   // to UTC slicing for legacy rows where local_date is still NULL.
   const dayLogs = useMemo(() => {
     return logs.filter((log) => {
-      const logDate = log.local_date ?? new Date(log.created_at).toISOString().split('T')[0]
+      // G-FOOD-04: bucket NULL-local_date (legacy) rows by the user's tz, not a
+      // UTC slice — a UTC slice disagrees with the backend at the midnight
+      // boundary, so a row the backend files under "today" could paint under
+      // "yesterday" here (a source of "logged, didn't show, showed up later").
+      const logDate = log.local_date ?? todayLocalISO(tz, new Date(log.created_at))
       return logDate === selectedDate && log.type === 'food'
     })
   }, [logs, selectedDate])
@@ -170,7 +174,7 @@ export default function DiaryPage() {
   const indicators = useMemo(() => {
     const map = new Map<string, { food?: boolean; workout?: boolean }>()
     for (const log of logs) {
-      const d = log.local_date ?? new Date(log.created_at).toISOString().split('T')[0]
+      const d = log.local_date ?? todayLocalISO(tz, new Date(log.created_at))
       const existing = map.get(d) || {}
       existing.food = true
       map.set(d, existing)
