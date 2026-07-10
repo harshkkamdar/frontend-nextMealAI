@@ -8,6 +8,27 @@ import { updateLog } from '@/lib/api/logs.api'
 import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 import type { FoodLogItem, FoodPayload, Log } from '@/types/logs.types'
 
+/**
+ * Render the quantity label for a food row. Prefers a NATURAL serving unit
+ * ("3 eggs", "2 slices") when the log carries a serving_label + servings —
+ * George, 2026-07-10: countable single-serve foods (egg, bread, cheese slice)
+ * should read as servings, not grams. Falls back to "N serving(s)", then grams,
+ * then "1 serving".
+ */
+function formatQuantity(payload: FoodPayload): string {
+  const servings = typeof payload.servings === 'number' ? payload.servings : undefined
+  const label = typeof payload.serving_label === 'string' ? payload.serving_label.trim() : ''
+  if (servings !== undefined && label) {
+    const plural = servings === 1 || /s$/i.test(label) ? label : `${label}s`
+    return `${servings} ${plural}`
+  }
+  if (servings !== undefined) {
+    return `${servings} serving${servings === 1 ? '' : 's'}`
+  }
+  if (payload.quantity_g) return `${payload.quantity_g}g`
+  return '1 serving'
+}
+
 interface MealGroupProps {
   mealType: string
   items: Log[]
@@ -96,9 +117,7 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-text-primary truncate">{payload.food_name}</p>
                     <p className="text-[11px] text-text-tertiary tabular-nums">
-                      {typeof payload.servings === 'number'
-                        ? `${payload.servings} serving${payload.servings === 1 ? '' : 's'}`
-                        : payload.quantity_g ? `${payload.quantity_g}g` : '1 serving'}
+                      {formatQuantity(payload)}
                       {cals > 0 && ` · ${formatMacroKcal(cals)} cal`}
                       {protein > 0 && <> · <span className="text-info">{formatMacroGrams(protein)} P</span></>}
                       {carbsVal > 0 && <> · <span className="text-warning">{formatMacroGrams(carbsVal)} C</span></>}
@@ -118,9 +137,7 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
                     <p className="text-sm text-text-primary truncate">{payload.food_name}</p>
                     <p aria-hidden="true" className="text-[11px] text-text-tertiary tabular-nums">
                       {/* FB-R5-03: render the unit the user logged in */}
-                      {typeof payload.servings === 'number'
-                        ? `${payload.servings} serving${payload.servings === 1 ? '' : 's'}`
-                        : payload.quantity_g ? `${payload.quantity_g}g` : '1 serving'}
+                      {formatQuantity(payload)}
                       {cals > 0 && ` · ${formatMacroKcal(cals)} cal`}
                       {protein > 0 && <> · <span className="text-info">{formatMacroGrams(protein)} P</span></>}
                       {carbsVal > 0 && <> · <span className="text-warning">{formatMacroGrams(carbsVal)} C</span></>}

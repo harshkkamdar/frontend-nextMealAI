@@ -164,3 +164,50 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
     expect(items[2].est_macros.calories).toBe(231)
   })
 })
+
+// George, 2026-07-10: countable single-serve foods must read as natural
+// servings ("3 eggs", "2 slices"), not grams or a bare "1 serving".
+describe('serving_label quantity rendering', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  function renderWith(payload: Record<string, unknown>) {
+    render(
+      <MealGroup mealType="Breakfast" items={[makeFoodLog({ payload: payload as never })]} onAddFood={() => {}} />,
+    )
+  }
+
+  it('renders "3 eggs" when serving_label + servings are present', () => {
+    renderWith({
+      food_name: 'Egg, whole',
+      servings: 3, serving_label: 'egg', serving_size_g: 50, quantity_g: 150,
+      est_macros: { calories: 216, protein: 19, carbs: 1, fat: 15 },
+    })
+    expect(screen.getByText(/3 eggs/i)).toBeInTheDocument()
+    expect(screen.queryByText(/150g/)).not.toBeInTheDocument()
+  })
+
+  it('pluralizes correctly: "1 egg" (singular) and "4 slices"', () => {
+    render(
+      <MealGroup
+        mealType="Lunch"
+        items={[
+          makeFoodLog({ id: 'a', payload: { food_name: 'Egg', servings: 1, serving_label: 'egg', quantity_g: 50, est_macros: { calories: 72 } } as never }),
+          makeFoodLog({ id: 'b', payload: { food_name: 'Cheese', servings: 4, serving_label: 'slice', quantity_g: 84, est_macros: { calories: 184 } } as never }),
+        ]}
+        onAddFood={() => {}}
+      />,
+    )
+    expect(screen.getByText(/1 egg\b/i)).toBeInTheDocument()
+    expect(screen.getByText(/4 slices/i)).toBeInTheDocument()
+  })
+
+  it('falls back to grams for a bulk food with no serving_label', () => {
+    renderWith({ food_name: 'Rice', quantity_g: 180, est_macros: { calories: 234 } })
+    expect(screen.getByText(/180g/)).toBeInTheDocument()
+  })
+
+  it('still shows "N servings" when servings present but no serving_label', () => {
+    renderWith({ food_name: 'Protein shake', servings: 2, quantity_g: 500, est_macros: { calories: 300 } })
+    expect(screen.getByText(/2 servings/i)).toBeInTheDocument()
+  })
+})
