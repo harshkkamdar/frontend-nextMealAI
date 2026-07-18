@@ -77,11 +77,20 @@ export function computeCompleteSetResult(
     return { exercises: updated, rest: { show: false, seconds: 0, bumpKey: false } }
   }
 
-  // Mark complete
+  // Mark complete. R7 #6 — record actuals from what's shown when the user
+  // hasn't overridden them. The carried/planned numbers render only as input
+  // PLACEHOLDERS, so a user who trusts the pre-filled value and just taps the
+  // check previously completed the set with actual_reps/actual_weight_kg = null.
+  // That zeroed volume AND — because next session's carry-forward seeds from
+  // prior actuals — meant nothing ever carried through ("previous weights/reps
+  // not tracking"). Defaulting actuals from planned makes the tap record the
+  // shown value, so history and carry-forward stay correct.
   target.sets[setIndex] = {
     ...set,
     completed: true,
     completed_at: nowIso,
+    actual_reps: set.actual_reps ?? set.planned_reps ?? null,
+    actual_weight_kg: set.actual_weight_kg ?? set.planned_weight_kg ?? null,
   } as SetData
 
   if (target.status === 'pending') {

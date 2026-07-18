@@ -466,7 +466,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
                   >
                     <span className="text-sm font-semibold text-text-primary">{set.set_number}</span>
                     <span className="text-xs text-text-tertiary tabular-nums">
-                      {set.previous_reps && set.previous_weight_kg ? `${set.previous_reps}×${set.previous_weight_kg}` : '—'}
+                      {set.previous_reps != null && set.previous_weight_kg != null ? `${set.previous_reps}×${set.previous_weight_kg}` : '—'}
                     </span>
                     <input
                       type="number" inputMode="numeric"
@@ -476,7 +476,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
                     />
                     <input
                       type="number" inputMode="decimal"
-                      value={set.actual_weight_kg ?? ''} placeholder={set.planned_weight_kg ? String(set.planned_weight_kg) : '—'}
+                      value={set.actual_weight_kg ?? ''} placeholder={set.planned_weight_kg != null ? String(set.planned_weight_kg) : '—'}
                       onChange={(e) => updateSet(currentIndex, setIdx, 'actual_weight_kg', e.target.value ? Number(e.target.value) : null)}
                       className="w-full h-10 text-center text-sm bg-background border border-border rounded-lg focus:border-accent outline-none tabular-nums"
                     />
