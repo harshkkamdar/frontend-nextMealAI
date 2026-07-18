@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { X, Minus, Plus, Volume2, VolumeX } from 'lucide-react'
+import { X, Minus, Plus, Volume2, VolumeX, ChevronDown, ChevronUp } from 'lucide-react'
 import { playBell } from '@/lib/audio'
 
 const MUTE_KEY = 'restTimerMuted'
@@ -26,6 +26,11 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
   // the progress ring both use it so adjustments survive a background/refocus.
   const [target, setTarget] = useState(duration)
   const [muted, setMuted] = useState(false)
+  // R7 #7/#8 — collapse the full-screen timer to a sticky bar so the workout
+  // list underneath stays visible and editable (browse ahead / adjust upcoming
+  // set weights while resting). Sticky across sets: once minimised it stays
+  // minimised for the next rest too, so browsing isn't interrupted every set.
+  const [minimized, setMinimized] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const onCompleteRef = useRef(onComplete)
   onCompleteRef.current = onComplete
@@ -124,6 +129,62 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
   const seconds = remaining % 60
   const R = 54
   const CIRC = 2 * Math.PI * R
+  const clock = `${minutes}:${seconds.toString().padStart(2, '0')}`
+
+  // Minimised: a compact sticky bar. The rest of the screen (the workout list)
+  // stays interactive, so the user can scroll ahead and edit upcoming weights.
+  if (minimized) {
+    return (
+      <motion.div
+        key="rest-bar"
+        initial={{ y: 80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 80, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        role="dialog"
+        aria-label="Rest timer (minimised)"
+        className="fixed inset-x-3 bottom-4 z-[60]"
+      >
+        <div className="relative flex items-center gap-2 rounded-2xl bg-accent text-white pl-4 pr-2 py-2.5 shadow-xl overflow-hidden">
+          {/* thin progress line along the bottom */}
+          <div
+            className="absolute left-0 bottom-0 h-1 bg-white/45"
+            style={{ width: `${progress * 100}%`, transition: 'width 1s linear' }}
+          />
+          <button
+            onClick={() => setMinimized(false)}
+            aria-label="Expand rest timer"
+            className="flex items-center gap-2 flex-1 text-left active:scale-95 transition-transform"
+          >
+            <ChevronUp className="w-4 h-4 shrink-0" />
+            <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-white/80">Rest</span>
+            <span className="text-xl font-bold tabular-nums leading-none" aria-live="polite">{clock}</span>
+          </button>
+          <button
+            onClick={() => adjust(-15)}
+            aria-label="Subtract 15 seconds"
+            className="flex items-center gap-0.5 px-2.5 py-2 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-xs font-semibold transition-all"
+          >
+            <Minus className="w-3.5 h-3.5" />15
+          </button>
+          <button
+            onClick={() => adjust(15)}
+            aria-label="Add 15 seconds"
+            className="flex items-center gap-0.5 px-2.5 py-2 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-xs font-semibold transition-all"
+          >
+            <Plus className="w-3.5 h-3.5" />15
+          </button>
+          <button
+            onClick={onSkip}
+            aria-label="Skip rest timer"
+            className="px-3.5 py-2 rounded-full bg-white text-accent text-xs font-bold hover:bg-white/90 active:scale-95 transition-all"
+          >
+            Skip
+          </button>
+        </div>
+      </motion.div>
+    )
+  }
 
   return (
     <motion.div
@@ -137,6 +198,15 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
       aria-label="Rest timer"
       className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-accent text-white px-6"
     >
+      {/* Minimise → sticky bar, so the workout list stays editable while resting */}
+      <button
+        onClick={() => setMinimized(true)}
+        aria-label="Minimise rest timer"
+        className="absolute top-5 left-5 w-10 h-10 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 active:scale-95 transition-all"
+      >
+        <ChevronDown className="w-5 h-5" />
+      </button>
+
       {/* Mute / sound toggle */}
       <button
         onClick={toggleMute}
@@ -192,6 +262,15 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
           <Plus className="w-4 h-4" /> 15s
         </button>
       </div>
+
+      {/* Discovery hint for browse-ahead (R7 #8) */}
+      <button
+        onClick={() => setMinimized(true)}
+        className="mt-8 flex items-center gap-1.5 text-xs font-medium text-white/75 hover:text-white active:scale-95 transition-all"
+      >
+        <ChevronDown className="w-3.5 h-3.5" />
+        Minimise to check or edit your upcoming sets
+      </button>
     </motion.div>
   )
 }
