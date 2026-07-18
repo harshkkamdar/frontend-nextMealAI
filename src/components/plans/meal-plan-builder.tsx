@@ -96,7 +96,11 @@ function fromInitial(plan: MealPlan | undefined): {
     meals: (d.meals ?? []).map((m) => ({ ...m, _key: nextKey() })),
   }))
   return {
-    name: '',
+    // R7 #11 — prefill the plan name from stored content. It was hardcoded ''
+    // in edit mode, so validate() ("Plan name is required") always failed and
+    // "Save changes" was permanently disabled — the user could never save a
+    // manual target change. (The workout builder already reads content.name.)
+    name: plan.content.name ?? '',
     notes: plan.content.notes ?? '',
     startDate: plan.start_date ?? '',
     endDate: plan.end_date ?? '',
@@ -165,6 +169,9 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
     setSubmitting(true)
     try {
       const content: MealPlan['content'] = {
+        // R7 #11 — persist the plan name so a rename in the editor sticks
+        // (previously omitted; the backend kept the old content.name).
+        name: name.trim() || undefined,
         daily_targets: {
           calories: targets.calories!,
           protein: targets.protein!,
