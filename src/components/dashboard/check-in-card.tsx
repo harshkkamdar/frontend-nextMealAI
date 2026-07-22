@@ -27,9 +27,9 @@ import type {
   DashboardCheckInDay,
 } from '@/lib/api/dashboard.api'
 
-const PREFILL = encodeURIComponent(
-  'Walk me through my trends from this week — what should I focus on?'
-)
+// Triggers Geo's structured Weekly Check-In (run_weekly_check_in) — how I'm
+// tracking vs my goal + whether to adjust, not just a freeform chat.
+const PREFILL = encodeURIComponent('Run my weekly check-in — how am I tracking and should I adjust anything?')
 
 function shortMacro(cell: { actual: number; target: number }): string {
   return `${Math.round(cell.actual)}/${Math.round(cell.target)}`
@@ -81,7 +81,7 @@ export function CheckInCard({ checkIn }: { checkIn: DashboardCheckIn }) {
         className="text-xs font-medium text-accent hover:underline"
         data-testid="check-in-drilldown-link"
       >
-        Ask Geo for the deeper view &rarr;
+        Run my weekly check-in with Geo &rarr;
       </Link>
     </div>
   )
