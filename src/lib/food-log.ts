@@ -42,6 +42,7 @@ function cleanMacros(m: FoodMacros): FoodMacros {
 export function buildFoodLogItems(
   pending: FoodDraft[],
   current: FoodDraft | null,
+  localDate?: string,
 ): CreateLogInput[] {
   const drafts = [...pending]
   if (isFoodDraftFilled(current)) drafts.push(current as FoodDraft)
@@ -55,5 +56,8 @@ export function buildFoodLogItems(
       user_food_id: d.user_food_id || undefined,
     },
     source: 'manual' as const,
+    // R6-12 — bucket the whole meal onto the viewed diary date (not "today")
+    // when the page was opened from a past/future day. Omitted → BE uses today.
+    ...(localDate ? { local_date: localDate } : {}),
   }))
 }

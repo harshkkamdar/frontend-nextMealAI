@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { ChatHeader } from '@/components/chat/chat-header'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { ChatInput } from '@/components/chat/chat-input'
+import { SuggestedReplies } from '@/components/chat/suggested-replies'
 import { getChatSession, getChatSessions, sendMessage } from '@/lib/api/chat.api'
 import { extractWorkoutProgram, isLikelyWorkoutProgramPrompt } from '@/lib/api/vision.api'
 import { WorkoutProgramPreviewCard } from '@/components/plans/workout-program-preview-card'
@@ -131,6 +132,8 @@ export default function ActiveChatPage({
           actions_taken: res.actions_taken,
           actions_failed: res.actions_failed,
         },
+        // R6-10 — tappable option chips (top-level or persisted metadata).
+        suggestedReplies: res.suggested_replies ?? res.response.metadata?.suggested_replies,
       }
       setMessages((prev) => [...prev, geoMessage])
 
@@ -184,6 +187,19 @@ export default function ActiveChatPage({
         </div>
       )}
       <ChatThread messages={messages} isTyping={isTyping} />
+      {/* R6-10 — option chips for the latest assistant message; tap sends it.
+          Reads live `suggestedReplies` or persisted `metadata.suggested_replies`. */}
+      {(() => {
+        const last = messages[messages.length - 1]
+        const chips = !isTyping && last?.role === 'assistant'
+          ? last.suggestedReplies ?? last.metadata?.suggested_replies ?? []
+          : []
+        return chips.length > 0 ? (
+          <div className="px-4">
+            <SuggestedReplies options={chips} onSelect={handleSend} />
+          </div>
+        ) : null
+      })()}
       {/* FB-R6-FE-D: pass sessionId so a draft started in the floating Geo
           widget survives the navigation here. */}
       <ChatInput

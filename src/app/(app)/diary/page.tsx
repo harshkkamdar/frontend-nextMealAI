@@ -182,10 +182,12 @@ export default function DiaryPage() {
     return map
   }, [logs])
 
+  // R6-12 — "Add food" now opens the dedicated full-page logger (favourites +
+  // recents first, multi-add), bucketed to the viewed meal + date. Returning
+  // (router.back) remounts the diary, which refetches. Editing an existing log
+  // still uses the inline sheet below.
   const handleAddFood = (mealType: string) => {
-    setEditingLog(null)
-    setSelectedMealType(mealType)
-    setSearchOpen(true)
+    router.push(`/logs/new/food?meal=${encodeURIComponent(mealType)}&date=${encodeURIComponent(selectedDate)}`)
   }
 
   // Copy the selected day's <mealType> onto today.

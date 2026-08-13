@@ -11,6 +11,7 @@ import { useGeoScreenContext } from '@/contexts/geo-screen-context'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { ChatBubble } from '@/components/chat/chat-bubble'
 import { ChatInput } from '@/components/chat/chat-input'
+import { SuggestedReplies } from '@/components/chat/suggested-replies'
 import { TypingIndicator } from '@/components/chat/typing-indicator'
 import {
   startCompanionSession,
@@ -211,6 +212,8 @@ export function GeoCompanionSheet() {
           actions_taken: res.actions_taken,
           actions_failed: res.actions_failed,
         },
+        // R6-10 — option chips (top-level or in persisted metadata).
+        suggestedReplies: res.suggested_replies ?? res.response.metadata?.suggested_replies,
       }
       setMessages((prev) => [...prev, geoMsg])
       messageCountRef.current += 1
@@ -291,6 +294,16 @@ export function GeoCompanionSheet() {
                     <ChatBubble key={msg.id ?? i} message={msg} />
                   ))}
                   {isTyping && <TypingIndicator />}
+                  {/* R6-10 — chips for the latest assistant message only. */}
+                  {(() => {
+                    const last = messages[messages.length - 1]
+                    const chips = !isTyping && last?.role === 'assistant'
+                      ? last.suggestedReplies ?? last.metadata?.suggested_replies ?? []
+                      : []
+                    return chips.length > 0 ? (
+                      <SuggestedReplies options={chips} onSelect={handleSend} />
+                    ) : null
+                  })()}
                 </>
               )}
               <div ref={bottomRef} />

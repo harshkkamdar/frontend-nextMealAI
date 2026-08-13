@@ -10,6 +10,8 @@ export interface ChatMessageMetadata {
   tools_used?: string[]
   actions_taken?: Array<{ type: string; details: unknown }>
   actions_failed?: ActionFailure[]
+  // R6-10 — tappable option chips Geo offered with this message (persisted).
+  suggested_replies?: string[]
 }
 
 // FB-R6-02 — chat image attachments persisted via the BE message_attachments
@@ -40,6 +42,8 @@ export interface ChatMessage {
    */
   attachments?: ChatAttachment[]
   metadata?: ChatMessageMetadata
+  // R6-10 — tappable option chips for this assistant message (from the reply).
+  suggestedReplies?: string[]
 }
 
 export interface ChatSession {
@@ -64,6 +68,8 @@ export interface ChatResponse {
   tools_used?: string[]
   actions_taken?: Array<{ type: string; details: unknown }>
   actions_failed?: ActionFailure[]
+  // R6-10 — top-level convenience copy of the message's option chips.
+  suggested_replies?: string[]
 }
 
 export interface SendMessageInput {

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { X, MessageCircle, Camera, Loader2, Sparkles, Search, Plus, Trash2 } from 'lucide-react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { X, MessageCircle, Camera, Loader2, Sparkles, Search, Plus, Trash2, Star, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,20 +12,32 @@ import {
   estimateFoodFromPhoto,
   logFromEstimate,
   searchFoods,
+  getPersonalFoods,
   type FoodEstimate,
 } from '@/lib/api/foods.api'
 import { buildFoodLogItems, type FoodDraft } from '@/lib/food-log'
 import { formatMacroKcal } from '@/lib/macros'
-import type { FoodSearchResult } from '@/types/foods.types'
+import type { FoodSearchResult, UserFood } from '@/types/foods.types'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
 
+function capitalizeMeal(v: string | null): string {
+  if (!v) return ''
+  const c = v.charAt(0).toUpperCase() + v.slice(1).toLowerCase()
+  return MEAL_TYPES.includes(c) ? c : ''
+}
+
 export function FoodLogForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // R6-12 — the diary opens this page as its "Add food" flow, passing the meal
+  // slot + the viewed date so the log lands on the right meal AND the right day
+  // (not always "today"). Other entry points omit them → sensible defaults.
+  const logDate = searchParams.get('date') || undefined
   const [saving, setSaving] = useState(false)
   const [foodName, setFoodName] = useState('')
   const [quantityG, setQuantityG] = useState<number | ''>('')
-  const [mealType, setMealType] = useState('')
+  const [mealType, setMealType] = useState(() => capitalizeMeal(searchParams.get('meal')))
   const [calories, setCalories] = useState<number | ''>('')
   const [protein, setProtein] = useState<number | ''>('')
   const [carbs, setCarbs] = useState<number | ''>('')
@@ -57,9 +69,49 @@ export function FoodLogForm() {
   const [estimateConfidence, setEstimateConfidence] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // R6-12 — the user's own foods, shown FIRST (before searching) so logging a
+  // usual food is one tap. `last_used_at`/`use_count` are populated server-side
+  // now (R6-11), so recents/favourites are meaningful.
+  const [personalFoods, setPersonalFoods] = useState<UserFood[]>([])
+
   useEffect(() => {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [])
+
+  useEffect(() => {
+    let alive = true
+    getPersonalFoods()
+      .then((foods) => { if (alive) setPersonalFoods(foods) })
+      .catch(() => { /* non-fatal — search still works */ })
+    return () => { alive = false }
+  }, [])
+
+  const favourites = useMemo(
+    () => personalFoods.filter((f) => f.is_favorite).slice(0, 12),
+    [personalFoods],
+  )
+  const recents = useMemo(() => {
+    const favIds = new Set(favourites.map((f) => f.id))
+    return personalFoods
+      .filter((f) => f.last_used_at && !favIds.has(f.id))
+      .sort((a, b) => new Date(b.last_used_at!).getTime() - new Date(a.last_used_at!).getTime())
+      .slice(0, 8)
+  }, [personalFoods, favourites])
+
+  // Adapt a saved UserFood to the same selection path as a search result so a
+  // tapped personal food prefills the form (and stays linked via user_food_id).
+  const handleSelectPersonalFood = (f: UserFood) => {
+    handleSelectResult({
+      id: f.id,
+      name: f.name,
+      brand: f.brand,
+      serving_size_g: f.serving_size_g,
+      macros_per_serving: f.macros_per_serving,
+      source: 'personal',
+      is_favorite: f.is_favorite,
+      use_count: f.use_count,
+    })
+  }
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q)
@@ -196,7 +248,7 @@ export function FoodLogForm() {
     // BUG-009 — multi-add commit. When items are staged (and we're not in the
     // photo-estimate path), log the whole meal in one batch.
     if (!estimateId && pending.length > 0) {
-      const items = buildFoodLogItems(pending, foodName.trim() ? currentDraft() : null)
+      const items = buildFoodLogItems(pending, foodName.trim() ? currentDraft() : null, logDate)
       if (items.length === 0) { toast.error('Nothing to log'); return }
       setSaving(true)
       try {
@@ -270,6 +322,8 @@ export function FoodLogForm() {
             user_food_id: userFoodId || undefined,
           },
           source: 'manual',
+          // R6-12 — bucket onto the viewed diary date when opened from a past day.
+          ...(logDate ? { local_date: logDate } : {}),
         })
         toast.success('Food logged')
       }
@@ -395,6 +449,38 @@ export function FoodLogForm() {
           </div>
         )}
       </div>
+
+      {/* R6-12 — Your foods (favourites + recents), shown FIRST before searching
+          so logging a usual food is one tap. Hidden once the user starts typing
+          a search or loads a photo estimate. */}
+      {query.trim().length < 2 && !estimateId && (favourites.length > 0 || recents.length > 0) && (
+        <div className="mb-4 space-y-3" data-testid="your-foods">
+          {favourites.length > 0 && (
+            <div>
+              <p className="mb-1.5 flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-text-tertiary">
+                <Star className="h-3 w-3" /> Favourites
+              </p>
+              <div className="rounded-xl border border-border bg-surface overflow-hidden">
+                {favourites.map((f) => (
+                  <PersonalFoodRow key={`fav-${f.id}`} food={f} onSelect={handleSelectPersonalFood} />
+                ))}
+              </div>
+            </div>
+          )}
+          {recents.length > 0 && (
+            <div>
+              <p className="mb-1.5 flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-text-tertiary">
+                <Clock className="h-3 w-3" /> Recent
+              </p>
+              <div className="rounded-xl border border-border bg-surface overflow-hidden">
+                {recents.map((f) => (
+                  <PersonalFoodRow key={`recent-${f.id}`} food={f} onSelect={handleSelectPersonalFood} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Meal type chips */}
       <div className="flex gap-2 mb-6 overflow-x-auto">
@@ -542,5 +628,29 @@ export function FoodLogForm() {
         </Button>
       </div>
     </div>
+  )
+}
+
+/** A tappable row for one of the user's saved foods (favourite or recent). */
+function PersonalFoodRow({ food, onSelect }: { food: UserFood; onSelect: (f: UserFood) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(food)}
+      data-testid="personal-food-row"
+      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-surface-hover transition-colors border-b border-border last:border-b-0"
+    >
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-text-primary truncate">{food.name}</p>
+        <p className="text-[11px] text-text-tertiary">
+          {formatMacroKcal(food.macros_per_serving.calories)} cal
+          {food.serving_size_g ? ` · per ${food.serving_size_g}g` : ''}
+          {food.brand ? ` · ${food.brand}` : ''}
+        </p>
+      </div>
+      <div className="w-7 h-7 rounded-full bg-accent-light flex items-center justify-center shrink-0">
+        <Plus className="w-4 h-4 text-accent" />
+      </div>
+    </button>
   )
 }

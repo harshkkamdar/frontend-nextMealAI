@@ -12,13 +12,19 @@ const mocks = vi.hoisted(() => ({
   estimate: vi.fn(),
   logFromEstimate: vi.fn(),
   createLog: vi.fn(),
+  createLogs: vi.fn(),
+  getPersonalFoods: vi.fn(async (): Promise<import('@/types/foods.types').UserFood[]> => []),
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
   back: vi.fn(),
+  push: vi.fn(),
+  // R6-12 — the form now reads useSearchParams (meal/date). Tests set this string.
+  searchParamsStr: '',
 }))
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ back: mocks.back, push: vi.fn() }),
+  useRouter: () => ({ back: mocks.back, push: mocks.push }),
+  useSearchParams: () => new URLSearchParams(mocks.searchParamsStr),
 }))
 
 vi.mock('sonner', () => ({
@@ -31,12 +37,13 @@ vi.mock('@/lib/api/foods.api', () => ({
   // BUG-009 — the page now searches the food DB; tests never type so this
   // resolves to no results, but the export must exist on the mocked module.
   searchFoods: () => Promise.resolve([]),
+  // R6-12 — the page loads the user's own foods (favourites + recents) up front.
+  getPersonalFoods: () => mocks.getPersonalFoods(),
 }))
 
 vi.mock('@/lib/api/logs.api', () => ({
   createLog: (...args: unknown[]) => mocks.createLog(...args),
-  // BUG-009 — multi-add commit fans out via createLogs; present for shape.
-  createLogs: (...args: unknown[]) => mocks.createLog(...args),
+  createLogs: (...args: unknown[]) => mocks.createLogs(...args),
 }))
 
 import { FoodLogForm } from '@/components/logs/food-log-form'
@@ -66,6 +73,9 @@ describe('FoodLogForm — FB-R6-13 Photo Estimate', () => {
     Object.values(mocks).forEach((m) => {
       if (typeof m === 'function' && 'mockReset' in m) (m as { mockReset: () => void }).mockReset()
     })
+    // Restore defaults cleared by mockReset (the form calls these on mount).
+    mocks.getPersonalFoods.mockResolvedValue([])
+    mocks.searchParamsStr = ''
   })
 
   it('AC01: Photo estimate button is visible at the top of the form', () => {
@@ -166,5 +176,72 @@ describe('FoodLogForm — FB-R6-13 Photo Estimate', () => {
     await waitFor(() => expect(mocks.toastError).toHaveBeenCalled())
     const btn = screen.getByTestId('photo-estimate-button') as HTMLButtonElement
     await waitFor(() => expect(btn.disabled).toBe(false))
+  })
+})
+
+// ── R6-12 — food logging as its own page: favourites/recents-first + meal/date ──
+function userFood(over: Partial<import('@/types/foods.types').UserFood> = {}): import('@/types/foods.types').UserFood {
+  return {
+    id: over.id ?? 'f1', user_id: 'u1', name: over.name ?? 'Oat Toast',
+    serving_size_g: over.serving_size_g ?? 40,
+    macros_per_serving: over.macros_per_serving ?? { calories: 90, protein: 3, carbs: 15, fat: 1 },
+    source: 'personal', is_favorite: over.is_favorite ?? false,
+    use_count: over.use_count ?? 1, last_used_at: over.last_used_at, created_at: '2026-08-01T00:00:00Z',
+    ...over,
+  }
+}
+
+describe('FoodLogForm — R6-12 full-page logging (favourites/recents-first)', () => {
+  beforeEach(() => {
+    Object.values(mocks).forEach((m) => {
+      if (typeof m === 'function' && 'mockReset' in m) (m as { mockReset: () => void }).mockReset()
+    })
+    mocks.getPersonalFoods.mockResolvedValue([])
+    mocks.searchParamsStr = ''
+  })
+
+  it('shows the user\'s favourites and recents BEFORE searching', async () => {
+    mocks.getPersonalFoods.mockResolvedValue([
+      userFood({ id: 'fav1', name: 'Greek Yogurt', is_favorite: true }),
+      userFood({ id: 'rec1', name: 'Raisin Toast', last_used_at: '2026-08-13T09:00:00Z' }),
+    ])
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByTestId('your-foods')).toBeInTheDocument())
+    expect(screen.getByText('Greek Yogurt')).toBeInTheDocument()
+    expect(screen.getByText('Raisin Toast')).toBeInTheDocument()
+    expect(screen.getByText('Favourites')).toBeInTheDocument()
+    expect(screen.getByText('Recent')).toBeInTheDocument()
+  })
+
+  it('tapping a saved food prefills the form', async () => {
+    mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Greek Yogurt', is_favorite: true })])
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByText('Greek Yogurt')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Greek Yogurt'))
+    // Food Name input now carries the tapped food.
+    expect(screen.getByDisplayValue('Greek Yogurt')).toBeInTheDocument()
+  })
+
+  it('logs to the meal + date from the URL (not "today")', async () => {
+    mocks.searchParamsStr = 'meal=Lunch&date=2026-08-10'
+    mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Greek Yogurt', is_favorite: true })])
+    mocks.createLog.mockResolvedValue({ id: 'log1' })
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByText('Greek Yogurt')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Greek Yogurt'))
+    fireEvent.click(screen.getByText('Save'))
+    await waitFor(() => expect(mocks.createLog).toHaveBeenCalled())
+    const arg = mocks.createLog.mock.calls[0][0]
+    expect(arg.local_date).toBe('2026-08-10')
+    expect(arg.payload.meal_type).toBe('Lunch')
+    expect(arg.payload.food_name).toBe('Greek Yogurt')
+  })
+
+  it('hides Your Foods once the user starts typing a search', async () => {
+    mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Greek Yogurt', is_favorite: true })])
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByTestId('your-foods')).toBeInTheDocument())
+    fireEvent.change(screen.getByTestId('food-search-input'), { target: { value: 'chicken' } })
+    await waitFor(() => expect(screen.queryByTestId('your-foods')).not.toBeInTheDocument())
   })
 })

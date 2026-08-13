@@ -1,6 +1,6 @@
 'use client'
 
-import { use } from 'react'
+import { use, Suspense } from 'react'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { FoodLogForm } from '@/components/logs/food-log-form'
 import { WorkoutLogForm } from '@/components/logs/workout-log-form'
@@ -30,7 +30,10 @@ export default function NewLogPage({ params }: { params: Promise<{ type: string 
 
   return (
     <PageWrapper>
-      <FormComponent />
+      {/* FoodLogForm reads useSearchParams (meal/date) — needs a Suspense boundary. */}
+      <Suspense fallback={null}>
+        <FormComponent />
+      </Suspense>
     </PageWrapper>
   )
 }
