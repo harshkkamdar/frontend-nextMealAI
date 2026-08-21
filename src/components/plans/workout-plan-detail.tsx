@@ -31,19 +31,30 @@ function formatDateRange(start?: string, end?: string): string {
   return `Until ${fmt(end!)}`
 }
 
-function formatExerciseDetail(exercise: { sets?: number; reps?: number; weight?: number; duration_seconds?: number }): string {
+// R7-05 — format rest like "90s" / "2m" / "2m 30s".
+function formatRest(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return s > 0 ? `${m}m ${s}s` : `${m}m`
+}
+
+function formatExerciseDetail(exercise: { sets?: number; reps?: number | string; weight?: number; duration_seconds?: number; rest_seconds?: number }): string {
   // FB-R6.7 — reps can land as a sentinel `-1` for duration-based exercises
-  // (plank holds etc.) from older AI-generated plans before the BE validator
-  // tightened to .positive(). Treat reps <= 0 as missing.
+  // (plank holds etc.). Treat reps <= 0 as missing. R7-05 — reps may also be a
+  // RANGE string ("8-10", "AMRAP"), and rest_seconds should always show.
   const parts: string[] = []
-  const validReps = typeof exercise.reps === 'number' && exercise.reps > 0
+  const repsVal = exercise.reps
+  const validReps =
+    (typeof repsVal === 'number' && repsVal > 0) || (typeof repsVal === 'string' && repsVal.trim().length > 0)
+  const repsStr = typeof repsVal === 'number' ? String(repsVal) : String(repsVal ?? '').trim()
   const validSets = typeof exercise.sets === 'number' && exercise.sets > 0
   if (validSets && validReps) {
-    parts.push(`${exercise.sets}x${exercise.reps}`)
+    parts.push(`${exercise.sets} × ${repsStr}`)
   } else if (validSets) {
     parts.push(`${exercise.sets} sets`)
   } else if (validReps) {
-    parts.push(`${exercise.reps} reps`)
+    parts.push(`${repsStr} reps`)
   }
   if (exercise.weight != null) {
     parts.push(`${exercise.weight} kg`)
@@ -53,7 +64,10 @@ function formatExerciseDetail(exercise: { sets?: number; reps?: number; weight?:
     const secs = exercise.duration_seconds % 60
     parts.push(mins > 0 ? `${mins}m${secs > 0 ? ` ${secs}s` : ''}` : `${secs}s`)
   }
-  return parts.join(' / ')
+  if (typeof exercise.rest_seconds === 'number' && exercise.rest_seconds > 0) {
+    parts.push(`${formatRest(exercise.rest_seconds)} rest`)
+  }
+  return parts.join(' · ')
 }
 
 export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {

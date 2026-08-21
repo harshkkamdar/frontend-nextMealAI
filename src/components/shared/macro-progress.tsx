@@ -18,7 +18,9 @@ interface MacroBarProps {
 function MacroBar({ label, macro, consumed, target, color, onDotClick }: MacroBarProps) {
   const hasTarget = target > 0
   const pct = hasTarget ? Math.min((consumed / target) * 100, 100) : 0
-  const remaining = Math.max(0, target - consumed)
+  // R7-04 — show how much OVER when consumed exceeds target (was clamped to 0).
+  const remaining = target - consumed
+  const over = remaining < 0
 
   return (
     <div className="flex-1">
@@ -29,7 +31,11 @@ function MacroBar({ label, macro, consumed, target, color, onDotClick }: MacroBa
           data-testid={`macro-${macro}-readout`}
         >
           {hasTarget ? (
-            <>{formatMacroGrams(consumed)} &middot; {formatMacroGrams(remaining)} left</>
+            over ? (
+              <>{formatMacroGrams(consumed)} &middot; <span className="text-destructive">{formatMacroGrams(Math.abs(remaining))} over</span></>
+            ) : (
+              <>{formatMacroGrams(consumed)} &middot; {formatMacroGrams(remaining)} left</>
+            )
           ) : (
             // FB-R6.7 Build B — explicit "not set" instead of "0g consumed"
             // which made George's planner read as a working plan when targets
@@ -68,7 +74,9 @@ interface MacroProgressProps {
 export function MacroProgress({ calories, protein, carbs, fat, foodLogs = [] }: MacroProgressProps) {
   const hasCalorieTarget = calories.target > 0
   const calPct = hasCalorieTarget ? Math.min((calories.consumed / calories.target) * 100, 100) : 0
-  const remaining = Math.max(0, calories.target - calories.consumed)
+  // R7-04 — show the overage (e.g. "142 over") instead of "0 remaining".
+  const remaining = calories.target - calories.consumed
+  const calOver = remaining < 0
   const [activeMacro, setActiveMacro] = useState<MacroKey | null>(null)
 
   return (
@@ -81,9 +89,11 @@ export function MacroProgress({ calories, protein, carbs, fat, foodLogs = [] }: 
             {hasCalorieTarget ? <>/ {formatMacroKcal(calories.target)} cal</> : 'cal'}
           </span>
         </div>
-        <span className="text-xs text-text-tertiary">
+        <span className="text-xs text-text-tertiary" data-testid="calorie-remaining-readout">
           {hasCalorieTarget
-            ? <>{formatMacroKcal(remaining)} remaining</>
+            ? calOver
+              ? <span className="text-destructive font-medium">{formatMacroKcal(Math.abs(remaining))} over</span>
+              : <>{formatMacroKcal(remaining)} remaining</>
             : <span className="italic">targets not set</span>}
         </span>
       </div>

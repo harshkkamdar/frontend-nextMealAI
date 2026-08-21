@@ -245,3 +245,47 @@ describe('FoodLogForm — R6-12 full-page logging (favourites/recents-first)', (
     await waitFor(() => expect(screen.queryByTestId('your-foods')).not.toBeInTheDocument())
   })
 })
+
+describe('FoodLogForm — R7-07 servings selector', () => {
+  beforeEach(() => {
+    Object.values(mocks).forEach((m) => {
+      if (typeof m === 'function' && 'mockReset' in m) (m as { mockReset: () => void }).mockReset()
+    })
+    mocks.getPersonalFoods.mockResolvedValue([])
+    mocks.searchParamsStr = ''
+  })
+
+  it('tapping a food with a serving size shows the Servings/Grams toggle (default Servings)', async () => {
+    mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Bega Cheese Slice', serving_size_g: 21, is_favorite: true })])
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByText('Bega Cheese Slice')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Bega Cheese Slice'))
+    expect(screen.getByTestId('serving-mode-toggle')).toBeInTheDocument()
+    expect(screen.getByTestId('servings-value').textContent).toBe('1')
+    expect(screen.getByText('21g')).toBeInTheDocument() // derived grams
+  })
+
+  it('the + stepper increases servings (and derived grams)', async () => {
+    mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Bega Cheese Slice', serving_size_g: 21, is_favorite: true })])
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByText('Bega Cheese Slice')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Bega Cheese Slice'))
+    fireEvent.click(screen.getByLabelText('More servings'))
+    expect(screen.getByTestId('servings-value').textContent).toBe('1.25')
+  })
+
+  it('logs quantity_g = servings × serving size (no manual gram math)', async () => {
+    mocks.searchParamsStr = 'meal=Dinner'
+    mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Bega Cheese Slice', serving_size_g: 21, is_favorite: true })])
+    mocks.createLog.mockResolvedValue({ id: 'log1' })
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByText('Bega Cheese Slice')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Bega Cheese Slice'))
+    // 1 → 2 servings (4 × +0.25)
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByLabelText('More servings'))
+    expect(screen.getByTestId('servings-value').textContent).toBe('2')
+    fireEvent.click(screen.getByText('Save'))
+    await waitFor(() => expect(mocks.createLog).toHaveBeenCalled())
+    expect(mocks.createLog.mock.calls[0][0].payload.quantity_g).toBe(42) // 2 × 21
+  })
+})

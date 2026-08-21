@@ -12,28 +12,36 @@ import { computeSelectedPlanDayIndex } from '@/lib/workout-session'
  * still float around). Defensive: treat reps <= 0 as missing and prefer
  * duration_seconds when present.
  */
+// R7-05 — reps may be a range string ("8-10"); rest should show; sets/reps must
+// present consistently (a missing-sets exercise used to render blank).
 function formatSetsRepsOrDuration(exercise: {
   sets?: number
-  reps?: number
+  reps?: number | string
   duration_seconds?: number
+  rest_seconds?: number
 }): string | null {
-  const validReps = typeof exercise.reps === 'number' && exercise.reps > 0
+  const repsVal = exercise.reps
+  const validReps =
+    (typeof repsVal === 'number' && repsVal > 0) || (typeof repsVal === 'string' && repsVal.trim().length > 0)
+  const repsStr = typeof repsVal === 'number' ? String(repsVal) : String(repsVal ?? '').trim()
   const validDuration =
     typeof exercise.duration_seconds === 'number' && exercise.duration_seconds > 0
   const validSets = typeof exercise.sets === 'number' && exercise.sets > 0
+  const rest =
+    typeof exercise.rest_seconds === 'number' && exercise.rest_seconds > 0
+      ? ` · ${exercise.rest_seconds < 60 ? `${exercise.rest_seconds}s` : `${Math.floor(exercise.rest_seconds / 60)}m${exercise.rest_seconds % 60 > 0 ? ` ${exercise.rest_seconds % 60}s` : ''}`} rest`
+      : ''
 
-  if (validSets && validReps) {
-    return `${exercise.sets} × ${exercise.reps}`
-  }
+  if (validSets && validReps) return `${exercise.sets} × ${repsStr}${rest}`
   if (validDuration) {
     const total = exercise.duration_seconds!
     const mins = Math.floor(total / 60)
     const secs = total % 60
     const dur = mins > 0 ? `${mins}m${secs > 0 ? ` ${secs}s` : ''}` : `${secs}s`
-    return validSets ? `${exercise.sets} × ${dur}` : dur
+    return `${validSets ? `${exercise.sets} × ${dur}` : dur}${rest}`
   }
-  if (validSets) return `${exercise.sets} sets`
-  if (validReps) return `${exercise.reps} reps`
+  if (validSets) return `${exercise.sets} sets${rest}`
+  if (validReps) return `${repsStr} reps${rest}`
   return null
 }
 

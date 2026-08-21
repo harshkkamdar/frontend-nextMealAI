@@ -60,6 +60,14 @@ export function FoodLogForm() {
   const [macroBasisPerG, setMacroBasisPerG] = useState<
     { calories: number; protein: number; carbs: number; fat: number } | null
   >(null)
+  // R7-07 — servings selector (so "4 servings" is a tap, not gram math). When a
+  // food with a known serving size is selected we default to Servings mode.
+  const [servingSizeG, setServingSizeG] = useState<number | null>(null)
+  const [inputMode, setInputMode] = useState<'servings' | 'grams'>('grams')
+  const [servings, setServings] = useState<number>(1)
+  // R7-02 — scroll the edit form into view when a food is tapped (it used to sit
+  // at the bottom of the page, "cumbersome" to reach).
+  const formRef = useRef<HTMLDivElement | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // FB-R6-13 — Photo estimate flow. When estimateId is set, Save calls
@@ -138,18 +146,36 @@ export function FoodLogForm() {
     setFat('')
     setUserFoodId(null)
     setMacroBasisPerG(null)
+    setServingSizeG(null)
+    setInputMode('grams')
+    setServings(1)
     clearEstimate()
   }
 
-  // Set quantity and, when a search result is the source (basis known), rescale
-  // the macros to the new amount so they never disagree with the quantity.
+  // Rescale macros from the per-gram basis (when a DB food is the source).
+  const rescaleMacros = (grams: number) => {
+    if (macroBasisPerG && grams > 0) {
+      setCalories(Math.round(macroBasisPerG.calories * grams))
+      setProtein(Math.round(macroBasisPerG.protein * grams * 10) / 10)
+      setCarbs(Math.round(macroBasisPerG.carbs * grams * 10) / 10)
+      setFat(Math.round(macroBasisPerG.fat * grams * 10) / 10)
+    }
+  }
+
+  // Set quantity (grams) and rescale macros so they never disagree with it.
   const handleQuantityChange = (val: number | '') => {
     setQuantityG(val)
-    if (macroBasisPerG && typeof val === 'number' && val > 0) {
-      setCalories(Math.round(macroBasisPerG.calories * val))
-      setProtein(Math.round(macroBasisPerG.protein * val * 10) / 10)
-      setCarbs(Math.round(macroBasisPerG.carbs * val * 10) / 10)
-      setFat(Math.round(macroBasisPerG.fat * val * 10) / 10)
+    if (typeof val === 'number') rescaleMacros(val)
+  }
+
+  // R7-07 — servings changed → derive grams from serving_size_g and rescale.
+  const handleServingsChange = (val: number) => {
+    const s = Number.isFinite(val) && val > 0 ? val : 0
+    setServings(s)
+    if (servingSizeG && s > 0) {
+      const grams = Math.round(s * servingSizeG)
+      setQuantityG(grams)
+      rescaleMacros(grams)
     }
   }
 
@@ -171,6 +197,21 @@ export function FoodLogForm() {
       protein: (m.protein ?? 0) / serving,
       carbs: (m.carbs ?? 0) / serving,
       fat: (m.fat ?? 0) / serving,
+    })
+    // R7-07 — enable Servings mode when the food has a known serving size.
+    if (food.serving_size_g && food.serving_size_g > 0) {
+      setServingSizeG(food.serving_size_g)
+      setServings(1)
+      setInputMode('servings')
+    } else {
+      setServingSizeG(null)
+      setInputMode('grams')
+    }
+    // R7-02 — bring the editable form into view instead of leaving it at the bottom.
+    requestAnimationFrame(() => {
+      if (typeof formRef.current?.scrollIntoView === 'function') {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
     })
     // Link to the personal food DB when this is a saved food (USDA results
     // have no personal id → stays null and logs as free text, as before).
@@ -500,7 +541,7 @@ export function FoodLogForm() {
       </div>
 
       {/* Form fields */}
-      <div className="space-y-4">
+      <div className="space-y-4" ref={formRef}>
         <div className="space-y-1">
           <Label className="text-xs text-text-secondary">Food Name</Label>
           <Input
@@ -511,15 +552,64 @@ export function FoodLogForm() {
           />
         </div>
 
-        <div className="space-y-1">
-          <Label className="text-xs text-text-secondary">Quantity (g)</Label>
-          <Input
-            type="number"
-            placeholder="Optional"
-            value={quantityG}
-            onChange={(e) => handleQuantityChange(e.target.value ? Number(e.target.value) : '')}
-          />
-        </div>
+        {/* R7-07 — Servings/Grams: pick "4 servings" without doing gram math.
+            Only offered when a food with a known serving size is selected. */}
+        {servingSizeG && servingSizeG > 0 ? (
+          <div className="space-y-1.5">
+            <div className="flex rounded-full bg-surface-hover p-0.5" data-testid="serving-mode-toggle">
+              <button
+                type="button"
+                onClick={() => {
+                  // switching to servings → seed from current grams
+                  if (typeof quantityG === 'number' && quantityG > 0) setServings(Math.round((quantityG / servingSizeG) * 100) / 100)
+                  setInputMode('servings')
+                }}
+                className={`flex-1 rounded-full py-1.5 text-sm transition-colors ${inputMode === 'servings' ? 'bg-accent text-white' : 'text-text-secondary'}`}
+              >
+                Servings
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  // switching to grams → seed grams from servings
+                  setQuantityG(Math.round(servings * servingSizeG))
+                  setInputMode('grams')
+                }}
+                className={`flex-1 rounded-full py-1.5 text-sm transition-colors ${inputMode === 'grams' ? 'bg-accent text-white' : 'text-text-secondary'}`}
+              >
+                Grams
+              </button>
+            </div>
+            {inputMode === 'servings' ? (
+              <div className="flex items-center gap-3">
+                <button type="button" aria-label="Fewer servings" onClick={() => handleServingsChange(Math.max(0.25, Math.round((servings - 0.25) * 100) / 100))} className="w-9 h-9 rounded-full border border-border text-lg text-text-secondary">−</button>
+                <div className="flex-1 text-center">
+                  <span className="text-lg font-semibold tabular-nums" data-testid="servings-value">{servings}</span>
+                  <span className="text-sm text-text-tertiary"> serving{servings === 1 ? '' : 's'}</span>
+                  <p className="text-[11px] text-text-tertiary">{Math.round(servings * servingSizeG)}g</p>
+                </div>
+                <button type="button" aria-label="More servings" onClick={() => handleServingsChange(Math.round((servings + 0.25) * 100) / 100)} className="w-9 h-9 rounded-full border border-border text-lg text-text-secondary">+</button>
+              </div>
+            ) : (
+              <Input
+                type="number"
+                placeholder="grams"
+                value={quantityG}
+                onChange={(e) => handleQuantityChange(e.target.value ? Number(e.target.value) : '')}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="space-y-1">
+            <Label className="text-xs text-text-secondary">Quantity (g)</Label>
+            <Input
+              type="number"
+              placeholder="Optional"
+              value={quantityG}
+              onChange={(e) => handleQuantityChange(e.target.value ? Number(e.target.value) : '')}
+            />
+          </div>
+        )}
 
         {/* Macros 2x2 grid */}
         <div className="grid grid-cols-2 gap-3">

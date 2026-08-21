@@ -19,6 +19,21 @@ import { useUserTimezone } from '@/hooks/useUserTimezone'
 import type { WorkoutPlan } from '@/types/plans.types'
 import type { WorkoutSession } from '@/types/workout-session.types'
 
+// R7-06 — a guarded "sets × reps · rest" line (reps may be a range string). When
+// nothing is set, returns '' so we never render a stray "— ×".
+function formatExDetail(ex: any): string {
+  const reps = ex?.reps
+  const validReps = (typeof reps === 'number' && reps > 0) || (typeof reps === 'string' && reps.trim().length > 0)
+  const repsStr = typeof reps === 'number' ? String(reps) : String(reps ?? '').trim()
+  const validSets = typeof ex?.sets === 'number' && ex.sets > 0
+  const rs = typeof ex?.rest_seconds === 'number' && ex.rest_seconds > 0 ? ex.rest_seconds : 0
+  const rest = rs ? ` · ${rs < 60 ? `${rs}s` : `${Math.floor(rs / 60)}m${rs % 60 ? ` ${rs % 60}s` : ''}`} rest` : ''
+  if (validSets && validReps) return `${ex.sets} × ${repsStr}${rest}`
+  if (validSets) return `${ex.sets} sets${rest}`
+  if (validReps) return `${repsStr} reps${rest}`
+  return ''
+}
+
 export default function ActivityPage() {
   const router = useRouter()
   const tz = useUserTimezone()
@@ -28,6 +43,8 @@ export default function ActivityPage() {
   const [history, setHistory] = useState<WorkoutSession[]>([])
   const [loading, setLoading] = useState(true)
   const [starting, setStarting] = useState(false)
+  // R7-06 — which program day is expanded to show its exercises inline.
+  const [expandedDay, setExpandedDay] = useState<number | null>(null)
 
   // FB-R5-02: snap selectedDate forward when tz upgrades from device→profile,
   // BUT only if the user is still sitting on what was "today" at mount.
@@ -238,11 +255,14 @@ export default function ActivityPage() {
 
                 {/* Exercise preview */}
                 <div className="space-y-1 mb-3">
-                  {(nextWorkout.exercises || []).slice(0, 4).map((ex: any, i: number) => (
-                    <p key={i} className="text-xs text-text-secondary">
-                      {ex.name} — {ex.sets}×{ex.reps}
-                    </p>
-                  ))}
+                  {(nextWorkout.exercises || []).slice(0, 4).map((ex: any, i: number) => {
+                    const detail = formatExDetail(ex)
+                    return (
+                      <p key={i} className="text-xs text-text-secondary">
+                        {ex.name}{detail && <span className="text-text-tertiary"> — {detail}</span>}
+                      </p>
+                    )
+                  })}
                   {(nextWorkout.exercises?.length ?? 0) > 4 && (
                     <p className="text-xs text-text-tertiary">+{nextWorkout.exercises!.length - 4} more</p>
                   )}
@@ -346,21 +366,43 @@ export default function ActivityPage() {
               <div className="space-y-1.5">
                 {days.map((d, i) => {
                   const isNext = i === nextIdx
+                  const exercises = (d.exercises ?? []) as any[]
+                  const canExpand = !d.is_rest_day && exercises.length > 0
+                  const isExpanded = expandedDay === i
                   return (
-                    <div
-                      key={i}
-                      className={`flex items-center justify-between rounded-lg px-3 py-2 border ${isNext ? 'bg-accent-light border-accent/30' : 'border-border'}`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`text-[11px] tabular-nums ${isNext ? 'text-accent font-semibold' : 'text-text-tertiary'}`}>{i + 1}</span>
-                        <span className={`text-sm truncate ${isNext ? 'text-text-primary font-medium' : 'text-text-secondary'}`}>
-                          {d.is_rest_day ? 'Rest' : (d.name || `Day ${i + 1}`)}
-                        </span>
-                      </div>
-                      {isNext ? (
-                        <span className="text-[10px] bg-accent text-white px-2 py-0.5 rounded-full shrink-0">Next</span>
-                      ) : (
-                        <span className="text-[11px] text-text-tertiary shrink-0">{d.is_rest_day ? '—' : `${d.exercises?.length ?? 0} ex`}</span>
+                    <div key={i}>
+                      {/* R7-06 — a tappable day row that expands to show its
+                          exercises inline (was a static div; the full program was
+                          only reachable via "View full plan"). */}
+                      <button
+                        type="button"
+                        onClick={() => canExpand && setExpandedDay(isExpanded ? null : i)}
+                        aria-expanded={isExpanded}
+                        className={`w-full flex items-center justify-between rounded-lg px-3 py-2 border text-left transition-colors ${isNext ? 'bg-accent-light border-accent/30' : 'border-border'} ${canExpand ? 'hover:bg-surface-hover' : ''}`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`text-[11px] tabular-nums ${isNext ? 'text-accent font-semibold' : 'text-text-tertiary'}`}>{i + 1}</span>
+                          <span className={`text-sm truncate ${isNext ? 'text-text-primary font-medium' : 'text-text-secondary'}`}>
+                            {d.is_rest_day ? 'Rest' : (d.name || `Day ${i + 1}`)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {isNext && <span className="text-[10px] bg-accent text-white px-2 py-0.5 rounded-full">Next</span>}
+                          <span className="text-[11px] text-text-tertiary">{d.is_rest_day ? '—' : `${exercises.length} ex`}</span>
+                          {canExpand && <ChevronRight className={`w-3.5 h-3.5 text-text-tertiary transition-transform ${isExpanded ? 'rotate-90' : ''}`} />}
+                        </div>
+                      </button>
+                      {isExpanded && canExpand && (
+                        <div className="mt-1 mb-1.5 ml-6 space-y-0.5">
+                          {exercises.map((ex: any, j: number) => {
+                            const detail = formatExDetail(ex)
+                            return (
+                              <p key={j} className="text-xs text-text-secondary">
+                                {ex.name}{detail && <span className="text-text-tertiary"> — {detail}</span>}
+                              </p>
+                            )
+                          })}
+                        </div>
                       )}
                     </div>
                   )
