@@ -1,5 +1,7 @@
 import { apiFetch } from './client'
+import { offlineMutate } from '@/lib/offline/mutate'
 import type { Log, LogsSummary, CreateLogInput } from '@/types/logs.types'
+import type { OfflineResult } from '@/types/offline.types'
 
 export async function getLogs(params?: { type?: string; days?: number; limit?: number; offset?: number }): Promise<Log[]> {
   const query = new URLSearchParams()
@@ -17,7 +19,27 @@ export async function getLogsSummary(period: 'day' | 'week' | 'month'): Promise<
 }
 
 export async function createLog(data: CreateLogInput): Promise<Log> {
-  return apiFetch<Log>('/v1/logs', { method: 'POST', body: data })
+  const result = await createLogWithStatus(data)
+  return result.queued ? result.optimistic : result.data
+}
+
+export async function createLogWithStatus(data: CreateLogInput): Promise<OfflineResult<Log>> {
+  return offlineMutate(
+    data.type === 'food' ? 'food_log' : 'log',
+    'POST',
+    '/v1/logs',
+    data,
+    (item) => {
+      const now = new Date().toISOString()
+      return {
+        ...data,
+        id: `pending-${item.id}`,
+        pending: true,
+        created_at: now,
+        local_date: data.local_date ?? now.slice(0, 10),
+      } as unknown as Log
+    },
+  )
 }
 
 /**

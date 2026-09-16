@@ -5,7 +5,10 @@ export async function getProfile(): Promise<Profile> {
   return apiFetch<Profile>('/v1/profile')
 }
 
-export async function updateProfile(data: Partial<Profile>): Promise<Profile> {
+export async function updateProfile(data: Partial<Profile> & {
+  ai_consent?: boolean
+  health_disclaimer_ack?: boolean
+}): Promise<Profile> {
   return apiFetch<Profile>('/v1/profile', { method: 'PUT', body: data })
 }
 

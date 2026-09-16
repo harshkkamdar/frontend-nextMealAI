@@ -1,4 +1,6 @@
 import { apiFetch } from './client'
+import { offlineMutate } from '@/lib/offline/mutate'
+import type { OfflineResult } from '@/types/offline.types'
 
 export interface FavouriteItem {
   food_name: string
@@ -39,5 +41,34 @@ export async function logFavourite(
   id: string,
   body?: { target_date?: string; target_meal_type?: string },
 ): Promise<{ success: boolean; favourite: string; logged: number; total: number; target_date: string }> {
-  return apiFetch(`/v1/favourites/${id}/log`, { method: 'POST', body: body ?? {} })
+  const result = await logFavouriteWithStatus(id, body)
+  return result.queued ? result.optimistic : result.data
+}
+
+type LogFavouriteResult = {
+  success: boolean
+  favourite: string
+  logged: number
+  total: number
+  target_date: string
+}
+
+export async function logFavouriteWithStatus(
+  id: string,
+  body?: { target_date?: string; target_meal_type?: string },
+): Promise<OfflineResult<LogFavouriteResult>> {
+  const payload = body ?? {}
+  return offlineMutate(
+    'favourite_log',
+    'POST',
+    `/v1/favourites/${id}/log`,
+    payload,
+    () => ({
+      success: true,
+      favourite: id,
+      logged: 0,
+      total: 0,
+      target_date: payload.target_date ?? new Date().toISOString().slice(0, 10),
+    }),
+  )
 }

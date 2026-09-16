@@ -115,6 +115,7 @@ describe('FE-RCA F3 — createLog singleton remains unchanged', () => {
     expect(mockedApiFetch).toHaveBeenCalledWith('/v1/logs', {
       method: 'POST',
       body: foodLogInput('Oats'),
+      idempotencyKey: expect.any(String),
     })
   })
 })

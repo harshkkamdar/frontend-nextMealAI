@@ -1,4 +1,6 @@
 import { apiFetch } from './client'
+import { offlineMutate } from '@/lib/offline/mutate'
+import type { OfflineResult } from '@/types/offline.types'
 
 export interface CopyMealResult {
   success: boolean
@@ -17,5 +19,22 @@ export async function copyMeal(params: {
   source_meal_type?: string
   target_meal_type?: string
 }): Promise<CopyMealResult> {
-  return apiFetch<CopyMealResult>('/v1/meals/copy', { method: 'POST', body: params })
+  const result = await copyMealWithStatus(params)
+  return result.queued ? result.optimistic : result.data
+}
+
+export async function copyMealWithStatus(params: {
+  source_date: string
+  target_date?: string
+  source_meal_type?: string
+  target_meal_type?: string
+}): Promise<OfflineResult<CopyMealResult>> {
+  return offlineMutate('meal_copy', 'POST', '/v1/meals/copy', params, () => ({
+    success: true,
+    copied: 0,
+    total: 0,
+    source_date: params.source_date,
+    target_date: params.target_date ?? new Date().toISOString().slice(0, 10),
+    items: [],
+  }))
 }

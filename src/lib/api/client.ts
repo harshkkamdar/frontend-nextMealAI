@@ -2,11 +2,20 @@
 // Do not import or call apiFetch from Server Components or Route Handlers.
 import { ApiException } from '@/types/api.types'
 import { useAuthStore } from '@/stores/auth.store'
+import { isOnline } from '@/lib/platform/network'
 
 export const API_BASE = (process.env.NEXT_PUBLIC_CORE_API_URL ?? 'http://localhost:4010').replace(/\/$/, '')
 
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown
+  idempotencyKey?: string
+}
+
+export class OfflineError extends Error {
+  constructor(message = 'Network unavailable') {
+    super(message)
+    this.name = 'OfflineError'
+  }
 }
 
 // FB-R6-02 — detect FormData so multipart uploads bypass JSON.stringify and
@@ -37,7 +46,10 @@ async function tryRefreshToken(): Promise<string | null> {
       const user = useAuthStore.getState().user!
       useAuthStore.getState().setSession(user, newAccess, newRefresh ?? refreshToken)
       return newAccess
-    } catch {
+    } catch (error) {
+      if (error instanceof TypeError && !(await isOnline())) {
+        throw new OfflineError(error.message)
+      }
       return null
     } finally {
       refreshPromise = null
@@ -48,6 +60,7 @@ async function tryRefreshToken(): Promise<string | null> {
 
 export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const accessToken = useAuthStore.getState().accessToken
+  const { idempotencyKey, ...requestOptions } = options
 
   // If no token and this isn't an auth endpoint, redirect to login
   if (!accessToken && !path.startsWith('/auth/')) {
@@ -68,6 +81,10 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     headers['Authorization'] = `Bearer ${accessToken}`
   }
 
+  if (idempotencyKey) {
+    headers['Idempotency-Key'] = idempotencyKey
+  }
+
   // FB-R6.7 Build E — attach the browser's IANA timezone on every request so
   // the BE can bucket `local_date` in the user's actual zone without depending
   // on a profile.timezone row that may be stale or NULL. The header overrides
@@ -82,16 +99,24 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     }
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers,
-    body:
-      options.body === undefined
-        ? undefined
-        : bodyIsForm
-          ? (options.body as FormData)
-          : JSON.stringify(options.body),
-  })
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...requestOptions,
+      headers,
+      body:
+        options.body === undefined
+          ? undefined
+          : bodyIsForm
+            ? (options.body as FormData)
+            : JSON.stringify(options.body),
+    })
+  } catch (error) {
+    if (error instanceof TypeError && !(await isOnline())) {
+      throw new OfflineError(error.message)
+    }
+    throw error
+  }
 
   if (!response.ok) {
     if (response.status === 401 && !path.startsWith('/auth/')) {
@@ -99,16 +124,24 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
       const newToken = await tryRefreshToken()
       if (newToken) {
         const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` }
-        const retryRes = await fetch(`${API_BASE}${path}`, {
-          ...options,
-          headers: retryHeaders,
-          body:
-            options.body === undefined
-              ? undefined
-              : bodyIsForm
-                ? (options.body as FormData)
-                : JSON.stringify(options.body),
-        })
+        let retryRes: Response
+        try {
+          retryRes = await fetch(`${API_BASE}${path}`, {
+            ...requestOptions,
+            headers: retryHeaders,
+            body:
+              options.body === undefined
+                ? undefined
+                : bodyIsForm
+                  ? (options.body as FormData)
+                  : JSON.stringify(options.body),
+          })
+        } catch (error) {
+          if (error instanceof TypeError && !(await isOnline())) {
+            throw new OfflineError(error.message)
+          }
+          throw error
+        }
         if (retryRes.ok) {
           if (retryRes.status === 204) return undefined as T
           return retryRes.json() as Promise<T>
