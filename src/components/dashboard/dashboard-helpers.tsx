@@ -29,10 +29,7 @@ export function emphasizeGeoMeasurements(line: string): ReactNode {
 export function formatDashboardDate(today: string): string {
   const [year, month, day] = today.split('-').map(Number)
   const date = new Date(Date.UTC(year, month - 1, day))
-  return new Intl.DateTimeFormat('en-AU', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    timeZone: 'UTC',
-  }).format(date)
+  const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: 'UTC' }).format(date)
+  const monthName = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' }).format(date)
+  return `${weekday} ${day} ${monthName}`
 }

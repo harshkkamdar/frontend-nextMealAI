@@ -13,8 +13,10 @@ const fillColors: Record<MacroBarProps['name'], string> = {
 }
 
 export function MacroBar({ name, current, target, unit }: MacroBarProps) {
-  const left = Math.max(target - current, 0)
-  const over = current - target
+  const c = Math.round(current)
+  const t = Math.round(target)
+  const left = Math.max(t - c, 0)
+  const over = c - t
   const fillWidth = Math.min(100, (current / target) * 100)
 
   return (
@@ -22,10 +24,10 @@ export function MacroBar({ name, current, target, unit }: MacroBarProps) {
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-[15.5px] font-semibold text-ink">{name}</span>
         <span className="text-[13.5px] whitespace-nowrap">
-          <b className="font-semibold text-ink">{current}</b>
-          <span className="text-ink-55"> / {target}{unit}</span>
+          <b className="font-semibold text-ink">{c}</b>
+          <span className="text-ink-55"> / {t}{unit}</span>
           {' · '}
-          {current > target ? (
+          {c > t ? (
             <span className="font-semibold text-accent">{over}{unit} over</span>
           ) : name === 'Calories' ? (
             <span className="font-semibold text-accent">{left} left</span>
