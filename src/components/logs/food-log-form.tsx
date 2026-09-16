@@ -18,6 +18,8 @@ import {
 import { buildFoodLogItems, type FoodDraft } from '@/lib/food-log'
 import { formatMacroKcal } from '@/lib/macros'
 import { compressImage } from '@/lib/image/compress'
+import { isNative } from '@/lib/platform'
+import { pickPhoto } from '@/lib/platform/camera'
 import type { FoodSearchResult, UserFood } from '@/types/foods.types'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
@@ -266,9 +268,7 @@ export function FoodLogForm() {
     setEstimateConfidence(est.confidence)
   }
 
-  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handlePhotoFile = async (file: File) => {
     setEstimating(true)
     try {
       const est = await estimateFoodFromPhoto(await compressImage(file))
@@ -279,6 +279,20 @@ export function FoodLogForm() {
       setEstimating(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
+  }
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) void handlePhotoFile(file)
+  }
+
+  const handlePhotoButton = async () => {
+    if (isNative()) {
+      const file = await pickPhoto({ source: 'prompt' })
+      if (file) await handlePhotoFile(file)
+      return
+    }
+    fileInputRef.current?.click()
   }
 
   const clearEstimate = () => {
@@ -394,7 +408,7 @@ export function FoodLogForm() {
       {/* FB-R6-13 — Photo estimate button (above meal-type chips, prominent) */}
       <button
         type="button"
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => void handlePhotoButton()}
         disabled={estimating}
         data-testid="photo-estimate-button"
         className="w-full mb-4 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border-2 border-dashed border-accent/40 bg-accent-light text-accent text-sm font-medium hover:bg-accent/10 transition-colors disabled:opacity-60"

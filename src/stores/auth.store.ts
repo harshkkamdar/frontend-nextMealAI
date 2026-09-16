@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import { createPlatformStorage } from '@/lib/platform/storage'
 
 interface User {
   id: string
@@ -35,6 +36,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'nextmealai-auth',
+      storage: createJSONStorage(() => createPlatformStorage()),
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,

@@ -1,16 +1,51 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { GeoCompanionSheet } from '@/components/geo/geo-companion-sheet'
 import { AuthGate } from '@/components/auth/auth-gate'
 import { GeoScreenContextProvider } from '@/contexts/geo-screen-context'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
+import { NotificationsPrompt } from '@/components/native/notifications-prompt'
+import { initNativeShell } from '@/lib/platform/app'
+import { registerPush, unregisterPush } from '@/lib/platform/notifications'
+import { useUIStore } from '@/stores/ui.store'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const hideBottomPad = /^\/(chat|train)\/session/.test(pathname)
+
+  useEffect(() => {
+    const cleanupNativeShell = initNativeShell({
+      onBack: () => {
+        if (useUIStore.getState().activeSheet) {
+          useUIStore.getState().closeSheet()
+          return true
+        }
+        return false
+      },
+      onResume: () => {},
+      onUrl: (url) => {
+        if (url.pathname === '/reset-password' || url.hash.includes('access_token')) {
+          router.replace('/reset-password' + url.search + url.hash)
+        }
+      },
+    })
+
+    const handleNotificationsChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ enabled: boolean }>).detail
+      if (detail?.enabled) void registerPush()
+      else void unregisterPush()
+    }
+    window.addEventListener('fiqr:notifications-changed', handleNotificationsChanged)
+
+    return () => {
+      cleanupNativeShell()
+      window.removeEventListener('fiqr:notifications-changed', handleNotificationsChanged)
+    }
+  }, [router])
 
   // FB-12: capture the browser's IANA timezone on first authenticated mount
   // so the backend can bucket logs onto the correct local calendar date.
@@ -40,6 +75,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {children}
           <BottomNav />
           <GeoCompanionSheet />
+          <NotificationsPrompt />
         </div>
       </GeoScreenContextProvider>
     </AuthGate>

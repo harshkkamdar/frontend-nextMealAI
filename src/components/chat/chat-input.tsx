@@ -6,6 +6,8 @@ import { toast } from 'sonner'
 import { uploadChatAttachment } from '@/lib/api/chat.api'
 import { useComposerStore } from '@/stores/composer.store'
 import { compressImage } from '@/lib/image/compress'
+import { isNative } from '@/lib/platform'
+import { pickPhoto } from '@/lib/platform/camera'
 import type { AttachedImage } from '@/types/chat.types'
 
 // FB-R6-03 — BE caps image_paths at 5 per message. Mirror that on the FE so
@@ -198,6 +200,15 @@ export function ChatInput({
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
+  const handleAttachPhoto = async () => {
+    if (isNative()) {
+      const file = await pickPhoto({ source: 'prompt' })
+      if (file) await addImages([file])
+      return
+    }
+    fileInputRef.current?.click()
+  }
+
   const removeAttachment = (storage_path: string) => {
     if (storeMode && sessionId) {
       removeStoreAttached(sessionId, storage_path)
@@ -261,7 +272,7 @@ export function ChatInput({
         {showCamera && (
           <>
             <button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => void handleAttachPhoto()}
               disabled={disabled || capReached}
               className="p-1 mb-0.5 text-text-tertiary hover:text-accent transition-colors disabled:opacity-50 shrink-0"
               aria-label="Attach photo"
