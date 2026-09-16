@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FIQR frontend
 
-## Getting Started
+FIQR is a mobile-first nutrition and training coach.
+Geo is the in-product coaching agent.
+This repository contains the FIQR web and native-shell frontend.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js 16.1, React 19, and TypeScript
+- Tailwind CSS 4 and shadcn-compatible UI primitives
+- Zustand 5 stores
+- Vitest and Testing Library
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Install dependencies with `npm install`.
+Start the development server with `npm run dev`.
+The app runs at `http://localhost:3010`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment
 
-## Learn More
+Copy `.env.local.example` to `.env.local`.
+Set `NEXT_PUBLIC_CORE_API_URL` to the absolute core API origin.
+Set `NEXT_PUBLIC_TARGET=capacitor` only for native static exports.
 
-To learn more about Next.js, take a look at the following resources:
+## Build modes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`npm run build` creates the normal Next.js web build.
+The web build includes legacy route redirects.
+`NEXT_PUBLIC_TARGET=capacitor npm run build` creates a static export.
+Static output is written to `out/` with trailing slashes enabled.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Quality checks
 
-## Deploy on Vercel
+Run `npm run lint` for ESLint.
+Run `npm run type-check` for TypeScript.
+Run `npm test` for the full Vitest suite.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Design reference
+The source design reference lives in `../FIQR/`.
