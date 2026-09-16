@@ -1,5 +1,9 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
+import { Ellipsis } from 'lucide-react'
+
+import { ReportSheet } from '@/components/chat/report-sheet'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { safeImageUrl } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat.types'
@@ -19,7 +23,7 @@ function renderInline(text: string): React.ReactNode[] {
     } else if (match[0].startsWith('*')) {
       parts.push(<em key={key++}>{match[3]}</em>)
     } else {
-      parts.push(<code key={key++} className="bg-surface-hover rounded px-1 py-0.5 text-xs font-mono">{match[4]}</code>)
+      parts.push(<code key={key++} className="rounded bg-ink-08 px-1">{match[4]}</code>)
     }
     last = match.index + match[0].length
   }
@@ -51,18 +55,16 @@ function GeoMessageContent({ content }: { content: string }) {
 
     if (headingMatch) {
       flushList()
-      const level = headingMatch[1].length
       const text = headingMatch[2]
-      const className = level === 1
-        ? 'text-sm font-bold text-text-primary mt-2 mb-1'
-        : level === 2
-        ? 'text-sm font-semibold text-text-primary mt-1.5 mb-0.5'
-        : 'text-xs font-semibold text-text-secondary mt-1'
-      elements.push(<p key={i} className={className}>{renderInline(text)}</p>)
+      elements.push(
+        <p key={i} className="mb-1 mt-2 text-[15.5px] font-semibold text-ink">
+          {renderInline(text)}
+        </p>,
+      )
     } else if (bulletMatch || numberedMatch) {
       const text = (bulletMatch?.[1] ?? numberedMatch?.[1]) ?? ''
       listItems.push(
-        <li key={i} className="text-sm text-text-primary">{renderInline(text)}</li>
+        <li key={i} className="text-[15.5px] text-ink">{renderInline(text)}</li>
       )
     } else if (line.trim() === '') {
       flushList()
@@ -72,7 +74,7 @@ function GeoMessageContent({ content }: { content: string }) {
     } else {
       flushList()
       elements.push(
-        <p key={i} className="text-sm text-text-primary leading-relaxed">
+        <p key={i} className="text-[15.5px] leading-[1.4] text-ink">
           {renderInline(line)}
         </p>
       )
@@ -83,8 +85,20 @@ function GeoMessageContent({ content }: { content: string }) {
   return <div className="space-y-0.5">{elements}</div>
 }
 
-export function ChatBubble({ message }: { message: ChatMessage }) {
+export function ChatBubble({ message, sessionId }: { message: ChatMessage; sessionId?: string }) {
   const isUser = message.role === 'user'
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const closeMenu = (event: MouseEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', closeMenu)
+    return () => document.removeEventListener('mousedown', closeMenu)
+  }, [menuOpen])
 
   const formattedTime = message.timestamp
     ? new Date(message.timestamp).toLocaleTimeString([], {
@@ -105,7 +119,7 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
 
     return (
       <div className="flex flex-col items-end max-w-[85%] ml-auto">
-        <div className="bg-accent hover:bg-accent-hover text-white rounded-2xl rounded-br-sm px-4 py-2.5">
+        <div className="rounded-[18px] rounded-br-[6px] bg-ink px-4 py-3 text-[15.5px] leading-[1.4] text-cream">
           {hasPersisted ? (
             <div className={persistedAttachments.length > 1 ? 'grid grid-cols-2 gap-1 mb-2' : 'mb-2'}>
               {persistedAttachments.map((att) => {
@@ -138,14 +152,14 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
             />
           ) : null}
           {displayContent && (
-            <p className="text-sm whitespace-pre-wrap break-words">{displayContent}</p>
+            <p className="whitespace-pre-wrap break-words">{displayContent}</p>
+          )}
+          {formattedTime && (
+            <div className="mt-1 text-right text-[11px] text-cream-55">
+              {formattedTime}
+            </div>
           )}
         </div>
-        {formattedTime && (
-          <span className="text-[10px] text-text-tertiary mt-1 mr-1">
-            {formattedTime}
-          </span>
-        )}
       </div>
     )
   }
@@ -177,30 +191,78 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
     return friendly ? `${base} — ${friendly}` : base
   }
 
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(message.content)
+    setMenuOpen(false)
+  }
+
   return (
-    <div className="flex flex-col items-start max-w-[85%]">
-      <div className="flex items-end gap-2">
-        <GeoAvatar state="default" size={28} />
-        <div className="bg-surface border border-border rounded-2xl rounded-bl-sm px-4 py-2.5">
-          <GeoMessageContent content={message.content} />
-          {hasFailures && (
-            <div className="mt-2 px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs">
-              <span className="font-medium">Heads up:</span>{' '}
-              {failures.map((a, i) => (
-                <span key={i}>
-                  {i > 0 && '; '}
-                  {describeFailure(a)}
-                </span>
-              ))}
+    <>
+      <div className="flex max-w-[85%] flex-col items-start">
+        <div className="flex items-start gap-2">
+          <GeoAvatar state="default" size={24} />
+          <div className="relative rounded-[18px] rounded-bl-[6px] border border-ink-12 bg-card px-4 py-3 text-[15.5px] leading-[1.4] text-ink">
+            <GeoMessageContent content={message.content} />
+            {hasFailures && (
+              <div className="mt-2 rounded-[12px] border border-accent/30 bg-accent-10 px-3 py-2 text-[13.5px] text-ink">
+                <span className="font-semibold">Heads up:</span>{' '}
+                {failures.map((a, i) => (
+                  <span key={i}>
+                    {i > 0 && '; '}
+                    {describeFailure(a)}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div ref={menuRef} className="relative mt-1 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setMenuOpen((current) => !current)}
+                className="flex h-7 w-7 items-center justify-center rounded-full text-ink-50 active:bg-ink-08"
+                aria-label="Message options"
+                aria-expanded={menuOpen}
+              >
+                <Ellipsis className="h-4 w-4" />
+              </button>
+              {menuOpen ? (
+                <div
+                  role="menu"
+                  className="absolute bottom-8 right-0 z-20 min-w-28 overflow-hidden rounded-[12px] border border-ink-12 bg-card py-1"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={handleCopy}
+                    className="block h-9 w-full px-3 text-left text-[13.5px] font-semibold text-ink active:bg-ink-08"
+                  >
+                    Copy
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      setReportOpen(true)
+                    }}
+                    className="block h-9 w-full px-3 text-left text-[13.5px] font-semibold text-ink active:bg-ink-08"
+                  >
+                    Report
+                  </button>
+                </div>
+              ) : null}
             </div>
-          )}
+          </div>
         </div>
+        {formattedTime && (
+          <span className="ml-8 mt-1 text-[11px] text-ink-50">{formattedTime}</span>
+        )}
       </div>
-      {formattedTime && (
-        <span className="text-[10px] text-text-tertiary mt-1 ml-10">
-          {formattedTime}
-        </span>
-      )}
-    </div>
+      <ReportSheet
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        sessionId={sessionId}
+        messageId={message.id}
+      />
+    </>
   )
 }

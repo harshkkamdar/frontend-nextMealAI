@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { SessionList } from '@/components/chat/session-list'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { getChatSessions } from '@/lib/api/chat.api'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import type { ChatSession } from '@/types/chat.types'
@@ -37,15 +38,15 @@ export default function ChatListPage() {
 
   return (
     <PageWrapper>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-[22px] font-semibold text-text-primary">Chats</h1>
-        <button
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-[22px] font-semibold text-ink">Chats</h1>
+        <PrimaryButton
           onClick={handleNewChat}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-accent hover:bg-accent-hover text-white transition-opacity"
+          icon={<Plus className="h-4 w-4" />}
+          className="w-auto px-3 py-2.5 text-[15.5px]"
         >
-          <Plus className="w-3.5 h-3.5" />
-          New Chat
-        </button>
+          New chat
+        </PrimaryButton>
       </div>
 
       {loading ? (

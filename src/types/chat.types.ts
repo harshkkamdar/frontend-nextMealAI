@@ -60,6 +60,7 @@ export interface ChatSession {
 export interface ChatResponse {
   session_id: string
   response: {
+    id?: string
     content: string
     role: MessageRole
     tokens_used?: number

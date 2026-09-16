@@ -1,31 +1,26 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { ChevronLeft } from 'lucide-react'
 
-export function ChatHeader({ sessionId, title }: { sessionId?: string; title?: string }) {
+export function ChatHeader({ title }: { sessionId?: string; title?: string }) {
   const router = useRouter()
 
   return (
-    <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3">
-      <div className="flex items-center gap-3">
+    <div className="sticky top-0 z-30 border-b border-ink-10 bg-cream px-gutter py-3">
+      <div className="flex items-center gap-2">
         <button
           onClick={() => router.push('/chat')}
-          className="flex items-center justify-center w-8 h-8 -ml-1 rounded-full hover:bg-surface-hover transition-colors"
+          className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full text-ink active:bg-ink-08"
           aria-label="Back to chats"
         >
-          <ArrowLeft className="w-5 h-5 text-text-primary" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
-        <GeoAvatar state="default" size={36} />
         <div className="flex flex-col min-w-0">
-          <span className="text-base font-semibold text-text-primary leading-tight truncate">
-            {title ?? 'Geo'}
+          <span className="truncate text-[17px] font-bold leading-tight text-ink">Geo</span>
+          <span className="truncate text-[13.5px] font-medium text-ink-55">
+            {title ?? 'New conversation'}
           </span>
-          <div className="flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-success" />
-            <span className="text-[11px] text-success">Online</span>
-          </div>
         </div>
       </div>
     </div>

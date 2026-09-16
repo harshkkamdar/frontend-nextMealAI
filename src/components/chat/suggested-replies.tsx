@@ -24,7 +24,7 @@ export function SuggestedReplies({
           type="button"
           disabled={disabled}
           onClick={() => onSelect(opt)}
-          className="rounded-full border border-accent/40 bg-accent-light px-3 py-1.5 text-[13px] font-medium text-accent transition-colors hover:bg-accent/10 disabled:opacity-50"
+          className="h-9 rounded-full border border-ink-16 bg-cream px-3 text-[13.5px] font-semibold text-ink active:bg-ink-08 disabled:opacity-50"
         >
           {opt}
         </button>

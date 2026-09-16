@@ -46,7 +46,7 @@ export default function ActiveChatPage() {
 
 function ActiveChatRoute() {
   const sessionId = useSearchParams().get('id') ?? ''
-  if (!sessionId) return <p className="p-4 text-sm text-text-secondary">Nothing selected. <Link href="/chat">Back to chats.</Link></p>
+  if (!sessionId) return <p className="p-4 text-[15.5px] text-ink-60">Nothing selected. <Link href="/chat">Back to chats.</Link></p>
   return <ActiveChatSession sessionId={sessionId} />
 }
 
@@ -129,7 +129,7 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
       const image_paths = attachments?.map((a) => a.storage_path)
       const res = await sendMessage({ message, session_id: sessionId, image_paths })
       const geoMessage: ChatMessage = {
-        id: `geo-${Date.now()}`,
+        id: res.response.id ?? `geo-${Date.now()}`,
         role: res.response.role,
         content: res.response.content,
         timestamp: new Date().toISOString(),
@@ -167,7 +167,7 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
 
   if (loading) {
     return (
-      <div className="h-dvh flex flex-col bg-background overflow-hidden">
+      <div className="flex h-dvh flex-col overflow-hidden bg-cream">
         <ChatHeader sessionId={sessionId} title={sessionTitle} />
         <div className="flex-1 flex items-center justify-center">
           <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
@@ -177,7 +177,7 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <div className="h-dvh flex flex-col bg-background overflow-hidden">
+    <div className="flex h-dvh flex-col overflow-hidden bg-cream">
       <Suspense fallback={null}>
         <PrefillReader onPrefill={setPrefill} />
       </Suspense>
@@ -192,7 +192,7 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
           />
         </div>
       )}
-      <ChatThread messages={messages} isTyping={isTyping} />
+      <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId} />
       {/* R6-10 — option chips for the latest assistant message; tap sends it.
           Reads live `suggestedReplies` or persisted `metadata.suggested_replies`. */}
       {(() => {
@@ -201,20 +201,25 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
           ? last.suggestedReplies ?? last.metadata?.suggested_replies ?? []
           : []
         return chips.length > 0 ? (
-          <div className="px-4">
+          <div className="px-gutter">
             <SuggestedReplies options={chips} onSelect={handleSend} />
           </div>
         ) : null
       })()}
       {/* FB-R6-FE-D: pass sessionId so a draft started in the floating Geo
           widget survives the navigation here. */}
-      <ChatInput
-        onSend={handleSend}
-        disabled={isTyping}
-        showCamera
-        defaultValue={prefill}
-        sessionId={sessionId}
-      />
+      <div
+        className="border-t border-ink-10 bg-cream"
+        style={{ paddingBottom: 'calc(8px + var(--safe-bottom))' }}
+      >
+        <ChatInput
+          onSend={handleSend}
+          disabled={isTyping}
+          showCamera
+          defaultValue={prefill}
+          sessionId={sessionId}
+        />
+      </div>
     </div>
   )
 }

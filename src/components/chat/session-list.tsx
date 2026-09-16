@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { MessageCircle, MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { EmptyState } from '@/components/shared/empty-state'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { GeoLine } from '@/components/ui/fiqr/geo-line'
 import { renameChatSession, deleteChatSession } from '@/lib/api/chat.api'
 import type { ChatSession } from '@/types/chat.types'
 
@@ -122,17 +122,15 @@ export function SessionList({
 
   if (sessions.length === 0) {
     return (
-      <EmptyState
-        icon={MessageCircle}
-        title="No chats yet"
-        description="Start a conversation with Geo"
-      />
+      <div className="py-8">
+        <GeoLine>Ask me anything about food, training or your week.</GeoLine>
+      </div>
     )
   }
 
   return (
     <>
-      <div className="space-y-1">
+      <div>
         {sessions.map((session) => {
           const sessionId = session.session_id ?? session.id
           const isEditing = editingId === session.session_id
@@ -146,84 +144,65 @@ export function SessionList({
               tabIndex={0}
               onClick={() => !isEditing && onSelect(session.session_id)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !isEditing) onSelect(session.session_id) }}
-              className="w-full flex items-center gap-3 p-3 hover:bg-surface-hover rounded-xl transition-colors cursor-pointer text-left group"
+              className="min-h-14 flex items-center justify-between border-b border-ink-09 gap-3 cursor-pointer text-left"
             >
-              <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                <MessageCircle className="w-4 h-4 text-accent" />
-              </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                  {isEditing ? (
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={() => commitRename(session.session_id)}
-                      onKeyDown={(e) => handleKeyDown(e, session.session_id)}
-                      onClick={(e) => e.stopPropagation()}
-                      disabled={renamingId === session.session_id}
-                      className="text-sm font-medium text-text-primary bg-surface border border-border rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-accent w-full min-w-0"
-                      maxLength={50}
-                    />
-                  ) : (
-                    <>
-                      <span className="text-sm font-medium text-text-primary truncate">
-                        {displayTitle}
-                      </span>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {/* More menu button */}
-                        <div className="relative" ref={isMenuOpen ? menuRef : undefined}>
-                          <button
-                            onClick={(e) => toggleMenu(e, session.session_id)}
-                            className="p-1 rounded hover:bg-surface-hover"
-                            aria-label="Chat options"
-                          >
-                            <MoreVertical className="w-3.5 h-3.5 text-text-tertiary" />
-                          </button>
-
-                          {/* Dropdown menu */}
-                          {isMenuOpen && (
-                            <div
-                              className="absolute right-0 top-full mt-1 w-36 bg-surface border border-border rounded-xl shadow-lg z-50 py-1 animate-in fade-in zoom-in-95 duration-100"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <button
-                                onClick={(e) => startEditing(e, session)}
-                                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-primary hover:bg-surface-hover transition-colors"
-                              >
-                                <Pencil className="w-3.5 h-3.5 text-text-tertiary" />
-                                Rename
-                              </button>
-                              <button
-                                onClick={(e) => handleDeleteClick(e, session)}
-                                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:bg-surface-hover transition-colors"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                Delete
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        <span className="text-[10px] text-text-tertiary whitespace-nowrap">
-                          {formatSessionDate(session.updated_at ?? session.created_at)}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-                {session.last_message && (
-                  <p className="text-xs text-text-secondary truncate mt-0.5">
-                    {session.last_message}
-                  </p>
-                )}
-                {session.message_count != null && session.message_count > 0 && (
-                  <p className="text-[10px] text-text-tertiary mt-0.5">
-                    {session.message_count} message{session.message_count !== 1 ? 's' : ''}
-                  </p>
+                {isEditing ? (
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={() => commitRename(session.session_id)}
+                    onKeyDown={(e) => handleKeyDown(e, session.session_id)}
+                    onClick={(e) => e.stopPropagation()}
+                    disabled={renamingId === session.session_id}
+                    className="w-full min-w-0 rounded border border-ink-16 bg-card px-1.5 py-0.5 text-[15.5px] font-semibold text-ink outline-none focus:border-accent"
+                    maxLength={50}
+                  />
+                ) : (
+                  <span className="block truncate text-[15.5px] font-semibold text-ink">
+                    {displayTitle}
+                  </span>
                 )}
               </div>
+              {!isEditing ? (
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <span className="whitespace-nowrap text-[13px] font-medium text-ink-55">
+                    {formatSessionDate(session.updated_at ?? session.created_at)}
+                  </span>
+                  <div className="relative" ref={isMenuOpen ? menuRef : undefined}>
+                    <button
+                      onClick={(e) => toggleMenu(e, session.session_id)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-ink-50 active:bg-ink-08"
+                      aria-label="Chat options"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </button>
+                    {isMenuOpen && (
+                      <div
+                        className="absolute right-0 top-full z-50 mt-1 w-36 overflow-hidden rounded-[12px] border border-ink-12 bg-card py-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={(e) => startEditing(e, session)}
+                          className="flex h-9 w-full items-center gap-2.5 px-3 text-[13.5px] font-semibold text-ink active:bg-ink-08"
+                        >
+                          <Pencil className="h-3.5 w-3.5 text-ink-50" />
+                          Rename
+                        </button>
+                        <button
+                          onClick={(e) => handleDeleteClick(e, session)}
+                          className="flex h-9 w-full items-center gap-2.5 px-3 text-[13.5px] font-semibold text-accent active:bg-accent-10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : null}
             </div>
           )
         })}
