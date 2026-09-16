@@ -1,7 +1,8 @@
 'use client'
 
-import { use, useEffect, useState, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Check, ChevronLeft, ChevronRight, MessageCircle, Plus, Trash2 } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { toast } from 'sonner'
@@ -33,8 +34,17 @@ function formatRest(secs: number): string {
   return `${secs}s`
 }
 
-export default function WorkoutFollowPage({ params }: { params: Promise<{ sessionId: string }> }) {
-  const { sessionId } = use(params)
+export default function WorkoutFollowPage() {
+  return <Suspense fallback={null}><WorkoutFollowRoute /></Suspense>
+}
+
+function WorkoutFollowRoute() {
+  const sessionId = useSearchParams().get('id') ?? ''
+  if (!sessionId) return <p className="p-4 text-sm text-text-secondary">Nothing selected. <Link href="/train">Back to training.</Link></p>
+  return <WorkoutFollowSession sessionId={sessionId} />
+}
+
+function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const router = useRouter()
   const [session, setSession] = useState<WorkoutSession | null>(null)
   const [loading, setLoading] = useState(true)
@@ -201,17 +211,17 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
   }
 
   const handleBack = () => {
-    if (showSummary || session?.status === 'completed') { router.push('/activity'); return }
+    if (showSummary || session?.status === 'completed') { router.push('/train'); return }
     setShowExitSheet(true)
   }
 
-  const handleSaveAndExit = () => router.push('/activity')
+  const handleSaveAndExit = () => router.push('/train')
 
   const handleDiscard = async () => {
     try {
       await abandonWorkoutSession(sessionId)
       toast.success('Workout discarded')
-      router.push('/activity')
+      router.push('/train')
     } catch {
       toast.error('Failed to discard workout')
     }
@@ -314,7 +324,7 @@ export default function WorkoutFollowPage({ params }: { params: Promise<{ sessio
               <p className="text-[10px] text-text-tertiary">kg volume</p>
             </div>
           </div>
-          <Button onClick={() => router.push('/activity')} className="w-full max-w-xs bg-accent hover:bg-accent-hover text-white">
+          <Button onClick={() => router.push('/train')} className="w-full max-w-xs bg-accent hover:bg-accent-hover text-white">
             Done
           </Button>
         </div>

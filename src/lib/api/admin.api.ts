@@ -9,7 +9,7 @@
  * carry the auth header manually.
  */
 
-import { apiFetch } from './client'
+import { API_BASE, apiFetch } from './client'
 import { useAuthStore } from '@/stores/auth.store'
 import type { AdminMetricsResponse, AdminUserSummary } from '@/types/admin.types'
 
@@ -28,7 +28,7 @@ export async function exportActiveUsersCsv(): Promise<{ blob: Blob; filename: st
     throw new Error('Not authenticated')
   }
 
-  const res = await fetch('/api/v1/admin/active-users/export.csv', {
+  const res = await fetch(`${API_BASE}/v1/admin/active-users/export.csv`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
   if (!res.ok) {

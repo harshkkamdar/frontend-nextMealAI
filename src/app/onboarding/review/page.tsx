@@ -9,10 +9,7 @@ import { GeoCommentary } from '@/components/onboarding/geo-commentary'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { getPlans } from '@/lib/api/plans.api'
 import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
-
-function setOnboardedCookie() {
-  document.cookie = 'nextmealai-onboarded=true; path=/; max-age=31536000'
-}
+import { useOnboardingStore } from '@/stores/onboarding.store'
 
 export default function ReviewPage() {
   const router = useRouter()
@@ -42,12 +39,12 @@ export default function ReviewPage() {
   const hasPlans = mealPlan || workoutPlan
 
   function handleAccept() {
-    setOnboardedCookie()
+    useOnboardingStore.getState().setStatus('complete')
     router.push('/dashboard')
   }
 
   function handleModify() {
-    setOnboardedCookie()
+    useOnboardingStore.getState().setStatus('complete')
     router.push('/chat')
   }
 

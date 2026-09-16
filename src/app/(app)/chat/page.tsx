@@ -24,11 +24,11 @@ export default function ChatListPage() {
 
   const handleNewChat = () => {
     const newSessionId = crypto.randomUUID()
-    router.push(`/chat/${newSessionId}`)
+    router.push(`/chat/session?id=${newSessionId}`)
   }
 
   const handleSelect = (sessionId: string) => {
-    router.push(`/chat/${sessionId}`)
+    router.push(`/chat/session?id=${sessionId}`)
   }
 
   const handleDelete = (sessionId: string) => {

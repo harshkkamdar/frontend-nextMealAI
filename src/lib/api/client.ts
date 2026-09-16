@@ -3,6 +3,8 @@
 import { ApiException } from '@/types/api.types'
 import { useAuthStore } from '@/stores/auth.store'
 
+export const API_BASE = (process.env.NEXT_PUBLIC_CORE_API_URL ?? 'http://localhost:4010').replace(/\/$/, '')
+
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown
 }
@@ -22,7 +24,7 @@ async function tryRefreshToken(): Promise<string | null> {
     try {
       const refreshToken = useAuthStore.getState().refreshToken
       if (!refreshToken) return null
-      const res = await fetch('/api/auth/refresh', {
+      const res = await fetch(`${API_BASE}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: refreshToken }),
@@ -34,7 +36,6 @@ async function tryRefreshToken(): Promise<string | null> {
       if (!newAccess) return null
       const user = useAuthStore.getState().user!
       useAuthStore.getState().setSession(user, newAccess, newRefresh ?? refreshToken)
-      document.cookie = `nextmealai-token=${newAccess}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`
       return newAccess
     } catch {
       return null
@@ -81,7 +82,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     }
   }
 
-  const response = await fetch(`/api${path}`, {
+  const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
     body:
@@ -98,7 +99,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
       const newToken = await tryRefreshToken()
       if (newToken) {
         const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` }
-        const retryRes = await fetch(`/api${path}`, {
+        const retryRes = await fetch(`${API_BASE}${path}`, {
           ...options,
           headers: retryHeaders,
           body:
@@ -141,8 +142,6 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
 
 function handleAuthFailure() {
   useAuthStore.getState().clearSession()
-  document.cookie = 'nextmealai-token=; path=/; max-age=0'
-  document.cookie = 'nextmealai-onboarded=; path=/; max-age=0'
   if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
     window.location.href = '/login'
   }

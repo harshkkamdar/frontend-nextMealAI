@@ -35,7 +35,7 @@ import type { Suggestion } from '@/types/suggestions.types'
 
 type QuickLogType = 'water' | 'mood' | 'sleep' | 'energy' | 'weight' | null
 
-// ── Inline quick-log sheets ──────────────────────────────────────────────────
+// ── Inline logging sheets ────────────────────────────────────────────────────
 
 function WaterSheet({ onDone }: { onDone: () => void }) {
   const [glasses, setGlasses] = useState(1)
@@ -185,7 +185,7 @@ function WeightSheet({ currentWeight, onDone }: { currentWeight?: number; onDone
 
 // ── Bottom sheet overlay ─────────────────────────────────────────────────────
 
-function QuickLogSheet({ type, onDone, onClose, currentWeight }: {
+function DashboardLogSheet({ type, onDone, onClose, currentWeight }: {
   type: QuickLogType
   onDone: () => void
   onClose: () => void
@@ -370,16 +370,16 @@ export default function DashboardPage() {
           const data = nudge.actionData as { planId: string; dayIndex: number } | undefined
           if (data) {
             const session = await startWorkoutSession({ plan_id: data.planId, plan_day_index: data.dayIndex })
-            router.push(`/activity/workout/${session.id}`)
+            router.push(`/train/session?id=${session.id}`)
           } else {
-            router.push('/activity')
+            router.push('/train')
           }
         } catch {
-          router.push('/activity')
+          router.push('/train')
         }
         break
       case 'open_food_search':
-        router.push('/diary')
+        router.push('/food')
         break
       case 'open_full_chat':
         router.push('/chat')
@@ -454,7 +454,7 @@ export default function DashboardPage() {
             loggedMealTypes={todayLogs.filter((l) => l.type === 'food').map((l) => (l.payload as any)?.meal_type?.toLowerCase?.() ?? '')}
             onCreatePlan={() => {
               const id = crypto.randomUUID()
-              router.push(`/chat/${id}?prefill=${encodeURIComponent('Can you create a 7-day nutrition plan for me based on my goals and preferences?')}`)
+              router.push(`/chat/session?id=${id}&prefill=${encodeURIComponent('Can you create a 7-day nutrition plan for me based on my goals and preferences?')}`)
             }}
           />
           <WorkoutCard workoutPlan={workoutPlan} today={today} />
@@ -500,7 +500,7 @@ export default function DashboardPage() {
       )}
 
       {/* Quick log bottom sheet */}
-      <QuickLogSheet
+      <DashboardLogSheet
         type={activeSheet}
         onDone={handleSheetDone}
         onClose={() => setActiveSheet(null)}

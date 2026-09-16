@@ -22,7 +22,7 @@ vi.mock('@/lib/api/plans.api', () => ({
 vi.mock('@/lib/api/exercises.api', () => ({ searchExercises: vi.fn(async () => []) }))
 vi.mock('@/lib/api/foods.api', () => ({ searchFoods: vi.fn(async () => []) }))
 
-import { EditPlanView } from '@/app/(app)/plans/[id]/edit/page'
+import { EditPlanView } from '@/app/(app)/plans/edit/page'
 
 beforeEach(() => {
   pushMock.mockReset()

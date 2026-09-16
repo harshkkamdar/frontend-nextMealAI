@@ -13,6 +13,10 @@ vi.mock('@/lib/api/chat.api', () => ({
   uploadChatAttachment: (...args: unknown[]) => mocks.upload(...args),
 }))
 
+vi.mock('@/lib/image/compress', () => ({
+  compressImage: (file: File) => Promise.resolve(file),
+}))
+
 vi.mock('sonner', () => ({
   toast: { error: mocks.toastError, success: vi.fn() },
 }))

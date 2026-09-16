@@ -42,12 +42,6 @@ const FULL: DashboardCheckIn = {
     makeDay({ date: '2026-05-15', day_of_week: 'Fri', hit: true }),
   ],
   takeaway: "Focus this week: protein. You're 30g/day short on average.",
-  metrics: {
-    macro_adherence_pct: 57,
-    weight_delta_kg: null,
-    workout_count_7d: 3,
-    data_days: 7,
-  },
   generated_at: '2026-05-15T20:00:00.000Z',
   v: 2,
 }
@@ -75,19 +69,6 @@ describe('CheckInCard — FB-R6.7 Build C', () => {
     expect(checks.length).toBe(4)
     const misses = screen.getAllByLabelText('missed target')
     expect(misses.length).toBe(3)
-  })
-
-  it('falls back to legacy narrative when days[] is missing (v=1 cutover)', () => {
-    const legacy: DashboardCheckIn = {
-      days: [],
-      takeaway: 'Focus this week: protein. Up your protein by 20g/day.',
-      metrics: FULL.metrics,
-      generated_at: FULL.generated_at,
-      narrative: 'Legacy paragraph from v=1 cache row.',
-    }
-    render(<CheckInCard checkIn={legacy} />)
-    expect(screen.getByText('Legacy paragraph from v=1 cache row.')).toBeInTheDocument()
-    expect(screen.queryByTestId('check-in-days-table')).not.toBeInTheDocument()
   })
 
   it('drill-down link prefills the Geo chat', () => {

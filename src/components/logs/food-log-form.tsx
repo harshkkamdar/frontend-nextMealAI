@@ -17,6 +17,7 @@ import {
 } from '@/lib/api/foods.api'
 import { buildFoodLogItems, type FoodDraft } from '@/lib/food-log'
 import { formatMacroKcal } from '@/lib/macros'
+import { compressImage } from '@/lib/image/compress'
 import type { FoodSearchResult, UserFood } from '@/types/foods.types'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
@@ -270,7 +271,7 @@ export function FoodLogForm() {
     if (!file) return
     setEstimating(true)
     try {
-      const est = await estimateFoodFromPhoto(file)
+      const est = await estimateFoodFromPhoto(await compressImage(file))
       populateFromEstimate(est)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Photo estimate failed')

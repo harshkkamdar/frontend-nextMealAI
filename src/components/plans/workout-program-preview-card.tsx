@@ -56,7 +56,7 @@ export function WorkoutProgramPreviewCard({
         description: 'Your new program is active.',
       })
       onAccept?.(plan.id)
-      router.push(`/plans/${plan.id}`)
+      router.push(`/plans/view?id=${plan.id}`)
     } catch {
       toast.error('Could not save the program. Please try again.')
     } finally {

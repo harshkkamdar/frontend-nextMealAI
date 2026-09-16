@@ -79,7 +79,7 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
     setStartingIdx(dayIdx)
     try {
       const session = await startWorkoutSession({ plan_id: plan.id, plan_day_index: dayIdx })
-      router.push(`/activity/workout/${session.id}`)
+      router.push(`/train/session?id=${session.id}`)
     } catch {
       toast.error('Failed to start workout')
       setStartingIdx(null)

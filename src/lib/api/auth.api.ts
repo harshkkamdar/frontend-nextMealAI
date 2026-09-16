@@ -1,5 +1,6 @@
-import { apiFetch } from './client'
+import { API_BASE, apiFetch } from './client'
 import { useAuthStore } from '@/stores/auth.store'
+import { useOnboardingStore } from '@/stores/onboarding.store'
 import { ApiException } from '@/types/api.types'
 
 interface AuthResponse {
@@ -21,7 +22,7 @@ export async function signup(email: string, password: string, fullName?: string)
     body: { email, password, fullName },
   })
   useAuthStore.getState().setSession(data.user, data.session.access_token, data.session.refresh_token)
-  document.cookie = `nextmealai-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`
+  useOnboardingStore.getState().setStatus('unknown')
   return data
 }
 
@@ -31,7 +32,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
     body: { email, password },
   })
   useAuthStore.getState().setSession(data.user, data.session.access_token, data.session.refresh_token)
-  document.cookie = `nextmealai-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`
+  useOnboardingStore.getState().setStatus('unknown')
   return data
 }
 
@@ -40,8 +41,6 @@ export async function logout(): Promise<void> {
     await apiFetch('/auth/logout', { method: 'POST' })
   } finally {
     useAuthStore.getState().clearSession()
-    document.cookie = 'nextmealai-token=; path=/; max-age=0'
-    document.cookie = 'nextmealai-onboarded=; path=/; max-age=0'
   }
 }
 
@@ -59,7 +58,7 @@ export async function updatePassword(
   // The access token comes from the Supabase magic-link URL fragment, not the
   // persisted auth store, so we bypass apiFetch's automatic Bearer attachment
   // and call the proxy directly with an explicit Authorization header.
-  const response = await fetch('/api/auth/update-password', {
+  const response = await fetch(`${API_BASE}/auth/update-password`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

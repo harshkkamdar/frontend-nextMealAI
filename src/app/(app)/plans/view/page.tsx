@@ -1,6 +1,8 @@
 'use client'
 
-import { use, useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { MealPlanDetail } from '@/components/plans/meal-plan-detail'
 import { WorkoutPlanDetail } from '@/components/plans/workout-plan-detail'
@@ -11,8 +13,17 @@ import { getPlan } from '@/lib/api/plans.api'
 import { toast } from 'sonner'
 import type { Plan, MealPlan, WorkoutPlan } from '@/types/plans.types'
 
-export default function PlanDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function PlanDetailPage() {
+  return <Suspense fallback={null}><PlanDetailRoute /></Suspense>
+}
+
+function PlanDetailRoute() {
+  const id = useSearchParams().get('id') ?? ''
+  if (!id) return <PageWrapper><p className="text-sm text-text-secondary">Nothing selected. <Link href="/plans">Back to plans.</Link></p></PageWrapper>
+  return <PlanDetailView id={id} />
+}
+
+function PlanDetailView({ id }: { id: string }) {
   const [loading, setLoading] = useState(true)
   const [plan, setPlan] = useState<Plan | null>(null)
 

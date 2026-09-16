@@ -59,11 +59,6 @@ export function CheckInCard({ checkIn }: { checkIn: DashboardCheckIn }) {
 
       {hasDays ? (
         <DaysTable days={checkIn.days} />
-      ) : checkIn.narrative ? (
-        // v=1 back-compat: a stale cache row from before Build C deployed.
-        <p className="text-sm text-text-primary leading-relaxed mb-3">
-          {checkIn.narrative}
-        </p>
       ) : null}
 
       <p

@@ -39,7 +39,7 @@ describe('PlansPage CTAs', () => {
     expect(pushMock).toHaveBeenCalledWith('/plans/new/workout')
   })
 
-  it('shows an edit button on existing plan cards that routes to /plans/:id/edit', async () => {
+  it('shows an edit button on existing plan cards that routes to the query-based edit page', async () => {
     getPlansMock.mockResolvedValue([
       {
         id: 'meal-1',
@@ -64,9 +64,9 @@ describe('PlansPage CTAs', () => {
 
     await waitFor(() => screen.getByLabelText('Edit nutrition plan'))
     fireEvent.click(screen.getByLabelText('Edit nutrition plan'))
-    expect(pushMock).toHaveBeenCalledWith('/plans/meal-1/edit')
+    expect(pushMock).toHaveBeenCalledWith('/plans/edit?id=meal-1')
 
     fireEvent.click(screen.getByLabelText('Edit workout plan'))
-    expect(pushMock).toHaveBeenCalledWith('/plans/workout-1/edit')
+    expect(pushMock).toHaveBeenCalledWith('/plans/edit?id=workout-1')
   })
 })

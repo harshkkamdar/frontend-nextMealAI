@@ -90,13 +90,13 @@ export default function PlansPage() {
               <div className="relative">
                 <PlanOverviewCard
                   plan={mealPlan}
-                  onClick={() => router.push(`/plans/${mealPlan.id}`)}
+                  onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
                 />
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation()
-                    router.push(`/plans/${mealPlan.id}/edit`)
+                    router.push(`/plans/edit?id=${mealPlan.id}`)
                   }}
                   aria-label="Edit nutrition plan"
                   className="absolute top-3 right-14 p-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-hover"
@@ -130,13 +130,13 @@ export default function PlansPage() {
               <div className="relative">
                 <PlanOverviewCard
                   plan={workoutPlan}
-                  onClick={() => router.push(`/plans/${workoutPlan.id}`)}
+                  onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)}
                 />
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation()
-                    router.push(`/plans/${workoutPlan.id}/edit`)
+                    router.push(`/plans/edit?id=${workoutPlan.id}`)
                   }}
                   aria-label="Edit workout plan"
                   className="absolute top-3 right-14 p-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-hover"

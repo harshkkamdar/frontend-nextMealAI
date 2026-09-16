@@ -125,7 +125,7 @@ describe('MealPlanBuilder component', () => {
     expect(payload.content.days[0].meals[0].calories).toBe(150)
 
     await waitFor(() => expect(activatePlanMock).toHaveBeenCalledWith('plan-9'))
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/plan-9'))
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-9'))
     expect(toastSuccess).toHaveBeenCalledWith('Nutrition plan created')
   })
 
@@ -174,6 +174,6 @@ describe('MealPlanBuilder component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-77')
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/plan-77'))
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-77'))
   })
 })

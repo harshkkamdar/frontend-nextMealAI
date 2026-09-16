@@ -200,11 +200,11 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
           }
         }
         toast.success('Nutrition plan created')
-        router.push(`/plans/${plan.id}`)
+        router.push(`/plans/view?id=${plan.id}`)
       } else if (initialPlan) {
         await updatePlan(initialPlan.id, { content })
         toast.success('Nutrition plan updated')
-        router.push(`/plans/${initialPlan.id}`)
+        router.push(`/plans/view?id=${initialPlan.id}`)
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to save plan'

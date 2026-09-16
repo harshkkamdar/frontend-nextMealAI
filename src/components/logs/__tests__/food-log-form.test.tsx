@@ -46,6 +46,10 @@ vi.mock('@/lib/api/logs.api', () => ({
   createLogs: (...args: unknown[]) => mocks.createLogs(...args),
 }))
 
+vi.mock('@/lib/image/compress', () => ({
+  compressImage: (file: File) => Promise.resolve(file),
+}))
+
 import { FoodLogForm } from '@/components/logs/food-log-form'
 
 function getFileInput(container: HTMLElement): HTMLInputElement {

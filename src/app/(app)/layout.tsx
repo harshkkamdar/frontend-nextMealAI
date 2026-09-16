@@ -4,13 +4,13 @@ import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { GeoCompanionSheet } from '@/components/geo/geo-companion-sheet'
-import { QuickLogSheet } from '@/components/shared/quick-log-sheet'
+import { AuthGate } from '@/components/auth/auth-gate'
 import { GeoScreenContextProvider } from '@/contexts/geo-screen-context'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const hideBottomPad = /^\/chat\/.+/.test(pathname) || /^\/activity\/workout\/.+/.test(pathname)
+  const hideBottomPad = /^\/(chat|train)\/session/.test(pathname)
 
   // FB-12: capture the browser's IANA timezone on first authenticated mount
   // so the backend can bucket logs onto the correct local calendar date.
@@ -34,13 +34,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <GeoScreenContextProvider>
-      <div className={`min-h-screen bg-background ${hideBottomPad ? '' : 'pb-20'}`}>
-        {children}
-        <BottomNav />
-        <GeoCompanionSheet />
-        <QuickLogSheet />
-      </div>
-    </GeoScreenContextProvider>
+    <AuthGate mode="app">
+      <GeoScreenContextProvider>
+        <div className={`min-h-screen bg-background ${hideBottomPad ? '' : 'pb-20'}`}>
+          {children}
+          <BottomNav />
+          <GeoCompanionSheet />
+        </div>
+      </GeoScreenContextProvider>
+    </AuthGate>
   )
 }

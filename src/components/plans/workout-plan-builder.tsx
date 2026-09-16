@@ -20,7 +20,7 @@ import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.
 import type { WorkoutPlan, WorkoutPlanDay, WorkoutExercise } from '@/types/plans.types'
 
 // FB-08 — Workout plan manual builder. Used by both the create route
-// (/plans/new/workout) and the edit route (/plans/[id]/edit). Keeps a
+// (/plans/new/workout) and the edit route (/plans/edit?id=...). Keeps a
 // single local `days` state tree that mirrors the Plan `content.days`
 // shape, so save just forwards it to createPlan / updatePlan.
 
@@ -188,11 +188,11 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
           }
         }
         toast.success('Workout plan created')
-        router.push(`/plans/${plan.id}`)
+        router.push(`/plans/view?id=${plan.id}`)
       } else if (initialPlan) {
         await updatePlan(initialPlan.id, { content: content as WorkoutPlan['content'] })
         toast.success('Workout plan updated')
-        router.push(`/plans/${initialPlan.id}`)
+        router.push(`/plans/view?id=${initialPlan.id}`)
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to save plan'

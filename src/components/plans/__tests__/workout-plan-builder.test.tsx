@@ -136,7 +136,7 @@ describe('WorkoutPlanBuilder component', () => {
     expect(payload.content.days[0].exercises[0].sets).toBe(3)
 
     await waitFor(() => expect(activatePlanMock).toHaveBeenCalledWith('plan-123'))
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/plan-123'))
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-123'))
     expect(toastSuccess).toHaveBeenCalledWith('Workout plan created')
   })
 
@@ -191,6 +191,6 @@ describe('WorkoutPlanBuilder component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-42')
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/plan-42'))
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-42'))
   })
 })

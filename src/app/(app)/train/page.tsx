@@ -142,7 +142,7 @@ export default function ActivityPage() {
         plan_day_index: nextIdx >= 0 ? nextIdx : undefined,
         day_name: nextWorkout?.name
       })
-      router.push(`/activity/workout/${session.id}`)
+      router.push(`/train/session?id=${session.id}`)
     } catch {
       toast.error('Failed to start workout')
     } finally {
@@ -151,7 +151,7 @@ export default function ActivityPage() {
   }
 
   const handleResume = () => {
-    if (inProgress) router.push(`/activity/workout/${inProgress.id}`)
+    if (inProgress) router.push(`/train/session?id=${inProgress.id}`)
   }
 
   // History for selected date — match by LOCAL date so the list and the
@@ -269,7 +269,7 @@ export default function ActivityPage() {
                 </div>
 
                 <button
-                  onClick={() => router.push(`/plans/${workoutPlan.id}`)}
+                  onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)}
                   className="text-xs text-accent hover:underline mb-3"
                 >
                   View full plan &rarr;
@@ -298,7 +298,7 @@ export default function ActivityPage() {
 
             {lastSession && (
               <button
-                onClick={() => router.push(`/activity/workout/${lastSession.id}`)}
+                onClick={() => router.push(`/train/session?id=${lastSession.id}`)}
                 className="w-full text-left bg-surface border border-border rounded-xl p-4 mb-3 hover:border-accent/30 transition-colors"
                 data-testid="activity-last-session"
               >
@@ -332,7 +332,7 @@ export default function ActivityPage() {
                   {selectedDateHistory.map((session) => (
                     <button
                       key={session.id}
-                      onClick={() => router.push(`/activity/workout/${session.id}`)}
+                      onClick={() => router.push(`/train/session?id=${session.id}`)}
                       className="w-full text-left bg-surface border border-border rounded-xl p-4 hover:border-accent/30 transition-colors"
                     >
                       <div className="flex items-center justify-between mb-2">

@@ -72,7 +72,7 @@ describe('FB-15 WorkoutProgramPreviewCard', () => {
       generated_by: 'ai',
     })
     await waitFor(() => expect(mockedActivate).toHaveBeenCalledWith('plan-123'))
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/plan-123'))
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-123'))
     expect(onAccept).toHaveBeenCalledWith('plan-123')
   })
 

@@ -70,7 +70,7 @@ export function WorkoutLogForm() {
         })),
       })
       // replace() so Back from the session doesn't return to this builder.
-      router.replace(`/activity/workout/${session.id}`)
+      router.replace(`/train/session?id=${session.id}`)
     } catch {
       toast.error('Failed to start workout')
       setStarting(false)

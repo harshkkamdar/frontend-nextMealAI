@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
@@ -10,8 +11,13 @@ import { MealPlanBuilder } from '@/components/plans/meal-plan-builder'
 import { getPlan } from '@/lib/api/plans.api'
 import type { Plan, MealPlan, WorkoutPlan } from '@/types/plans.types'
 
-export default function EditPlanPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function EditPlanPage() {
+  return <Suspense fallback={null}><EditPlanRoute /></Suspense>
+}
+
+function EditPlanRoute() {
+  const id = useSearchParams().get('id') ?? ''
+  if (!id) return <PageWrapper><p className="text-sm text-text-secondary">Nothing selected. <Link href="/plans">Back to plans.</Link></p></PageWrapper>
   return <EditPlanView id={id} />
 }
 

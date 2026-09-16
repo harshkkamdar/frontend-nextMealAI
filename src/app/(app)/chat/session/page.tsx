@@ -1,6 +1,7 @@
 'use client'
 
-import { use, useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, Suspense } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { ChatHeader } from '@/components/chat/chat-header'
@@ -39,12 +40,17 @@ function PrefillReader({ onPrefill }: { onPrefill: (v: string) => void }) {
   return null
 }
 
-export default function ActiveChatPage({
-  params,
-}: {
-  params: Promise<{ sessionId: string }>
-}) {
-  const { sessionId } = use(params)
+export default function ActiveChatPage() {
+  return <Suspense fallback={null}><ActiveChatRoute /></Suspense>
+}
+
+function ActiveChatRoute() {
+  const sessionId = useSearchParams().get('id') ?? ''
+  if (!sessionId) return <p className="p-4 text-sm text-text-secondary">Nothing selected. <Link href="/chat">Back to chats.</Link></p>
+  return <ActiveChatSession sessionId={sessionId} />
+}
+
+function ActiveChatSession({ sessionId }: { sessionId: string }) {
   const router = useRouter()
   const [prefill, setPrefill] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])

@@ -1,64 +1,86 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
-  --color-background: #FFFFFF;
-  --color-surface: #F9F7F4;
-  --color-surface-hover: #F3F0EB;
-  --color-border: #E8E4DF;
-  --color-accent: #E8663C;
-  --color-accent-hover: #D45A32;
-  --color-accent-light: #FDF0EB;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #6B6560;
-  --color-text-tertiary: #A39E99;
-  --color-success: #34C759;
-  --color-info: #3B82F6;
-  --color-warning: #FF9F0A;
-  --color-purple: #A855F7;
-  --color-destructive: #FF3B30;
+  /* FIQR base colours — the only ones allowed */
+  --color-ink: #111C35;
+  --color-accent: #E8622A;
+  --color-cream: #FDF6EC;
+  --color-card: #FFFFFF;
+  --color-macro-teal: #3E7C77;
+  --color-macro-ochre: #A07A3C;
+  /* derived opacities (ink over cream) */
+  --color-ink-80: rgba(17,28,53,.8);
+  --color-ink-62: rgba(17,28,53,.62);
+  --color-ink-60: rgba(17,28,53,.6);
+  --color-ink-55: rgba(17,28,53,.55);
+  --color-ink-50: rgba(17,28,53,.5);
+  --color-ink-35: rgba(17,28,53,.35);
+  --color-ink-16: rgba(17,28,53,.16);
+  --color-ink-12: rgba(17,28,53,.12);
+  --color-ink-10: rgba(17,28,53,.1);
+  --color-ink-09: rgba(17,28,53,.09);
+  --color-ink-08: rgba(17,28,53,.08);
+  --color-cream-60: rgba(253,246,236,.6);
+  --color-cream-55: rgba(253,246,236,.55);
+  --color-cream-22: rgba(253,246,236,.22);
+  --color-accent-10: rgba(232,98,42,.10);
+  /* compatibility aliases used by existing screens; retire as screens are redesigned */
+  --color-background: #FDF6EC;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: rgba(17,28,53,.04);
+  --color-border: rgba(17,28,53,.12);
+  --color-accent-hover: #E8622A;
+  --color-accent-light: rgba(232,98,42,.10);
+  --color-text-primary: #111C35;
+  --color-text-secondary: rgba(17,28,53,.62);
+  --color-text-tertiary: rgba(17,28,53,.5);
+  --color-success: #3E7C77;
+  --color-info: rgba(17,28,53,.62);
+  --color-warning: #A07A3C;
+  --color-purple: #3E7C77;
+  --color-destructive: #E8622A;
+  /* shadcn token names still referenced by src/components/ui and the log forms */
+  --color-primary: #E8622A;
+  --color-primary-foreground: #FDF6EC;
+  --color-secondary: rgba(17,28,53,.08);
+  --color-secondary-foreground: #111C35;
+  --color-muted: rgba(17,28,53,.08);
+  --color-muted-foreground: rgba(17,28,53,.62);
+  --color-card-foreground: #111C35;
+  --color-input: rgba(17,28,53,.12);
+  --color-ring: #E8622A;
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
+  --radius-btn: 18px;
+  --radius-btn-secondary: 15px;
+  --radius-tile: 16px;
+  --radius-feature: 22px;
   --radius-full: 9999px;
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --shadow-action: 0 8px 20px rgba(232,98,42,.26);
+  --shadow-raised: 0 6px 16px rgba(17,28,53,.28);
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --gutter: 22px;
 }
 
 @layer base {
-  body {
-    @apply bg-background text-text-primary font-sans antialiased;
-  }
-}
-
-.dark {
-  --color-background: #0F0F0F;
-  --color-surface: #1A1A1A;
-  --color-surface-hover: #242424;
-  --color-border: #2E2E2E;
-  --color-accent: #E8663C;
-  --color-accent-hover: #F0885E;
-  --color-accent-light: #2A1810;
-  --color-text-primary: #F5F5F5;
-  --color-text-secondary: #A0A0A0;
-  --color-text-tertiary: #666666;
-  --color-success: #34C759;
-  --color-info: #5B9CF6;
-  --color-warning: #FFB84D;
-  --color-purple: #C084FC;
-  --color-destructive: #FF6B6B;
+  html { background: #FDF6EC; }
+  html, body { overscroll-behavior: none; }
+  body { @apply bg-background text-text-primary font-sans antialiased; }
 }
 
 @layer utilities {
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .px-gutter { padding-left: var(--gutter); padding-right: var(--gutter); }
 }

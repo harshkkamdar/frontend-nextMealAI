@@ -116,7 +116,7 @@ export function WorkoutCard({ workoutPlan, today }: { workoutPlan: WorkoutPlan |
 
   return (
     <Link
-      href="/activity"
+      href="/train"
       className="block active:scale-[0.98] transition-transform"
       aria-label={`Open today's workout: ${todayWorkout.name}`}
     >

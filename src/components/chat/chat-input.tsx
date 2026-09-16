@@ -5,6 +5,7 @@ import { ArrowUp, Camera, X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { uploadChatAttachment } from '@/lib/api/chat.api'
 import { useComposerStore } from '@/stores/composer.store'
+import { compressImage } from '@/lib/image/compress'
 import type { AttachedImage } from '@/types/chat.types'
 
 // FB-R6-03 — BE caps image_paths at 5 per message. Mirror that on the FE so
@@ -112,14 +113,15 @@ export function ChatInput({
         toast.error(`Max ${MAX_IMAGES} images per message`)
         return
       }
-      const accepted = files.slice(0, room)
-      if (files.length > accepted.length) {
+      const selected = files.slice(0, room)
+      if (files.length > selected.length) {
         toast.error(
-          `Only ${accepted.length} of ${files.length} added (max ${MAX_IMAGES} per message)`
+          `Only ${selected.length} of ${files.length} added (max ${MAX_IMAGES} per message)`
         )
       }
-      if (storeMode && sessionId) incrementStoreUploading(sessionId, accepted.length)
-      else setLocalUploadingCount((c) => c + accepted.length)
+      if (storeMode && sessionId) incrementStoreUploading(sessionId, selected.length)
+      else setLocalUploadingCount((c) => c + selected.length)
+      const accepted = await Promise.all(selected.map(compressImage))
 
       for (const file of accepted) {
         const preview_url = URL.createObjectURL(file)

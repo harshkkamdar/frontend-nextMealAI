@@ -4,7 +4,7 @@
  * Lifts chat-composer state (text + attached images + in-flight uploads)
  * out of any single component so the same draft survives navigation
  * between the floating Geo widget (`<GeoCompanionSheet>`) and the full
- * chat page (`/chat/[sessionId]`). Both views read/write through this
+ * chat page (`/chat/session?id=...`). Both views read/write through this
  * store, keyed by `sessionId`.
  *
  * Ownership rules:
