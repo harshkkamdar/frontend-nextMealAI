@@ -1,5 +1,4 @@
 export type GeoPersonality = 'nurturing' | 'drill_sergeant' | 'balanced' | 'data_driven'
-export type Theme = 'light' | 'dark' | 'system'
 export type NotificationType = 'daily_summary' | 'meal_reminders' | 'workout_reminders' | 'goal_achievements'
 
 export type RestTimerDuration = 60 | 90 | 120 | 180
@@ -13,8 +12,7 @@ export interface Settings {
   geo_personality: GeoPersonality
   auto_apply_suggestions: boolean
   auto_apply_threshold: number
-  theme: Theme
-  language: string
+  check_in_weekday: number
   share_progress: boolean
   analytics_enabled: boolean
   rest_timer_seconds: RestTimerDuration

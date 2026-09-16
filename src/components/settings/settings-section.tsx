@@ -1,14 +1,32 @@
 'use client'
 
-import { ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 
 export function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-      <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary px-4 pt-4 pb-2">{title}</p>
-      <div className="divide-y divide-border">{children}</div>
-    </div>
+    <section>
+      <SectionLabel className="mb-2">{title}</SectionLabel>
+      <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+        {children}
+      </div>
+    </section>
+  )
+}
+
+function RowChevron() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5 text-ink-50"
+    >
+      <path d="m9 18 6-6-6-6" />
+    </svg>
   )
 }
 
@@ -16,38 +34,39 @@ export function SettingsRow({
   label,
   value,
   onClick,
-  destructive,
   children,
 }: {
   label: string
   value?: string
   onClick?: () => void
-  destructive?: boolean
   children?: React.ReactNode
 }) {
-  const Comp: React.ElementType = onClick ? 'button' : 'div'
+  const content = (
+    <>
+      <span className="font-medium text-ink">{label}</span>
+      <span className="flex items-center gap-2">
+        {value && !children ? <span className="text-[13.5px] text-ink-55">{value}</span> : null}
+        {children}
+        {onClick && !children ? <RowChevron /> : null}
+      </span>
+    </>
+  )
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="min-h-14 w-full px-[14px] flex items-center justify-between text-left text-[15.5px]"
+      >
+        {content}
+      </button>
+    )
+  }
 
   return (
-    <Comp
-      onClick={onClick}
-      className={cn(
-        'flex w-full items-center justify-between px-4 py-3 text-sm transition-colors',
-        onClick && 'cursor-pointer hover:bg-surface-hover',
-        destructive && 'text-destructive'
-      )}
-    >
-      <span className={cn('font-medium', destructive ? 'text-destructive' : 'text-text-primary')}>
-        {label}
-      </span>
-      <div className="flex items-center gap-2">
-        {value && !children && (
-          <span className="text-text-secondary">{value}</span>
-        )}
-        {children}
-        {onClick && !children && (
-          <ChevronRight className="w-4 h-4 text-text-tertiary" />
-        )}
-      </div>
-    </Comp>
+    <div className="min-h-14 px-[14px] flex items-center justify-between text-[15.5px]">
+      {content}
+    </div>
   )
 }

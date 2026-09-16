@@ -25,6 +25,8 @@ export interface Profile {
   meals_per_day?: number
   workout_frequency?: number
   timezone?: string | null
+  ai_consent_at?: string | null
+  health_disclaimer_ack_at?: string | null
   onboarding_personal_complete?: boolean
   onboarding_fitness_complete?: boolean
   onboarding_nutrition_complete?: boolean

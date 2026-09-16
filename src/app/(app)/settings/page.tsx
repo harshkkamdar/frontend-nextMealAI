@@ -1,27 +1,26 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { PageWrapper } from '@/components/layout/page-wrapper'
-import { SettingsSection, SettingsRow } from '@/components/settings/settings-section'
-import { CardSkeleton } from '@/components/shared/loading-skeleton'
-import { getSettings, updateSettings } from '@/lib/api/settings.api'
-import { logout } from '@/lib/api/auth.api'
-import { useAuthStore } from '@/stores/auth.store'
-import { cn } from '@/lib/utils'
-import {
-  LogOut,
-  ChevronRight,
-  CalendarDays,
-  MessageCircle,
-  BarChart3,
-  FileText,
-  ShieldCheck,
-} from 'lucide-react'
 import { toast } from 'sonner'
+import { PageWrapper } from '@/components/layout/page-wrapper'
+import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { DeleteAccountSheet } from '@/components/settings/delete-account-sheet'
+import { SettingsRow, SettingsSection } from '@/components/settings/settings-section'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { downloadExport } from '@/lib/api/account.api'
+import { logout } from '@/lib/api/auth.api'
+import { getProfile, updateProfile } from '@/lib/api/profile.api'
+import { getSettings, updateSettings } from '@/lib/api/settings.api'
+import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth.store'
+import type { Profile } from '@/types/profile.types'
+import type { GeoPersonality, RestTimerDuration, Settings } from '@/types/settings.types'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
-import type { Settings, GeoPersonality, RestTimerDuration } from '@/types/settings.types'
+
+const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev'
 
 const PERSONALITY_OPTIONS: { value: GeoPersonality; label: string }[] = [
   { value: 'nurturing', label: 'Nurturing' },
@@ -37,51 +36,191 @@ const REST_TIMER_OPTIONS: { value: RestTimerDuration; label: string }[] = [
   { value: 180, label: '3m' },
 ]
 
-const FEATURE_LINKS: {
-  icon: typeof CalendarDays
+const WEEKDAYS = [
+  { value: 0, short: 'S', label: 'Sunday' },
+  { value: 1, short: 'M', label: 'Monday' },
+  { value: 2, short: 'T', label: 'Tuesday' },
+  { value: 3, short: 'W', label: 'Wednesday' },
+  { value: 4, short: 'T', label: 'Thursday' },
+  { value: 5, short: 'F', label: 'Friday' },
+  { value: 6, short: 'S', label: 'Saturday' },
+] as const
+
+function BackHeader({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="mb-6 flex items-center gap-3">
+      <button type="button" onClick={onBack} aria-label="Back to dashboard" className="text-ink">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.75}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-6 w-6"
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </button>
+      <h1 className="text-[22px] font-semibold tracking-[-0.4px]">Settings</h1>
+    </div>
+  )
+}
+
+function RowChevron() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5 shrink-0 text-ink-50"
+    >
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  )
+}
+
+function PersonIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-6 w-6"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  )
+}
+
+function SettingsSwitch({
+  label,
+  checked,
+  disabled = false,
+  onChange,
+}: {
   label: string
-  route: string
-  color: string
-}[] = [
-  { icon: CalendarDays, label: 'My Plans', route: '/plans', color: '#E8663C' },
-  { icon: MessageCircle, label: 'Chat History', route: '/chat', color: '#3B82F6' },
-  { icon: BarChart3, label: 'Activity Log', route: '/logs', color: '#34C759' },
-  { icon: FileText, label: 'Food Database', route: '/foods', color: '#6B6560' },
-]
+  checked: boolean
+  disabled?: boolean
+  onChange: (checked: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-label={label}
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        'relative inline-flex h-7 w-12 shrink-0 rounded-full p-0.5 disabled:opacity-50',
+        checked ? 'bg-accent' : 'bg-ink-08',
+      )}
+    >
+      <span
+        className={cn(
+          'block h-6 w-6 rounded-full bg-card transition-transform',
+          checked ? 'translate-x-5' : 'translate-x-0',
+        )}
+      />
+    </button>
+  )
+}
 
 export default function SettingsPage() {
   useSetGeoScreen('settings', {})
   const router = useRouter()
-  const user = useAuthStore((s) => s.user)
+  const user = useAuthStore((state) => state.user)
+  const isAdmin = useIsAdmin()
+  const reminderTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [settings, setSettings] = useState<Settings | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [loggingOut, setLoggingOut] = useState(false)
-  // FB-R6-S2-v2: probe /v1/admin/metrics once per session; render the Admin
-  // link only when the probe returns 200 (admin allow-listed).
-  const isAdmin = useIsAdmin()
+  const [exporting, setExporting] = useState(false)
+  const [updatingAi, setUpdatingAi] = useState(false)
+  const [showAiConfirm, setShowAiConfirm] = useState(false)
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false)
 
   useEffect(() => {
-    getSettings()
-      .then(setSettings)
+    Promise.all([getSettings(), getProfile()])
+      .then(([nextSettings, nextProfile]) => {
+        setSettings(nextSettings)
+        setProfile(nextProfile)
+      })
       .catch(() => toast.error('Failed to load settings'))
       .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (reminderTimer.current) clearTimeout(reminderTimer.current)
+    }
   }, [])
 
   const handleUpdate = useCallback(
     async (patch: Parameters<typeof updateSettings>[0]) => {
       if (!settings) return
-      const optimistic = { ...settings, ...patch }
-      setSettings(optimistic)
+      const previous = settings
+      setSettings({ ...settings, ...patch })
       try {
         const updated = await updateSettings(patch)
         setSettings(updated)
       } catch {
-        setSettings(settings)
+        setSettings(previous)
         toast.error('Failed to update settings')
       }
     },
-    [settings]
+    [settings],
   )
+
+  const handleNotificationChange = (enabled: boolean) => {
+    void handleUpdate({ notifications_enabled: enabled })
+    window.dispatchEvent(new CustomEvent('fiqr:notifications-changed', { detail: { enabled } }))
+  }
+
+  const handleReminderChange = (value: string) => {
+    setSettings((current) => current ? { ...current, notification_time: value } : current)
+    if (reminderTimer.current) clearTimeout(reminderTimer.current)
+    reminderTimer.current = setTimeout(() => {
+      void handleUpdate({ notification_time: value })
+    }, 600)
+  }
+
+  const handleAiConsent = async (enabled: boolean) => {
+    setUpdatingAi(true)
+    try {
+      const updated = await updateProfile({ ai_consent: enabled })
+      setProfile(updated)
+      setShowAiConfirm(false)
+    } catch {
+      toast.error('Failed to update AI processing')
+    } finally {
+      setUpdatingAi(false)
+    }
+  }
+
+  const handleDownload = async () => {
+    setExporting(true)
+    try {
+      await downloadExport()
+      toast.success('Export ready')
+    } catch {
+      toast.error('Failed to download data')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   const handleLogout = async () => {
     setLoggingOut(true)
@@ -97,7 +236,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <PageWrapper>
-        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary mb-6">More</h1>
+        <BackHeader onBack={() => router.push('/dashboard')} />
         <div className="space-y-4">
           <CardSkeleton />
           <CardSkeleton />
@@ -107,219 +246,228 @@ export default function SettingsPage() {
     )
   }
 
-  if (!settings) {
+  if (!settings || !profile) {
     return (
       <PageWrapper>
-        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary mb-6">More</h1>
-        <p className="text-text-secondary text-sm">Unable to load settings.</p>
+        <BackHeader onBack={() => router.push('/dashboard')} />
+        <p className="text-[15.5px] text-ink-62">Unable to load settings.</p>
       </PageWrapper>
     )
   }
 
+  const profileName = profile.full_name || user?.email?.split('@')[0] || 'Profile'
+  const email = user?.email ?? '---'
+  const aiEnabled = Boolean(profile.ai_consent_at)
+
   return (
     <PageWrapper>
-      <h1 className="text-[22px] font-semibold tracking-tight text-text-primary mb-6">More</h1>
+      <BackHeader onBack={() => router.push('/dashboard')} />
 
-      <div className="space-y-4">
-        {/* Profile Card */}
-        <button
-          type="button"
-          onClick={() => router.push('/settings/profile')}
-          className="flex w-full items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 transition-colors hover:bg-surface-hover"
-        >
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white text-base font-semibold">
-            {user?.email?.[0]?.toUpperCase() ?? '?'}
-          </div>
-          <div className="flex flex-col items-start text-left min-w-0">
-            <span className="text-sm font-semibold text-text-primary truncate w-full">
-              {user?.email?.split('@')[0] ?? 'Profile'}
+      <div className="space-y-7">
+        <SettingsSection title="Profile">
+          <button
+            type="button"
+            onClick={() => router.push('/settings/profile')}
+            className="min-h-14 w-full px-[14px] py-2.5 flex items-center gap-3 text-left"
+          >
+            <span className="w-10 h-10 rounded-full bg-ink-08 border border-ink-16 flex shrink-0 items-center justify-center text-ink">
+              <PersonIcon />
             </span>
-            <span className="text-xs text-text-secondary truncate w-full">
-              {user?.email ?? '---'}
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[15.5px] font-semibold text-ink">{profileName}</span>
+              <span className="block truncate text-[13.5px] text-ink-55">{email}</span>
             </span>
-          </div>
-          <ChevronRight className="ml-auto w-4 h-4 shrink-0 text-text-tertiary" />
-        </button>
+            <RowChevron />
+          </button>
+        </SettingsSection>
 
-        {/* FB-R6-S2-v2: Admin link — only renders for ADMIN_EMAILS allow-listed users. */}
-        {isAdmin && (
-          <SettingsSection title="Admin">
-            <button
-              type="button"
-              onClick={() => router.push('/admin')}
-              className="flex w-full items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-surface-hover"
-            >
-              <div
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                style={{ backgroundColor: '#E8663C14' }}
-              >
-                <ShieldCheck className="w-4 h-4 text-accent" />
-              </div>
-              <span className="font-medium text-text-primary">Admin Dashboard</span>
-              <ChevronRight className="ml-auto w-4 h-4 text-text-tertiary" />
-            </button>
+        <SettingsSection title="Library">
+          <SettingsRow label="My plans" onClick={() => router.push('/plans')} />
+          <SettingsRow label="Chat history" onClick={() => router.push('/chat')} />
+          <SettingsRow label="Activity log" onClick={() => router.push('/logs')} />
+          <SettingsRow label="Food database" onClick={() => router.push('/foods')} />
+          {isAdmin ? <SettingsRow label="Admin dashboard" onClick={() => router.push('/admin')} /> : null}
+        </SettingsSection>
+
+        <div>
+          <SettingsSection title="Notifications">
+            <SettingsRow label="Push notifications">
+              <SettingsSwitch
+                label="Push notifications"
+                checked={settings.notifications_enabled}
+                onChange={handleNotificationChange}
+              />
+            </SettingsRow>
+            <SettingsRow label="Reminder time">
+              <input
+                type="time"
+                value={settings.notification_time ?? '08:00'}
+                onChange={(event) => handleReminderChange(event.target.value)}
+                className="bg-transparent text-[15.5px] text-ink outline-none"
+              />
+            </SettingsRow>
           </SettingsSection>
-        )}
+          <p className="mt-2 px-[14px] text-[13px] text-ink-55">
+            Geo nudges you when a check-in is ready or you&apos;ve gone quiet. No marketing.
+          </p>
+        </div>
 
-        {/* Features */}
-        <SettingsSection title="Features">
-          {FEATURE_LINKS.map((item) => {
-            const Icon = item.icon
-            return (
+        <div>
+          <SettingsSection title="Check-in day">
+            <div className="min-h-14 px-[14px] py-2.5 flex items-center justify-between gap-2">
+              {WEEKDAYS.map((day) => (
+                <button
+                  key={day.value}
+                  type="button"
+                  aria-label={day.label}
+                  aria-pressed={settings.check_in_weekday === day.value}
+                  onClick={() => void handleUpdate({ check_in_weekday: day.value })}
+                  className={cn(
+                    'h-9 w-9 rounded-full text-[13.5px] font-semibold',
+                    settings.check_in_weekday === day.value
+                      ? 'bg-ink text-cream'
+                      : 'bg-ink-08 text-ink',
+                  )}
+                >
+                  {day.short}
+                </button>
+              ))}
+            </div>
+          </SettingsSection>
+          <p className="mt-2 px-[14px] text-[13px] text-ink-55">
+            Your weekly check-in lands on this day.
+          </p>
+        </div>
+
+        <SettingsSection title="Geo">
+          <div className="px-[14px] py-3 flex flex-wrap gap-2">
+            {PERSONALITY_OPTIONS.map((option) => (
               <button
-                key={item.label}
+                key={option.value}
                 type="button"
-                onClick={() => router.push(item.route)}
-                className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-surface-hover"
+                onClick={() => void handleUpdate({ geo_personality: option.value })}
+                className={cn(
+                  'rounded-full px-3 h-9 text-[13.5px] font-semibold',
+                  settings.geo_personality === option.value
+                    ? 'bg-accent text-cream'
+                    : 'bg-ink-08 text-ink',
+                )}
               >
-                <div
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                  style={{ backgroundColor: `${item.color}14` }}
-                >
-                  <Icon className="w-4 h-4" style={{ color: item.color }} />
-                </div>
-                <span className="font-medium text-text-primary">{item.label}</span>
-                <ChevronRight className="ml-auto w-4 h-4 text-text-tertiary" />
+                {option.label}
               </button>
-            )
-          })}
+            ))}
+          </div>
         </SettingsSection>
 
-        {/* Notifications */}
-        <SettingsSection title="Notifications">
-          <SettingsRow label="Enabled">
-            <button
-              type="button"
-              role="switch"
-              aria-checked={settings.notifications_enabled}
-              onClick={() =>
-                handleUpdate({ notifications_enabled: !settings.notifications_enabled })
-              }
-              className={cn(
-                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
-                settings.notifications_enabled ? 'bg-accent' : 'bg-surface-hover'
-              )}
-            >
-              <span
-                className={cn(
-                  'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform',
-                  settings.notifications_enabled ? 'translate-x-5' : 'translate-x-0'
-                )}
-              />
-            </button>
-          </SettingsRow>
-          <SettingsRow label="Reminder time">
-            <input
-              type="time"
-              value={settings.notification_time ?? '08:00'}
-              onChange={(e) => handleUpdate({ notification_time: e.target.value })}
-              className="bg-transparent text-sm text-text-primary outline-none"
-            />
-          </SettingsRow>
-        </SettingsSection>
-
-        {/* Geo Personality */}
-        <SettingsSection title="Geo Personality">
-          <div className="px-4 py-3">
-            <div className="grid grid-cols-2 gap-2">
-              {PERSONALITY_OPTIONS.map((opt) => (
+        <SettingsSection title="Training">
+          <div className="px-[14px] py-3">
+            <p className="mb-2 text-[13px] font-semibold text-ink-62">Rest timer</p>
+            <div className="flex flex-wrap gap-2">
+              {REST_TIMER_OPTIONS.map((option) => (
                 <button
-                  key={opt.value}
+                  key={option.value}
                   type="button"
-                  onClick={() => handleUpdate({ geo_personality: opt.value })}
+                  onClick={() => void handleUpdate({ rest_timer_seconds: option.value })}
                   className={cn(
-                    'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
-                    settings.geo_personality === opt.value
-                      ? 'bg-accent border-accent text-white'
-                      : 'bg-background border-border text-text-primary hover:bg-surface-hover'
+                    'rounded-full px-3 h-9 text-[13.5px] font-semibold',
+                    settings.rest_timer_seconds === option.value
+                      ? 'bg-accent text-cream'
+                      : 'bg-ink-08 text-ink',
                   )}
                 >
-                  {opt.label}
+                  {option.label}
                 </button>
               ))}
             </div>
           </div>
         </SettingsSection>
 
-        {/* Workout Settings */}
-        <SettingsSection title="Workout">
-          <div className="px-4 py-3">
-            <p className="text-xs font-medium text-text-secondary mb-2">Default Rest Timer</p>
-            <div className="flex gap-2">
-              {REST_TIMER_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => handleUpdate({ rest_timer_seconds: opt.value } as any)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
-                    (settings.rest_timer_seconds ?? 90) === opt.value
-                      ? 'bg-accent border-accent text-white'
-                      : 'bg-background border-border text-text-primary hover:bg-surface-hover'
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+        <SettingsSection title="Data & AI">
+          <div>
+            <SettingsRow label="AI processing">
+              <SettingsSwitch
+                label="AI processing"
+                checked={aiEnabled}
+                disabled={updatingAi}
+                onChange={(enabled) => {
+                  if (enabled) void handleAiConsent(true)
+                  else setShowAiConfirm(true)
+                }}
+              />
+            </SettingsRow>
+            <p className="px-[14px] pb-4 text-[13px] leading-[1.45] text-ink-62">
+              Your food logs, photos, weight and messages are sent to our model providers to generate coaching. See the privacy policy for who they are.
+            </p>
           </div>
+          <SettingsRow label="Download my data" onClick={() => void handleDownload()}>
+            {exporting ? (
+              <span
+                aria-label="Downloading"
+                className="h-5 w-5 rounded-full border-2 border-ink-16 border-t-ink animate-spin"
+              />
+            ) : undefined}
+          </SettingsRow>
+          <SettingsRow label="Privacy policy" onClick={() => router.push('/privacy')} />
+          <SettingsRow label="Support" onClick={() => router.push('/support')} />
         </SettingsSection>
 
-        {/* Data */}
-        <SettingsSection title="Data">
-          <SettingsRow label="Share progress">
-            <button
-              type="button"
-              role="switch"
-              aria-checked={settings.share_progress}
-              onClick={() => handleUpdate({ share_progress: !settings.share_progress })}
-              className={cn(
-                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
-                settings.share_progress ? 'bg-accent' : 'bg-surface-hover'
-              )}
-            >
-              <span
-                className={cn(
-                  'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform',
-                  settings.share_progress ? 'translate-x-5' : 'translate-x-0'
-                )}
-              />
-            </button>
-          </SettingsRow>
-          <SettingsRow label="Analytics">
-            <button
-              type="button"
-              role="switch"
-              aria-checked={settings.analytics_enabled}
-              onClick={() =>
-                handleUpdate({ analytics_enabled: !settings.analytics_enabled })
-              }
-              className={cn(
-                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
-                settings.analytics_enabled ? 'bg-accent' : 'bg-surface-hover'
-              )}
-            >
-              <span
-                className={cn(
-                  'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform',
-                  settings.analytics_enabled ? 'translate-x-5' : 'translate-x-0'
-                )}
-              />
-            </button>
-          </SettingsRow>
+        <SettingsSection title="About">
+          <SettingsRow label="Version" value={APP_VERSION} />
+          <p className="px-[14px] py-4 text-[13px] leading-[1.45] text-ink-62">
+            FIQR is a wellness and fitness coaching app, not a medical device. Geo does not diagnose or treat conditions or advise on medication. Check with a doctor or registered dietitian before making medical decisions.
+          </p>
         </SettingsSection>
 
-        {/* Logout */}
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={loggingOut}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-destructive py-3 text-sm font-medium text-destructive transition-colors hover:bg-destructive/5 disabled:opacity-50"
-        >
-          <LogOut className="w-4 h-4" />
-          {loggingOut ? 'Logging out...' : 'Log out'}
-        </button>
+        <div>
+          <SecondaryButton type="button" onNavy={false} disabled={loggingOut} onClick={handleLogout}>
+            {loggingOut ? 'Logging out...' : 'Log out'}
+          </SecondaryButton>
+          <button
+            type="button"
+            onClick={() => setShowDeleteAccount(true)}
+            className="text-[15.5px] font-semibold text-ink-60 underline-offset-4 underline mt-4 mx-auto block"
+          >
+            Delete account
+          </button>
+        </div>
       </div>
+
+      <BottomSheet
+        open={showAiConfirm}
+        onClose={() => setShowAiConfirm(false)}
+        dismissible={!updatingAi}
+        ariaLabel="Turn off AI processing?"
+      >
+        <div className="px-gutter pb-6 pt-3">
+          <h2 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Turn off AI processing?</h2>
+          <p className="mt-3 text-[15.5px] leading-[1.45] text-ink-62">
+            Geo can&apos;t coach without it. You can turn it back on any time.
+          </p>
+          <div className="mt-5">
+            <SecondaryButton
+              type="button"
+              onNavy={false}
+              disabled={updatingAi}
+              onClick={() => void handleAiConsent(false)}
+            >
+              Turn off
+            </SecondaryButton>
+          </div>
+          <button
+            type="button"
+            disabled={updatingAi}
+            onClick={() => setShowAiConfirm(false)}
+            className="mx-auto mt-4 block text-[15.5px] font-semibold text-ink-60"
+          >
+            Keep on
+          </button>
+        </div>
+      </BottomSheet>
+
+      <DeleteAccountSheet
+        open={showDeleteAccount}
+        onClose={() => setShowDeleteAccount(false)}
+      />
     </PageWrapper>
   )
 }
