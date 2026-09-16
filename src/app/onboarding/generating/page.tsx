@@ -30,9 +30,9 @@ export default function GeneratingPage() {
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6">
       <GeoAvatar state="thinking" size={64} />
 
-      <p className="text-lg font-medium text-text-primary">
-        Creating your personalised plan...
-      </p>
+      <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
+        Building your plan…
+      </h1>
 
       <div className="flex items-center gap-1.5">
         <span className="size-2 rounded-full bg-accent animate-pulse" style={{ animationDelay: '0ms' }} />
@@ -40,8 +40,8 @@ export default function GeneratingPage() {
         <span className="size-2 rounded-full bg-accent animate-pulse" style={{ animationDelay: '400ms' }} />
       </div>
 
-      <p className="text-sm text-text-secondary text-center max-w-xs">
-        Geo is calculating your calories, macros, and building your training program
+      <p className="max-w-xs text-center text-[15.5px] text-ink-60">
+        Geo is working out your calories, macros and training days.
       </p>
     </div>
   )

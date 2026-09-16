@@ -3,10 +3,12 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Flame, Dumbbell, Moon, MessageCircle, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Dumbbell } from 'lucide-react'
 import { GeoCommentary } from '@/components/onboarding/geo-commentary'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { MetricTile } from '@/components/ui/fiqr/metric-tile'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { getPlans } from '@/lib/api/plans.api'
 import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 import { useOnboardingStore } from '@/stores/onboarding.store'
@@ -73,40 +75,25 @@ export default function ReviewPage() {
         </div>
       ) : hasPlans ? (
         <div className="space-y-4">
-          {/* ── Nutrition Plan Card ── */}
           {mealPlan && (
-            <div className="bg-surface border border-border rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Flame className="w-4 h-4 text-accent" />
-                <h2 className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
-                  Nutrition Plan
-                </h2>
-              </div>
+            <div className="rounded-[16px] border border-ink-12 bg-card p-[14px]">
+              <SectionLabel>Nutrition Plan</SectionLabel>
 
               {targets ? (
-                <>
-                  {/* Calorie target */}
-                  <p className="text-2xl font-bold text-text-primary mb-1">
-                    {targets.calories.toLocaleString()}{' '}
-                    <span className="text-sm font-normal text-text-secondary">kcal / day</span>
-                  </p>
-
-                  {/* Macro breakdown */}
-                  <div className="grid grid-cols-3 gap-3 mt-3">
-                    <MacroStat label="Protein" grams={targets.protein} color="bg-blue-500" />
-                    <MacroStat label="Carbs" grams={targets.carbs} color="bg-amber-500" />
-                    <MacroStat label="Fat" grams={targets.fat} color="bg-rose-500" />
-                  </div>
-                </>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <MetricTile label="Calories" value={targets.calories.toLocaleString()} />
+                  <MetricTile label="Protein" value={targets.protein} unit="g" />
+                  <MetricTile label="Carbs" value={targets.carbs} unit="g" />
+                  <MetricTile label="Fat" value={targets.fat} unit="g" />
+                </div>
               ) : (
-                <p className="text-sm text-text-secondary">
+                <p className="mt-3 text-[15.5px] text-ink-60">
                   No calorie or macro targets set yet.
                 </p>
               )}
 
-              {/* Meals per day hint */}
               {mealDays && mealDays.length > 0 && mealDays[0].meals && (
-                <p className="text-xs text-text-tertiary mt-3">
+                <p className="mt-3 text-[13.5px] text-ink-60">
                   {mealDays[0].meals.length} meals per day across {mealDays.length} day
                   {mealDays.length > 1 ? 's' : ''}
                 </p>
@@ -114,156 +101,74 @@ export default function ReviewPage() {
             </div>
           )}
 
-          {/* ── Workout Plan Card ── */}
           {workoutPlan && (
-            <div className="bg-surface border border-border rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Dumbbell className="w-4 h-4 text-accent" />
-                <h2 className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
-                  Workout Plan
-                </h2>
-              </div>
+            <div className="rounded-[16px] border border-ink-12 bg-card p-[14px]">
+              <SectionLabel>Workout Plan</SectionLabel>
 
               {workoutDays && workoutDays.length > 0 ? (
                 <>
-                  {/* Program overview */}
-                  <p className="text-sm font-semibold text-text-primary mb-3">
+                  <p className="mb-3 mt-3 text-[15.5px] font-semibold text-ink">
                     {workoutDays.filter((d) => !d.is_rest_day).length}-day programme
-                    <span className="font-normal text-text-secondary">
+                    <span className="font-normal text-ink-60">
                       {' '}
                       / {workoutDays.length} day cycle
                     </span>
                   </p>
 
-                  {/* Day list */}
                   <div className="space-y-2">
                     {workoutDays.map((day, i) => (
                       <div
                         key={i}
-                        className="border border-border rounded-xl px-3 py-2.5"
+                        className="rounded-[15px] border border-ink-12 bg-card px-3 py-3 text-[15.5px] text-ink"
                       >
-                        {day.is_rest_day ? (
-                          <div className="flex items-center gap-2">
-                            <Moon className="w-3.5 h-3.5 text-text-tertiary" />
-                            <span className="text-sm text-text-secondary">
-                              Rest Day
-                            </span>
-                          </div>
-                        ) : (
-                          <>
-                            <p className="text-sm font-medium text-text-primary mb-1">
-                              {day.name || `Day ${i + 1}`}
-                            </p>
-
-                            {day.exercises && day.exercises.length > 0 && (
-                              <div className="space-y-0.5">
-                                {day.exercises.map((ex, j) => (
-                                  <p key={j} className="text-xs text-text-secondary">
-                                    {ex.name}
-                                    {ex.sets && ex.reps
-                                      ? ` — ${ex.sets}\u00D7${ex.reps}`
-                                      : ''}
-                                    {ex.duration_seconds
-                                      ? ` — ${ex.duration_seconds}s`
-                                      : ''}
-                                  </p>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Muscle group chips */}
-                            {day.exercises && day.exercises.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mt-1.5">
-                                {[
-                                  ...new Set(
-                                    day.exercises
-                                      .map((e: any) => e.muscle_group)
-                                      .filter(Boolean)
-                                  ),
-                                ]
-                                  .slice(0, 4)
-                                  .map((mg: string) => (
-                                    <span
-                                      key={mg}
-                                      className="text-[10px] bg-accent-light text-accent px-2 py-0.5 rounded-full"
-                                    >
-                                      {mg}
-                                    </span>
-                                  ))}
-                              </div>
-                            )}
-                          </>
-                        )}
+                        <span className="font-semibold">{day.is_rest_day ? 'Rest Day' : day.name || `Day ${i + 1}`}</span>
+                        <span className="text-ink-60"> · {day.exercises?.length ?? 0} exercises</span>
                       </div>
                     ))}
                   </div>
                 </>
               ) : (
-                <p className="text-sm text-text-secondary">
+                <p className="mt-3 text-[15.5px] text-ink-60">
                   No workout schedule generated yet.
                 </p>
               )}
             </div>
           )}
 
-          {/* ── Action buttons ── */}
           <div className="space-y-3 pt-2">
-            <Button
+            <PrimaryButton
               onClick={handleAccept}
-              className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
-              size="lg"
+              className="justify-center"
             >
-              Looks good, let&apos;s go!
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
+              Looks good, let&apos;s go
+            </PrimaryButton>
 
             <button
               onClick={handleModify}
-              className="w-full flex items-center justify-center gap-2 text-sm text-text-secondary hover:text-accent transition-colors py-2"
+              className="w-full py-2 text-[15.5px] font-semibold text-ink-60"
             >
-              <MessageCircle className="w-4 h-4" />
               I&apos;d like to make changes
             </button>
           </div>
         </div>
       ) : (
-        /* ── Fallback: no plans generated ── */
-        <div className="bg-surface border border-border rounded-2xl p-6 text-center">
-          <Dumbbell className="w-10 h-10 text-text-tertiary mx-auto mb-3" />
-          <p className="text-sm font-medium text-text-primary mb-1">
+        <div className="rounded-[16px] border border-ink-12 bg-card p-6 text-center">
+          <Dumbbell className="mx-auto mb-3 size-10 text-ink-35" />
+          <p className="mb-1 text-[15.5px] font-semibold text-ink">
             No plans created yet
           </p>
-          <p className="text-xs text-text-secondary mb-4">
+          <p className="mb-4 text-[13.5px] text-ink-60">
             Geo is still working on your plan, or it may not have generated.
             You can head to the dashboard and ask Geo to create one.
           </p>
-          <Button
+          <PrimaryButton
             onClick={handleAccept}
-            className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
+            className="justify-center"
           >
             Continue to dashboard
-          </Button>
+          </PrimaryButton>
         </div>
       )}
-    </div>
-  )
-}
-
-/* ── Small helper component for macro stats ── */
-function MacroStat({
-  label,
-  grams,
-  color,
-}: {
-  label: string
-  grams: number
-  color: string
-}) {
-  return (
-    <div className="text-center">
-      <div className={`h-1 rounded-full ${color} mb-2`} />
-      <p className="text-lg font-bold text-text-primary">{grams}g</p>
-      <p className="text-[11px] text-text-tertiary">{label}</p>
     </div>
   )
 }

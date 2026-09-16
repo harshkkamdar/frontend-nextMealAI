@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
   pathname: '/dashboard',
   getOnboardingStatus: vi.fn(),
+  getProfile: vi.fn(),
 }))
 
 vi.mock('next/navigation', () => ({
@@ -15,6 +16,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/lib/api/profile.api', () => ({
   getOnboardingStatus: () => mocks.getOnboardingStatus(),
+  getProfile: () => mocks.getProfile(),
 }))
 
 import { AuthGate } from '@/components/auth/auth-gate'
@@ -25,9 +27,10 @@ describe('AuthGate', () => {
   beforeEach(() => {
     mocks.replace.mockReset()
     mocks.getOnboardingStatus.mockReset()
+    mocks.getProfile.mockReset()
     mocks.pathname = '/dashboard'
     useAuthStore.setState({ accessToken: null, hasHydrated: true })
-    useOnboardingStore.setState({ status: 'unknown' })
+    useOnboardingStore.setState({ status: 'unknown', consent: 'unknown' } as never)
   })
 
   it("redirects guests to '/login'", async () => {
@@ -58,6 +61,10 @@ describe('AuthGate', () => {
       fitness: { complete: true, completed_at: null },
       nutrition: { complete: true, completed_at: null },
     })
+    mocks.getProfile.mockResolvedValue({
+      ai_consent_at: '2026-09-17T00:00:00.000Z',
+      health_disclaimer_ack_at: '2026-09-17T00:00:00.000Z',
+    })
 
     render(<AuthGate mode="app">Private</AuthGate>)
 
@@ -71,10 +78,34 @@ describe('AuthGate', () => {
       fitness: { complete: true, completed_at: null },
       nutrition: { complete: true, completed_at: null },
     })
+    mocks.getProfile.mockResolvedValue({
+      ai_consent_at: '2026-09-17T00:00:00.000Z',
+      health_disclaimer_ack_at: '2026-09-17T00:00:00.000Z',
+    })
 
     render(<StrictMode><AuthGate mode="app">Private</AuthGate></StrictMode>)
 
     expect(await screen.findByText('Private')).toBeInTheDocument()
     expect(mocks.getOnboardingStatus).toHaveBeenCalledTimes(1)
+    expect(mocks.getProfile).toHaveBeenCalledTimes(1)
+  })
+
+  it("redirects fully onboarded users with missing consent to '/onboarding/consent'", async () => {
+    useAuthStore.setState({ accessToken: 'token' })
+    useOnboardingStore.setState({ status: 'complete', consent: 'missing' } as never)
+
+    render(<AuthGate mode="app">Private</AuthGate>)
+
+    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith('/onboarding/consent'))
+    expect(screen.queryByText('Private')).not.toBeInTheDocument()
+  })
+
+  it('renders children for a fully onboarded user who has given consent', () => {
+    useAuthStore.setState({ accessToken: 'token' })
+    useOnboardingStore.setState({ status: 'complete', consent: 'given' } as never)
+
+    render(<AuthGate mode="app">Private</AuthGate>)
+
+    expect(screen.getByText('Private')).toBeInTheDocument()
   })
 })

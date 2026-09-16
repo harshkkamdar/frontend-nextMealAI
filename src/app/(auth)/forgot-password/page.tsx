@@ -6,9 +6,9 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { forgotPassword } from '@/lib/api/auth.api'
 
 const forgotPasswordSchema = z.object({
@@ -16,6 +16,8 @@ const forgotPasswordSchema = z.object({
 })
 
 type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>
+
+const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-35 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -52,41 +54,42 @@ export default function ForgotPasswordPage() {
 
   return (
     <div>
-      <div className="mb-8 text-center">
-        <h1 className="text-[22px] font-semibold text-text-primary">
-          Forgot your password?
+      <div className="mb-8">
+        <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
+          Reset your password
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-[15.5px] text-ink-60">
           Enter your email and we&apos;ll send you a reset link
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <SectionLabel><label htmlFor="email">Email</label></SectionLabel>
           <Input
             id="email"
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
+            className={inputClassName}
             {...register('email')}
           />
           {errors.email && (
-            <p className="text-xs text-red-500">{errors.email.message}</p>
+            <p className="text-xs text-accent">{errors.email.message}</p>
           )}
         </div>
 
-        <Button
+        <PrimaryButton
           type="submit"
           disabled={isLoading}
-          className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
+          className="justify-center"
         >
           {isLoading ? 'Sending...' : 'Send reset link'}
-        </Button>
+        </PrimaryButton>
       </form>
 
-      <p className="mt-6 text-center text-sm text-text-secondary">
-        <Link href="/login" className="font-medium text-accent hover:text-accent-hover">
+      <p className="mt-6 text-center">
+        <Link href="/login" className="text-[15.5px] font-semibold text-ink-60">
           Back to sign in
         </Link>
       </p>

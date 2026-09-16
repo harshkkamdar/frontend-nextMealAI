@@ -7,9 +7,9 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { updatePassword } from '@/lib/api/auth.api'
 
 const resetPasswordSchema = z
@@ -23,6 +23,8 @@ const resetPasswordSchema = z
   })
 
 type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
+
+const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-35 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
 
 type LinkState =
   | { status: 'pending' }
@@ -87,25 +89,25 @@ function ResetPasswordForm() {
 
   if (linkState.status === 'pending') {
     return (
-      <div className="text-center text-sm text-text-secondary">Loading...</div>
+      <div className="text-center text-[15.5px] text-ink-60">Loading...</div>
     )
   }
 
   if (linkState.status === 'invalid') {
     return (
       <div>
-        <div className="mb-8 text-center">
-          <h1 className="text-[22px] font-semibold text-text-primary">
+        <div className="mb-8">
+          <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
             Invalid or expired reset link
           </h1>
-          <p className="mt-1 text-sm text-text-secondary">
+          <p className="mt-1 text-[15.5px] text-ink-60">
             Please request a new password reset link.
           </p>
         </div>
-        <p className="text-center text-sm text-text-secondary">
+        <p className="text-center">
           <Link
             href="/forgot-password"
-            className="font-medium text-accent hover:text-accent-hover"
+            className="text-[15.5px] font-semibold text-ink-60"
           >
             Request a new link
           </Link>
@@ -116,59 +118,61 @@ function ResetPasswordForm() {
 
   return (
     <div>
-      <div className="mb-8 text-center">
-        <h1 className="text-[22px] font-semibold text-text-primary">
-          Set a new password
+      <div className="mb-8">
+        <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
+          Choose a new password
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-[15.5px] text-ink-60">
           Choose a strong password you haven&apos;t used before
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="password">New password</Label>
+          <SectionLabel><label htmlFor="password">New password</label></SectionLabel>
           <Input
             id="password"
             type="password"
             placeholder="At least 8 characters"
             autoComplete="new-password"
+            className={inputClassName}
             {...register('password')}
           />
           {errors.password && (
-            <p className="text-xs text-red-500">{errors.password.message}</p>
+            <p className="text-xs text-accent">{errors.password.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm new password</Label>
+          <SectionLabel><label htmlFor="confirmPassword">Confirm new password</label></SectionLabel>
           <Input
             id="confirmPassword"
             type="password"
             placeholder="Re-enter your password"
             autoComplete="new-password"
+            className={inputClassName}
             {...register('confirmPassword')}
           />
           {errors.confirmPassword && (
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-accent">
               {errors.confirmPassword.message}
             </p>
           )}
         </div>
 
-        <Button
+        <PrimaryButton
           type="submit"
           disabled={isLoading}
-          className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
+          className="justify-center"
         >
           {isLoading ? 'Updating...' : 'Update password'}
-        </Button>
+        </PrimaryButton>
       </form>
 
-      <p className="mt-6 text-center text-sm text-text-secondary">
+      <p className="mt-6 text-center">
         <Link
           href="/login"
-          className="font-medium text-accent hover:text-accent-hover"
+          className="text-[15.5px] font-semibold text-ink-60"
         >
           Back to sign in
         </Link>
@@ -181,7 +185,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="text-center text-sm text-text-secondary">Loading...</div>
+        <div className="text-center text-[15.5px] text-ink-60">Loading...</div>
       }
     >
       <ResetPasswordForm />

@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { GeoCommentary } from '@/components/onboarding/geo-commentary'
 import { MultiChip } from '@/components/onboarding/multi-chip'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { submitFitnessOnboarding } from '@/lib/api/profile.api'
 import { cn } from '@/lib/utils'
 import type { ActivityLevel, ExperienceLevel, PrimaryGoal } from '@/types/profile.types'
@@ -44,6 +44,9 @@ const GOALS: { label: string; value: PrimaryGoal }[] = [
   { label: 'Maintenance', value: 'maintenance' },
   { label: 'Body Recomposition', value: 'body_recomposition' },
 ]
+
+const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-35 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+const pillClassName = 'h-9 rounded-full px-3 text-[13.5px] font-semibold'
 
 export function FitnessForm() {
   const router = useRouter()
@@ -121,7 +124,7 @@ export function FitnessForm() {
 
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label>Equipment</Label>
+          <SectionLabel>Equipment</SectionLabel>
           <MultiChip
             options={EQUIPMENT_OPTIONS}
             selected={equipment}
@@ -130,13 +133,14 @@ export function FitnessForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Injuries</Label>
+          <SectionLabel>Injuries</SectionLabel>
           <div className="flex gap-2">
             <Input
               type="text"
               placeholder="e.g. Lower back pain"
               value={injuryInput}
               onChange={(e) => setInjuryInput(e.target.value)}
+              className={inputClassName}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
@@ -144,14 +148,13 @@ export function FitnessForm() {
                 }
               }}
             />
-            <Button
+            <button
               type="button"
-              variant="outline"
               onClick={addInjury}
-              className="shrink-0"
+              className="h-14 shrink-0 rounded-[15px] bg-ink-08 px-4 text-[15.5px] font-semibold text-ink"
             >
               Add
-            </Button>
+            </button>
           </div>
           {injuries.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
@@ -160,7 +163,7 @@ export function FitnessForm() {
                   key={injury}
                   type="button"
                   onClick={() => removeInjury(injury)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium bg-accent border border-accent text-white transition-colors"
+                  className="inline-flex h-9 items-center gap-1 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"
                 >
                   {injury}
                   <X className="size-3.5" />
@@ -171,7 +174,7 @@ export function FitnessForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Activity level</Label>
+          <SectionLabel>Activity level</SectionLabel>
           <div className="flex flex-wrap gap-2">
             {ACTIVITY_LEVELS.map((level) => (
               <button
@@ -179,10 +182,10 @@ export function FitnessForm() {
                 type="button"
                 onClick={() => setActivityLevel(level.value)}
                 className={cn(
-                  'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
+                  pillClassName,
                   activityLevel === level.value
-                    ? 'bg-accent border-accent text-white'
-                    : 'bg-surface border-border text-text-primary hover:bg-surface-hover'
+                    ? 'bg-ink text-cream'
+                    : 'bg-ink-08 text-ink'
                 )}
               >
                 {level.label}
@@ -192,7 +195,7 @@ export function FitnessForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Experience level</Label>
+          <SectionLabel>Experience level</SectionLabel>
           <div className="flex flex-wrap gap-2">
             {EXPERIENCE_LEVELS.map((level) => (
               <button
@@ -200,10 +203,10 @@ export function FitnessForm() {
                 type="button"
                 onClick={() => setExperienceLevel(level.value)}
                 className={cn(
-                  'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
+                  pillClassName,
                   experienceLevel === level.value
-                    ? 'bg-accent border-accent text-white'
-                    : 'bg-surface border-border text-text-primary hover:bg-surface-hover'
+                    ? 'bg-ink text-cream'
+                    : 'bg-ink-08 text-ink'
                 )}
               >
                 {level.label}
@@ -213,13 +216,14 @@ export function FitnessForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="workout-frequency">Workout frequency (days per week)</Label>
+          <SectionLabel><label htmlFor="workout-frequency">Workout frequency (days per week)</label></SectionLabel>
           <Input
             id="workout-frequency"
             type="number"
             min={0}
             max={7}
             value={workoutFrequency}
+            className={inputClassName}
             onChange={(e) => {
               // FB-R6-FE-A: preserve empty string instead of coercing to 0 so
               // the user can clear the value and re-type freely.
@@ -230,7 +234,7 @@ export function FitnessForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Primary goal</Label>
+          <SectionLabel>Primary goal</SectionLabel>
           <div className="flex flex-wrap gap-2">
             {GOALS.map((goal) => (
               <button
@@ -238,10 +242,10 @@ export function FitnessForm() {
                 type="button"
                 onClick={() => setPrimaryGoal(goal.value)}
                 className={cn(
-                  'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
+                  pillClassName,
                   primaryGoal === goal.value
-                    ? 'bg-accent border-accent text-white'
-                    : 'bg-surface border-border text-text-primary hover:bg-surface-hover'
+                    ? 'bg-ink text-cream'
+                    : 'bg-ink-08 text-ink'
                 )}
               >
                 {goal.label}
@@ -251,16 +255,16 @@ export function FitnessForm() {
         </div>
 
         {/* Optional body measurements */}
-        <div className="space-y-3 rounded-lg border border-border bg-surface/50 p-4">
+        <div className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]">
           <div>
-            <Label className="text-base font-semibold">Body Measurements</Label>
-            <p className="text-sm text-text-secondary mt-0.5">
+            <SectionLabel>Body Measurements</SectionLabel>
+            <p className="mt-1 text-[13.5px] text-ink-60">
               Optional — helps Geo make more accurate plans
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label htmlFor="waist-cm">Waist (cm)</Label>
+              <SectionLabel><label htmlFor="waist-cm">Waist (cm)</label></SectionLabel>
               <Input
                 id="waist-cm"
                 type="number"
@@ -269,10 +273,11 @@ export function FitnessForm() {
                 placeholder="e.g. 80"
                 value={waistCm}
                 onChange={(e) => setWaistCm(e.target.value)}
+                className={inputClassName}
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="chest-cm">Chest (cm)</Label>
+              <SectionLabel><label htmlFor="chest-cm">Chest (cm)</label></SectionLabel>
               <Input
                 id="chest-cm"
                 type="number"
@@ -281,10 +286,11 @@ export function FitnessForm() {
                 placeholder="e.g. 100"
                 value={chestCm}
                 onChange={(e) => setChestCm(e.target.value)}
+                className={inputClassName}
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="hip-cm">Hip (cm)</Label>
+              <SectionLabel><label htmlFor="hip-cm">Hip (cm)</label></SectionLabel>
               <Input
                 id="hip-cm"
                 type="number"
@@ -293,10 +299,11 @@ export function FitnessForm() {
                 placeholder="e.g. 95"
                 value={hipCm}
                 onChange={(e) => setHipCm(e.target.value)}
+                className={inputClassName}
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="body-fat-pct">Body fat (%)</Label>
+              <SectionLabel><label htmlFor="body-fat-pct">Body fat (%)</label></SectionLabel>
               <Input
                 id="body-fat-pct"
                 type="number"
@@ -306,18 +313,19 @@ export function FitnessForm() {
                 placeholder="e.g. 18"
                 value={bodyFatPct}
                 onChange={(e) => setBodyFatPct(e.target.value)}
+                className={inputClassName}
               />
             </div>
           </div>
         </div>
 
-        <Button
+        <PrimaryButton
           type="submit"
           disabled={isLoading}
-          className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
+          className="justify-center"
         >
           {isLoading ? 'Saving...' : 'Continue'}
-        </Button>
+        </PrimaryButton>
       </form>
     </div>
   )

@@ -6,10 +6,10 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { GeoCommentary } from '@/components/onboarding/geo-commentary'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { submitPersonalOnboarding } from '@/lib/api/profile.api'
 import { cn } from '@/lib/utils'
 import type { Sex } from '@/types/profile.types'
@@ -26,6 +26,8 @@ const SEX_OPTIONS: { label: string; value: Sex }[] = [
   { label: 'Female', value: 'female' },
   { label: 'Other', value: 'other' },
 ]
+
+const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-35 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
 
 export function PersonalForm() {
   const router = useRouter()
@@ -77,33 +79,35 @@ export function PersonalForm() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+          <SectionLabel><label htmlFor="name">Name</label></SectionLabel>
           <Input
             id="name"
             type="text"
             placeholder="Your name"
             autoComplete="name"
+            className={inputClassName}
             {...register('name')}
           />
           {errors.name && (
-            <p className="text-xs text-red-500">{errors.name.message}</p>
+            <p className="text-xs text-accent">{errors.name.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dob">Date of birth</Label>
+          <SectionLabel><label htmlFor="dob">Date of birth</label></SectionLabel>
           <Input
             id="dob"
             type="date"
+            className={inputClassName}
             {...register('dob')}
           />
           {errors.dob && (
-            <p className="text-xs text-red-500">{errors.dob.message}</p>
+            <p className="text-xs text-accent">{errors.dob.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label>Sex</Label>
+          <SectionLabel>Sex</SectionLabel>
           <div className="flex flex-wrap gap-2">
             {SEX_OPTIONS.map((option) => (
               <button
@@ -111,10 +115,10 @@ export function PersonalForm() {
                 type="button"
                 onClick={() => setSex(option.value)}
                 className={cn(
-                  'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
+                  'h-9 rounded-full px-3 text-[13.5px] font-semibold',
                   sex === option.value
-                    ? 'bg-accent border-accent text-white'
-                    : 'bg-surface border-border text-text-primary hover:bg-surface-hover'
+                    ? 'bg-ink text-cream'
+                    : 'bg-ink-08 text-ink'
                 )}
               >
                 {option.label}
@@ -124,8 +128,8 @@ export function PersonalForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="height-cm">Height</Label>
-          <p className="text-xs text-text-secondary">We&apos;ll use this to compute your daily calorie target.</p>
+          <SectionLabel><label htmlFor="height-cm">Height</label></SectionLabel>
+          <p className="text-[13.5px] text-ink-60">We&apos;ll use this to compute your daily calorie target.</p>
           <div className="relative">
             <Input
               id="height-cm"
@@ -137,19 +141,19 @@ export function PersonalForm() {
               placeholder="e.g. 175"
               value={heightCm}
               onChange={(e) => setHeightCm(e.target.value)}
-              className="pr-12"
+              className={`${inputClassName} pr-12`}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary pointer-events-none">cm</span>
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[13.5px] text-ink-60">cm</span>
           </div>
         </div>
 
-        <Button
+        <PrimaryButton
           type="submit"
           disabled={isLoading}
-          className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
+          className="justify-center"
         >
           {isLoading ? 'Saving...' : 'Continue'}
-        </Button>
+        </PrimaryButton>
       </form>
     </div>
   )

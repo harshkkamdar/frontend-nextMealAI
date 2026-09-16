@@ -38,10 +38,10 @@ export function MultiChip({
             onClick={() => toggle(option)}
             aria-pressed={isActive}
             className={cn(
-              'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
+              'h-9 rounded-full px-3 text-[13.5px] font-semibold',
               isActive
-                ? 'bg-accent border-accent text-white'
-                : 'bg-surface border-border text-text-primary hover:bg-surface-hover'
+                ? 'bg-ink text-cream'
+                : 'bg-ink-08 text-ink'
             )}
           >
             {option}

@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { GeoCommentary } from '@/components/onboarding/geo-commentary'
 import { MultiChip } from '@/components/onboarding/multi-chip'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { submitNutritionOnboarding } from '@/lib/api/profile.api'
 import { cn } from '@/lib/utils'
 import type { DietaryStyle } from '@/types/profile.types'
@@ -25,6 +25,9 @@ const DIETARY_STYLES: { label: string; value: DietaryStyle }[] = [
   { label: 'Halal', value: 'halal' },
   { label: 'Kosher', value: 'kosher' },
 ]
+
+const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-35 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+const pillClassName = 'h-9 rounded-full px-3 text-[13.5px] font-semibold'
 
 export function NutritionForm() {
   const router = useRouter()
@@ -82,7 +85,7 @@ export function NutritionForm() {
         target_weight_kg: targetWeightKg ? Number(targetWeightKg) : undefined,
       })
       toast.success('Step 3 complete')
-      router.push('/onboarding/generating')
+      router.push('/onboarding/consent')
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to save nutrition info')
     } finally {
@@ -99,7 +102,7 @@ export function NutritionForm() {
 
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label>Allergies</Label>
+          <SectionLabel>Allergies</SectionLabel>
           <MultiChip
             options={ALLERGY_OPTIONS}
             selected={allergies}
@@ -108,7 +111,7 @@ export function NutritionForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Dietary style</Label>
+          <SectionLabel>Dietary style</SectionLabel>
           <div className="flex flex-wrap gap-2">
             {DIETARY_STYLES.map((style) => (
               <button
@@ -116,10 +119,10 @@ export function NutritionForm() {
                 type="button"
                 onClick={() => setDietaryStyle(style.value)}
                 className={cn(
-                  'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
+                  pillClassName,
                   dietaryStyle === style.value
-                    ? 'bg-accent border-accent text-white'
-                    : 'bg-surface border-border text-text-primary hover:bg-surface-hover'
+                    ? 'bg-ink text-cream'
+                    : 'bg-ink-08 text-ink'
                 )}
               >
                 {style.label}
@@ -129,13 +132,14 @@ export function NutritionForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Disliked foods</Label>
+          <SectionLabel>Disliked foods</SectionLabel>
           <div className="flex gap-2">
             <Input
               type="text"
               placeholder="e.g. Broccoli"
               value={dislikeInput}
               onChange={(e) => setDislikeInput(e.target.value)}
+              className={inputClassName}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
@@ -143,14 +147,13 @@ export function NutritionForm() {
                 }
               }}
             />
-            <Button
+            <button
               type="button"
-              variant="outline"
               onClick={addDislike}
-              className="shrink-0"
+              className="h-14 shrink-0 rounded-[15px] bg-ink-08 px-4 text-[15.5px] font-semibold text-ink"
             >
               Add
-            </Button>
+            </button>
           </div>
           {dislikes.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
@@ -159,7 +162,7 @@ export function NutritionForm() {
                   key={item}
                   type="button"
                   onClick={() => removeDislike(item)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium bg-accent border border-accent text-white transition-colors"
+                  className="inline-flex h-9 items-center gap-1 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"
                 >
                   {item}
                   <X className="size-3.5" />
@@ -170,13 +173,14 @@ export function NutritionForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Preferred cuisines</Label>
+          <SectionLabel>Preferred cuisines</SectionLabel>
           <div className="flex gap-2">
             <Input
               type="text"
               placeholder="e.g. Italian"
               value={cuisineInput}
               onChange={(e) => setCuisineInput(e.target.value)}
+              className={inputClassName}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
@@ -184,14 +188,13 @@ export function NutritionForm() {
                 }
               }}
             />
-            <Button
+            <button
               type="button"
-              variant="outline"
               onClick={addCuisine}
-              className="shrink-0"
+              className="h-14 shrink-0 rounded-[15px] bg-ink-08 px-4 text-[15.5px] font-semibold text-ink"
             >
               Add
-            </Button>
+            </button>
           </div>
           {cuisines.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
@@ -200,7 +203,7 @@ export function NutritionForm() {
                   key={item}
                   type="button"
                   onClick={() => removeCuisine(item)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium bg-accent border border-accent text-white transition-colors"
+                  className="inline-flex h-9 items-center gap-1 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"
                 >
                   {item}
                   <X className="size-3.5" />
@@ -211,7 +214,7 @@ export function NutritionForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="meals-per-day">Meals per day</Label>
+          <SectionLabel><label htmlFor="meals-per-day">Meals per day</label></SectionLabel>
           <Input
             id="meals-per-day"
             type="number"
@@ -219,11 +222,12 @@ export function NutritionForm() {
             max={6}
             value={mealsPerDay}
             onChange={(e) => setMealsPerDay(Number(e.target.value))}
+            className={inputClassName}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="weight-kg">Current weight (kg)</Label>
+          <SectionLabel><label htmlFor="weight-kg">Current weight (kg)</label></SectionLabel>
           <Input
             id="weight-kg"
             type="number"
@@ -234,11 +238,12 @@ export function NutritionForm() {
             placeholder="e.g. 75"
             value={weightKg}
             onChange={(e) => setWeightKg(e.target.value)}
+            className={inputClassName}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="target-weight-kg">Target weight (kg)</Label>
+          <SectionLabel><label htmlFor="target-weight-kg">Target weight (kg)</label></SectionLabel>
           <Input
             id="target-weight-kg"
             type="number"
@@ -249,16 +254,17 @@ export function NutritionForm() {
             placeholder="e.g. 70"
             value={targetWeightKg}
             onChange={(e) => setTargetWeightKg(e.target.value)}
+            className={inputClassName}
           />
         </div>
 
-        <Button
+        <PrimaryButton
           type="submit"
           disabled={isLoading}
-          className="w-full bg-accent hover:bg-accent-hover text-white hover:opacity-90"
+          className="justify-center"
         >
           {isLoading ? 'Saving...' : 'Continue'}
-        </Button>
+        </PrimaryButton>
       </form>
     </div>
   )
