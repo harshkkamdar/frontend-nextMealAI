@@ -1,109 +1,170 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/stores/auth.store'
-import { getLogsSummary, getLogs, createLog } from '@/lib/api/logs.api'
-import { getPlans } from '@/lib/api/plans.api'
-import { getSuggestions } from '@/lib/api/suggestions.api'
-import { getProfile } from '@/lib/api/profile.api'
-import { getGreeting, formatDate } from '@/lib/utils'
-import { todayLocalISO } from '@/lib/timezone'
-import { useUserTimezone } from '@/hooks/useUserTimezone'
-import { useSetGeoScreen } from '@/contexts/geo-screen-context'
-import { useSyncRefetch } from '@/hooks/use-sync-refetch'
-import { CalendarDays, ChevronRight, X, Minus, Plus } from 'lucide-react'
-import { CardSkeleton } from '@/components/shared/loading-skeleton'
-import { PageWrapper } from '@/components/layout/page-wrapper'
-import { NextUpCard } from '@/components/dashboard/next-up-card'
-import { ProgressCard } from '@/components/dashboard/progress-card'
-import { QuickStats } from '@/components/dashboard/quick-stats'
-import { WorkoutCard } from '@/components/dashboard/workout-card'
-import { SuggestionCard } from '@/components/dashboard/suggestion-card'
-import { WeightChart } from '@/components/dashboard/weight-chart'
-import { NudgeCard } from '@/components/dashboard/nudge-card'
-import { CheckInCard } from '@/components/dashboard/check-in-card'
-import { getDashboardCheckIn, type DashboardCheckIn } from '@/lib/api/dashboard.api'
-import { computeNudges, type Nudge } from '@/lib/nudges'
-import { useUIStore } from '@/stores/ui.store'
-import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { Minus, Plus, X } from 'lucide-react'
 import { toast } from 'sonner'
-import type { MealPlan, WorkoutPlan, Plan } from '@/types/plans.types'
-import type { LogsSummary, Log } from '@/types/logs.types'
+import {
+  emphasizeGeoMeasurements,
+  formatDashboardDate,
+  getDashboardFirstName,
+  getDashboardGeoLine,
+} from '@/components/dashboard/dashboard-helpers'
+import { SuggestionCard } from '@/components/dashboard/suggestion-card'
+import { WorkoutCard } from '@/components/dashboard/workout-card'
+import { PageWrapper } from '@/components/layout/page-wrapper'
+import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { MacroBreakdownSheet } from '@/components/shared/macro-breakdown-sheet'
+import { OfflineBand } from '@/components/shared/offline-band'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { GeoLine } from '@/components/ui/fiqr/geo-line'
+import { MacroBar } from '@/components/ui/fiqr/macro-bar'
+import { MetricTile } from '@/components/ui/fiqr/metric-tile'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { Wordmark } from '@/components/ui/fiqr/wordmark'
+import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useCachedQuery } from '@/hooks/use-cached-query'
+import { useSyncRefetch } from '@/hooks/use-sync-refetch'
+import { useUserTimezone } from '@/hooks/useUserTimezone'
+import { OfflineError } from '@/lib/api/client'
+import { getDashboardCheckIn, type DashboardCheckIn } from '@/lib/api/dashboard.api'
+import { createLog, getLogs, getLogsSummary } from '@/lib/api/logs.api'
+import { getPlans } from '@/lib/api/plans.api'
+import { getProfile } from '@/lib/api/profile.api'
+import { getSuggestions } from '@/lib/api/suggestions.api'
+import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import type { MacroKey } from '@/lib/macros'
+import { computeNudges } from '@/lib/nudges'
+import { todayLocalISO } from '@/lib/timezone'
+import { useAuthStore } from '@/stores/auth.store'
+import { useUIStore } from '@/stores/ui.store'
+import type { Log, LogsSummary } from '@/types/logs.types'
+import type { MealPlan, Plan, WorkoutPlan } from '@/types/plans.types'
 import type { Profile } from '@/types/profile.types'
 import type { Suggestion } from '@/types/suggestions.types'
 
 type QuickLogType = 'water' | 'mood' | 'sleep' | 'energy' | 'weight' | null
 
-// ── Inline logging sheets ────────────────────────────────────────────────────
+const EMPTY_LOGS: Log[] = []
+const EMPTY_PLANS: Plan[] = []
+
+interface DashboardData {
+  summary: LogsSummary | null
+  weekSummary: LogsSummary | null
+  plans: Plan[]
+  suggestions: Suggestion[]
+  todayLogs: Log[]
+  profile: Profile | null
+  weightLogs: Log[]
+  checkIn: DashboardCheckIn | null
+  recentSleepLogs: Log[]
+}
+
+async function withFallback<T>(request: Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await request
+  } catch (error) {
+    if (error instanceof OfflineError) throw error
+    return fallback
+  }
+}
 
 function WaterSheet({ onDone }: { onDone: () => void }) {
   const [glasses, setGlasses] = useState(1)
   const [saving, setSaving] = useState(false)
-  const handle = async () => {
+
+  const handleSave = async () => {
     setSaving(true)
     try {
       await createLog({ type: 'water', payload: { glasses }, source: 'manual' })
       toast.success('Water logged')
       onDone()
-    } catch { toast.error('Failed to log water') } finally { setSaving(false) }
+    } catch {
+      toast.error('Failed to log water')
+    } finally {
+      setSaving(false)
+    }
   }
+
   return (
-    <div className="space-y-6">
-      <p className="text-[17px] font-semibold text-text-primary text-center">Log Water</p>
+    <div className="space-y-6 px-gutter pb-6">
+      <p className="text-center text-[17px] font-semibold text-ink">Log Water</p>
       <div className="flex items-center justify-center gap-8 py-4">
-        <button type="button" onClick={() => setGlasses(Math.max(0, glasses - 1))}
-          className="w-12 h-12 rounded-full border-2 border-accent flex items-center justify-center text-accent">
+        <button
+          type="button"
+          onClick={() => setGlasses(Math.max(0, glasses - 1))}
+          className="w-12 h-12 rounded-full border border-ink-16 flex items-center justify-center text-ink"
+        >
           <Minus className="w-5 h-5" />
         </button>
         <div className="text-center">
-          <span className="text-5xl font-bold text-text-primary tabular-nums">{glasses}</span>
-          <p className="text-sm text-text-secondary mt-1">glasses</p>
+          <span className="text-[34px] font-bold text-ink tabular-nums">{glasses}</span>
+          <p className="mt-1 text-[13px] text-ink-55">glasses</p>
         </div>
-        <button type="button" onClick={() => setGlasses(glasses + 1)}
-          className="w-12 h-12 rounded-full border-2 border-accent flex items-center justify-center text-accent">
+        <button
+          type="button"
+          onClick={() => setGlasses(glasses + 1)}
+          className="w-12 h-12 rounded-full border border-ink-16 flex items-center justify-center text-ink"
+        >
           <Plus className="w-5 h-5" />
         </button>
       </div>
-      <button onClick={handle} disabled={saving}
-        className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
+      <PrimaryButton type="button" disabled={saving} onClick={handleSave} className="justify-center">
         {saving ? 'Saving…' : 'Save'}
-      </button>
+      </PrimaryButton>
     </div>
   )
 }
 
-function RatingSheet({ title, color, onDone, type }: { title: string; color: string; onDone: () => void; type: 'mood' | 'energy' }) {
+function RatingSheet({ title, onDone, type }: {
+  title: string
+  onDone: () => void
+  type: 'mood' | 'energy'
+}) {
   const [rating, setRating] = useState(0)
   const [saving, setSaving] = useState(false)
-  const handle = async () => {
-    if (!rating) { toast.error('Select a rating'); return }
+
+  const handleSave = async () => {
+    if (!rating) {
+      toast.error('Select a rating')
+      return
+    }
     setSaving(true)
     try {
       await createLog({ type, payload: { rating }, source: 'manual' })
       toast.success(`${title} logged`)
       onDone()
-    } catch { toast.error(`Failed to log ${title.toLowerCase()}`) } finally { setSaving(false) }
+    } catch {
+      toast.error(`Failed to log ${title.toLowerCase()}`)
+    } finally {
+      setSaving(false)
+    }
   }
+
   return (
-    <div className="space-y-6">
-      <p className="text-[17px] font-semibold text-text-primary text-center">{title}</p>
-      <div className="text-center py-2">
-        <span className="text-5xl font-bold text-text-primary tabular-nums">{rating || '—'}</span>
-        <p className="text-sm text-text-secondary mt-1">out of 10</p>
+    <div className="space-y-6 px-gutter pb-6">
+      <p className="text-center text-[17px] font-semibold text-ink">{title}</p>
+      <div className="py-2 text-center">
+        <span className="text-[34px] font-bold text-ink tabular-nums">{rating || '—'}</span>
+        <p className="mt-1 text-[13px] text-ink-55">out of 10</p>
       </div>
-      <div className="flex gap-2 justify-between">
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-          <button key={n} type="button" onClick={() => setRating(n)}
-            className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${n <= rating ? `${color} text-white` : 'bg-surface-hover text-text-secondary'}`}>
-            {n}
+      <div className="flex justify-between gap-1">
+        {Array.from({ length: 10 }, (_, index) => index + 1).map((number) => (
+          <button
+            key={number}
+            type="button"
+            onClick={() => setRating(number)}
+            className={`w-8 h-8 rounded-full text-[12px] font-semibold ${number <= rating ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
+          >
+            {number}
           </button>
         ))}
       </div>
-      <button onClick={handle} disabled={saving}
-        className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
+      <PrimaryButton type="button" disabled={saving} onClick={handleSave} className="justify-center">
         {saving ? 'Saving…' : 'Save'}
-      </button>
+      </PrimaryButton>
     </div>
   )
 }
@@ -112,40 +173,66 @@ function SleepSheet({ onDone }: { onDone: () => void }) {
   const [hours, setHours] = useState<number | ''>('')
   const [quality, setQuality] = useState(0)
   const [saving, setSaving] = useState(false)
-  const handle = async () => {
-    if (!hours) { toast.error('Enter hours slept'); return }
-    if (!quality) { toast.error('Select sleep quality'); return }
+
+  const handleSave = async () => {
+    if (!hours) {
+      toast.error('Enter hours slept')
+      return
+    }
+    if (!quality) {
+      toast.error('Select sleep quality')
+      return
+    }
     setSaving(true)
     try {
-      await createLog({ type: 'sleep', payload: { hours: Number(hours), quality_rating: quality }, source: 'manual' })
+      await createLog({
+        type: 'sleep',
+        payload: { hours: Number(hours), quality_rating: quality },
+        source: 'manual',
+      })
       toast.success('Sleep logged')
       onDone()
-    } catch { toast.error('Failed to log sleep') } finally { setSaving(false) }
+    } catch {
+      toast.error('Failed to log sleep')
+    } finally {
+      setSaving(false)
+    }
   }
+
   return (
-    <div className="space-y-5">
-      <p className="text-[17px] font-semibold text-text-primary text-center">Log Sleep</p>
-      <div className="flex items-center justify-center gap-2 py-2">
-        <input type="number" step="0.5" min="0" max="24" placeholder="7.5"
-          value={hours} onChange={(e) => setHours(e.target.value ? Number(e.target.value) : '')}
-          className="w-24 text-center text-4xl font-bold bg-transparent border-b-2 border-border focus:border-accent outline-none py-1 text-text-primary" />
-        <span className="text-lg text-text-secondary font-medium">hrs</span>
+    <div className="space-y-5 px-gutter pb-6">
+      <p className="text-center text-[17px] font-semibold text-ink">Log Sleep</p>
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          step="0.5"
+          min="0"
+          max="24"
+          placeholder="7.5"
+          value={hours}
+          onChange={(event) => setHours(event.target.value ? Number(event.target.value) : '')}
+          className="h-14 min-w-0 flex-1 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none focus:border-accent"
+        />
+        <span className="text-[15.5px] font-medium text-ink-55">hours</span>
       </div>
       <div>
-        <p className="text-xs text-text-secondary mb-2">Sleep quality</p>
-        <div className="flex gap-2 justify-between">
-          {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-            <button key={n} type="button" onClick={() => setQuality(n)}
-              className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${n <= quality ? 'bg-[#6366F1] text-white' : 'bg-surface-hover text-text-secondary'}`}>
-              {n}
+        <p className="mb-2 text-[13px] text-ink-55">Sleep quality</p>
+        <div className="flex justify-between gap-1">
+          {Array.from({ length: 10 }, (_, index) => index + 1).map((number) => (
+            <button
+              key={number}
+              type="button"
+              onClick={() => setQuality(number)}
+              className={`w-8 h-8 rounded-full text-[12px] font-semibold ${number <= quality ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
+            >
+              {number}
             </button>
           ))}
         </div>
       </div>
-      <button onClick={handle} disabled={saving}
-        className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
+      <PrimaryButton type="button" disabled={saving} onClick={handleSave} className="justify-center">
         {saving ? 'Saving…' : 'Save'}
-      </button>
+      </PrimaryButton>
     </div>
   )
 }
@@ -153,37 +240,44 @@ function SleepSheet({ onDone }: { onDone: () => void }) {
 function WeightSheet({ currentWeight, onDone }: { currentWeight?: number; onDone: () => void }) {
   const [kg, setKg] = useState<number | ''>(currentWeight ?? '')
   const [saving, setSaving] = useState(false)
-  const handle = async () => {
-    if (!kg) { toast.error('Enter your weight'); return }
+
+  const handleSave = async () => {
+    if (!kg) {
+      toast.error('Enter your weight')
+      return
+    }
     setSaving(true)
     try {
       await createLog({ type: 'weight', payload: { weight_kg: Number(kg) }, source: 'manual' })
       toast.success('Weight logged')
       onDone()
-    } catch { toast.error('Failed to log weight') } finally { setSaving(false) }
+    } catch {
+      toast.error('Failed to log weight')
+    } finally {
+      setSaving(false)
+    }
   }
-  const todayLabel = new Date().toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
+
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-[17px] font-semibold text-text-primary">Log Weight</p>
-        <p className="text-xs text-text-tertiary mt-0.5">Today · {todayLabel}</p>
+    <div className="space-y-5 px-gutter pb-6">
+      <p className="text-center text-[17px] font-semibold text-ink">Log Weight</p>
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          step="0.1"
+          placeholder="75.0"
+          value={kg}
+          onChange={(event) => setKg(event.target.value ? Number(event.target.value) : '')}
+          className="h-14 min-w-0 flex-1 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none focus:border-accent"
+        />
+        <span className="text-[15.5px] font-medium text-ink-55">kg</span>
       </div>
-      <div className="flex items-center justify-center gap-2 py-4">
-        <input type="number" step="0.1" placeholder="75.0"
-          value={kg} onChange={(e) => setKg(e.target.value ? Number(e.target.value) : '')}
-          className="w-28 text-center text-4xl font-bold bg-transparent border-b-2 border-border focus:border-accent outline-none py-1 text-text-primary" />
-        <span className="text-lg text-text-secondary font-medium">kg</span>
-      </div>
-      <button onClick={handle} disabled={saving}
-        className="w-full rounded-xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white disabled:opacity-50">
+      <PrimaryButton type="button" disabled={saving} onClick={handleSave} className="justify-center">
         {saving ? 'Saving…' : 'Save'}
-      </button>
+      </PrimaryButton>
     </div>
   )
 }
-
-// ── Bottom sheet overlay ─────────────────────────────────────────────────────
 
 function DashboardLogSheet({ type, onDone, onClose, currentWeight }: {
   type: QuickLogType
@@ -191,315 +285,276 @@ function DashboardLogSheet({ type, onDone, onClose, currentWeight }: {
   onClose: () => void
   currentWeight?: number
 }) {
-  if (!type) return null
   return (
-    <>
-      {/* Backdrop — z-[49] so it's above page content but BELOW the nav bar (z-50) */}
-      <div
-        className="fixed inset-0 z-[49] bg-black/40"
+    <BottomSheet open={type !== null} onClose={onClose} ariaLabel="Quick log">
+      <button
+        type="button"
         onClick={onClose}
-      />
-      {/* Sheet panel — z-[51] above nav, positioned just above it */}
-      <div className="fixed bottom-[60px] left-0 right-0 z-[51] bg-background rounded-t-2xl px-5 pt-3 pb-6 shadow-2xl">
-        {/* Handle */}
-        <div className="flex justify-center mb-3">
-          <div className="w-10 h-1 rounded-full bg-border" />
-        </div>
-        <button type="button" onClick={onClose} className="absolute top-3 right-4 text-text-tertiary">
-          <X className="w-5 h-5" />
-        </button>
-        {type === 'water' && <WaterSheet onDone={onDone} />}
-        {type === 'mood' && <RatingSheet title="Log Mood" color="bg-[#FF9F0A]" type="mood" onDone={onDone} />}
-        {type === 'sleep' && <SleepSheet onDone={onDone} />}
-        {type === 'energy' && <RatingSheet title="Log Energy" color="bg-accent" type="energy" onDone={onDone} />}
-        {type === 'weight' && <WeightSheet currentWeight={currentWeight} onDone={onDone} />}
-      </div>
-    </>
+        className="absolute right-4 top-3 text-ink-50"
+        aria-label="Close"
+      >
+        <X className="w-5 h-5" />
+      </button>
+      {type === 'water' ? <WaterSheet onDone={onDone} /> : null}
+      {type === 'mood' ? <RatingSheet title="Log Mood" type="mood" onDone={onDone} /> : null}
+      {type === 'sleep' ? <SleepSheet onDone={onDone} /> : null}
+      {type === 'energy' ? <RatingSheet title="Log Energy" type="energy" onDone={onDone} /> : null}
+      {type === 'weight' ? <WeightSheet currentWeight={currentWeight} onDone={onDone} /> : null}
+    </BottomSheet>
   )
 }
 
-// ── Main page ────────────────────────────────────────────────────────────────
+function PersonIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-6 h-6"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  )
+}
 
 export default function DashboardPage() {
+  const router = useRouter()
   const tz = useUserTimezone()
-  const user = useAuthStore((s) => s.user)
-  const [loading, setLoading] = useState(true)
-  const [summary, setSummary] = useState<LogsSummary | null>(null)
-  const [plans, setPlans] = useState<Plan[]>([])
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
-  const [todayLogs, setTodayLogs] = useState<Log[]>([])
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [weightLogs, setWeightLogs] = useState<Log[]>([])
-  // Sleep is a "last night" metric — log it for yesterday and it still belongs on
-  // today's card. todayLogs (days:1) can't see a yesterday-stamped row, so fetch
-  // the single most-recent sleep log regardless of date.
-  const [recentSleepLogs, setRecentSleepLogs] = useState<Log[]>([])
+  const user = useAuthStore((state) => state.user)
   const [activeSheet, setActiveSheet] = useState<QuickLogType>(null)
-  // FB-R6-10 — check-in card; null when user has <7 days of data (BE gate)
-  // or while loading. Falls back silently to existing onboarding cards.
-  const [checkIn, setCheckIn] = useState<DashboardCheckIn | null>(null)
-
+  const [activeMacro, setActiveMacro] = useState<MacroKey | null>(null)
+  const [hiddenSuggestionIds, setHiddenSuggestionIds] = useState<string[]>([])
   const today = todayLocalISO(tz)
 
-  const fetchData = useCallback(async () => {
-    try {
-      const [summaryRes, plansRes, suggestionsRes, logsRes, profileRes, weightRes, checkInRes, sleepRes] = await Promise.all([
-        getLogsSummary('day').catch(() => null),
-        getPlans({ active_only: true }).catch(() => [] as Plan[]),
-        getSuggestions({ status: 'pending' }).catch(() => [] as Suggestion[]),
-        getLogs({ days: 1 }).catch(() => [] as Log[]),
-        getProfile().catch(() => null),
-        getLogs({ type: 'weight', limit: 100 }).catch(() => [] as Log[]),
-        // FB-R6-10: optional, gracefully nulls out on any failure (incl. 404
-        // if the BE endpoint isn't shipped on this branch yet).
-        getDashboardCheckIn().catch(() => ({ check_in: null })),
-        getLogs({ type: 'sleep', limit: 1 }).catch(() => [] as Log[]),
-      ])
-      setSummary(summaryRes)
-      setPlans(plansRes)
-      setSuggestions(suggestionsRes)
-      setTodayLogs(logsRes)
-      setProfile(profileRes)
-      setWeightLogs(weightRes)
-      setCheckIn(checkInRes.check_in)
-      setRecentSleepLogs(sleepRes)
-    } finally {
-      setLoading(false)
+  const fetchAll = useCallback(async (): Promise<DashboardData> => {
+    const [summary, weekSummary, plans, suggestions, todayLogs, profile, weightLogs, checkInResponse, recentSleepLogs] = await Promise.all([
+      withFallback(getLogsSummary('day'), null),
+      withFallback(getLogsSummary('week'), null),
+      withFallback(getPlans({ active_only: true }), [] as Plan[]),
+      withFallback(getSuggestions({ status: 'pending' }), [] as Suggestion[]),
+      withFallback(getLogs({ days: 1 }), [] as Log[]),
+      withFallback(getProfile(), null),
+      withFallback(getLogs({ type: 'weight', limit: 100 }), [] as Log[]),
+      withFallback(getDashboardCheckIn(), { check_in: null }),
+      withFallback(getLogs({ type: 'sleep', limit: 1 }), [] as Log[]),
+    ])
+
+    return {
+      summary,
+      weekSummary,
+      plans,
+      suggestions,
+      todayLogs,
+      profile,
+      weightLogs,
+      checkIn: checkInResponse.check_in,
+      recentSleepLogs,
     }
   }, [])
 
-  useEffect(() => { fetchData() }, [fetchData])
+  const { data, loading, refetch } = useCachedQuery('dashboard', fetchAll, [today])
+  const refresh = useCallback(() => { void refetch() }, [refetch])
 
-  // FB-R6-08 — refetch when Geo deactivates the active plan via chat so the
-  // dashboard cards (workout, next-up nutrition) reflect the new state
-  // without a manual reload. Legacy DOM-event listener kept ONE release
-  // while syncBus rolls out.
   useEffect(() => {
-    const handler = () => { fetchData() }
-    window.addEventListener('workout:plan-deactivated', handler)
-    return () => {
-      window.removeEventListener('workout:plan-deactivated', handler)
-    }
-  }, [fetchData])
+    window.addEventListener('workout:plan-deactivated', refresh)
+    return () => window.removeEventListener('workout:plan-deactivated', refresh)
+  }, [refresh])
 
-  // FB-R6.7 Build B — chat→UI sync. Plans + logs both feed dashboard cards.
-  useSyncRefetch(['plans:*', 'logs:*'], fetchData)
+  useSyncRefetch(['plans:*', 'logs:*'], refresh)
+  useSetGeoScreen('dashboard', { loading: loading && !data })
 
-  useSetGeoScreen('dashboard', { loading })
-
-  const mealPlan = (plans.find((p) => p.type === 'meal') as MealPlan) ?? null
-  const workoutPlan = (plans.find((p) => p.type === 'workout') as WorkoutPlan) ?? null
-
-  // FE-RCA F1 — Dashboard/Diary divergence fix.
-  // Previous: fell back to `summary?.daily_breakdown?.[0]` when today had no
-  // bucket. Because the BE orders daily_breakdown by created_at ASC ([0] is
-  // the EARLIEST day), this rendered yesterday's calories as if they were
-  // today's. Diary, correctly filtering by local_date, showed 0. The user
-  // saw two different answers and trust collapsed.
-  // Cure: only the today-bucket counts. No row → zero. Matches Diary's
-  // strict-equality filter exactly.
-  const dailyBreakdown = summary?.daily_breakdown?.find((d) => d.date === today)
+  const summary = data?.summary ?? null
+  const plans = data?.plans ?? EMPTY_PLANS
+  const todayLogs = data?.todayLogs ?? EMPTY_LOGS
+  const profile = data?.profile ?? null
+  const workoutPlan = (plans.find((plan) => plan.type === 'workout') as WorkoutPlan) ?? null
+  const mealPlan = (plans.find((plan) => plan.type === 'meal') as MealPlan) ?? null
+  const dailyBreakdown = summary?.daily_breakdown?.find((day) => day.date === today)
   const caloriesConsumed = dailyBreakdown?.calories ?? 0
   const proteinConsumed = dailyBreakdown?.protein ?? 0
   const carbsConsumed = dailyBreakdown?.carbs ?? 0
   const fatConsumed = dailyBreakdown?.fat ?? 0
-
-  // FB-tdee-baseline: profile.daily_*_target is the source of truth. A nutrition plan,
-  // if active, may carry an optional override under content.daily_targets.
-  // No hardcoded defaults — when the profile is incomplete, targets stay 0 and
-  // the macro-progress component drops the "left" suffix gracefully.
-  const planTargets = mealPlan?.content?.daily_targets
+  const planTargets = mealPlan?.content.daily_targets
   const caloriesTarget = planTargets?.calories ?? profile?.daily_calorie_target ?? 0
   const proteinTarget = planTargets?.protein ?? profile?.daily_protein_g ?? 0
   const carbsTarget = planTargets?.carbs ?? profile?.daily_carbs_g ?? 0
   const fatTarget = planTargets?.fat ?? profile?.daily_fat_g ?? 0
   const profileIncomplete = (profile?.daily_targets_missing_fields?.length ?? 0) > 0
 
-  const waterLogs = todayLogs.filter((l) => l.type === 'water')
-  const water = waterLogs.reduce((sum, l) => sum + ((l.payload as any)?.glasses ?? 0), 0)
-
-  const moodLogs = todayLogs.filter((l) => l.type === 'mood')
-  const mood = moodLogs.length > 0
-    ? Math.round(moodLogs.reduce((sum, l) => sum + ((l.payload as any)?.rating ?? 0), 0) / moodLogs.length)
-    : 0
-
-  // Prefer a sleep log from today; otherwise show the most recent night's sleep
-  // (sleep is logged for "last night", which is yesterday's local_date).
-  const sleepLogs = todayLogs.filter((l) => l.type === 'sleep')
-  const sleep = sleepLogs.length > 0
-    ? (sleepLogs[sleepLogs.length - 1].payload as any)?.hours ?? 0
-    : recentSleepLogs.length > 0
-      ? (recentSleepLogs[0].payload as any)?.hours ?? 0
-      : summary?.summary?.avg_sleep_hours ?? 0
-
-  const energyLogs = todayLogs.filter((l) => l.type === 'energy')
-  const energy = energyLogs.length > 0
-    ? Math.round(energyLogs.reduce((sum, l) => sum + ((l.payload as any)?.rating ?? 0), 0) / energyLogs.length)
-    : summary?.summary?.avg_energy_rating ?? 0
-
-  // Today's weight log — FB-12: prefer the user-local bucket so a morning
-  // weigh-in shows under today regardless of UTC offset.
-  const todayWeightLog = weightLogs.find(
-    (l) => (l.local_date ?? new Date(l.created_at).toISOString().split('T')[0]) === today
+  const todayWeightLog = data?.weightLogs.find(
+    (log) => (log.local_date ?? new Date(log.created_at).toISOString().split('T')[0]) === today,
   )
   const displayWeight = todayWeightLog
-    ? (todayWeightLog.payload as any)?.weight_kg
+    ? Number((todayWeightLog.payload as { weight_kg?: number }).weight_kg)
     : profile?.current_weight_kg
+  const todaySleepLogs = todayLogs.filter((log) => log.type === 'sleep')
+  const sleepHours = todaySleepLogs.length > 0
+    ? Number((todaySleepLogs[todaySleepLogs.length - 1].payload as { hours?: number }).hours ?? 0)
+    : data?.recentSleepLogs.length
+      ? Number((data.recentSleepLogs[0].payload as { hours?: number }).hours ?? 0)
+      : summary?.summary.avg_sleep_hours ?? 0
+  const sessionsThisWeek = data?.weekSummary?.summary?.workout_count ?? 0
+  const firstName = getDashboardFirstName(profile?.full_name, user?.email)
+  const nudges = useMemo(
+    () => data ? computeNudges({ todayLogs, summary, mealPlan, workoutPlan, profile }) : [],
+    [data, todayLogs, summary, mealPlan, workoutPlan, profile],
+  )
+  const geoLine = getDashboardGeoLine(data?.checkIn?.takeaway, nudges)
+  const pendingSuggestion = data?.suggestions.find(
+    (suggestion) => !hiddenSuggestionIds.includes(suggestion.id),
+  )
+  const foodLogs = todayLogs.filter((log) => log.type === 'food')
 
-  const firstName = user?.email?.split('@')[0] ?? 'there'
-  const initials = firstName.slice(0, 2).toUpperCase()
-
-  function handleSuggestionAction() {
-    setSuggestions((prev) => prev.slice(1))
-  }
-
-  const router = useRouter()
-
-  const nudges = useMemo(() => {
-    if (loading) return []
-    return computeNudges({ todayLogs, summary, mealPlan, workoutPlan, profile })
-  }, [loading, todayLogs, summary, mealPlan, workoutPlan, profile])
-
-  async function handleNudgeAction(nudge: Nudge) {
-    switch (nudge.action) {
-      case 'open_companion':
-        useUIStore.getState().openSheet('geo-companion')
-        break
-      case 'start_workout':
-        try {
-          const data = nudge.actionData as { planId: string; dayIndex: number } | undefined
-          if (data) {
-            const session = await startWorkoutSession({ plan_id: data.planId, plan_day_index: data.dayIndex })
-            router.push(`/train/session?id=${session.id}`)
-          } else {
-            router.push('/train')
-          }
-        } catch {
-          router.push('/train')
-        }
-        break
-      case 'open_food_search':
-        router.push('/food')
-        break
-      case 'open_full_chat':
-        router.push('/chat')
-        break
+  const handleStartWorkout = async (plan: WorkoutPlan, dayIndex: number) => {
+    try {
+      const session = await startWorkoutSession({ plan_id: plan.id, plan_day_index: dayIndex })
+      router.push(`/train/session?id=${session.id}`)
+    } catch {
+      toast.error('Failed to start workout')
     }
   }
 
   const handleSheetDone = () => {
     setActiveSheet(null)
-    fetchData()
+    void refetch()
   }
 
   return (
     <PageWrapper>
-      <div
-        className="fixed top-0 left-0 right-0 h-48 pointer-events-none -z-10"
-        style={{ background: 'linear-gradient(180deg, #FDF0EB 0%, #FFFFFF 100%)' }}
-      />
+      <header>
+        <div className="flex items-center justify-between gap-[14px]">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-[9px]">
+              <Wordmark size={22} />
+              <span className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50">
+                {formatDashboardDate(today)}
+              </span>
+            </div>
+            <h1 className="mt-[5px] text-[22px] font-semibold tracking-[-0.4px]">
+              Welcome back, {firstName}
+            </h1>
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push('/settings')}
+            aria-label="Settings"
+            className="w-10 h-10 rounded-full bg-ink-08 border border-ink-16 text-ink-60 flex shrink-0 items-center justify-center"
+          >
+            <PersonIcon />
+          </button>
+        </div>
+      </header>
 
-      {/* Greeting row */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-text-primary">
-            Good {getGreeting()}, {firstName}
-          </h1>
-          <p className="text-xs text-text-secondary mt-0.5">{formatDate(new Date())}</p>
-        </div>
-        <div className="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center text-sm font-semibold shrink-0">
-          {initials}
-        </div>
+      <div className="-mx-gutter">
+        <OfflineBand />
       </div>
 
-      {loading ? (
-        <div className="space-y-4">
+      {!data && loading ? (
+        <div className="mt-4 space-y-4">
           <CardSkeleton />
           <CardSkeleton />
           <CardSkeleton />
         </div>
+      ) : !data ? (
+        <p className="mt-4 text-[15.5px] text-ink-62">Unable to load your dashboard.</p>
       ) : (
-        <div className="space-y-4">
-          {profileIncomplete && (
-            <div className="bg-warning/10 border border-warning/20 rounded-xl p-4">
-              <p className="text-sm font-medium text-text-primary">Complete your profile to see daily targets</p>
-              <p className="text-xs text-text-secondary mt-1">We need: {profile?.daily_targets_missing_fields?.join(', ')}</p>
-              <button
-                onClick={() => router.push('/settings/profile')}
-                className="text-xs text-accent mt-2 underline"
-              >
-                Update profile →
+        <>
+          <GeoLine>{emphasizeGeoMeasurements(geoLine)}</GeoLine>
+
+          <section className="border-t border-ink-09 pt-5">
+            <SectionLabel>Today&apos;s targets</SectionLabel>
+            <div className="mt-[13px] flex flex-col gap-[13px]">
+              <button type="button" className="w-full text-left" onClick={() => setActiveMacro('calories')}>
+                <MacroBar name="Calories" current={caloriesConsumed} target={caloriesTarget} />
+              </button>
+              <button type="button" className="w-full text-left" onClick={() => setActiveMacro('protein')}>
+                <MacroBar name="Protein" current={proteinConsumed} target={proteinTarget} unit="g" />
+              </button>
+              <button type="button" className="w-full text-left" onClick={() => setActiveMacro('carbs')}>
+                <MacroBar name="Carbs" current={carbsConsumed} target={carbsTarget} unit="g" />
+              </button>
+              <button type="button" className="w-full text-left" onClick={() => setActiveMacro('fat')}>
+                <MacroBar name="Fat" current={fatConsumed} target={fatTarget} unit="g" />
               </button>
             </div>
-          )}
-          {/* FB-R6-10 — When the BE returns a check-in (≥7 days of activity
-              across ≥2 of food/weight/workout), it leads the dashboard.
-              When null, the existing nudge + next-up + empty-state cards
-              run unchanged. */}
-          {checkIn && <CheckInCard checkIn={checkIn} />}
-          {nudges.map((nudge) => (
-            <NudgeCard key={nudge.type} nudge={nudge} onAction={handleNudgeAction} />
-          ))}
-          {/* FE-RCA F8 — macros above training, per George (2026-06-09). */}
-          <ProgressCard
-            calories={{ consumed: caloriesConsumed, target: caloriesTarget }}
-            protein={{ consumed: proteinConsumed, target: proteinTarget }}
-            carbs={{ consumed: carbsConsumed, target: carbsTarget }}
-            fat={{ consumed: fatConsumed, target: fatTarget }}
-            foodLogs={todayLogs.filter((l) => l.type === 'food')}
-          />
-          <NextUpCard
-            mealPlan={mealPlan}
-            today={today}
-            loggedMealTypes={todayLogs.filter((l) => l.type === 'food').map((l) => (l.payload as any)?.meal_type?.toLowerCase?.() ?? '')}
-            onCreatePlan={() => {
-              const id = crypto.randomUUID()
-              router.push(`/chat/session?id=${id}&prefill=${encodeURIComponent('Can you create a 7-day nutrition plan for me based on my goals and preferences?')}`)
-            }}
-          />
-          <WorkoutCard workoutPlan={workoutPlan} today={today} />
-          <QuickStats
-            water={water}
-            mood={mood}
-            sleep={sleep}
-            energy={energy}
-            weightKg={displayWeight}
-            onWater={() => setActiveSheet('water')}
-            onMood={() => setActiveSheet('mood')}
-            onSleep={() => setActiveSheet('sleep')}
-            onEnergy={() => setActiveSheet('energy')}
-            onWeight={() => setActiveSheet('weight')}
-          />
-          <button
-            onClick={() => router.push('/plans')}
-            className="w-full bg-surface border border-border rounded-xl p-4 flex items-center justify-between active:scale-[0.98] transition-transform"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-accent-light flex items-center justify-center">
-                <CalendarDays className="w-5 h-5 text-accent" />
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-text-primary">My Plans</p>
-                <p className="text-xs text-text-secondary">View and manage your meal & workout plans</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-text-tertiary" />
-          </button>
-          {suggestions.length > 0 && (
-            <SuggestionCard suggestion={suggestions[0]} onAction={handleSuggestionAction} />
-          )}
-          {profile?.current_weight_kg && (
-            <WeightChart
-              startWeight={profile.current_weight_kg}
-              targetWeight={profile.target_weight_kg ?? profile.current_weight_kg}
-              weightLogs={weightLogs}
-              profileCreatedAt={profile.created_at}
+          </section>
+
+          <div className="mt-4">
+            <PrimaryButton
+              type="button"
+              icon="+"
+              trailing="Scan · Search"
+              onClick={() => router.push('/logs/new/food')}
+            >
+              Log food
+            </PrimaryButton>
+          </div>
+
+          <div className="mt-4">
+            <WorkoutCard
+              workoutPlan={workoutPlan}
+              today={today}
+              onStart={(plan, dayIndex) => void handleStartWorkout(plan, dayIndex)}
+              onSeeProgram={() => router.push('/train')}
+              onAskGeo={() => useUIStore.getState().openSheet('geo-companion')}
             />
-          )}
-        </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-[10px]">
+            <button type="button" className="text-left" onClick={() => setActiveSheet('weight')}>
+              <MetricTile
+                className="h-full"
+                label="Weight"
+                value={displayWeight?.toFixed(1) ?? '—'}
+                unit="kg"
+              />
+            </button>
+            <button type="button" className="text-left" onClick={() => setActiveSheet('sleep')}>
+              <MetricTile
+                className="h-full"
+                label="Sleep"
+                value={sleepHours ? sleepHours.toFixed(1) : '—'}
+                unit="h"
+              />
+            </button>
+            <button type="button" className="text-left" onClick={() => router.push('/train')}>
+              <MetricTile className="h-full" label="Sessions" value={sessionsThisWeek} sub="this week" />
+            </button>
+          </div>
+
+          {profileIncomplete ? (
+            <Link
+              href="/settings/profile"
+              className="mt-4 block bg-card rounded-[16px] border border-ink-12 px-[14px] py-[13px]"
+            >
+              <div className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-62">Profile</div>
+              <div className="mt-[3px] text-[15.5px] font-semibold text-ink">Add your height →</div>
+            </Link>
+          ) : null}
+
+          {pendingSuggestion ? (
+            <div className="mt-4">
+              <SuggestionCard
+                suggestion={pendingSuggestion}
+                onAction={() => setHiddenSuggestionIds((ids) => [...ids, pendingSuggestion.id])}
+              />
+            </div>
+          ) : null}
+
+          <MacroBreakdownSheet
+            open={activeMacro !== null}
+            macro={activeMacro ?? 'calories'}
+            foodLogs={foodLogs}
+            onClose={() => setActiveMacro(null)}
+          />
+        </>
       )}
 
-      {/* Quick log bottom sheet */}
       <DashboardLogSheet
         type={activeSheet}
         onDone={handleSheetDone}

@@ -25,18 +25,18 @@ export function SuggestionCard({
   }
 
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4 border-l-4 border-l-accent">
-      <div className="flex gap-3">
-        <GeoAvatar state="suggest" size={36} />
+    <div className="bg-card border border-ink-12 rounded-[16px] p-[14px]">
+      <div className="flex gap-[11px]">
+        <GeoAvatar state="suggest" size={24} />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-text-primary">{suggestion.title}</p>
-          <p className="text-[13px] text-text-secondary mt-0.5">{suggestion.description}</p>
+          <p className="text-[15.5px] font-semibold text-ink">{suggestion.title}</p>
+          <p className="mt-0.5 text-[13.5px] font-normal text-ink-62">{suggestion.description}</p>
           <div className="flex items-center gap-2 mt-3">
             <button
               type="button"
               disabled={loading}
               onClick={() => handleAction('approve')}
-              className="rounded-lg bg-accent hover:bg-accent-hover px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+              className="rounded-full bg-ink px-3 h-9 text-[13.5px] font-semibold text-cream disabled:opacity-50"
             >
               Yes, update
             </button>
@@ -44,7 +44,7 @@ export function SuggestionCard({
               type="button"
               disabled={loading}
               onClick={() => handleAction('dismiss')}
-              className="rounded-lg px-3 py-1.5 text-xs font-medium text-text-secondary disabled:opacity-50"
+              className="rounded-full bg-ink-08 px-3 h-9 text-[13.5px] font-semibold text-ink disabled:opacity-50"
             >
               Not now
             </button>
