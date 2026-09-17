@@ -1,43 +1,27 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { Search, Star, Trash2, Plus, Utensils, X } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { MoreHorizontal, Plus, Search, Star, Utensils, X } from 'lucide-react'
+import { toast } from 'sonner'
 import { PageWrapper } from '@/components/layout/page-wrapper'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
-import { getPersonalFoods, updateFood, deleteUserFood, saveFood } from '@/lib/api/foods.api'
-import { ConfirmDialog } from '@/components/shared/confirm-dialog'
-import type { UserFood, FoodMacros } from '@/types/foods.types'
-import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { deleteUserFood, getPersonalFoods, saveFood, updateFood } from '@/lib/api/foods.api'
+import type { UserFood } from '@/types/foods.types'
 
 const SOURCE_LABELS: Record<string, string> = {
   manual: 'Manual',
   usda: 'USDA',
-  geo_estimate: 'Geo AI',
+  geo_estimate: 'Geo',
   personal: 'Personal',
 }
 
-const SOURCE_COLORS: Record<string, string> = {
-  manual: 'bg-purple-100 text-purple-700',
-  usda: 'bg-blue-100 text-blue-700',
-  geo_estimate: 'bg-amber-100 text-amber-700',
-  personal: 'bg-green-100 text-green-700',
-}
-
-function MacroPill({ label, value }: { label: string; value?: number }) {
-  return (
-    <span className="text-[11px] text-text-secondary">
-      <span className="font-medium text-text-primary">{value ?? 0}</span>{' '}
-      {label}
-    </span>
-  )
-}
-
-function FoodCard({
+function FoodRow({
   food,
   onToggleFavorite,
   onDelete,
@@ -46,85 +30,60 @@ function FoodCard({
   onToggleFavorite: (id: string, current: boolean) => void
   onDelete: (id: string) => void
 }) {
+  const [menuOpen, setMenuOpen] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const macros = food.macros_per_serving
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -80 }}
-      transition={{ duration: 0.2 }}
-      className="bg-surface border border-border rounded-xl px-4 py-3 flex items-start gap-3"
-    >
-      {/* Favorite star */}
+    <div className="flex min-h-16 items-start gap-3 px-[14px] py-3">
       <button
         type="button"
         onClick={() => onToggleFavorite(food.id, food.is_favorite)}
-        className="mt-0.5 shrink-0 active:scale-90 transition-transform"
         aria-label={food.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+        className={`mt-0.5 shrink-0 ${food.is_favorite ? 'text-accent' : 'text-ink-35'}`}
       >
-        <Star
-          className={cn(
-            'w-5 h-5 transition-colors',
-            food.is_favorite
-              ? 'fill-accent text-accent'
-              : 'text-text-tertiary'
-          )}
-        />
+        <Star className={`size-6 ${food.is_favorite ? 'fill-current' : ''}`} />
       </button>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-medium text-text-primary truncate">
-            {food.name}
-          </p>
-          <span
-            className={cn(
-              'shrink-0 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full',
-              SOURCE_COLORS[food.source] ?? 'bg-gray-100 text-gray-600'
-            )}
-          >
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
+          <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-55">
             {SOURCE_LABELS[food.source] ?? food.source}
           </span>
         </div>
-
-        {food.brand && (
-          <p className="text-xs text-text-secondary truncate mt-0.5">
-            {food.brand}
-          </p>
-        )}
-
-        <div className="flex items-center gap-3 mt-1.5">
-          <MacroPill label="cal" value={macros.calories} />
-          <MacroPill label="P" value={macros.protein} />
-          <MacroPill label="C" value={macros.carbs} />
-          <MacroPill label="F" value={macros.fat} />
-        </div>
-
-        <p className="text-[10px] text-text-tertiary mt-1">
-          {food.serving_size_g}g per serving
-          {food.use_count > 0 && ` · Used ${food.use_count}x`}
+        <p className="mt-0.5 text-[13px] leading-[1.45] text-ink-55">
+          {food.serving_size_g || 100}g · {macros.calories ?? 0} kcal · {macros.protein ?? 0}P {macros.carbs ?? 0}C {macros.fat ?? 0}F · used {food.use_count ?? 0}×
         </p>
       </div>
 
-      {/* Delete */}
       <button
         type="button"
-        onClick={() => setShowDeleteConfirm(true)}
-        className="mt-0.5 shrink-0 active:scale-90 transition-transform"
-        aria-label="Delete food"
+        onClick={() => setMenuOpen(true)}
+        aria-label={`More options for ${food.name}`}
+        className="-mr-1 flex size-8 shrink-0 items-center justify-center text-ink-50"
       >
-        <Trash2 className="w-4 h-4 text-text-tertiary" />
+        <MoreHorizontal className="size-6" />
       </button>
+
+      <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} ariaLabel={`${food.name} options`}>
+        <div className="px-gutter pb-6 pt-3">
+          <p className="text-[17px] font-bold text-ink">{food.name}</p>
+          <button
+            type="button"
+            onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true) }}
+            className="mt-4 h-12 w-full rounded-[15px] bg-ink-08 text-[15.5px] font-semibold text-ink"
+          >
+            Delete
+          </button>
+        </div>
+      </BottomSheet>
 
       <ConfirmDialog
         open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={async () => {
-          onDelete(food.id)
+          await onDelete(food.id)
           setShowDeleteConfirm(false)
         }}
         title="Delete food?"
@@ -132,17 +91,11 @@ function FoodCard({
         confirmLabel="Delete"
         variant="danger"
       />
-    </motion.div>
+    </div>
   )
 }
 
-function AddFoodForm({
-  onSave,
-  onClose,
-}: {
-  onSave: (food: UserFood) => void
-  onClose: () => void
-}) {
+function AddFoodForm({ onSave }: { onSave: (food: UserFood) => void }) {
   const [name, setName] = useState('')
   const [brand, setBrand] = useState('')
   const [servingSize, setServingSize] = useState('100')
@@ -152,8 +105,8 @@ function AddFoodForm({
   const [fat, setFat] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
     if (!name.trim()) {
       toast.error('Name is required')
       return
@@ -182,85 +135,26 @@ function AddFoodForm({
     }
   }
 
-  return (
-    <motion.form
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 16 }}
-      transition={{ duration: 0.2 }}
-      onSubmit={handleSubmit}
-      className="bg-surface border border-border rounded-2xl p-4 space-y-3"
-    >
-      <div className="flex items-center justify-between mb-1">
-        <p className="text-sm font-semibold text-text-primary">Add New Food</p>
-        <button type="button" onClick={onClose} className="text-text-tertiary">
-          <X className="w-4 h-4" />
-        </button>
-      </div>
+  const inputClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35 focus:border-ink'
 
-      <input
-        type="text"
-        placeholder="Food name *"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-        autoFocus
-      />
-      <input
-        type="text"
-        placeholder="Brand (optional)"
-        value={brand}
-        onChange={(e) => setBrand(e.target.value)}
-        className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-      />
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3 px-gutter pb-6 pt-3">
+      <h2 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Add a food</h2>
+      <input type="text" placeholder="Food name *" value={name} onChange={(event) => setName(event.target.value)} className={inputClass} autoFocus />
+      <input type="text" placeholder="Brand (optional)" value={brand} onChange={(event) => setBrand(event.target.value)} className={inputClass} />
       <div className="grid grid-cols-2 gap-2">
-        <input
-          type="number"
-          placeholder="Serving (g)"
-          value={servingSize}
-          onChange={(e) => setServingSize(e.target.value)}
-          className="rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-        />
-        <input
-          type="number"
-          placeholder="Calories"
-          value={calories}
-          onChange={(e) => setCalories(e.target.value)}
-          className="rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-        />
+        <input type="number" placeholder="Serving (g)" value={servingSize} onChange={(event) => setServingSize(event.target.value)} className={inputClass} />
+        <input type="number" placeholder="Calories" value={calories} onChange={(event) => setCalories(event.target.value)} className={inputClass} />
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <input
-          type="number"
-          placeholder="Protein (g)"
-          value={protein}
-          onChange={(e) => setProtein(e.target.value)}
-          className="rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-        />
-        <input
-          type="number"
-          placeholder="Carbs (g)"
-          value={carbs}
-          onChange={(e) => setCarbs(e.target.value)}
-          className="rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-        />
-        <input
-          type="number"
-          placeholder="Fat (g)"
-          value={fat}
-          onChange={(e) => setFat(e.target.value)}
-          className="rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-        />
+        <input type="number" placeholder="Protein (g)" value={protein} onChange={(event) => setProtein(event.target.value)} className={inputClass} />
+        <input type="number" placeholder="Carbs (g)" value={carbs} onChange={(event) => setCarbs(event.target.value)} className={inputClass} />
+        <input type="number" placeholder="Fat (g)" value={fat} onChange={(event) => setFat(event.target.value)} className={inputClass} />
       </div>
-
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-full rounded-xl bg-accent py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
-      >
-        {saving ? 'Saving...' : 'Save Food'}
-      </button>
-    </motion.form>
+      <PrimaryButton type="submit" disabled={saving} className="justify-center">
+        {saving ? 'Saving…' : 'Save food'}
+      </PrimaryButton>
+    </form>
   )
 }
 
@@ -272,7 +166,6 @@ export default function FoodsPage() {
   const [search, setSearch] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
 
-  // Fetch foods on mount
   useEffect(() => {
     getPersonalFoods()
       .then(setFoods)
@@ -280,50 +173,31 @@ export default function FoodsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Filter by search query
   const filtered = useMemo(() => {
     if (!search.trim()) return foods
-    const q = search.toLowerCase()
-    return foods.filter(
-      (f) =>
-        f.name.toLowerCase().includes(q) ||
-        (f.brand && f.brand.toLowerCase().includes(q))
-    )
+    const query = search.toLowerCase()
+    return foods.filter((food) => food.name.toLowerCase().includes(query) || food.brand?.toLowerCase().includes(query))
   }, [foods, search])
 
-  // Split into favorites and all
-  const favorites = useMemo(() => filtered.filter((f) => f.is_favorite), [filtered])
+  const favorites = useMemo(() => filtered.filter((food) => food.is_favorite), [filtered])
   const allFoods = useMemo(
     () => [...filtered].sort((a, b) => (b.use_count ?? 0) - (a.use_count ?? 0)),
-    [filtered]
+    [filtered],
   )
 
-  const handleToggleFavorite = useCallback(
-    async (id: string, currentFavorite: boolean) => {
-      // Optimistic update
-      setFoods((prev) =>
-        prev.map((f) =>
-          f.id === id ? { ...f, is_favorite: !currentFavorite } : f
-        )
-      )
-      try {
-        await updateFood(id, { is_favorite: !currentFavorite })
-      } catch {
-        // Revert on failure
-        setFoods((prev) =>
-          prev.map((f) =>
-            f.id === id ? { ...f, is_favorite: currentFavorite } : f
-          )
-        )
-        toast.error('Failed to update favorite')
-      }
-    },
-    []
-  )
+  const handleToggleFavorite = useCallback(async (id: string, currentFavorite: boolean) => {
+    setFoods((current) => current.map((food) => food.id === id ? { ...food, is_favorite: !currentFavorite } : food))
+    try {
+      await updateFood(id, { is_favorite: !currentFavorite })
+    } catch {
+      setFoods((current) => current.map((food) => food.id === id ? { ...food, is_favorite: currentFavorite } : food))
+      toast.error('Failed to update favorite')
+    }
+  }, [])
 
   const handleDelete = useCallback(async (id: string) => {
     const backup = foods
-    setFoods((prev) => prev.filter((f) => f.id !== id))
+    setFoods((current) => current.filter((food) => food.id !== id))
     try {
       await deleteUserFood(id)
       toast.success('Food deleted')
@@ -334,142 +208,75 @@ export default function FoodsPage() {
   }, [foods])
 
   const handleFoodAdded = useCallback((food: UserFood) => {
-    setFoods((prev) => [food, ...prev])
+    setFoods((current) => [food, ...current])
     setShowAddForm(false)
   }, [])
 
-  if (loading) {
-    return (
-      <PageWrapper>
-        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary mb-4">
-          My Foods
-        </h1>
-        <div className="space-y-3">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      </PageWrapper>
-    )
-  }
-
   return (
     <PageWrapper className="pb-32">
-      <h1 className="text-[22px] font-semibold tracking-tight text-text-primary mb-4">
-        My Foods
-      </h1>
+      <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Foods</h1>
 
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
+      <div className="relative mt-4">
+        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-50" />
         <input
           type="text"
-          placeholder="Search foods..."
+          placeholder="Search foods, brands, or describe it"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-border bg-surface pl-9 pr-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+          onChange={(event) => setSearch(event.target.value)}
+          className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-11 text-[17px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
         />
-        {search && (
-          <button
-            type="button"
-            onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2"
-          >
-            <X className="w-4 h-4 text-text-tertiary" />
+        {search ? (
+          <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center text-ink-50">
+            <X className="size-5" />
           </button>
-        )}
+        ) : null}
       </div>
 
-      {/* Add Food Form */}
-      <AnimatePresence>
-        {showAddForm && (
-          <div className="mb-4">
-            <AddFoodForm
-              onSave={handleFoodAdded}
-              onClose={() => setShowAddForm(false)}
-            />
-          </div>
-        )}
-      </AnimatePresence>
+      {!showAddForm ? (
+        <PrimaryButton type="button" onClick={() => setShowAddForm(true)} icon={<Plus className="size-5" />} className="mt-3">
+          Add a food
+        </PrimaryButton>
+      ) : null}
 
-      {foods.length === 0 ? (
-        <EmptyState
-          icon={Utensils}
-          title="No saved foods yet"
-          description="Foods you log will appear here automatically."
-        >
-          <button
-            type="button"
-            onClick={() => setShowAddForm(true)}
-            className="mt-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
-          >
-            Add Your First Food
-          </button>
-        </EmptyState>
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          icon={Search}
-          title="No matches"
-          description={`No foods match "${search}"`}
-        />
-      ) : (
-        <div className="space-y-5">
-          {/* Favorites section */}
-          {favorites.length > 0 && (
-            <section>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary px-1 mb-2">
-                Favorites
-              </p>
-              <div className="space-y-2">
-                <AnimatePresence mode="popLayout">
+      <BottomSheet open={showAddForm} onClose={() => setShowAddForm(false)} ariaLabel="Add a food">
+        <AddFoodForm onSave={handleFoodAdded} />
+      </BottomSheet>
+
+      <div className="mt-8">
+        {loading ? (
+          <div className="space-y-3">
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
+        ) : foods.length === 0 ? (
+          <EmptyState icon={Utensils} title="No saved foods yet" description="Foods you log will appear here automatically." />
+        ) : filtered.length === 0 ? (
+          <EmptyState icon={Search} title="No matches" description={`No foods match "${search}"`} />
+        ) : (
+          <div className="space-y-7">
+            {favorites.length > 0 ? (
+              <section>
+                <SectionLabel className="mb-2">Favourites</SectionLabel>
+                <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
                   {favorites.map((food) => (
-                    <FoodCard
-                      key={food.id}
-                      food={food}
-                      onToggleFavorite={handleToggleFavorite}
-                      onDelete={handleDelete}
-                    />
+                    <FoodRow key={`favorite-${food.id}`} food={food} onToggleFavorite={handleToggleFavorite} onDelete={handleDelete} />
                   ))}
-                </AnimatePresence>
+                </div>
+              </section>
+            ) : null}
+
+            <section>
+              <SectionLabel className="mb-2">All foods · {allFoods.length}</SectionLabel>
+              <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+                {allFoods.map((food) => (
+                  <FoodRow key={food.id} food={food} onToggleFavorite={handleToggleFavorite} onDelete={handleDelete} />
+                ))}
               </div>
             </section>
-          )}
-
-          {/* All Foods section */}
-          <section>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary px-1 mb-2">
-              All Foods
-              {filtered.length > 0 && (
-                <span className="ml-1 text-text-tertiary">({filtered.length})</span>
-              )}
-            </p>
-            <div className="space-y-2">
-              <AnimatePresence mode="popLayout">
-                {allFoods.map((food) => (
-                  <FoodCard
-                    key={food.id}
-                    food={food}
-                    onToggleFavorite={handleToggleFavorite}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
-          </section>
-        </div>
-      )}
-
-      {/* Floating Add Button */}
-      {!showAddForm && (
-        <button
-          type="button"
-          onClick={() => setShowAddForm(true)}
-          className="fixed bottom-24 right-5 z-50 w-14 h-14 rounded-full bg-accent shadow-lg flex items-center justify-center hover:bg-accent-hover transition-colors active:scale-95"
-          aria-label="Add new food"
-        >
-          <Plus className="w-6 h-6 text-white" />
-        </button>
-      )}
+          </div>
+        )}
+      </div>
     </PageWrapper>
   )
 }

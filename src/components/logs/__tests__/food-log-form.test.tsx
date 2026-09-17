@@ -102,10 +102,8 @@ describe('FoodLogForm — FB-R6-13 Photo Estimate', () => {
       expect((screen.getByPlaceholderText(/grilled chicken breast/i) as HTMLInputElement).value)
         .toBe('grilled chicken, rice')
     })
-    expect((screen.getByPlaceholderText('kcal') as HTMLInputElement).value).toBe('380')
-    // Protein/Carbs/Fat share the 'g' placeholder; use the surrounding label structure.
-    const proteinInput = screen.getByText('Protein').nextElementSibling as HTMLInputElement | null
-    expect(proteinInput?.value).toBe('43')
+    expect((screen.getByLabelText('KCAL') as HTMLInputElement).value).toBe('380')
+    expect((screen.getByLabelText('P') as HTMLInputElement).value).toBe('43')
   })
 
   it('AC02: shows the estimate confidence chip after a successful estimate', async () => {
@@ -128,7 +126,7 @@ describe('FoodLogForm — FB-R6-13 Photo Estimate', () => {
     input.dispatchEvent(new Event('change', { bubbles: true }))
     await waitFor(() => expect(screen.getByTestId('estimate-chip')).toBeInTheDocument())
 
-    fireEvent.click(screen.getByRole('button', { name: /^save$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^log meal$/i }))
 
     await waitFor(() => expect(mocks.logFromEstimate).toHaveBeenCalledTimes(1))
     const [estimateId, edits] = mocks.logFromEstimate.mock.calls[0]
@@ -148,7 +146,7 @@ describe('FoodLogForm — FB-R6-13 Photo Estimate', () => {
 
     fireEvent.click(screen.getByLabelText(/clear photo estimate/i))
 
-    fireEvent.click(screen.getByRole('button', { name: /^save$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^log meal$/i }))
     await waitFor(() => expect(mocks.createLog).toHaveBeenCalledTimes(1))
     expect(mocks.logFromEstimate).not.toHaveBeenCalled()
   })
@@ -217,6 +215,18 @@ describe('FoodLogForm — R6-12 full-page logging (favourites/recents-first)', (
     expect(screen.getByText('Recent')).toBeInTheDocument()
   })
 
+  it('keeps the tray save action disabled when there is no food', () => {
+    render(<FoodLogForm />)
+    expect(screen.queryByTestId('food-meal-tray')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^log meal$/i })).not.toBeInTheDocument()
+  })
+
+  it('prefills the meal pill from the URL', () => {
+    mocks.searchParamsStr = 'meal=Dinner'
+    render(<FoodLogForm />)
+    expect(screen.getByRole('button', { name: /Dinner/ })).toBeInTheDocument()
+  })
+
   it('tapping a saved food prefills the form', async () => {
     mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Greek Yogurt', is_favorite: true })])
     render(<FoodLogForm />)
@@ -233,7 +243,7 @@ describe('FoodLogForm — R6-12 full-page logging (favourites/recents-first)', (
     render(<FoodLogForm />)
     await waitFor(() => expect(screen.getByText('Greek Yogurt')).toBeInTheDocument())
     fireEvent.click(screen.getByText('Greek Yogurt'))
-    fireEvent.click(screen.getByText('Save'))
+    fireEvent.click(screen.getByText('Log meal'))
     await waitFor(() => expect(mocks.createLog).toHaveBeenCalled())
     const arg = mocks.createLog.mock.calls[0][0]
     expect(arg.local_date).toBe('2026-08-10')
@@ -247,6 +257,20 @@ describe('FoodLogForm — R6-12 full-page logging (favourites/recents-first)', (
     await waitFor(() => expect(screen.getByTestId('your-foods')).toBeInTheDocument())
     fireEvent.change(screen.getByTestId('food-search-input'), { target: { value: 'chicken' } })
     await waitFor(() => expect(screen.queryByTestId('your-foods')).not.toBeInTheDocument())
+  })
+
+  it('shows the staged and current item count in the tray', async () => {
+    mocks.getPersonalFoods.mockResolvedValue([
+      userFood({ name: 'Greek Yogurt', is_favorite: true }),
+    ])
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByText('Greek Yogurt')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Greek Yogurt'))
+    fireEvent.click(screen.getByRole('button', { name: 'Add to tray' }))
+    await waitFor(() => expect(screen.getAllByText('Greek Yogurt')).toHaveLength(2))
+    fireEvent.click(screen.getByTestId('personal-food-row'))
+    expect(screen.getByText('2 items · 180 kcal')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Log 2 items' })).toBeInTheDocument()
   })
 })
 
@@ -288,7 +312,7 @@ describe('FoodLogForm — R7-07 servings selector', () => {
     // 1 → 2 servings (4 × +0.25)
     for (let i = 0; i < 4; i++) fireEvent.click(screen.getByLabelText('More servings'))
     expect(screen.getByTestId('servings-value').textContent).toBe('2')
-    fireEvent.click(screen.getByText('Save'))
+    fireEvent.click(screen.getByText('Log meal'))
     await waitFor(() => expect(mocks.createLog).toHaveBeenCalled())
     expect(mocks.createLog.mock.calls[0][0].payload.quantity_g).toBe(42) // 2 × 21
   })

@@ -24,7 +24,7 @@ export default function NewLogPage({ type }: { type: string }) {
   const FormComponent = FORMS[type]
 
   if (!FormComponent) {
-    return <PageWrapper><p className="text-text-secondary">Unknown log type</p></PageWrapper>
+    return <PageWrapper><p className="text-ink-62">Unknown log type</p></PageWrapper>
   }
 
   return (

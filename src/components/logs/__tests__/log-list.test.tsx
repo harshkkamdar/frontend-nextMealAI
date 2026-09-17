@@ -117,7 +117,7 @@ describe('LogList — FB-09 icons + workout title', () => {
     ])
     // Wait for load, then inspect every workout row's title paragraph
     await screen.findByText('Workout completed')
-    const titles = document.querySelectorAll('p.text-sm.font-medium.truncate')
+    const titles = document.querySelectorAll('p.text-\\[15\\.5px\\].font-semibold.truncate')
     titles.forEach((el) => {
       expect(el.textContent?.trim()).not.toBe('')
     })

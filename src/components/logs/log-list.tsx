@@ -33,20 +33,17 @@ const FILTERS: { label: string; value: LogType | 'all' }[] = [
   { label: 'Energy', value: 'energy' },
 ]
 
-// Typed icons double as the Activity Log legend — each row's type is
-// identifiable without a separate legend chip. Colours are retained via
-// text-* utility on each icon so filter states still read visually.
-const FALLBACK_ICON = { icon: ClipboardList, label: 'Activity', color: 'text-text-tertiary' } as const
+const FALLBACK_ICON = { icon: ClipboardList, label: 'Activity' } as const
 
-const TYPE_ICONS: Record<LogType, { icon: LucideIcon; label: string; color: string }> = {
-  food: { icon: Utensils, label: 'Food activity', color: 'text-accent' },
-  workout: { icon: Dumbbell, label: 'Workout activity', color: 'text-[#34C759]' },
-  water: { icon: Droplet, label: 'Water activity', color: 'text-[#3B82F6]' },
-  weight: { icon: Scale, label: 'Weight activity', color: 'text-[#A855F7]' },
-  mood: { icon: Smile, label: 'Mood activity', color: 'text-[#FF9F0A]' },
-  sleep: { icon: Moon, label: 'Sleep activity', color: 'text-[#6366F1]' },
-  energy: { icon: Zap, label: 'Energy activity', color: 'text-accent' },
-  correction: { icon: History, label: 'Correction activity', color: 'text-text-tertiary' },
+const TYPE_ICONS: Record<LogType, { icon: LucideIcon; label: string }> = {
+  food: { icon: Utensils, label: 'Food activity' },
+  workout: { icon: Dumbbell, label: 'Workout activity' },
+  water: { icon: Droplet, label: 'Water activity' },
+  weight: { icon: Scale, label: 'Weight activity' },
+  mood: { icon: Smile, label: 'Mood activity' },
+  sleep: { icon: Moon, label: 'Sleep activity' },
+  energy: { icon: Zap, label: 'Energy activity' },
+  correction: { icon: History, label: 'Correction activity' },
 }
 
 function LogTypeIcon({ type }: { type: LogType }) {
@@ -54,7 +51,7 @@ function LogTypeIcon({ type }: { type: LogType }) {
   const Icon = entry.icon
   return (
     <>
-      <Icon aria-hidden="true" className={`w-4 h-4 shrink-0 ${entry.color}`} />
+      <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-60" />
       <span className="sr-only">{entry.label}</span>
     </>
   )
@@ -205,16 +202,14 @@ export function LogList({ filterType }: LogListProps = {}) {
   return (
     <div>
       {/* Header row: filter chips + Select/Cancel button */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide flex-1">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="scrollbar-hide -mx-4 flex flex-1 gap-2 overflow-x-auto px-4 pb-1">
           {FILTERS.map((f) => (
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
-                filter === f.value
-                  ? 'bg-accent border border-accent text-white'
-                  : 'bg-surface border border-border text-text-primary hover:bg-surface-hover'
+              className={`h-9 whitespace-nowrap rounded-full px-3 text-[13.5px] font-semibold ${
+                filter === f.value ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
               }`}
             >
               {f.label}
@@ -224,7 +219,7 @@ export function LogList({ filterType }: LogListProps = {}) {
         {logs.length > 0 && !loading && (
           <button
             onClick={selectMode ? exitSelectMode : () => setSelectMode(true)}
-            className="ml-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors bg-surface border border-border text-text-primary hover:bg-surface-hover shrink-0"
+            className="ml-2 h-9 shrink-0 whitespace-nowrap rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
           >
             {selectMode ? 'Cancel' : 'Select'}
           </button>
@@ -245,26 +240,24 @@ export function LogList({ filterType }: LogListProps = {}) {
           description="Start tracking your food, workouts, and more to see them here."
         />
       ) : (
-        <div className="space-y-2">
+        <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
           {logs.map((log) => (
             <div
               key={log.id}
               onClick={selectMode ? () => toggleSelect(log.id) : undefined}
-              className={`flex items-center gap-3 bg-surface border rounded-xl px-4 py-3 ${
-                selectMode && selectedIds.has(log.id)
-                  ? 'border-accent'
-                  : 'border-border'
+              className={`flex min-h-14 items-center gap-3 px-[14px] py-2.5 ${
+                selectMode && selectedIds.has(log.id) ? 'bg-ink-08' : ''
               } ${selectMode ? 'cursor-pointer' : ''}`}
             >
               {/* Checkbox in select mode */}
               {selectMode && (
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleSelect(log.id) }}
-                  className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-                    selectedIds.has(log.id) ? 'bg-accent border-accent' : 'border-border'
+                  className={`flex size-5 shrink-0 items-center justify-center rounded border ${
+                    selectedIds.has(log.id) ? 'border-ink bg-ink' : 'border-ink-16'
                   }`}
                 >
-                  {selectedIds.has(log.id) && <Check className="w-3 h-3 text-white" />}
+                  {selectedIds.has(log.id) && <Check className="size-3 text-cream" />}
                 </button>
               )}
 
@@ -273,17 +266,17 @@ export function LogList({ filterType }: LogListProps = {}) {
 
               {/* Description */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text-primary truncate">
+                <p className="truncate text-[15.5px] font-semibold text-ink">
                   {getLogDescription(log)}
                 </p>
-                <p className="text-xs text-text-tertiary mt-0.5">
+                <p className="mt-0.5 text-[13px] text-ink-55">
                   {relativeTime(log.created_at)}
                 </p>
               </div>
 
               {/* Metric */}
               {getLogMetric(log) && (
-                <span className="text-sm font-medium text-text-secondary whitespace-nowrap">
+                <span className="whitespace-nowrap text-[13.5px] font-medium text-ink-55">
                   {getLogMetric(log)}
                 </span>
               )}
@@ -295,14 +288,14 @@ export function LogList({ filterType }: LogListProps = {}) {
       {/* Floating action bar for bulk delete */}
       {selectMode && selectedIds.size > 0 && (
         <div className="fixed bottom-24 left-0 right-0 z-40 flex justify-center">
-          <div className="bg-surface border border-border rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
-            <span className="text-sm text-text-primary font-medium">{selectedIds.size} selected</span>
+          <div className="flex items-center gap-3 rounded-full bg-ink px-4 py-2 text-cream">
+            <span className="text-[13.5px] font-semibold">{selectedIds.size} selected</span>
             <button
               onClick={() => setShowBulkDeleteConfirm(true)}
               disabled={bulkDeleting}
-              className="px-3 py-1.5 text-xs font-medium rounded-full bg-destructive text-white disabled:opacity-50"
+              className="rounded-full bg-cream-22 px-3 py-1.5 text-[13px] font-semibold text-cream disabled:opacity-50"
             >
-              {bulkDeleting ? 'Deleting...' : 'Delete'}
+              {bulkDeleting ? 'Deleting…' : 'Delete'}
             </button>
           </div>
         </div>

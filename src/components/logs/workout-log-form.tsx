@@ -2,11 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Play } from 'lucide-react'
 import { toast } from 'sonner'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import {
   NumberField,
   SearchablePicker,
@@ -15,6 +11,7 @@ import {
 } from '@/components/plans/plan-builder-shared'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
 import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { ManualLogShell } from './manual-log-shell'
 
 interface DraftExercise {
   key: string
@@ -78,58 +75,44 @@ export function WorkoutLogForm() {
   }
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-1">
-        <button onClick={() => router.back()} className="p-1" aria-label="Close">
-          <X className="w-5 h-5 text-text-secondary" />
-        </button>
-        <h2 className="text-[17px] font-semibold text-text-primary">Freestyle Workout</h2>
-        <div className="w-5" />
-      </div>
-      <p className="text-xs text-text-secondary text-center mb-6">
-        Add exercises, then start — log each set as you go.
-      </p>
-
-      <div className="space-y-4">
-        <div className="space-y-1">
-          <Label className="text-xs text-text-secondary">Workout title (optional)</Label>
-          <Input
+    <ManualLogShell
+      title="Log workout"
+      prompt="Build today's session and I'll time your rests."
+      saving={starting}
+      onSave={() => void handleStart()}
+      actionLabel="Start session"
+      savingLabel="Starting…"
+    >
+      <div className="space-y-6">
+        <label className="block">
+          <span className="mb-2 block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Workout title</span>
+          <input
             type="text"
             placeholder="e.g. Push day"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(event) => setTitle(event.target.value)}
+            className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35 focus:border-ink"
           />
-        </div>
+        </label>
 
         <div className="space-y-3">
-          <Label className="text-xs text-text-secondary">Exercises</Label>
-          {exercises.map((ex, i) => (
-            <ExerciseRow
-              key={ex.key}
-              exercise={ex}
-              index={i}
-              canRemove={exercises.length > 1}
-              onPatch={(patch) => patchExercise(ex.key, patch)}
-              onRemove={() => removeExercise(ex.key)}
-            />
-          ))}
+          <p className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Exercises</p>
+          <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+            {exercises.map((exercise, index) => (
+              <ExerciseRow
+                key={exercise.key}
+                exercise={exercise}
+                index={index}
+                canRemove={exercises.length > 1}
+                onPatch={(patch) => patchExercise(exercise.key, patch)}
+                onRemove={() => removeExercise(exercise.key)}
+              />
+            ))}
+          </div>
           <AddRowButton label="Add exercise" onClick={addExercise} />
         </div>
       </div>
-
-      <Button
-        onClick={handleStart}
-        disabled={starting}
-        className="w-full bg-accent hover:bg-accent-hover text-white mt-6"
-      >
-        <Play className="w-4 h-4 mr-1 fill-white" />
-        {starting ? 'Starting…' : 'Start workout'}
-      </Button>
-      <p className="text-[11px] text-text-tertiary text-center mt-2">
-        You can add or remove exercises during the workout too.
-      </p>
-    </div>
+    </ManualLogShell>
   )
 }
 
@@ -147,7 +130,7 @@ function ExerciseRow({
   onRemove: () => void
 }) {
   return (
-    <div className="border border-border rounded-xl p-3 space-y-3 bg-surface">
+    <div className="space-y-3 p-[14px]">
       <div className="flex items-start gap-2">
         <div className="flex-1">
           <SearchablePicker<ExerciseSearchResult>
@@ -156,9 +139,9 @@ function ExerciseRow({
             search={searchExercises}
             renderItem={(item) => (
               <div>
-                <div className="text-text-primary">{item.name}</div>
+                <div className="text-ink">{item.name}</div>
                 {item.primary_muscles && item.primary_muscles.length > 0 ? (
-                  <div className="text-[11px] text-text-tertiary">{item.primary_muscles.join(', ')}</div>
+                  <div className="text-[11px] text-ink-55">{item.primary_muscles.join(', ')}</div>
                 ) : null}
               </div>
             )}

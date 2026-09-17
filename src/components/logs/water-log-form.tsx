@@ -2,15 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Minus, Plus } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { createLog } from '@/lib/api/logs.api'
+import { ManualLogShell } from './manual-log-shell'
 
 export function WaterLogForm() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
-  const [glasses, setGlasses] = useState(1)
+  const [glasses, setGlasses] = useState(3)
 
   const handleSave = async () => {
     if (glasses <= 0) {
@@ -35,51 +34,28 @@ export function WaterLogForm() {
   }
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <button onClick={() => router.back()} className="p-1">
-          <X className="w-5 h-5 text-text-secondary" />
+    <ManualLogShell title="Log water" prompt="How much water today?" saving={saving} onSave={() => void handleSave()}>
+      <div className="flex items-center justify-center gap-7 py-10">
+        <button
+          type="button"
+          onClick={() => setGlasses(Math.max(0, glasses - 1))}
+          aria-label="Fewer glasses"
+          className="flex size-11 items-center justify-center rounded-full bg-ink-08 text-[24px] font-semibold text-ink"
+        >
+          −
         </button>
-        <h2 className="text-[17px] font-semibold text-text-primary">Log Water</h2>
-        <div className="w-5" />
+        <p className="min-w-32 text-center text-[28px] font-bold tracking-[-0.6px] text-ink">
+          {glasses} glass{glasses === 1 ? '' : 'es'}
+        </p>
+        <button
+          type="button"
+          onClick={() => setGlasses(glasses + 1)}
+          aria-label="More glasses"
+          className="flex size-11 items-center justify-center rounded-full bg-ink-08 text-[24px] font-semibold text-ink"
+        >
+          +
+        </button>
       </div>
-
-      {/* Counter */}
-      <div className="flex flex-col items-center py-12">
-        <div className="flex items-center gap-8">
-          <button
-            type="button"
-            onClick={() => setGlasses(Math.max(0, glasses - 1))}
-            className="w-12 h-12 rounded-full border-2 border-accent flex items-center justify-center text-accent transition-colors hover:bg-accent-light"
-          >
-            <Minus className="w-5 h-5" />
-          </button>
-
-          <span className="text-[48px] font-bold text-text-primary tabular-nums min-w-[80px] text-center">
-            {glasses}
-          </span>
-
-          <button
-            type="button"
-            onClick={() => setGlasses(glasses + 1)}
-            className="w-12 h-12 rounded-full border-2 border-accent flex items-center justify-center text-accent transition-colors hover:bg-accent-light"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </div>
-
-        <span className="text-sm text-text-secondary mt-2">glasses</span>
-      </div>
-
-      {/* Save */}
-      <Button
-        onClick={handleSave}
-        disabled={saving}
-        className="w-full bg-accent hover:bg-accent-hover text-white mt-6"
-      >
-        {saving ? 'Saving...' : 'Save'}
-      </Button>
-    </div>
+    </ManualLogShell>
   )
 }

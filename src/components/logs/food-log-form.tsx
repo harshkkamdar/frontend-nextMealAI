@@ -2,11 +2,12 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { X, MessageCircle, Camera, Loader2, Sparkles, Search, Plus, Trash2, Star, Clock } from 'lucide-react'
+import { Camera, ChevronLeft, FileText, Search, X } from 'lucide-react'
 import { toast } from 'sonner'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
+import { FeatureCard } from '@/components/ui/fiqr/feature-card'
+import { PrimaryButton as TrayButton } from '@/components/ui/fiqr/primary-button'
+import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { createLog, createLogs } from '@/lib/api/logs.api'
 import {
   estimateFoodFromPhoto,
@@ -15,7 +16,7 @@ import {
   getPersonalFoods,
   type FoodEstimate,
 } from '@/lib/api/foods.api'
-import { buildFoodLogItems, type FoodDraft } from '@/lib/food-log'
+import { buildFoodLogItems, isFoodDraftFilled, type FoodDraft } from '@/lib/food-log'
 import { formatMacroKcal } from '@/lib/macros'
 import { compressImage } from '@/lib/image/compress'
 import { isNative } from '@/lib/platform'
@@ -23,6 +24,14 @@ import { pickPhoto } from '@/lib/platform/camera'
 import type { FoodSearchResult, UserFood } from '@/types/foods.types'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
+
+const SOURCE_LABELS: Record<string, string> = {
+  personal: 'Yours',
+  open_food_facts: 'Open Food Facts',
+  openfoodfacts: 'Open Food Facts',
+  off: 'Open Food Facts',
+  usda: 'USDA',
+}
 
 function capitalizeMeal(v: string | null): string {
   if (!v) return ''
@@ -40,7 +49,8 @@ export function FoodLogForm() {
   const [saving, setSaving] = useState(false)
   const [foodName, setFoodName] = useState('')
   const [quantityG, setQuantityG] = useState<number | ''>('')
-  const [mealType, setMealType] = useState(() => capitalizeMeal(searchParams.get('meal')))
+  const [mealType, setMealType] = useState(() => capitalizeMeal(searchParams.get('meal')) || 'Lunch')
+  const [mealMenuOpen, setMealMenuOpen] = useState(false)
   const [calories, setCalories] = useState<number | ''>('')
   const [protein, setProtein] = useState<number | ''>('')
   const [carbs, setCarbs] = useState<number | ''>('')
@@ -393,345 +403,264 @@ export function FoodLogForm() {
 
   const hasCurrent = foodName.trim().length > 0
   const totalCount = pending.length + (hasCurrent ? 1 : 0)
+  const totalCalories = Math.round(
+    pending.reduce((sum, item) => sum + (item.est_macros.calories ?? 0), 0)
+      + (hasCurrent && typeof calories === 'number' ? calories : 0),
+  )
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <button onClick={() => router.back()} className="p-1">
-          <X className="w-5 h-5 text-text-secondary" />
-        </button>
-        <h2 className="text-[17px] font-semibold text-text-primary">Log Food</h2>
-        <div className="w-5" />
-      </div>
-
-      {/* FB-R6-13 — Photo estimate button (above meal-type chips, prominent) */}
-      <button
-        type="button"
-        onClick={() => void handlePhotoButton()}
-        disabled={estimating}
-        data-testid="photo-estimate-button"
-        className="w-full mb-4 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border-2 border-dashed border-accent/40 bg-accent-light text-accent text-sm font-medium hover:bg-accent/10 transition-colors disabled:opacity-60"
-      >
-        {estimating ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Analyzing photo…
-          </>
-        ) : (
-          <>
-            <Camera className="w-4 h-4" />
-            Photo estimate
-          </>
-        )}
-      </button>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handlePhotoSelect}
-        className="hidden"
-      />
-
-      {/* Photo-estimate chip when an estimate is loaded */}
-      {estimateId && (
-        <div
-          data-testid="estimate-chip"
-          className="mb-4 flex items-center justify-between gap-2 rounded-xl bg-surface border border-border px-3 py-2"
-        >
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-accent" />
-            <span className="text-xs text-text-primary">
-              From photo estimate
-              {estimateConfidence != null && (
-                <span className="text-text-tertiary">
-                  {' '}· confidence {Math.round(estimateConfidence * 100)}%
-                </span>
-              )}
-            </span>
-          </div>
+    <div className="pb-40">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
           <button
             type="button"
-            onClick={clearEstimate}
-            aria-label="Clear photo estimate"
-            className="text-text-tertiary hover:text-text-primary"
+            onClick={() => router.back()}
+            aria-label="Back"
+            className="-ml-2 flex size-10 items-center justify-center text-ink"
           >
-            <X className="w-3.5 h-3.5" />
+            <ChevronLeft className="size-6" />
           </button>
+          <h1 className="truncate text-[22px] font-semibold tracking-[-0.4px] text-ink">Log food</h1>
         </div>
-      )}
-
-      {/* BUG-009 — food database search. Tap a result to prefill the form. */}
-      <div className="mb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-          <Input
-            type="text"
-            value={query}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search foods…"
-            className="pl-9"
-            data-testid="food-search-input"
-          />
-        </div>
-        {(searching || results.length > 0) && (
-          <div className="mt-2 rounded-xl border border-border bg-surface overflow-hidden">
-            {searching && (
-              <div className="flex justify-center py-4">
-                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-            {!searching && results.map((food, i) => (
-              <button
-                key={food.id ?? `usda-${food.usda_fdc_id ?? i}`}
-                type="button"
-                onClick={() => handleSelectResult(food)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-surface-hover transition-colors border-b border-border last:border-b-0"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-text-primary truncate">{food.name}</p>
-                  <p className="text-[11px] text-text-tertiary">
-                    {formatMacroKcal(food.macros_per_serving.calories)} cal
-                    {food.serving_size_g ? ` · per ${food.serving_size_g}g` : ''}
-                    {food.brand ? ` · ${food.brand}` : ''}
-                    {food.source === 'usda' && ' · USDA'}
-                  </p>
-                </div>
-                <div className="w-7 h-7 rounded-full bg-accent-light flex items-center justify-center shrink-0">
-                  <Plus className="w-4 h-4 text-accent" />
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
+        <button
+          type="button"
+          onClick={() => setMealMenuOpen((open) => !open)}
+          aria-expanded={mealMenuOpen}
+          className="flex h-9 shrink-0 items-center rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
+        >
+          {mealType} <span aria-hidden="true" className="ml-1">▾</span>
+        </button>
       </div>
 
-      {/* R6-12 — Your foods (favourites + recents), shown FIRST before searching
-          so logging a usual food is one tap. Hidden once the user starts typing
-          a search or loads a photo estimate. */}
-      {query.trim().length < 2 && !estimateId && (favourites.length > 0 || recents.length > 0) && (
-        <div className="mb-4 space-y-3" data-testid="your-foods">
-          {favourites.length > 0 && (
-            <div>
-              <p className="mb-1.5 flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-text-tertiary">
-                <Star className="h-3 w-3" /> Favourites
-              </p>
-              <div className="rounded-xl border border-border bg-surface overflow-hidden">
-                {favourites.map((f) => (
-                  <PersonalFoodRow key={`fav-${f.id}`} food={f} onSelect={handleSelectPersonalFood} />
-                ))}
-              </div>
-            </div>
-          )}
-          {recents.length > 0 && (
-            <div>
-              <p className="mb-1.5 flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-text-tertiary">
-                <Clock className="h-3 w-3" /> Recent
-              </p>
-              <div className="rounded-xl border border-border bg-surface overflow-hidden">
-                {recents.map((f) => (
-                  <PersonalFoodRow key={`recent-${f.id}`} food={f} onSelect={handleSelectPersonalFood} />
-                ))}
-              </div>
-            </div>
-          )}
+      {mealMenuOpen ? (
+        <div className="mb-4 flex gap-2 overflow-x-auto" aria-label="Meal type">
+          {MEAL_TYPES.map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => { setMealType(type); setMealMenuOpen(false) }}
+              className={`h-9 whitespace-nowrap rounded-full px-3 text-[13.5px] font-semibold ${
+                mealType === type ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
+              }`}
+            >
+              {type}
+            </button>
+          ))}
         </div>
-      )}
+      ) : null}
 
-      {/* Meal type chips */}
-      <div className="flex gap-2 mb-6 overflow-x-auto">
-        {MEAL_TYPES.map((type) => (
-          <button
-            key={type}
-            onClick={() => setMealType(mealType === type ? '' : type)}
-            className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
-              mealType === type
-                ? 'bg-accent border border-accent text-white'
-                : 'bg-surface border border-border text-text-primary hover:bg-surface-hover'
-            }`}
-          >
-            {type}
-          </button>
-        ))}
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-50" />
+        <input
+          type="text"
+          value={query}
+          onChange={(event) => handleSearch(event.target.value)}
+          placeholder="Search foods, brands, or describe it"
+          className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-4 text-[17px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+          data-testid="food-search-input"
+        />
       </div>
+      <div className="mt-2 flex gap-2">
+        <button
+          type="button"
+          onClick={() => void handlePhotoButton()}
+          disabled={estimating}
+          data-testid="photo-estimate-button"
+          className="flex h-9 items-center gap-2 rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink disabled:text-ink-35"
+        >
+          <Camera className="size-4" />
+          {estimating ? 'Analysing…' : 'Photo'}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push('/chat?prefill=' + encodeURIComponent('Scan this menu and suggest what fits my remaining macros'))}
+          className="flex h-9 items-center gap-2 rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
+        >
+          <FileText className="size-4" />
+          Menu
+        </button>
+      </div>
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
 
-      {/* Form fields */}
-      <div className="space-y-4" ref={formRef}>
-        <div className="space-y-1">
-          <Label className="text-xs text-text-secondary">Food Name</Label>
-          <Input
+      {(searching || results.length > 0) ? (
+        <div className="mt-4 overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+          {searching ? (
+            <div className="flex min-h-14 items-center justify-center gap-1.5" aria-label="Searching">
+              {[0, 1, 2].map((dot) => <span key={dot} className="size-2 animate-pulse rounded-full bg-ink-35" />)}
+            </div>
+          ) : results.map((food, index) => (
+            <button
+              key={food.id ?? `usda-${food.usda_fdc_id ?? index}`}
+              type="button"
+              onClick={() => handleSelectResult(food)}
+              className="flex min-h-14 w-full items-center justify-between gap-3 px-[14px] py-2.5 text-left"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[15.5px] font-semibold text-ink">{food.name}</span>
+                {SOURCE_LABELS[String(food.source)] ? (
+                  <span className="mt-0.5 block text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-55">
+                    {SOURCE_LABELS[String(food.source)]}
+                  </span>
+                ) : null}
+                <span className="block truncate text-[13px] text-ink-55">
+                  {food.serving_size_g ? `${food.serving_size_g}g` : '1 serving'} · {formatMacroKcal(food.macros_per_serving.calories)} kcal
+                  {food.brand ? ` · ${food.brand}` : ''}
+                </span>
+              </span>
+              <span className="shrink-0 text-[17px] font-semibold text-ink">+</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {query.trim().length < 2 && !estimateId && (favourites.length > 0 || recents.length > 0) ? (
+        <div className="mt-7 space-y-7" data-testid="your-foods">
+          {recents.length > 0 ? (
+            <div>
+              <SectionLabel className="mb-2">Recent</SectionLabel>
+              <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+                {recents.map((food) => <PersonalFoodRow key={`recent-${food.id}`} food={food} onSelect={handleSelectPersonalFood} />)}
+              </div>
+            </div>
+          ) : null}
+          {favourites.length > 0 ? (
+            <div>
+              <SectionLabel className="mb-2">Favourites</SectionLabel>
+              <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+                {favourites.map((food) => <PersonalFoodRow key={`fav-${food.id}`} food={food} onSelect={handleSelectPersonalFood} />)}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {foodName ? (
+        <div ref={formRef} className="mt-7 space-y-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
+          <input
             type="text"
             placeholder="e.g. Grilled chicken breast"
             value={foodName}
-            onChange={(e) => { setFoodName(e.target.value); setUserFoodId(null); setMacroBasisPerG(null) }}
+            onChange={(event) => { setFoodName(event.target.value); setUserFoodId(null); setMacroBasisPerG(null) }}
+            className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35 focus:border-ink"
           />
-        </div>
 
-        {/* R7-07 — Servings/Grams: pick "4 servings" without doing gram math.
-            Only offered when a food with a known serving size is selected. */}
-        {servingSizeG && servingSizeG > 0 ? (
-          <div className="space-y-1.5">
-            <div className="flex rounded-full bg-surface-hover p-0.5" data-testid="serving-mode-toggle">
-              <button
-                type="button"
-                onClick={() => {
-                  // switching to servings → seed from current grams
-                  if (typeof quantityG === 'number' && quantityG > 0) setServings(Math.round((quantityG / servingSizeG) * 100) / 100)
-                  setInputMode('servings')
-                }}
-                className={`flex-1 rounded-full py-1.5 text-sm transition-colors ${inputMode === 'servings' ? 'bg-accent text-white' : 'text-text-secondary'}`}
-              >
-                Servings
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  // switching to grams → seed grams from servings
-                  setQuantityG(Math.round(servings * servingSizeG))
-                  setInputMode('grams')
-                }}
-                className={`flex-1 rounded-full py-1.5 text-sm transition-colors ${inputMode === 'grams' ? 'bg-accent text-white' : 'text-text-secondary'}`}
-              >
-                Grams
-              </button>
-            </div>
-            {inputMode === 'servings' ? (
-              <div className="flex items-center gap-3">
-                <button type="button" aria-label="Fewer servings" onClick={() => handleServingsChange(Math.max(0.25, Math.round((servings - 0.25) * 100) / 100))} className="w-9 h-9 rounded-full border border-border text-lg text-text-secondary">−</button>
-                <div className="flex-1 text-center">
-                  <span className="text-lg font-semibold tabular-nums" data-testid="servings-value">{servings}</span>
-                  <span className="text-sm text-text-tertiary"> serving{servings === 1 ? '' : 's'}</span>
-                  <p className="text-[11px] text-text-tertiary">{Math.round(servings * servingSizeG)}g</p>
+          {servingSizeG && servingSizeG > 0 ? (
+            <div className="space-y-3">
+              {inputMode === 'servings' ? (
+                <div className="flex items-center justify-between gap-3">
+                  <button type="button" aria-label="Fewer servings" onClick={() => handleServingsChange(Math.max(0.25, Math.round((servings - 0.25) * 100) / 100))} className="flex size-9 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">−</button>
+                  <div className="flex flex-1 items-baseline justify-center gap-2 text-center">
+                    <span className="text-[15.5px] font-semibold text-ink">
+                      <span data-testid="servings-value">{servings}</span> serving{servings === 1 ? '' : 's'}
+                    </span>
+                    <span className="text-[13px] text-ink-55">{Math.round(servings * servingSizeG)}g</span>
+                  </div>
+                  <button type="button" aria-label="More servings" onClick={() => handleServingsChange(Math.round((servings + 0.25) * 100) / 100)} className="flex size-9 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">+</button>
                 </div>
-                <button type="button" aria-label="More servings" onClick={() => handleServingsChange(Math.round((servings + 0.25) * 100) / 100)} className="w-9 h-9 rounded-full border border-border text-lg text-text-secondary">+</button>
-              </div>
-            ) : (
-              <Input
-                type="number"
-                placeholder="grams"
-                value={quantityG}
-                onChange={(e) => handleQuantityChange(e.target.value ? Number(e.target.value) : '')}
-              />
-            )}
-          </div>
-        ) : (
-          <div className="space-y-1">
-            <Label className="text-xs text-text-secondary">Quantity (g)</Label>
-            <Input
-              type="number"
-              placeholder="Optional"
-              value={quantityG}
-              onChange={(e) => handleQuantityChange(e.target.value ? Number(e.target.value) : '')}
-            />
-          </div>
-        )}
-
-        {/* Macros 2x2 grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label className="text-xs text-text-secondary">Calories</Label>
-            <Input
-              type="number"
-              placeholder="kcal"
-              value={calories}
-              onChange={(e) => { setCalories(e.target.value ? Number(e.target.value) : ''); setMacroBasisPerG(null) }}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs text-text-secondary">Protein</Label>
-            <Input
-              type="number"
-              placeholder="g"
-              value={protein}
-              onChange={(e) => { setProtein(e.target.value ? Number(e.target.value) : ''); setMacroBasisPerG(null) }}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs text-text-secondary">Carbs</Label>
-            <Input
-              type="number"
-              placeholder="g"
-              value={carbs}
-              onChange={(e) => { setCarbs(e.target.value ? Number(e.target.value) : ''); setMacroBasisPerG(null) }}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs text-text-secondary">Fat</Label>
-            <Input
-              type="number"
-              placeholder="g"
-              value={fat}
-              onChange={(e) => { setFat(e.target.value ? Number(e.target.value) : ''); setMacroBasisPerG(null) }}
-            />
-          </div>
-        </div>
-
-        {/* Geo estimate link */}
-        <button
-          onClick={() => router.push('/chat')}
-          className="flex items-center gap-1.5 text-accent text-[13px]"
-        >
-          <MessageCircle className="w-3.5 h-3.5" />
-          Don&apos;t know macros? Ask Geo to estimate
-        </button>
-      </div>
-
-      {/* BUG-009 — staged meal tray (multi-select). Review/remove before logging. */}
-      {pending.length > 0 && (
-        <div className="mt-5 bg-surface border border-border rounded-xl p-3 space-y-2" data-testid="food-meal-tray">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary">
-            In this meal · {pending.length}
-          </p>
-          <ul className="space-y-1.5">
-            {pending.map((item, idx) => (
-              <li key={`pending-${idx}-${item.food_name}`} className="flex items-center justify-between gap-2 text-sm">
-                <div className="min-w-0 flex-1">
-                  <p className="text-text-primary truncate">{item.food_name}</p>
-                  <p className="text-[11px] text-text-tertiary tabular-nums">
-                    {item.quantity_g ? `${item.quantity_g}g` : 'qty —'}
-                    {item.est_macros.calories ? ` · ${formatMacroKcal(item.est_macros.calories)} cal` : ''}
-                  </p>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <input
+                    aria-label="Grams"
+                    type="number"
+                    value={quantityG}
+                    onChange={(event) => handleQuantityChange(event.target.value ? Number(event.target.value) : '')}
+                    className="h-11 min-w-0 flex-1 rounded-[12px] border-0 bg-ink-08 px-3 text-center text-[15.5px] font-semibold text-ink outline-none"
+                  />
+                  <span className="text-[13px] text-ink-55">g</span>
                 </div>
+              )}
+              <div className="flex gap-2" data-testid="serving-mode-toggle">
                 <button
                   type="button"
-                  onClick={() => handleRemovePending(idx)}
-                  aria-label={`Remove ${item.food_name}`}
-                  className="p-1 text-text-tertiary hover:text-destructive shrink-0"
+                  onClick={() => {
+                    if (typeof quantityG === 'number' && quantityG > 0) setServings(Math.round((quantityG / servingSizeG) * 100) / 100)
+                    setInputMode('servings')
+                  }}
+                  className={`h-8 rounded-full px-3 text-[13px] font-semibold ${inputMode === 'servings' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  servings
                 </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+                <button
+                  type="button"
+                  onClick={() => { setQuantityG(Math.round(servings * servingSizeG)); setInputMode('grams') }}
+                  className={`h-8 rounded-full px-3 text-[13px] font-semibold ${inputMode === 'grams' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
+                >
+                  grams
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <input
+                aria-label="Quantity in grams"
+                type="number"
+                placeholder="Quantity"
+                value={quantityG}
+                onChange={(event) => handleQuantityChange(event.target.value ? Number(event.target.value) : '')}
+                className="h-11 min-w-0 flex-1 rounded-[12px] border-0 bg-ink-08 px-3 text-center text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35"
+              />
+              <span className="text-[13px] text-ink-55">g</span>
+            </div>
+          )}
 
-      {/* Actions — "Add another" stages the current item; Save logs everything.
-          Add another is hidden in the photo-estimate path (single compound log). */}
-      <div className="flex gap-2 mt-6">
-        {!estimateId && (
-          <Button
-            variant="outline"
-            onClick={handleAddAnother}
-            disabled={saving || !hasCurrent}
-            className="flex-1"
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            Add another
-          </Button>
-        )}
-        <Button
-          onClick={handleSave}
-          disabled={saving || (totalCount === 0)}
-          className="flex-1 bg-accent hover:bg-accent-hover text-white"
+          <div className="grid grid-cols-4 gap-2">
+            <MacroInput label="KCAL" value={calories} onChange={(value) => { setCalories(value); setMacroBasisPerG(null) }} />
+            <MacroInput label="P" value={protein} onChange={(value) => { setProtein(value); setMacroBasisPerG(null) }} />
+            <MacroInput label="C" value={carbs} onChange={(value) => { setCarbs(value); setMacroBasisPerG(null) }} />
+            <MacroInput label="F" value={fat} onChange={(value) => { setFat(value); setMacroBasisPerG(null) }} />
+          </div>
+
+          <button type="button" onClick={() => router.push('/chat')} className="text-[13.5px] font-semibold text-ink-60">
+            Ask Geo to estimate
+          </button>
+
+          {!estimateId ? (
+            <SecondaryButton onNavy={false} type="button" onClick={handleAddAnother} disabled={saving || !hasCurrent}>
+              Add to tray
+            </SecondaryButton>
+          ) : null}
+        </div>
+      ) : null}
+
+      {estimateId ? (
+        <div data-testid="estimate-chip" className="mt-3 flex h-8 w-fit items-center gap-2 rounded-full bg-ink-08 px-3 text-[13px] font-medium text-ink">
+          <span>
+            Photo estimate
+            {estimateConfidence != null ? ` · confidence ${Math.round(estimateConfidence * 100)}%` : ''}
+          </span>
+          <button type="button" onClick={clearEstimate} aria-label="Clear photo estimate" className="text-[16px] leading-none">×</button>
+        </div>
+      ) : null}
+
+      {(pending.length > 0 || isFoodDraftFilled(currentDraft())) ? (
+        <FeatureCard
+          data-testid="food-meal-tray"
+          className="fixed inset-x-gutter inset-x-[var(--gutter)] z-30 mx-auto max-w-md"
+          style={{ bottom: 'calc(96px + var(--safe-bottom))' }}
         >
-          {saving
-            ? 'Saving...'
-            : pending.length > 0
-              ? `Log meal (${totalCount})`
-              : 'Save'}
-        </Button>
-      </div>
+          <p className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Tray</p>
+          <p className="mt-1 text-[17px] font-bold text-cream">
+            {totalCount} item{totalCount === 1 ? '' : 's'} · {formatMacroKcal(totalCalories)} kcal
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {pending.map((item, index) => (
+              <span key={`pending-${index}-${item.food_name}`} className="flex h-8 items-center gap-2 rounded-full bg-cream-22 px-3 text-[13px] font-medium text-cream">
+                <span className="max-w-36 truncate">{item.food_name}</span>
+                <button type="button" onClick={() => handleRemovePending(index)} aria-label={`Remove ${item.food_name}`} className="text-[16px] leading-none">×</button>
+              </span>
+            ))}
+            {hasCurrent ? (
+              <span className="flex h-8 items-center gap-2 rounded-full bg-cream-22 px-3 text-[13px] font-medium text-cream">
+                <span className="max-w-36 truncate">{foodName.trim()}</span>
+                <button type="button" onClick={clearForm} aria-label={`Remove ${foodName.trim()}`} className="text-[16px] leading-none">×</button>
+              </span>
+            ) : null}
+          </div>
+          <TrayButton type="button" onClick={handleSave} disabled={saving || totalCount === 0} className="mt-4 justify-center">
+            {saving ? 'Saving…' : totalCount > 1 ? `Log ${totalCount} items` : 'Log meal'}
+          </TrayButton>
+        </FeatureCard>
+      ) : null}
     </div>
   )
 }
@@ -743,19 +672,41 @@ function PersonalFoodRow({ food, onSelect }: { food: UserFood; onSelect: (f: Use
       type="button"
       onClick={() => onSelect(food)}
       data-testid="personal-food-row"
-      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-surface-hover transition-colors border-b border-border last:border-b-0"
+      className="flex min-h-14 w-full items-center justify-between gap-3 px-[14px] py-2.5 text-left"
     >
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-text-primary truncate">{food.name}</p>
-        <p className="text-[11px] text-text-tertiary">
-          {formatMacroKcal(food.macros_per_serving.calories)} cal
-          {food.serving_size_g ? ` · per ${food.serving_size_g}g` : ''}
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
+        <p className="truncate text-[13px] text-ink-55">
+          1 serving · {formatMacroKcal(food.macros_per_serving.calories)} kcal
           {food.brand ? ` · ${food.brand}` : ''}
         </p>
       </div>
-      <div className="w-7 h-7 rounded-full bg-accent-light flex items-center justify-center shrink-0">
-        <Plus className="w-4 h-4 text-accent" />
-      </div>
+      <span className="shrink-0 text-[17px] font-semibold text-ink">+</span>
     </button>
+  )
+}
+
+function MacroInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: number | ''
+  onChange: (value: number | '') => void
+}) {
+  const id = `food-macro-${label.toLowerCase()}`
+  return (
+    <label htmlFor={id} className="min-w-0">
+      <span className="mb-1 block text-center text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-55">{label}</span>
+      <input
+        id={id}
+        aria-label={label}
+        type="number"
+        value={value}
+        onChange={(event) => onChange(event.target.value ? Number(event.target.value) : '')}
+        className="h-11 w-full rounded-[12px] border-0 bg-ink-08 px-1 text-center text-[15.5px] font-semibold text-ink outline-none"
+      />
+    </label>
   )
 }
