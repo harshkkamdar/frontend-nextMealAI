@@ -1,159 +1,57 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MessageCircle, RefreshCw, Pencil, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { PlanOverviewCard } from '@/components/plans/plan-overview-card'
-import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { getPlans } from '@/lib/api/plans.api'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
-import type { Plan, MealPlan, WorkoutPlan } from '@/types/plans.types'
+import { useUIStore } from '@/stores/ui.store'
+import type { MealPlan, Plan, WorkoutPlan } from '@/types/plans.types'
 
 export default function PlansPage() {
   useSetGeoScreen('plans', {})
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [plans, setPlans] = useState<Plan[]>([])
-
   const fetchPlans = useCallback(async () => {
     setLoading(true)
-    try {
-      const data = await getPlans({ active_only: true })
-      setPlans(data)
-    } catch (err: any) {
-      setPlans([])
-      toast.error(err?.message || 'Failed to load plans')
-    } finally {
-      setLoading(false)
-    }
+    try { setPlans(await getPlans({ active_only: true })) }
+    catch (err: unknown) { setPlans([]); toast.error(err instanceof Error ? err.message : 'Failed to load plans') }
+    finally { setLoading(false) }
   }, [])
-
-  useEffect(() => {
-    fetchPlans()
-  }, [fetchPlans])
-
-  // Re-fetch when returning to this page from another tab/page
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (!document.hidden) fetchPlans()
-    }
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [fetchPlans])
-
-  // FB-R6.7 Build B — chat→UI sync. When Geo creates/updates/deactivates a
-  // plan via chat, the plans page reflects it without a manual refresh.
+  useEffect(() => { fetchPlans() }, [fetchPlans])
+  useEffect(() => { const handleVisibility = () => { if (!document.hidden) fetchPlans() }; document.addEventListener('visibilitychange', handleVisibility); return () => document.removeEventListener('visibilitychange', handleVisibility) }, [fetchPlans])
   useSyncRefetch(['plans:*'], fetchPlans)
+  const mealPlan = (plans.find((plan) => plan.type === 'meal') as MealPlan) ?? null
+  const workoutPlan = (plans.find((plan) => plan.type === 'workout') as WorkoutPlan) ?? null
 
-  const mealPlan = (plans.find((p) => p.type === 'meal') as MealPlan) ?? null
-  const workoutPlan = (plans.find((p) => p.type === 'workout') as WorkoutPlan) ?? null
-
-  return (
-    <PageWrapper>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary">Plans</h1>
-        <button
-          onClick={fetchPlans}
-          disabled={loading}
-          className="p-2 text-text-secondary hover:text-text-primary transition-colors disabled:opacity-40"
-          aria-label="Refresh plans"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        </button>
+  return <PageWrapper>
+    <h1 className="mb-6 text-[22px] font-semibold text-ink">Plans</h1>
+    {loading ? <div className="space-y-3"><CardSkeleton /><CardSkeleton /></div> : <div className="space-y-6">
+      <section className="space-y-2.5">
+        <SectionLabel>Active</SectionLabel>
+        {mealPlan ? <PlanOverviewCard plan={mealPlan} onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)} onEdit={() => router.push(`/plans/edit?id=${mealPlan.id}`)} /> : <MissingRow label="No nutrition plan yet" href="/plans/new/meal" />}
+        {workoutPlan ? <PlanOverviewCard plan={workoutPlan} onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} onEdit={() => router.push(`/plans/edit?id=${workoutPlan.id}`)} /> : <MissingRow label="No training program yet" href="/plans/new/workout" />}
+      </section>
+      <div className="space-y-3">
+        <PrimaryButton icon={<Plus className="h-5 w-5" />} onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a plan</PrimaryButton>
+        <div className="flex flex-col items-center gap-2">
+          <Link href="/plans/new/meal" aria-label="Build nutrition plan by hand" className="text-[13.5px] font-semibold text-ink-60">Build one by hand →</Link>
+          <Link href="/plans/new/workout" aria-label="Build training program by hand" className="text-[13.5px] font-semibold text-ink-60">Build one by hand →</Link>
+        </div>
       </div>
+    </div>}
+  </PageWrapper>
+}
 
-      {loading ? (
-        <div className="space-y-4">
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Nutrition Plan section */}
-          <section>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-medium text-text-secondary">Nutrition Plan</h2>
-              <button
-                type="button"
-                onClick={() => router.push('/plans/new/meal')}
-                className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                New Nutrition Plan
-              </button>
-            </div>
-            {mealPlan ? (
-              <div className="relative">
-                <PlanOverviewCard
-                  plan={mealPlan}
-                  onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
-                />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    router.push(`/plans/edit?id=${mealPlan.id}`)
-                  }}
-                  aria-label="Edit nutrition plan"
-                  className="absolute top-3 right-14 p-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-hover"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <EmptyState
-                icon={MessageCircle}
-                title="No nutrition plan"
-                description="Chat with Geo or build one manually"
-              />
-            )}
-          </section>
-
-          {/* Workout Plan section */}
-          <section>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-medium text-text-secondary">Workout Plan</h2>
-              <button
-                type="button"
-                onClick={() => router.push('/plans/new/workout')}
-                className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                New Workout Plan
-              </button>
-            </div>
-            {workoutPlan ? (
-              <div className="relative">
-                <PlanOverviewCard
-                  plan={workoutPlan}
-                  onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)}
-                />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    router.push(`/plans/edit?id=${workoutPlan.id}`)
-                  }}
-                  aria-label="Edit workout plan"
-                  className="absolute top-3 right-14 p-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-hover"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <EmptyState
-                icon={MessageCircle}
-                title="No workout plan"
-                description="Chat with Geo or build one manually"
-              />
-            )}
-          </section>
-        </div>
-      )}
-    </PageWrapper>
-  )
+function MissingRow({ label, href }: { label: string; href: string }) {
+  return <div className="flex min-h-14 items-center justify-between rounded-[16px] border border-ink-12 bg-card px-[14px]"><span className="text-[15.5px] text-ink-50">{label}</span><Link href={href} className="text-[13.5px] font-semibold text-ink-60">Build one →</Link></div>
 }

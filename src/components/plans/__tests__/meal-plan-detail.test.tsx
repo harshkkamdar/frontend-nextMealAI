@@ -46,4 +46,22 @@ describe('MealPlanDetail — plan name in header', () => {
     render(<MealPlanDetail plan={plan} />)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Nutrition Plan')
   })
+
+  it('renders daily target tiles and meal-day pills', () => {
+    const plan = makePlan({
+      start_date: '2026-09-15',
+      end_date: '2026-10-12',
+      content: {
+        name: 'Cut Phase',
+        daily_targets: { calories: 2600, protein: 180, carbs: 250, fat: 70 },
+        days: [{ date: '2026-09-15', meals: [{ type: 'Breakfast', name: 'Oats', calories: 612, protein: 30, carbs: 80, fat: 12 }] }],
+      },
+    })
+    render(<MealPlanDetail plan={plan} />)
+    expect(screen.getByText('Active · 15 Sep – 12 Oct')).toBeInTheDocument()
+    expect(screen.getByText('Daily targets')).toBeInTheDocument()
+    expect(screen.getByText('Calories')).toBeInTheDocument()
+    expect(screen.getByText('Tue 15')).toBeInTheDocument()
+    expect(screen.getByText('Breakfast · 612 kcal')).toBeInTheDocument()
+  })
 })

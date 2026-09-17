@@ -102,7 +102,7 @@ describe('WorkoutPlanBuilder component', () => {
 
   it('submit is blocked until required fields are valid', async () => {
     render(<WorkoutPlanBuilder mode="create" />)
-    const submit = screen.getByRole('button', { name: 'Create plan' })
+    const submit = screen.getByRole('button', { name: 'Save plan' })
     expect(submit).toBeDisabled()
   })
 
@@ -125,7 +125,7 @@ describe('WorkoutPlanBuilder component', () => {
     await waitFor(() => screen.getByText('Bench Press'))
     fireEvent.click(screen.getByText('Bench Press'))
 
-    const submit = screen.getByRole('button', { name: 'Create plan' })
+    const submit = screen.getByRole('button', { name: 'Save plan' })
     await waitFor(() => expect(submit).not.toBeDisabled())
     fireEvent.click(submit)
 
@@ -153,7 +153,7 @@ describe('WorkoutPlanBuilder component', () => {
     await waitFor(() => screen.getByText('Squat'))
     fireEvent.click(screen.getByText('Squat'))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Create plan' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save plan' }))
     await waitFor(() => expect(toastError).toHaveBeenCalledWith('boom'))
   })
 
@@ -188,7 +188,7 @@ describe('WorkoutPlanBuilder component', () => {
     expect(screen.getByDisplayValue('Chest')).toBeInTheDocument()
     expect(screen.getByText('Bench Press')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save plan' }))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-42')
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-42'))

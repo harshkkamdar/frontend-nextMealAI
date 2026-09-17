@@ -19,7 +19,7 @@ export default function PlanDetailPage() {
 
 function PlanDetailRoute() {
   const id = useSearchParams().get('id') ?? ''
-  if (!id) return <PageWrapper><p className="text-sm text-text-secondary">Nothing selected. <Link href="/plans">Back to plans.</Link></p></PageWrapper>
+  if (!id) return <PageWrapper><p className="text-[13.5px] text-ink-62">Nothing selected. <Link href="/plans">Back to plans.</Link></p></PageWrapper>
   return <PlanDetailView id={id} />
 }
 
@@ -56,7 +56,7 @@ function PlanDetailView({ id }: { id: string }) {
           <CardSkeleton />
         </div>
       ) : !plan ? (
-        <p className="text-sm text-text-secondary text-center py-12">Plan not found</p>
+        <p className="py-12 text-center text-[13.5px] text-ink-62">Plan not found</p>
       ) : plan.type === 'meal' ? (
         <MealPlanDetail plan={plan as MealPlan} />
       ) : (

@@ -2,182 +2,50 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Moon, Play } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
-import type { WorkoutPlan, PlanStatus } from '@/types/plans.types'
-import { formatDate } from '@/lib/utils'
 import { PlanChangelog } from '@/components/plans/plan-changelog'
+import { formatDateRange, statusLabel } from '@/components/plans/plan-format'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { activatePlan } from '@/lib/api/plans.api'
 import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import type { WorkoutExercise, WorkoutPlan } from '@/types/plans.types'
 
-const STATUS_STYLES: Record<PlanStatus, string> = {
-  active: 'bg-[#34C759]/10 text-[#34C759]',
-  draft: 'bg-surface text-text-secondary',
-  superseded: 'bg-surface text-text-tertiary',
-  completed: 'bg-[#3B82F6]/10 text-[#3B82F6]',
-}
-
-function formatDayDate(dateStr: string | undefined, fallbackIndex?: number): string {
-  if (!dateStr) return fallbackIndex !== undefined ? `Day ${fallbackIndex + 1}` : 'Day'
-  const d = new Date(dateStr)
-  if (isNaN(d.getTime())) return fallbackIndex !== undefined ? `Day ${fallbackIndex + 1}` : 'Day'
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-}
-
-function formatDateRange(start?: string, end?: string): string {
-  if (!start && !end) return 'No dates set'
-  const fmt = (d: string) => formatDate(new Date(d))
-  if (start && end) return `${fmt(start)} - ${fmt(end)}`
-  if (start) return `From ${fmt(start)}`
-  return `Until ${fmt(end!)}`
-}
-
-// R7-05 — format rest like "90s" / "2m" / "2m 30s".
-function formatRest(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return s > 0 ? `${m}m ${s}s` : `${m}m`
-}
-
-function formatExerciseDetail(exercise: { sets?: number; reps?: number | string; weight?: number; duration_seconds?: number; rest_seconds?: number }): string {
-  // FB-R6.7 — reps can land as a sentinel `-1` for duration-based exercises
-  // (plank holds etc.). Treat reps <= 0 as missing. R7-05 — reps may also be a
-  // RANGE string ("8-10", "AMRAP"), and rest_seconds should always show.
+export function formatExerciseDetail(exercise: Omit<WorkoutExercise, 'reps'> & { reps?: number | string }): string {
   const parts: string[] = []
-  const repsVal = exercise.reps
-  const validReps =
-    (typeof repsVal === 'number' && repsVal > 0) || (typeof repsVal === 'string' && repsVal.trim().length > 0)
-  const repsStr = typeof repsVal === 'number' ? String(repsVal) : String(repsVal ?? '').trim()
-  const validSets = typeof exercise.sets === 'number' && exercise.sets > 0
-  if (validSets && validReps) {
-    parts.push(`${exercise.sets} × ${repsStr}`)
-  } else if (validSets) {
-    parts.push(`${exercise.sets} sets`)
-  } else if (validReps) {
-    parts.push(`${repsStr} reps`)
-  }
-  if (exercise.weight != null) {
-    parts.push(`${exercise.weight} kg`)
-  }
-  if (exercise.duration_seconds != null && exercise.duration_seconds > 0) {
-    const mins = Math.floor(exercise.duration_seconds / 60)
-    const secs = exercise.duration_seconds % 60
-    parts.push(mins > 0 ? `${mins}m${secs > 0 ? ` ${secs}s` : ''}` : `${secs}s`)
-  }
-  if (typeof exercise.rest_seconds === 'number' && exercise.rest_seconds > 0) {
-    parts.push(`${formatRest(exercise.rest_seconds)} rest`)
-  }
+  const reps = typeof exercise.reps === 'string' ? exercise.reps.replace(/(?<=\d)-(?=\d)/g, '–') : exercise.reps
+  if (exercise.sets && reps) parts.push(`${exercise.sets} × ${reps}`)
+  else if (exercise.sets) parts.push(`${exercise.sets} sets`)
+  else if (reps) parts.push(`${reps} reps`)
+  if (exercise.weight != null) parts.push(`${exercise.weight} kg`)
+  if (exercise.duration_seconds) parts.push(`${exercise.duration_seconds} s`)
+  if (exercise.rest_seconds) parts.push(`${exercise.rest_seconds} s`)
   return parts.join(' · ')
 }
 
 export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
   const router = useRouter()
+  const [expanded, setExpanded] = useState<number | null>(null)
   const [startingIdx, setStartingIdx] = useState<number | null>(null)
+  const [activating, setActivating] = useState(false)
+  const days = plan.content.days ?? []
+  async function handleStartWorkout(dayIdx: number) { if (startingIdx !== null) return; setStartingIdx(dayIdx); try { const session = await startWorkoutSession({ plan_id: plan.id, plan_day_index: dayIdx }); router.push(`/train/session?id=${session.id}`) } catch { toast.error('Failed to start workout'); setStartingIdx(null) } }
+  async function makeActive() { setActivating(true); try { await activatePlan(plan.id); toast.success('Plan activated'); router.refresh() } catch { toast.error('Failed to activate plan') } finally { setActivating(false) } }
 
-  const handleStartWorkout = async (dayIdx: number) => {
-    if (startingIdx !== null) return
-    setStartingIdx(dayIdx)
-    try {
-      const session = await startWorkoutSession({ plan_id: plan.id, plan_day_index: dayIdx })
-      router.push(`/train/session?id=${session.id}`)
-    } catch {
-      toast.error('Failed to start workout')
-      setStartingIdx(null)
-    }
-  }
-
-  return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-hover transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-text-primary" />
-        </button>
-        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary">
-          {plan.content.name || 'Workout Plan'}
-        </h1>
+  return <div className="space-y-7">
+    <header><div className="flex items-center gap-2"><button type="button" onClick={() => router.back()} aria-label="Back" className="inline-flex h-9 w-9 items-center justify-center text-ink-60"><ChevronLeft className="h-6 w-6" /></button><h1 className="text-[22px] font-semibold text-ink">{plan.content.name || 'Workout Plan'}</h1></div><p className="ml-11 mt-1 text-[13.5px] text-ink-55">{statusLabel(plan.status)} · {formatDateRange(plan.start_date, plan.end_date)}</p></header>
+    {plan.content.notes ? <section className="space-y-2.5"><SectionLabel>Notes</SectionLabel><div className="rounded-[16px] border border-ink-12 bg-card p-[14px] text-[15.5px] text-ink-80">{plan.content.notes}</div></section> : null}
+    <section className="space-y-2.5"><SectionLabel>Days</SectionLabel>{days.length ? <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">{days.map((day, index) => {
+      const isOpen = expanded === index
+      const count = day.exercises?.length ?? 0
+      return <div key={`${day.name}-${index}`}>
+        <button type="button" aria-label={`${day.name || 'Rest'} day ${index + 1}`} onClick={() => setExpanded(isOpen ? null : index)} className="flex min-h-14 w-full items-center gap-3 px-[14px] py-3 text-left"><span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink-08 text-[12px] font-semibold text-ink">{index + 1}</span><span className="min-w-0 flex-1"><span className="block text-[15.5px] font-semibold text-ink">{day.is_rest_day ? 'Rest' : day.name || `Day ${index + 1}`}</span><span className="block text-[13px] text-ink-55">{day.is_rest_day ? 'Recovery day' : `${count} ${count === 1 ? 'exercise' : 'exercises'}`}</span></span>{isOpen ? <ChevronDown className="h-5 w-5 text-ink-50" /> : <ChevronRight className="h-5 w-5 text-ink-50" />}</button>
+        {isOpen && !day.is_rest_day ? <div className="border-t border-ink-09 px-[14px] py-3"><div className="divide-y divide-ink-09">{day.exercises?.map((exercise, exerciseIndex) => <div key={`${exercise.name}-${exerciseIndex}`} className="py-3 text-[13.5px] text-ink-62"><span className="font-semibold text-ink">{exercise.name}</span>{formatExerciseDetail(exercise) ? ` · ${formatExerciseDetail(exercise)}` : ''}</div>)}</div><SecondaryButton onNavy={false} className="mt-3" onClick={() => handleStartWorkout(index)} disabled={startingIdx !== null}>{startingIdx === index ? 'Starting…' : 'Start workout'}</SecondaryButton></div> : null}
       </div>
-
-      {/* Status + date range */}
-      <div className="flex items-center gap-2 mb-4">
-        <span
-          className={`text-[10px] font-medium px-2 py-0.5 rounded-full capitalize ${STATUS_STYLES[plan.status]}`}
-        >
-          {plan.status}
-        </span>
-        <span className="text-xs text-text-secondary">
-          {formatDateRange(plan.start_date, plan.end_date)}
-        </span>
-      </div>
-
-      {/* Notes */}
-      {plan.content.notes && (
-        <p className="text-xs text-text-secondary mb-6 italic">{plan.content.notes}</p>
-      )}
-
-      {/* Day-by-day */}
-      {plan.content.days && plan.content.days.length > 0 ? (
-        <div className="space-y-3">
-          {plan.content.days.map((day, idx) => (
-            <div key={idx} className="bg-surface border border-border rounded-2xl p-4">
-              <h3 className="text-sm font-semibold text-text-primary mb-2">
-                {formatDayDate(day.date, idx)}
-              </h3>
-
-              {day.is_rest_day ? (
-                <div className="flex items-center gap-2 py-2">
-                  <Moon className="w-4 h-4 text-text-tertiary" />
-                  <span className="text-sm text-text-secondary">Rest Day</span>
-                </div>
-              ) : (
-                <>
-                  {day.name && <p className="text-base font-semibold text-text-primary mb-3">{day.name}</p>}
-                  {day.exercises && day.exercises.length > 0 && (
-                    <div className="space-y-2 mb-3">
-                      {day.exercises.map((exercise, eIdx) => {
-                        const detail = formatExerciseDetail(exercise)
-                        return (
-                          <div key={eIdx} className="flex items-start justify-between gap-2">
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm text-text-primary">{exercise.name}</p>
-                              {detail && (
-                                <p className="text-xs text-text-secondary mt-0.5">{detail}</p>
-                              )}
-                            </div>
-                            {exercise.notes && (
-                              <p className="text-[10px] text-text-tertiary italic shrink-0 max-w-[120px] text-right">
-                                {exercise.notes}
-                              </p>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                  <button
-                    onClick={() => handleStartWorkout(idx)}
-                    disabled={startingIdx !== null}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-accent hover:bg-accent-hover text-white disabled:opacity-50 transition-opacity"
-                  >
-                    <Play className="w-3 h-3 fill-white" />
-                    {startingIdx === idx ? 'Starting...' : 'Start Workout'}
-                  </button>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm text-text-tertiary text-center py-8">
-          No workout days configured yet
-        </p>
-      )}
-
-      <PlanChangelog planId={plan.id} />
-    </div>
-  )
+    })}</div> : <div className="rounded-[16px] border border-ink-12 bg-card p-[14px] text-[15.5px] text-ink-50">No workout days yet</div>}</section>
+    <PlanChangelog planId={plan.id} />
+    <div className="space-y-3"><SecondaryButton onNavy={false} onClick={() => router.push(`/plans/edit?id=${plan.id}`)}>Edit plan</SecondaryButton>{plan.status !== 'active' ? <PrimaryButton onClick={makeActive} disabled={activating}>{activating ? 'Activating…' : 'Make this my plan'}</PrimaryButton> : null}</div>
+  </div>
 }

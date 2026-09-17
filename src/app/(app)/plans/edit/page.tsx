@@ -17,7 +17,7 @@ export default function EditPlanPage() {
 
 function EditPlanRoute() {
   const id = useSearchParams().get('id') ?? ''
-  if (!id) return <PageWrapper><p className="text-sm text-text-secondary">Nothing selected. <Link href="/plans">Back to plans.</Link></p></PageWrapper>
+  if (!id) return <PageWrapper><p className="text-[13.5px] text-ink-62">Nothing selected. <Link href="/plans">Back to plans.</Link></p></PageWrapper>
   return <EditPlanView id={id} />
 }
 

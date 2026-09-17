@@ -51,7 +51,7 @@ describe('FB-15 WorkoutProgramPreviewCard', () => {
     expect(screen.getByTestId('program-summary')).toHaveTextContent('2 days')
     expect(screen.getByTestId('program-summary')).toHaveTextContent('3 exercises')
     expect(screen.getByTestId('confidence-badge')).toHaveTextContent('High confidence')
-    expect(screen.getByTestId('confidence-badge')).toHaveTextContent('90%')
+    expect(screen.getByText('Program from your photo')).toBeInTheDocument()
     const days = screen.getByTestId('day-list')
     expect(days).toHaveTextContent('Day 1 — Push')
     expect(days).toHaveTextContent('Day 2 — Pull')
@@ -74,6 +74,13 @@ describe('FB-15 WorkoutProgramPreviewCard', () => {
     await waitFor(() => expect(mockedActivate).toHaveBeenCalledWith('plan-123'))
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-123'))
     expect(onAccept).toHaveBeenCalledWith('plan-123')
+  })
+
+  it('uses the FIQR card action labels', () => {
+    render(<WorkoutProgramPreviewCard program={program} confidence={0.7} />)
+    expect(screen.getByRole('button', { name: 'Use this program' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Edit first' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Discard' })).toBeInTheDocument()
   })
 
   it('Edit routes to the manual builder with a prefill query param', () => {

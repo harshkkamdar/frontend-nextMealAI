@@ -3,10 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { ChevronLeft, Plus, Dumbbell } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { ChevronLeft } from 'lucide-react'
 import {
   PlanNameField,
   PlanDateRangeField,
@@ -18,6 +15,10 @@ import {
 import { createPlan, updatePlan, activatePlan } from '@/lib/api/plans.api'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
 import type { WorkoutPlan, WorkoutPlanDay, WorkoutExercise } from '@/types/plans.types'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { cn } from '@/lib/utils'
 
 // FB-08 — Workout plan manual builder. Used by both the create route
 // (/plans/new/workout) and the edit route (/plans/edit?id=...). Keeps a
@@ -203,23 +204,20 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-7">
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={() => router.push('/plans')}
-          className="text-text-secondary hover:text-text-primary"
+          className="inline-flex h-9 w-9 items-center justify-center text-ink-60"
           aria-label="Back to plans"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-6 w-6" />
         </button>
-        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary flex items-center gap-2">
-          <Dumbbell className="w-5 h-5 text-accent" />
-          {mode === 'create' ? 'New Workout Plan' : 'Edit Workout Plan'}
-        </h1>
+        <h1 className="text-[22px] font-semibold text-ink">{mode === 'create' ? 'New training program' : 'Edit training program'}</h1>
       </div>
 
-      <div className="bg-surface border border-border rounded-2xl p-4 space-y-4">
+      <section className="space-y-2.5"><SectionLabel>Plan</SectionLabel><div className="space-y-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
         <PlanNameField value={name} onChange={setName} placeholder="e.g. Push Pull Legs" />
         <PlanDateRangeField
           startDate={startDate}
@@ -230,19 +228,19 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
           }}
         />
         <div className="space-y-1.5">
-          <Label htmlFor="plan-notes">Notes</Label>
+          <label htmlFor="plan-notes" className="block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Notes</label>
           <textarea
             id="plan-notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Optional notes about the program"
-            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            className="min-h-24 w-full rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
           />
         </div>
-      </div>
+      </div></section>
 
-      <div className="space-y-4">
+      <section className="space-y-4"><SectionLabel>Days</SectionLabel>
         {days.map((day, dayIndex) => (
           <DayCard
             key={day._key}
@@ -256,46 +254,28 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
             onRemoveExercise={(exKey) => removeExercise(day._key, exKey)}
           />
         ))}
-        <button
-          type="button"
-          onClick={addDay}
-          className="w-full inline-flex items-center justify-center gap-1.5 rounded-2xl border border-dashed border-border py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add day
-        </button>
-      </div>
+        <SecondaryButton type="button" onNavy={false} onClick={addDay}>Add day</SecondaryButton>
+      </section>
 
       {touched && errors.length > 0 ? (
-        <ul className="text-xs text-red-500 space-y-1" role="alert">
+        <ul className="space-y-1 rounded-[12px] bg-ink-08 p-3 text-[13.5px] text-ink" role="alert">
           {errors.map((err) => (
             <li key={err}>{err}</li>
           ))}
         </ul>
       ) : null}
 
-      <label className="flex items-center gap-2 text-sm text-text-secondary">
+      <label className="flex cursor-pointer items-center gap-3 text-[15.5px] font-semibold text-ink">
         <input
           type="checkbox"
           checked={setActive}
-          onChange={(e) => setSetActive(e.target.checked)}
+          onChange={(e) => setSetActive(e.target.checked)} className="sr-only"
         />
+        <span aria-hidden="true" className={cn('flex size-[22px] shrink-0 items-center justify-center rounded-[6px]', setActive ? 'bg-ink' : 'border border-ink-16 bg-card')}>{setActive ? <svg viewBox="0 0 16 16" className="size-4 text-cream" fill="none"><path d="m3 8 3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}</span>
         Set as active plan
       </label>
 
-      <div className="flex items-center gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => router.push('/plans')}
-          disabled={submitting}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={submitting || !isValid}>
-          {submitting ? 'Saving…' : mode === 'create' ? 'Create plan' : 'Save changes'}
-        </Button>
-      </div>
+      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid}>{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="w-full text-[13.5px] font-semibold text-ink-60">Cancel</button></div>
     </form>
   )
 }
@@ -320,18 +300,18 @@ function DayCard({
   onRemoveExercise: (exKey: string) => void
 }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4 space-y-3">
+    <div className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]">
       <div className="flex items-center gap-2">
-        <Input
+        <input
           aria-label={`Day ${index + 1} name`}
           value={day.name}
           onChange={(e) => onPatch({ name: e.target.value })}
-          className="flex-1"
+          className="h-14 min-w-0 flex-1 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none focus:border-ink"
         />
         {canRemove ? <RemoveRowButton label={`Remove day ${index + 1}`} onClick={onRemove} /> : null}
       </div>
 
-      <label className="flex items-center gap-2 text-xs text-text-secondary">
+      <label className="flex items-center gap-2 text-[13.5px] font-semibold text-ink-60">
         <input
           type="checkbox"
           checked={day.is_rest_day}
@@ -341,7 +321,7 @@ function DayCard({
       </label>
 
       {!day.is_rest_day ? (
-        <div className="space-y-3">
+        <div className="divide-y divide-ink-09">
           {day.exercises.map((ex, exIndex) => (
             <ExerciseRow
               key={ex._key}
@@ -351,7 +331,7 @@ function DayCard({
               onRemove={() => onRemoveExercise(ex._key)}
             />
           ))}
-          <AddRowButton label="Add exercise" onClick={onAddExercise} />
+          <div className="pt-3"><AddRowButton label="Add exercise" onClick={onAddExercise} /></div>
         </div>
       ) : null}
     </div>
@@ -370,7 +350,7 @@ function ExerciseRow({
   onRemove: () => void
 }) {
   return (
-    <div className="border border-border rounded-xl p-3 space-y-3">
+    <div className="space-y-3 py-3 first:pt-0">
       <div className="flex items-start gap-2">
         <div className="flex-1">
           <SearchablePicker<ExerciseSearchResult>
@@ -379,9 +359,9 @@ function ExerciseRow({
             search={searchExercises}
             renderItem={(item) => (
               <div>
-                <div className="text-text-primary">{item.name}</div>
+                <div className="text-ink">{item.name}</div>
                 {item.primary_muscles && item.primary_muscles.length > 0 ? (
-                  <div className="text-[11px] text-text-tertiary">
+                  <div className="text-[11px] text-ink-55">
                     {item.primary_muscles.join(', ')}
                   </div>
                 ) : null}

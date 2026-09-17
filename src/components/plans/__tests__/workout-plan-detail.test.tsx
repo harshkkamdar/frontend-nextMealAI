@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
@@ -53,5 +53,20 @@ describe('WorkoutPlanDetail — plan name in header', () => {
     const plan = makePlan({ content: { name: '', days: [] } })
     render(<WorkoutPlanDetail plan={plan} />)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Workout Plan')
+  })
+
+  it('expands a day to show exercise detail', () => {
+    const plan = makePlan({
+      start_date: '2026-09-15',
+      end_date: '2026-10-12',
+      content: { name: 'PPL', days: [{ date: '2026-09-15', name: 'Push', is_rest_day: false, exercises: [{ name: 'Bench Press', sets: 3, reps: 10, rest_seconds: 90 }] }] },
+    })
+    render(<WorkoutPlanDetail plan={plan} />)
+    expect(screen.getByText('Active · 15 Sep – 12 Oct')).toBeInTheDocument()
+    expect(screen.getByText('Days')).toBeInTheDocument()
+    expect(screen.getByText('Push')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Push/ }))
+    expect(screen.getByText('Bench Press').parentElement).toHaveTextContent('Bench Press · 3 × 10 · 90 s')
+    expect(screen.getByRole('button', { name: 'Start workout' })).toBeInTheDocument()
   })
 })

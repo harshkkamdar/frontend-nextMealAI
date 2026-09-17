@@ -3,10 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { ChevronLeft, Plus, UtensilsCrossed } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { ChevronLeft } from 'lucide-react'
 import {
   PlanNameField,
   PlanDateRangeField,
@@ -19,6 +16,10 @@ import { createPlan, updatePlan, activatePlan } from '@/lib/api/plans.api'
 import { searchFoods } from '@/lib/api/foods.api'
 import type { FoodSearchResult } from '@/types/foods.types'
 import type { MealPlan, MealPlanDay, MealPlanMeal } from '@/types/plans.types'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { cn } from '@/lib/utils'
 
 // FB-08 — Nutrition plan manual builder. Symmetric with the workout builder.
 // Users set daily macro targets, then build out day-by-day meals. Meal
@@ -215,25 +216,21 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-7">
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={() => router.push('/plans')}
-          className="text-text-secondary hover:text-text-primary"
+          className="inline-flex h-9 w-9 items-center justify-center text-ink-60"
           aria-label="Back to plans"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-6 w-6" />
         </button>
-        <h1 className="text-[22px] font-semibold tracking-tight text-text-primary flex items-center gap-2">
-          <UtensilsCrossed className="w-5 h-5 text-accent" />
-          {mode === 'create' ? 'New Nutrition Plan' : 'Edit Nutrition Plan'}
-        </h1>
+        <h1 className="text-[22px] font-semibold text-ink">{mode === 'create' ? 'New nutrition plan' : 'Edit nutrition plan'}</h1>
       </div>
 
-      <div className="bg-surface border border-border rounded-2xl p-4 space-y-4">
-        <PlanNameField value={name} onChange={setName} placeholder="e.g. Cut phase" />
-        <PlanDateRangeField
+      <section className="space-y-2.5"><SectionLabel>Plan</SectionLabel><div className="space-y-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
+        <PlanNameField value={name} onChange={setName} placeholder="e.g. Cut phase" /><PlanDateRangeField
           startDate={startDate}
           endDate={endDate}
           onChange={(next) => {
@@ -242,20 +239,19 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
           }}
         />
         <div className="space-y-1.5">
-          <Label htmlFor="plan-notes">Notes</Label>
+          <label htmlFor="plan-notes" className="block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Notes</label>
           <textarea
             id="plan-notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Optional notes"
-            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            className="min-h-24 w-full rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
           />
         </div>
-      </div>
+      </div></section>
 
-      <div className="bg-surface border border-border rounded-2xl p-4 space-y-3">
-        <h2 className="text-sm font-medium text-text-primary">Daily targets</h2>
+      <section className="space-y-2.5"><SectionLabel>Daily targets</SectionLabel><div className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]">
         <div className="grid grid-cols-2 gap-3">
           <NumberField
             label="Calories"
@@ -286,9 +282,9 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
             min={0}
           />
         </div>
-      </div>
+      </div></section>
 
-      <div className="space-y-4">
+      <section className="space-y-4"><SectionLabel>Days</SectionLabel>
         {days.map((day, dayIndex) => (
           <MealDayCard
             key={day._key}
@@ -302,42 +298,24 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
             onPatchMeal={(mealKey, patch) => patchMeal(day._key, mealKey, patch)}
           />
         ))}
-        <button
-          type="button"
-          onClick={addDay}
-          className="w-full inline-flex items-center justify-center gap-1.5 rounded-2xl border border-dashed border-border py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add day
-        </button>
-      </div>
+        <SecondaryButton type="button" onNavy={false} onClick={addDay}>Add day</SecondaryButton>
+      </section>
 
       {touched && errors.length > 0 ? (
-        <ul className="text-xs text-red-500 space-y-1" role="alert">
+        <ul className="space-y-1 rounded-[12px] bg-ink-08 p-3 text-[13.5px] text-ink" role="alert">
           {errors.map((err) => (
             <li key={err}>{err}</li>
           ))}
         </ul>
       ) : null}
 
-      <label className="flex items-center gap-2 text-sm text-text-secondary">
-        <input type="checkbox" checked={setActive} onChange={(e) => setSetActive(e.target.checked)} />
+      <label className="flex cursor-pointer items-center gap-3 text-[15.5px] font-semibold text-ink">
+        <input type="checkbox" checked={setActive} onChange={(e) => setSetActive(e.target.checked)} className="sr-only" />
+        <span aria-hidden="true" className={cn('flex size-[22px] shrink-0 items-center justify-center rounded-[6px]', setActive ? 'bg-ink' : 'border border-ink-16 bg-card')}>{setActive ? <svg viewBox="0 0 16 16" className="size-4 text-cream" fill="none"><path d="m3 8 3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}</span>
         Set as active plan
       </label>
 
-      <div className="flex items-center gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => router.push('/plans')}
-          disabled={submitting}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={submitting || !isValid}>
-          {submitting ? 'Saving…' : mode === 'create' ? 'Create plan' : 'Save changes'}
-        </Button>
-      </div>
+      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid}>{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="w-full text-[13.5px] font-semibold text-ink-60">Cancel</button></div>
     </form>
   )
 }
@@ -362,18 +340,18 @@ function MealDayCard({
   onPatchMeal: (mealKey: string, patch: Partial<DraftMeal>) => void
 }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4 space-y-3">
+    <div className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]">
       <div className="flex items-center gap-2">
-        <Input
+        <input
           type="date"
           aria-label={`Day ${index + 1} date`}
           value={day.date}
           onChange={(e) => onPatch({ date: e.target.value })}
-          className="flex-1"
+          className="h-14 min-w-0 flex-1 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none focus:border-ink"
         />
         {canRemove ? <RemoveRowButton label={`Remove day ${index + 1}`} onClick={onRemove} /> : null}
       </div>
-      <div className="space-y-3">
+      <div className="divide-y divide-ink-09">
         {day.meals.map((meal, mealIndex) => (
           <MealRow
             key={meal._key}
@@ -383,7 +361,7 @@ function MealDayCard({
             onRemove={() => onRemoveMeal(meal._key)}
           />
         ))}
-        <AddRowButton label="Add meal" onClick={onAddMeal} />
+        <div className="pt-3"><AddRowButton label="Add meal" onClick={onAddMeal} /></div>
       </div>
     </div>
   )
@@ -401,33 +379,19 @@ function MealRow({
   onRemove: () => void
 }) {
   return (
-    <div className="border border-border rounded-xl p-3 space-y-3">
+    <div className="space-y-3 py-3 first:pt-0">
       <div className="flex items-start gap-2">
         <div className="flex-1 space-y-3">
-          <div className="space-y-1.5">
-            <Label htmlFor={`meal-type-${meal._key}`}>Meal type</Label>
-            <select
-              id={`meal-type-${meal._key}`}
-              value={meal.type}
-              onChange={(e) => onPatch({ type: e.target.value })}
-              className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            >
-              {MEAL_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div className="space-y-1.5"><div className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Meal type</div><div className="flex flex-wrap gap-2">{MEAL_TYPES.map((type) => <button key={type} type="button" onClick={() => onPatch({ type })} className={`h-9 rounded-full px-3 text-[13.5px] font-semibold ${meal.type === type ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}>{type}</button>)}</div></div>
           <SearchablePicker<FoodSearchResult>
             label={`Meal ${index + 1}`}
             placeholder="Search foods"
             search={(q) => searchFoods(q)}
             renderItem={(item) => (
               <div>
-                <div className="text-text-primary">{item.name}</div>
+                <div className="text-ink">{item.name}</div>
                 {item.brand ? (
-                  <div className="text-[11px] text-text-tertiary">{item.brand}</div>
+                  <div className="text-[11px] text-ink-55">{item.brand}</div>
                 ) : null}
               </div>
             )}

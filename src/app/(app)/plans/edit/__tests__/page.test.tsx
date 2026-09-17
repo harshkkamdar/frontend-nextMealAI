@@ -42,7 +42,7 @@ describe('EditPlanPage', () => {
       updated_at: 'n',
     })
     render(<EditPlanView id="p1" />)
-    await waitFor(() => expect(screen.getByText('Edit Workout Plan')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Edit training program')).toBeInTheDocument())
   })
 
   it('routes to MealPlanBuilder for nutrition plans', async () => {
@@ -59,7 +59,7 @@ describe('EditPlanPage', () => {
       updated_at: 'n',
     })
     render(<EditPlanView id="p2" />)
-    await waitFor(() => expect(screen.getByText('Edit Nutrition Plan')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Edit nutrition plan')).toBeInTheDocument())
   })
 
   it('redirects to /plans on load failure', async () => {

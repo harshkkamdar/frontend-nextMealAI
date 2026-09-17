@@ -12,6 +12,9 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createPlan, activatePlan } from '@/lib/api/plans.api'
 import type { WorkoutProgramContent } from '@/types/plans.types'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 
 export interface WorkoutProgramPreviewCardProps {
   program: WorkoutProgramContent
@@ -21,10 +24,10 @@ export interface WorkoutProgramPreviewCardProps {
   onDiscard?: () => void
 }
 
-function confidenceLabel(c: number): { label: string; tone: string } {
-  if (c >= 0.85) return { label: 'High confidence', tone: 'text-green-600' }
-  if (c >= 0.6) return { label: 'Medium confidence', tone: 'text-yellow-600' }
-  return { label: 'Low confidence', tone: 'text-orange-600' }
+function confidenceLabel(c: number): string {
+  if (c >= 0.85) return 'High confidence'
+  if (c >= 0.6) return 'Medium confidence'
+  return 'Low confidence'
 }
 
 export function WorkoutProgramPreviewCard({
@@ -85,23 +88,21 @@ export function WorkoutProgramPreviewCard({
   return (
     <div
       data-testid="workout-program-preview-card"
-      className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3"
+      className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">
-          Geo extracted a workout program
-        </h3>
-        <span className={`text-xs font-medium ${conf.tone}`} data-testid="confidence-badge">
-          {conf.label} ({Math.round(confidence * 100)}%)
+        <SectionLabel>Program from your photo</SectionLabel>
+        <span className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-55" data-testid="confidence-badge">
+          {conf}
         </span>
       </div>
 
-      <div className="text-sm text-muted-foreground" data-testid="program-summary">
+      <div className="text-[13.5px] text-ink-62" data-testid="program-summary">
         {days.length} day{days.length === 1 ? '' : 's'} · {totalExercises} exercise
         {totalExercises === 1 ? '' : 's'}
       </div>
 
-      <ul className="text-xs text-muted-foreground space-y-1" data-testid="day-list">
+      <ul className="space-y-1 text-[13.5px] text-ink-62" data-testid="day-list">
         {days.map((d, i) => (
           <li key={i} className="flex items-center justify-between">
             <span>{d.name || `Day ${i + 1}`}</span>
@@ -110,30 +111,29 @@ export function WorkoutProgramPreviewCard({
         ))}
       </ul>
 
-      <div className="flex gap-2 pt-1">
-        <button
+      <div className="space-y-2 pt-1">
+        <PrimaryButton
           type="button"
           onClick={handleAccept}
           disabled={busy}
-          className="flex-1 rounded-xl bg-accent px-3 py-2 text-sm font-medium text-accent-foreground disabled:opacity-60"
           data-testid="preview-accept"
         >
-          {busy ? 'Saving…' : 'Accept'}
-        </button>
-        <button
+          {busy ? 'Saving…' : 'Use this program'}
+        </PrimaryButton>
+        <SecondaryButton
           type="button"
           onClick={handleEdit}
           disabled={busy}
-          className="flex-1 rounded-xl border border-border px-3 py-2 text-sm font-medium text-foreground"
+          onNavy={false}
           data-testid="preview-edit"
         >
-          Edit
-        </button>
+          Edit first
+        </SecondaryButton>
         <button
           type="button"
           onClick={handleDiscard}
           disabled={busy}
-          className="rounded-xl border border-border px-3 py-2 text-sm font-medium text-muted-foreground"
+          className="w-full py-2 text-[13.5px] font-semibold text-ink-60"
           data-testid="preview-discard"
         >
           Discard

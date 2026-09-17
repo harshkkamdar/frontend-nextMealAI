@@ -113,7 +113,7 @@ describe('MealPlanBuilder component', () => {
     await waitFor(() => screen.getByText('Oats'))
     fireEvent.click(screen.getByText('Oats'))
 
-    const submit = screen.getByRole('button', { name: 'Create plan' })
+    const submit = screen.getByRole('button', { name: 'Save plan' })
     await waitFor(() => expect(submit).not.toBeDisabled())
     fireEvent.click(submit)
 
@@ -148,7 +148,7 @@ describe('MealPlanBuilder component', () => {
     fireEvent.change(screen.getByPlaceholderText('Search foods'), { target: { value: 'ri' } })
     await waitFor(() => screen.getByText('Rice'))
     fireEvent.click(screen.getByText('Rice'))
-    fireEvent.click(screen.getByRole('button', { name: 'Create plan' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save plan' }))
     await waitFor(() => expect(toastError).toHaveBeenCalledWith('nope'))
   })
 
@@ -171,7 +171,7 @@ describe('MealPlanBuilder component', () => {
     fireEvent.change(screen.getByPlaceholderText('e.g. Cut phase'), { target: { value: 'Recut' } })
     expect(screen.getByText('Eggs')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save plan' }))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-77')
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-77'))
