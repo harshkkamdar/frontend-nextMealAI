@@ -44,8 +44,8 @@ export default function PlansPage() {
       <div className="space-y-3">
         <PrimaryButton icon={<Plus className="h-5 w-5" />} onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a plan</PrimaryButton>
         <div className="flex flex-col items-center gap-2">
-          <Link href="/plans/new/meal" aria-label="Build nutrition plan by hand" className="text-[13.5px] font-semibold text-ink-60">Build one by hand →</Link>
-          <Link href="/plans/new/workout" aria-label="Build training program by hand" className="text-[13.5px] font-semibold text-ink-60">Build one by hand →</Link>
+          <Link href="/plans/new/meal" aria-label="Build nutrition plan by hand" className="text-[13.5px] font-semibold text-ink-60">Build a nutrition plan by hand →</Link>
+          <Link href="/plans/new/workout" aria-label="Build training program by hand" className="text-[13.5px] font-semibold text-ink-60">Build a training program by hand →</Link>
         </div>
       </div>
     </div>}
