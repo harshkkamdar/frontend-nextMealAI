@@ -200,7 +200,7 @@ export function ChatBubble({ message, sessionId }: { message: ChatMessage; sessi
     <>
       <div className="flex max-w-[85%] flex-col items-start">
         <div className="flex items-start gap-2">
-          <GeoAvatar state="default" size={24} />
+          <GeoAvatar variant="face" state={hasFailures ? 'thinking' : (message.metadata?.actions_taken?.length ? 'happy' : 'default')} size={24} />
           <div className="relative rounded-[18px] rounded-bl-[6px] border border-ink-12 bg-card px-4 py-3 text-[15.5px] leading-[1.4] text-ink">
             <GeoMessageContent content={message.content} />
             {hasFailures && (

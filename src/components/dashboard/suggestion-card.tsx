@@ -27,7 +27,7 @@ export function SuggestionCard({
   return (
     <div className="bg-card border border-ink-12 rounded-[16px] p-[14px]">
       <div className="flex gap-[11px]">
-        <GeoAvatar state="suggest" size={24} />
+        <GeoAvatar variant="face" state="suggest" size={24} />
         <div className="min-w-0 flex-1">
           <p className="text-[15.5px] font-semibold text-ink">{suggestion.title}</p>
           <p className="mt-0.5 text-[13.5px] font-normal text-ink-62">{suggestion.description}</p>

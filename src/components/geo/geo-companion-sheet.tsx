@@ -246,7 +246,7 @@ export function GeoCompanionSheet() {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-ink-10 px-gutter pb-3">
               <div className="flex items-center gap-2.5">
-                <GeoAvatar state="default" size={32} />
+                <GeoAvatar variant="face" state="happy" size={32} />
                 <div>
                   <span className="text-[17px] font-bold text-ink">Geo</span>
                   <div className="flex items-center gap-1">
@@ -283,7 +283,7 @@ export function GeoCompanionSheet() {
                 </div>
               ) : messages.length === 0 && !isTyping ? (
                 <div className="flex flex-col items-center justify-center py-6 gap-2">
-                  <GeoAvatar state="happy" size={48} />
+                  <GeoAvatar variant="face" state="happy" size={48} />
                   <p className="text-center text-[15.5px] text-ink-60">
                     Hey! What can I help you with?
                   </p>

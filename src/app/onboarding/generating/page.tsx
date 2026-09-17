@@ -28,7 +28,7 @@ export default function GeneratingPage() {
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6">
-      <GeoAvatar state="thinking" size={64} />
+      <GeoAvatar variant="face" state="thinking" size={64} />
 
       <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
         Building your plan…
