@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, cleanup, act } from '@testing-library/react'
+import { render, screen, cleanup, act, fireEvent } from '@testing-library/react'
 import { RestTimer } from '../rest-timer'
 
 function advance(ms: number) {
@@ -114,5 +114,44 @@ describe('FB-05 RestTimer resetToken behavior (AC01.4, AC01.5)', () => {
       />
     )
     expect(screen.getByText(/1:00/)).toBeInTheDocument()
+  })
+
+  it('renders the FIQR adjust controls and changes the countdown', () => {
+    render(
+      <RestTimer
+        isActive={true}
+        duration={90}
+        onSkip={vi.fn()}
+        onComplete={vi.fn()}
+      />
+    )
+
+    const subtract = screen.getByRole('button', { name: 'Subtract 15 seconds' })
+    const add = screen.getByRole('button', { name: 'Add 15 seconds' })
+    expect(subtract).toHaveTextContent('−15')
+    expect(add).toHaveTextContent('+15')
+
+    fireEvent.click(add)
+    expect(screen.getByText('1:45')).toBeInTheDocument()
+    fireEvent.click(subtract)
+    expect(screen.getByText('1:30')).toBeInTheDocument()
+  })
+
+  it('calls onSkip and can minimise then expand the timer', () => {
+    const onSkip = vi.fn()
+    render(
+      <RestTimer
+        isActive={true}
+        duration={60}
+        onSkip={onSkip}
+        onComplete={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Minimise rest timer' }))
+    expect(screen.getByRole('dialog', { name: 'Rest timer (minimised)' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Expand rest timer' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Skip rest timer' }))
+    expect(onSkip).toHaveBeenCalledTimes(1)
   })
 })
