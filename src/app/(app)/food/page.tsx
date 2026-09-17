@@ -4,27 +4,29 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { CalendarStrip } from '@/components/shared/calendar-strip'
-import { MacroProgress } from '@/components/shared/macro-progress'
 import { MealGroup } from '@/components/diary/meal-group'
 import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
 import { NameFavouriteDialog } from '@/components/shared/name-favourite-dialog'
 import { CopyMealDialog } from '@/components/diary/copy-meal-dialog'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { OfflineBand } from '@/components/shared/offline-band'
+import { MacroBar } from '@/components/ui/fiqr/macro-bar'
+import { PrimaryButton as FoodActionButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { toast } from 'sonner'
-import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
+import { getLogs } from '@/lib/api/logs.api'
 import { copyMeal } from '@/lib/api/meals.api'
 import { createFavourite } from '@/lib/api/favourites.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { todayLocalISO } from '@/lib/timezone'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
-import { formatWeekMonthLabel } from '@/lib/month-label'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import type { MealPlan } from '@/types/plans.types'
-import type { Profile } from '@/types/profile.types'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
@@ -48,12 +50,8 @@ export default function DiaryPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stale read of selectedDate; see comment above
   }, [tz])
-  const [logs, setLogs] = useState<Log[]>([])
   const [nameFavFor, setNameFavFor] = useState<string | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
-  const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedMealType, setSelectedMealType] = useState<string>('Breakfast')
   const [monthOpen, setMonthOpen] = useState(false)
@@ -73,32 +71,30 @@ export default function DiaryPage() {
     const diff = Math.round((Date.parse(today) - Date.parse(selectedDate)) / 86_400_000)
     return Math.max(30, (Number.isFinite(diff) ? diff : 0) + 7)
   }, [today, selectedDate])
-  const firstLoadRef = useRef(true)
-
   const fetchData = useCallback(async () => {
-    if (firstLoadRef.current) setLoading(true)
-    try {
-      const [logsRes, plansRes, profileRes] = await Promise.all([
-        getLogs({ type: 'food', days: neededDays }).catch(() => [] as Log[]),
-        getPlans({ type: 'meal', active_only: true }).catch(() => []),
-        getProfile().catch(() => null)
-      ])
-      setLogs(logsRes)
-      const meal = plansRes.find((p) => p.type === 'meal') as MealPlan | undefined
-      setMealPlan(meal ?? null)
-      setProfile(profileRes)
-    } finally {
-      setLoading(false)
-      firstLoadRef.current = false
-    }
+    const [logsRes, plansRes, profileRes] = await Promise.all([
+      getLogs({ type: 'food', days: neededDays }),
+      getPlans({ type: 'meal', active_only: true }),
+      getProfile(),
+    ])
+    const meal = plansRes.find((p) => p.type === 'meal') as MealPlan | undefined
+    return { logs: logsRes, mealPlan: meal ?? null, profile: profileRes }
   }, [neededDays])
 
-  useEffect(() => { fetchData() }, [fetchData])
+  const { data, loading, refetch } = useCachedQuery(
+    `food:${selectedDate}`,
+    fetchData,
+    [neededDays],
+  )
+
+  const logs = useMemo(() => data?.logs ?? [], [data?.logs])
+  const mealPlan = data?.mealPlan ?? null
+  const profile = data?.profile ?? null
 
   // FB-R6.7 Build B — chat→UI sync. When Geo logs/edits/deletes a meal OR
   // updates the active nutrition plan via chat, the diary reflects it
   // (logs list + macro bar targets) without a manual refresh.
-  useSyncRefetch(['logs:*', 'plans:updated'], fetchData)
+  useSyncRefetch(['logs:*', 'plans:updated'], refetch)
 
   // Filter logs for selected date — FB-12: prefer the user-local bucket date
   // so 7:21 AM logs land under "today" regardless of UTC offset. Falls back
@@ -112,7 +108,7 @@ export default function DiaryPage() {
       const logDate = log.local_date ?? todayLocalISO(tz, new Date(log.created_at))
       return logDate === selectedDate && log.type === 'food'
     })
-  }, [logs, selectedDate])
+  }, [logs, selectedDate, tz])
 
   // Group by meal type
   const groupedMeals = useMemo(() => {
@@ -148,7 +144,7 @@ export default function DiaryPage() {
   }, [dayLogs])
 
   // Targets: active nutrition plan first, then the user's profile targets, then
-  // 0 (MacroProgress drops the "left" suffix gracefully). No hardcoded numbers —
+  // 0. No hardcoded numbers —
   // a 2000-cal default was wrong for anyone whose real target differs.
   const planTargets = mealPlan?.content?.daily_targets
   const targets = {
@@ -157,18 +153,6 @@ export default function DiaryPage() {
     carbs: planTargets?.carbs ?? profile?.daily_carbs_g ?? 0,
     fat: planTargets?.fat ?? profile?.daily_fat_g ?? 0,
   }
-
-  // FB-07: month label for the current ±3 day window
-  const weekLabel = useMemo(() => {
-    const center = new Date(selectedDate + 'T12:00:00')
-    const weekDates: string[] = []
-    for (let offset = -3; offset <= 3; offset++) {
-      const d = new Date(center)
-      d.setDate(d.getDate() + offset)
-      weekDates.push(d.toISOString().split('T')[0])
-    }
-    return formatWeekMonthLabel(weekDates)
-  }, [selectedDate])
 
   // Calendar indicators — FB-12: bucket the dot under the user's local date.
   const indicators = useMemo(() => {
@@ -180,7 +164,7 @@ export default function DiaryPage() {
       map.set(d, existing)
     }
     return map
-  }, [logs])
+  }, [logs, tz])
 
   // R6-12 — "Add food" now opens the dedicated full-page logger (favourites +
   // recents first, multi-add), bucketed to the viewed meal + date. Returning
@@ -210,7 +194,7 @@ export default function DiaryPage() {
           ? `Copied ${source} to today's ${targetMeal} — ${r.copied} item${r.copied === 1 ? '' : 's'}`
           : `Nothing to copy from ${source}`,
       )
-      if (r.copied > 0) fetchData()
+      if (r.copied > 0) refetch()
     } catch {
       toast.error('Failed to copy meal')
     }
@@ -234,7 +218,7 @@ export default function DiaryPage() {
 
   const handleFoodLogged = () => {
     // Refresh data after logging
-    fetchData()
+    refetch()
     setSearchOpen(false)
   }
 
@@ -249,68 +233,100 @@ export default function DiaryPage() {
     setSearchOpen(true)
   }
 
-  const handleLogUpdated = (logId: string, payload: FoodPayload) => {
-    setLogs((prev) => prev.map((l) => (l.id === logId ? { ...l, payload } : l)))
+  const handleLogUpdated = (_logId: string, _payload: FoodPayload) => {
+    refetch()
     setEditingLog(null)
   }
 
-  const handleLogDeleted = (logId: string) => {
-    setLogs((prev) => prev.filter((l) => l.id !== logId))
+  const handleLogDeleted = (_logId: string) => {
+    refetch()
     setEditingLog(null)
   }
+
+  const selectedDay = new Date(`${selectedDate}T12:00:00`)
+  const monthLabel = selectedDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
+  const dayLabel = selectedDay.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric' })
 
   return (
-    <PageWrapper>
-      <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-text-primary mb-4">
-        Food Diary
-      </h1>
+    <PageWrapper className="space-y-6">
+      <header className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50">{monthLabel}</p>
+          <p className="text-[22px] font-semibold tracking-[-0.4px] text-ink">{dayLabel}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setMonthOpen(true)}
+          aria-label="Open month view"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-60"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M3 10h18M8 3v4M16 3v4" />
+          </svg>
+        </button>
+      </header>
+
+      <OfflineBand />
 
       <CalendarStrip
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
         indicators={indicators}
-        label={weekLabel}
-        onLabelClick={() => setMonthOpen(true)}
         tz={tz}
       />
 
       {loading ? (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-4">
           <CardSkeleton />
           <CardSkeleton />
           <CardSkeleton />
         </div>
       ) : (
-        <div className="space-y-4 mt-4">
-          <MacroProgress
-            calories={{ consumed: dayTotals.calories, target: targets.calories }}
-            protein={{ consumed: dayTotals.protein, target: targets.protein }}
-            carbs={{ consumed: dayTotals.carbs, target: targets.carbs }}
-            fat={{ consumed: dayTotals.fat, target: targets.fat }}
-            foodLogs={dayLogs}
-          />
+        <div className="space-y-6">
+          <section>
+            <SectionLabel className="mb-3">This day</SectionLabel>
+            <div className="flex flex-col gap-[13px]">
+              <MacroBar name="Calories" current={dayTotals.calories} target={targets.calories} />
+              <MacroBar name="Protein" current={dayTotals.protein} target={targets.protein} unit="g" />
+              <MacroBar name="Carbs" current={dayTotals.carbs} target={targets.carbs} unit="g" />
+              <MacroBar name="Fat" current={dayTotals.fat} target={targets.fat} unit="g" />
+            </div>
 
-          {mealPlan && (
-            <button
-              onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
-              className="text-xs text-accent hover:underline"
+            {mealPlan && (
+              <button
+                onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
+                className="mt-4 text-[13.5px] font-semibold text-ink-60"
+              >
+                View nutrition plan &rarr;
+              </button>
+            )}
+          </section>
+
+          <div className="space-y-6">
+            {MEAL_TYPES.map((mealType) => (
+              <MealGroup
+                key={mealType}
+                mealType={mealType}
+                items={groupedMeals[mealType] || []}
+                onAddFood={() => handleAddFood(mealType)}
+                onEditLog={handleEditLog}
+                isToday={selectedDate === today}
+                onCopyToToday={() => handleCopyToToday(mealType)}
+                onSaveFavourite={() => handleSaveFavourite(mealType)}
+              />
+            ))}
+          </div>
+
+          <div className="sticky z-20" style={{ bottom: 'calc(96px + var(--safe-bottom))' }}>
+            <FoodActionButton
+              icon="+"
+              trailing="Scan · Search"
+              onClick={() => router.push(`/logs/new/food?date=${selectedDate}`)}
             >
-              View nutrition plan &rarr;
-            </button>
-          )}
-
-          {MEAL_TYPES.map((mealType) => (
-            <MealGroup
-              key={mealType}
-              mealType={mealType}
-              items={groupedMeals[mealType] || []}
-              onAddFood={() => handleAddFood(mealType)}
-              onEditLog={handleEditLog}
-              isToday={selectedDate === today}
-              onCopyToToday={() => handleCopyToToday(mealType)}
-              onSaveFavourite={() => handleSaveFavourite(mealType)}
-            />
-          ))}
+              Log food
+            </FoodActionButton>
+          </div>
         </div>
       )}
 

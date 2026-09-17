@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { ResizableSheet } from '@/components/ui/resizable-sheet'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { Search, Star, X, Plus, Minus, MessageCircle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
@@ -33,11 +35,11 @@ function FoodRow({ food, onSelect, onToggleFavorite }: {
           onSelect(food)
         }
       }}
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-hover transition-colors text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent"
+      className="flex min-h-14 w-full cursor-pointer items-center gap-3 px-[14px] py-3 text-left outline-none focus:bg-ink-08"
     >
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-text-primary truncate">{food.name}</p>
-        <p className="text-[11px] text-text-tertiary">
+        <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
+        <p className="text-[13px] text-ink-55">
           {formatMacroKcal(food.macros_per_serving.calories)} cal
           {food.serving_size_g ? ` · per ${food.serving_size_g}g` : ''}
           {food.brand ? ` · ${food.brand}` : ''}
@@ -51,13 +53,13 @@ function FoodRow({ food, onSelect, onToggleFavorite }: {
           className="p-1 shrink-0"
         >
           <Star
-            className={`w-4 h-4 ${food.is_favorite ? 'fill-warning text-warning' : 'text-text-tertiary'}`}
+            className={`size-4 ${food.is_favorite ? 'fill-ink text-ink' : 'text-ink-50'}`}
           />
         </button>
       )}
 
-      <div className="w-8 h-8 rounded-full bg-accent-light flex items-center justify-center shrink-0">
-        <Plus className="w-4 h-4 text-accent" />
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink-08">
+        <Plus className="size-4 text-ink" />
       </div>
     </div>
   )
@@ -104,6 +106,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   const [favourites, setFavourites] = useState<Favourite[]>([])
   const [loggingFav, setLoggingFav] = useState<string | null>(null)
   const [confirmDeleteFav, setConfirmDeleteFav] = useState<string | null>(null)
+  const [confirmDeleteEdit, setConfirmDeleteEdit] = useState(false)
   // Add-food sheet has two tabs: search individual Foods, or log a saved Meal.
   const [activeTab, setActiveTab] = useState<'food' | 'meals'>('food')
   const [mealQuery, setMealQuery] = useState('')
@@ -564,18 +567,19 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   } : null
 
   return (
-    <ResizableSheet open={isOpen} onClose={onClose} ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'} levels={[0.4, 0.7, 0.94]} defaultLevelIndex={mode === 'edit' ? 0 : 1}>
+    <>
+      <ResizableSheet open={isOpen} onClose={onClose} ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'} levels={[0.4, 0.7, 0.94]} defaultLevelIndex={mode === 'edit' ? 0 : 1}>
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
-              <h2 id="food-sheet-title" className="text-base font-semibold text-text-primary">
+              <h2 id="food-sheet-title" className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
                 {mode === 'edit'
                   ? `Edit ${(existingLog?.payload as FoodPayload | undefined)?.food_name ?? 'food'}`
                   : pending.length > 0
                     ? `Add to ${mealType} · ${pending.length} in meal`
                     : `Add to ${mealType}`}
               </h2>
-              <button onClick={onClose} aria-label="Close" className="p-1.5 rounded-full hover:bg-surface-hover">
-                <X className="w-4 h-4 text-text-secondary" />
+              <button onClick={onClose} aria-label="Close" className="rounded-full p-1.5 text-ink-60">
+                <X className="size-5" />
               </button>
             </div>
 
@@ -586,31 +590,31 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 {mode !== 'edit' && (
                   <button
                     onClick={() => setSelectedFood(null)}
-                    className="text-xs text-accent mb-3 hover:underline"
+                    className="mb-3 text-[13.5px] font-semibold text-ink-60"
                   >
                     &larr; Back to search
                   </button>
                 )}
 
-                <div className="bg-surface border border-border rounded-xl p-4 mb-4">
-                  <p className="text-base font-semibold text-text-primary">{selectedFood.name}</p>
+                <div className="mb-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
+                  <p className="text-[15.5px] font-semibold text-ink">{selectedFood.name}</p>
                   {selectedFood.brand && (
-                    <p className="text-xs text-text-secondary">{selectedFood.brand}</p>
+                    <p className="text-[13px] text-ink-55">{selectedFood.brand}</p>
                   )}
-                  <p className="text-[11px] text-text-tertiary mt-1">
+                  <p className="mt-1 text-[13px] text-ink-55">
                     Per serving ({selectedFood.serving_size_g}g)
                   </p>
                 </div>
 
                 {/* Input mode toggle */}
                 <div className="mb-4">
-                  <div className="flex rounded-lg bg-surface border border-border p-0.5 mb-3">
+                  <div className="mb-3 flex gap-2">
                     <button
                       onClick={() => setInputMode('servings')}
-                      className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`h-9 flex-1 rounded-full px-3 text-[13.5px] font-semibold ${
                         inputMode === 'servings'
-                          ? 'bg-accent text-white'
-                          : 'text-text-secondary hover:text-text-primary'
+                          ? 'bg-ink text-cream'
+                          : 'bg-ink-08 text-ink'
                       }`}
                     >
                       Servings
@@ -620,10 +624,10 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                         setInputMode('grams')
                         setGrams(Math.round((selectedFood?.serving_size_g || 100) * servings))
                       }}
-                      className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`h-9 flex-1 rounded-full px-3 text-[13.5px] font-semibold ${
                         inputMode === 'grams'
-                          ? 'bg-accent text-white'
-                          : 'text-text-secondary hover:text-text-primary'
+                          ? 'bg-ink text-cream'
+                          : 'bg-ink-08 text-ink'
                       }`}
                     >
                       Grams
@@ -635,7 +639,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                       <button
                         onClick={() => setServings(Math.max(0.25, servings - 0.25))}
                         aria-label="Decrease servings"
-                        className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                        className="flex size-10 items-center justify-center rounded-full bg-ink-08 text-ink"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
@@ -650,12 +654,12 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                         }}
                         onBlur={() => { if (!servings || servings < 0.25) setServings(0.25) }}
                         aria-label="Servings"
-                        className="w-20 text-xl font-semibold text-text-primary tabular-nums text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="h-14 w-24 rounded-[15px] border border-ink-16 bg-card px-4 text-center text-[17px] font-semibold tabular-nums text-ink outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                       <button
                         onClick={() => setServings(servings + 0.25)}
                         aria-label="Increase servings"
-                        className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                        className="flex size-10 items-center justify-center rounded-full bg-ink-08 text-ink"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -665,7 +669,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                       <button
                         onClick={() => setGrams(Math.max(1, (grams || 0) - 10))}
                         aria-label="Decrease grams"
-                        className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                        className="flex size-10 items-center justify-center rounded-full bg-ink-08 text-ink"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
@@ -681,14 +685,14 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                           }}
                           onBlur={() => { if (grams === '' || grams === 0) setGrams(1) }}
                           aria-label="Grams"
-                          className="w-20 text-xl font-semibold text-text-primary tabular-nums text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="h-14 w-24 rounded-[15px] border border-ink-16 bg-card px-4 text-center text-[17px] font-semibold tabular-nums text-ink outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
-                        <span className="text-sm text-text-tertiary">g</span>
+                        <span className="text-[13px] text-ink-55">g</span>
                       </div>
                       <button
                         onClick={() => setGrams((grams || 0) + 10)}
                         aria-label="Increase grams"
-                        className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-surface-hover"
+                        className="flex size-10 items-center justify-center rounded-full bg-ink-08 text-ink"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -699,36 +703,36 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 {/* Macro preview */}
                 {calculatedMacros && (
                   <div className="grid grid-cols-4 gap-2 mb-6">
-                    <div className="bg-surface border border-border rounded-lg p-2.5 text-center">
-                      <p className="text-sm font-semibold text-text-primary">{formatMacroKcal(calculatedMacros.calories)}</p>
-                      <p className="text-[9px] text-text-tertiary">kcal</p>
+                    <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
+                      <p className="text-[15.5px] font-semibold text-ink">{formatMacroKcal(calculatedMacros.calories)}</p>
+                      <p className="text-[11px] text-ink-55">kcal</p>
                     </div>
-                    <div className="bg-surface border border-border rounded-lg p-2.5 text-center">
-                      <p className="text-sm font-semibold text-info">{formatMacroGrams(calculatedMacros.protein)}</p>
-                      <p className="text-[9px] text-text-tertiary">protein</p>
+                    <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
+                      <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.protein)}</p>
+                      <p className="text-[11px] text-ink-55">protein</p>
                     </div>
-                    <div className="bg-surface border border-border rounded-lg p-2.5 text-center">
-                      <p className="text-sm font-semibold text-warning">{formatMacroGrams(calculatedMacros.carbs)}</p>
-                      <p className="text-[9px] text-text-tertiary">carbs</p>
+                    <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
+                      <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.carbs)}</p>
+                      <p className="text-[11px] text-ink-55">carbs</p>
                     </div>
-                    <div className="bg-surface border border-border rounded-lg p-2.5 text-center">
-                      <p className="text-sm font-semibold text-purple">{formatMacroGrams(calculatedMacros.fat)}</p>
-                      <p className="text-[9px] text-text-tertiary">fat</p>
+                    <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
+                      <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.fat)}</p>
+                      <p className="text-[11px] text-ink-55">fat</p>
                     </div>
                   </div>
                 )}
 
               </div>
               {/* Sticky footer button(s) */}
-              <div className="px-4 pb-20 pt-2 border-t border-border">
+              <div className="border-t border-ink-12 px-4 pb-20 pt-3">
                 {mode === 'edit' ? (
-                  <div className="flex gap-2">
-                    <Button variant="ghost" onClick={handleDeleteEdit} disabled={saving} className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10">
-                      Delete
-                    </Button>
-                    <Button onClick={handleSaveEdit} disabled={saving || !selectedFood} className="flex-1 bg-accent hover:bg-accent-hover text-white">
+                  <div className="space-y-3">
+                    <PrimaryButton onClick={handleSaveEdit} disabled={saving || !selectedFood} className="justify-center">
                       Save
-                    </Button>
+                    </PrimaryButton>
+                    <button type="button" onClick={() => setConfirmDeleteEdit(true)} disabled={saving} className="w-full text-center text-[15.5px] font-semibold text-ink-60">
+                      Delete entry
+                    </button>
                   </div>
                 ) : (
                   /* FE-RCA F3 — multi-select footer.
@@ -746,17 +750,13 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                       <Plus className="w-4 h-4 mr-1" />
                       Add to meal
                     </Button>
-                    <Button
-                      onClick={handleConfirmLog}
-                      disabled={saving || (inputMode === 'grams' && !grams)}
-                      className="flex-1 bg-accent hover:bg-accent-hover text-white"
-                    >
+                    <PrimaryButton onClick={handleConfirmLog} disabled={saving || (inputMode === 'grams' && !grams)} className="flex-1 justify-center px-3">
                       {saving
                         ? 'Logging...'
                         : pending.length > 0
                           ? `Log meal (${pending.length + 1})`
                           : 'Log Food'}
-                    </Button>
+                    </PrimaryButton>
                   </div>
                 )}
               </div>
@@ -767,16 +767,16 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 {/* Food | Meals tabs (log mode only) */}
                 {mode !== 'edit' && (
                   <div className="px-4 pb-3">
-                    <div className="flex rounded-lg bg-surface border border-border p-0.5">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => setActiveTab('food')}
-                        className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === 'food' ? 'bg-accent text-white' : 'text-text-secondary hover:text-text-primary'}`}
+                        className={`h-9 flex-1 rounded-full px-3 text-[13.5px] font-semibold ${activeTab === 'food' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
                       >
                         Food
                       </button>
                       <button
                         onClick={() => setActiveTab('meals')}
-                        className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 ${activeTab === 'meals' ? 'bg-accent text-white' : 'text-text-secondary hover:text-text-primary'}`}
+                        className={`flex h-9 flex-1 items-center justify-center gap-1 rounded-full px-3 text-[13.5px] font-semibold ${activeTab === 'meals' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
                       >
                         Meals{favourites.length > 0 ? ` · ${favourites.length}` : ''}
                       </button>
@@ -790,13 +790,13 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   {favourites.length > 0 && (
                     <div className="px-4 pb-3">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
+                        <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-50" />
                         <Input
                           type="text"
                           value={mealQuery}
                           onChange={(e) => setMealQuery(e.target.value)}
                           placeholder="Search saved meals..."
-                          className="pl-9 h-10 rounded-xl border-border bg-surface focus-visible:ring-1 focus-visible:ring-accent/40 focus-visible:border-accent"
+                          className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 pl-11 text-[17px] text-ink focus-visible:ring-0"
                         />
                       </div>
                     </div>
@@ -804,9 +804,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   <div className="flex-1 overflow-y-auto px-4 pb-6 min-h-0">
                     {favourites.length === 0 ? (
                       <div className="text-center py-12 space-y-1.5">
-                        <Star className="w-6 h-6 text-text-tertiary mx-auto" />
-                        <p className="text-sm text-text-secondary">No saved meals yet</p>
-                        <p className="text-xs text-text-tertiary px-6">Log a meal, then tap &ldquo;Save as meal&rdquo; on it in your diary to reuse it here.</p>
+                        <Star className="mx-auto size-6 text-ink-50" />
+                        <p className="text-[15.5px] text-ink-60">No saved meals yet</p>
+                        <p className="px-6 text-[13px] text-ink-50">Log a meal, then tap &ldquo;Save as meal&rdquo; on it in your diary to reuse it here.</p>
                       </div>
                     ) : (() => {
                       const q = mealQuery.trim().toLowerCase()
@@ -814,12 +814,12 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                         ? favourites.filter((f) => f.name.toLowerCase().includes(q) || f.items.some((it) => (it.food_name ?? '').toLowerCase().includes(q)))
                         : favourites
                       if (shown.length === 0) {
-                        return <p className="text-center text-sm text-text-tertiary py-10">No saved meals match &ldquo;{mealQuery}&rdquo;</p>
+                        return <p className="py-10 text-center text-[15.5px] text-ink-50">No saved meals match &ldquo;{mealQuery}&rdquo;</p>
                       }
                       return (
-                      <div className="space-y-1.5" role="listbox" aria-label="Saved meals">
+                      <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09" role="listbox" aria-label="Saved meals">
                         {shown.map((f) => (
-                          <div key={f.id} className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface border border-border">
+                          <div key={f.id} className="flex min-h-14 items-center gap-2 px-[14px] py-3">
                             <button
                               onClick={() => handleLogFavourite(f)}
                               disabled={loggingFav === f.id}
@@ -827,21 +827,21 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                               aria-label={`Log ${f.name}`}
                             >
                               <span className="min-w-0">
-                                <span className="block text-sm font-medium text-text-primary truncate">{f.name}</span>
-                                <span className="block text-[11px] text-text-tertiary truncate">
+                                <span className="block truncate text-[15.5px] font-semibold text-ink">{f.name}</span>
+                                <span className="block truncate text-[13px] text-ink-55">
                                   {f.items.length} item{f.items.length === 1 ? '' : 's'}
                                   {f.items.length > 0 ? ` · ${f.items.map((it) => it.food_name).slice(0, 3).join(', ')}${f.items.length > 3 ? '…' : ''}` : ''}
                                 </span>
                               </span>
-                              <span className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-accent">
+                              <span className="inline-flex shrink-0 items-center gap-1 text-[13.5px] font-semibold text-ink">
                                 <Plus className="w-3.5 h-3.5" />
                                 {loggingFav === f.id ? 'Logging…' : 'Log'}
                               </span>
                             </button>
                             {confirmDeleteFav === f.id ? (
-                              <button onClick={() => handleDeleteFavourite(f)} className="shrink-0 text-[10px] text-destructive font-medium px-1.5" aria-label={`Confirm remove ${f.name}`}>Remove?</button>
+                              <button onClick={() => handleDeleteFavourite(f)} className="shrink-0 px-1.5 text-[11px] font-semibold text-ink" aria-label={`Confirm remove ${f.name}`}>Remove?</button>
                             ) : (
-                              <button onClick={() => setConfirmDeleteFav(f.id)} aria-label={`Remove ${f.name}`} className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-text-tertiary hover:text-destructive hover:bg-surface-hover transition-colors">
+                              <button onClick={() => setConfirmDeleteFav(f.id)} aria-label={`Remove ${f.name}`} className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-50">
                                 <X className="w-3.5 h-3.5" />
                               </button>
                             )}
@@ -857,14 +857,14 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 {/* Search input */}
                 <div className="px-4 pb-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
+                    <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-50" />
                     <Input
                       ref={inputRef}
                       type="text"
                       value={query}
                       onChange={(e) => handleSearch(e.target.value)}
                       placeholder="Search foods..."
-                      className="pl-9 h-10 rounded-xl border-border bg-surface focus-visible:ring-1 focus-visible:ring-accent/40 focus-visible:border-accent"
+                      className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 pl-11 text-[17px] text-ink focus-visible:ring-0"
                     />
                   </div>
                 </div>
@@ -874,8 +874,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     user review/remove items before committing the meal. */}
                 {mode !== 'edit' && pending.length > 0 && (
                   <div className="px-4 pb-3">
-                    <div className="bg-surface border border-border rounded-xl p-3 space-y-2">
-                      <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide">
+                    <div className="space-y-2 rounded-[16px] border border-ink-12 bg-card p-[14px]">
+                      <p className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-50">
                         In this meal · {pending.length}
                       </p>
                       <ul className="space-y-1.5">
@@ -885,8 +885,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                             className="flex items-center justify-between gap-2 text-sm"
                           >
                             <div className="min-w-0 flex-1">
-                              <p className="text-text-primary truncate">{item.food.name}</p>
-                              <p className="text-[11px] text-text-tertiary tabular-nums">
+                              <p className="truncate text-[15.5px] font-semibold text-ink">{item.food.name}</p>
+                              <p className="text-[13px] tabular-nums text-ink-55">
                                 {item.inputMode === 'servings'
                                   ? `${item.servings} × ${item.food.serving_size_g ?? 100}g`
                                   : `${item.quantity_g}g`}
@@ -898,20 +898,16 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                               type="button"
                               onClick={() => handleRemovePendingItem(idx)}
                               aria-label={`Remove ${item.food.name}`}
-                              className="p-1 text-text-tertiary hover:text-destructive shrink-0"
+                              className="shrink-0 p-1 text-ink-50"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </li>
                         ))}
                       </ul>
-                      <Button
-                        onClick={handleCommitMeal}
-                        disabled={saving}
-                        className="w-full bg-accent hover:bg-accent-hover text-white"
-                      >
+                      <PrimaryButton onClick={handleCommitMeal} disabled={saving} className="justify-center">
                         {saving ? 'Logging...' : `Log meal (${pending.length})`}
-                      </Button>
+                      </PrimaryButton>
                     </div>
                   </div>
                 )}
@@ -920,12 +916,12 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 <div className="flex-1 overflow-y-auto px-4 pb-4 min-h-0">
                   {searching && (
                     <div className="flex justify-center py-6">
-                      <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                      <div className="size-5 animate-spin rounded-full border-2 border-ink border-t-transparent" />
                     </div>
                   )}
 
                   {!searching && results.length > 0 && (
-                    <div className="space-y-1" role="listbox" aria-label="Food search results">
+                    <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09" role="listbox" aria-label="Food search results">
                       {results.map((food, i) => (
                         <FoodRow
                           key={food.id ?? `usda-${food.usda_fdc_id ?? i}`}
@@ -939,10 +935,10 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
 
                   {!searching && query.length >= 2 && results.length === 0 && (
                     <div className="text-center py-8">
-                      <p className="text-sm text-text-secondary mb-3">No results found</p>
+                      <p className="mb-3 text-[15.5px] text-ink-60">No results found</p>
                       <button
                         onClick={() => { setShowCustomForm(true); setCustomName(query) }}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-full bg-accent hover:bg-accent-hover text-white"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Add &ldquo;{query}&rdquo; as custom food
@@ -952,8 +948,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
 
                   {!searching && query.length < 2 && recentFoods.length > 0 ? (
                     <div>
-                      <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide mb-2">Recent</p>
-                      <div className="space-y-1" role="listbox" aria-label="Recent foods">
+                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-50">Recent</p>
+                      <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09" role="listbox" aria-label="Recent foods">
                         {recentFoods.map((food, i) => (
                           <FoodRow
                             key={food.id ?? `recent-${i}`}
@@ -966,23 +962,23 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     </div>
                   ) : !searching && query.length < 2 ? (
                     <div className="text-center py-8 space-y-4">
-                      <p className="text-sm text-text-tertiary">Type to search foods</p>
+                      <p className="text-[15.5px] text-ink-50">Type to search foods</p>
                     </div>
                   ) : null}
                 </div>
 
                 {/* Bottom actions */}
-                <div className="px-4 pb-4 border-t border-border pt-3 flex items-center justify-between">
+                <div className="flex items-center justify-between border-t border-ink-12 px-4 pb-4 pt-3">
                   <button
                     onClick={handleAskGeo}
-                    className="flex items-center gap-1.5 text-xs text-accent hover:underline"
+                    className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-60"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                     Ask Geo to estimate
                   </button>
                   <button
                     onClick={() => setShowCustomForm(true)}
-                    className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-accent"
+                    className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-60"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Add custom food
@@ -998,70 +994,78 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
               <div className="flex-1 overflow-y-auto px-4 pb-6">
                 <button
                   onClick={() => setShowCustomForm(false)}
-                  className="text-xs text-accent mb-3 hover:underline"
+                  className="mb-3 text-[13.5px] font-semibold text-ink-60"
                 >
                   &larr; Back to search
                 </button>
 
-                <h3 className="text-sm font-semibold text-text-primary mb-4">Create Custom Food</h3>
+                <h3 className="mb-4 text-[22px] font-semibold tracking-[-0.4px] text-ink">Create Custom Food</h3>
 
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <Label className="text-xs text-text-secondary">Food Name</Label>
+                    <Label className="text-[13px] text-ink-60">Food Name</Label>
                     <Input
                       type="text"
                       placeholder="e.g. Mom's Dal Rice"
                       value={customName}
                       onChange={(e) => setCustomName(e.target.value)}
                       autoFocus
+                      className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-xs text-text-secondary">Serving Size (g)</Label>
+                    <Label className="text-[13px] text-ink-60">Serving Size (g)</Label>
                     <Input
                       type="number"
                       placeholder="100"
                       value={customServingG}
                       onChange={(e) => setCustomServingG(e.target.value ? Number(e.target.value) : '')}
+                      className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0"
                     />
                   </div>
 
-                  <p className="text-[10px] font-medium uppercase tracking-wide text-text-tertiary mt-2">Macros per serving</p>
+                  <p className="mt-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-50">Macros per serving</p>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <Label className="text-xs text-text-secondary">Calories</Label>
-                      <Input type="number" placeholder="kcal" value={customCalories} onChange={(e) => setCustomCalories(e.target.value ? Number(e.target.value) : '')} />
+                      <Label className="text-[13px] text-ink-60">Calories</Label>
+                      <Input type="number" placeholder="kcal" value={customCalories} onChange={(e) => setCustomCalories(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs text-text-secondary">Protein (g)</Label>
-                      <Input type="number" placeholder="g" value={customProtein} onChange={(e) => setCustomProtein(e.target.value ? Number(e.target.value) : '')} />
+                      <Label className="text-[13px] text-ink-60">Protein (g)</Label>
+                      <Input type="number" placeholder="g" value={customProtein} onChange={(e) => setCustomProtein(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs text-text-secondary">Carbs (g)</Label>
-                      <Input type="number" placeholder="g" value={customCarbs} onChange={(e) => setCustomCarbs(e.target.value ? Number(e.target.value) : '')} />
+                      <Label className="text-[13px] text-ink-60">Carbs (g)</Label>
+                      <Input type="number" placeholder="g" value={customCarbs} onChange={(e) => setCustomCarbs(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs text-text-secondary">Fat (g)</Label>
-                      <Input type="number" placeholder="g" value={customFat} onChange={(e) => setCustomFat(e.target.value ? Number(e.target.value) : '')} />
+                      <Label className="text-[13px] text-ink-60">Fat (g)</Label>
+                      <Input type="number" placeholder="g" value={customFat} onChange={(e) => setCustomFat(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
                     </div>
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleSaveCustomFood}
-                  disabled={saving || !customName.trim()}
-                  className="w-full bg-accent hover:bg-accent-hover text-white mt-4"
-                >
+                <PrimaryButton onClick={handleSaveCustomFood} disabled={saving || !customName.trim()} className="mt-4 justify-center">
                   {saving ? 'Saving...' : 'Save & Log'}
-                </Button>
+                </PrimaryButton>
 
-                <p className="text-[10px] text-text-tertiary text-center mt-2">
+                <p className="mt-2 text-center text-[11px] text-ink-50">
                   This food will be saved to your personal database for quick access later
                 </p>
               </div>
             )}
-    </ResizableSheet>
+      </ResizableSheet>
+      <ConfirmDialog
+        open={confirmDeleteEdit}
+        onClose={() => setConfirmDeleteEdit(false)}
+        onConfirm={handleDeleteEdit}
+        title="Delete entry?"
+        description="This food entry will be removed from your diary."
+        confirmLabel="Delete entry"
+        variant="danger"
+      />
+    </>
   )
 }

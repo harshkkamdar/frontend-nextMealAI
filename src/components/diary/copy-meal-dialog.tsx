@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 
 const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
@@ -19,9 +20,22 @@ interface CopyMealDialogProps {
  * dialog (no native prompt); sits above the bottom nav (z-[110] > nav z-[100]).
  */
 export function CopyMealDialog({ open, sourceMeal, onClose, onPick }: CopyMealDialogProps) {
+  const [targetMeal, setTargetMeal] = useState<string | null>(null)
+  const selectedMeal = targetMeal ?? sourceMeal ?? 'Breakfast'
+
+  const close = () => {
+    setTargetMeal(null)
+    onClose()
+  }
+
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setTargetMeal(null)
+        onClose()
+      }
+    }
     document.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
@@ -30,32 +44,33 @@ export function CopyMealDialog({ open, sourceMeal, onClose, onPick }: CopyMealDi
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
+    <div className="fixed inset-0 z-[110] flex items-end justify-center">
+      <div className="absolute inset-0 bg-ink/40" onClick={close} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Copy meal to which slot"
-        className="relative z-10 w-[90%] max-w-sm bg-surface border border-border rounded-2xl p-5 shadow-xl animate-in fade-in zoom-in-95 duration-150"
+        className="relative z-10 w-full max-w-md rounded-t-[22px] bg-cream p-[22px]"
       >
-        <h2 className="text-base font-semibold text-text-primary">Copy {sourceMeal} to today</h2>
-        <p className="text-sm text-text-secondary mt-1.5">Which meal should it go under?</p>
-        <div className="grid grid-cols-2 gap-2 mt-4">
+        <h2 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Copy {sourceMeal} to today</h2>
+        <p className="mt-1.5 text-[15.5px] text-ink-60">Which meal should it go under?</p>
+        <div className="mt-4 flex flex-wrap gap-2">
           {MEALS.map((m) => (
             <button
               key={m}
-              onClick={() => onPick(m)}
-              className={`py-2.5 text-sm font-medium rounded-xl border transition-colors ${
-                m === sourceMeal
-                  ? 'border-accent text-accent bg-accent/5'
-                  : 'border-border text-text-primary hover:bg-surface-hover'
+              onClick={() => setTargetMeal(m)}
+              className={`h-9 rounded-full px-3 text-[13.5px] font-semibold ${
+                m === selectedMeal ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
               }`}
             >
               {m}
             </button>
           ))}
         </div>
-        <button onClick={onClose} className="mt-4 w-full py-2 text-sm text-text-secondary hover:text-text-primary">
+        <PrimaryButton onClick={() => { setTargetMeal(null); onPick(selectedMeal) }} className="mt-5 justify-center">
+          Copy meal
+        </PrimaryButton>
+        <button onClick={close} className="mt-3 w-full py-2 text-[15.5px] font-semibold text-ink-60">
           Cancel
         </button>
       </div>

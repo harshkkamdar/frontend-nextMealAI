@@ -68,6 +68,50 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
     expect(screen.queryByRole('button', { name: /expand items/i })).toBeNull()
   })
 
+  it('tapping a simple food row calls onEditLog', () => {
+    const log = makeFoodLog({ id: 'plain' })
+    const onEditLog = vi.fn()
+    render(
+      <MealGroup
+        mealType="Breakfast"
+        items={[log]}
+        onAddFood={() => {}}
+        onEditLog={onEditLog}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /edit breakfast bowl/i }))
+
+    expect(onEditLog).toHaveBeenCalledWith(log)
+  })
+
+  it('the empty meal row calls onAddFood', () => {
+    const onAddFood = vi.fn()
+    render(<MealGroup mealType="Lunch" items={[]} onAddFood={onAddFood} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /nothing logged/i }))
+
+    expect(onAddFood).toHaveBeenCalledOnce()
+  })
+
+  it('hides Copy to today from the overflow sheet when viewing today', () => {
+    render(
+      <MealGroup
+        mealType="Breakfast"
+        items={[makeFoodLog()]}
+        onAddFood={() => {}}
+        isToday
+        onCopyToToday={() => {}}
+        onSaveFavourite={() => {}}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /breakfast actions/i }))
+
+    expect(screen.queryByRole('button', { name: /copy to today/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /save as meal/i })).toBeInTheDocument()
+  })
+
   it('does not render a chevron when items is an empty array', () => {
     const log = makeFoodLog({
       id: 'empty',

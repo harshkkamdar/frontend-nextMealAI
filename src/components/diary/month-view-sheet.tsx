@@ -144,19 +144,19 @@ export function MonthViewSheet({
   return (
     <BottomSheet open={isOpen} onClose={onClose} ariaLabel="Select date">
             {/* Header: prev | title | next | close */}
-            <div className="flex items-center justify-between px-4 pb-3">
+            <div className="flex items-center justify-between px-gutter pb-3">
               <button
                 type="button"
                 onClick={handlePrev}
                 aria-label="Previous month"
-                className="p-2 rounded-full hover:bg-surface-hover"
+                className="rounded-full p-2 text-ink-60"
               >
-                <ChevronLeft className="w-4 h-4 text-text-secondary" />
+                <ChevronLeft className="size-5" />
               </button>
 
               <h2
                 id="month-sheet-title"
-                className="text-base font-semibold text-text-primary tabular-nums"
+                className="text-[22px] font-semibold tracking-[-0.4px] text-ink tabular-nums"
               >
                 {monthTitle(anchor)}
               </h2>
@@ -166,27 +166,27 @@ export function MonthViewSheet({
                   type="button"
                   onClick={handleNext}
                   aria-label="Next month"
-                  className="p-2 rounded-full hover:bg-surface-hover"
+                  className="rounded-full p-2 text-ink-60"
                 >
-                  <ChevronRight className="w-4 h-4 text-text-secondary" />
+                  <ChevronRight className="size-5" />
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
                   aria-label="Close"
-                  className="p-2 rounded-full hover:bg-surface-hover"
+                  className="rounded-full p-2 text-ink-60"
                 >
-                  <X className="w-4 h-4 text-text-secondary" />
+                  <X className="size-5" />
                 </button>
               </div>
             </div>
 
             {/* Weekday header row */}
-            <div className="grid grid-cols-7 gap-1 px-4 pb-1">
+            <div className="grid grid-cols-7 gap-1 px-gutter pb-1">
               {WEEKDAY_LABELS.map((label, i) => (
                 <div
                   key={`${label}-${i}`}
-                  className="text-[10px] font-medium uppercase tracking-[0.08em] text-text-tertiary text-center py-1"
+                  className="py-1 text-center text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-50"
                 >
                   {label}
                 </div>
@@ -195,7 +195,7 @@ export function MonthViewSheet({
 
             {/* Grid body */}
             <div
-              className="flex-1 min-h-0 overflow-y-auto px-4 pb-6"
+              className="min-h-0 flex-1 overflow-y-auto px-gutter pb-6"
               aria-busy={loading || undefined}
             >
               <div className="grid grid-cols-7 gap-1">
@@ -213,18 +213,18 @@ export function MonthViewSheet({
                           : undefined
                       }
                       className={cn(
-                        'aspect-square flex flex-col items-center justify-center gap-0.5 rounded-xl border transition-colors tabular-nums',
+                        'aspect-square flex flex-col items-center justify-center gap-0.5 rounded-[12px] tabular-nums',
                         cell.inMonth
-                          ? 'bg-surface border-border hover:bg-surface-hover text-text-primary'
-                          : 'bg-transparent border-transparent text-text-tertiary/40 cursor-default',
-                        isSelected && cell.inMonth && 'bg-accent border-accent text-white hover:bg-accent',
-                        cell.isToday && cell.inMonth && !isSelected && 'border-accent'
+                          ? 'text-ink'
+                          : 'cursor-default bg-transparent text-ink-35',
+                        cell.isToday && cell.inMonth && 'bg-ink text-cream',
+                        isSelected && cell.inMonth && !cell.isToday && 'border border-ink'
                       )}
                     >
                       <span
                         className={cn(
                           'text-sm font-semibold leading-none',
-                          isSelected && cell.inMonth ? 'text-white' : undefined
+                          cell.isToday && cell.inMonth ? 'text-cream' : undefined
                         )}
                       >
                         {cell.dayNum}
@@ -232,8 +232,8 @@ export function MonthViewSheet({
                       {cell.inMonth && (
                         <span
                           className={cn(
-                            'text-[9px] leading-none',
-                            isSelected ? 'text-white/80' : 'text-text-tertiary'
+                            'text-[11px] leading-none',
+                            cell.isToday ? 'text-cream-55' : 'text-ink-55'
                           )}
                         >
                           {cell.calories !== null ? `${cell.calories}` : '\u2014'}
@@ -242,8 +242,7 @@ export function MonthViewSheet({
                       {cell.inMonth && cell.workouts > 0 && (
                         <span
                           className={cn(
-                            'w-1 h-1 rounded-full',
-                            isSelected ? 'bg-white' : 'bg-info'
+                            'size-1 rounded-full bg-accent'
                           )}
                           aria-hidden="true"
                         />

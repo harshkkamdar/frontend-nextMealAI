@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useEffect, memo, useMemo } from 'react'
-import { CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { todayLocalISO } from '@/lib/timezone'
 
@@ -55,41 +54,33 @@ export const CalendarStrip = memo(function CalendarStrip({
   const todayLocal = useMemo(() => todayLocalISO(tz), [tz])
   const days = useMemo(() => generateDays(selectedDate, todayLocal), [selectedDate, todayLocal])
 
-  // Center-scroll on mount
+  // Center-scroll on mount.
   useEffect(() => {
-    if (scrollRef.current) {
-      const container = scrollRef.current
-      const selected = container.querySelector('[data-selected="true"]') as HTMLElement
-      if (selected) {
-        const offset = selected.offsetLeft - container.offsetWidth / 2 + selected.offsetWidth / 2
-        container.scrollTo({ left: offset, behavior: 'instant' })
-      }
-    }
+    const selected = scrollRef.current?.querySelector('[data-selected="true"]') as HTMLElement | null
+    selected?.scrollIntoView({ inline: 'center', block: 'nearest' })
   }, [])
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {label && (
         onLabelClick ? (
           <button
             type="button"
             onClick={onLabelClick}
             aria-label={`${label} — open month view`}
-            className="flex items-center gap-1.5 px-1 py-0.5 rounded-md text-xs font-medium uppercase tracking-[0.08em] text-text-secondary hover:text-accent transition-colors"
+            className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50"
           >
-            <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{label}</span>
           </button>
         ) : (
-          <div className="flex items-center gap-1.5 px-1 py-0.5 text-xs font-medium uppercase tracking-[0.08em] text-text-secondary">
-            <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
+          <div className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50">
             <span>{label}</span>
           </div>
         )
       )}
     <div
       ref={scrollRef}
-      className="flex gap-1 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4"
+      className="flex gap-2 overflow-x-auto scrollbar-hide -mx-gutter px-gutter"
     >
       {days.map((day) => {
         const isSelected = day.date === selectedDate
@@ -100,45 +91,32 @@ export const CalendarStrip = memo(function CalendarStrip({
             key={day.date}
             data-selected={isSelected}
             onClick={() => onSelectDate(day.date)}
+            aria-label={`${day.date}${day.isToday ? ', today' : ''}`}
             className={cn(
-              'snap-center flex flex-col items-center gap-0.5 min-w-[52px] py-2 px-1.5 rounded-xl transition-colors shrink-0',
-              isSelected
-                ? 'bg-accent text-white'
-                : 'bg-surface border border-border text-text-primary hover:bg-surface-hover'
+              'flex w-11 shrink-0 flex-col items-center gap-1 rounded-[14px] py-2',
+              day.isToday
+                ? 'bg-ink text-cream'
+                : isSelected
+                  ? 'border border-ink text-ink'
+                  : 'text-ink'
             )}
           >
             <span className={cn(
-              'text-[10px] font-medium uppercase tracking-wide',
-              isSelected ? 'text-white/80' : 'text-text-tertiary'
+              'text-[11px] font-semibold uppercase tracking-[1.4px]',
+              day.isToday ? 'text-cream-55' : 'text-ink-62'
             )}>
               {day.dayName}
             </span>
             <span className={cn(
-              'text-base font-semibold',
-              isSelected ? 'text-white' : 'text-text-primary'
+              'text-[17px] font-semibold',
+              day.isToday ? 'text-cream' : 'text-ink'
             )}>
               {day.dayNum}
             </span>
 
-            {/* Indicator dots */}
-            <div className="flex gap-0.5 h-1.5">
-              {day.isToday && !ind?.food && !ind?.workout && (
-                <div className={cn(
-                  'w-1.5 h-1.5 rounded-full',
-                  isSelected ? 'bg-white/60' : 'bg-accent'
-                )} />
-              )}
-              {ind?.food && (
-                <div className={cn(
-                  'w-1.5 h-1.5 rounded-full',
-                  isSelected ? 'bg-white' : 'bg-success'
-                )} />
-              )}
-              {ind?.workout && (
-                <div className={cn(
-                  'w-1.5 h-1.5 rounded-full',
-                  isSelected ? 'bg-white' : 'bg-info'
-                )} />
+            <div className="h-1">
+              {(ind?.food || ind?.workout) && (
+                <div data-indicator="activity" className="size-1 rounded-full bg-accent" />
               )}
             </div>
           </button>

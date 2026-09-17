@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 
 interface NameFavouriteDialogProps {
   open: boolean
@@ -51,16 +52,16 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={() => !loading && onClose()} aria-hidden="true" />
+    <div className="fixed inset-0 z-[100] flex items-end justify-center">
+      <div className="absolute inset-0 bg-ink/40" onClick={() => !loading && onClose()} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="name-fav-title"
-        className="relative z-10 w-[90%] max-w-sm bg-surface border border-border rounded-2xl p-5 shadow-xl animate-in fade-in zoom-in-95 duration-150"
+        className="relative z-10 w-full max-w-md rounded-t-[22px] bg-cream p-[22px]"
       >
-        <h2 id="name-fav-title" className="text-base font-semibold text-text-primary">Save as a meal</h2>
-        <p className="text-sm text-text-secondary mt-1.5">
+        <h2 id="name-fav-title" className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Save as a meal</h2>
+        <p className="mt-1.5 text-[15.5px] text-ink-60">
           {mealType
             ? `Save your ${mealType} as a reusable meal — find it under the Meals tab and log it in one tap next time.`
             : 'Name this meal so you can reuse it later.'}
@@ -73,24 +74,24 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
           placeholder="e.g. Usual Lunch"
           maxLength={60}
           aria-label="Meal name"
-          className="mt-4 w-full px-3 py-2.5 text-sm bg-background border border-border rounded-xl text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/40"
+          className="mt-4 h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none placeholder:text-ink-35"
         />
-        <div className="flex items-center justify-end gap-2.5 mt-5">
+        <div className="mt-5 space-y-3">
+          <PrimaryButton
+            type="button"
+            onClick={submit}
+            disabled={loading || !name.trim()}
+            className="justify-center"
+          >
+            {loading ? 'Saving…' : 'Save'}
+          </PrimaryButton>
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-text-secondary bg-surface border border-border rounded-xl hover:bg-surface-hover transition-colors disabled:opacity-50"
+            className="w-full py-2 text-[15.5px] font-semibold text-ink-60 disabled:opacity-50"
           >
             Cancel
-          </button>
-          <button
-            type="button"
-            onClick={submit}
-            disabled={loading || !name.trim()}
-            className="px-4 py-2 text-sm font-medium rounded-xl bg-accent text-white hover:bg-accent-hover transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Saving…' : 'Save'}
           </button>
         </div>
       </div>
