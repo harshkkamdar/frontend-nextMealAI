@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
@@ -8,34 +8,31 @@ import { toast } from 'sonner'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { PlanOverviewCard } from '@/components/plans/plan-overview-card'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { OfflineBand } from '@/components/shared/offline-band'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { getPlans } from '@/lib/api/plans.api'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { useUIStore } from '@/stores/ui.store'
-import type { MealPlan, Plan, WorkoutPlan } from '@/types/plans.types'
+import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 
 export default function PlansPage() {
   useSetGeoScreen('plans', {})
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [plans, setPlans] = useState<Plan[]>([])
-  const fetchPlans = useCallback(async () => {
-    setLoading(true)
-    try { setPlans(await getPlans({ active_only: true })) }
-    catch (err: unknown) { setPlans([]); toast.error(err instanceof Error ? err.message : 'Failed to load plans') }
-    finally { setLoading(false) }
-  }, [])
-  useEffect(() => { fetchPlans() }, [fetchPlans])
-  useEffect(() => { const handleVisibility = () => { if (!document.hidden) fetchPlans() }; document.addEventListener('visibilitychange', handleVisibility); return () => document.removeEventListener('visibilitychange', handleVisibility) }, [fetchPlans])
-  useSyncRefetch(['plans:*'], fetchPlans)
+  const { data, loading, error, refetch } = useCachedQuery('plans', () => getPlans({ active_only: true }), [])
+  const plans = data ?? []
+  useEffect(() => { if (error) toast.error(error instanceof Error ? error.message : 'Failed to load plans') }, [error])
+  useEffect(() => { const handleVisibility = () => { if (!document.hidden) void refetch() }; document.addEventListener('visibilitychange', handleVisibility); return () => document.removeEventListener('visibilitychange', handleVisibility) }, [refetch])
+  useSyncRefetch(['plans:*'], refetch)
   const mealPlan = (plans.find((plan) => plan.type === 'meal') as MealPlan) ?? null
   const workoutPlan = (plans.find((plan) => plan.type === 'workout') as WorkoutPlan) ?? null
 
   return <PageWrapper>
     <h1 className="mb-6 text-[22px] font-semibold text-ink">Plans</h1>
-    {loading ? <div className="space-y-3"><CardSkeleton /><CardSkeleton /></div> : <div className="space-y-6">
+    <div className="-mx-gutter"><OfflineBand /></div>
+    {loading && !data ? <div className="space-y-3"><CardSkeleton /><CardSkeleton /></div> : <div className="space-y-6">
       <section className="space-y-2.5">
         <SectionLabel>Active</SectionLabel>
         {mealPlan ? <PlanOverviewCard plan={mealPlan} onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)} onEdit={() => router.push(`/plans/edit?id=${mealPlan.id}`)} /> : <MissingRow label="No nutrition plan yet" href="/plans/new/meal" />}

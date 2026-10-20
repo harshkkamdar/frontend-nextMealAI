@@ -1,4 +1,4 @@
-export type LogType = 'food' | 'workout' | 'sleep' | 'mood' | 'energy' | 'water' | 'weight' | 'correction'
+export type LogType = 'food' | 'workout' | 'sleep' | 'mood' | 'energy' | 'water' | 'weight' | 'steps' | 'correction'
 export type LogSource = 'manual' | 'menu_scan' | 'ai_suggestion' | 'quick_log' | 'import'
 
 export interface FoodMacros {
@@ -97,7 +97,12 @@ export interface WeightPayload {
   notes?: string
 }
 
-export type LogPayload = FoodPayload | WorkoutPayload | SleepPayload | MoodPayload | EnergyPayload | WaterPayload | WeightPayload
+export interface StepsPayload {
+  steps: number
+  active_kcal?: number
+}
+
+export type LogPayload = FoodPayload | WorkoutPayload | SleepPayload | MoodPayload | EnergyPayload | WaterPayload | WeightPayload | StepsPayload
 
 export interface Log {
   id: string

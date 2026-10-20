@@ -1,17 +1,19 @@
 'use client'
 
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { Suspense, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { MealPlanDetail } from '@/components/plans/meal-plan-detail'
 import { WorkoutPlanDetail } from '@/components/plans/workout-plan-detail'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { OfflineBand } from '@/components/shared/offline-band'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { getPlan } from '@/lib/api/plans.api'
 import { toast } from 'sonner'
-import type { Plan, MealPlan, WorkoutPlan } from '@/types/plans.types'
+import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 
 export default function PlanDetailPage() {
   return <Suspense fallback={null}><PlanDetailRoute /></Suspense>
@@ -24,32 +26,18 @@ function PlanDetailRoute() {
 }
 
 function PlanDetailView({ id }: { id: string }) {
-  const [loading, setLoading] = useState(true)
-  const [plan, setPlan] = useState<Plan | null>(null)
-
   useSetGeoScreen('plan_detail', { planId: id })
-
-  const fetchPlan = useCallback(async () => {
-    try {
-      const data = await getPlan(id)
-      setPlan(data)
-    } catch {
-      setPlan(null)
-      toast.error('Failed to load plan')
-    } finally {
-      setLoading(false)
-    }
-  }, [id])
-
-  useEffect(() => { fetchPlan() }, [fetchPlan])
+  const { data: plan, loading, error, refetch } = useCachedQuery(`plan:${id}`, () => getPlan(id), [id])
+  useEffect(() => { if (error) toast.error('Failed to load plan') }, [error])
 
   // FB-R6.7 Build B — chat→UI sync. Geo edits this plan in chat → detail
   // view shows the new state without a manual refresh.
-  useSyncRefetch(['plans:updated', 'plans:deactivated'], fetchPlan)
+  useSyncRefetch(['plans:updated', 'plans:deactivated'], refetch)
 
   return (
     <PageWrapper>
-      {loading ? (
+      <div className="-mx-gutter"><OfflineBand /></div>
+      {loading && !plan ? (
         <div className="space-y-4">
           <CardSkeleton />
           <CardSkeleton />

@@ -12,6 +12,7 @@ import {
   Moon,
   Zap,
   History,
+  Footprints,
   type LucideIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -20,7 +21,7 @@ import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { formatMacroKcal } from '@/lib/macros'
-import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload } from '@/types/logs.types'
+import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload, StepsPayload } from '@/types/logs.types'
 
 const FILTERS: { label: string; value: LogType | 'all' }[] = [
   { label: 'All', value: 'all' },
@@ -31,6 +32,7 @@ const FILTERS: { label: string; value: LogType | 'all' }[] = [
   { label: 'Mood', value: 'mood' },
   { label: 'Sleep', value: 'sleep' },
   { label: 'Energy', value: 'energy' },
+  { label: 'Steps', value: 'steps' },
 ]
 
 const FALLBACK_ICON = { icon: ClipboardList, label: 'Activity' } as const
@@ -43,6 +45,7 @@ const TYPE_ICONS: Record<LogType, { icon: LucideIcon; label: string }> = {
   mood: { icon: Smile, label: 'Mood activity' },
   sleep: { icon: Moon, label: 'Sleep activity' },
   energy: { icon: Zap, label: 'Energy activity' },
+  steps: { icon: Footprints, label: 'Steps activity' },
   correction: { icon: History, label: 'Correction activity' },
 }
 
@@ -84,6 +87,8 @@ function getLogDescription(log: Log): string {
       return `${(log.payload as SleepPayload).hours} hours`
     case 'energy':
       return `Energy: ${(log.payload as EnergyPayload).rating}/10`
+    case 'steps':
+      return `${(log.payload as StepsPayload).steps} steps`
     default:
       return log.type
   }
@@ -111,6 +116,8 @@ function getLogMetric(log: Log): string {
       return `${(log.payload as SleepPayload).hours}h`
     case 'energy':
       return `${(log.payload as EnergyPayload).rating}/10`
+    case 'steps':
+      return `${(log.payload as StepsPayload).steps} steps`
     default:
       return ''
   }

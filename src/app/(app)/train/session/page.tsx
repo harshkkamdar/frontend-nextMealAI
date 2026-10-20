@@ -16,6 +16,7 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { unlockAudio } from '@/lib/audio'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
 import { abandonWorkoutSession, completeWorkoutSession, getWorkoutSession, updateWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { writeWorkoutToHealth } from '@/lib/platform/health'
 import { cn } from '@/lib/utils'
 import { computeCompleteSetResult, firstIncompleteExerciseIndex, isExerciseComplete, nextIncompleteExerciseIndex, resolveElapsedForSession } from '@/lib/workout-session'
 import { useUIStore } from '@/stores/ui.store'
@@ -237,6 +238,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     setCompleting(true)
     try {
       const completed = await completeWorkoutSession(sessionId)
+      void writeWorkoutToHealth(completed)
       setSession(completed)
       setShowSummary(true)
       setShowMenu(false)

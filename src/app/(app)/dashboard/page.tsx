@@ -35,12 +35,13 @@ import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { getSuggestions } from '@/lib/api/suggestions.api'
 import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { healthLabel, isHealthConnected } from '@/lib/platform/health'
 import type { MacroKey } from '@/lib/macros'
 import { computeNudges } from '@/lib/nudges'
 import { todayLocalISO } from '@/lib/timezone'
 import { useAuthStore } from '@/stores/auth.store'
 import { useUIStore } from '@/stores/ui.store'
-import type { Log, LogsSummary } from '@/types/logs.types'
+import type { Log, LogsSummary, StepsPayload } from '@/types/logs.types'
 import type { MealPlan, Plan, WorkoutPlan } from '@/types/plans.types'
 import type { Profile } from '@/types/profile.types'
 import type { Suggestion } from '@/types/suggestions.types'
@@ -52,7 +53,6 @@ const EMPTY_PLANS: Plan[] = []
 
 interface DashboardData {
   summary: LogsSummary | null
-  weekSummary: LogsSummary | null
   plans: Plan[]
   suggestions: Suggestion[]
   todayLogs: Log[]
@@ -60,6 +60,7 @@ interface DashboardData {
   weightLogs: Log[]
   checkIn: DashboardCheckIn | null
   recentSleepLogs: Log[]
+  stepLogs: Log[]
 }
 
 async function withFallback<T>(request: Promise<T>, fallback: T): Promise<T> {
@@ -329,12 +330,12 @@ export default function DashboardPage() {
   const [activeSheet, setActiveSheet] = useState<QuickLogType>(null)
   const [activeMacro, setActiveMacro] = useState<MacroKey | null>(null)
   const [hiddenSuggestionIds, setHiddenSuggestionIds] = useState<string[]>([])
+  const [showConnect, setShowConnect] = useState(false)
   const today = todayLocalISO(tz)
 
   const fetchAll = useCallback(async (): Promise<DashboardData> => {
-    const [summary, weekSummary, plans, suggestions, todayLogs, profile, weightLogs, checkInResponse, recentSleepLogs] = await Promise.all([
+    const [summary, plans, suggestions, todayLogs, profile, weightLogs, checkInResponse, recentSleepLogs, stepLogs] = await Promise.all([
       withFallback(getLogsSummary('day'), null),
-      withFallback(getLogsSummary('week'), null),
       withFallback(getPlans({ active_only: true }), [] as Plan[]),
       withFallback(getSuggestions({ status: 'pending' }), [] as Suggestion[]),
       withFallback(getLogs({ days: 1 }), [] as Log[]),
@@ -342,11 +343,11 @@ export default function DashboardPage() {
       withFallback(getLogs({ type: 'weight', limit: 100 }), [] as Log[]),
       withFallback(getDashboardCheckIn(), { check_in: null }),
       withFallback(getLogs({ type: 'sleep', limit: 1 }), [] as Log[]),
+      withFallback(getLogs({ type: 'steps', days: 1 }), [] as Log[]),
     ])
 
     return {
       summary,
-      weekSummary,
       plans,
       suggestions,
       todayLogs,
@@ -354,6 +355,7 @@ export default function DashboardPage() {
       weightLogs,
       checkIn: checkInResponse.check_in,
       recentSleepLogs,
+      stepLogs,
     }
   }, [])
 
@@ -364,6 +366,13 @@ export default function DashboardPage() {
     window.addEventListener('workout:plan-deactivated', refresh)
     return () => window.removeEventListener('workout:plan-deactivated', refresh)
   }, [refresh])
+
+  useEffect(() => {
+    if (healthLabel() === null) return
+    let active = true
+    void isHealthConnected().then((connected) => { if (active) setShowConnect(!connected) })
+    return () => { active = false }
+  }, [])
 
   useSyncRefetch(['plans:*', 'logs:*'], refresh)
   useSetGeoScreen('dashboard', { loading: loading && !data })
@@ -398,7 +407,10 @@ export default function DashboardPage() {
     : data?.recentSleepLogs.length
       ? Number((data.recentSleepLogs[0].payload as { hours?: number }).hours ?? 0)
       : summary?.summary.avg_sleep_hours ?? 0
-  const sessionsThisWeek = data?.weekSummary?.summary?.workout_count ?? 0
+  const stepsTodayLog = data?.stepLogs
+    .filter((log) => log.local_date === today)
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))[0]
+  const stepsToday = stepsTodayLog ? (stepsTodayLog.payload as StepsPayload).steps : null
   const firstName = getDashboardFirstName(profile?.full_name, user?.email)
   const nudges = useMemo(
     () => data ? computeNudges({ todayLogs, summary, mealPlan, workoutPlan, profile }) : [],
@@ -522,9 +534,13 @@ export default function DashboardPage() {
                 unit="h"
               />
             </button>
-            <button type="button" className="text-left" onClick={() => router.push('/train')}>
-              <MetricTile className="h-full" label="Sessions" value={sessionsThisWeek} sub="this week" />
-            </button>
+            {stepsToday === null && showConnect ? (
+              <button type="button" className="text-left" onClick={() => router.push('/settings')}>
+                <MetricTile className="h-full" label="Steps" value="—" sub="Connect Health" />
+              </button>
+            ) : (
+              <MetricTile className="h-full" label="Steps" value={stepsToday === null ? '—' : stepsToday.toLocaleString('en-AU')} sub="today" />
+            )}
           </div>
 
           {profileIncomplete ? (

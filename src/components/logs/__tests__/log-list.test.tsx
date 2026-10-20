@@ -58,13 +58,14 @@ describe('LogList — FB-09 icons + workout title', () => {
     expect(screen.getByText('Workout activity')).toBeInTheDocument()
   })
 
-  it('AC01.1 — renders typed icons for water / weight / mood / sleep / energy', async () => {
+  it('AC01.1 — renders typed icons for water / weight / mood / sleep / energy / steps', async () => {
     await renderWithLogs([
       makeLog({ id: 'wa', type: 'water', payload: { glasses: 2 } }),
       makeLog({ id: 'we', type: 'weight', payload: { weight_kg: 70 } }),
       makeLog({ id: 'mo', type: 'mood', payload: { rating: 8 } }),
       makeLog({ id: 'sl', type: 'sleep', payload: { hours: 7, quality_rating: 8 } }),
       makeLog({ id: 'en', type: 'energy', payload: { rating: 6 } }),
+      makeLog({ id: 'st', type: 'steps', payload: { steps: 8412 } }),
     ])
     // "2 glasses" appears twice (description + metric column) — use findAllByText
     const glasses = await screen.findAllByText('2 glasses')
@@ -74,6 +75,8 @@ describe('LogList — FB-09 icons + workout title', () => {
     expect(screen.getByText('Mood activity')).toBeInTheDocument()
     expect(screen.getByText('Sleep activity')).toBeInTheDocument()
     expect(screen.getByText('Energy activity')).toBeInTheDocument()
+    expect(screen.getByText('Steps activity')).toBeInTheDocument()
+    expect((await screen.findAllByText('8412 steps')).length).toBeGreaterThanOrEqual(1)
   })
 
   // AC02 — workout title fallback

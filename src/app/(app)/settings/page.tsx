@@ -1,18 +1,23 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { DeleteAccountSheet } from '@/components/settings/delete-account-sheet'
 import { SettingsRow, SettingsSection } from '@/components/settings/settings-section'
+import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
 import { downloadExport } from '@/lib/api/account.api'
 import { logout } from '@/lib/api/auth.api'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
 import { getSettings, updateSettings } from '@/lib/api/settings.api'
+import { isNative } from '@/lib/platform'
+import { disconnectHealth, healthLabel, isHealthConnected, lastHealthSync } from '@/lib/platform/health'
+import { isSubscribed, manageSubscription, restorePurchases } from '@/lib/platform/purchases'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth.store'
 import type { Profile } from '@/types/profile.types'
@@ -151,6 +156,10 @@ export default function SettingsPage() {
   const [updatingAi, setUpdatingAi] = useState(false)
   const [showAiConfirm, setShowAiConfirm] = useState(false)
   const [showDeleteAccount, setShowDeleteAccount] = useState(false)
+  const [showHealthConnect, setShowHealthConnect] = useState(false)
+  const [connected, setConnected] = useState(false)
+  const [lastSynced, setLastSynced] = useState<string | null>(null)
+  const [subscribed, setSubscribed] = useState(false)
 
   useEffect(() => {
     Promise.all([getSettings(), getProfile()])
@@ -160,6 +169,19 @@ export default function SettingsPage() {
       })
       .catch(() => toast.error('Failed to load settings'))
       .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    if (isNative()) void isSubscribed().then((value) => { if (active) setSubscribed(value) })
+    if (healthLabel() !== null) {
+      void Promise.all([isHealthConnected(), lastHealthSync()]).then(([nextConnected, nextLastSynced]) => {
+        if (!active) return
+        setConnected(nextConnected)
+        setLastSynced(nextLastSynced)
+      })
+    }
+    return () => { active = false }
   }, [])
 
   useEffect(() => {
@@ -222,6 +244,23 @@ export default function SettingsPage() {
     }
   }
 
+  const handleRestore = async () => {
+    const restored = await restorePurchases()
+    if (restored) setSubscribed(true)
+    toast.success(restored ? 'Subscription restored' : 'No active subscription found')
+  }
+
+  const handleHealthChange = (enabled: boolean) => {
+    if (enabled) {
+      setShowHealthConnect(true)
+      return
+    }
+    void disconnectHealth().then(() => {
+      setConnected(false)
+      setLastSynced(null)
+    })
+  }
+
   const handleLogout = async () => {
     setLoggingOut(true)
     try {
@@ -258,6 +297,11 @@ export default function SettingsPage() {
   const profileName = profile.full_name || user?.email?.split('@')[0] || 'Profile'
   const email = user?.email ?? '---'
   const aiEnabled = Boolean(profile.ai_consent_at)
+  const native = isNative()
+  const healthName = healthLabel()
+  const lastSyncedValue = lastSynced
+    ? new Intl.DateTimeFormat('en-AU', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }).format(new Date(lastSynced))
+    : 'Never'
 
   return (
     <PageWrapper>
@@ -279,6 +323,21 @@ export default function SettingsPage() {
             </span>
             <RowChevron />
           </button>
+        </SettingsSection>
+
+        <SettingsSection title="Subscription">
+          {!native ? (
+            <SettingsRow label="Plan" value="Manage in the FIQR app" />
+          ) : subscribed ? (
+            <SettingsRow label="Plan" value="FIQR Plus" />
+          ) : (
+            <Link href="/paywall" className="min-h-14 w-full px-[14px] flex items-center justify-between text-left text-[15.5px]">
+              <span className="font-medium text-ink">Plan</span>
+              <span className="flex items-center gap-2"><span className="text-[13.5px] text-ink-55">Free</span><RowChevron /></span>
+            </Link>
+          )}
+          {native ? <SettingsRow label="Restore purchases" onClick={() => void handleRestore()} /> : null}
+          {native && subscribed ? <SettingsRow label="Manage subscription" onClick={() => void manageSubscription()} /> : null}
         </SettingsSection>
 
         <SettingsSection title="Library">
@@ -338,6 +397,20 @@ export default function SettingsPage() {
             Your weekly check-in lands on this day.
           </p>
         </div>
+
+        {healthName ? (
+          <div>
+            <SettingsSection title={healthName}>
+              <SettingsRow label="Sync health data">
+                <SettingsSwitch label="Sync health data" checked={connected} onChange={handleHealthChange} />
+              </SettingsRow>
+              <SettingsRow label="Last synced" value={lastSyncedValue} />
+            </SettingsSection>
+            <p className="mt-2 px-[14px] text-[13px] text-ink-55">
+              Reads steps, active energy, weight, sleep and workouts. Saves workouts you finish in FIQR.
+            </p>
+          </div>
+        ) : null}
 
         <SettingsSection title="Geo">
           <div className="px-[14px] py-3 flex flex-wrap gap-2">
@@ -467,6 +540,14 @@ export default function SettingsPage() {
       <DeleteAccountSheet
         open={showDeleteAccount}
         onClose={() => setShowDeleteAccount(false)}
+      />
+      <HealthConnectSheet
+        open={showHealthConnect}
+        onClose={() => setShowHealthConnect(false)}
+        onConnected={() => {
+          setConnected(true)
+          void lastHealthSync().then(setLastSynced)
+        }}
       />
     </PageWrapper>
   )
