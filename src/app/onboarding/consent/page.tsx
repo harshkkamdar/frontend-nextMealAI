@@ -61,7 +61,9 @@ export default function ConsentPage() {
         health_disclaimer_ack: true,
       } as unknown as Parameters<typeof updateProfile>[0])
       useOnboardingStore.getState().setConsent(true)
-      router.push('/onboarding/generating')
+      // Existing users sent here by AuthGate already have plans; return them to the app.
+      const next = new URLSearchParams(window.location.search).get('next')
+      router.push(next?.startsWith('/') && !next.startsWith('//') ? next : '/onboarding/generating')
     } catch {
       toast.error("Couldn't save. Try again.")
     } finally {

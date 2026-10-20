@@ -96,7 +96,7 @@ describe('AuthGate', () => {
 
     render(<AuthGate mode="app">Private</AuthGate>)
 
-    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith('/onboarding/consent'))
+    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith('/onboarding/consent?next=%2Fdashboard'))
     expect(screen.queryByText('Private')).not.toBeInTheDocument()
   })
 

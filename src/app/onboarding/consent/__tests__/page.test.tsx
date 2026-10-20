@@ -59,4 +59,18 @@ describe('ConsentPage', () => {
     expect(useOnboardingStore.getState().consent).toBe('given')
     expect(mocks.push).toHaveBeenCalledWith('/onboarding/generating')
   })
+
+  it('returns an existing user to the page they came from, never off-site', async () => {
+    mocks.updateProfile.mockResolvedValue({})
+    for (const [search, target] of [['?next=%2Fplans', '/plans'], ['?next=%2F%2Fevil.com', '/onboarding/generating']]) {
+      mocks.push.mockReset()
+      window.history.replaceState(null, '', `/onboarding/consent${search}`)
+      const { unmount } = render(<ConsentPage />)
+      screen.getAllByRole('checkbox').forEach((box) => fireEvent.click(box))
+      fireEvent.click(screen.getByRole('button', { name: 'Agree and continue' }))
+      await waitFor(() => expect(mocks.push).toHaveBeenCalledWith(target))
+      unmount()
+    }
+    window.history.replaceState(null, '', '/')
+  })
 })

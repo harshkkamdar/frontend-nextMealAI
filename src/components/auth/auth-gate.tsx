@@ -59,7 +59,7 @@ export function AuthGate({ children, mode }: { children: React.ReactNode; mode: 
       return
     }
     if (mode === 'app' && status === 'complete' && consent === 'missing') {
-      router.replace('/onboarding/consent')
+      router.replace(`/onboarding/consent?next=${encodeURIComponent(pathname)}`)
       return
     }
     if (mode === 'onboarding' && status === 'complete' && consent === 'given' && !isConsentPath && !pathname.startsWith('/onboarding/generating') && !pathname.startsWith('/onboarding/review')) {
