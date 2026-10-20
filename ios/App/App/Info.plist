@@ -70,6 +70,10 @@
 	<string>FIQR uses the camera to photograph meals and menus so Geo can estimate nutrition.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>FIQR lets you pick meal and menu photos for Geo to analyse.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>FIQR reads your steps, active energy, weight, sleep and workouts so Geo can coach from your real activity.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>FIQR saves the workouts you finish in FIQR to Apple Health.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>
