@@ -145,6 +145,7 @@ Gate: `npm run type-check`, `npm run lint`, `npx vitest run`, `npm run build`, `
 - **Check the privacy policy against reality**: deletion "within 24 hours", request logs "kept for 30 days", backups "roll off within 30 days".
 - **Paywall copy is a placeholder.** The "Terms of use" link points to Apple's standard EULA, which is wrong on Android; it needs a terms page, or a per-platform link.
 - **Nothing sits behind the paywall yet**; George decides by week 6.
+- **Running the backend unit tests with a real `.env` writes to that Supabase project.** `tests/setup.ts` loads `nextmealai/.env` and, when it finds keys, deletes and recreates six `@example.com` test users and deletes `newuser@example.com`; no real user accounts are touched. With the production keys that is production auth. CI uses placeholder values, so it never connects. Point your local `.env` at a non-production project before running tests, or make the seeding opt-in.
 - **Settings calls `/v1/admin/metrics` for every user** to decide whether to show the admin link, so non-admins log a 403 each time. It's harmless but noisy.
 - **Not yet reviewed visually**: the live workout screen (starting one writes a real session), the Health connect sheet and the purchase flow (both native only).
 - **Decisions to confirm with George**: calorie floors of 1,200 kcal (women) and 1,500 (men); 5 of 7 days logged before a check-in gives a verdict; the Geo avatar.
