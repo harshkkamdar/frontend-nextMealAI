@@ -27,6 +27,7 @@ import { todayLocalISO } from '@/lib/timezone'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import type { MealPlan } from '@/types/plans.types'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
@@ -81,7 +82,7 @@ export default function DiaryPage() {
     return { logs: logsRes, mealPlan: meal ?? null, profile: profileRes }
   }, [neededDays])
 
-  const { data, loading, refetch } = useCachedQuery(
+  const { data, loading, error, refetch } = useCachedQuery(
     `food:${selectedDate}`,
     fetchData,
     [neededDays],
@@ -282,6 +283,8 @@ export default function DiaryPage() {
           <CardSkeleton />
           <CardSkeleton />
         </div>
+      ) : !data && error ? (
+        <ErrorState onRetry={() => void refetch()}>I couldn&apos;t load this day. Check your connection and try again.</ErrorState>
       ) : (
         <div className="space-y-6">
           <section>

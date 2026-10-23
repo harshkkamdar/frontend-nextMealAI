@@ -286,8 +286,8 @@ export function FoodLogForm() {
     try {
       const est = await estimateFoodFromPhoto(await compressImage(file))
       populateFromEstimate(est)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Photo estimate failed')
+    } catch {
+      toast.error("I couldn't read that photo. Try another angle with the whole plate in frame, or search for the food.")
     } finally {
       setEstimating(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -543,12 +543,14 @@ export function FoodLogForm() {
 
       {foodName ? (
         <div ref={formRef} className="mt-7 space-y-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-          <input
-            type="text"
+          {/* Wraps instead of clipping: photo estimates name the whole plate. */}
+          <textarea
+            rows={1}
+            aria-label="Food name"
             placeholder="e.g. Grilled chicken breast"
             value={foodName}
             onChange={(event) => { setFoodName(event.target.value); setUserFoodId(null); setMacroBasisPerG(null) }}
-            className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+            className="field-sizing-content min-h-14 w-full resize-none rounded-[15px] border border-ink-16 bg-card px-4 py-[15px] text-[15.5px] font-semibold leading-[1.35] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
           />
 
           {servingSizeG && servingSizeG > 0 ? (

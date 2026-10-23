@@ -224,7 +224,7 @@ export default function FoodsPage() {
         <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
         <input
           type="text"
-          placeholder="Search foods, brands, or describe it"
+          placeholder="Search your foods"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-11 text-[17px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"

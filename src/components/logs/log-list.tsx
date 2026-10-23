@@ -22,6 +22,7 @@ import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { formatMacroKcal } from '@/lib/macros'
 import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload, StepsPayload } from '@/types/logs.types'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
 
 const FILTERS: { label: string; value: LogType | 'all' }[] = [
   { label: 'All', value: 'all' },
@@ -145,6 +146,8 @@ interface LogListProps {
 export function LogList({ filterType }: LogListProps = {}) {
   const [logs, setLogs] = useState<Log[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadFailed, setLoadFailed] = useState(false)
+  const [reload, setReload] = useState(0)
   const [filter, setFilter] = useState<LogType | 'all'>('all')
   const [selectMode, setSelectMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -197,14 +200,16 @@ export function LogList({ filterType }: LogListProps = {}) {
         if (filter !== 'all') params.type = filter
         const data = await getLogs(params)
         setLogs(data)
+        setLoadFailed(false)
       } catch {
         setLogs([])
+        setLoadFailed(true)
       } finally {
         setLoading(false)
       }
     }
     fetchLogs()
-  }, [filter])
+  }, [filter, reload])
 
   return (
     <div>
@@ -240,6 +245,8 @@ export function LogList({ filterType }: LogListProps = {}) {
           <CardSkeleton />
           <CardSkeleton />
         </div>
+      ) : loadFailed ? (
+        <ErrorState onRetry={() => setReload((n) => n + 1)}>I couldn&apos;t load your recent logs. Check your connection and try again.</ErrorState>
       ) : logs.length === 0 ? (
         <EmptyState
           icon={ClipboardList}
