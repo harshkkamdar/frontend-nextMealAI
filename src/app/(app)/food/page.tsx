@@ -244,21 +244,21 @@ export default function DiaryPage() {
   }
 
   const selectedDay = new Date(`${selectedDate}T12:00:00`)
-  const monthLabel = selectedDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
-  const dayLabel = selectedDay.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric' })
+  const monthLabel = selectedDay.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' }).toUpperCase()
+  const dayLabel = `${selectedDay.toLocaleDateString('en-AU', { weekday: 'long' })} ${selectedDay.getDate()}`
 
   return (
     <PageWrapper className="space-y-6">
       <header className="flex items-center justify-between gap-4">
         <div>
           <p className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65">{monthLabel}</p>
-          <p className="text-[22px] font-semibold tracking-[-0.4px] text-ink">{dayLabel}</p>
+          <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">{dayLabel}</h1>
         </div>
         <button
           type="button"
           onClick={() => setMonthOpen(true)}
           aria-label="Open month view"
-          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-65"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-65"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -318,7 +318,7 @@ export default function DiaryPage() {
             ))}
           </div>
 
-          <div className="sticky z-20" style={{ bottom: 'calc(96px + var(--safe-bottom))' }}>
+          <div className="sticky z-20 -mx-gutter bg-cream px-gutter pb-7 pt-3" style={{ bottom: 'calc(68px + var(--safe-bottom))' }}>
             <FoodActionButton
               icon="+"
               trailing="Scan · Search"

@@ -79,7 +79,7 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
           <SectionLabel>{mealType}</SectionLabel>
           {calories > 0 ? <span className="text-[11.5px] font-semibold text-ink-65">· {formatMacroKcal(calories)} kcal</span> : null}
         </div>
-        <button type="button" onClick={() => setActionsOpen(true)} aria-label={`${mealType} actions`} className="flex size-6 shrink-0 items-center justify-center text-ink-65">
+        <button type="button" onClick={() => setActionsOpen(true)} aria-label={`${mealType} actions`} className="-my-[10px] -mr-[10px] flex size-11 shrink-0 items-center justify-center text-ink-65">
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="currentColor">
             <circle cx="5" cy="12" r="1.5" />
             <circle cx="12" cy="12" r="1.5" />
@@ -92,7 +92,7 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
         {items.length === 0 ? (
           <button type="button" onClick={onAddFood} className="flex min-h-14 w-full items-center justify-between gap-3 px-[14px] py-3 text-left">
             <span className="text-[15.5px] text-ink-65">Nothing logged</span>
-            <span className="text-[13.5px] font-semibold text-ink">+</span>
+            <span className="text-[13.5px] font-semibold text-ink">+ Add</span>
           </button>
         ) : items.map((item) => {
           const payload = item.payload as FoodPayload

@@ -53,6 +53,9 @@
   --color-input: rgba(17,28,53,.12);
   --color-ring: #E8622A;
 
+  /* page gutter as a spacing step, so -mx-gutter bleeds to the screen edge */
+  --spacing-gutter: 22px;
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
