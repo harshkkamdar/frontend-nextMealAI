@@ -43,7 +43,7 @@ export default function ChatListPage() {
         <PrimaryButton
           onClick={handleNewChat}
           icon={<Plus className="h-4 w-4" />}
-          className="w-auto px-3 py-2.5 text-[15.5px]"
+          className="w-auto px-4 py-2"
         >
           New chat
         </PrimaryButton>

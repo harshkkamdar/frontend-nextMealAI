@@ -8,6 +8,7 @@ import { X, ExternalLink, SquarePen } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUIStore } from '@/stores/ui.store'
 import { useGeoScreenContext } from '@/contexts/geo-screen-context'
+import { useOnline } from '@/lib/platform/network'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { ChatBubble } from '@/components/chat/chat-bubble'
 import { ChatInput } from '@/components/chat/chat-input'
@@ -87,6 +88,8 @@ export function GeoCompanionSheet() {
   const router = useRouter()
 
   const isOpen = activeSheet === 'geo-companion'
+
+  const online = useOnline()
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isTyping, setIsTyping] = useState(false)
@@ -249,9 +252,10 @@ export function GeoCompanionSheet() {
                 <GeoAvatar variant="face" state="happy" size={32} />
                 <div>
                   <span className="text-[17px] font-bold text-ink">Geo</span>
+                  {/* Status follows the device connection; teal is reserved for carbs, so the dot is ink. */}
                   <div className="flex items-center gap-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-macro-teal" />
-                    <span className="text-[11px] font-medium text-ink-65">Online</span>
+                    <div className={`h-1.5 w-1.5 rounded-full ${online ? 'bg-ink' : 'bg-ink-35'}`} />
+                    <span className="text-[12px] font-medium text-ink-65">{online ? 'Online' : 'Offline'}</span>
                   </div>
                 </div>
               </div>
@@ -259,7 +263,7 @@ export function GeoCompanionSheet() {
                 <button
                   onClick={handleStartNewChat}
                   disabled={initializing || messages.length === 0}
-                  className="flex h-8 items-center gap-1 rounded-full px-2.5 text-[13.5px] font-semibold text-ink-65 active:bg-ink-08 disabled:pointer-events-none disabled:opacity-40"
+                  className="flex h-11 items-center gap-1 rounded-full px-3 text-[14px] font-semibold text-ink active:bg-ink-08 disabled:pointer-events-none disabled:text-ink-35"
                   aria-label="Start a new chat"
                 >
                   <SquarePen className="w-3.5 h-3.5" />
@@ -267,7 +271,7 @@ export function GeoCompanionSheet() {
                 </button>
                 <button
                   onClick={handleClose}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
+                  className="-mr-2.5 flex size-11 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
                   aria-label="Close"
                 >
                   <X className="h-4 w-4" />

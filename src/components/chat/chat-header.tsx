@@ -11,7 +11,7 @@ export function ChatHeader({ title }: { sessionId?: string; title?: string }) {
       <div className="flex items-center gap-2">
         <button
           onClick={() => router.push('/chat')}
-          className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full text-ink active:bg-ink-08"
+          className="-ml-3 flex size-11 items-center justify-center rounded-full text-ink active:bg-ink-08"
           aria-label="Back to chats"
         >
           <ChevronLeft className="h-5 w-5" />

@@ -306,7 +306,7 @@ export function ChatInput({
         <button
           onClick={handleSend}
           disabled={sendDisabled}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-accent hover:bg-accent-hover text-white disabled:opacity-40 transition-opacity shrink-0 mb-0.5"
+          className="flex items-center justify-center size-11 rounded-full bg-accent text-cream disabled:opacity-40 transition-opacity shrink-0 mb-0.5"
           aria-label="Send message"
         >
           <ArrowUp className="w-4 h-4" />

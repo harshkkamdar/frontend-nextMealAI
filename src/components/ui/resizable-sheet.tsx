@@ -114,7 +114,7 @@ export function ResizableSheet({
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
           className="flex justify-center pt-3 pb-2 shrink-0 cursor-grab active:cursor-grabbing touch-none"
-          aria-label="Drag to resize"
+          aria-hidden="true"
         >
           <div className="w-10 h-1.5 rounded-full bg-border" />
         </div>

@@ -140,41 +140,43 @@ export function SessionList({
           return (
             <div
               key={sessionId}
-              role="button"
-              tabIndex={0}
-              onClick={() => !isEditing && onSelect(session.session_id)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !isEditing) onSelect(session.session_id) }}
-              className="min-h-14 flex items-center justify-between border-b border-ink-09 gap-3 cursor-pointer text-left"
+              className="min-h-14 flex items-center justify-between border-b border-ink-09 gap-1"
             >
-              <div className="flex-1 min-w-0">
-                {isEditing ? (
+              {isEditing ? (
+                <div className="flex-1 min-w-0">
                   <input
                     ref={inputRef}
                     type="text"
+                    aria-label="Chat name"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => commitRename(session.session_id)}
                     onKeyDown={(e) => handleKeyDown(e, session.session_id)}
-                    onClick={(e) => e.stopPropagation()}
                     disabled={renamingId === session.session_id}
-                    className="w-full min-w-0 rounded border border-ink-16 bg-card px-1.5 py-0.5 text-[15.5px] font-semibold text-ink outline-none focus:border-accent"
+                    className="h-11 w-full min-w-0 rounded-[12px] border border-ink-16 bg-card px-3 text-[15.5px] font-semibold text-ink outline-none focus:border-ink"
                     maxLength={50}
                   />
-                ) : (
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onSelect(session.session_id)}
+                  className="flex min-h-14 min-w-0 flex-1 items-center justify-between gap-3 text-left"
+                >
                   <span className="block truncate text-[15.5px] font-semibold text-ink">
                     {displayTitle}
                   </span>
-                )}
-              </div>
-              {!isEditing ? (
-                <div className="flex shrink-0 items-center gap-1.5">
                   <span className="whitespace-nowrap text-[13px] font-medium text-ink-65">
                     {formatSessionDate(session.updated_at ?? session.created_at)}
                   </span>
+                </button>
+              )}
+              {!isEditing ? (
+                <div className="flex shrink-0 items-center">
                   <div className="relative" ref={isMenuOpen ? menuRef : undefined}>
                     <button
                       onClick={(e) => toggleMenu(e, session.session_id)}
-                      className="flex h-7 w-7 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
+                      className="-mr-2.5 flex size-11 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
                       aria-label="Chat options"
                     >
                       <MoreVertical className="h-4 w-4" />
@@ -186,14 +188,14 @@ export function SessionList({
                       >
                         <button
                           onClick={(e) => startEditing(e, session)}
-                          className="flex h-9 w-full items-center gap-2.5 px-3 text-[13.5px] font-semibold text-ink active:bg-ink-08"
+                          className="flex h-11 w-full items-center gap-2.5 px-3 text-[14px] font-semibold text-ink active:bg-ink-08"
                         >
                           <Pencil className="h-3.5 w-3.5 text-ink-65" />
                           Rename
                         </button>
                         <button
                           onClick={(e) => handleDeleteClick(e, session)}
-                          className="flex h-9 w-full items-center gap-2.5 px-3 text-[13.5px] font-semibold text-ink active:bg-ink-08"
+                          className="flex h-11 w-full items-center gap-2.5 px-3 text-[14px] font-semibold text-ink active:bg-ink-08"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Delete
