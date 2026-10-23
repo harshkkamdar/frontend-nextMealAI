@@ -2,8 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from 'react'
 
-/** Bottom-nav bar height (safe-area added in CSS). The sheet rests ABOVE this. */
-const NAV_PX = 56
+/** Space the nav takes at the bottom (`--nav-clearance` in globals.css, safe area included). The sheet rests ABOVE this. */
+function navClearancePx(): number {
+  const probe = document.createElement('div')
+  probe.style.height = 'var(--nav-clearance)'
+  document.body.appendChild(probe)
+  const px = probe.offsetHeight
+  probe.remove()
+  return px
+}
 
 export interface ResizableSheetProps {
   open: boolean
@@ -45,7 +52,7 @@ export function ResizableSheet({
   const dragRef = useRef({ startY: 0, startH: 0 })
 
   const avail = useCallback(
-    () => (typeof window !== 'undefined' ? window.innerHeight - NAV_PX : 800),
+    () => (typeof window !== 'undefined' ? window.innerHeight - navClearancePx() : 800),
     [],
   )
   const levelsPx = useCallback(() => levels.map((f) => Math.round(f * avail())), [levels, avail])
@@ -99,14 +106,14 @@ export function ResizableSheet({
       {/* Backdrop stops at the nav top so the nav (z-[100]) stays fully visible. */}
       <div
         onClick={onClose}
-        className={`absolute inset-x-0 top-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] bg-black/40 transition-opacity duration-200 ${shown ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-x-0 top-0 bottom-[var(--nav-clearance)] bg-black/40 transition-opacity duration-200 ${shown ? 'opacity-100' : 'opacity-0'}`}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
         style={{ height: heightPx }}
-        className={`absolute left-0 right-0 z-[70] bottom-[calc(56px+env(safe-area-inset-bottom,0px))] flex flex-col bg-background rounded-t-3xl shadow-2xl will-change-transform ${dragging ? '' : 'transition-[height,transform] duration-200'} ${shown ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`absolute left-0 right-0 z-[70] bottom-[var(--nav-clearance)] flex flex-col bg-background rounded-t-3xl shadow-2xl will-change-transform ${dragging ? '' : 'transition-[height,transform] duration-200'} ${shown ? 'translate-y-0' : 'translate-y-full'}`}
       >
         <div
           onPointerDown={onPointerDown}

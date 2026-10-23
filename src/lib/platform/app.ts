@@ -13,10 +13,7 @@ export function initNativeShell(handlers: NativeShellHandlers): () => void {
   const removers: Array<() => Promise<void>> = []
 
   void (async () => {
-    const [{ App }, { SplashScreen }] = await Promise.all([
-      import('@capacitor/app'),
-      import('@capacitor/splash-screen'),
-    ])
+    const { App } = await import('@capacitor/app')
 
     const listenerHandles = await Promise.all([
       App.addListener('backButton', ({ canGoBack }) => {
@@ -38,12 +35,7 @@ export function initNativeShell(handlers: NativeShellHandlers): () => void {
     for (const handle of listenerHandles) removers.push(() => handle.remove())
     if (disposed) {
       await Promise.all(removers.map((remove) => remove()))
-      return
     }
-
-    requestAnimationFrame(() => {
-      void SplashScreen.hide()
-    })
   })()
 
   return () => {
@@ -51,6 +43,13 @@ export function initNativeShell(handlers: NativeShellHandlers): () => void {
     for (const remove of removers) void remove()
     removers.length = 0
   }
+}
+
+// Called from the root layout so every route (login, onboarding, public pages) hides it, not only the (app) group.
+export async function hideSplash(): Promise<void> {
+  if (!isNative()) return
+  const { SplashScreen } = await import('@capacitor/splash-screen')
+  await SplashScreen.hide()
 }
 
 export async function haptic(kind: 'light' | 'success' | 'warning'): Promise<void> {

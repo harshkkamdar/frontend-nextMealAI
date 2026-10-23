@@ -75,6 +75,8 @@
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Bottom nav is ~82px tall plus the safe area, and the raised Geo button pokes ~14px above it; sheets rest above both. */
+  --nav-clearance: calc(96px + var(--safe-bottom));
   --gutter: 22px;
 }
 
