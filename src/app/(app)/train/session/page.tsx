@@ -385,7 +385,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
             <SecondaryButton type="button" onClick={() => setShowAddForm(true)} className="mt-4">Add an exercise</SecondaryButton>
           </div>
         ) : (
-          <div ref={pagerRef} className="scrollbar-hide -mx-gutter flex snap-x snap-mandatory gap-3 overflow-x-auto px-gutter">
+          <div ref={pagerRef} className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto px-gutter">
             {exercises.map((exercise, exerciseIndex) => (
               <article key={`${exercise.name}-${exerciseIndex}`} data-exercise-index={exerciseIndex} className="w-[calc(100vw-44px)] max-w-[346px] shrink-0 snap-center rounded-[22px] border border-ink-12 bg-card p-[22px]">
                 <h1 className="line-clamp-3 text-[28px] font-bold leading-[1.1] tracking-[-0.6px] text-ink">{exercise.name}</h1>
