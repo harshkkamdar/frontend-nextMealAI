@@ -309,13 +309,13 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
         </ul>
       ) : null}
 
-      <label className="flex cursor-pointer items-center gap-3 text-[15.5px] font-semibold text-ink">
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-[12px] text-[15.5px] font-semibold text-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ink">
         <input type="checkbox" checked={setActive} onChange={(e) => setSetActive(e.target.checked)} className="sr-only" />
         <span aria-hidden="true" className={cn('flex size-[22px] shrink-0 items-center justify-center rounded-[6px]', setActive ? 'bg-ink' : 'border border-ink-16 bg-card')}>{setActive ? <svg viewBox="0 0 16 16" className="size-4 text-cream" fill="none"><path d="m3 8 3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}</span>
         Set as active plan
       </label>
 
-      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid}>{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="w-full text-[13.5px] font-semibold text-ink-65">Cancel</button></div>
+      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid} className="justify-center">{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="min-h-11 w-full text-[13.5px] font-semibold text-ink-65">Cancel</button></div>
     </form>
   )
 }

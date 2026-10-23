@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft } from 'lucide-react'
+import { PageHeader } from '@/components/ui/fiqr/page-header'
 import { toast } from 'sonner'
 import { PlanChangelog } from '@/components/plans/plan-changelog'
 import { formatDateRange, formatDayDate, statusLabel } from '@/components/plans/plan-format'
@@ -30,10 +30,7 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
   }
 
   return <div className="space-y-7">
-    <header>
-      <div className="flex items-center gap-2"><button type="button" onClick={() => router.back()} aria-label="Back" className="inline-flex h-9 w-9 items-center justify-center text-ink-65"><ChevronLeft className="h-6 w-6" /></button><h1 className="text-[22px] font-semibold text-ink">{plan.content.name || 'Nutrition Plan'}</h1></div>
-      <p className="ml-11 mt-1 text-[13.5px] text-ink-65">{statusLabel(plan.status)} · {formatDateRange(plan.start_date, plan.end_date)}</p>
-    </header>
+    <PageHeader title={plan.content.name || 'Nutrition Plan'} sub={`${statusLabel(plan.status)} · ${formatDateRange(plan.start_date, plan.end_date)}`} onBack={() => router.back()} />
 
     <section className="space-y-2.5">
       <SectionLabel>Daily targets</SectionLabel>

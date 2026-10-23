@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
+import { PageHeader } from '@/components/ui/fiqr/page-header'
 import { toast } from 'sonner'
 import { PlanChangelog } from '@/components/plans/plan-changelog'
 import { formatDateRange, statusLabel } from '@/components/plans/plan-format'
@@ -35,7 +36,7 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
   async function makeActive() { setActivating(true); try { await activatePlan(plan.id); toast.success('Plan activated'); router.refresh() } catch { toast.error('Failed to activate plan') } finally { setActivating(false) } }
 
   return <div className="space-y-7">
-    <header><div className="flex items-center gap-2"><button type="button" onClick={() => router.back()} aria-label="Back" className="inline-flex h-9 w-9 items-center justify-center text-ink-65"><ChevronLeft className="h-6 w-6" /></button><h1 className="text-[22px] font-semibold text-ink">{plan.content.name || 'Workout Plan'}</h1></div><p className="ml-11 mt-1 text-[13.5px] text-ink-65">{statusLabel(plan.status)} · {formatDateRange(plan.start_date, plan.end_date)}</p></header>
+    <PageHeader title={plan.content.name || 'Workout Plan'} sub={`${statusLabel(plan.status)} · ${formatDateRange(plan.start_date, plan.end_date)}`} onBack={() => router.back()} />
     {plan.content.notes ? <section className="space-y-2.5"><SectionLabel>Notes</SectionLabel><div className="rounded-[16px] border border-ink-12 bg-card p-[14px] text-[15.5px] text-ink-80">{plan.content.notes}</div></section> : null}
     <section className="space-y-2.5"><SectionLabel>Days</SectionLabel>{days.length ? <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">{days.map((day, index) => {
       const isOpen = expanded === index

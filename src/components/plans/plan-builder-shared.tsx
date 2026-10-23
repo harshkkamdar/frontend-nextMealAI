@@ -5,6 +5,8 @@ import { Plus, Search, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const fieldClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink placeholder:text-ink-35 outline-none focus:border-ink'
+// Dates use a smaller face so dd/mm/yyyy and the picker icon fit two-up at 360px.
+const dateClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-3 text-[15.5px] text-ink outline-none focus:border-ink'
 const labelClass = 'block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65'
 
 export function PlanNameField({ value, onChange, placeholder = 'Plan name' }: { value: string; onChange: (value: string) => void; placeholder?: string }) {
@@ -13,8 +15,8 @@ export function PlanNameField({ value, onChange, placeholder = 'Plan name' }: { 
 
 export function PlanDateRangeField({ startDate, endDate, onChange }: { startDate: string; endDate: string; onChange: (next: { startDate: string; endDate: string }) => void }) {
   return <div className="grid grid-cols-2 gap-[10px]">
-    <div className="space-y-1.5"><label className={labelClass} htmlFor="plan-start">Start date</label><input id="plan-start" type="date" value={startDate} onChange={(e) => onChange({ startDate: e.target.value, endDate })} className={fieldClass} /></div>
-    <div className="space-y-1.5"><label className={labelClass} htmlFor="plan-end">End date</label><input id="plan-end" type="date" value={endDate} onChange={(e) => onChange({ startDate, endDate: e.target.value })} className={fieldClass} /></div>
+    <div className="space-y-1.5"><label className={labelClass} htmlFor="plan-start">Start date</label><input id="plan-start" type="date" value={startDate} onChange={(e) => onChange({ startDate: e.target.value, endDate })} className={dateClass} /></div>
+    <div className="space-y-1.5"><label className={labelClass} htmlFor="plan-end">End date</label><input id="plan-end" type="date" value={endDate} onChange={(e) => onChange({ startDate, endDate: e.target.value })} className={dateClass} /></div>
   </div>
 }
 
@@ -28,7 +30,7 @@ export function NumberField({ label, value, onChange, min, max, step, suffix, id
 }
 
 export function IconButton({ icon, label, onClick, variant: _variant = 'ghost', type = 'button' }: { icon: React.ReactNode; label: string; onClick?: () => void; variant?: 'ghost' | 'danger' | 'accent'; type?: 'button' | 'submit' }) {
-  return <button type={type} onClick={onClick} aria-label={label} className="inline-flex h-8 w-8 items-center justify-center text-ink-65 [&_svg]:h-6 [&_svg]:w-6">{icon}</button>
+  return <button type={type} onClick={onClick} aria-label={label} className="inline-flex size-11 items-center justify-center text-ink-65 [&_svg]:h-6 [&_svg]:w-6">{icon}</button>
 }
 
 export function AddRowButton({ label, onClick }: { label: string; onClick: () => void }) {

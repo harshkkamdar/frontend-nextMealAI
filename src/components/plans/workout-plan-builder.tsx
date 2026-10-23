@@ -265,7 +265,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
         </ul>
       ) : null}
 
-      <label className="flex cursor-pointer items-center gap-3 text-[15.5px] font-semibold text-ink">
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-[12px] text-[15.5px] font-semibold text-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ink">
         <input
           type="checkbox"
           checked={setActive}
@@ -275,7 +275,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
         Set as active plan
       </label>
 
-      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid}>{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="w-full text-[13.5px] font-semibold text-ink-65">Cancel</button></div>
+      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid} className="justify-center">{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="min-h-11 w-full text-[13.5px] font-semibold text-ink-65">Cancel</button></div>
     </form>
   )
 }
@@ -311,9 +311,10 @@ function DayCard({
         {canRemove ? <RemoveRowButton label={`Remove day ${index + 1}`} onClick={onRemove} /> : null}
       </div>
 
-      <label className="flex items-center gap-2 text-[13.5px] font-semibold text-ink-65">
+      <label className="flex min-h-11 items-center gap-3 text-[14px] font-semibold text-ink-65">
         <input
           type="checkbox"
+          className="size-5 accent-ink"
           checked={day.is_rest_day}
           onChange={(e) => onPatch({ is_rest_day: e.target.checked })}
         />
