@@ -14,8 +14,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={archivo.variable}>
       <body>
         {children}
+        {/* Opaque strip under the phone's status bar: headers are padded below it, but scrolled content would otherwise slide under the clock and battery. Height is 0 on the web. */}
+        <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-[55] bg-cream" style={{ height: 'var(--safe-top)' }} />
         <Toaster
           position="top-center"
+          offset={{ top: 'calc(12px + var(--safe-top))' }}
+          mobileOffset={{ top: 'calc(12px + var(--safe-top))' }}
           toastOptions={{ style: { background: '#FFFFFF', color: '#111C35', border: '1px solid rgba(17,28,53,.16)', borderRadius: 16, fontFamily: 'var(--font-archivo)', fontSize: 14.5, fontWeight: 600 } }}
         />
         <SplashHider />

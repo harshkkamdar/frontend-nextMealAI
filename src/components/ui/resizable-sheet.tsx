@@ -4,8 +4,13 @@ import { useCallback, useEffect, useRef, useState, type ReactNode, type PointerE
 
 /** Space the nav takes at the bottom (`--nav-clearance` in globals.css, safe area included). The sheet rests ABOVE this. */
 function navClearancePx(): number {
+  return cssLengthPx('var(--nav-clearance)')
+}
+
+/** Resolves a CSS length (custom properties and env() included) to pixels. */
+function cssLengthPx(length: string): number {
   const probe = document.createElement('div')
-  probe.style.height = 'var(--nav-clearance)'
+  probe.style.height = length
   document.body.appendChild(probe)
   const px = probe.offsetHeight
   probe.remove()
@@ -52,7 +57,8 @@ export function ResizableSheet({
   const dragRef = useRef({ startY: 0, startH: 0 })
 
   const avail = useCallback(
-    () => (typeof window !== 'undefined' ? window.innerHeight - navClearancePx() : 800),
+    // The tallest level stops below the status bar, so the sheet never sits under the clock.
+    () => (typeof window !== 'undefined' ? window.innerHeight - navClearancePx() - cssLengthPx('var(--safe-top)') : 800),
     [],
   )
   const levelsPx = useCallback(() => levels.map((f) => Math.round(f * avail())), [levels, avail])
