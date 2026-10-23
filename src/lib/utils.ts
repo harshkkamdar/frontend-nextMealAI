@@ -37,3 +37,8 @@ export function safeImageUrl(url: string | null | undefined): string | null {
   if (!url) return null
   return /^(https?:\/\/|blob:|\/\/)/i.test(url) ? url : null
 }
+
+/** `plural(1, 'exercise')` -> "1 exercise", `plural(5, 'exercise')` -> "5 exercises". */
+export function plural(count: number, word: string): string {
+  return `${count} ${word}${count === 1 ? '' : 's'}`
+}

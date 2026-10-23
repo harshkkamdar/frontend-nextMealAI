@@ -4,6 +4,7 @@ import { FeatureCard } from '@/components/ui/fiqr/feature-card'
 import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
 import { computeSelectedPlanDayIndex } from '@/lib/workout-session'
 import type { WorkoutPlan } from '@/types/plans.types'
+import { plural } from '@/lib/utils'
 
 interface WorkoutCardProps {
   workoutPlan: WorkoutPlan | null
@@ -39,7 +40,7 @@ export function WorkoutCard({
     const exerciseCount = day.exercises?.length ?? 0
     const duration = Math.max(15, Math.round(exerciseCount * 7.5 / 5) * 5)
     name = day.name || `Day ${dayIndex + 1}`
-    meta = `${exerciseCount} exercises · ${duration} min`
+    meta = `${plural(exerciseCount, 'exercise')} · ${duration} min`
     action = 'Start Workout'
     onClick = () => onStart(workoutPlan, dayIndex)
   }

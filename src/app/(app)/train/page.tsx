@@ -25,6 +25,8 @@ import { deriveWorkoutEntryLabel, nextWorkoutDayIndex } from '@/lib/workout-sess
 import { useUIStore } from '@/stores/ui.store'
 import type { WorkoutPlan } from '@/types/plans.types'
 import type { WorkoutSession } from '@/types/workout-session.types'
+import { plural } from '@/lib/utils'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
 
 interface TrainData {
   workoutPlan: WorkoutPlan | null
@@ -96,16 +98,20 @@ export default function ActivityPage() {
   useSetGeoScreen('activity', { selectedDate })
 
   const fetchData = useCallback(async (): Promise<TrainData> => {
+    const failures: unknown[] = []
+    const fail = <T,>(fallback: T) => (error: unknown) => { failures.push(error); return fallback }
     const [plansRes, inProgress, history] = await Promise.all([
-      getPlans({ type: 'workout', active_only: true }).catch(() => []),
-      getInProgressSession().catch(() => null),
-      getWorkoutHistory(50).catch(() => []),
+      getPlans({ type: 'workout', active_only: true }).catch(fail([])),
+      getInProgressSession().catch(fail(null)),
+      getWorkoutHistory(50).catch(fail([])),
     ])
+    // All three failing means there is nothing true to show; report it instead of "No program yet".
+    if (failures.length === 3) throw failures[0]
     const workoutPlan = (plansRes.find((plan) => plan.type === 'workout') as WorkoutPlan | undefined) ?? null
     return { workoutPlan, inProgress, history }
   }, [])
 
-  const { data, loading, refetch } = useCachedQuery('train', fetchData, [])
+  const { data, loading, error, refetch } = useCachedQuery('train', fetchData, [])
   const refresh = useCallback(() => { void refetch() }, [refetch])
 
   useEffect(() => {
@@ -182,7 +188,7 @@ export default function ActivityPage() {
     <PageWrapper>
       <header className="flex items-center justify-between gap-4">
         <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Train</h1>
-        <button type="button" onClick={() => setCalendarOpen(true)} aria-label="Open workout calendar" className="flex h-10 w-10 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-65"><CalendarIcon /></button>
+        <button type="button" onClick={() => setCalendarOpen(true)} aria-label="Open workout calendar" className="flex size-11 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-65"><CalendarIcon /></button>
       </header>
       <div className="-mx-gutter mt-3"><OfflineBand /></div>
 
@@ -192,19 +198,16 @@ export default function ActivityPage() {
           <div className="grid grid-cols-3 gap-[10px]"><Skeleton className="h-[92px] rounded-[16px] bg-ink-08" /><Skeleton className="h-[92px] rounded-[16px] bg-ink-08" /><Skeleton className="h-[92px] rounded-[16px] bg-ink-08" /></div>
           <Skeleton className="h-[240px] rounded-[18px] bg-ink-08" />
         </div>
+      ) : !data && error ? (
+        <ErrorState onRetry={refresh}>I couldn&apos;t load your training. Check your connection and try again.</ErrorState>
       ) : (
         <>
-          {isResume && !isRestDay && (
-            <button type="button" onClick={handleResume} className="mt-4 flex w-full items-center justify-between rounded-[16px] bg-ink-08 px-[14px] py-3 text-left">
-              <span className="text-[15.5px] font-semibold text-ink">Resume · {inProgress?.day_name}</span><ChevronIcon className="h-5 w-5 text-ink-65" />
-            </button>
-          )}
 
           <FeatureCard className="mt-4" data-testid="activity-next-up-card">
             <p className="text-[11px] font-semibold uppercase tracking-[1.4px] text-cream-55">Next up</p>
             <h2 className="mt-2 text-[28px] font-bold leading-[1.1] tracking-[-0.6px] text-cream">{!workoutPlan ? 'No program yet' : isRestDay ? 'Rest day' : (nextWorkout?.name || `Day ${nextIdx + 1}`)}</h2>
             <p className="mt-2 text-[14px] text-cream-60">
-              {!workoutPlan ? 'Geo can build one from your goals' : isRestDay ? 'Recovery · no session' : `${nextWorkout?.exercises?.length ?? 0} exercises · ${Math.max(15, Math.round(((nextWorkout?.exercises?.length ?? 0) * 7.5) / 5) * 5)} min`}
+              {!workoutPlan ? 'Geo can build one from your goals' : isRestDay ? 'Recovery · no session' : `${plural(nextWorkout?.exercises?.length ?? 0, 'exercise')} · ${Math.max(15, Math.round(((nextWorkout?.exercises?.length ?? 0) * 7.5) / 5) * 5)} min`}
             </p>
             <SecondaryButton
               type="button" onNavy arrow disabled={starting} data-testid={workoutPlan && !isRestDay ? 'activity-start-workout-button' : undefined} className="mt-5"
@@ -245,7 +248,7 @@ export default function ActivityPage() {
                     <div key={`${day.name}-${index}`} className="border-b border-ink-09 last:border-b-0">
                       <button type="button" onClick={() => canExpand && setExpandedDay(isExpanded ? null : index)} aria-expanded={isExpanded} className="flex w-full items-center gap-3 px-[14px] py-[13px] text-left">
                         <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold ${isNext ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}>{index + 1}</span>
-                        <span className="min-w-0 flex-1"><span className="block truncate text-[15.5px] font-semibold text-ink">{day.is_rest_day ? 'Rest' : (day.name || `Day ${index + 1}`)}</span><span className="block text-[13px] text-ink-65">{exerciseList.length} exercises</span></span>
+                        <span className="min-w-0 flex-1"><span className="block truncate text-[15.5px] font-semibold text-ink">{day.is_rest_day ? 'Rest' : (day.name || `Day ${index + 1}`)}</span><span className="block text-[13px] text-ink-65">{plural(exerciseList.length, 'exercise')}</span></span>
                         <ChevronIcon className={`h-5 w-5 shrink-0 text-ink-65 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                       </button>
                       {isExpanded && canExpand && (

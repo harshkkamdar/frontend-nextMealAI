@@ -12,6 +12,7 @@ import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { getPlans } from '@/lib/api/plans.api'
 import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 import { useOnboardingStore } from '@/stores/onboarding.store'
+import { plural } from '@/lib/utils'
 
 export default function ReviewPage() {
   const router = useRouter()
@@ -122,7 +123,7 @@ export default function ReviewPage() {
                         className="rounded-[15px] border border-ink-12 bg-card px-3 py-3 text-[15.5px] text-ink"
                       >
                         <span className="font-semibold">{day.is_rest_day ? 'Rest Day' : day.name || `Day ${i + 1}`}</span>
-                        <span className="text-ink-65"> · {day.exercises?.length ?? 0} exercises</span>
+                        <span className="text-ink-65"> · {plural(day.exercises?.length ?? 0, 'exercise')}</span>
                       </div>
                     ))}
                   </div>

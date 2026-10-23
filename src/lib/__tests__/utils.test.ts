@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { safeImageUrl } from '@/lib/utils'
+import { plural, safeImageUrl } from '@/lib/utils'
 
 describe('safeImageUrl — defense-in-depth on <img src>', () => {
   it('allows https URLs', () => {
@@ -38,5 +38,13 @@ describe('safeImageUrl — defense-in-depth on <img src>', () => {
     expect(safeImageUrl(null)).toBeNull()
     expect(safeImageUrl(undefined)).toBeNull()
     expect(safeImageUrl('')).toBeNull()
+  })
+})
+
+describe('plural', () => {
+  it('uses the singular only for one', () => {
+    expect(plural(1, 'exercise')).toBe('1 exercise')
+    expect(plural(0, 'exercise')).toBe('0 exercises')
+    expect(plural(5, 'exercise')).toBe('5 exercises')
   })
 })
