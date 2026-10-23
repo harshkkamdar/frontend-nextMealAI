@@ -284,7 +284,10 @@ async function contactSheets(browser, results) {
     while (jobs.length) {
       const [row, state, size] = jobs.shift()
       try {
-        const r = await capture(browser, ctxInfo, row, state, size)
+        let r = await capture(browser, ctxInfo, row, state, size)
+        // A blank page shot (under ~12 KB) outside the loading state is a render race; shoot once more.
+        const shot = path.join(OUT, `${row.id}-${row.slug}-${state}-${size.w}.png`)
+        if (state !== 'loading' && fs.statSync(shot).size < 12000) r = await capture(browser, ctxInfo, row, state, size)
         results.push(r)
         console.log(`${r.row} ${state} ${size.w} ${r.url} axe:${r.violations.map((v) => v.id).join(',') || 0}`)
       } catch (e) {
