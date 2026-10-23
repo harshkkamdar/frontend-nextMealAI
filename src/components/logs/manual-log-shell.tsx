@@ -54,7 +54,7 @@ export function NotesField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="min-h-24 w-full resize-none rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+        className="min-h-24 w-full resize-none rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
       />
     </label>
   )
@@ -127,7 +127,7 @@ export function NumericSuffixInput({
         step={step}
         min={min}
         max={max}
-        className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-12 text-center text-[28px] font-bold tracking-[-0.6px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+        className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-12 text-center text-[28px] font-bold tracking-[-0.6px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
       />
       <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-medium text-ink-65">{suffix}</span>
     </label>

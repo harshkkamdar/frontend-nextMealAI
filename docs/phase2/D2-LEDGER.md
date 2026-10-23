@@ -23,6 +23,8 @@ Finding tags: H hierarchy, T type scale, S spacing, 44 touch target, C contrast,
 | X9 | Controls under 44px | A, B | built across slices (see rows) |
 | X10 | Three page-header patterns | A | built bef82b2 (PageHeader), carried in 3351492, 5f5ae82, 7704813 |
 | X11 | `-mx-gutter` generated no CSS, so full-bleed strips never bled | found in slice | built cf2022e (`--spacing-gutter`) |
+| X13 | Crash screen (error boundary, every route) printed the raw error (chunk paths) | found in capture | built b97fbe1 |
+| X14 | Placeholder text in ink-35/50 under 4.5:1 | craft floor | built (placeholder commit, ink-65) |
 | X12 | Error states that read as empty data | A, grader | built 64f1a39, 496e182, 11cafec, 5f5ae82, 0fbdeb6, 8eb7cbd (shared ErrorState) |
 
 ## Rows
@@ -73,7 +75,6 @@ Final checks: 350 after captures, 0 serious or critical axe violations (`docs/ph
 | D2-31 | Support | X3 orange links | built 65c198b |
 | D2-32 | Account deletion (public) | X3; left-aligned label | built 65c198b, 4b1c550 |
 | D2-32b | Account deletion (in-app sheet) | C | built 65c198b, 9fea770 |
-| D2-X | Crash screen (error boundary, every route) | Printed the raw error (chunk paths) | built b97fbe1 |
 
 ## Gates
 

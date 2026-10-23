@@ -27,7 +27,7 @@ const SEX_OPTIONS: { label: string; value: Sex }[] = [
   { label: 'Other', value: 'other' },
 ]
 
-const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-35 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-65 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
 
 export function PersonalForm() {
   const router = useRouter()

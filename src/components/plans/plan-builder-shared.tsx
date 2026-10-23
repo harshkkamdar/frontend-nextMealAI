@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Plus, Search, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const fieldClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink placeholder:text-ink-35 outline-none focus:border-ink'
+const fieldClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink placeholder:text-ink-65 outline-none focus:border-ink'
 // Dates use a smaller face so dd/mm/yyyy and the picker icon fit two-up at 360px.
 const dateClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-3 text-[15.5px] text-ink outline-none focus:border-ink'
 const labelClass = 'block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65'
@@ -25,7 +25,7 @@ export function NumberField({ label, value, onChange, min, max, step, suffix, id
   const inputId = id ?? generatedId
   return <div className="space-y-1.5">
     <label className="block text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65" htmlFor={inputId}>{label}{suffix ? <span className="ml-1">({suffix})</span> : null}</label>
-    <input id={inputId} type="number" inputMode="decimal" min={min} max={max} step={step} placeholder={placeholder} value={value === undefined || Number.isNaN(value) ? '' : value} onChange={(e) => { const raw = e.target.value; if (raw === '') return onChange(undefined); const parsed = Number(raw); if (!Number.isFinite(parsed)) return; let next = parsed; if (min !== undefined && next < min) next = min; if (max !== undefined && next > max) next = max; onChange(next) }} className="h-11 w-full rounded-[12px] border-0 bg-ink-08 px-2 text-center text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35" />
+    <input id={inputId} type="number" inputMode="decimal" min={min} max={max} step={step} placeholder={placeholder} value={value === undefined || Number.isNaN(value) ? '' : value} onChange={(e) => { const raw = e.target.value; if (raw === '') return onChange(undefined); const parsed = Number(raw); if (!Number.isFinite(parsed)) return; let next = parsed; if (min !== undefined && next < min) next = min; if (max !== undefined && next > max) next = max; onChange(next) }} className="h-11 w-full rounded-[12px] border-0 bg-ink-08 px-2 text-center text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-65" />
   </div>
 }
 

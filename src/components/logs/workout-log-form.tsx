@@ -91,7 +91,7 @@ export function WorkoutLogForm() {
             placeholder="e.g. Push day"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+            className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-65 focus:border-ink"
           />
         </label>
 

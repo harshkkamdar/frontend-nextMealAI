@@ -74,7 +74,7 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
           placeholder="e.g. Usual Lunch"
           maxLength={60}
           aria-label="Meal name"
-          className="mt-4 h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none placeholder:text-ink-35"
+          className="mt-4 h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none placeholder:text-ink-65"
         />
         <div className="mt-5 space-y-3">
           <PrimaryButton

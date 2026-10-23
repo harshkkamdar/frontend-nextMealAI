@@ -459,7 +459,7 @@ export function FoodLogForm() {
           value={query}
           onChange={(event) => handleSearch(event.target.value)}
           placeholder="Search foods, brands, or describe it"
-          className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-4 text-[17px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+          className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-4 text-[17px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
           data-testid="food-search-input"
         />
       </div>
@@ -560,7 +560,7 @@ export function FoodLogForm() {
             placeholder="e.g. Grilled chicken breast"
             value={foodName}
             onChange={(event) => { setFoodName(event.target.value); setUserFoodId(null); setMacroBasisPerG(null) }}
-            className="field-sizing-content min-h-14 w-full resize-none rounded-[15px] border border-ink-16 bg-card px-4 py-[15px] text-[15.5px] font-semibold leading-[1.35] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+            className="field-sizing-content min-h-14 w-full resize-none rounded-[15px] border border-ink-16 bg-card px-4 py-[15px] text-[15.5px] font-semibold leading-[1.35] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
           />
 
           {servingSizeG && servingSizeG > 0 ? (
@@ -616,7 +616,7 @@ export function FoodLogForm() {
                 placeholder="Quantity"
                 value={quantityG}
                 onChange={(event) => handleQuantityChange(event.target.value ? Number(event.target.value) : '')}
-                className="h-11 min-w-0 flex-1 rounded-[12px] border-0 bg-ink-08 px-3 text-center text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35"
+                className="h-11 min-w-0 flex-1 rounded-[12px] border-0 bg-ink-08 px-3 text-center text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-65"
               />
               <span className="text-[13px] text-ink-65">g</span>
             </div>

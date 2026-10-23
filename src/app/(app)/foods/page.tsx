@@ -136,7 +136,7 @@ function AddFoodForm({ onSave }: { onSave: (food: UserFood) => void }) {
     }
   }
 
-  const inputClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35 focus:border-ink'
+  const inputClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-65 focus:border-ink'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 px-gutter pb-6 pt-3">
@@ -227,7 +227,7 @@ export default function FoodsPage() {
           placeholder="Search your foods"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-11 text-[17px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+          className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-11 text-[17px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
         />
         {search ? (
           <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-1.5 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center text-ink-65">

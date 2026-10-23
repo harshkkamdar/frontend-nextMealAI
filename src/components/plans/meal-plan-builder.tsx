@@ -246,7 +246,7 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Optional notes"
-            className="min-h-24 w-full rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
+            className="min-h-24 w-full rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
           />
         </div>
       </div></section>
