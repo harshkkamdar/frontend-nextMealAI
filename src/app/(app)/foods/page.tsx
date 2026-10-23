@@ -5,6 +5,7 @@ import { MoreHorizontal, Plus, Search, Star, Utensils, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { EmptyState } from '@/components/shared/empty-state'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
@@ -40,7 +41,7 @@ function FoodRow({
         type="button"
         onClick={() => onToggleFavorite(food.id, food.is_favorite)}
         aria-label={food.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
-        className={`mt-0.5 shrink-0 ${food.is_favorite ? 'text-accent' : 'text-ink-35'}`}
+        className={`-my-2.5 -ml-2.5 flex size-11 shrink-0 items-center justify-center ${food.is_favorite ? 'text-accent' : 'text-ink-65'}`}
       >
         <Star className={`size-6 ${food.is_favorite ? 'fill-current' : ''}`} />
       </button>
@@ -61,7 +62,7 @@ function FoodRow({
         type="button"
         onClick={() => setMenuOpen(true)}
         aria-label={`More options for ${food.name}`}
-        className="-mr-1 flex size-8 shrink-0 items-center justify-center text-ink-65"
+        className="-my-2.5 -mr-2.5 flex size-11 shrink-0 items-center justify-center text-ink-65"
       >
         <MoreHorizontal className="size-6" />
       </button>
@@ -163,15 +164,18 @@ export default function FoodsPage() {
 
   const [foods, setFoods] = useState<UserFood[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadFailed, setLoadFailed] = useState(false)
   const [search, setSearch] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
 
-  useEffect(() => {
+  const loadFoods = useCallback(() => {
     getPersonalFoods()
-      .then(setFoods)
-      .catch(() => toast.error('Failed to load foods'))
+      .then((next) => { setFoods(next); setLoadFailed(false) })
+      .catch(() => setLoadFailed(true))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(loadFoods, [loadFoods])
 
   const filtered = useMemo(() => {
     if (!search.trim()) return foods
@@ -226,7 +230,7 @@ export default function FoodsPage() {
           className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-11 text-[17px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
         />
         {search ? (
-          <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center text-ink-65">
+          <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-1.5 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center text-ink-65">
             <X className="size-5" />
           </button>
         ) : null}
@@ -249,6 +253,8 @@ export default function FoodsPage() {
             <CardSkeleton />
             <CardSkeleton />
           </div>
+        ) : loadFailed && foods.length === 0 ? (
+          <ErrorState onRetry={() => { setLoading(true); loadFoods() }}>I couldn&apos;t load your foods. Check your connection and try again.</ErrorState>
         ) : foods.length === 0 ? (
           <EmptyState icon={Utensils} title="No saved foods yet" description="Foods you log will appear here automatically." />
         ) : filtered.length === 0 ? (
