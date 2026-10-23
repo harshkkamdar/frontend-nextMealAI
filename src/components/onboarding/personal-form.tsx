@@ -115,7 +115,7 @@ export function PersonalForm() {
                 type="button"
                 onClick={() => setSex(option.value)}
                 className={cn(
-                  'h-9 rounded-full px-3 text-[13.5px] font-semibold',
+                  'min-h-11 rounded-full px-4 text-[14px] font-semibold',
                   sex === option.value
                     ? 'bg-ink text-cream'
                     : 'bg-ink-08 text-ink'

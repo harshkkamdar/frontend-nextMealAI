@@ -22,7 +22,7 @@ function ConsentCheckbox({
   children: React.ReactNode
 }) {
   return (
-    <label className="mt-4 flex cursor-pointer items-center gap-3 text-[15.5px] font-semibold text-ink">
+    <label className="mt-4 flex min-h-11 cursor-pointer items-center gap-3 rounded-[12px] text-[15.5px] font-semibold text-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ink">
       <input
         type="checkbox"
         checked={checked}

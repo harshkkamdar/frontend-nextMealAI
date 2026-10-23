@@ -12,7 +12,7 @@ export function StepIndicator({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
           key={step}
           className={cn(
             'size-[7px] rounded-full',
-            step <= currentStep ? 'bg-accent' : 'bg-ink-16'
+            step <= currentStep ? 'bg-ink' : 'bg-ink-16'
           )}
         />
       ))}

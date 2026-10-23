@@ -27,7 +27,7 @@ const DIETARY_STYLES: { label: string; value: DietaryStyle }[] = [
 ]
 
 const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-35 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
-const pillClassName = 'h-9 rounded-full px-3 text-[13.5px] font-semibold'
+const pillClassName = 'min-h-11 rounded-full px-4 text-[14px] font-semibold'
 
 export function NutritionForm() {
   const router = useRouter()
@@ -162,7 +162,7 @@ export function NutritionForm() {
                   key={item}
                   type="button"
                   onClick={() => removeDislike(item)}
-                  className="inline-flex h-9 items-center gap-1 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"
+                  className="inline-flex min-h-11 items-center gap-1 rounded-full bg-ink px-4 text-[14px] font-semibold text-cream"
                 >
                   {item}
                   <X className="size-3.5" />
@@ -203,7 +203,7 @@ export function NutritionForm() {
                   key={item}
                   type="button"
                   onClick={() => removeCuisine(item)}
-                  className="inline-flex h-9 items-center gap-1 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"
+                  className="inline-flex min-h-11 items-center gap-1 rounded-full bg-ink px-4 text-[14px] font-semibold text-cream"
                 >
                   {item}
                   <X className="size-3.5" />
