@@ -59,7 +59,7 @@ const ROWS = [
   { id: 'D2-05', slug: 'food-diary', path: '/food', states: ALL },
   { id: 'D2-06', slug: 'log-food-search', path: '/logs/new/food', states: ALL, act: async (p) => { await p.getByPlaceholder(/Search foods/i).first().fill('oat'); await p.waitForTimeout(6000) } },
   { id: 'D2-07', slug: 'log-food-photo', path: '/logs/new/food', states: ['default', 'error', 'long'], act: photoEstimate },
-  { id: 'D2-08', slug: 'log-food-menu', path: '/chat?prefill=' + encodeURIComponent('Scan this menu and suggest what fits my remaining macros'), states: ALL },
+  { id: 'D2-08', slug: 'log-food-menu', path: `/chat/session?id=${crypto.randomUUID()}&prefill=` + encodeURIComponent('Scan this menu and suggest what fits my remaining macros'), states: ALL },
   { id: 'D2-09', slug: 'log-weight', path: '/logs/new/weight', states: ALL },
   { id: 'D2-10', slug: 'log-water', path: '/logs/new/water', states: ALL },
   { id: 'D2-11', slug: 'log-sleep', path: '/logs/new/sleep', states: ALL },
@@ -167,7 +167,10 @@ async function installRoutes(page, row, state) {
     }
     if (method !== 'GET') {
       if (/^\/auth\/(login|refresh)$/.test(p) && !(row.guest && state === 'error')) return route.continue()
-      if (row.guest && state === 'error') return json(route, 401, { error: true, code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' })
+      if (row.guest && state === 'error') {
+        const failure = p === '/auth/signup' ? [409, 'EMAIL_TAKEN', 'An account with this email already exists'] : p === '/auth/reset-password' ? [500, 'INTERNAL', "We couldn't send the reset link. Try again in a moment."] : [401, 'INVALID_CREDENTIALS', 'Invalid email or password']
+        return json(route, failure[0], { error: true, code: failure[1], message: failure[2] })
+      }
       return json(route, 200, {})
     }
     if (p === '/v1/profile/onboarding' && row.onboarding === 'incomplete') {
@@ -188,10 +191,28 @@ async function installRoutes(page, row, state) {
   })
 }
 
-async function login(browser) {
-  const res = await fetch(`${API}/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: EMAIL, password: PASSWORD }) })
-  const data = await res.json()
+// /auth/login allows 10 calls per 15 minutes, so reuse the last session (refreshing it) across runs.
+const SESSION_FILE = process.env.SESSION_FILE || path.join(process.env.TMPDIR || '/tmp', 'd2-capture-session.json')
+async function session() {
+  const saved = fs.existsSync(SESSION_FILE) ? JSON.parse(fs.readFileSync(SESSION_FILE, 'utf8')) : null
+  if (saved) {
+    const ok = await fetch(`${API}/v1/profile`, { headers: { authorization: `Bearer ${saved.session.access_token}` } })
+    if (ok.status === 200) return saved
+    const refreshed = await fetch(`${API}/auth/refresh`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ refresh_token: saved.session.refresh_token }) }).then((r) => r.json())
+    if (refreshed.session?.access_token) {
+      const next = { user: saved.user, session: refreshed.session }
+      fs.writeFileSync(SESSION_FILE, JSON.stringify(next))
+      return next
+    }
+  }
+  const data = await fetch(`${API}/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: EMAIL, password: PASSWORD }) }).then((r) => r.json())
   if (!data.session?.access_token) throw new Error('login failed: ' + JSON.stringify(data).slice(0, 200))
+  fs.writeFileSync(SESSION_FILE, JSON.stringify({ user: data.user, session: data.session }))
+  return data
+}
+
+async function login() {
+  const data = await session()
   const inProgress = await fetch(`${API}/v1/workout-sessions/in-progress`, { headers: { authorization: `Bearer ${data.session.access_token}` } }).then((r) => r.json())
   const auth = { state: { user: { id: data.user.id, email: data.user.email }, accessToken: data.session.access_token, refreshToken: data.session.refresh_token }, version: 0 }
   return { auth, sessionId: inProgress.session?.id }

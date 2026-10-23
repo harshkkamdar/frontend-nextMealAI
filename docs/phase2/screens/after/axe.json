@@ -340,16 +340,7 @@
     "state": "default",
     "width": 360,
     "url": "/food",
-    "violations": [
-      {
-        "id": "target-size",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          "button[aria-label=\"Dinner actions\"]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-05",
@@ -405,16 +396,7 @@
     "state": "long",
     "width": 360,
     "url": "/food",
-    "violations": [
-      {
-        "id": "target-size",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          "button[aria-label=\"Dinner actions\"]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-05",
@@ -428,33 +410,14 @@
     "state": "offline",
     "width": 360,
     "url": "/food",
-    "violations": [
-      {
-        "id": "target-size",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          "button[aria-label=\"Lunch actions\"]",
-          "section:nth-child(2) > .rounded-\\[16px\\].border-ink-12.bg-card > .min-h-14.px-\\[14px\\].py-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-05",
     "state": "offline",
     "width": 390,
     "url": "/food",
-    "violations": [
-      {
-        "id": "target-size",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          "section:nth-child(2) > .rounded-\\[16px\\].border-ink-12.bg-card > .min-h-14.px-\\[14px\\].py-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-06",
@@ -586,253 +549,85 @@
     "row": "D2-08",
     "state": "default",
     "width": 360,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "default",
     "width": 390,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "empty",
     "width": 360,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "empty",
     "width": 390,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "error",
     "width": 360,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "error",
     "width": 390,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "loading",
     "width": 360,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "loading",
     "width": 390,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "long",
     "width": 360,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "long",
     "width": 390,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "offline",
     "width": 360,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-08",
     "state": "offline",
     "width": 390,
-    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "url": "/chat/session?id=f4adff95-613c-4e89-b23d-ab163c66bb25&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
   },
   {
     "row": "D2-09",
@@ -1259,192 +1054,84 @@
     "state": "default",
     "width": 360,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "default",
     "width": 390,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "empty",
     "width": 360,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "empty",
     "width": 390,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "error",
     "width": 360,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "error",
     "width": 390,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "loading",
     "width": 360,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "loading",
     "width": 390,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "long",
     "width": 360,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "long",
     "width": 390,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "offline",
     "width": 360,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-14",
     "state": "offline",
     "width": 390,
     "url": "/logs",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".text-\\[17px\\]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-15",
@@ -1618,84 +1305,84 @@
     "row": "D2-17",
     "state": "default",
     "width": 360,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "default",
     "width": 390,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "empty",
     "width": 360,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "empty",
     "width": 390,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "error",
     "width": 360,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "error",
     "width": 390,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "loading",
     "width": 360,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "loading",
     "width": 390,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "long",
     "width": 360,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "long",
     "width": 390,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "offline",
     "width": 360,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
     "row": "D2-17",
     "state": "offline",
     "width": 390,
-    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "url": "/train/session?id=922a081d-e74c-4428-86b7-25015d3a331a",
     "violations": []
   },
   {
@@ -2179,348 +1866,126 @@
     "state": "default",
     "width": 360,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "default",
     "width": 390,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "empty",
     "width": 360,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "empty",
     "width": 390,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "error",
     "width": 360,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "error",
     "width": 390,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "loading",
     "width": 360,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "loading",
     "width": 390,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "long",
     "width": 360,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "long",
     "width": 390,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "offline",
     "width": 360,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-21",
     "state": "offline",
     "width": 390,
     "url": "/chat",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      },
-      {
-        "id": "nested-interactive",
-        "impact": "serious",
-        "nodes": 20,
-        "targets": [
-          ".min-h-14.border-b.border-ink-09:nth-child(1)",
-          ".min-h-14.border-b.border-ink-09:nth-child(2)",
-          ".min-h-14.border-b.border-ink-09:nth-child(3)"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-22",
     "state": "default",
     "width": 360,
     "url": "/dashboard",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".pt-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-22",
     "state": "default",
     "width": 390,
     "url": "/dashboard",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".pt-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-22",
     "state": "long",
     "width": 360,
     "url": "/dashboard",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".pt-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-22",
     "state": "long",
     "width": 390,
     "url": "/dashboard",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".pt-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-22",
     "state": "offline",
     "width": 360,
     "url": "/dashboard",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".pt-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-22",
     "state": "offline",
     "width": 390,
     "url": "/dashboard",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".pt-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-23b",
@@ -2765,100 +2230,28 @@
     "state": "default",
     "width": 360,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      },
-      {
-        "id": "label",
-        "impact": "critical",
-        "nodes": 1,
-        "targets": [
-          "input"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-28",
     "state": "default",
     "width": 390,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      },
-      {
-        "id": "label",
-        "impact": "critical",
-        "nodes": 1,
-        "targets": [
-          "input"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-28",
     "state": "empty",
     "width": 360,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      },
-      {
-        "id": "label",
-        "impact": "critical",
-        "nodes": 1,
-        "targets": [
-          "input"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-28",
     "state": "empty",
     "width": 390,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      },
-      {
-        "id": "label",
-        "impact": "critical",
-        "nodes": 1,
-        "targets": [
-          "input"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-28",
@@ -2893,100 +2286,28 @@
     "state": "long",
     "width": 360,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      },
-      {
-        "id": "label",
-        "impact": "critical",
-        "nodes": 1,
-        "targets": [
-          "input"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-28",
     "state": "long",
     "width": 390,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      },
-      {
-        "id": "label",
-        "impact": "critical",
-        "nodes": 1,
-        "targets": [
-          "input"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-28",
     "state": "offline",
     "width": 360,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      },
-      {
-        "id": "label",
-        "impact": "critical",
-        "nodes": 1,
-        "targets": [
-          "input"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-28",
     "state": "offline",
     "width": 390,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      },
-      {
-        "id": "label",
-        "impact": "critical",
-        "nodes": 1,
-        "targets": [
-          "input"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-29",
@@ -3077,34 +2398,14 @@
     "state": "default",
     "width": 360,
     "url": "/privacy",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          "a[href$=\"delete-account\"]",
-          "a[href$=\"mailto:support@fiqr.app\"]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-30",
     "state": "default",
     "width": 390,
     "url": "/privacy",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          "a[href$=\"delete-account\"]",
-          "a[href$=\"mailto:support@fiqr.app\"]"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-31",
@@ -3125,34 +2426,14 @@
     "state": "default",
     "width": 360,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-32b",
     "state": "default",
     "width": 390,
     "url": "/settings",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 2,
-        "targets": [
-          ".py-3.flex-wrap.gap-2 > .text-cream.bg-accent.px-3",
-          ".py-3.px-\\[14px\\] > .flex-wrap.gap-2.flex > .text-cream.bg-accent.px-3"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-32",
