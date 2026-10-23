@@ -31,7 +31,7 @@ describe('FIQR live-session markup contract', () => {
   it('uses the set-progress bar, horizontal pager, five-column set table, and fixed nav', () => {
     expect(sessionPage).toContain('completedSets / totalSets')
     expect(sessionPage).toContain('snap-x snap-mandatory')
-    expect(sessionPage).toContain('grid-cols-[36px_1fr_1fr_1fr_40px]')
+    expect(sessionPage).toContain('grid-cols-[32px_1fr_1fr_1fr_44px]')
     expect(sessionPage).toContain('fixed inset-x-0 bottom-0')
   })
 

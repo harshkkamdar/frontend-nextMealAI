@@ -1862,49 +1862,15 @@
     "row": "D2-17",
     "state": "error",
     "width": 360,
-    "url": "about:blank",
-    "violations": [
-      {
-        "id": "document-title",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          "html"
-        ]
-      },
-      {
-        "id": "html-has-lang",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          "html"
-        ]
-      }
-    ]
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": []
   },
   {
     "row": "D2-17",
     "state": "error",
     "width": 390,
-    "url": "about:blank",
-    "violations": [
-      {
-        "id": "document-title",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          "html"
-        ]
-      },
-      {
-        "id": "html-has-lang",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          "html"
-        ]
-      }
-    ]
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": []
   },
   {
     "row": "D2-17",

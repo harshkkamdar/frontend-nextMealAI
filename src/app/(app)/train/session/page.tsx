@@ -9,6 +9,8 @@ import { NumberField, SearchablePicker } from '@/components/plans/plan-builder-s
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { MetricTile } from '@/components/ui/fiqr/metric-tile'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { PageHeader } from '@/components/ui/fiqr/page-header'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
 import { RestTimer } from '@/components/workout/rest-timer'
@@ -48,6 +50,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const router = useRouter()
   const [session, setSession] = useState<WorkoutSession | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadFailed, setLoadFailed] = useState(false)
   const [showRestTimer, setShowRestTimer] = useState(false)
   const [restSeconds, setRestSeconds] = useState(90)
   const [restKey, setRestKey] = useState(0)
@@ -79,10 +82,12 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     return getWorkoutSession(sessionId)
       .then((nextSession) => {
         setSession(nextSession)
+        setLoadFailed(false)
         if (showToast) toast.success('Workout updated!')
       })
-      .catch(() => { toast.error('Failed to load workout'); router.back() })
-  }, [sessionId, router])
+      // Stay on the page: going back from a deep link or cold start lands on a blank page.
+      .catch(() => setLoadFailed(true))
+  }, [sessionId])
 
   useEffect(() => {
     loadSession().finally(() => setLoading(false))
@@ -322,7 +327,18 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const formatTime = (seconds: number) => `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`
 
   if (loading) return <div className="flex h-dvh items-center justify-center bg-cream"><div className="h-6 w-6 animate-spin rounded-full border-2 border-ink-16 border-t-ink" /></div>
-  if (!session) return null
+  if (!session) {
+    return (
+      <div className="flex h-dvh flex-col bg-cream px-gutter" style={{ paddingTop: 'calc(16px + var(--safe-top))' }}>
+        <PageHeader title="Workout" onBack={() => router.push('/train')} backLabel="Back to training" />
+        {loadFailed ? (
+          <ErrorState onRetry={() => { setLoading(true); void loadSession().finally(() => setLoading(false)) }}>
+            I couldn&apos;t load this workout. Check your connection and try again.
+          </ErrorState>
+        ) : null}
+      </div>
+    )
+  }
 
   if (showSummary) {
     const completedExercises = exercises.filter((exercise) => exercise.status === 'completed').length
@@ -352,10 +368,10 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       <RestTimer isActive={showRestTimer} duration={restSeconds} resetToken={restKey} onSkip={() => setShowRestTimer(false)} onComplete={() => setShowRestTimer(false)} />
 
       <header className="sticky top-0 z-20 bg-cream px-gutter pb-3" style={{ paddingTop: 'calc(10px + var(--safe-top))' }}>
-        <div className="grid grid-cols-[40px_1fr_40px] items-center">
-          <button type="button" onClick={handleBack} aria-label="Go back" className="flex h-10 w-10 items-center justify-center text-ink"><Chevron direction="left" /></button>
+        <div className="grid grid-cols-[44px_1fr_44px] items-center">
+          <button type="button" onClick={handleBack} aria-label="Go back" className="-ml-[2px] flex size-11 items-center justify-center text-ink"><Chevron direction="left" /></button>
           <p className="truncate text-center text-[15.5px] font-semibold tabular-nums text-ink">{session.day_name} · {formatTime(elapsedSeconds)}</p>
-          <button type="button" onClick={() => setShowMenu(true)} aria-label="Workout options" className="flex h-10 w-10 items-center justify-center text-[24px] leading-none text-ink-65">…</button>
+          <button type="button" onClick={() => setShowMenu(true)} aria-label="Workout options" className="flex size-11 items-center justify-center text-ink-65"><svg viewBox="0 0 24 24" aria-hidden="true" className="size-6" fill="currentColor"><circle cx="5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="19" cy="12" r="1.8" /></svg></button>
         </div>
         <div className="mt-2 h-[7px] overflow-hidden rounded-[4px] bg-ink-10">
           <div className="h-full bg-ink transition-[width] duration-300" style={{ width: `${totalSets ? (completedSets / totalSets) * 100 : 0}%` }} />
@@ -372,7 +388,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
           <div ref={pagerRef} className="scrollbar-hide -mx-gutter flex snap-x snap-mandatory gap-3 overflow-x-auto px-gutter">
             {exercises.map((exercise, exerciseIndex) => (
               <article key={`${exercise.name}-${exerciseIndex}`} data-exercise-index={exerciseIndex} className="w-[calc(100vw-44px)] max-w-[346px] shrink-0 snap-center rounded-[22px] border border-ink-12 bg-card p-[22px]">
-                <h1 className="text-[28px] font-bold leading-[1.1] tracking-[-0.6px] text-ink">{exercise.name}</h1>
+                <h1 className="line-clamp-3 text-[28px] font-bold leading-[1.1] tracking-[-0.6px] text-ink">{exercise.name}</h1>
                 <p className="mt-2 text-[14px] text-ink-65">{exercise.planned_sets} × {exercise.planned_reps}{exercise.rest_seconds ? ` · ${exercise.rest_seconds} s rest` : ''}</p>
 
                 {exercise.instructions && exercise.instructions.length > 0 && (
@@ -382,12 +398,12 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                   </details>
                 )}
 
-                <div className="mt-5 grid grid-cols-[36px_1fr_1fr_1fr_40px] items-center gap-1 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
-                  <span>Set</span><span>Prev</span><span className="text-center">kg</span><span className="text-center">Reps</span><span className="text-center">✓</span>
+                <div className="mt-5 grid grid-cols-[32px_1fr_1fr_1fr_44px] items-center gap-1 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
+                  <span>Set</span><span>Prev</span><span className="text-center">kg</span><span className="text-center">Reps</span><span className="text-center">Done</span>
                 </div>
                 <div className="mt-1">
                   {exercise.sets.map((set, setIndex) => (
-                    <div key={setIndex} className="grid h-12 grid-cols-[36px_1fr_1fr_1fr_40px] items-center gap-1 border-t border-ink-09 first:border-t-0">
+                    <div key={setIndex} className="grid h-12 grid-cols-[32px_1fr_1fr_1fr_44px] items-center gap-1 border-t border-ink-09 first:border-t-0">
                       <span className="text-[15.5px] font-semibold text-ink">{set.set_number}</span>
                       <span className="text-[13.5px] tabular-nums text-ink-65">{set.previous_reps != null && set.previous_weight_kg != null ? `${set.previous_reps}×${set.previous_weight_kg}` : '—'}</span>
                       <input
@@ -404,15 +420,18 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                       />
                       <button
                         type="button" onClick={() => completeSet(exerciseIndex, setIndex)} aria-label={`Complete set ${set.set_number}`}
-                        className={cn('mx-auto flex h-8 w-8 items-center justify-center rounded-full border border-ink-16 transition-transform duration-200', set.completed && 'bg-ink text-cream', celebrate && exerciseIndex === currentIndex && set.completed && 'scale-110')}
+                        aria-pressed={set.completed}
+                        className="mx-auto flex size-11 items-center justify-center"
                       >
-                        {set.completed ? <TickIcon /> : null}
+                        <span className={cn('flex size-8 items-center justify-center rounded-full border border-ink-16 transition-transform duration-200', set.completed && 'border-ink bg-ink text-cream', celebrate && exerciseIndex === currentIndex && set.completed && 'scale-110')}>
+                          {set.completed ? <TickIcon /> : null}
+                        </span>
                       </button>
                     </div>
                   ))}
                 </div>
 
-                <button type="button" onClick={() => addSet(exerciseIndex)} className="mt-3 text-[13.5px] font-semibold text-ink-65">+ Add set</button>
+                <button type="button" onClick={() => addSet(exerciseIndex)} className="mt-1 min-h-11 text-[13.5px] font-semibold text-ink-65">+ Add set</button>
 
                 <textarea
                   placeholder="Notes (form cues, how it felt...)" aria-label={`Notes for ${exercise.name}`} value={exercise.notes || ''}
@@ -450,8 +469,9 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         )}
       </main>
 
+      {exercises.length > 0 ? (
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-ink-10 bg-cream px-gutter pt-3" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
-        {allComplete ? (
+        {allComplete || currentIndex === exercises.length - 1 ? (
           <PrimaryButton type="button" onClick={() => void handleComplete()} disabled={completing} className="justify-center">{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
         ) : (
           <div className="flex gap-[10px]">
@@ -472,6 +492,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
           </div>
         )}
       </nav>
+      ) : null}
 
       <BottomSheet open={showMenu} onClose={() => { setShowMenu(false); setRemoveConfirm(false); setDiscardConfirm(false) }} ariaLabel="Workout options">
         <div className="px-gutter pb-6 pt-2">
