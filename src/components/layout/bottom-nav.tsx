@@ -68,9 +68,11 @@ export function BottomNav() {
       <Link
         key={item.href}
         href={item.href}
-        className={`flex flex-col items-center gap-[5px] ${isActive ? 'text-accent' : 'text-ink-50'}`}
+        aria-current={isActive ? 'page' : undefined}
+        className={`flex min-h-11 flex-col items-center gap-[5px] ${isActive ? 'text-ink' : 'text-ink-65'}`}
       >
-        <Icon />
+        {/* Orange icon marks the active tab; the label stays ink so it passes 4.5:1. */}
+        <span className={isActive ? 'text-accent' : undefined}><Icon /></span>
         <span className={`text-[10.5px] ${isActive ? 'font-semibold' : 'font-medium'}`}>
           {item.label}
         </span>
@@ -95,7 +97,7 @@ export function BottomNav() {
           >
             G
           </button>
-          <span className="mt-[6px] text-[10.5px] font-semibold text-ink-60">Geo</span>
+          <span className="mt-[6px] text-[10.5px] font-semibold text-ink-65">Geo</span>
         </div>
         {renderItem(navItems[2])}
         {renderItem(navItems[3])}

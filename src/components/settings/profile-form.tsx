@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { CardSkeleton } from '@/components/shared/loading-skeleton'
-import { cn } from '@/lib/utils'
+import { Chip } from '@/components/ui/fiqr/chip'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { fieldClass } from '@/components/ui/fiqr/field'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { toast } from 'sonner'
-import { Loader2, MessageCircle } from 'lucide-react'
 import { computeAgeFromDob, computeDailyTargets } from '@/lib/tdee'
 import type { Profile, PrimaryGoal, ActivityLevel, DietaryStyle } from '@/types/profile.types'
 
@@ -85,7 +86,7 @@ export function ProfileForm() {
   })
   const [resettingTargets, setResettingTargets] = useState(false)
 
-  useEffect(() => {
+  const load = useCallback(() => {
     getProfile()
       .then((p) => {
         setProfile(p)
@@ -101,9 +102,11 @@ export function ProfileForm() {
         setDailyCarbs(p.daily_carbs_g?.toString() ?? '')
         setDailyFat(p.daily_fat_g?.toString() ?? '')
       })
-      .catch(() => toast.error('Failed to load profile'))
+      .catch(() => setProfile(null))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(load, [load])
 
   const toggleEquipment = (item: string) => {
     if (item === 'None') {
@@ -208,7 +211,7 @@ export function ProfileForm() {
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="mt-6 space-y-4">
         <CardSkeleton />
         <CardSkeleton />
         <CardSkeleton />
@@ -217,7 +220,7 @@ export function ProfileForm() {
   }
 
   if (!profile) {
-    return <p className="text-text-secondary text-sm">Unable to load profile.</p>
+    return <ErrorState onRetry={() => { setLoading(true); load() }}>I couldn&apos;t load your profile. Check your connection and try again.</ErrorState>
   }
 
   // FB-tdee-baseline UX — surface the specific fields the user needs to
@@ -226,274 +229,141 @@ export function ProfileForm() {
   const missingFields = profile.daily_targets_missing_fields ?? []
   const heightMissing = missingFields.includes('height_cm')
   const weightMissing = missingFields.includes('current_weight_kg')
+  const hasOverrides = profile.daily_calorie_target != null
+    || profile.daily_protein_g != null
+    || profile.daily_carbs_g != null
+    || profile.daily_fat_g != null
+
+  const targetFields = [
+    { id: 'calories', label: 'Calories', unit: 'kcal', value: dailyCalories, set: setDailyCalories, saved: profile.daily_calorie_target, preview: previewTargets?.calories },
+    { id: 'protein', label: 'Protein', unit: 'g', value: dailyProtein, set: setDailyProtein, saved: profile.daily_protein_g, preview: previewTargets?.protein },
+    { id: 'carbs', label: 'Carbs', unit: 'g', value: dailyCarbs, set: setDailyCarbs, saved: profile.daily_carbs_g, preview: previewTargets?.carbs },
+    { id: 'fat', label: 'Fat', unit: 'g', value: dailyFat, set: setDailyFat, saved: profile.daily_fat_g, preview: previewTargets?.fat },
+  ] as const
 
   return (
-    <div className="space-y-4">
+    <div>
       {missingFields.length > 0 && (
-        <div className="bg-warning/10 border border-warning/30 rounded-2xl p-4">
-          <p className="text-sm font-semibold text-text-primary">Daily targets aren't computing yet</p>
-          <p className="text-xs text-text-secondary mt-1">
-            We still need: <span className="font-medium text-text-primary">{missingFields.join(', ')}</span>.
-            Fill these in and tap <span className="font-medium">Save changes</span> at the bottom.
-          </p>
+        <div role="status" className="mt-5 rounded-[16px] border border-ink-16 bg-card px-[14px] py-[13px]">
+          <p className="text-[15.5px] font-semibold text-ink">Add your {missingFields.map((f) => f.replace(/_(kg|cm)$/, '').replace(/_/g, ' ')).join(' and ')}</p>
+          <p className="mt-1 text-[13.5px] text-ink-65">FIQR needs them to work out your daily targets.</p>
         </div>
       )}
 
-      {/* Measurements */}
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-3">
-          Measurements
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label className="text-text-secondary text-xs mb-1">
-              Weight (kg) {weightMissing && <span className="text-warning">· required</span>}
-            </Label>
-            <Input
-              type="number"
-              inputMode="decimal"
-              step="0.1"
-              value={currentWeight}
-              onChange={(e) => setCurrentWeight(e.target.value)}
-              placeholder={weightMissing ? 'enter your weight' : 'e.g. 75'}
-              className={cn(weightMissing && 'border-warning')}
-            />
-          </div>
-          <div>
-            <Label className="text-text-secondary text-xs mb-1">Target (kg)</Label>
-            <Input
-              type="number"
-              inputMode="decimal"
-              step="0.1"
-              value={targetWeight}
-              onChange={(e) => setTargetWeight(e.target.value)}
-              placeholder="e.g. 70"
-            />
-          </div>
+      <section className="mt-6">
+        <SectionLabel>Body</SectionLabel>
+        <div className="mt-[13px] grid grid-cols-2 gap-[10px]">
+          <Field id="weight" label={weightMissing ? 'Weight · needed' : 'Weight'} unit="kg">
+            <input id="weight" type="number" inputMode="decimal" step="0.1" value={currentWeight} onChange={(e) => setCurrentWeight(e.target.value)} placeholder="75" className={`${fieldClass} pr-11 tabular-nums`} />
+          </Field>
+          <Field id="target-weight" label="Goal weight" unit="kg">
+            <input id="target-weight" type="number" inputMode="decimal" step="0.1" value={targetWeight} onChange={(e) => setTargetWeight(e.target.value)} placeholder="70" className={`${fieldClass} pr-11 tabular-nums`} />
+          </Field>
+          <Field id="height" label={heightMissing ? 'Height · needed' : 'Height'} unit="cm">
+            <input id="height" type="number" inputMode="decimal" step="0.1" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="175" className={`${fieldClass} pr-11 tabular-nums`} />
+          </Field>
         </div>
-        <div className="mt-3">
-          <Label className="text-text-secondary text-xs mb-1">
-            Height (cm) {heightMissing && <span className="text-warning">· required</span>}
-          </Label>
-          <Input
-            type="number"
-            inputMode="decimal"
-            step="0.1"
-            value={height}
-            onChange={(e) => setHeight(e.target.value)}
-            placeholder={heightMissing ? 'enter your height' : 'e.g. 175'}
-            className={cn(heightMissing && 'border-warning')}
-          />
-        </div>
-      </div>
+      </section>
 
-      {/* Daily Targets — manual override of TDEE auto-compute */}
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-1">
-          Daily Targets
+      <section className="mt-7">
+        <SectionLabel>Daily targets</SectionLabel>
+        <p className="mt-2 text-[13.5px] leading-[1.45] text-ink-65">
+          {previewTargets
+            ? <>From your body, goal and activity FIQR suggests <b className="font-semibold text-ink tabular-nums">{previewTargets.calories.toLocaleString('en-AU')} kcal</b>. Type a number to set your own.</>
+            : 'Add your weight and height and FIQR works these out for you.'}
         </p>
-        <p className="text-xs text-text-secondary mb-2">
-          Auto-computed from your profile (weight, height, goal, etc.). Numbers update instantly as you change goal or measurements. Type your own number in any field to override just that one — the rest still recompute on save.
-        </p>
-        {previewTargets ? (
-          <div className="bg-accent-light/40 border border-accent/20 rounded-lg px-3 py-2 mb-3 text-xs">
-            <span className="text-text-tertiary">Live preview: </span>
-            <span className="font-medium text-text-primary tabular-nums">
-              {previewTargets.calories} cal · {previewTargets.protein}g P · {previewTargets.carbs}g C · {previewTargets.fat}g F
-            </span>
-          </div>
-        ) : null}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label className="text-text-secondary text-xs mb-1">Calories</Label>
-            <Input
-              type="number"
-              inputMode="numeric"
-              value={dailyCalories}
-              onChange={(e) => { setDailyCalories(e.target.value); setTouchedTargets(t => ({ ...t, calories: true })) }}
-              placeholder={previewTargets ? String(previewTargets.calories) : (profile.daily_calorie_target ? String(profile.daily_calorie_target) : '—')}
-            />
-          </div>
-          <div>
-            <Label className="text-text-secondary text-xs mb-1">Protein (g)</Label>
-            <Input
-              type="number"
-              inputMode="numeric"
-              value={dailyProtein}
-              onChange={(e) => { setDailyProtein(e.target.value); setTouchedTargets(t => ({ ...t, protein: true })) }}
-              placeholder={previewTargets ? String(previewTargets.protein) : (profile.daily_protein_g ? String(profile.daily_protein_g) : '—')}
-            />
-          </div>
-          <div>
-            <Label className="text-text-secondary text-xs mb-1">Carbs (g)</Label>
-            <Input
-              type="number"
-              inputMode="numeric"
-              value={dailyCarbs}
-              onChange={(e) => { setDailyCarbs(e.target.value); setTouchedTargets(t => ({ ...t, carbs: true })) }}
-              placeholder={previewTargets ? String(previewTargets.carbs) : (profile.daily_carbs_g ? String(profile.daily_carbs_g) : '—')}
-            />
-          </div>
-          <div>
-            <Label className="text-text-secondary text-xs mb-1">Fat (g)</Label>
-            <Input
-              type="number"
-              inputMode="numeric"
-              value={dailyFat}
-              onChange={(e) => { setDailyFat(e.target.value); setTouchedTargets(t => ({ ...t, fat: true })) }}
-              placeholder={previewTargets ? String(previewTargets.fat) : (profile.daily_fat_g ? String(profile.daily_fat_g) : '—')}
-            />
-          </div>
+        <div className="mt-[13px] grid grid-cols-2 gap-[10px]">
+          {targetFields.map((f) => (
+            <Field key={f.id} id={`target-${f.id}`} label={f.label} unit={f.unit}>
+              <input
+                id={`target-${f.id}`}
+                type="number"
+                inputMode="numeric"
+                value={f.value}
+                onChange={(e) => { f.set(e.target.value); setTouchedTargets((t) => ({ ...t, [f.id]: true })) }}
+                placeholder={f.preview != null ? String(f.preview) : f.saved != null ? String(f.saved) : '—'}
+                className={`${fieldClass} pr-14 tabular-nums`}
+              />
+            </Field>
+          ))}
         </div>
-        {(profile.daily_calorie_target != null
-          || profile.daily_protein_g != null
-          || profile.daily_carbs_g != null
-          || profile.daily_fat_g != null) && (
+        {hasOverrides && (
           <button
             type="button"
             onClick={handleResetTargetsToBaseline}
             disabled={resettingTargets}
-            className="mt-3 text-xs text-accent hover:underline disabled:opacity-50"
+            className="mt-1 min-h-11 text-[13.5px] font-semibold text-ink underline decoration-ink-35 underline-offset-4 disabled:text-ink-35"
           >
-            {resettingTargets ? 'Resetting…' : 'Reset to TDEE baseline'}
+            {resettingTargets ? 'Resetting…' : 'Use the suggested targets'}
           </button>
         )}
-      </div>
+      </section>
 
-      {/* Primary Goal */}
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-3">
-          Primary Goal
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {GOAL_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => setGoal(opt.value)}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
-                goal === opt.value
-                  ? 'bg-accent border-accent text-white'
-                  : 'bg-background border-border text-text-primary hover:bg-surface-hover'
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
+      <ChipGroup label="Goal">
+        {GOAL_OPTIONS.map((opt) => (
+          <Chip key={opt.value} selected={goal === opt.value} onClick={() => setGoal(opt.value)}>{opt.label}</Chip>
+        ))}
+      </ChipGroup>
+
+      <ChipGroup label="Activity">
+        {ACTIVITY_OPTIONS.map((opt) => (
+          <Chip key={opt.value} selected={activity === opt.value} onClick={() => setActivity(opt.value)}>{opt.label}</Chip>
+        ))}
+      </ChipGroup>
+
+      <ChipGroup label="Eating style">
+        {DIETARY_OPTIONS.map((opt) => (
+          <Chip key={opt.value} selected={diet === opt.value} onClick={() => setDiet(opt.value)}>{opt.label}</Chip>
+        ))}
+      </ChipGroup>
+
+      <ChipGroup label="Equipment">
+        {EQUIPMENT_OPTIONS.map((item) => (
+          <Chip key={item} selected={equipment.includes(item)} onClick={() => toggleEquipment(item)}>{item}</Chip>
+        ))}
+      </ChipGroup>
+
+      <section className="mt-7">
+        <SectionLabel>Injuries</SectionLabel>
+        <div className="mt-[13px] rounded-[16px] border border-ink-12 bg-card px-[14px] py-[13px]">
+          {profile.injuries && profile.injuries.length > 0 ? (
+            <ul className="space-y-1">
+              {profile.injuries.map((injury) => <li key={injury} className="text-[15.5px] font-semibold text-ink">{injury}</li>)}
+            </ul>
+          ) : (
+            <p className="text-[15.5px] font-semibold text-ink">None recorded</p>
+          )}
+          <p className="mt-1 text-[13.5px] text-ink-65">Tell Geo about a new injury and it updates this list.</p>
         </div>
-      </div>
+      </section>
 
-      {/* Activity Level */}
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-3">
-          Activity Level
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {ACTIVITY_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => setActivity(opt.value)}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
-                activity === opt.value
-                  ? 'bg-accent border-accent text-white'
-                  : 'bg-background border-border text-text-primary hover:bg-surface-hover'
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+      {/* Cream band runs under the nav's top edge so content never shows between the button and the nav. */}
+      <div className="sticky z-10 mt-7 bg-cream pb-7 pt-3" style={{ bottom: 'calc(68px + var(--safe-bottom))' }}>
+        <PrimaryButton type="button" onClick={handleSave} disabled={saving} className="justify-center">
+          {saving ? 'Saving…' : 'Save changes'}
+        </PrimaryButton>
       </div>
-
-      {/* Dietary Style */}
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-3">
-          Dietary Style
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {DIETARY_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => setDiet(opt.value)}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
-                diet === opt.value
-                  ? 'bg-accent border-accent text-white'
-                  : 'bg-background border-border text-text-primary hover:bg-surface-hover'
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Equipment */}
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-3">
-          Equipment
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {EQUIPMENT_OPTIONS.map((item) => {
-            const isActive = equipment.includes(item)
-            return (
-              <button
-                key={item}
-                type="button"
-                onClick={() => toggleEquipment(item)}
-                className={cn(
-                  'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
-                  isActive
-                    ? 'bg-accent border-accent text-white'
-                    : 'bg-background border-border text-text-primary hover:bg-surface-hover'
-                )}
-              >
-                {item}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Injuries */}
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary mb-3">
-          Injuries
-        </p>
-        {profile.injuries && profile.injuries.length > 0 ? (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {profile.injuries.map((injury) => (
-              <span
-                key={injury}
-                className="px-3 py-1.5 rounded-full text-sm font-medium bg-surface-hover border border-border text-text-primary"
-              >
-                {injury}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-text-secondary mb-3">No injuries recorded</p>
-        )}
-        <div className="flex items-center gap-1.5 text-xs text-text-tertiary">
-          <MessageCircle className="w-3.5 h-3.5" />
-          <span>Chat with Geo to update</span>
-        </div>
-      </div>
-
-      {/* Save Button */}
-      <button
-        type="button"
-        onClick={handleSave}
-        disabled={saving}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent hover:bg-accent-hover py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-      >
-        {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-        {saving ? 'Saving...' : 'Save changes'}
-      </button>
     </div>
+  )
+}
+
+function Field({ id, label, unit, children }: { id: string; label: string; unit?: string; children: ReactNode }) {
+  return (
+    <div>
+      <SectionLabel><label htmlFor={id}>{label}</label></SectionLabel>
+      <div className="relative mt-2">
+        {children}
+        {unit ? <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[13.5px] font-medium text-ink-65">{unit}</span> : null}
+      </div>
+    </div>
+  )
+}
+
+function ChipGroup({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <section className="mt-7" role="group" aria-label={label}>
+      <SectionLabel>{label}</SectionLabel>
+      <div className="mt-[13px] flex flex-wrap gap-2">{children}</div>
+    </section>
   )
 }

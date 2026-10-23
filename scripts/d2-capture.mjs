@@ -214,6 +214,7 @@ async function capture(browser, ctxInfo, row, state, size) {
     if (row.act && state !== 'loading') await row.act(page, state).catch((e) => console.warn(row.id, state, 'act failed:', e.message.split('\n')[0]))
     if (state === 'offline') { await context.setOffline(true); await page.waitForTimeout(1200) }
     await page.screenshot({ path: file })
+    if (process.env.FULLPAGE) await page.screenshot({ path: file.replace(/\.png$/, '-full.png'), fullPage: true })
     const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()
     const bad = axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
     return { row: row.id, state, width: size.w, url: page.url().replace(BASE, ''), violations: bad.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, targets: v.nodes.slice(0, 3).map((n) => n.target.join(' ')) })) }

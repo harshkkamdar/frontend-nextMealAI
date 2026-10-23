@@ -1,0 +1,86 @@
+[
+  {
+    "row": "D2-29",
+    "state": "default",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "default",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "empty",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "empty",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "error",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "error",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "loading",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "loading",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "long",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "long",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "offline",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "offline",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": []
+  }
+]

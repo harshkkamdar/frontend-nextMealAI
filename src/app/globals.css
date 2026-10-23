@@ -12,6 +12,8 @@
   /* derived opacities (ink over cream) */
   --color-ink-80: rgba(17,28,53,.8);
   --color-ink-62: rgba(17,28,53,.62);
+  /* lightest ink that passes 4.5:1 for small text on cream, white and ink-08 chips */
+  --color-ink-65: rgba(17,28,53,.65);
   --color-ink-60: rgba(17,28,53,.6);
   --color-ink-55: rgba(17,28,53,.55);
   --color-ink-50: rgba(17,28,53,.5);
