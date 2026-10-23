@@ -1,0 +1,6131 @@
+[
+  {
+    "row": "D2-01",
+    "state": "default",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "default",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "empty",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "empty",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "error",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 17,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "error",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 17,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "loading",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": []
+  },
+  {
+    "row": "D2-01",
+    "state": "loading",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": []
+  },
+  {
+    "row": "D2-01",
+    "state": "long",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "long",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "offline",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-01",
+    "state": "offline",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "default",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 17,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".whitespace-nowrap",
+          ".rounded-\\[14px\\].px-\\[10px\\].py-\\[10px\\]:nth-child(1) > .text-\\[12px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "default",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 17,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".whitespace-nowrap",
+          ".rounded-\\[14px\\].px-\\[10px\\].py-\\[10px\\]:nth-child(1) > .text-\\[12px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "empty",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".whitespace-nowrap",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "empty",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 18,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".whitespace-nowrap",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "error",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "error",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "loading",
+    "width": 360,
+    "url": "/check-in",
+    "violations": []
+  },
+  {
+    "row": "D2-02",
+    "state": "loading",
+    "width": 390,
+    "url": "/check-in",
+    "violations": []
+  },
+  {
+    "row": "D2-02",
+    "state": "long",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 17,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".whitespace-nowrap",
+          ".rounded-\\[14px\\].px-\\[10px\\].py-\\[10px\\]:nth-child(1) > .text-\\[12px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "long",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 17,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".whitespace-nowrap",
+          ".rounded-\\[14px\\].px-\\[10px\\].py-\\[10px\\]:nth-child(1) > .text-\\[12px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "offline",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 17,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".whitespace-nowrap",
+          ".rounded-\\[14px\\].px-\\[10px\\].py-\\[10px\\]:nth-child(1) > .text-\\[12px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-02",
+    "state": "offline",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 17,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".whitespace-nowrap",
+          ".rounded-\\[14px\\].px-\\[10px\\].py-\\[10px\\]:nth-child(1) > .text-\\[12px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "default",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".text-right.text-\\[13\\.5px\\].text-ink-55",
+          ".min-w-0 > p:nth-child(2)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "default",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".text-right.text-\\[13\\.5px\\].text-ink-55",
+          ".min-w-0 > p:nth-child(2)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "empty",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".text-right.text-\\[13\\.5px\\].text-ink-55",
+          ".min-w-0 > p:nth-child(2)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "empty",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".text-right.text-\\[13\\.5px\\].text-ink-55",
+          ".min-w-0 > p:nth-child(2)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "error",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "error",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "loading",
+    "width": 360,
+    "url": "/check-in",
+    "violations": []
+  },
+  {
+    "row": "D2-03",
+    "state": "loading",
+    "width": 390,
+    "url": "/check-in",
+    "violations": []
+  },
+  {
+    "row": "D2-03",
+    "state": "long",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".text-right.text-\\[13\\.5px\\].text-ink-55",
+          ".min-w-0 > p:nth-child(2)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "long",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".text-right.text-\\[13\\.5px\\].text-ink-55",
+          ".min-w-0 > p:nth-child(2)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "offline",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".text-right.text-\\[13\\.5px\\].text-ink-55",
+          ".min-w-0 > p:nth-child(2)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-03",
+    "state": "offline",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "targets": [
+          ".min-w-0.flex-1 > p",
+          ".text-right.text-\\[13\\.5px\\].text-ink-55",
+          ".min-w-0 > p:nth-child(2)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "default",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 12,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\]",
+          ".mt-4.p-\\[14px\\].border-ink-12 > .justify-between.gap-3.items-baseline > .text-\\[13\\.5px\\].text-ink-55",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "default",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 11,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\]",
+          ".mt-4.p-\\[14px\\].border-ink-12 > .justify-between.gap-3.items-baseline > .text-\\[13\\.5px\\].text-ink-55",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "empty",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 12,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\]",
+          ".mt-4.p-\\[14px\\].border-ink-12 > .justify-between.gap-3.items-baseline > .text-\\[13\\.5px\\].text-ink-55",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "empty",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 11,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\]",
+          ".mt-4.p-\\[14px\\].border-ink-12 > .justify-between.gap-3.items-baseline > .text-\\[13\\.5px\\].text-ink-55",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "error",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "error",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "loading",
+    "width": 360,
+    "url": "/check-in",
+    "violations": []
+  },
+  {
+    "row": "D2-04",
+    "state": "loading",
+    "width": 390,
+    "url": "/check-in",
+    "violations": []
+  },
+  {
+    "row": "D2-04",
+    "state": "long",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 12,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\]",
+          ".mt-4.p-\\[14px\\].border-ink-12 > .justify-between.gap-3.items-baseline > .text-\\[13\\.5px\\].text-ink-55",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "long",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 12,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\]",
+          ".mt-4.p-\\[14px\\].border-ink-12 > .justify-between.gap-3.items-baseline > .text-\\[13\\.5px\\].text-ink-55",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "offline",
+    "width": 360,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 12,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\]",
+          ".mt-4.p-\\[14px\\].border-ink-12 > .justify-between.gap-3.items-baseline > .text-\\[13\\.5px\\].text-ink-55",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-04",
+    "state": "offline",
+    "width": 390,
+    "url": "/check-in",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".gap-1"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 12,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\]",
+          ".mt-4.p-\\[14px\\].border-ink-12 > .justify-between.gap-3.items-baseline > .text-\\[13\\.5px\\].text-ink-55",
+          ".mt-2"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "default",
+    "width": 360,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      },
+      {
+        "id": "target-size",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "button[aria-label=\"Dinner actions\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "default",
+    "width": 390,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "empty",
+    "width": 360,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 19,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "empty",
+    "width": 390,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 19,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "error",
+    "width": 360,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 19,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "error",
+    "width": 390,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 19,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "loading",
+    "width": 360,
+    "url": "/food",
+    "violations": []
+  },
+  {
+    "row": "D2-05",
+    "state": "loading",
+    "width": 390,
+    "url": "/food",
+    "violations": []
+  },
+  {
+    "row": "D2-05",
+    "state": "long",
+    "width": 360,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      },
+      {
+        "id": "target-size",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "button[aria-label=\"Dinner actions\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "long",
+    "width": 390,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "offline",
+    "width": 360,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      },
+      {
+        "id": "target-size",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "button[aria-label=\"Lunch actions\"]",
+          "section:nth-child(2) > .rounded-\\[16px\\].border-ink-12.bg-card > .min-h-14.px-\\[14px\\].py-3"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-05",
+    "state": "offline",
+    "width": 390,
+    "url": "/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".text-\\[12px\\]",
+          "div:nth-child(1) > .items-baseline.gap-3.justify-between > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55",
+          ".text-accent.font-semibold"
+        ]
+      },
+      {
+        "id": "target-size",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "section:nth-child(2) > .rounded-\\[16px\\].border-ink-12.bg-card > .min-h-14.px-\\[14px\\].py-3"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "default",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 45,
+        "targets": [
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .text-\\[13px\\].text-ink-55.truncate",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "default",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 45,
+        "targets": [
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .text-\\[13px\\].text-ink-55.truncate",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "empty",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "empty",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "error",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "error",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "loading",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "loading",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "long",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 45,
+        "targets": [
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .text-\\[13px\\].text-ink-55.truncate",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "long",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 45,
+        "targets": [
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .text-\\[13px\\].text-ink-55.truncate",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "offline",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 45,
+        "targets": [
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .text-\\[13px\\].text-ink-55.truncate",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-06",
+    "state": "offline",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 45,
+        "targets": [
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .flex-1.min-w-0 > .text-\\[13px\\].text-ink-55.truncate",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .flex-1.min-w-0 > .mt-0\\.5.text-\\[11px\\].uppercase"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-07",
+    "state": "default",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "label[for=\"food-macro-kcal\"] > .mb-1.block.text-\\[11px\\]",
+          ".text-ink-60.text-\\[13\\.5px\\][type=\"button\"]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-07",
+    "state": "default",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "label[for=\"food-macro-kcal\"] > .mb-1.block.text-\\[11px\\]",
+          ".text-ink-60.text-\\[13\\.5px\\][type=\"button\"]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-07",
+    "state": "error",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-07",
+    "state": "error",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-07",
+    "state": "long",
+    "width": 360,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "label[for=\"food-macro-kcal\"] > .mb-1.block.text-\\[11px\\]",
+          ".text-ink-60.text-\\[13\\.5px\\][type=\"button\"]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-07",
+    "state": "long",
+    "width": 390,
+    "url": "/logs/new/food",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "label[for=\"food-macro-kcal\"] > .mb-1.block.text-\\[11px\\]",
+          ".text-ink-60.text-\\[13\\.5px\\][type=\"button\"]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "default",
+    "width": 360,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "default",
+    "width": 390,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "empty",
+    "width": 360,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "empty",
+    "width": 390,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "error",
+    "width": 360,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "error",
+    "width": 390,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "loading",
+    "width": 360,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
+  },
+  {
+    "row": "D2-08",
+    "state": "loading",
+    "width": 390,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": []
+  },
+  {
+    "row": "D2-08",
+    "state": "long",
+    "width": 360,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "long",
+    "width": 390,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "offline",
+    "width": 360,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-08",
+    "state": "offline",
+    "width": 390,
+    "url": "/chat?prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "default",
+    "width": 360,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "default",
+    "width": 390,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "empty",
+    "width": 360,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "empty",
+    "width": 390,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "error",
+    "width": 360,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "error",
+    "width": 390,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "loading",
+    "width": 360,
+    "url": "/logs/new/weight",
+    "violations": []
+  },
+  {
+    "row": "D2-09",
+    "state": "loading",
+    "width": 390,
+    "url": "/logs/new/weight",
+    "violations": []
+  },
+  {
+    "row": "D2-09",
+    "state": "long",
+    "width": 360,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "long",
+    "width": 390,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "offline",
+    "width": 360,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-09",
+    "state": "offline",
+    "width": 390,
+    "url": "/logs/new/weight",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".pointer-events-none",
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "default",
+    "width": 360,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "default",
+    "width": 390,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "empty",
+    "width": 360,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "empty",
+    "width": 390,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "error",
+    "width": 360,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "error",
+    "width": 390,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "loading",
+    "width": 360,
+    "url": "/logs/new/water",
+    "violations": []
+  },
+  {
+    "row": "D2-10",
+    "state": "loading",
+    "width": 390,
+    "url": "/logs/new/water",
+    "violations": []
+  },
+  {
+    "row": "D2-10",
+    "state": "long",
+    "width": 360,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "long",
+    "width": 390,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "offline",
+    "width": 360,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-10",
+    "state": "offline",
+    "width": 390,
+    "url": "/logs/new/water",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "default",
+    "width": 360,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "default",
+    "width": 390,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "empty",
+    "width": 360,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "empty",
+    "width": 390,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "error",
+    "width": 360,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "error",
+    "width": 390,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "loading",
+    "width": 360,
+    "url": "/logs/new/sleep",
+    "violations": []
+  },
+  {
+    "row": "D2-11",
+    "state": "loading",
+    "width": 390,
+    "url": "/logs/new/sleep",
+    "violations": []
+  },
+  {
+    "row": "D2-11",
+    "state": "long",
+    "width": 360,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "long",
+    "width": 390,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "offline",
+    "width": 360,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-11",
+    "state": "offline",
+    "width": 390,
+    "url": "/logs/new/sleep",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "default",
+    "width": 360,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "default",
+    "width": 390,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "empty",
+    "width": 360,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "empty",
+    "width": 390,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "error",
+    "width": 360,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "error",
+    "width": 390,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "loading",
+    "width": 360,
+    "url": "/logs/new/mood",
+    "violations": []
+  },
+  {
+    "row": "D2-12",
+    "state": "loading",
+    "width": 390,
+    "url": "/logs/new/mood",
+    "violations": []
+  },
+  {
+    "row": "D2-12",
+    "state": "long",
+    "width": 360,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "long",
+    "width": 390,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "offline",
+    "width": 360,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-12",
+    "state": "offline",
+    "width": 390,
+    "url": "/logs/new/mood",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "default",
+    "width": 360,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "default",
+    "width": 390,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "empty",
+    "width": 360,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "empty",
+    "width": 390,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "error",
+    "width": 360,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "error",
+    "width": 390,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "loading",
+    "width": 360,
+    "url": "/logs/new/energy",
+    "violations": []
+  },
+  {
+    "row": "D2-13",
+    "state": "loading",
+    "width": 390,
+    "url": "/logs/new/energy",
+    "violations": []
+  },
+  {
+    "row": "D2-13",
+    "state": "long",
+    "width": 360,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "long",
+    "width": 390,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "offline",
+    "width": 360,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-13",
+    "state": "offline",
+    "width": 390,
+    "url": "/logs/new/energy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "default",
+    "width": 360,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 57,
+        "targets": [
+          ".text-\\[17px\\]",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "default",
+    "width": 390,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 57,
+        "targets": [
+          ".text-\\[17px\\]",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "empty",
+    "width": 360,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".text-\\[17px\\]",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "empty",
+    "width": 390,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".text-\\[17px\\]",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "error",
+    "width": 360,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".text-\\[17px\\]",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "error",
+    "width": 390,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".text-\\[17px\\]",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "loading",
+    "width": 360,
+    "url": "/logs",
+    "violations": []
+  },
+  {
+    "row": "D2-14",
+    "state": "loading",
+    "width": 390,
+    "url": "/logs",
+    "violations": []
+  },
+  {
+    "row": "D2-14",
+    "state": "long",
+    "width": 360,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 57,
+        "targets": [
+          ".text-\\[17px\\]",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "long",
+    "width": 390,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 57,
+        "targets": [
+          ".text-\\[17px\\]",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "offline",
+    "width": 360,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 57,
+        "targets": [
+          ".text-\\[17px\\]",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-14",
+    "state": "offline",
+    "width": 390,
+    "url": "/logs",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 57,
+        "targets": [
+          ".text-\\[17px\\]",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(1) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55",
+          ".min-h-14.px-\\[14px\\].py-2\\.5:nth-child(2) > .min-w-0.flex-1 > .mt-0\\.5.text-\\[13px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "default",
+    "width": 360,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 19,
+        "targets": [
+          ".bg-accent",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .flex-wrap.items-baseline.gap-x-2 > .text-\\[11px\\].tracking-\\[1\\.4px\\].uppercase",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .text-\\[13px\\].leading-\\[1\\.45\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "default",
+    "width": 390,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".bg-accent",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .flex-wrap.items-baseline.gap-x-2 > .text-\\[11px\\].tracking-\\[1\\.4px\\].uppercase",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .text-\\[13px\\].leading-\\[1\\.45\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "empty",
+    "width": 360,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "empty",
+    "width": 390,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "error",
+    "width": 360,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "error",
+    "width": 390,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "loading",
+    "width": 360,
+    "url": "/foods",
+    "violations": []
+  },
+  {
+    "row": "D2-15",
+    "state": "loading",
+    "width": 390,
+    "url": "/foods",
+    "violations": []
+  },
+  {
+    "row": "D2-15",
+    "state": "long",
+    "width": 360,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".bg-accent",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .flex-wrap.items-baseline.gap-x-2 > .text-\\[11px\\].tracking-\\[1\\.4px\\].uppercase",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .text-\\[13px\\].leading-\\[1\\.45\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "long",
+    "width": 390,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".bg-accent",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .flex-wrap.items-baseline.gap-x-2 > .text-\\[11px\\].tracking-\\[1\\.4px\\].uppercase",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .text-\\[13px\\].leading-\\[1\\.45\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "offline",
+    "width": 360,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 19,
+        "targets": [
+          ".bg-accent",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .flex-wrap.items-baseline.gap-x-2 > .text-\\[11px\\].tracking-\\[1\\.4px\\].uppercase",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .text-\\[13px\\].leading-\\[1\\.45\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-15",
+    "state": "offline",
+    "width": 390,
+    "url": "/foods",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".bg-accent",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .flex-wrap.items-baseline.gap-x-2 > .text-\\[11px\\].tracking-\\[1\\.4px\\].uppercase",
+          ".min-h-16.items-start.gap-3:nth-child(1) > .min-w-0.flex-1 > .text-\\[13px\\].leading-\\[1\\.45\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "default",
+    "width": 360,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(1) > .text-\\[12px\\].text-ink-55",
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".text-\\[13\\.5px\\].shrink-0.text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "default",
+    "width": 390,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(1) > .text-\\[12px\\].text-ink-55",
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".text-\\[13\\.5px\\].shrink-0.text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "empty",
+    "width": 360,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".rounded-\\[16px\\].py-\\[13px\\].bg-card:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".py-5",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "empty",
+    "width": 390,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".rounded-\\[16px\\].py-\\[13px\\].bg-card:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".py-5",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "error",
+    "width": 360,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".rounded-\\[16px\\].py-\\[13px\\].bg-card:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".py-5",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "error",
+    "width": 390,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".rounded-\\[16px\\].py-\\[13px\\].bg-card:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".py-5",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "loading",
+    "width": 360,
+    "url": "/train",
+    "violations": []
+  },
+  {
+    "row": "D2-16",
+    "state": "loading",
+    "width": 390,
+    "url": "/train",
+    "violations": []
+  },
+  {
+    "row": "D2-16",
+    "state": "long",
+    "width": 360,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(1) > .text-\\[12px\\].text-ink-55",
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".text-\\[13\\.5px\\].shrink-0.text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "long",
+    "width": 390,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(1) > .text-\\[12px\\].text-ink-55",
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".text-\\[13\\.5px\\].shrink-0.text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "offline",
+    "width": 360,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(1) > .text-\\[12px\\].text-ink-55",
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".text-\\[13\\.5px\\].shrink-0.text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-16",
+    "state": "offline",
+    "width": 390,
+    "url": "/train",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(1) > .text-\\[12px\\].text-ink-55",
+          ".rounded-\\[16px\\].bg-card.border-ink-12:nth-child(2) > .text-\\[12px\\].text-ink-55",
+          ".text-\\[13\\.5px\\].shrink-0.text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-17",
+    "state": "default",
+    "width": 360,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "article[data-exercise-index=\"0\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"1\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"2\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-17",
+    "state": "default",
+    "width": 390,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "article[data-exercise-index=\"0\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"1\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"2\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-17",
+    "state": "empty",
+    "width": 360,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": []
+  },
+  {
+    "row": "D2-17",
+    "state": "empty",
+    "width": 390,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": []
+  },
+  {
+    "row": "D2-17",
+    "state": "error",
+    "width": 360,
+    "url": "about:blank",
+    "violations": [
+      {
+        "id": "document-title",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "html"
+        ]
+      },
+      {
+        "id": "html-has-lang",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "html"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-17",
+    "state": "error",
+    "width": 390,
+    "url": "about:blank",
+    "violations": [
+      {
+        "id": "document-title",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "html"
+        ]
+      },
+      {
+        "id": "html-has-lang",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "html"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-17",
+    "state": "loading",
+    "width": 360,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": []
+  },
+  {
+    "row": "D2-17",
+    "state": "loading",
+    "width": 390,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": []
+  },
+  {
+    "row": "D2-17",
+    "state": "long",
+    "width": 360,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "article[data-exercise-index=\"0\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"1\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"2\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-17",
+    "state": "long",
+    "width": 390,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "article[data-exercise-index=\"0\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"1\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"2\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-17",
+    "state": "offline",
+    "width": 360,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "article[data-exercise-index=\"0\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"1\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"2\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-17",
+    "state": "offline",
+    "width": 390,
+    "url": "/train/session?id=c561592c-e09b-484a-bcb4-5ae0253b85e5",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          "article[data-exercise-index=\"0\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"1\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]",
+          "article[data-exercise-index=\"2\"] > .mt-3.text-ink-60.text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "default",
+    "width": 360,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(2) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(3) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "default",
+    "width": 390,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(2) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(3) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "empty",
+    "width": 360,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 12,
+        "targets": [
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[15\\.5px\\].text-ink-50",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[13\\.5px\\].text-ink-60[href$=\"meal\"]",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(3) > .text-\\[15\\.5px\\].text-ink-50"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "empty",
+    "width": 390,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 12,
+        "targets": [
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[15\\.5px\\].text-ink-50",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[13\\.5px\\].text-ink-60[href$=\"meal\"]",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(3) > .text-\\[15\\.5px\\].text-ink-50"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "error",
+    "width": 360,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[15\\.5px\\].text-ink-50",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[13\\.5px\\].text-ink-60[href$=\"meal\"]",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(3) > .text-\\[15\\.5px\\].text-ink-50"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "error",
+    "width": 390,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[15\\.5px\\].text-ink-50",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[13\\.5px\\].text-ink-60[href$=\"meal\"]",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(3) > .text-\\[15\\.5px\\].text-ink-50"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "loading",
+    "width": 360,
+    "url": "/plans",
+    "violations": []
+  },
+  {
+    "row": "D2-18",
+    "state": "loading",
+    "width": 390,
+    "url": "/plans",
+    "violations": []
+  },
+  {
+    "row": "D2-18",
+    "state": "long",
+    "width": 360,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(2) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(3) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "long",
+    "width": 390,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(2) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(3) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "offline",
+    "width": 360,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(2) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(3) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-18",
+    "state": "offline",
+    "width": 390,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(2) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".cursor-pointer.justify-between.rounded-\\[16px\\]:nth-child(3) > .min-w-0 > .mt-0\\.5.text-ink-55.text-\\[13\\.5px\\]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "default",
+    "width": 360,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "p",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "default",
+    "width": 390,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "p",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "empty",
+    "width": 360,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "p",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "empty",
+    "width": 390,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "p",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "error",
+    "width": 360,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]",
+          "a[href$=\"food\"] > .font-medium.text-\\[10\\.5px\\]",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "error",
+    "width": 390,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "loading",
+    "width": 360,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": []
+  },
+  {
+    "row": "D2-19b",
+    "state": "loading",
+    "width": 390,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": []
+  },
+  {
+    "row": "D2-19b",
+    "state": "long",
+    "width": 360,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "p",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "long",
+    "width": 390,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "p",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "offline",
+    "width": 360,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "p",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19b",
+    "state": "offline",
+    "width": 390,
+    "url": "/plans/view?id=44511b07-06c0-4648-8168-1324ff10c8dd",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "p",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "default",
+    "width": 360,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "p",
+          "button[aria-label=\"Push day 1\"] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block",
+          "button[aria-label=\"Pull day 2\"] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "default",
+    "width": 390,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "p",
+          "button[aria-label=\"Push day 1\"] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block",
+          "button[aria-label=\"Pull day 2\"] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "empty",
+    "width": 360,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          "p",
+          ".rounded-\\[16px\\]",
+          "a[href$=\"dashboard\"] > .font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "empty",
+    "width": 390,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          "p",
+          ".rounded-\\[16px\\]",
+          "a[href$=\"dashboard\"] > .font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "error",
+    "width": 360,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "error",
+    "width": 390,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "loading",
+    "width": 360,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": []
+  },
+  {
+    "row": "D2-19",
+    "state": "loading",
+    "width": 390,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": []
+  },
+  {
+    "row": "D2-19",
+    "state": "long",
+    "width": 360,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "p",
+          "div:nth-child(1) > .gap-3.min-h-14.px-\\[14px\\] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block",
+          "div:nth-child(2) > .gap-3.min-h-14.px-\\[14px\\] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "long",
+    "width": 390,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "p",
+          "div:nth-child(1) > .gap-3.min-h-14.px-\\[14px\\] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block",
+          "div:nth-child(2) > .gap-3.min-h-14.px-\\[14px\\] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "offline",
+    "width": 360,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "p",
+          "button[aria-label=\"Push day 1\"] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block",
+          "button[aria-label=\"Pull day 2\"] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-19",
+    "state": "offline",
+    "width": 390,
+    "url": "/plans/view?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          "p",
+          "button[aria-label=\"Push day 1\"] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block",
+          "button[aria-label=\"Pull day 2\"] > .min-w-0.flex-1 > .text-\\[13px\\].text-ink-55.block"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20b",
+    "state": "default",
+    "width": 360,
+    "url": "/plans/new/workout",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".text-\\[13\\.5px\\].gap-2.text-ink-60",
+          ".gap-1\\.5",
+          ".space-y-3 > .text-\\[13\\.5px\\].text-ink-60[type=\"button\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20b",
+    "state": "default",
+    "width": 390,
+    "url": "/plans/new/workout",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".text-\\[13\\.5px\\].gap-2.text-ink-60",
+          ".gap-1\\.5",
+          ".space-y-3 > .text-\\[13\\.5px\\].text-ink-60[type=\"button\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20b",
+    "state": "long",
+    "width": 360,
+    "url": "/plans/new/workout",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".text-\\[13\\.5px\\].gap-2.text-ink-60",
+          ".gap-1\\.5",
+          ".space-y-3 > .text-\\[13\\.5px\\].text-ink-60[type=\"button\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20b",
+    "state": "long",
+    "width": 390,
+    "url": "/plans/new/workout",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".text-\\[13\\.5px\\].gap-2.text-ink-60",
+          ".gap-1\\.5",
+          ".space-y-3 > .text-\\[13\\.5px\\].text-ink-60[type=\"button\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "default",
+    "width": 360,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .text-ink-60.text-\\[13\\.5px\\].flex",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .divide-y.divide-ink-09 > .pt-3 > .gap-1\\.5.text-ink-60.text-\\[13\\.5px\\]",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(3) > .text-ink-60.text-\\[13\\.5px\\].flex"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "default",
+    "width": 390,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .text-ink-60.text-\\[13\\.5px\\].flex",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .divide-y.divide-ink-09 > .pt-3 > .gap-1\\.5.text-ink-60.text-\\[13\\.5px\\]",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(3) > .text-ink-60.text-\\[13\\.5px\\].flex"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "empty",
+    "width": 360,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".text-\\[13\\.5px\\].gap-2.text-ink-60",
+          ".gap-1\\.5",
+          ".space-y-3 > .text-\\[13\\.5px\\].text-ink-60[type=\"button\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "empty",
+    "width": 390,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 8,
+        "targets": [
+          ".text-\\[13\\.5px\\].gap-2.text-ink-60",
+          ".gap-1\\.5",
+          ".space-y-3 > .text-\\[13\\.5px\\].text-ink-60[type=\"button\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "error",
+    "width": 360,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[15\\.5px\\].text-ink-50",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[13\\.5px\\].text-ink-60[href$=\"meal\"]",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(3) > .text-\\[15\\.5px\\].text-ink-50"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "error",
+    "width": 390,
+    "url": "/plans",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[15\\.5px\\].text-ink-50",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(2) > .text-\\[13\\.5px\\].text-ink-60[href$=\"meal\"]",
+          ".min-h-14.justify-between.rounded-\\[16px\\]:nth-child(3) > .text-\\[15\\.5px\\].text-ink-50"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "loading",
+    "width": 360,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": []
+  },
+  {
+    "row": "D2-20c",
+    "state": "loading",
+    "width": 390,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": []
+  },
+  {
+    "row": "D2-20c",
+    "state": "long",
+    "width": 360,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .text-ink-60.text-\\[13\\.5px\\].flex",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .divide-y.divide-ink-09 > .pt-3 > .gap-1\\.5.text-ink-60.text-\\[13\\.5px\\]",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(3) > .text-ink-60.text-\\[13\\.5px\\].flex"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "long",
+    "width": 390,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .text-ink-60.text-\\[13\\.5px\\].flex",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .divide-y.divide-ink-09 > .pt-3 > .gap-1\\.5.text-ink-60.text-\\[13\\.5px\\]",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(3) > .text-ink-60.text-\\[13\\.5px\\].flex"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "offline",
+    "width": 360,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .text-ink-60.text-\\[13\\.5px\\].flex",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .divide-y.divide-ink-09 > .pt-3 > .gap-1\\.5.text-ink-60.text-\\[13\\.5px\\]",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(3) > .text-ink-60.text-\\[13\\.5px\\].flex"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20c",
+    "state": "offline",
+    "width": 390,
+    "url": "/plans/edit?id=a6d46d3d-1de4-4173-8cec-eccdbfddc9cc",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10,
+        "targets": [
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .text-ink-60.text-\\[13\\.5px\\].flex",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(2) > .divide-y.divide-ink-09 > .pt-3 > .gap-1\\.5.text-ink-60.text-\\[13\\.5px\\]",
+          ".rounded-\\[16px\\].border-ink-12.p-\\[14px\\]:nth-child(3) > .text-ink-60.text-\\[13\\.5px\\].flex"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20",
+    "state": "default",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".gap-1\\.5",
+          ".space-y-3 > .text-ink-60.text-\\[13\\.5px\\][type=\"button\"]",
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20",
+    "state": "default",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".gap-1\\.5",
+          ".space-y-3 > .text-ink-60.text-\\[13\\.5px\\][type=\"button\"]",
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20",
+    "state": "long",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".gap-1\\.5",
+          ".space-y-3 > .text-ink-60.text-\\[13\\.5px\\][type=\"button\"]",
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-20",
+    "state": "long",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 7,
+        "targets": [
+          ".gap-1\\.5",
+          ".space-y-3 > .text-ink-60.text-\\[13\\.5px\\][type=\"button\"]",
+          "a[href$=\"dashboard\"] > .font-medium.text-\\[10\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "default",
+    "width": 360,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "default",
+    "width": 390,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "empty",
+    "width": 360,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "empty",
+    "width": 390,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "error",
+    "width": 360,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "error",
+    "width": 390,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".text-\\[13\\.5px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "loading",
+    "width": 360,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": []
+  },
+  {
+    "row": "D2-21b",
+    "state": "loading",
+    "width": 390,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": []
+  },
+  {
+    "row": "D2-21b",
+    "state": "long",
+    "width": 360,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "long",
+    "width": 390,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "offline",
+    "width": 360,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21b",
+    "state": "offline",
+    "width": 390,
+    "url": "/chat/session?id=568f5f42-f519-4cbb-aab7-6a6b345a313d",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "default",
+    "width": 360,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "default",
+    "width": 390,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "empty",
+    "width": 360,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "empty",
+    "width": 390,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "error",
+    "width": 360,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "error",
+    "width": 390,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          ".bg-accent",
+          "a[href$=\"dashboard\"] > .text-\\[10\\.5px\\].font-medium",
+          "a[href$=\"food\"] > .text-\\[10\\.5px\\].font-medium"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "loading",
+    "width": 360,
+    "url": "/chat",
+    "violations": []
+  },
+  {
+    "row": "D2-21",
+    "state": "loading",
+    "width": 390,
+    "url": "/chat",
+    "violations": []
+  },
+  {
+    "row": "D2-21",
+    "state": "long",
+    "width": 360,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "long",
+    "width": 390,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "offline",
+    "width": 360,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-21",
+    "state": "offline",
+    "width": 390,
+    "url": "/chat",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 26,
+        "targets": [
+          ".bg-accent",
+          ".min-h-14.border-b.border-ink-09:nth-child(1) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55",
+          ".min-h-14.border-b.border-ink-09:nth-child(2) > .shrink-0.gap-1\\.5.flex > .whitespace-nowrap.text-\\[13px\\].text-ink-55"
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "nodes": 20,
+        "targets": [
+          ".min-h-14.border-b.border-ink-09:nth-child(1)",
+          ".min-h-14.border-b.border-ink-09:nth-child(2)",
+          ".min-h-14.border-b.border-ink-09:nth-child(3)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-22",
+    "state": "default",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".pt-3"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 22,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-22",
+    "state": "default",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".pt-3"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 22,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-22",
+    "state": "long",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".pt-3"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 22,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-22",
+    "state": "long",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".pt-3"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 22,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-22",
+    "state": "offline",
+    "width": 360,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".pt-3"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 22,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-22",
+    "state": "offline",
+    "width": 390,
+    "url": "/dashboard",
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".pt-3"
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 22,
+        "targets": [
+          ".text-\\[12px\\].tracking-\\[1\\.4px\\].text-ink-50",
+          "em",
+          ".text-left.w-full[type=\"button\"]:nth-child(1) > div > .gap-3.justify-between.items-baseline > .whitespace-nowrap.text-\\[13\\.5px\\] > .text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23b",
+    "state": "default",
+    "width": 360,
+    "url": "/onboarding/fitness",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "p",
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23b",
+    "state": "default",
+    "width": 390,
+    "url": "/onboarding/fitness",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "p",
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23b",
+    "state": "long",
+    "width": 360,
+    "url": "/onboarding/fitness",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "p",
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23b",
+    "state": "long",
+    "width": 390,
+    "url": "/onboarding/fitness",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "p",
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23c",
+    "state": "default",
+    "width": 360,
+    "url": "/onboarding/nutrition",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23c",
+    "state": "default",
+    "width": 390,
+    "url": "/onboarding/nutrition",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23c",
+    "state": "long",
+    "width": 360,
+    "url": "/onboarding/nutrition",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23c",
+    "state": "long",
+    "width": 390,
+    "url": "/onboarding/nutrition",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23d",
+    "state": "default",
+    "width": 360,
+    "url": "/onboarding/review",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          ".font-normal",
+          ".rounded-\\[15px\\].px-3.py-3:nth-child(1) > .text-ink-60",
+          ".rounded-\\[15px\\].px-3.py-3:nth-child(2) > .text-ink-60"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23d",
+    "state": "default",
+    "width": 390,
+    "url": "/onboarding/review",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          ".font-normal",
+          ".rounded-\\[15px\\].px-3.py-3:nth-child(1) > .text-ink-60",
+          ".rounded-\\[15px\\].px-3.py-3:nth-child(2) > .text-ink-60"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23",
+    "state": "default",
+    "width": 360,
+    "url": "/onboarding/personal",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "targets": [
+          "p",
+          "span",
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23",
+    "state": "default",
+    "width": 390,
+    "url": "/onboarding/personal",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "targets": [
+          "p",
+          "span",
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23d",
+    "state": "long",
+    "width": 360,
+    "url": "/onboarding/review",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          ".font-normal",
+          ".rounded-\\[15px\\].px-3.py-3:nth-child(1) > .text-ink-60",
+          ".rounded-\\[15px\\].px-3.py-3:nth-child(2) > .text-ink-60"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23d",
+    "state": "long",
+    "width": 390,
+    "url": "/onboarding/review",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          ".font-normal",
+          ".rounded-\\[15px\\].px-3.py-3:nth-child(1) > .text-ink-60",
+          ".rounded-\\[15px\\].px-3.py-3:nth-child(2) > .text-ink-60"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23",
+    "state": "long",
+    "width": 360,
+    "url": "/onboarding/personal",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "targets": [
+          "p",
+          "span",
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-23",
+    "state": "long",
+    "width": 390,
+    "url": "/onboarding/personal",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "targets": [
+          "p",
+          "span",
+          ".text-cream"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-24",
+    "state": "default",
+    "width": 360,
+    "url": "/onboarding/consent?next=/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-24",
+    "state": "default",
+    "width": 390,
+    "url": "/onboarding/consent?next=/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-24",
+    "state": "long",
+    "width": 360,
+    "url": "/onboarding/consent?next=/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-24",
+    "state": "long",
+    "width": 390,
+    "url": "/onboarding/consent?next=/dashboard",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-25",
+    "state": "default",
+    "width": 360,
+    "url": "/login",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 4,
+        "targets": [
+          ".mt-1",
+          "a[href$=\"forgot-password\"]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-25",
+    "state": "default",
+    "width": 390,
+    "url": "/login",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 4,
+        "targets": [
+          ".mt-1",
+          "a[href$=\"forgot-password\"]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-25",
+    "state": "error",
+    "width": 360,
+    "url": "/login",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          ".mt-1",
+          "a[href$=\"forgot-password\"]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-25",
+    "state": "error",
+    "width": 390,
+    "url": "/login",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5,
+        "targets": [
+          ".mt-1",
+          "a[href$=\"forgot-password\"]",
+          ".bg-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-26",
+    "state": "default",
+    "width": 360,
+    "url": "/signup",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "targets": [
+          ".mt-1",
+          ".bg-accent",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-26",
+    "state": "default",
+    "width": 390,
+    "url": "/signup",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "targets": [
+          ".mt-1",
+          ".bg-accent",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-26",
+    "state": "error",
+    "width": 360,
+    "url": "/signup",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 4,
+        "targets": [
+          ".mt-1",
+          ".bg-accent",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-26",
+    "state": "error",
+    "width": 390,
+    "url": "/signup",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 4,
+        "targets": [
+          ".mt-1",
+          ".bg-accent",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-27b",
+    "state": "default",
+    "width": 360,
+    "url": "/reset-password",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          ".mt-1",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-27b",
+    "state": "default",
+    "width": 390,
+    "url": "/reset-password",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          ".mt-1",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-27",
+    "state": "default",
+    "width": 360,
+    "url": "/forgot-password",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "targets": [
+          ".mt-1",
+          ".bg-accent",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-27",
+    "state": "default",
+    "width": 390,
+    "url": "/forgot-password",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "targets": [
+          ".mt-1",
+          ".bg-accent",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-27",
+    "state": "error",
+    "width": 360,
+    "url": "/forgot-password",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 4,
+        "targets": [
+          ".mt-1",
+          ".bg-accent",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-27",
+    "state": "error",
+    "width": 390,
+    "url": "/forgot-password",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 4,
+        "targets": [
+          ".mt-1",
+          ".bg-accent",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "default",
+    "width": 360,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.block.text-ink-55",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": 1,
+        "targets": [
+          "input"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "default",
+    "width": 390,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.block.text-ink-55",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": 1,
+        "targets": [
+          "input"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "empty",
+    "width": 360,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.block.text-ink-55",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": 1,
+        "targets": [
+          "input"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "empty",
+    "width": 390,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.block.text-ink-55",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": 1,
+        "targets": [
+          "input"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "error",
+    "width": 360,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "error",
+    "width": 390,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "loading",
+    "width": 360,
+    "url": "/settings",
+    "violations": []
+  },
+  {
+    "row": "D2-28",
+    "state": "loading",
+    "width": 390,
+    "url": "/settings",
+    "violations": []
+  },
+  {
+    "row": "D2-28",
+    "state": "long",
+    "width": 360,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.block.text-ink-55",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": 1,
+        "targets": [
+          "input"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "long",
+    "width": 390,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.block.text-ink-55",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": 1,
+        "targets": [
+          "input"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "offline",
+    "width": 360,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.block.text-ink-55",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": 1,
+        "targets": [
+          "input"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-28",
+    "state": "offline",
+    "width": 390,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.block.text-ink-55",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": 1,
+        "targets": [
+          "input"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "default",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 25,
+        "targets": [
+          ".bg-surface.p-4.rounded-2xl:nth-child(1) > .uppercase.tracking-wider",
+          ".bg-surface.p-4.rounded-2xl:nth-child(2) > .uppercase.tracking-wider",
+          ".bg-accent-light\\/40 > span:nth-child(1)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "default",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 25,
+        "targets": [
+          ".bg-surface.p-4.rounded-2xl:nth-child(1) > .uppercase.tracking-wider",
+          ".bg-surface.p-4.rounded-2xl:nth-child(2) > .uppercase.tracking-wider",
+          ".bg-accent-light\\/40 > .text-text-tertiary"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "empty",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 19,
+        "targets": [
+          ".bg-surface.p-4.rounded-2xl:nth-child(1) > .uppercase.tracking-wider.mb-3",
+          ".uppercase.tracking-wider.mb-1",
+          ".bg-accent-light\\/40 > .text-text-tertiary"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "empty",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 19,
+        "targets": [
+          ".bg-surface.p-4.rounded-2xl:nth-child(1) > .uppercase.tracking-wider.mb-3",
+          ".uppercase.tracking-wider.mb-1",
+          "span:nth-child(1)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "error",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "error",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6,
+        "targets": [
+          "a[href$=\"dashboard\"] > .font-medium",
+          "a[href$=\"food\"] > .font-medium",
+          ".mt-\\[6px\\]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "loading",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "loading",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": []
+  },
+  {
+    "row": "D2-29",
+    "state": "long",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 25,
+        "targets": [
+          ".bg-surface.p-4.rounded-2xl:nth-child(1) > .uppercase.tracking-wider",
+          ".bg-surface.p-4.rounded-2xl:nth-child(2) > .uppercase.tracking-wider",
+          ".bg-accent-light\\/40 > span:nth-child(1)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "long",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 25,
+        "targets": [
+          ".bg-surface.p-4.rounded-2xl:nth-child(1) > .uppercase.tracking-wider",
+          ".bg-surface.p-4.rounded-2xl:nth-child(2) > .uppercase.tracking-wider",
+          ".bg-accent-light\\/40 > span:nth-child(1)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "offline",
+    "width": 360,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 25,
+        "targets": [
+          ".bg-surface.p-4.rounded-2xl:nth-child(1) > .uppercase.tracking-wider",
+          ".bg-surface.p-4.rounded-2xl:nth-child(2) > .uppercase.tracking-wider",
+          ".bg-accent-light\\/40 > span:nth-child(1)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-29",
+    "state": "offline",
+    "width": 390,
+    "url": "/settings/profile",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 25,
+        "targets": [
+          ".bg-surface.p-4.rounded-2xl:nth-child(1) > .uppercase.tracking-wider",
+          ".bg-surface.p-4.rounded-2xl:nth-child(2) > .uppercase.tracking-wider",
+          ".bg-accent-light\\/40 > span:nth-child(1)"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-30",
+    "state": "default",
+    "width": 360,
+    "url": "/privacy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "a[href$=\"delete-account\"]",
+          "a[href$=\"mailto:support@fiqr.app\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-30",
+    "state": "default",
+    "width": 390,
+    "url": "/privacy",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "a[href$=\"delete-account\"]",
+          "a[href$=\"mailto:support@fiqr.app\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-31",
+    "state": "default",
+    "width": 360,
+    "url": "/support",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "a[href$=\"delete-account\"]",
+          "a[href$=\"privacy\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-31",
+    "state": "default",
+    "width": 390,
+    "url": "/support",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          "a[href$=\"delete-account\"]",
+          "a[href$=\"privacy\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-32b",
+    "state": "default",
+    "width": 360,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.text-ink-55.block",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center.flex > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2.text-\\[13px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-32b",
+    "state": "default",
+    "width": 390,
+    "url": "/settings",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "targets": [
+          ".truncate.text-ink-55.block",
+          "section:nth-child(2) > .overflow-hidden.rounded-\\[16px\\].border-ink-12 > .justify-between.min-h-14.text-\\[15\\.5px\\] > .gap-2.items-center.flex > .text-ink-55.text-\\[13\\.5px\\]",
+          "div:nth-child(4) > .mt-2.text-\\[13px\\].text-ink-55"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-32",
+    "state": "default",
+    "width": 360,
+    "url": "/delete-account",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          ".bg-accent",
+          ".text-accent"
+        ]
+      }
+    ]
+  },
+  {
+    "row": "D2-32",
+    "state": "default",
+    "width": 390,
+    "url": "/delete-account",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          ".bg-accent",
+          ".text-accent"
+        ]
+      }
+    ]
+  }
+]
