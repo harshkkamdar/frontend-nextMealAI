@@ -62,6 +62,7 @@ export function FoodLogForm() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<FoodSearchResult[]>([])
   const [searching, setSearching] = useState(false)
+  const [searchFailed, setSearchFailed] = useState(false)
   const [pending, setPending] = useState<FoodDraft[]>([])
   // Personal-food id of the currently-selected search result, so a DB-sourced
   // food stays linked (enables recents/favorites/dedup) instead of being logged
@@ -140,10 +141,12 @@ export function FoodLogForm() {
     if (q.trim().length < 2) { setResults([]); return }
     debounceRef.current = setTimeout(async () => {
       setSearching(true)
+      setSearchFailed(false)
       try {
         setResults(await searchFoods(q.trim()))
       } catch {
         setResults([])
+        setSearchFailed(true)
       } finally {
         setSearching(false)
       }
@@ -426,7 +429,7 @@ export function FoodLogForm() {
           type="button"
           onClick={() => setMealMenuOpen((open) => !open)}
           aria-expanded={mealMenuOpen}
-          className="flex h-9 shrink-0 items-center rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
+          className="flex h-11 shrink-0 items-center rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
         >
           {mealType} <span aria-hidden="true" className="ml-1">▾</span>
         </button>
@@ -439,7 +442,7 @@ export function FoodLogForm() {
               key={type}
               type="button"
               onClick={() => { setMealType(type); setMealMenuOpen(false) }}
-              className={`h-9 whitespace-nowrap rounded-full px-3 text-[13.5px] font-semibold ${
+              className={`h-11 whitespace-nowrap rounded-full px-3 text-[13.5px] font-semibold ${
                 mealType === type ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
               }`}
             >
@@ -466,15 +469,15 @@ export function FoodLogForm() {
           onClick={() => void handlePhotoButton()}
           disabled={estimating}
           data-testid="photo-estimate-button"
-          className="flex h-9 items-center gap-2 rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink disabled:text-ink-35"
+          className="flex h-11 items-center gap-2 rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink disabled:text-ink-35"
         >
           <Camera className="size-4" />
           {estimating ? 'Analysing…' : 'Photo'}
         </button>
         <button
           type="button"
-          onClick={() => router.push('/chat?prefill=' + encodeURIComponent('Scan this menu and suggest what fits my remaining macros'))}
-          className="flex h-9 items-center gap-2 rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
+          onClick={() => router.push(`/chat/session?id=${crypto.randomUUID()}&prefill=` + encodeURIComponent('Scan this menu and suggest what fits my remaining macros'))}
+          className="flex h-11 items-center gap-2 rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
         >
           <FileText className="size-4" />
           Menu
@@ -482,10 +485,14 @@ export function FoodLogForm() {
       </div>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
 
+      {searchFailed && !searching && query.trim().length >= 2 ? (
+        <p role="status" className="mt-4 text-[15.5px] font-medium text-ink-80">Search isn&apos;t reachable right now. Try again, or use Photo or Menu.</p>
+      ) : null}
+
       {(searching || results.length > 0) ? (
         <div className="mt-4 overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
           {searching ? (
-            <div className="flex min-h-14 items-center justify-center gap-1.5" aria-label="Searching">
+            <div className="flex min-h-14 items-center justify-center gap-1.5" role="status" aria-label="Searching">
               {[0, 1, 2].map((dot) => <span key={dot} className="size-2 animate-pulse rounded-full bg-ink-35" />)}
             </div>
           ) : results.map((food, index) => (
@@ -548,14 +555,14 @@ export function FoodLogForm() {
             <div className="space-y-3">
               {inputMode === 'servings' ? (
                 <div className="flex items-center justify-between gap-3">
-                  <button type="button" aria-label="Fewer servings" onClick={() => handleServingsChange(Math.max(0.25, Math.round((servings - 0.25) * 100) / 100))} className="flex size-9 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">−</button>
+                  <button type="button" aria-label="Fewer servings" onClick={() => handleServingsChange(Math.max(0.25, Math.round((servings - 0.25) * 100) / 100))} className="flex size-11 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">−</button>
                   <div className="flex flex-1 items-baseline justify-center gap-2 text-center">
                     <span className="text-[15.5px] font-semibold text-ink">
                       <span data-testid="servings-value">{servings}</span> serving{servings === 1 ? '' : 's'}
                     </span>
                     <span className="text-[13px] text-ink-65">{Math.round(servings * servingSizeG)}g</span>
                   </div>
-                  <button type="button" aria-label="More servings" onClick={() => handleServingsChange(Math.round((servings + 0.25) * 100) / 100)} className="flex size-9 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">+</button>
+                  <button type="button" aria-label="More servings" onClick={() => handleServingsChange(Math.round((servings + 0.25) * 100) / 100)} className="flex size-11 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">+</button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
@@ -576,14 +583,14 @@ export function FoodLogForm() {
                     if (typeof quantityG === 'number' && quantityG > 0) setServings(Math.round((quantityG / servingSizeG) * 100) / 100)
                     setInputMode('servings')
                   }}
-                  className={`h-8 rounded-full px-3 text-[13px] font-semibold ${inputMode === 'servings' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
+                  className={`h-11 rounded-full px-4 text-[14px] font-semibold ${inputMode === 'servings' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
                 >
                   servings
                 </button>
                 <button
                   type="button"
                   onClick={() => { setQuantityG(Math.round(servings * servingSizeG)); setInputMode('grams') }}
-                  className={`h-8 rounded-full px-3 text-[13px] font-semibold ${inputMode === 'grams' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
+                  className={`h-11 rounded-full px-4 text-[14px] font-semibold ${inputMode === 'grams' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
                 >
                   grams
                 </button>
@@ -628,7 +635,7 @@ export function FoodLogForm() {
             Photo estimate
             {estimateConfidence != null ? ` · confidence ${Math.round(estimateConfidence * 100)}%` : ''}
           </span>
-          <button type="button" onClick={clearEstimate} aria-label="Clear photo estimate" className="text-[16px] leading-none">×</button>
+          <button type="button" onClick={clearEstimate} aria-label="Clear photo estimate" className="-my-3 -mr-3 flex size-11 items-center justify-center text-[18px] leading-none">×</button>
         </div>
       ) : null}
 
@@ -646,13 +653,13 @@ export function FoodLogForm() {
             {pending.map((item, index) => (
               <span key={`pending-${index}-${item.food_name}`} className="flex h-8 items-center gap-2 rounded-full bg-cream-22 px-3 text-[13px] font-medium text-cream">
                 <span className="max-w-36 truncate">{item.food_name}</span>
-                <button type="button" onClick={() => handleRemovePending(index)} aria-label={`Remove ${item.food_name}`} className="text-[16px] leading-none">×</button>
+                <button type="button" onClick={() => handleRemovePending(index)} aria-label={`Remove ${item.food_name}`} className="-my-3 -mr-3 flex size-11 items-center justify-center text-[18px] leading-none">×</button>
               </span>
             ))}
             {hasCurrent ? (
               <span className="flex h-8 items-center gap-2 rounded-full bg-cream-22 px-3 text-[13px] font-medium text-cream">
                 <span className="max-w-36 truncate">{foodName.trim()}</span>
-                <button type="button" onClick={clearForm} aria-label={`Remove ${foodName.trim()}`} className="text-[16px] leading-none">×</button>
+                <button type="button" onClick={clearForm} aria-label={`Remove ${foodName.trim()}`} className="-my-3 -mr-3 flex size-11 items-center justify-center text-[18px] leading-none">×</button>
               </span>
             ) : null}
           </div>
