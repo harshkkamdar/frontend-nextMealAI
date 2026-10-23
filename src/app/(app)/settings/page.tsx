@@ -24,6 +24,7 @@ import type { Profile } from '@/types/profile.types'
 import type { GeoPersonality, RestTimerDuration, Settings } from '@/types/settings.types'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev'
 
@@ -161,15 +162,17 @@ export default function SettingsPage() {
   const [lastSynced, setLastSynced] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState(false)
 
-  useEffect(() => {
+  const loadSettings = useCallback(() => {
     Promise.all([getSettings(), getProfile()])
       .then(([nextSettings, nextProfile]) => {
         setSettings(nextSettings)
         setProfile(nextProfile)
       })
-      .catch(() => toast.error('Failed to load settings'))
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(loadSettings, [loadSettings])
 
   useEffect(() => {
     let active = true
@@ -289,7 +292,7 @@ export default function SettingsPage() {
     return (
       <PageWrapper>
         <BackHeader onBack={() => router.push('/dashboard')} />
-        <p className="text-[15.5px] text-ink-65">Unable to load settings.</p>
+        <ErrorState onRetry={() => { setLoading(true); loadSettings() }}>I couldn&apos;t load your settings. Check your connection and try again.</ErrorState>
       </PageWrapper>
     )
   }
@@ -327,7 +330,7 @@ export default function SettingsPage() {
 
         <SettingsSection title="Subscription">
           {!native ? (
-            <SettingsRow label="Plan" value="Manage in the FIQR app" />
+            <SettingsRow label="Plan" value="In the iOS and Android app" />
           ) : subscribed ? (
             <SettingsRow label="Plan" value="FIQR Plus" />
           ) : (
@@ -360,6 +363,7 @@ export default function SettingsPage() {
             <SettingsRow label="Reminder time">
               <input
                 type="time"
+                aria-label="Reminder time"
                 value={settings.notification_time ?? '08:00'}
                 onChange={(event) => handleReminderChange(event.target.value)}
                 className="bg-transparent text-[15.5px] text-ink outline-none"
@@ -420,9 +424,9 @@ export default function SettingsPage() {
                 type="button"
                 onClick={() => void handleUpdate({ geo_personality: option.value })}
                 className={cn(
-                  'rounded-full px-3 h-9 text-[13.5px] font-semibold',
+                  'rounded-full px-4 h-11 text-[14px] font-semibold',
                   settings.geo_personality === option.value
-                    ? 'bg-accent text-cream'
+                    ? 'bg-ink text-cream'
                     : 'bg-ink-08 text-ink',
                 )}
               >
@@ -442,9 +446,9 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => void handleUpdate({ rest_timer_seconds: option.value })}
                   className={cn(
-                    'rounded-full px-3 h-9 text-[13.5px] font-semibold',
+                    'rounded-full px-4 h-11 text-[14px] font-semibold',
                     settings.rest_timer_seconds === option.value
-                      ? 'bg-accent text-cream'
+                      ? 'bg-ink text-cream'
                       : 'bg-ink-08 text-ink',
                   )}
                 >

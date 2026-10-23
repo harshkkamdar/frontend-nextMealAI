@@ -76,7 +76,7 @@ export default function DeleteAccountPage() {
             />
           </div>
 
-          <PrimaryButton type="submit" disabled={submissionState === 'submitting'}>
+          <PrimaryButton type="submit" disabled={submissionState === 'submitting'} className="justify-center">
             Request deletion
           </PrimaryButton>
 
