@@ -89,7 +89,7 @@ export function CheckInDue({ status, refetch }: CheckInDueProps) {
           items={[
             { label: 'Kcal', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)}` },
             { label: 'Protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)}g` },
-            { label: 'Sess.', value: week.sessions_done, sub: `of ${week.sessions_planned}` },
+            { label: 'Train', value: week.sessions_done, sub: `of ${week.sessions_planned}` },
             { label: 'Sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} nights` },
           ]}
         />
@@ -112,7 +112,7 @@ export function CheckInDue({ status, refetch }: CheckInDueProps) {
           </SecondaryButton>
         ) : (
           <PrimaryButton
-            className="h-[58px] justify-center text-[18px]"
+            className="h-[58px] justify-center"
             disabled={submitting}
             onClick={() => void handleApply()}
           >

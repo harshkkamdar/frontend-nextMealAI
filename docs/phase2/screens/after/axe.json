@@ -88,64 +88,28 @@
     "state": "default",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-02",
     "state": "default",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-02",
     "state": "empty",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-02",
     "state": "empty",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-02",
@@ -180,128 +144,56 @@
     "state": "long",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-02",
     "state": "long",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-02",
     "state": "offline",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-02",
     "state": "offline",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".bg-accent"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-03",
     "state": "default",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-03",
     "state": "default",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-03",
     "state": "empty",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-03",
     "state": "empty",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-03",
@@ -336,128 +228,56 @@
     "state": "long",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-03",
     "state": "long",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-03",
     "state": "offline",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-03",
     "state": "offline",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-04",
     "state": "default",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-04",
     "state": "default",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-04",
     "state": "empty",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-04",
     "state": "empty",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-04",
@@ -492,64 +312,28 @@
     "state": "long",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-04",
     "state": "long",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-04",
     "state": "offline",
     "width": 360,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-04",
     "state": "offline",
     "width": 390,
     "url": "/check-in",
-    "violations": [
-      {
-        "id": "aria-prohibited-attr",
-        "impact": "serious",
-        "nodes": 1,
-        "targets": [
-          ".gap-1"
-        ]
-      }
-    ]
+    "violations": []
   },
   {
     "row": "D2-05",

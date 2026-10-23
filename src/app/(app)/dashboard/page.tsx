@@ -25,6 +25,7 @@ import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { Wordmark } from '@/components/ui/fiqr/wordmark'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
@@ -63,11 +64,12 @@ interface DashboardData {
   stepLogs: Log[]
 }
 
-async function withFallback<T>(request: Promise<T>, fallback: T): Promise<T> {
+async function withFallback<T>(request: Promise<T>, fallback: T, failures?: unknown[]): Promise<T> {
   try {
     return await request
   } catch (error) {
     if (error instanceof OfflineError) throw error
+    failures?.push(error)
     return fallback
   }
 }
@@ -334,17 +336,21 @@ export default function DashboardPage() {
   const today = todayLocalISO(tz)
 
   const fetchAll = useCallback(async (): Promise<DashboardData> => {
+    const failures: unknown[] = []
     const [summary, plans, suggestions, todayLogs, profile, weightLogs, checkInResponse, recentSleepLogs, stepLogs] = await Promise.all([
-      withFallback(getLogsSummary('day'), null),
-      withFallback(getPlans({ active_only: true }), [] as Plan[]),
+      withFallback(getLogsSummary('day'), null, failures),
+      withFallback(getPlans({ active_only: true }), [] as Plan[], failures),
       withFallback(getSuggestions({ status: 'pending' }), [] as Suggestion[]),
       withFallback(getLogs({ days: 1 }), [] as Log[]),
-      withFallback(getProfile(), null),
+      withFallback(getProfile(), null, failures),
       withFallback(getLogs({ type: 'weight', limit: 100 }), [] as Log[]),
       withFallback(getDashboardCheckIn(), { check_in: null }),
       withFallback(getLogs({ type: 'sleep', limit: 1 }), [] as Log[]),
       withFallback(getLogs({ type: 'steps', days: 1 }), [] as Log[]),
     ])
+
+    // Targets, plan and profile all failing means Home has nothing true to show; report it instead of zeros.
+    if (failures.length === 3) throw failures[0]
 
     return {
       summary,
@@ -473,7 +479,7 @@ export default function DashboardPage() {
           <CardSkeleton />
         </div>
       ) : !data ? (
-        <p className="mt-4 text-[15.5px] text-ink-65">Unable to load your dashboard.</p>
+        <ErrorState onRetry={refresh}>I couldn&apos;t load today. Check your connection and try again.</ErrorState>
       ) : (
         <>
           <GeoLine>{emphasizeGeoMeasurements(geoLine)}</GeoLine>

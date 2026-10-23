@@ -6,8 +6,8 @@ import { CheckInDue } from '@/components/check-in/check-in-due'
 import { CheckInInsufficient } from '@/components/check-in/check-in-insufficient'
 import { CheckInMidWeek } from '@/components/check-in/check-in-mid-week'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { GeoLine } from '@/components/ui/fiqr/geo-line'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { PageHeader } from '@/components/ui/fiqr/page-header'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
@@ -37,8 +37,8 @@ export default function CheckInPage() {
   if (!data && error) {
     return (
       <main className="mx-auto w-full max-w-md px-gutter pb-6" style={{ paddingTop: 'calc(20px + var(--safe-top))' }}>
-        <GeoLine>Couldn&apos;t load your week. Pull to refresh.</GeoLine>
-        <SecondaryButton onClick={() => void refetch()} onNavy={false}>Try again</SecondaryButton>
+        <PageHeader title="Check-in" />
+        <ErrorState onRetry={() => void refetch()}>I couldn&apos;t load your week. Check your connection and try again.</ErrorState>
       </main>
     )
   }
@@ -52,7 +52,7 @@ export default function CheckInPage() {
   return (
     <main
       className="mx-auto flex w-full max-w-md flex-col"
-      style={{ minHeight: 'calc(100dvh - 80px - var(--safe-bottom))' }}
+      style={{ minHeight: 'calc(100dvh - 104px - var(--safe-bottom))' }}
     >
       <header className="flex items-center gap-[14px] px-gutter" style={{ paddingTop: 'calc(16px + var(--safe-top))' }}>
         <div className="min-w-0 flex-1">

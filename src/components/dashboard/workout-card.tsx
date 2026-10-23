@@ -47,7 +47,7 @@ export function WorkoutCard({
   return (
     <FeatureCard>
       <div className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Next up</div>
-      <div className="mt-[3px] text-[28px] font-bold tracking-[-0.6px] leading-[1.1]">{name}</div>
+      <div className="mt-[3px] line-clamp-2 text-[28px] font-bold tracking-[-0.6px] leading-[1.1]">{name}</div>
       <div className="mt-[3px] text-[14px] text-cream-60">{meta}</div>
       <SecondaryButton type="button" onNavy arrow className="mt-[18px]" onClick={onClick}>
         {action}

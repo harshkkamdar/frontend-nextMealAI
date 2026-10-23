@@ -74,7 +74,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGate mode="app">
       <GeoScreenContextProvider>
-        <div className={`min-h-screen bg-background ${hideBottomPad ? '' : 'pb-20'}`}>
+        <div className={`min-h-screen bg-background ${hideBottomPad ? '' : 'pb-[calc(104px+var(--safe-bottom))]'}`}>
           {children}
           <BottomNav />
           <GeoCompanionSheet />
