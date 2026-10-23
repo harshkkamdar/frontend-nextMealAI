@@ -107,7 +107,7 @@ function ResetPasswordForm() {
         <p className="text-center">
           <Link
             href="/forgot-password"
-            className="text-[15.5px] font-semibold text-ink-65"
+            className="flex h-14 w-full items-center justify-center rounded-[15px] border border-ink-16 bg-cream text-[18px] font-bold text-ink"
           >
             Request a new link
           </Link>
