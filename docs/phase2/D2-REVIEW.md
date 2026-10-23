@@ -21,7 +21,7 @@ Files are named `<screen id>-<screen>-<state>-<width>.png`. Each screen was capt
 
 The empty, error and long captures were made by changing the data the app received. Your account was never written to.
 
-One screen was also checked on the iPhone 16 Pro simulator: `after/ios-sim/home-iphone16pro.png`.
+Home, Food diary and a live workout were also checked on the iPhone 16 Pro simulator, in `after/ios-sim/`.
 
 ## What changed on every screen
 
@@ -63,5 +63,4 @@ One screen was also checked on the iPhone 16 Pro simulator: `after/ios-sim/home-
 
 ## Known gaps
 
-- **Food diary and live workout on the simulator.** Only Home has been captured on the simulator so far. Reaching the other two needs taps, and this machine does not yet allow the simulator to be controlled. They are verified in the web captures only until then.
-- **Geo sheet gap.** With the Geo sheet open, a sliver of the page shows between the sheet and the tab bar. This comes from a sheet-positioning change that is still in progress and is not part of this pass. It will be fixed with that change.
+- Loading and offline states were checked by automated accessibility tests and by eye. The independent graders did not cover them.
