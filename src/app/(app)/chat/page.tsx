@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/page-wrapper'
@@ -10,6 +10,7 @@ import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { getChatSessions } from '@/lib/api/chat.api'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import type { ChatSession } from '@/types/chat.types'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
 
 export default function ChatListPage() {
   useSetGeoScreen('chat_list', {})
@@ -17,11 +18,16 @@ export default function ChatListPage() {
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const [loadFailed, setLoadFailed] = useState(false)
+
+  const load = useCallback(() => {
     getChatSessions()
-      .then(setSessions)
+      .then((next) => { setSessions(next); setLoadFailed(false) })
+      .catch(() => setLoadFailed(true))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(load, [load])
 
   const handleNewChat = () => {
     const newSessionId = crypto.randomUUID()
@@ -55,6 +61,8 @@ export default function ChatListPage() {
           <CardSkeleton />
           <CardSkeleton />
         </div>
+      ) : loadFailed ? (
+        <ErrorState onRetry={() => { setLoading(true); load() }}>I couldn&apos;t load your chats. Check your connection and try again.</ErrorState>
       ) : (
         <SessionList sessions={sessions} onSelect={handleSelect} onDelete={handleDelete} />
       )}

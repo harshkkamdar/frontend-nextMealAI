@@ -15,6 +15,8 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { handleGeoToolResults } from '@/lib/sync/dispatch-from-chat'
 import type { AttachedImage, ChatMessage } from '@/types/chat.types'
 import type { WorkoutProgramContent } from '@/types/plans.types'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { ApiException } from '@/types/api.types'
 
 // FB-R6-02 — FB-15 (program extraction) still wants a base64 payload. The
 // chat-input no longer keeps base64 around (it has a File + storage_path
@@ -57,6 +59,7 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
   const [sessionTitle, setSessionTitle] = useState<string | undefined>()
   const [isTyping, setIsTyping] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [historyFailed, setHistoryFailed] = useState(false)
   // FB-15: preview card for an extracted workout program. One at a time.
   const [programPreview, setProgramPreview] = useState<
     { program: WorkoutProgramContent; confidence: number } | null
@@ -68,7 +71,11 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
     let cancelled = false
     const fetchSession = () =>
       Promise.all([
-        getChatSession(sessionId).catch(() => ({ messages: [] as ChatMessage[] })),
+        // A new chat id has no history yet (404); any other failure is shown, not treated as an empty chat.
+        getChatSession(sessionId).catch((error: unknown) => {
+          if (!(error instanceof ApiException && error.statusCode === 404)) setHistoryFailed(true)
+          return { messages: [] as ChatMessage[] }
+        }),
         getChatSessions().catch(() => []),
       ]).then(([sessionData, sessions]) => {
         if (cancelled) return
@@ -192,6 +199,9 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
           />
         </div>
       )}
+      {historyFailed && messages.length === 0 ? (
+        <div className="px-gutter"><ErrorState>I couldn&apos;t load this conversation. You can still send a message, or go back and try again.</ErrorState></div>
+      ) : null}
       <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId} />
       {/* R6-10 — option chips for the latest assistant message; tap sends it.
           Reads live `suggestedReplies` or persisted `metadata.suggested_replies`. */}
