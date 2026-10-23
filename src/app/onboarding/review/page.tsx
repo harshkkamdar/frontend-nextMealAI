@@ -109,11 +109,10 @@ export default function ReviewPage() {
               {workoutDays && workoutDays.length > 0 ? (
                 <>
                   <p className="mb-3 mt-3 text-[15.5px] font-semibold text-ink">
-                    {workoutDays.filter((d) => !d.is_rest_day).length}-day programme
-                    <span className="font-normal text-ink-65">
-                      {' '}
-                      / {workoutDays.length} day cycle
-                    </span>
+                    {workoutDays.filter((d) => !d.is_rest_day).length}-day program
+                    {workoutDays.some((d) => d.is_rest_day) ? (
+                      <span className="font-normal text-ink-65"> · {workoutDays.length}-day cycle</span>
+                    ) : null}
                   </p>
 
                   <div className="space-y-2">

@@ -54,7 +54,7 @@ export function CheckInMidWeek({ status }: { status: CheckInStatus }) {
         <WeightTrendCard
           currentKg={weight.current_kg}
           deltaKg={weight.delta_week_kg}
-          note={`${weight.points.length} weeks`}
+          note={weight.points.length > 1 ? `${weight.points.length} weeks` : undefined}
           points={weight.points}
           tone="muted"
         />
