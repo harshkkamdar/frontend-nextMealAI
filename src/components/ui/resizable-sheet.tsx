@@ -108,6 +108,8 @@ export function ResizableSheet({
         onClick={onClose}
         className={`absolute inset-x-0 top-0 bottom-[var(--nav-clearance)] bg-black/40 transition-opacity duration-200 ${shown ? 'opacity-100' : 'opacity-0'}`}
       />
+      {/* Cream under the nav's top edge: the sheet rests above the raised Geo button, so without this the page shows in the strip between them. */}
+      <div aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-[var(--nav-clearance)] bg-background transition-opacity duration-200 ${shown ? 'opacity-100' : 'opacity-0'}`} />
       <div
         role="dialog"
         aria-modal="true"

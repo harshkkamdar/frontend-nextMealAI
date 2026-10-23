@@ -53,6 +53,8 @@ export function BottomSheet({
         {/* Overlay stops at the nav top, so the nav is never dimmed and stays
             fully on top. */}
         <Drawer.Overlay className="fixed inset-x-0 top-0 z-[60] bg-black/40 bottom-[var(--nav-clearance)]" />
+        {/* Cream under the nav's top edge so the page never shows between the sheet and the nav. */}
+        <div aria-hidden="true" className="fixed inset-x-0 bottom-0 z-[60] h-[var(--nav-clearance)] bg-background" />
         <Drawer.Content
           aria-label={ariaLabel}
           className={`fixed left-0 right-0 z-[70] flex flex-col bg-background rounded-t-3xl outline-none bottom-[var(--nav-clearance)] max-h-[calc(88vh-var(--nav-clearance))] ${className}`}
