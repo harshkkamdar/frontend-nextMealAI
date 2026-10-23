@@ -40,7 +40,7 @@ export function MoodLogForm() {
   return (
     <ManualLogShell title="Log mood" prompt="How are you feeling?" saving={saving} onSave={() => void handleSave()}>
       <div className="space-y-7">
-        <RatingPills rating={rating} onChange={setRating} label="Mood rating" />
+        <RatingPills rating={rating} onChange={setRating} label="Mood" />
         <NotesField value={notes} onChange={setNotes} placeholder="What's on your mind?" />
       </div>
     </ManualLogShell>

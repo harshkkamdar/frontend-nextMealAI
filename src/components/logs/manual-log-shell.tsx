@@ -1,10 +1,11 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { GeoLine } from '@/components/ui/fiqr/geo-line'
+import { PageHeader } from '@/components/ui/fiqr/page-header'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 
 export function ManualLogShell({
   title,
@@ -27,18 +28,7 @@ export function ManualLogShell({
 
   return (
     <div>
-      <div className="mb-2 grid grid-cols-[40px_1fr_40px] items-center">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          aria-label="Back"
-          className="-ml-2 flex size-10 items-center justify-center text-ink"
-        >
-          <ChevronLeft className="size-6" />
-        </button>
-        <h1 className="text-center text-[22px] font-semibold tracking-[-0.4px] text-ink">{title}</h1>
-        <span aria-hidden="true" />
-      </div>
+      <PageHeader title={title} onBack={() => router.back()} className="mb-2" />
       <GeoLine>{prompt}</GeoLine>
       <div className="mt-4">{children}</div>
       <PrimaryButton type="button" onClick={onSave} disabled={saving} className="mt-6 justify-center">
@@ -81,17 +71,20 @@ export function RatingPills({
 }) {
   return (
     <div>
-      <p className="mb-4 text-center text-[28px] font-bold tracking-[-0.6px] text-ink">
-        {rating || 0}/10
-      </p>
-      <div className="grid grid-cols-5 gap-2" aria-label={label}>
+      <div className="mb-3 flex items-baseline justify-between">
+        <SectionLabel>{label}</SectionLabel>
+        <p className="text-[28px] font-bold tracking-[-0.6px] text-ink tabular-nums" aria-live="polite">
+          {rating ? rating : '–'}<span className="text-[15.5px] font-semibold text-ink-65">/10</span>
+        </p>
+      </div>
+      <div className="grid grid-cols-5 gap-2" role="group" aria-label={label}>
         {Array.from({ length: 10 }, (_, index) => index + 1).map((number) => (
           <button
             key={number}
             type="button"
             onClick={() => onChange(number)}
             aria-pressed={rating === number}
-            className={`h-10 w-full rounded-full text-[13.5px] font-semibold ${
+            className={`h-11 w-full rounded-full text-[15.5px] font-semibold ${
               rating === number ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
             }`}
           >

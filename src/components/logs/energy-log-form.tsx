@@ -44,7 +44,7 @@ export function EnergyLogForm() {
   return (
     <ManualLogShell title="Log energy" prompt="How's your energy?" saving={saving} onSave={() => void handleSave()}>
       <div className="space-y-7">
-        <RatingPills rating={rating} onChange={setRating} label="Energy rating" />
+        <RatingPills rating={rating} onChange={setRating} label="Energy" />
         <div>
           <p className="mb-2 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Time of day</p>
           <div className="flex gap-2">
@@ -54,7 +54,7 @@ export function EnergyLogForm() {
                 type="button"
                 onClick={() => setTimeOfDay(timeOfDay === option ? '' : option)}
                 aria-pressed={timeOfDay === option}
-                className={`h-10 rounded-full px-4 text-[13.5px] font-semibold ${
+                className={`h-11 rounded-full px-4 text-[14px] font-semibold ${
                   timeOfDay === option ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
                 }`}
               >

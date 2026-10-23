@@ -4,7 +4,7 @@ import { Droplet, Dumbbell, Moon, Scale, Smile, Zap, type LucideIcon } from 'luc
 import { useRouter } from 'next/navigation'
 import { PageWrapper } from '@/components/layout/page-wrapper'
 import { LogList } from '@/components/logs/log-list'
-import { ActionCard } from '@/components/ui/fiqr/action-card'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 
@@ -25,13 +25,9 @@ export default function LogsPage() {
     <PageWrapper className="pb-32">
       <h1 className="mb-5 text-[22px] font-semibold tracking-[-0.4px] text-ink">Log</h1>
 
-      <button type="button" onClick={() => router.push('/logs/new/food')} className="block w-full text-left">
-        <ActionCard className="flex items-center gap-3">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-cream-22 text-[20px] font-semibold text-cream">+</span>
-          <span className="text-[17px] font-bold text-cream">Log food</span>
-          <span className="ml-auto text-[13.5px] font-semibold text-ink">Scan · Search</span>
-        </ActionCard>
-      </button>
+      <PrimaryButton type="button" icon="+" trailing="Scan · Search" onClick={() => router.push('/logs/new/food')}>
+        Log food
+      </PrimaryButton>
 
       <div className="mt-[10px] grid grid-cols-2 gap-[10px]">
         {LOG_TYPES.map(({ type, label, icon: Icon }) => (
