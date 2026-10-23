@@ -541,6 +541,16 @@ export function FoodLogForm() {
         </div>
       ) : null}
 
+      {estimateId ? (
+        <div data-testid="estimate-chip" className="mt-6 flex h-8 w-fit items-center gap-2 rounded-full bg-ink-08 px-3 text-[13px] font-medium text-ink">
+          <span>
+            Photo estimate
+            {estimateConfidence != null ? ` · confidence ${Math.round(estimateConfidence * 100)}%` : ''}
+          </span>
+          <button type="button" onClick={clearEstimate} aria-label="Clear photo estimate" className="-my-3 -mr-3 flex size-11 items-center justify-center text-[18px] leading-none">×</button>
+        </div>
+      ) : null}
+
       {foodName ? (
         <div ref={formRef} className="mt-7 space-y-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
           {/* Wraps instead of clipping: photo estimates name the whole plate. */}
@@ -631,20 +641,11 @@ export function FoodLogForm() {
         </div>
       ) : null}
 
-      {estimateId ? (
-        <div data-testid="estimate-chip" className="mt-3 flex h-8 w-fit items-center gap-2 rounded-full bg-ink-08 px-3 text-[13px] font-medium text-ink">
-          <span>
-            Photo estimate
-            {estimateConfidence != null ? ` · confidence ${Math.round(estimateConfidence * 100)}%` : ''}
-          </span>
-          <button type="button" onClick={clearEstimate} aria-label="Clear photo estimate" className="-my-3 -mr-3 flex size-11 items-center justify-center text-[18px] leading-none">×</button>
-        </div>
-      ) : null}
 
       {(pending.length > 0 || isFoodDraftFilled(currentDraft())) ? (
         <FeatureCard
           data-testid="food-meal-tray"
-          className="fixed inset-x-gutter inset-x-[var(--gutter)] z-30 mx-auto max-w-md"
+          className="sticky z-30 mt-6"
           style={{ bottom: 'calc(96px + var(--safe-bottom))' }}
         >
           <p className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Tray</p>

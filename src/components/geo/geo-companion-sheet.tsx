@@ -260,15 +260,15 @@ export function GeoCompanionSheet() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <button
+                {messages.length > 0 ? <button
                   onClick={handleStartNewChat}
-                  disabled={initializing || messages.length === 0}
+                  disabled={initializing}
                   className="flex h-11 items-center gap-1 rounded-full px-3 text-[14px] font-semibold text-ink active:bg-ink-08 disabled:pointer-events-none disabled:text-ink-35"
                   aria-label="Start a new chat"
                 >
                   <SquarePen className="w-3.5 h-3.5" />
                   New
-                </button>
+                </button> : null}
                 <button
                   onClick={handleClose}
                   className="-mr-2.5 flex size-11 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"

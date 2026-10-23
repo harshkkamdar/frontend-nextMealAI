@@ -213,29 +213,29 @@ export function LogList({ filterType }: LogListProps = {}) {
 
   return (
     <div>
-      {/* Header row: filter chips + Select/Cancel button */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="scrollbar-hide -ml-gutter flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 pl-gutter">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`h-11 whitespace-nowrap rounded-full px-4 text-[14px] font-semibold ${
-                filter === f.value ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-        {logs.length > 0 && !loading && (
+      {/* Filter chips scroll edge to edge; Select sits on its own line so it never cuts a chip. */}
+      {logs.length > 0 && !loading && (
+        <div className="-mt-11 mb-2 flex justify-end">
           <button
             onClick={selectMode ? exitSelectMode : () => setSelectMode(true)}
-            className="ml-2 h-11 shrink-0 whitespace-nowrap rounded-full bg-ink-08 px-4 text-[14px] font-semibold text-ink"
+            className="h-11 shrink-0 whitespace-nowrap rounded-full px-3 text-[14px] font-semibold text-ink"
           >
             {selectMode ? 'Cancel' : 'Select'}
           </button>
-        )}
+        </div>
+      )}
+      <div className="scrollbar-hide -mx-gutter mb-4 flex gap-2 overflow-x-auto px-gutter pb-1">
+        {FILTERS.map((f) => (
+          <button
+            key={f.value}
+            onClick={() => setFilter(f.value)}
+            className={`h-11 shrink-0 whitespace-nowrap rounded-full px-4 text-[14px] font-semibold ${
+              filter === f.value ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
 
       {/* Content */}

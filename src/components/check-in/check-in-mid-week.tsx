@@ -74,6 +74,8 @@ export function CheckInMidWeek({ status }: { status: CheckInStatus }) {
         />
       </section>
 
+      {/* Keeps at least a gutter between the last card and the footer when the page is full. */}
+      <div aria-hidden="true" className="h-[22px] shrink-0" />
       <div className="mt-auto flex items-baseline justify-between gap-4 border-t border-ink-09 pb-[22px] pt-4">
         <span className="text-[15.5px] font-medium text-ink-65">Current targets</span>
         <span className="text-right text-[15.5px] font-semibold">
