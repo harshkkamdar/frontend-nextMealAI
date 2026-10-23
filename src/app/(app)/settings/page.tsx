@@ -83,7 +83,7 @@ function RowChevron() {
       strokeWidth={1.75}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-5 w-5 shrink-0 text-ink-50"
+      className="h-5 w-5 shrink-0 text-ink-65"
     >
       <path d="m9 18 6-6-6-6" />
     </svg>
@@ -289,7 +289,7 @@ export default function SettingsPage() {
     return (
       <PageWrapper>
         <BackHeader onBack={() => router.push('/dashboard')} />
-        <p className="text-[15.5px] text-ink-62">Unable to load settings.</p>
+        <p className="text-[15.5px] text-ink-65">Unable to load settings.</p>
       </PageWrapper>
     )
   }
@@ -319,7 +319,7 @@ export default function SettingsPage() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[15.5px] font-semibold text-ink">{profileName}</span>
-              <span className="block truncate text-[13.5px] text-ink-55">{email}</span>
+              <span className="block truncate text-[13.5px] text-ink-65">{email}</span>
             </span>
             <RowChevron />
           </button>
@@ -333,7 +333,7 @@ export default function SettingsPage() {
           ) : (
             <Link href="/paywall" className="min-h-14 w-full px-[14px] flex items-center justify-between text-left text-[15.5px]">
               <span className="font-medium text-ink">Plan</span>
-              <span className="flex items-center gap-2"><span className="text-[13.5px] text-ink-55">Free</span><RowChevron /></span>
+              <span className="flex items-center gap-2"><span className="text-[13.5px] text-ink-65">Free</span><RowChevron /></span>
             </Link>
           )}
           {native ? <SettingsRow label="Restore purchases" onClick={() => void handleRestore()} /> : null}
@@ -366,7 +366,7 @@ export default function SettingsPage() {
               />
             </SettingsRow>
           </SettingsSection>
-          <p className="mt-2 px-[14px] text-[13px] text-ink-55">
+          <p className="mt-2 px-[14px] text-[13px] text-ink-65">
             Geo nudges you when a check-in is ready or you&apos;ve gone quiet. No marketing.
           </p>
         </div>
@@ -393,7 +393,7 @@ export default function SettingsPage() {
               ))}
             </div>
           </SettingsSection>
-          <p className="mt-2 px-[14px] text-[13px] text-ink-55">
+          <p className="mt-2 px-[14px] text-[13px] text-ink-65">
             Your weekly check-in lands on this day.
           </p>
         </div>
@@ -406,7 +406,7 @@ export default function SettingsPage() {
               </SettingsRow>
               <SettingsRow label="Last synced" value={lastSyncedValue} />
             </SettingsSection>
-            <p className="mt-2 px-[14px] text-[13px] text-ink-55">
+            <p className="mt-2 px-[14px] text-[13px] text-ink-65">
               Reads steps, active energy, weight, sleep and workouts. Saves workouts you finish in FIQR.
             </p>
           </div>
@@ -434,7 +434,7 @@ export default function SettingsPage() {
 
         <SettingsSection title="Training">
           <div className="px-[14px] py-3">
-            <p className="mb-2 text-[13px] font-semibold text-ink-62">Rest timer</p>
+            <p className="mb-2 text-[13px] font-semibold text-ink-65">Rest timer</p>
             <div className="flex flex-wrap gap-2">
               {REST_TIMER_OPTIONS.map((option) => (
                 <button
@@ -468,7 +468,7 @@ export default function SettingsPage() {
                 }}
               />
             </SettingsRow>
-            <p className="px-[14px] pb-4 text-[13px] leading-[1.45] text-ink-62">
+            <p className="px-[14px] pb-4 text-[13px] leading-[1.45] text-ink-65">
               Your food logs, photos, weight and messages are sent to our model providers to generate coaching. See the privacy policy for who they are.
             </p>
           </div>
@@ -486,7 +486,7 @@ export default function SettingsPage() {
 
         <SettingsSection title="About">
           <SettingsRow label="Version" value={APP_VERSION} />
-          <p className="px-[14px] py-4 text-[13px] leading-[1.45] text-ink-62">
+          <p className="px-[14px] py-4 text-[13px] leading-[1.45] text-ink-65">
             FIQR is a wellness and fitness coaching app, not a medical device. Geo does not diagnose or treat conditions or advise on medication. Check with a doctor or registered dietitian before making medical decisions.
           </p>
         </SettingsSection>
@@ -498,7 +498,7 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={() => setShowDeleteAccount(true)}
-            className="text-[15.5px] font-semibold text-ink-60 underline-offset-4 underline mt-4 mx-auto block"
+            className="text-[15.5px] font-semibold text-ink-65 underline-offset-4 underline mt-4 mx-auto block"
           >
             Delete account
           </button>
@@ -513,7 +513,7 @@ export default function SettingsPage() {
       >
         <div className="px-gutter pb-6 pt-3">
           <h2 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Turn off AI processing?</h2>
-          <p className="mt-3 text-[15.5px] leading-[1.45] text-ink-62">
+          <p className="mt-3 text-[15.5px] leading-[1.45] text-ink-65">
             Geo can&apos;t coach without it. You can turn it back on any time.
           </p>
           <div className="mt-5">
@@ -530,7 +530,7 @@ export default function SettingsPage() {
             type="button"
             disabled={updatingAi}
             onClick={() => setShowAiConfirm(false)}
-            className="mx-auto mt-4 block text-[15.5px] font-semibold text-ink-60"
+            className="mx-auto mt-4 block text-[15.5px] font-semibold text-ink-65"
           >
             Keep on
           </button>

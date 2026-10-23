@@ -25,7 +25,7 @@ export function CheckInMidWeek({ status }: { status: CheckInStatus }) {
       <div className="mt-[18px] rounded-[20px] border border-ink-12 bg-card p-5">
         <div className="flex items-baseline justify-between gap-3">
           <SectionLabel>Next check-in</SectionLabel>
-          <span className="text-right text-[13.5px] text-ink-55">{formatCheckInDate(status.next_check_in_date)}</span>
+          <span className="text-right text-[13.5px] text-ink-65">{formatCheckInDate(status.next_check_in_date)}</span>
         </div>
         <span className="sr-only">{status.days_to_go} days to go</span>
         <div aria-hidden="true" className="mt-[14px] flex items-baseline gap-[9px]">
@@ -43,7 +43,7 @@ export function CheckInMidWeek({ status }: { status: CheckInStatus }) {
         </span>
         <div className="min-w-0">
           <p className="text-[15.5px] font-semibold">{status.days_logged} of {daysElapsed} days logged</p>
-          <p className="text-[13.5px] text-ink-62">
+          <p className="text-[13.5px] text-ink-65">
             {onTrack ? 'On track for a useful check-in' : `Log ${remaining} more days for a useful check-in`}
           </p>
         </div>
@@ -75,7 +75,7 @@ export function CheckInMidWeek({ status }: { status: CheckInStatus }) {
       </section>
 
       <div className="mt-auto flex items-baseline justify-between gap-4 border-t border-ink-09 pb-[22px] pt-4">
-        <span className="text-[15.5px] font-medium text-ink-62">Current targets</span>
+        <span className="text-[15.5px] font-medium text-ink-65">Current targets</span>
         <span className="text-right text-[15.5px] font-semibold">
           {formatMetric(targets.calories)} kcal · {formatMetric(targets.protein_g)}g protein
         </span>

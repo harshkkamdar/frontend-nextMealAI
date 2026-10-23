@@ -20,4 +20,11 @@ describe('MacroBar', () => {
 
     expect(screen.getByText(/15g over/)).toBeInTheDocument()
   })
+
+  it('shows an empty bar and no-target copy when the target is missing', () => {
+    const { container } = render(<MacroBar name="Calories" current={0} target={0} />)
+
+    expect(screen.getByText(/no target yet/)).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="macro-bar-fill"]')).toHaveStyle({ width: '0%' })
+  })
 })

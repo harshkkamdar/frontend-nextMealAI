@@ -55,7 +55,7 @@ export function LoginForm() {
         <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
           Welcome back
         </h1>
-        <p className="mt-1 text-[15.5px] text-ink-60">
+        <p className="mt-1 text-[15.5px] text-ink-65">
           Sign in to your account
         </p>
       </div>
@@ -72,7 +72,7 @@ export function LoginForm() {
             {...register('email')}
           />
           {errors.email && (
-            <p className="text-xs text-accent">{errors.email.message}</p>
+            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.email.message}</p>
           )}
         </div>
 
@@ -87,12 +87,12 @@ export function LoginForm() {
             {...register('password')}
           />
           {errors.password && (
-            <p className="text-xs text-accent">{errors.password.message}</p>
+            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.password.message}</p>
           )}
           <div className="flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-[15.5px] font-semibold text-ink-60"
+              className="text-[15.5px] font-semibold text-ink-65"
             >
               Forgot password?
             </Link>
@@ -109,7 +109,7 @@ export function LoginForm() {
       </form>
 
       <p className="mt-6 text-center">
-        <Link href="/signup" className="text-[15.5px] font-semibold text-ink-60">
+        <Link href="/signup" className="text-[15.5px] font-semibold text-ink-65">
           New here? Create an account
         </Link>
       </p>

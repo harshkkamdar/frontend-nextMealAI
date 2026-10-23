@@ -149,7 +149,7 @@ export function MonthViewSheet({
                 type="button"
                 onClick={handlePrev}
                 aria-label="Previous month"
-                className="rounded-full p-2 text-ink-60"
+                className="rounded-full p-2 text-ink-65"
               >
                 <ChevronLeft className="size-5" />
               </button>
@@ -166,7 +166,7 @@ export function MonthViewSheet({
                   type="button"
                   onClick={handleNext}
                   aria-label="Next month"
-                  className="rounded-full p-2 text-ink-60"
+                  className="rounded-full p-2 text-ink-65"
                 >
                   <ChevronRight className="size-5" />
                 </button>
@@ -174,7 +174,7 @@ export function MonthViewSheet({
                   type="button"
                   onClick={onClose}
                   aria-label="Close"
-                  className="rounded-full p-2 text-ink-60"
+                  className="rounded-full p-2 text-ink-65"
                 >
                   <X className="size-5" />
                 </button>
@@ -186,7 +186,7 @@ export function MonthViewSheet({
               {WEEKDAY_LABELS.map((label, i) => (
                 <div
                   key={`${label}-${i}`}
-                  className="py-1 text-center text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-50"
+                  className="py-1 text-center text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65"
                 >
                   {label}
                 </div>
@@ -233,7 +233,7 @@ export function MonthViewSheet({
                         <span
                           className={cn(
                             'text-[11px] leading-none',
-                            cell.isToday ? 'text-cream-55' : 'text-ink-55'
+                            cell.isToday ? 'text-cream-55' : 'text-ink-65'
                           )}
                         >
                           {cell.calories !== null ? `${cell.calories}` : '\u2014'}

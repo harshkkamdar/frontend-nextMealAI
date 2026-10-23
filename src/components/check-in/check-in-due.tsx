@@ -36,9 +36,9 @@ function TargetChange({ label, current, next, unit = '' }: {
         <span className="text-[15.5px] font-semibold text-ink">No change</span>
       ) : (
         <span className="flex items-center gap-3 text-[15px]">
-          <s className="text-ink-55">{formatMetric(current)}{unit}</s>
+          <s className="text-ink-65">{formatMetric(current)}{unit}</s>
           <span className="text-ink-35">→</span>
-          <b className="font-semibold text-accent">{next.toLocaleString()}{unit}</b>
+          <b className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-[3px]">{next.toLocaleString()}{unit}</b>
         </span>
       )}
     </div>
@@ -120,7 +120,7 @@ export function CheckInDue({ status, refetch }: CheckInDueProps) {
           </PrimaryButton>
         )}
         <button
-          className="self-center px-3 py-1 text-[15.5px] font-semibold text-ink-60"
+          className="self-center px-3 py-1 text-[15.5px] font-semibold text-ink-65"
           onClick={() => useUIStore.getState().openSheet('geo-companion')}
           type="button"
         >

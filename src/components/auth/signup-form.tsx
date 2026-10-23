@@ -62,7 +62,7 @@ export function SignupForm() {
         <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
           Create your account
         </h1>
-        <p className="mt-1 text-[15.5px] text-ink-60">
+        <p className="mt-1 text-[15.5px] text-ink-65">
           Start your fitness journey
         </p>
       </div>
@@ -79,7 +79,7 @@ export function SignupForm() {
             {...register('email')}
           />
           {errors.email && (
-            <p className="text-xs text-accent">{errors.email.message}</p>
+            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.email.message}</p>
           )}
         </div>
 
@@ -94,7 +94,7 @@ export function SignupForm() {
             {...register('password')}
           />
           {errors.password && (
-            <p className="text-xs text-accent">{errors.password.message}</p>
+            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.password.message}</p>
           )}
         </div>
 
@@ -109,7 +109,7 @@ export function SignupForm() {
             {...register('confirmPassword')}
           />
           {errors.confirmPassword && (
-            <p className="text-xs text-accent">
+            <p role="alert" className="text-[13px] font-semibold text-ink">
               {errors.confirmPassword.message}
             </p>
           )}
@@ -125,7 +125,7 @@ export function SignupForm() {
       </form>
 
       <p className="mt-6 text-center">
-        <Link href="/login" className="text-[15.5px] font-semibold text-ink-60">
+        <Link href="/login" className="text-[15.5px] font-semibold text-ink-65">
           Have an account? Log in
         </Link>
       </p>

@@ -102,7 +102,7 @@ function WaterSheet({ onDone }: { onDone: () => void }) {
         </button>
         <div className="text-center">
           <span className="text-[34px] font-bold text-ink tabular-nums">{glasses}</span>
-          <p className="mt-1 text-[13px] text-ink-55">glasses</p>
+          <p className="mt-1 text-[13px] text-ink-65">glasses</p>
         </div>
         <button
           type="button"
@@ -149,7 +149,7 @@ function RatingSheet({ title, onDone, type }: {
       <p className="text-center text-[17px] font-semibold text-ink">{title}</p>
       <div className="py-2 text-center">
         <span className="text-[34px] font-bold text-ink tabular-nums">{rating || '—'}</span>
-        <p className="mt-1 text-[13px] text-ink-55">out of 10</p>
+        <p className="mt-1 text-[13px] text-ink-65">out of 10</p>
       </div>
       <div className="flex justify-between gap-1">
         {Array.from({ length: 10 }, (_, index) => index + 1).map((number) => (
@@ -214,10 +214,10 @@ function SleepSheet({ onDone }: { onDone: () => void }) {
           onChange={(event) => setHours(event.target.value ? Number(event.target.value) : '')}
           className="h-14 min-w-0 flex-1 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none focus:border-accent"
         />
-        <span className="text-[15.5px] font-medium text-ink-55">hours</span>
+        <span className="text-[15.5px] font-medium text-ink-65">hours</span>
       </div>
       <div>
-        <p className="mb-2 text-[13px] text-ink-55">Sleep quality</p>
+        <p className="mb-2 text-[13px] text-ink-65">Sleep quality</p>
         <div className="flex justify-between gap-1">
           {Array.from({ length: 10 }, (_, index) => index + 1).map((number) => (
             <button
@@ -271,7 +271,7 @@ function WeightSheet({ currentWeight, onDone }: { currentWeight?: number; onDone
           onChange={(event) => setKg(event.target.value ? Number(event.target.value) : '')}
           className="h-14 min-w-0 flex-1 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none focus:border-accent"
         />
-        <span className="text-[15.5px] font-medium text-ink-55">kg</span>
+        <span className="text-[15.5px] font-medium text-ink-65">kg</span>
       </div>
       <PrimaryButton type="button" disabled={saving} onClick={handleSave} className="justify-center">
         {saving ? 'Saving…' : 'Save'}
@@ -291,7 +291,7 @@ function DashboardLogSheet({ type, onDone, onClose, currentWeight }: {
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-4 top-3 text-ink-50"
+        className="absolute right-4 top-3 text-ink-65"
         aria-label="Close"
       >
         <X className="w-5 h-5" />
@@ -443,7 +443,7 @@ export default function DashboardPage() {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-[9px]">
               <Wordmark size={22} />
-              <span className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50">
+              <span className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65">
                 {formatDashboardDate(today)}
               </span>
             </div>
@@ -455,7 +455,7 @@ export default function DashboardPage() {
             type="button"
             onClick={() => router.push('/settings')}
             aria-label="Settings"
-            className="w-10 h-10 rounded-full bg-ink-08 border border-ink-16 text-ink-60 flex shrink-0 items-center justify-center"
+            className="w-10 h-10 rounded-full bg-ink-08 border border-ink-16 text-ink-65 flex shrink-0 items-center justify-center"
           >
             <PersonIcon />
           </button>
@@ -473,7 +473,7 @@ export default function DashboardPage() {
           <CardSkeleton />
         </div>
       ) : !data ? (
-        <p className="mt-4 text-[15.5px] text-ink-62">Unable to load your dashboard.</p>
+        <p className="mt-4 text-[15.5px] text-ink-65">Unable to load your dashboard.</p>
       ) : (
         <>
           <GeoLine>{emphasizeGeoMeasurements(geoLine)}</GeoLine>
@@ -548,7 +548,7 @@ export default function DashboardPage() {
               href="/settings/profile"
               className="mt-4 block bg-card rounded-[16px] border border-ink-12 px-[14px] py-[13px]"
             >
-              <div className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-62">Profile</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">Profile</div>
               <div className="mt-[3px] text-[15.5px] font-semibold text-ink">Add your height →</div>
             </Link>
           ) : null}

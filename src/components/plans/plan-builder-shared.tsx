@@ -5,7 +5,7 @@ import { Plus, Search, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const fieldClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink placeholder:text-ink-35 outline-none focus:border-ink'
-const labelClass = 'block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62'
+const labelClass = 'block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65'
 
 export function PlanNameField({ value, onChange, placeholder = 'Plan name' }: { value: string; onChange: (value: string) => void; placeholder?: string }) {
   return <div className="space-y-1.5"><label className={labelClass} htmlFor="plan-name">Plan name</label><input id="plan-name" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={fieldClass} /></div>
@@ -22,17 +22,17 @@ export function NumberField({ label, value, onChange, min, max, step, suffix, id
   const generatedId = React.useId()
   const inputId = id ?? generatedId
   return <div className="space-y-1.5">
-    <label className="block text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-62" htmlFor={inputId}>{label}{suffix ? <span className="ml-1">({suffix})</span> : null}</label>
+    <label className="block text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65" htmlFor={inputId}>{label}{suffix ? <span className="ml-1">({suffix})</span> : null}</label>
     <input id={inputId} type="number" inputMode="decimal" min={min} max={max} step={step} placeholder={placeholder} value={value === undefined || Number.isNaN(value) ? '' : value} onChange={(e) => { const raw = e.target.value; if (raw === '') return onChange(undefined); const parsed = Number(raw); if (!Number.isFinite(parsed)) return; let next = parsed; if (min !== undefined && next < min) next = min; if (max !== undefined && next > max) next = max; onChange(next) }} className="h-11 w-full rounded-[12px] border-0 bg-ink-08 px-2 text-center text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35" />
   </div>
 }
 
 export function IconButton({ icon, label, onClick, variant: _variant = 'ghost', type = 'button' }: { icon: React.ReactNode; label: string; onClick?: () => void; variant?: 'ghost' | 'danger' | 'accent'; type?: 'button' | 'submit' }) {
-  return <button type={type} onClick={onClick} aria-label={label} className="inline-flex h-8 w-8 items-center justify-center text-ink-50 [&_svg]:h-6 [&_svg]:w-6">{icon}</button>
+  return <button type={type} onClick={onClick} aria-label={label} className="inline-flex h-8 w-8 items-center justify-center text-ink-65 [&_svg]:h-6 [&_svg]:w-6">{icon}</button>
 }
 
 export function AddRowButton({ label, onClick }: { label: string; onClick: () => void }) {
-  return <button type="button" onClick={onClick} className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-60"><Plus className="h-4 w-4" />{label}</button>
+  return <button type="button" onClick={onClick} className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-65"><Plus className="h-4 w-4" />{label}</button>
 }
 
 export function RemoveRowButton({ label, onClick }: { label: string; onClick: () => void }) {
@@ -58,7 +58,7 @@ export function SearchablePicker<T>({ placeholder = 'Search…', search, renderI
   if (value) return <div className="space-y-1.5">{label ? <div className={labelClass}>{label}</div> : null}<div className="inline-flex h-9 max-w-full items-center gap-2 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"><span className="truncate">{value}</span>{onClear ? <button type="button" onClick={onClear} aria-label="Clear selection" className="shrink-0"><X className="h-4 w-4" /></button> : null}</div></div>
   return <div className="relative space-y-1.5">
     {label ? <label className={labelClass}>{label}</label> : null}
-    <div className="relative"><Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-50" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={placeholder} onFocus={() => results.length > 0 && setOpen(true)} className={cn(fieldClass, 'pl-11')} /></div>
-    {open && (results.length > 0 || loading) ? <ul role="listbox" className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-[16px] border border-ink-12 bg-card shadow-none">{loading ? <li className="flex min-h-12 items-center px-[14px] text-[13.5px] text-ink-55">Searching…</li> : results.map((item) => <li key={getItemKey(item)}><button type="button" onClick={() => { onSelect(item); setQuery(''); setResults([]); setOpen(false) }} className="min-h-12 w-full px-[14px] text-left text-[15.5px] text-ink hover:bg-ink-08">{renderItem(item)}</button></li>)}</ul> : null}
+    <div className="relative"><Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-65" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={placeholder} onFocus={() => results.length > 0 && setOpen(true)} className={cn(fieldClass, 'pl-11')} /></div>
+    {open && (results.length > 0 || loading) ? <ul role="listbox" className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-[16px] border border-ink-12 bg-card shadow-none">{loading ? <li className="flex min-h-12 items-center px-[14px] text-[13.5px] text-ink-65">Searching…</li> : results.map((item) => <li key={getItemKey(item)}><button type="button" onClick={() => { onSelect(item); setQuery(''); setResults([]); setOpen(false) }} className="min-h-12 w-full px-[14px] text-left text-[15.5px] text-ink hover:bg-ink-08">{renderItem(item)}</button></li>)}</ul> : null}
   </div>
 }

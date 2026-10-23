@@ -89,7 +89,7 @@ export function PersonalForm() {
             {...register('name')}
           />
           {errors.name && (
-            <p className="text-xs text-accent">{errors.name.message}</p>
+            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.name.message}</p>
           )}
         </div>
 
@@ -102,7 +102,7 @@ export function PersonalForm() {
             {...register('dob')}
           />
           {errors.dob && (
-            <p className="text-xs text-accent">{errors.dob.message}</p>
+            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.dob.message}</p>
           )}
         </div>
 
@@ -129,7 +129,7 @@ export function PersonalForm() {
 
         <div className="space-y-2">
           <SectionLabel><label htmlFor="height-cm">Height</label></SectionLabel>
-          <p className="text-[13.5px] text-ink-60">We&apos;ll use this to compute your daily calorie target.</p>
+          <p className="text-[13.5px] text-ink-65">We&apos;ll use this to compute your daily calorie target.</p>
           <div className="relative">
             <Input
               id="height-cm"
@@ -143,7 +143,7 @@ export function PersonalForm() {
               onChange={(e) => setHeightCm(e.target.value)}
               className={`${inputClassName} pr-12`}
             />
-            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[13.5px] text-ink-60">cm</span>
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[13.5px] text-ink-65">cm</span>
           </div>
         </div>
 

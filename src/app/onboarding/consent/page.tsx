@@ -82,7 +82,7 @@ export default function ConsentPage() {
         <p className="mt-2 text-[15.5px] font-normal leading-[1.45] text-ink-80">
           To coach you, FIQR sends what you log — food, photos, weight and body measurements, workouts and your messages to Geo — to the AI model providers listed in our privacy policy. They process it to generate your plan and Geo&apos;s replies. We never sell your data or use it for advertising.
         </p>
-        <Link href="/privacy" className="mt-3 inline-block font-semibold text-accent">
+        <Link href="/privacy" className="mt-3 inline-block min-h-11 py-3 font-semibold text-ink underline decoration-ink-35 underline-offset-4">
           Read the privacy policy
         </Link>
         <ConsentCheckbox checked={aiConsent} onChange={setAiConsent}>

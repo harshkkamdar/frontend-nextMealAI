@@ -31,8 +31,8 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
 
   return <div className="space-y-7">
     <header>
-      <div className="flex items-center gap-2"><button type="button" onClick={() => router.back()} aria-label="Back" className="inline-flex h-9 w-9 items-center justify-center text-ink-60"><ChevronLeft className="h-6 w-6" /></button><h1 className="text-[22px] font-semibold text-ink">{plan.content.name || 'Nutrition Plan'}</h1></div>
-      <p className="ml-11 mt-1 text-[13.5px] text-ink-55">{statusLabel(plan.status)} · {formatDateRange(plan.start_date, plan.end_date)}</p>
+      <div className="flex items-center gap-2"><button type="button" onClick={() => router.back()} aria-label="Back" className="inline-flex h-9 w-9 items-center justify-center text-ink-65"><ChevronLeft className="h-6 w-6" /></button><h1 className="text-[22px] font-semibold text-ink">{plan.content.name || 'Nutrition Plan'}</h1></div>
+      <p className="ml-11 mt-1 text-[13.5px] text-ink-65">{statusLabel(plan.status)} · {formatDateRange(plan.start_date, plan.end_date)}</p>
     </header>
 
     <section className="space-y-2.5">
@@ -63,5 +63,5 @@ function MealBlock({ meal }: { meal: MealPlanMeal }) {
 
 function FoodRow({ food }: { food: MealPlanMeal | MealPlanSnack }) {
   const macros = [food.protein != null ? `${formatMacroGrams(food.protein)} P` : null, food.carbs != null ? `${formatMacroGrams(food.carbs)} C` : null, food.fat != null ? `${formatMacroGrams(food.fat)} F` : null].filter(Boolean).join(' · ')
-  return <div className="min-h-14 px-[14px] py-3"><div className="text-[15.5px] font-semibold text-ink">{food.name}</div>{macros ? <div className="text-[13px] text-ink-55">{macros}</div> : null}</div>
+  return <div className="min-h-14 px-[14px] py-3"><div className="text-[15.5px] font-semibold text-ink">{food.name}</div>{macros ? <div className="text-[13px] text-ink-65">{macros}</div> : null}</div>
 }

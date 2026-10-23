@@ -13,7 +13,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={archivo.variable}>
       <body>
         {children}
-        <Toaster position="top-center" richColors />
+        <Toaster
+          position="top-center"
+          toastOptions={{ style: { background: '#FFFFFF', color: '#111C35', border: '1px solid rgba(17,28,53,.16)', borderRadius: 16, fontFamily: 'var(--font-archivo)', fontSize: 14.5, fontWeight: 600 } }}
+        />
       </body>
     </html>
   )

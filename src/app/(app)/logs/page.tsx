@@ -41,7 +41,7 @@ export default function LogsPage() {
             onClick={() => router.push(`/logs/new/${type}`)}
             className="flex items-center gap-3 rounded-[16px] border border-ink-12 bg-card p-[14px] text-left"
           >
-            <Icon className="size-6 shrink-0 text-ink-60" />
+            <Icon className="size-6 shrink-0 text-ink-65" />
             <span className="text-[15.5px] font-semibold text-ink">{label}</span>
           </button>
         ))}

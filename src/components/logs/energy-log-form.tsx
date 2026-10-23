@@ -46,7 +46,7 @@ export function EnergyLogForm() {
       <div className="space-y-7">
         <RatingPills rating={rating} onChange={setRating} label="Energy rating" />
         <div>
-          <p className="mb-2 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Time of day</p>
+          <p className="mb-2 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Time of day</p>
           <div className="flex gap-2">
             {TIME_OF_DAY_OPTIONS.map((option) => (
               <button

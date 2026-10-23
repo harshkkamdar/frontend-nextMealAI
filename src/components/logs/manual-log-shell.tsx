@@ -59,7 +59,7 @@ export function NotesField({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Notes</span>
+      <span className="mb-2 block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Notes</span>
       <textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -136,7 +136,7 @@ export function NumericSuffixInput({
         max={max}
         className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-12 text-center text-[28px] font-bold tracking-[-0.6px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
       />
-      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-medium text-ink-55">{suffix}</span>
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-medium text-ink-65">{suffix}</span>
     </label>
   )
 }

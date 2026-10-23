@@ -209,7 +209,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
         <button
           type="button"
           onClick={() => router.push('/plans')}
-          className="inline-flex h-9 w-9 items-center justify-center text-ink-60"
+          className="inline-flex h-9 w-9 items-center justify-center text-ink-65"
           aria-label="Back to plans"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -228,7 +228,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
           }}
         />
         <div className="space-y-1.5">
-          <label htmlFor="plan-notes" className="block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Notes</label>
+          <label htmlFor="plan-notes" className="block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Notes</label>
           <textarea
             id="plan-notes"
             value={notes}
@@ -275,7 +275,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
         Set as active plan
       </label>
 
-      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid}>{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="w-full text-[13.5px] font-semibold text-ink-60">Cancel</button></div>
+      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid}>{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="w-full text-[13.5px] font-semibold text-ink-65">Cancel</button></div>
     </form>
   )
 }
@@ -311,7 +311,7 @@ function DayCard({
         {canRemove ? <RemoveRowButton label={`Remove day ${index + 1}`} onClick={onRemove} /> : null}
       </div>
 
-      <label className="flex items-center gap-2 text-[13.5px] font-semibold text-ink-60">
+      <label className="flex items-center gap-2 text-[13.5px] font-semibold text-ink-65">
         <input
           type="checkbox"
           checked={day.is_rest_day}
@@ -361,7 +361,7 @@ function ExerciseRow({
               <div>
                 <div className="text-ink">{item.name}</div>
                 {item.primary_muscles && item.primary_muscles.length > 0 ? (
-                  <div className="text-[11px] text-ink-55">
+                  <div className="text-[11px] text-ink-65">
                     {item.primary_muscles.join(', ')}
                   </div>
                 ) : null}

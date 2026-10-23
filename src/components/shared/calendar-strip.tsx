@@ -68,12 +68,12 @@ export const CalendarStrip = memo(function CalendarStrip({
             type="button"
             onClick={onLabelClick}
             aria-label={`${label} — open month view`}
-            className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50"
+            className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65"
           >
             <span>{label}</span>
           </button>
         ) : (
-          <div className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50">
+          <div className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65">
             <span>{label}</span>
           </div>
         )
@@ -103,7 +103,7 @@ export const CalendarStrip = memo(function CalendarStrip({
           >
             <span className={cn(
               'text-[11px] font-semibold uppercase tracking-[1.4px]',
-              day.isToday ? 'text-cream-55' : 'text-ink-62'
+              day.isToday ? 'text-cream-55' : 'text-ink-65'
             )}>
               {day.dayName}
             </span>

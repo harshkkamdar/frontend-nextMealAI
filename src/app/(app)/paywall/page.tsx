@@ -79,7 +79,7 @@ export default function PaywallPage() {
       </button>
 
       <h1 className="mt-2 text-[28px] font-bold leading-[1.1] tracking-[-0.6px] text-ink">FIQR Plus</h1>
-      <GeoLine>Coaching that adapts to what you <em className="not-italic font-semibold text-accent">actually</em> do.</GeoLine>
+      <GeoLine>Coaching that adapts to what you <em className="not-italic font-semibold text-ink underline decoration-accent decoration-2 underline-offset-[3px]">actually</em> do.</GeoLine>
 
       <SectionLabel className="mt-2">What you get</SectionLabel>
       <ul className="mt-2 divide-y divide-ink-09 rounded-[16px] border border-ink-12 bg-card">
@@ -88,7 +88,7 @@ export default function PaywallPage() {
             <svg viewBox="0 0 24 24" className="mt-[2px] h-5 w-5 shrink-0 text-ink" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
             <div>
               <div className="text-[15.5px] font-semibold text-ink">{b.title}</div>
-              <div className="text-[13px] text-ink-55">{b.sub}</div>
+              <div className="text-[13px] text-ink-65">{b.sub}</div>
             </div>
           </li>
         ))}
@@ -97,7 +97,7 @@ export default function PaywallPage() {
       {subscribed ? (
         <div className="mt-6 rounded-[16px] bg-ink-08 p-[14px]">
           <div className="text-[15.5px] font-semibold text-ink">You&apos;re on FIQR Plus</div>
-          <button type="button" onClick={() => void manageSubscription()} className="mt-1 text-[13.5px] font-semibold text-ink-60">
+          <button type="button" onClick={() => void manageSubscription()} className="mt-1 text-[13.5px] font-semibold text-ink-65">
             Manage subscription
           </button>
         </div>
@@ -127,7 +127,7 @@ export default function PaywallPage() {
                   </span>
                   <span className="flex-1 text-[15.5px] font-semibold text-ink">{o.period === 'yearly' ? 'Yearly' : 'Monthly'}</span>
                   <span className="text-[15.5px] font-semibold text-ink">{o.price}</span>
-                  <span className="text-[13px] text-ink-55">/ {o.period === 'yearly' ? 'year' : 'month'}</span>
+                  <span className="text-[13px] text-ink-65">/ {o.period === 'yearly' ? 'year' : 'month'}</span>
                 </button>
               )
             })}
@@ -140,18 +140,18 @@ export default function PaywallPage() {
       )}
 
       {!subscribed && (
-        <button type="button" disabled={busy} onClick={() => void restore()} className="mt-4 w-full text-center text-[15.5px] font-semibold text-ink-60">
+        <button type="button" disabled={busy} onClick={() => void restore()} className="mt-4 w-full text-center text-[15.5px] font-semibold text-ink-65">
           Restore purchases
         </button>
       )}
 
-      <p className="mt-6 text-[12px] leading-[1.5] text-ink-55">
+      <p className="mt-6 text-[12px] leading-[1.5] text-ink-65">
         Payment is charged to your {os === 'android' ? 'Google Play account' : 'Apple ID'} when you confirm. The subscription renews
         automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel any time in your
         account settings.{' '}
-        <Link href="/privacy" className="font-semibold text-ink-60 underline">Privacy policy</Link>
+        <Link href="/privacy" className="font-semibold text-ink-65 underline">Privacy policy</Link>
         {' · '}
-        <a href={APPLE_EULA} className="font-semibold text-ink-60 underline">Terms of use</a>
+        <a href={APPLE_EULA} className="font-semibold text-ink-65 underline">Terms of use</a>
       </p>
     </PageWrapper>
   )

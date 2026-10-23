@@ -40,12 +40,12 @@ export function CheckInInsufficient({ status }: { status: CheckInStatus }) {
       <div className="mt-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
         <div className="flex items-baseline justify-between gap-3">
           <span className="text-[15.5px] font-semibold">{status.days_logged} of 7 days logged</span>
-          <span className="text-[13.5px] text-ink-55">{status.days_needed} needed</span>
+          <span className="text-[13.5px] text-ink-65">{status.days_needed} needed</span>
         </div>
         <div className="mt-[10px]">
           <SegmentsBar filled={status.days_logged} tone="ink" total={7} />
         </div>
-        <p className="mt-[10px] text-pretty text-[13.5px] text-ink-62">
+        <p className="mt-[10px] text-pretty text-[13.5px] text-ink-65">
           {neededWord.charAt(0).toUpperCase() + neededWord.slice(1)} days next week gives me a real answer.
         </p>
       </div>
@@ -65,7 +65,7 @@ export function CheckInInsufficient({ status }: { status: CheckInStatus }) {
             { label: 'Sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} nights` },
           ]}
         />
-        <div className="rounded-[16px] border-0 bg-ink-08 px-[14px] py-[13px] text-[13.5px] text-ink-62">
+        <div className="rounded-[16px] border-0 bg-ink-08 px-[14px] py-[13px] text-[13.5px] text-ink-65">
           Food averages hidden — {numberWord(status.days_logged)} days isn&apos;t a week
         </div>
       </section>
@@ -75,7 +75,7 @@ export function CheckInInsufficient({ status }: { status: CheckInStatus }) {
           Keep current targets
         </SecondaryButton>
         <button
-          className="self-center px-3 py-1 text-[15.5px] font-semibold text-ink-60"
+          className="self-center px-3 py-1 text-[15.5px] font-semibold text-ink-65"
           onClick={() => useUIStore.getState().openSheet('geo-companion')}
           type="button"
         >

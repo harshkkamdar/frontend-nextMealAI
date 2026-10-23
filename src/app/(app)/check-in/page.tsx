@@ -56,12 +56,12 @@ export default function CheckInPage() {
     >
       <header className="flex items-center gap-[14px] px-gutter" style={{ paddingTop: 'calc(16px + var(--safe-top))' }}>
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50">{data.week.label}</p>
+          <p className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65">{data.week.label}</p>
           <h1 className="mt-[3px] text-[22px] font-semibold tracking-[-0.4px] text-ink">{title}</h1>
         </div>
         <button
           aria-label="Open settings"
-          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-60"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-65"
           onClick={() => router.push('/settings')}
           type="button"
         >

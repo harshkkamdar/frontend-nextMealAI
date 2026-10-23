@@ -40,7 +40,7 @@ export default function WorkoutFollowPage() {
 
 function WorkoutFollowRoute() {
   const sessionId = useSearchParams().get('id') ?? ''
-  if (!sessionId) return <p className="p-4 text-sm text-ink-62">Nothing selected. <Link href="/train">Back to training.</Link></p>
+  if (!sessionId) return <p className="p-4 text-sm text-ink-65">Nothing selected. <Link href="/train">Back to training.</Link></p>
   return <WorkoutFollowSession sessionId={sessionId} />
 }
 
@@ -355,7 +355,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         <div className="grid grid-cols-[40px_1fr_40px] items-center">
           <button type="button" onClick={handleBack} aria-label="Go back" className="flex h-10 w-10 items-center justify-center text-ink"><Chevron direction="left" /></button>
           <p className="truncate text-center text-[15.5px] font-semibold tabular-nums text-ink">{session.day_name} · {formatTime(elapsedSeconds)}</p>
-          <button type="button" onClick={() => setShowMenu(true)} aria-label="Workout options" className="flex h-10 w-10 items-center justify-center text-[24px] leading-none text-ink-60">…</button>
+          <button type="button" onClick={() => setShowMenu(true)} aria-label="Workout options" className="flex h-10 w-10 items-center justify-center text-[24px] leading-none text-ink-65">…</button>
         </div>
         <div className="mt-2 h-[7px] overflow-hidden rounded-[4px] bg-ink-10">
           <div className="h-full bg-ink transition-[width] duration-300" style={{ width: `${totalSets ? (completedSets / totalSets) * 100 : 0}%` }} />
@@ -365,7 +365,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       <main className="flex-1 overflow-y-auto pb-28 pt-3">
         {exercises.length === 0 ? (
           <div className="px-gutter py-14 text-center">
-            <p className="text-[15.5px] text-ink-62">No exercises in this session.</p>
+            <p className="text-[15.5px] text-ink-65">No exercises in this session.</p>
             <SecondaryButton type="button" onClick={() => setShowAddForm(true)} className="mt-4">Add an exercise</SecondaryButton>
           </div>
         ) : (
@@ -373,23 +373,23 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
             {exercises.map((exercise, exerciseIndex) => (
               <article key={`${exercise.name}-${exerciseIndex}`} data-exercise-index={exerciseIndex} className="w-[calc(100vw-44px)] max-w-[346px] shrink-0 snap-center rounded-[22px] border border-ink-12 bg-card p-[22px]">
                 <h1 className="text-[28px] font-bold leading-[1.1] tracking-[-0.6px] text-ink">{exercise.name}</h1>
-                <p className="mt-2 text-[14px] text-ink-62">{exercise.planned_sets} × {exercise.planned_reps}{exercise.rest_seconds ? ` · ${exercise.rest_seconds} s rest` : ''}</p>
+                <p className="mt-2 text-[14px] text-ink-65">{exercise.planned_sets} × {exercise.planned_reps}{exercise.rest_seconds ? ` · ${exercise.rest_seconds} s rest` : ''}</p>
 
                 {exercise.instructions && exercise.instructions.length > 0 && (
                   <details className="mt-3">
-                    <summary className="cursor-pointer text-[13.5px] font-semibold text-ink-60">How to perform</summary>
-                    <ol className="mt-2 list-decimal space-y-1 pl-5">{exercise.instructions.map((step, index) => <li key={index} className="text-[13px] text-ink-62">{step}</li>)}</ol>
+                    <summary className="cursor-pointer text-[13.5px] font-semibold text-ink-65">How to perform</summary>
+                    <ol className="mt-2 list-decimal space-y-1 pl-5">{exercise.instructions.map((step, index) => <li key={index} className="text-[13px] text-ink-65">{step}</li>)}</ol>
                   </details>
                 )}
 
-                <div className="mt-5 grid grid-cols-[36px_1fr_1fr_1fr_40px] items-center gap-1 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-62">
+                <div className="mt-5 grid grid-cols-[36px_1fr_1fr_1fr_40px] items-center gap-1 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
                   <span>Set</span><span>Prev</span><span className="text-center">kg</span><span className="text-center">Reps</span><span className="text-center">✓</span>
                 </div>
                 <div className="mt-1">
                   {exercise.sets.map((set, setIndex) => (
                     <div key={setIndex} className="grid h-12 grid-cols-[36px_1fr_1fr_1fr_40px] items-center gap-1 border-t border-ink-09 first:border-t-0">
                       <span className="text-[15.5px] font-semibold text-ink">{set.set_number}</span>
-                      <span className="text-[13.5px] tabular-nums text-ink-50">{set.previous_reps != null && set.previous_weight_kg != null ? `${set.previous_reps}×${set.previous_weight_kg}` : '—'}</span>
+                      <span className="text-[13.5px] tabular-nums text-ink-65">{set.previous_reps != null && set.previous_weight_kg != null ? `${set.previous_reps}×${set.previous_weight_kg}` : '—'}</span>
                       <input
                         type="number" inputMode="decimal" aria-label={`${exercise.name} set ${set.set_number} kilograms`}
                         value={set.actual_weight_kg ?? ''} placeholder={set.planned_weight_kg != null ? String(set.planned_weight_kg) : '—'}
@@ -412,7 +412,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                   ))}
                 </div>
 
-                <button type="button" onClick={() => addSet(exerciseIndex)} className="mt-3 text-[13.5px] font-semibold text-ink-60">+ Add set</button>
+                <button type="button" onClick={() => addSet(exerciseIndex)} className="mt-3 text-[13.5px] font-semibold text-ink-65">+ Add set</button>
 
                 <textarea
                   placeholder="Notes (form cues, how it felt...)" aria-label={`Notes for ${exercise.name}`} value={exercise.notes || ''}
@@ -423,7 +423,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                     setSession({ ...session, exercises: updated })
                     saveExercises(updated)
                   }}
-                  className="mt-4 h-16 w-full resize-none rounded-[12px] border border-ink-12 bg-ink-08 px-3 py-2 text-[13px] text-ink-62 outline-none placeholder:text-ink-50 focus:ring-1 focus:ring-ink"
+                  className="mt-4 h-16 w-full resize-none rounded-[12px] border border-ink-12 bg-ink-08 px-3 py-2 text-[13px] text-ink-65 outline-none placeholder:text-ink-65 focus:ring-1 focus:ring-ink"
                 />
               </article>
             ))}
@@ -434,7 +434,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
           <div className="mx-[var(--gutter)] mt-4 space-y-3 rounded-[18px] border border-ink-12 bg-card p-4">
             <SearchablePicker<ExerciseSearchResult>
               label="Exercise" placeholder="Search exercises…" search={searchExercises}
-              renderItem={(item) => <div className="flex flex-col"><span className="text-sm text-ink">{item.name}</span>{item.primary_muscles?.length ? <span className="text-[11px] text-ink-50">{item.primary_muscles.join(', ')}</span> : null}</div>}
+              renderItem={(item) => <div className="flex flex-col"><span className="text-sm text-ink">{item.name}</span>{item.primary_muscles?.length ? <span className="text-[11px] text-ink-65">{item.primary_muscles.join(', ')}</span> : null}</div>}
               getItemKey={(item) => item.id} onSelect={(item) => setAddPick(item)} value={addPick?.name} onClear={() => setAddPick(null)}
             />
             <div className="grid grid-cols-3 gap-2">
@@ -443,7 +443,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
               <NumberField label="Rest" value={addRest} onChange={setAddRest} min={0} max={600} step={5} suffix="s" />
             </div>
             <div className="flex gap-2 pt-1">
-              <button type="button" onClick={resetAddForm} className="h-11 flex-1 rounded-[12px] border border-ink-16 text-[14px] font-semibold text-ink-60">Cancel</button>
+              <button type="button" onClick={resetAddForm} className="h-11 flex-1 rounded-[12px] border border-ink-16 text-[14px] font-semibold text-ink-65">Cancel</button>
               <button type="button" onClick={handleAddExercise} disabled={!addPick} className="h-11 flex-1 rounded-[12px] bg-ink text-[14px] font-semibold text-cream disabled:bg-ink-08 disabled:text-ink-35">Add</button>
             </div>
           </div>
@@ -479,11 +479,11 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
           <button type="button" onClick={() => void handleComplete()} disabled={completing} className="w-full border-b border-ink-09 py-4 text-left text-[15.5px] font-semibold text-ink">Finish workout</button>
           {current && (
             removeConfirm ? (
-              <div className="flex items-center gap-3 border-b border-ink-09 py-3"><button type="button" onClick={() => setRemoveConfirm(false)} className="flex-1 py-1 text-left text-[15.5px] text-ink-60">Cancel removal</button><button type="button" onClick={() => handleRemoveExercise(currentIndex)} className="py-1 text-[15.5px] font-semibold text-ink">Confirm remove</button></div>
+              <div className="flex items-center gap-3 border-b border-ink-09 py-3"><button type="button" onClick={() => setRemoveConfirm(false)} className="flex-1 py-1 text-left text-[15.5px] text-ink-65">Cancel removal</button><button type="button" onClick={() => handleRemoveExercise(currentIndex)} className="py-1 text-[15.5px] font-semibold text-ink">Confirm remove</button></div>
             ) : <button type="button" onClick={() => setRemoveConfirm(true)} className="w-full border-b border-ink-09 py-4 text-left text-[15.5px] font-semibold text-ink">Remove {current.name}</button>
           )}
           {discardConfirm ? (
-            <div className="flex items-center gap-3 border-b border-ink-09 py-3"><button type="button" onClick={() => setDiscardConfirm(false)} className="flex-1 py-1 text-left text-[15.5px] text-ink-60">Cancel discard</button><button type="button" onClick={() => void handleDiscard()} className="py-1 text-[15.5px] font-semibold text-ink">Confirm discard</button></div>
+            <div className="flex items-center gap-3 border-b border-ink-09 py-3"><button type="button" onClick={() => setDiscardConfirm(false)} className="flex-1 py-1 text-left text-[15.5px] text-ink-65">Cancel discard</button><button type="button" onClick={() => void handleDiscard()} className="py-1 text-[15.5px] font-semibold text-ink">Confirm discard</button></div>
           ) : <button type="button" onClick={() => setDiscardConfirm(true)} className="w-full border-b border-ink-09 py-4 text-left text-[15.5px] font-semibold text-ink">Discard workout</button>}
           <button type="button" onClick={() => { setShowMenu(false); useUIStore.getState().openSheet('geo-companion') }} className="w-full py-4 text-left text-[15.5px] font-semibold text-ink">Ask Geo</button>
         </div>
@@ -492,12 +492,12 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       <BottomSheet open={showExitSheet} onClose={() => { setShowExitSheet(false); setDiscardConfirm(false) }} ariaLabel="Exit workout">
         <div className="px-gutter pb-6 pt-2">
           <h2 className="text-center text-[18px] font-semibold text-ink">End workout?</h2>
-          <p className="mt-1 text-center text-[13.5px] text-ink-62">Pick what you&apos;d like to do with this session.</p>
+          <p className="mt-1 text-center text-[13.5px] text-ink-65">Pick what you&apos;d like to do with this session.</p>
           <SecondaryButton type="button" onNavy={false} onClick={handleSaveAndExit} className="mt-5">Save &amp; exit</SecondaryButton>
           {discardConfirm ? (
-            <div className="mt-2 flex items-center justify-center gap-4 py-3"><button type="button" onClick={() => setDiscardConfirm(false)} className="text-[14px] font-semibold text-ink-60">Keep workout</button><button type="button" onClick={() => void handleDiscard()} className="text-[14px] font-semibold text-ink">Confirm discard</button></div>
-          ) : <button type="button" onClick={() => setDiscardConfirm(true)} className="mt-2 w-full py-3 text-[14px] font-semibold text-ink-60">Discard workout</button>}
-          <button type="button" onClick={() => setShowExitSheet(false)} className="w-full py-3 text-[14px] font-semibold text-ink-60">Cancel</button>
+            <div className="mt-2 flex items-center justify-center gap-4 py-3"><button type="button" onClick={() => setDiscardConfirm(false)} className="text-[14px] font-semibold text-ink-65">Keep workout</button><button type="button" onClick={() => void handleDiscard()} className="text-[14px] font-semibold text-ink">Confirm discard</button></div>
+          ) : <button type="button" onClick={() => setDiscardConfirm(true)} className="mt-2 w-full py-3 text-[14px] font-semibold text-ink-65">Discard workout</button>}
+          <button type="button" onClick={() => setShowExitSheet(false)} className="w-full py-3 text-[14px] font-semibold text-ink-65">Cancel</button>
         </div>
       </BottomSheet>
     </div>

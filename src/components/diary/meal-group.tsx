@@ -33,7 +33,7 @@ interface MealGroupProps {
 
 function Chevron({ expanded }: { expanded: boolean }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className={`size-6 shrink-0 text-ink-60 transition-transform ${expanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg aria-hidden="true" viewBox="0 0 24 24" className={`size-6 shrink-0 text-ink-65 transition-transform ${expanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <path d="m6 9 6 6 6-6" />
     </svg>
   )
@@ -41,7 +41,7 @@ function Chevron({ expanded }: { expanded: boolean }) {
 
 function PencilIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6 text-ink-60" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6 text-ink-65" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 20h9" />
       <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
     </svg>
@@ -77,9 +77,9 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
       <div className="mb-2 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-baseline gap-1">
           <SectionLabel>{mealType}</SectionLabel>
-          {calories > 0 ? <span className="text-[11.5px] font-semibold text-ink-50">· {formatMacroKcal(calories)} kcal</span> : null}
+          {calories > 0 ? <span className="text-[11.5px] font-semibold text-ink-65">· {formatMacroKcal(calories)} kcal</span> : null}
         </div>
-        <button type="button" onClick={() => setActionsOpen(true)} aria-label={`${mealType} actions`} className="flex size-6 shrink-0 items-center justify-center text-ink-50">
+        <button type="button" onClick={() => setActionsOpen(true)} aria-label={`${mealType} actions`} className="flex size-6 shrink-0 items-center justify-center text-ink-65">
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="currentColor">
             <circle cx="5" cy="12" r="1.5" />
             <circle cx="12" cy="12" r="1.5" />
@@ -91,7 +91,7 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
       <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
         {items.length === 0 ? (
           <button type="button" onClick={onAddFood} className="flex min-h-14 w-full items-center justify-between gap-3 px-[14px] py-3 text-left">
-            <span className="text-[15.5px] text-ink-50">Nothing logged</span>
+            <span className="text-[15.5px] text-ink-65">Nothing logged</span>
             <span className="text-[13.5px] font-semibold text-ink">+</span>
           </button>
         ) : items.map((item) => {
@@ -141,9 +141,9 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
                             <div className="min-w-0 flex-1">
                               <p className="truncate font-semibold text-ink">
                                 {child.name}
-                                {child.quantity_label ? <span className="font-normal text-ink-55"> · {child.quantity_label}</span> : child.quantity_g ? <span className="font-normal text-ink-55"> · {child.quantity_g}g</span> : null}
+                                {child.quantity_label ? <span className="font-normal text-ink-65"> · {child.quantity_label}</span> : child.quantity_g ? <span className="font-normal text-ink-65"> · {child.quantity_g}g</span> : null}
                               </p>
-                              <p className="text-[13px] text-ink-55">{formatMacroKcal(child.est_macros.calories ?? 0)} kcal · {formatMacroGrams(child.est_macros.carbs ?? 0)} C · {formatMacroGrams(child.est_macros.fat ?? 0)} F</p>
+                              <p className="text-[13px] text-ink-65">{formatMacroKcal(child.est_macros.calories ?? 0)} kcal · {formatMacroGrams(child.est_macros.carbs ?? 0)} C · {formatMacroGrams(child.est_macros.fat ?? 0)} F</p>
                             </div>
                             <button type="button" onClick={() => setEditingChild({ logId: item.id, idx })} aria-label="Edit item" className="shrink-0">
                               <PencilIcon />
@@ -180,9 +180,9 @@ function FoodRowCopy({ payload }: { payload: FoodPayload }) {
     <>
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15.5px] font-semibold text-ink">{payload.food_name}</p>
-        <p aria-hidden="true" className="text-[13px] text-ink-55">{formatQuantity(payload)} · {formatMacroKcal(macros?.calories ?? 0)} kcal</p>
+        <p aria-hidden="true" className="text-[13px] text-ink-65">{formatQuantity(payload)} · {formatMacroKcal(macros?.calories ?? 0)} kcal</p>
       </div>
-      <span className="shrink-0 text-[13px] font-medium text-ink-55">{formatMacroGrams(macros?.carbs ?? 0)} C · {formatMacroGrams(macros?.fat ?? 0)} F</span>
+      <span className="shrink-0 text-[13px] font-medium text-ink-65">{formatMacroGrams(macros?.carbs ?? 0)} C · {formatMacroGrams(macros?.fat ?? 0)} F</span>
     </>
   )
 }
@@ -191,7 +191,7 @@ function ActionRow({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} className="flex min-h-14 w-full items-center justify-between px-[14px] py-3 text-left text-[15.5px] font-semibold text-ink">
       {label}
-      <span aria-hidden="true" className="text-[13.5px] text-ink-50">+</span>
+      <span aria-hidden="true" className="text-[13.5px] text-ink-65">+</span>
     </button>
   )
 }
@@ -224,7 +224,7 @@ function ChildEditForm({ child, onCancel, onSave }: { child: FoodLogItem; onCanc
       <p className="font-semibold text-ink">{child.name}</p>
       <div className="grid grid-cols-2 gap-2">
         {fields.map(([label, value, setter]) => (
-          <label key={label} className="space-y-1 text-[11px] font-semibold text-ink-55">
+          <label key={label} className="space-y-1 text-[11px] font-semibold text-ink-65">
             <span>{label}</span>
             <input type="number" value={value} onChange={(event) => setter(event.target.value)} className="h-11 w-full rounded-[12px] border-0 bg-ink-08 text-center text-[15.5px] font-semibold text-ink outline-none" />
           </label>

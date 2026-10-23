@@ -92,7 +92,7 @@ function ReportForm({
         value={note}
         onChange={(event) => setNote(event.target.value)}
         placeholder="What went wrong? (optional)"
-        className="mt-4 min-h-24 w-full resize-none rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-50 focus:border-ink"
+        className="mt-4 min-h-24 w-full resize-none rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
       />
       <PrimaryButton
         type="button"
@@ -105,7 +105,7 @@ function ReportForm({
       <button
         type="button"
         onClick={onClose}
-        className="mt-3 h-10 w-full text-[15.5px] font-semibold text-ink-60"
+        className="mt-3 h-10 w-full text-[15.5px] font-semibold text-ink-65"
       >
         Cancel
       </button>

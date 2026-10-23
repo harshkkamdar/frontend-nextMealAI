@@ -18,7 +18,7 @@ export function ChatHeader({ title }: { sessionId?: string; title?: string }) {
         </button>
         <div className="flex flex-col min-w-0">
           <span className="truncate text-[17px] font-bold leading-tight text-ink">Geo</span>
-          <span className="truncate text-[13.5px] font-medium text-ink-55">
+          <span className="truncate text-[13.5px] font-medium text-ink-65">
             {title ?? 'New conversation'}
           </span>
         </div>

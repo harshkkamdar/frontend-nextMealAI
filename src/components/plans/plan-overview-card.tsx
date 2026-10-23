@@ -19,12 +19,12 @@ export function PlanOverviewCard({ plan, onClick, onEdit }: { plan: Plan; onClic
     <div role="link" tabIndex={0} onClick={onClick} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') onClick() }} className="flex cursor-pointer items-center justify-between rounded-[16px] border border-ink-12 bg-card p-[14px]">
       <div className="min-w-0">
         <div className="truncate text-[17px] font-bold text-ink">{title}</div>
-        <div className="mt-0.5 text-[13.5px] text-ink-55">{planMeta(plan)}</div>
+        <div className="mt-0.5 text-[13.5px] text-ink-65">{planMeta(plan)}</div>
         <span className="mt-2 inline-flex h-6 items-center rounded-full bg-ink-08 px-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink">Active</span>
       </div>
       <div className="ml-3 flex shrink-0 items-center gap-2">
-        {onEdit ? <button type="button" aria-label={`Edit ${plan.type === 'meal' ? 'nutrition' : 'workout'} plan`} onClick={(event) => { event.stopPropagation(); onEdit() }} className="inline-flex h-10 w-10 items-center justify-center text-ink-60"><Pencil className="h-6 w-6" /></button> : null}
-        <ChevronRight className="h-5 w-5 text-ink-50" />
+        {onEdit ? <button type="button" aria-label={`Edit ${plan.type === 'meal' ? 'nutrition' : 'workout'} plan`} onClick={(event) => { event.stopPropagation(); onEdit() }} className="inline-flex h-10 w-10 items-center justify-center text-ink-65"><Pencil className="h-6 w-6" /></button> : null}
+        <ChevronRight className="h-5 w-5 text-ink-65" />
       </div>
     </div>
   )

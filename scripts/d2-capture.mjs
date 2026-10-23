@@ -162,12 +162,12 @@ async function installRoutes(page, row, state) {
     const method = req.method()
     if (method === 'OPTIONS') return route.fulfill({ status: 204, headers: cors })
     if (p === '/v1/foods/estimate-from-photo') {
-      if (state === 'error') return json(route, 500, { error: { message: 'Photo estimate failed' } })
+      if (state === 'error') return json(route, 500, { error: true, code: 'ESTIMATE_FAILED', message: 'Photo estimate failed' })
       return json(route, 200, state === 'long' ? longStrings(ESTIMATE) : ESTIMATE)
     }
     if (method !== 'GET') {
       if (/^\/auth\/(login|refresh)$/.test(p) && !(row.guest && state === 'error')) return route.continue()
-      if (row.guest && state === 'error') return json(route, 401, { error: { message: 'Invalid email or password' } })
+      if (row.guest && state === 'error') return json(route, 401, { error: true, code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' })
       return json(route, 200, {})
     }
     if (p === '/v1/profile/onboarding' && row.onboarding === 'incomplete') {
@@ -176,7 +176,7 @@ async function installRoutes(page, row, state) {
     // The gate and the timezone check read the profile first; mocking those reads would redirect away.
     const gateRead = p === '/v1/profile/onboarding' || (p === '/v1/profile' && profileReads++ < 2)
     if (!gateRead && state === 'loading') return new Promise(() => {})
-    if (!gateRead && state === 'error') return json(route, 500, { error: { message: 'Internal error' } })
+    if (!gateRead && state === 'error') return json(route, 500, { error: true, code: 'INTERNAL', message: 'Internal error' })
     const res = await cachedFetch(route)
     let body
     try { body = JSON.parse(res.text) } catch { return route.fulfill({ status: res.status, headers: res.headers, body: res.text }) }

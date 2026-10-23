@@ -251,14 +251,14 @@ export default function DiaryPage() {
     <PageWrapper className="space-y-6">
       <header className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-50">{monthLabel}</p>
+          <p className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65">{monthLabel}</p>
           <p className="text-[22px] font-semibold tracking-[-0.4px] text-ink">{dayLabel}</p>
         </div>
         <button
           type="button"
           onClick={() => setMonthOpen(true)}
           aria-label="Open month view"
-          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-60"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-65"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -296,7 +296,7 @@ export default function DiaryPage() {
             {mealPlan && (
               <button
                 onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
-                className="mt-4 text-[13.5px] font-semibold text-ink-60"
+                className="mt-4 text-[13.5px] font-semibold text-ink-65"
               >
                 View nutrition plan &rarr;
               </button>

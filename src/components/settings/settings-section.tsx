@@ -23,7 +23,7 @@ function RowChevron() {
       strokeWidth={1.75}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-5 w-5 text-ink-50"
+      className="h-5 w-5 text-ink-65"
     >
       <path d="m9 18 6-6-6-6" />
     </svg>
@@ -45,7 +45,7 @@ export function SettingsRow({
     <>
       <span className="font-medium text-ink">{label}</span>
       <span className="flex items-center gap-2">
-        {value && !children ? <span className="text-[13.5px] text-ink-55">{value}</span> : null}
+        {value && !children ? <span className="text-[13.5px] text-ink-65">{value}</span> : null}
         {children}
         {onClick && !children ? <RowChevron /> : null}
       </span>

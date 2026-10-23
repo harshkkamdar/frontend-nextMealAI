@@ -35,10 +35,10 @@
   --color-accent-hover: #E8622A;
   --color-accent-light: rgba(232,98,42,.10);
   --color-text-primary: #111C35;
-  --color-text-secondary: rgba(17,28,53,.62);
-  --color-text-tertiary: rgba(17,28,53,.5);
+  --color-text-secondary: rgba(17,28,53,.65);
+  --color-text-tertiary: rgba(17,28,53,.65);
   --color-success: #3E7C77;
-  --color-info: rgba(17,28,53,.62);
+  --color-info: rgba(17,28,53,.65);
   --color-warning: #A07A3C;
   --color-purple: #3E7C77;
   --color-destructive: #E8622A;
@@ -48,7 +48,7 @@
   --color-secondary: rgba(17,28,53,.08);
   --color-secondary-foreground: #111C35;
   --color-muted: rgba(17,28,53,.08);
-  --color-muted-foreground: rgba(17,28,53,.62);
+  --color-muted-foreground: rgba(17,28,53,.65);
   --color-card-foreground: #111C35;
   --color-input: rgba(17,28,53,.12);
   --color-ring: #E8622A;
@@ -79,6 +79,16 @@
   html { background: #FDF6EC; }
   html, body { overscroll-behavior: none; }
   body { @apply bg-background text-text-primary font-sans antialiased; }
+}
+
+/* Reduced motion keeps state changes visible but drops loops and travel. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-iteration-count: 1 !important;
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer utilities {

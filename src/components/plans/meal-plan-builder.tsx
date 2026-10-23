@@ -221,7 +221,7 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
         <button
           type="button"
           onClick={() => router.push('/plans')}
-          className="inline-flex h-9 w-9 items-center justify-center text-ink-60"
+          className="inline-flex h-9 w-9 items-center justify-center text-ink-65"
           aria-label="Back to plans"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -239,7 +239,7 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
           }}
         />
         <div className="space-y-1.5">
-          <label htmlFor="plan-notes" className="block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Notes</label>
+          <label htmlFor="plan-notes" className="block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Notes</label>
           <textarea
             id="plan-notes"
             value={notes}
@@ -315,7 +315,7 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
         Set as active plan
       </label>
 
-      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid}>{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="w-full text-[13.5px] font-semibold text-ink-60">Cancel</button></div>
+      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid}>{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="w-full text-[13.5px] font-semibold text-ink-65">Cancel</button></div>
     </form>
   )
 }
@@ -382,7 +382,7 @@ function MealRow({
     <div className="space-y-3 py-3 first:pt-0">
       <div className="flex items-start gap-2">
         <div className="flex-1 space-y-3">
-          <div className="space-y-1.5"><div className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Meal type</div><div className="flex flex-wrap gap-2">{MEAL_TYPES.map((type) => <button key={type} type="button" onClick={() => onPatch({ type })} className={`h-9 rounded-full px-3 text-[13.5px] font-semibold ${meal.type === type ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}>{type}</button>)}</div></div>
+          <div className="space-y-1.5"><div className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Meal type</div><div className="flex flex-wrap gap-2">{MEAL_TYPES.map((type) => <button key={type} type="button" onClick={() => onPatch({ type })} className={`h-9 rounded-full px-3 text-[13.5px] font-semibold ${meal.type === type ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}>{type}</button>)}</div></div>
           <SearchablePicker<FoodSearchResult>
             label={`Meal ${index + 1}`}
             placeholder="Search foods"
@@ -391,7 +391,7 @@ function MealRow({
               <div>
                 <div className="text-ink">{item.name}</div>
                 {item.brand ? (
-                  <div className="text-[11px] text-ink-55">{item.brand}</div>
+                  <div className="text-[11px] text-ink-65">{item.brand}</div>
                 ) : null}
               </div>
             )}

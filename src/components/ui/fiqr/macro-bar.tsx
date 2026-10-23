@@ -17,7 +17,7 @@ export function MacroBar({ name, current, target, unit }: MacroBarProps) {
   const t = Math.round(target)
   const left = Math.max(t - c, 0)
   const over = c - t
-  const fillWidth = Math.min(100, (current / target) * 100)
+  const fillWidth = target > 0 ? Math.min(100, (current / target) * 100) : 0
 
   return (
     <div>
@@ -25,14 +25,16 @@ export function MacroBar({ name, current, target, unit }: MacroBarProps) {
         <span className="text-[15.5px] font-semibold text-ink">{name}</span>
         <span className="text-[13.5px] whitespace-nowrap">
           <b className="font-semibold text-ink">{c}</b>
-          <span className="text-ink-55"> / {t}{unit}</span>
+          <span className="text-ink-65"> / {t}{unit}</span>
           {' · '}
-          {c > t ? (
-            <span className="font-semibold text-accent">{over}{unit} over</span>
+          {t <= 0 ? (
+            <span className="text-ink-65">no target yet</span>
+          ) : c > t ? (
+            <span className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-[3px]">{over}{unit} over</span>
           ) : name === 'Calories' ? (
-            <span className="font-semibold text-accent">{left} left</span>
+            <span className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-[3px]">{left} left</span>
           ) : (
-            <span className="text-ink-55">{left}{unit} left</span>
+            <span className="text-ink-65">{left}{unit} left</span>
           )}
         </span>
       </div>

@@ -168,13 +168,13 @@ export function SessionList({
               </div>
               {!isEditing ? (
                 <div className="flex shrink-0 items-center gap-1.5">
-                  <span className="whitespace-nowrap text-[13px] font-medium text-ink-55">
+                  <span className="whitespace-nowrap text-[13px] font-medium text-ink-65">
                     {formatSessionDate(session.updated_at ?? session.created_at)}
                   </span>
                   <div className="relative" ref={isMenuOpen ? menuRef : undefined}>
                     <button
                       onClick={(e) => toggleMenu(e, session.session_id)}
-                      className="flex h-7 w-7 items-center justify-center rounded-full text-ink-50 active:bg-ink-08"
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
                       aria-label="Chat options"
                     >
                       <MoreVertical className="h-4 w-4" />
@@ -188,12 +188,12 @@ export function SessionList({
                           onClick={(e) => startEditing(e, session)}
                           className="flex h-9 w-full items-center gap-2.5 px-3 text-[13.5px] font-semibold text-ink active:bg-ink-08"
                         >
-                          <Pencil className="h-3.5 w-3.5 text-ink-50" />
+                          <Pencil className="h-3.5 w-3.5 text-ink-65" />
                           Rename
                         </button>
                         <button
                           onClick={(e) => handleDeleteClick(e, session)}
-                          className="flex h-9 w-full items-center gap-2.5 px-3 text-[13.5px] font-semibold text-accent active:bg-accent-10"
+                          className="flex h-9 w-full items-center gap-2.5 px-3 text-[13.5px] font-semibold text-ink active:bg-ink-08"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Delete

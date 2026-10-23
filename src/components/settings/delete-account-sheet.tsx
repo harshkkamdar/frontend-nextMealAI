@@ -44,7 +44,7 @@ export function DeleteAccountSheet({ open, onClose }: DeleteAccountSheetProps) {
     >
       <div className="px-gutter pb-6 pt-3">
         <h2 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Delete your account</h2>
-        <p className="mt-3 text-[15.5px] leading-[1.45] text-ink-62">
+        <p className="mt-3 text-[15.5px] leading-[1.45] text-ink-65">
           This removes your profile, logs, plans, check-ins, photos and chats permanently. It cannot be undone.
         </p>
 
@@ -76,7 +76,7 @@ export function DeleteAccountSheet({ open, onClose }: DeleteAccountSheetProps) {
           type="button"
           onClick={handleClose}
           disabled={deleting}
-          className="mx-auto mt-4 block text-[15.5px] font-semibold text-ink-60"
+          className="mx-auto mt-4 block text-[15.5px] font-semibold text-ink-65"
         >
           Cancel
         </button>

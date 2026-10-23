@@ -40,7 +40,7 @@ export default function GeneratingPage() {
         <span className="size-2 rounded-full bg-accent animate-pulse" style={{ animationDelay: '400ms' }} />
       </div>
 
-      <p className="max-w-xs text-center text-[15.5px] text-ink-60">
+      <p className="max-w-xs text-center text-[15.5px] text-ink-65">
         Geo is working out your calories, macros and training days.
       </p>
     </div>

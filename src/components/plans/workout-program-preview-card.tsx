@@ -92,17 +92,17 @@ export function WorkoutProgramPreviewCard({
     >
       <div className="flex items-center justify-between">
         <SectionLabel>Program from your photo</SectionLabel>
-        <span className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-55" data-testid="confidence-badge">
+        <span className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65" data-testid="confidence-badge">
           {conf}
         </span>
       </div>
 
-      <div className="text-[13.5px] text-ink-62" data-testid="program-summary">
+      <div className="text-[13.5px] text-ink-65" data-testid="program-summary">
         {days.length} day{days.length === 1 ? '' : 's'} · {totalExercises} exercise
         {totalExercises === 1 ? '' : 's'}
       </div>
 
-      <ul className="space-y-1 text-[13.5px] text-ink-62" data-testid="day-list">
+      <ul className="space-y-1 text-[13.5px] text-ink-65" data-testid="day-list">
         {days.map((d, i) => (
           <li key={i} className="flex items-center justify-between">
             <span>{d.name || `Day ${i + 1}`}</span>
@@ -133,7 +133,7 @@ export function WorkoutProgramPreviewCard({
           type="button"
           onClick={handleDiscard}
           disabled={busy}
-          className="w-full py-2 text-[13.5px] font-semibold text-ink-60"
+          className="w-full py-2 text-[13.5px] font-semibold text-ink-65"
           data-testid="preview-discard"
         >
           Discard

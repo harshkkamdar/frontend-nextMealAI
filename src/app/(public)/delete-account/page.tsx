@@ -90,7 +90,7 @@ export default function DeleteAccountPage() {
 
       <p className={paragraphClass}>
         Deleting your account removes all personal data listed in our{' '}
-        <Link href="/privacy" className="font-semibold text-accent">privacy policy</Link>. Anonymous, aggregated statistics are not personal data and are not affected.
+        <Link href="/privacy" className="font-semibold text-ink underline decoration-ink-35 underline-offset-4">privacy policy</Link>. Anonymous, aggregated statistics are not personal data and are not affected.
       </p>
     </main>
   )

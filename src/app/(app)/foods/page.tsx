@@ -48,11 +48,11 @@ function FoodRow({
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
-          <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-55">
+          <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
             {SOURCE_LABELS[food.source] ?? food.source}
           </span>
         </div>
-        <p className="mt-0.5 text-[13px] leading-[1.45] text-ink-55">
+        <p className="mt-0.5 text-[13px] leading-[1.45] text-ink-65">
           {food.serving_size_g || 100}g · {macros.calories ?? 0} kcal · {macros.protein ?? 0}P {macros.carbs ?? 0}C {macros.fat ?? 0}F · used {food.use_count ?? 0}×
         </p>
       </div>
@@ -61,7 +61,7 @@ function FoodRow({
         type="button"
         onClick={() => setMenuOpen(true)}
         aria-label={`More options for ${food.name}`}
-        className="-mr-1 flex size-8 shrink-0 items-center justify-center text-ink-50"
+        className="-mr-1 flex size-8 shrink-0 items-center justify-center text-ink-65"
       >
         <MoreHorizontal className="size-6" />
       </button>
@@ -217,7 +217,7 @@ export default function FoodsPage() {
       <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Foods</h1>
 
       <div className="relative mt-4">
-        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-50" />
+        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
         <input
           type="text"
           placeholder="Search foods, brands, or describe it"
@@ -226,7 +226,7 @@ export default function FoodsPage() {
           className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-11 text-[17px] text-ink outline-none placeholder:text-ink-35 focus:border-ink"
         />
         {search ? (
-          <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center text-ink-50">
+          <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center text-ink-65">
             <X className="size-5" />
           </button>
         ) : null}

@@ -251,7 +251,7 @@ export function GeoCompanionSheet() {
                   <span className="text-[17px] font-bold text-ink">Geo</span>
                   <div className="flex items-center gap-1">
                     <div className="h-1.5 w-1.5 rounded-full bg-macro-teal" />
-                    <span className="text-[11px] font-medium text-ink-55">Online</span>
+                    <span className="text-[11px] font-medium text-ink-65">Online</span>
                   </div>
                 </div>
               </div>
@@ -259,7 +259,7 @@ export function GeoCompanionSheet() {
                 <button
                   onClick={handleStartNewChat}
                   disabled={initializing || messages.length === 0}
-                  className="flex h-8 items-center gap-1 rounded-full px-2.5 text-[13.5px] font-semibold text-ink-60 active:bg-ink-08 disabled:pointer-events-none disabled:opacity-40"
+                  className="flex h-8 items-center gap-1 rounded-full px-2.5 text-[13.5px] font-semibold text-ink-65 active:bg-ink-08 disabled:pointer-events-none disabled:opacity-40"
                   aria-label="Start a new chat"
                 >
                   <SquarePen className="w-3.5 h-3.5" />
@@ -267,7 +267,7 @@ export function GeoCompanionSheet() {
                 </button>
                 <button
                   onClick={handleClose}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-ink-60 active:bg-ink-08"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
                   aria-label="Close"
                 >
                   <X className="h-4 w-4" />
@@ -284,7 +284,7 @@ export function GeoCompanionSheet() {
               ) : messages.length === 0 && !isTyping ? (
                 <div className="flex flex-col items-center justify-center py-6 gap-2">
                   <GeoAvatar variant="face" state="happy" size={48} />
-                  <p className="text-center text-[15.5px] text-ink-60">
+                  <p className="text-center text-[15.5px] text-ink-65">
                     Hey! What can I help you with?
                   </p>
                 </div>
@@ -313,14 +313,14 @@ export function GeoCompanionSheet() {
             <div className="flex items-center gap-3 px-gutter pt-1">
               <button
                 onClick={handleOpenFullChat}
-                className="flex items-center gap-1 text-[13.5px] font-semibold text-ink-60"
+                className="flex items-center gap-1 text-[13.5px] font-semibold text-ink-65"
               >
                 Open full chat
                 <ExternalLink className="w-3 h-3" />
               </button>
               <button
                 onClick={() => { handleClose(); setTimeout(() => router.push('/chat'), 50) }}
-                className="flex items-center gap-1 text-[13.5px] font-semibold text-ink-60"
+                className="flex items-center gap-1 text-[13.5px] font-semibold text-ink-65"
               >
                 All chats
               </button>

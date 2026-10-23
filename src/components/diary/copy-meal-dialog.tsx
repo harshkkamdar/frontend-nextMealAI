@@ -53,7 +53,7 @@ export function CopyMealDialog({ open, sourceMeal, onClose, onPick }: CopyMealDi
         className="relative z-10 w-full max-w-md rounded-t-[22px] bg-cream p-[22px]"
       >
         <h2 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Copy {sourceMeal} to today</h2>
-        <p className="mt-1.5 text-[15.5px] text-ink-60">Which meal should it go under?</p>
+        <p className="mt-1.5 text-[15.5px] text-ink-65">Which meal should it go under?</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {MEALS.map((m) => (
             <button
@@ -70,7 +70,7 @@ export function CopyMealDialog({ open, sourceMeal, onClose, onPick }: CopyMealDi
         <PrimaryButton onClick={() => { setTargetMeal(null); onPick(selectedMeal) }} className="mt-5 justify-center">
           Copy meal
         </PrimaryButton>
-        <button onClick={close} className="mt-3 w-full py-2 text-[15.5px] font-semibold text-ink-60">
+        <button onClick={close} className="mt-3 w-full py-2 text-[15.5px] font-semibold text-ink-65">
           Cancel
         </button>
       </div>

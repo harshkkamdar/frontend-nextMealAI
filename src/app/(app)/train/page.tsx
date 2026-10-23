@@ -182,7 +182,7 @@ export default function ActivityPage() {
     <PageWrapper>
       <header className="flex items-center justify-between gap-4">
         <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Train</h1>
-        <button type="button" onClick={() => setCalendarOpen(true)} aria-label="Open workout calendar" className="flex h-10 w-10 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-60"><CalendarIcon /></button>
+        <button type="button" onClick={() => setCalendarOpen(true)} aria-label="Open workout calendar" className="flex h-10 w-10 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-65"><CalendarIcon /></button>
       </header>
       <div className="-mx-gutter mt-3"><OfflineBand /></div>
 
@@ -196,7 +196,7 @@ export default function ActivityPage() {
         <>
           {isResume && !isRestDay && (
             <button type="button" onClick={handleResume} className="mt-4 flex w-full items-center justify-between rounded-[16px] bg-ink-08 px-[14px] py-3 text-left">
-              <span className="text-[15.5px] font-semibold text-ink">Resume · {inProgress?.day_name}</span><ChevronIcon className="h-5 w-5 text-ink-60" />
+              <span className="text-[15.5px] font-semibold text-ink">Resume · {inProgress?.day_name}</span><ChevronIcon className="h-5 w-5 text-ink-65" />
             </button>
           )}
 
@@ -233,7 +233,7 @@ export default function ActivityPage() {
               <SectionLabel>Program</SectionLabel>
               <div className="mt-3 flex items-baseline justify-between gap-3">
                 <h2 className="truncate text-[15.5px] font-semibold text-ink">{workoutPlan.content.name || 'Your program'}</h2>
-                <span className="shrink-0 text-[13.5px] text-ink-55">Day {nextIdx + 1} of {days.length}</span>
+                <span className="shrink-0 text-[13.5px] text-ink-65">Day {nextIdx + 1} of {days.length}</span>
               </div>
               <div className="mt-3 overflow-hidden rounded-[18px] border border-ink-12 bg-card" data-testid="activity-program-overview">
                 {days.map((day, index) => {
@@ -245,14 +245,14 @@ export default function ActivityPage() {
                     <div key={`${day.name}-${index}`} className="border-b border-ink-09 last:border-b-0">
                       <button type="button" onClick={() => canExpand && setExpandedDay(isExpanded ? null : index)} aria-expanded={isExpanded} className="flex w-full items-center gap-3 px-[14px] py-[13px] text-left">
                         <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold ${isNext ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}>{index + 1}</span>
-                        <span className="min-w-0 flex-1"><span className="block truncate text-[15.5px] font-semibold text-ink">{day.is_rest_day ? 'Rest' : (day.name || `Day ${index + 1}`)}</span><span className="block text-[13px] text-ink-55">{exerciseList.length} exercises</span></span>
-                        <ChevronIcon className={`h-5 w-5 shrink-0 text-ink-50 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                        <span className="min-w-0 flex-1"><span className="block truncate text-[15.5px] font-semibold text-ink">{day.is_rest_day ? 'Rest' : (day.name || `Day ${index + 1}`)}</span><span className="block text-[13px] text-ink-65">{exerciseList.length} exercises</span></span>
+                        <ChevronIcon className={`h-5 w-5 shrink-0 text-ink-65 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                       </button>
                       {isExpanded && canExpand && (
                         <div className="space-y-1 pb-[13px] pl-9 pr-[14px]">
                           {exerciseList.map((exercise, exerciseIndex) => {
                             const detail = formatExDetail(exercise)
-                            return <p key={`${exercise.name}-${exerciseIndex}`} className="text-[13.5px] text-ink-62">{exercise.name}{detail ? ` — ${detail}` : ''}</p>
+                            return <p key={`${exercise.name}-${exerciseIndex}`} className="text-[13.5px] text-ink-65">{exercise.name}{detail ? ` — ${detail}` : ''}</p>
                           })}
                         </div>
                       )}
@@ -260,19 +260,19 @@ export default function ActivityPage() {
                   )
                 })}
               </div>
-              <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-3 text-[13.5px] font-semibold text-ink-60">View full plan →</button>
+              <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-3 text-[13.5px] font-semibold text-ink-65">View full plan →</button>
             </section>
           )}
 
           <section className="mt-6">
             <SectionLabel>History</SectionLabel>
             <div className="mt-3 overflow-hidden rounded-[18px] border border-ink-12 bg-card">
-              {completedHistory.length === 0 ? <p className="px-[14px] py-5 text-[13.5px] text-ink-50">No completed workouts yet</p> : completedHistory.slice(0, 10).map((session, index) => {
+              {completedHistory.length === 0 ? <p className="px-[14px] py-5 text-[13.5px] text-ink-65">No completed workouts yet</p> : completedHistory.slice(0, 10).map((session, index) => {
                 const setCount = session.exercises.reduce((sum, exercise) => sum + exercise.sets.filter((set) => set.completed).length, 0)
                 return (
                   <button key={session.id} type="button" onClick={() => router.push(`/train/session?id=${session.id}`)} className="flex w-full items-center gap-3 border-b border-ink-09 px-[14px] py-[13px] text-left last:border-b-0" data-testid={index === 0 ? 'activity-last-session' : undefined}>
-                    <span className="min-w-0 flex-1"><span className="block text-[15.5px] font-medium text-ink">{formatHistoryDate(session.completed_at!, tz)}</span><span className="block truncate text-[13px] text-ink-55">{session.day_name} · {session.duration_minutes ?? 0} min · {setCount} sets</span></span>
-                    <ChevronIcon className="h-5 w-5 shrink-0 text-ink-50" />
+                    <span className="min-w-0 flex-1"><span className="block text-[15.5px] font-medium text-ink">{formatHistoryDate(session.completed_at!, tz)}</span><span className="block truncate text-[13px] text-ink-65">{session.day_name} · {session.duration_minutes ?? 0} min · {setCount} sets</span></span>
+                    <ChevronIcon className="h-5 w-5 shrink-0 text-ink-65" />
                   </button>
                 )
               })}
@@ -287,9 +287,9 @@ export default function ActivityPage() {
         <div className="px-gutter pb-6 pt-3">
           <CalendarStrip selectedDate={selectedDate} onSelectDate={setSelectedDate} indicators={indicators} label="Today" onLabelClick={() => setSelectedDate(todayLocalISO(tz))} tz={tz} />
           <div className="mt-4 overflow-hidden rounded-[18px] border border-ink-12 bg-card">
-            {selectedDateHistory.length === 0 ? <p className="px-[14px] py-5 text-[13.5px] text-ink-50">No workouts on this day</p> : selectedDateHistory.map((session) => (
+            {selectedDateHistory.length === 0 ? <p className="px-[14px] py-5 text-[13.5px] text-ink-65">No workouts on this day</p> : selectedDateHistory.map((session) => (
               <button key={session.id} type="button" onClick={() => router.push(`/train/session?id=${session.id}`)} className="flex w-full items-center gap-3 border-b border-ink-09 px-[14px] py-[13px] text-left last:border-b-0">
-                <span className="min-w-0 flex-1"><span className="block text-[15.5px] font-semibold text-ink">{session.day_name}</span><span className="block text-[13px] text-ink-55">{session.duration_minutes ?? 0} min</span></span><ChevronIcon className="h-5 w-5 shrink-0 text-ink-50" />
+                <span className="min-w-0 flex-1"><span className="block text-[15.5px] font-semibold text-ink">{session.day_name}</span><span className="block text-[13px] text-ink-65">{session.duration_minutes ?? 0} min</span></span><ChevronIcon className="h-5 w-5 shrink-0 text-ink-65" />
               </button>
             ))}
           </div>

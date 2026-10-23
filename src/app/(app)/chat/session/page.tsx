@@ -46,7 +46,7 @@ export default function ActiveChatPage() {
 
 function ActiveChatRoute() {
   const sessionId = useSearchParams().get('id') ?? ''
-  if (!sessionId) return <p className="p-4 text-[15.5px] text-ink-60">Nothing selected. <Link href="/chat">Back to chats.</Link></p>
+  if (!sessionId) return <p className="p-4 text-[15.5px] text-ink-65">Nothing selected. <Link href="/chat">Back to chats.</Link></p>
   return <ActiveChatSession sessionId={sessionId} />
 }
 

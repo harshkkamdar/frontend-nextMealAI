@@ -87,13 +87,13 @@ export default function ReviewPage() {
                   <MetricTile label="Fat" value={targets.fat} unit="g" />
                 </div>
               ) : (
-                <p className="mt-3 text-[15.5px] text-ink-60">
+                <p className="mt-3 text-[15.5px] text-ink-65">
                   No calorie or macro targets set yet.
                 </p>
               )}
 
               {mealDays && mealDays.length > 0 && mealDays[0].meals && (
-                <p className="mt-3 text-[13.5px] text-ink-60">
+                <p className="mt-3 text-[13.5px] text-ink-65">
                   {mealDays[0].meals.length} meals per day across {mealDays.length} day
                   {mealDays.length > 1 ? 's' : ''}
                 </p>
@@ -109,7 +109,7 @@ export default function ReviewPage() {
                 <>
                   <p className="mb-3 mt-3 text-[15.5px] font-semibold text-ink">
                     {workoutDays.filter((d) => !d.is_rest_day).length}-day programme
-                    <span className="font-normal text-ink-60">
+                    <span className="font-normal text-ink-65">
                       {' '}
                       / {workoutDays.length} day cycle
                     </span>
@@ -122,13 +122,13 @@ export default function ReviewPage() {
                         className="rounded-[15px] border border-ink-12 bg-card px-3 py-3 text-[15.5px] text-ink"
                       >
                         <span className="font-semibold">{day.is_rest_day ? 'Rest Day' : day.name || `Day ${i + 1}`}</span>
-                        <span className="text-ink-60"> · {day.exercises?.length ?? 0} exercises</span>
+                        <span className="text-ink-65"> · {day.exercises?.length ?? 0} exercises</span>
                       </div>
                     ))}
                   </div>
                 </>
               ) : (
-                <p className="mt-3 text-[15.5px] text-ink-60">
+                <p className="mt-3 text-[15.5px] text-ink-65">
                   No workout schedule generated yet.
                 </p>
               )}
@@ -145,7 +145,7 @@ export default function ReviewPage() {
 
             <button
               onClick={handleModify}
-              className="w-full py-2 text-[15.5px] font-semibold text-ink-60"
+              className="w-full py-2 text-[15.5px] font-semibold text-ink-65"
             >
               I&apos;d like to make changes
             </button>
@@ -157,7 +157,7 @@ export default function ReviewPage() {
           <p className="mb-1 text-[15.5px] font-semibold text-ink">
             No plans created yet
           </p>
-          <p className="mb-4 text-[13.5px] text-ink-60">
+          <p className="mb-4 text-[13.5px] text-ink-65">
             Geo is still working on your plan, or it may not have generated.
             You can head to the dashboard and ask Geo to create one.
           </p>

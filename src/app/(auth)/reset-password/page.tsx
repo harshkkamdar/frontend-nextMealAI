@@ -89,7 +89,7 @@ function ResetPasswordForm() {
 
   if (linkState.status === 'pending') {
     return (
-      <div className="text-center text-[15.5px] text-ink-60">Loading...</div>
+      <div className="text-center text-[15.5px] text-ink-65">Loading...</div>
     )
   }
 
@@ -100,14 +100,14 @@ function ResetPasswordForm() {
           <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
             Invalid or expired reset link
           </h1>
-          <p className="mt-1 text-[15.5px] text-ink-60">
+          <p className="mt-1 text-[15.5px] text-ink-65">
             Please request a new password reset link.
           </p>
         </div>
         <p className="text-center">
           <Link
             href="/forgot-password"
-            className="text-[15.5px] font-semibold text-ink-60"
+            className="text-[15.5px] font-semibold text-ink-65"
           >
             Request a new link
           </Link>
@@ -122,7 +122,7 @@ function ResetPasswordForm() {
         <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
           Choose a new password
         </h1>
-        <p className="mt-1 text-[15.5px] text-ink-60">
+        <p className="mt-1 text-[15.5px] text-ink-65">
           Choose a strong password you haven&apos;t used before
         </p>
       </div>
@@ -139,7 +139,7 @@ function ResetPasswordForm() {
             {...register('password')}
           />
           {errors.password && (
-            <p className="text-xs text-accent">{errors.password.message}</p>
+            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.password.message}</p>
           )}
         </div>
 
@@ -154,7 +154,7 @@ function ResetPasswordForm() {
             {...register('confirmPassword')}
           />
           {errors.confirmPassword && (
-            <p className="text-xs text-accent">
+            <p role="alert" className="text-[13px] font-semibold text-ink">
               {errors.confirmPassword.message}
             </p>
           )}
@@ -172,7 +172,7 @@ function ResetPasswordForm() {
       <p className="mt-6 text-center">
         <Link
           href="/login"
-          className="text-[15.5px] font-semibold text-ink-60"
+          className="text-[15.5px] font-semibold text-ink-65"
         >
           Back to sign in
         </Link>
@@ -185,7 +185,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="text-center text-[15.5px] text-ink-60">Loading...</div>
+        <div className="text-center text-[15.5px] text-ink-65">Loading...</div>
       }
     >
       <ResetPasswordForm />

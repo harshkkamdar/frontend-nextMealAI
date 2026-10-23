@@ -258,7 +258,7 @@ export function FitnessForm() {
         <div className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]">
           <div>
             <SectionLabel>Body Measurements</SectionLabel>
-            <p className="mt-1 text-[13.5px] text-ink-60">
+            <p className="mt-1 text-[13.5px] text-ink-65">
               Optional — helps Geo make more accurate plans
             </p>
           </div>

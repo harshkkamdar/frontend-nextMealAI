@@ -21,7 +21,7 @@ export function getDashboardGeoLine(
 export function emphasizeGeoMeasurements(line: string): ReactNode {
   return line.split(MEASUREMENT_PATTERN).map((part, index) => (
     MEASUREMENT_EXACT_PATTERN.test(part)
-      ? <em key={`${part}-${index}`} className="not-italic font-semibold text-accent">{part}</em>
+      ? <em key={`${part}-${index}`} className="not-italic font-semibold text-ink underline decoration-accent decoration-2 underline-offset-[3px]">{part}</em>
       : part
   ))
 }

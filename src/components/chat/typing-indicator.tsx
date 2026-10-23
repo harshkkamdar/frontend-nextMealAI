@@ -11,7 +11,7 @@ export function TypingIndicator() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="h-2 w-2 animate-bounce rounded-full bg-ink-35"
+              className="h-2 w-2 animate-pulse rounded-full bg-ink-35"
               style={{ animationDelay: `${i * 150}ms` }}
             />
           ))}

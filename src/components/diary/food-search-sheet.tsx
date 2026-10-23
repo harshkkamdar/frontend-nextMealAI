@@ -39,7 +39,7 @@ function FoodRow({ food, onSelect, onToggleFavorite }: {
     >
       <div className="flex-1 min-w-0">
         <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
-        <p className="text-[13px] text-ink-55">
+        <p className="text-[13px] text-ink-65">
           {formatMacroKcal(food.macros_per_serving.calories)} cal
           {food.serving_size_g ? ` · per ${food.serving_size_g}g` : ''}
           {food.brand ? ` · ${food.brand}` : ''}
@@ -53,7 +53,7 @@ function FoodRow({ food, onSelect, onToggleFavorite }: {
           className="p-1 shrink-0"
         >
           <Star
-            className={`size-4 ${food.is_favorite ? 'fill-ink text-ink' : 'text-ink-50'}`}
+            className={`size-4 ${food.is_favorite ? 'fill-ink text-ink' : 'text-ink-65'}`}
           />
         </button>
       )}
@@ -578,7 +578,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     ? `Add to ${mealType} · ${pending.length} in meal`
                     : `Add to ${mealType}`}
               </h2>
-              <button onClick={onClose} aria-label="Close" className="rounded-full p-1.5 text-ink-60">
+              <button onClick={onClose} aria-label="Close" className="rounded-full p-1.5 text-ink-65">
                 <X className="size-5" />
               </button>
             </div>
@@ -590,7 +590,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 {mode !== 'edit' && (
                   <button
                     onClick={() => setSelectedFood(null)}
-                    className="mb-3 text-[13.5px] font-semibold text-ink-60"
+                    className="mb-3 text-[13.5px] font-semibold text-ink-65"
                   >
                     &larr; Back to search
                   </button>
@@ -599,9 +599,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 <div className="mb-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
                   <p className="text-[15.5px] font-semibold text-ink">{selectedFood.name}</p>
                   {selectedFood.brand && (
-                    <p className="text-[13px] text-ink-55">{selectedFood.brand}</p>
+                    <p className="text-[13px] text-ink-65">{selectedFood.brand}</p>
                   )}
-                  <p className="mt-1 text-[13px] text-ink-55">
+                  <p className="mt-1 text-[13px] text-ink-65">
                     Per serving ({selectedFood.serving_size_g}g)
                   </p>
                 </div>
@@ -687,7 +687,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                           aria-label="Grams"
                           className="h-14 w-24 rounded-[15px] border border-ink-16 bg-card px-4 text-center text-[17px] font-semibold tabular-nums text-ink outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
-                        <span className="text-[13px] text-ink-55">g</span>
+                        <span className="text-[13px] text-ink-65">g</span>
                       </div>
                       <button
                         onClick={() => setGrams((grams || 0) + 10)}
@@ -705,19 +705,19 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   <div className="grid grid-cols-4 gap-2 mb-6">
                     <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
                       <p className="text-[15.5px] font-semibold text-ink">{formatMacroKcal(calculatedMacros.calories)}</p>
-                      <p className="text-[11px] text-ink-55">kcal</p>
+                      <p className="text-[11px] text-ink-65">kcal</p>
                     </div>
                     <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
                       <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.protein)}</p>
-                      <p className="text-[11px] text-ink-55">protein</p>
+                      <p className="text-[11px] text-ink-65">protein</p>
                     </div>
                     <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
                       <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.carbs)}</p>
-                      <p className="text-[11px] text-ink-55">carbs</p>
+                      <p className="text-[11px] text-ink-65">carbs</p>
                     </div>
                     <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
                       <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.fat)}</p>
-                      <p className="text-[11px] text-ink-55">fat</p>
+                      <p className="text-[11px] text-ink-65">fat</p>
                     </div>
                   </div>
                 )}
@@ -730,7 +730,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     <PrimaryButton onClick={handleSaveEdit} disabled={saving || !selectedFood} className="justify-center">
                       Save
                     </PrimaryButton>
-                    <button type="button" onClick={() => setConfirmDeleteEdit(true)} disabled={saving} className="w-full text-center text-[15.5px] font-semibold text-ink-60">
+                    <button type="button" onClick={() => setConfirmDeleteEdit(true)} disabled={saving} className="w-full text-center text-[15.5px] font-semibold text-ink-65">
                       Delete entry
                     </button>
                   </div>
@@ -790,7 +790,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   {favourites.length > 0 && (
                     <div className="px-4 pb-3">
                       <div className="relative">
-                        <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-50" />
+                        <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
                         <Input
                           type="text"
                           value={mealQuery}
@@ -804,9 +804,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   <div className="flex-1 overflow-y-auto px-4 pb-6 min-h-0">
                     {favourites.length === 0 ? (
                       <div className="text-center py-12 space-y-1.5">
-                        <Star className="mx-auto size-6 text-ink-50" />
-                        <p className="text-[15.5px] text-ink-60">No saved meals yet</p>
-                        <p className="px-6 text-[13px] text-ink-50">Log a meal, then tap &ldquo;Save as meal&rdquo; on it in your diary to reuse it here.</p>
+                        <Star className="mx-auto size-6 text-ink-65" />
+                        <p className="text-[15.5px] text-ink-65">No saved meals yet</p>
+                        <p className="px-6 text-[13px] text-ink-65">Log a meal, then tap &ldquo;Save as meal&rdquo; on it in your diary to reuse it here.</p>
                       </div>
                     ) : (() => {
                       const q = mealQuery.trim().toLowerCase()
@@ -814,7 +814,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                         ? favourites.filter((f) => f.name.toLowerCase().includes(q) || f.items.some((it) => (it.food_name ?? '').toLowerCase().includes(q)))
                         : favourites
                       if (shown.length === 0) {
-                        return <p className="py-10 text-center text-[15.5px] text-ink-50">No saved meals match &ldquo;{mealQuery}&rdquo;</p>
+                        return <p className="py-10 text-center text-[15.5px] text-ink-65">No saved meals match &ldquo;{mealQuery}&rdquo;</p>
                       }
                       return (
                       <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09" role="listbox" aria-label="Saved meals">
@@ -828,7 +828,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                             >
                               <span className="min-w-0">
                                 <span className="block truncate text-[15.5px] font-semibold text-ink">{f.name}</span>
-                                <span className="block truncate text-[13px] text-ink-55">
+                                <span className="block truncate text-[13px] text-ink-65">
                                   {f.items.length} item{f.items.length === 1 ? '' : 's'}
                                   {f.items.length > 0 ? ` · ${f.items.map((it) => it.food_name).slice(0, 3).join(', ')}${f.items.length > 3 ? '…' : ''}` : ''}
                                 </span>
@@ -841,7 +841,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                             {confirmDeleteFav === f.id ? (
                               <button onClick={() => handleDeleteFavourite(f)} className="shrink-0 px-1.5 text-[11px] font-semibold text-ink" aria-label={`Confirm remove ${f.name}`}>Remove?</button>
                             ) : (
-                              <button onClick={() => setConfirmDeleteFav(f.id)} aria-label={`Remove ${f.name}`} className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-50">
+                              <button onClick={() => setConfirmDeleteFav(f.id)} aria-label={`Remove ${f.name}`} className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-65">
                                 <X className="w-3.5 h-3.5" />
                               </button>
                             )}
@@ -857,7 +857,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 {/* Search input */}
                 <div className="px-4 pb-3">
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-50" />
+                    <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
                     <Input
                       ref={inputRef}
                       type="text"
@@ -875,7 +875,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 {mode !== 'edit' && pending.length > 0 && (
                   <div className="px-4 pb-3">
                     <div className="space-y-2 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-                      <p className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-50">
+                      <p className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
                         In this meal · {pending.length}
                       </p>
                       <ul className="space-y-1.5">
@@ -886,7 +886,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                           >
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-[15.5px] font-semibold text-ink">{item.food.name}</p>
-                              <p className="text-[13px] tabular-nums text-ink-55">
+                              <p className="text-[13px] tabular-nums text-ink-65">
                                 {item.inputMode === 'servings'
                                   ? `${item.servings} × ${item.food.serving_size_g ?? 100}g`
                                   : `${item.quantity_g}g`}
@@ -898,7 +898,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                               type="button"
                               onClick={() => handleRemovePendingItem(idx)}
                               aria-label={`Remove ${item.food.name}`}
-                              className="shrink-0 p-1 text-ink-50"
+                              className="shrink-0 p-1 text-ink-65"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -935,7 +935,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
 
                   {!searching && query.length >= 2 && results.length === 0 && (
                     <div className="text-center py-8">
-                      <p className="mb-3 text-[15.5px] text-ink-60">No results found</p>
+                      <p className="mb-3 text-[15.5px] text-ink-65">No results found</p>
                       <button
                         onClick={() => { setShowCustomForm(true); setCustomName(query) }}
                         className="inline-flex h-9 items-center gap-1.5 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"
@@ -948,7 +948,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
 
                   {!searching && query.length < 2 && recentFoods.length > 0 ? (
                     <div>
-                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-50">Recent</p>
+                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">Recent</p>
                       <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09" role="listbox" aria-label="Recent foods">
                         {recentFoods.map((food, i) => (
                           <FoodRow
@@ -962,7 +962,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     </div>
                   ) : !searching && query.length < 2 ? (
                     <div className="text-center py-8 space-y-4">
-                      <p className="text-[15.5px] text-ink-50">Type to search foods</p>
+                      <p className="text-[15.5px] text-ink-65">Type to search foods</p>
                     </div>
                   ) : null}
                 </div>
@@ -971,14 +971,14 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 <div className="flex items-center justify-between border-t border-ink-12 px-4 pb-4 pt-3">
                   <button
                     onClick={handleAskGeo}
-                    className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-60"
+                    className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-65"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                     Ask Geo to estimate
                   </button>
                   <button
                     onClick={() => setShowCustomForm(true)}
-                    className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-60"
+                    className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-65"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Add custom food
@@ -994,7 +994,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
               <div className="flex-1 overflow-y-auto px-4 pb-6">
                 <button
                   onClick={() => setShowCustomForm(false)}
-                  className="mb-3 text-[13.5px] font-semibold text-ink-60"
+                  className="mb-3 text-[13.5px] font-semibold text-ink-65"
                 >
                   &larr; Back to search
                 </button>
@@ -1003,7 +1003,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
 
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <Label className="text-[13px] text-ink-60">Food Name</Label>
+                    <Label className="text-[13px] text-ink-65">Food Name</Label>
                     <Input
                       type="text"
                       placeholder="e.g. Mom's Dal Rice"
@@ -1015,7 +1015,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[13px] text-ink-60">Serving Size (g)</Label>
+                    <Label className="text-[13px] text-ink-65">Serving Size (g)</Label>
                     <Input
                       type="number"
                       placeholder="100"
@@ -1025,23 +1025,23 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     />
                   </div>
 
-                  <p className="mt-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-50">Macros per serving</p>
+                  <p className="mt-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">Macros per serving</p>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <Label className="text-[13px] text-ink-60">Calories</Label>
+                      <Label className="text-[13px] text-ink-65">Calories</Label>
                       <Input type="number" placeholder="kcal" value={customCalories} onChange={(e) => setCustomCalories(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[13px] text-ink-60">Protein (g)</Label>
+                      <Label className="text-[13px] text-ink-65">Protein (g)</Label>
                       <Input type="number" placeholder="g" value={customProtein} onChange={(e) => setCustomProtein(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[13px] text-ink-60">Carbs (g)</Label>
+                      <Label className="text-[13px] text-ink-65">Carbs (g)</Label>
                       <Input type="number" placeholder="g" value={customCarbs} onChange={(e) => setCustomCarbs(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[13px] text-ink-60">Fat (g)</Label>
+                      <Label className="text-[13px] text-ink-65">Fat (g)</Label>
                       <Input type="number" placeholder="g" value={customFat} onChange={(e) => setCustomFat(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
                     </div>
                   </div>
@@ -1051,7 +1051,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   {saving ? 'Saving...' : 'Save & Log'}
                 </PrimaryButton>
 
-                <p className="mt-2 text-center text-[11px] text-ink-50">
+                <p className="mt-2 text-center text-[11px] text-ink-65">
                   This food will be saved to your personal database for quick access later
                 </p>
               </div>

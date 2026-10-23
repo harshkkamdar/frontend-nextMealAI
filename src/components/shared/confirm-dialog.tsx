@@ -113,8 +113,8 @@ export function ConfirmDialog({
             disabled={loading}
             className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors disabled:opacity-50 ${
               variant === 'danger'
-                ? 'bg-red-500 text-white hover:bg-red-600'
-                : 'bg-accent text-white hover:bg-accent-hover'
+                ? 'bg-ink text-cream'
+                : 'bg-accent text-cream'
             }`}
           >
             {loading ? 'Please wait...' : confirmLabel}

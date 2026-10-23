@@ -30,7 +30,7 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, note }: Weig
     <div className="rounded-[16px] border border-ink-12 bg-card p-[14px]">
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-[15.5px] font-semibold text-ink">Weight trend</span>
-        <span className="whitespace-nowrap text-[13.5px] font-normal text-ink-55">
+        <span className="whitespace-nowrap text-[13.5px] font-normal text-ink-65">
           <b className="text-[15.5px] font-semibold text-ink">
             {currentKg === null ? '—' : currentKg.toFixed(1)}{currentKg === null ? '' : 'kg'}
           </b>
@@ -39,7 +39,7 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, note }: Weig
       </div>
 
       {points.length < 2 ? (
-        <p className="mt-2 text-[13.5px] text-ink-55">Log your weight to see a trend</p>
+        <p className="mt-2 text-[13.5px] text-ink-65">Log your weight to see a trend</p>
       ) : (
         <svg
           aria-label="Weight trend chart"

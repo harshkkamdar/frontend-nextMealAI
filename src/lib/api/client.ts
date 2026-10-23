@@ -151,17 +151,19 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
       throw new ApiException(401, 'Session expired', 'INVALID_TOKEN', 'Please log in again')
     }
 
-    let errorData: { error?: string; code?: string; message?: string } = {}
+    let errorData: { error?: unknown; code?: string; message?: unknown } = {}
     try {
       errorData = await response.json()
     } catch {
       // ignore parse errors
     }
+    // The API sends { error: true, code, message }; never let a non-string reach a toast.
+    const text = (value: unknown) => (typeof value === 'string' && value.trim() ? value : undefined)
     throw new ApiException(
       response.status,
-      errorData.error ?? response.statusText,
+      text(errorData.error) ?? response.statusText,
       errorData.code,
-      errorData.message
+      text(errorData.message) ?? (response.status >= 500 ? 'Something went wrong on our side. Try again in a moment.' : undefined)
     )
   }
 

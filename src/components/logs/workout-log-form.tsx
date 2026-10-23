@@ -85,7 +85,7 @@ export function WorkoutLogForm() {
     >
       <div className="space-y-6">
         <label className="block">
-          <span className="mb-2 block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Workout title</span>
+          <span className="mb-2 block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Workout title</span>
           <input
             type="text"
             placeholder="e.g. Push day"
@@ -96,7 +96,7 @@ export function WorkoutLogForm() {
         </label>
 
         <div className="space-y-3">
-          <p className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Exercises</p>
+          <p className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Exercises</p>
           <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
             {exercises.map((exercise, index) => (
               <ExerciseRow
@@ -141,7 +141,7 @@ function ExerciseRow({
               <div>
                 <div className="text-ink">{item.name}</div>
                 {item.primary_muscles && item.primary_muscles.length > 0 ? (
-                  <div className="text-[11px] text-ink-55">{item.primary_muscles.join(', ')}</div>
+                  <div className="text-[11px] text-ink-65">{item.primary_muscles.join(', ')}</div>
                 ) : null}
               </div>
             )}

@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
         <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
           Reset your password
         </h1>
-        <p className="mt-1 text-[15.5px] text-ink-60">
+        <p className="mt-1 text-[15.5px] text-ink-65">
           Enter your email and we&apos;ll send you a reset link
         </p>
       </div>
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
             {...register('email')}
           />
           {errors.email && (
-            <p className="text-xs text-accent">{errors.email.message}</p>
+            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.email.message}</p>
           )}
         </div>
 
@@ -89,7 +89,7 @@ export default function ForgotPasswordPage() {
       </form>
 
       <p className="mt-6 text-center">
-        <Link href="/login" className="text-[15.5px] font-semibold text-ink-60">
+        <Link href="/login" className="text-[15.5px] font-semibold text-ink-65">
           Back to sign in
         </Link>
       </p>

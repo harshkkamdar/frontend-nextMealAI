@@ -61,7 +61,7 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
         className="relative z-10 w-full max-w-md rounded-t-[22px] bg-cream p-[22px]"
       >
         <h2 id="name-fav-title" className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Save as a meal</h2>
-        <p className="mt-1.5 text-[15.5px] text-ink-60">
+        <p className="mt-1.5 text-[15.5px] text-ink-65">
           {mealType
             ? `Save your ${mealType} as a reusable meal — find it under the Meals tab and log it in one tap next time.`
             : 'Name this meal so you can reuse it later.'}
@@ -89,7 +89,7 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="w-full py-2 text-[15.5px] font-semibold text-ink-60 disabled:opacity-50"
+            className="w-full py-2 text-[15.5px] font-semibold text-ink-65 disabled:opacity-50"
           >
             Cancel
           </button>

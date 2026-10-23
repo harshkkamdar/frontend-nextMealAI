@@ -218,7 +218,7 @@ export function ChatBubble({ message, sessionId }: { message: ChatMessage; sessi
               <button
                 type="button"
                 onClick={() => setMenuOpen((current) => !current)}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-ink-50 active:bg-ink-08"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
                 aria-label="Message options"
                 aria-expanded={menuOpen}
               >
@@ -254,7 +254,7 @@ export function ChatBubble({ message, sessionId }: { message: ChatMessage; sessi
           </div>
         </div>
         {formattedTime && (
-          <span className="ml-8 mt-1 text-[11px] text-ink-50">{formattedTime}</span>
+          <span className="ml-8 mt-1 text-[11px] text-ink-65">{formattedTime}</span>
         )}
       </div>
       <ReportSheet

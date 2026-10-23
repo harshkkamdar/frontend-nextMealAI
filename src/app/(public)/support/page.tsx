@@ -9,7 +9,7 @@ const headingClass = 'text-[28px] font-bold leading-tight tracking-[-0.6px]'
 const sectionClass = 'mt-8 text-[17px] font-bold'
 const paragraphClass = 'mt-3 text-[15.5px] font-normal leading-[1.5] text-ink-80'
 const questionClass = 'mt-5 text-[15.5px] font-bold'
-const linkClass = 'font-semibold text-accent'
+const linkClass = 'font-semibold text-ink underline decoration-ink-35 underline-offset-4'
 
 export const metadata: Metadata = {
   title: 'Support',

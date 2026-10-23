@@ -450,7 +450,7 @@ export function FoodLogForm() {
       ) : null}
 
       <div className="relative">
-        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-50" />
+        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
         <input
           type="text"
           value={query}
@@ -498,11 +498,11 @@ export function FoodLogForm() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[15.5px] font-semibold text-ink">{food.name}</span>
                 {SOURCE_LABELS[String(food.source)] ? (
-                  <span className="mt-0.5 block text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-55">
+                  <span className="mt-0.5 block text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
                     {SOURCE_LABELS[String(food.source)]}
                   </span>
                 ) : null}
-                <span className="block truncate text-[13px] text-ink-55">
+                <span className="block truncate text-[13px] text-ink-65">
                   {food.serving_size_g ? `${food.serving_size_g}g` : '1 serving'} · {formatMacroKcal(food.macros_per_serving.calories)} kcal
                   {food.brand ? ` · ${food.brand}` : ''}
                 </span>
@@ -553,7 +553,7 @@ export function FoodLogForm() {
                     <span className="text-[15.5px] font-semibold text-ink">
                       <span data-testid="servings-value">{servings}</span> serving{servings === 1 ? '' : 's'}
                     </span>
-                    <span className="text-[13px] text-ink-55">{Math.round(servings * servingSizeG)}g</span>
+                    <span className="text-[13px] text-ink-65">{Math.round(servings * servingSizeG)}g</span>
                   </div>
                   <button type="button" aria-label="More servings" onClick={() => handleServingsChange(Math.round((servings + 0.25) * 100) / 100)} className="flex size-9 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">+</button>
                 </div>
@@ -566,7 +566,7 @@ export function FoodLogForm() {
                     onChange={(event) => handleQuantityChange(event.target.value ? Number(event.target.value) : '')}
                     className="h-11 min-w-0 flex-1 rounded-[12px] border-0 bg-ink-08 px-3 text-center text-[15.5px] font-semibold text-ink outline-none"
                   />
-                  <span className="text-[13px] text-ink-55">g</span>
+                  <span className="text-[13px] text-ink-65">g</span>
                 </div>
               )}
               <div className="flex gap-2" data-testid="serving-mode-toggle">
@@ -599,7 +599,7 @@ export function FoodLogForm() {
                 onChange={(event) => handleQuantityChange(event.target.value ? Number(event.target.value) : '')}
                 className="h-11 min-w-0 flex-1 rounded-[12px] border-0 bg-ink-08 px-3 text-center text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-35"
               />
-              <span className="text-[13px] text-ink-55">g</span>
+              <span className="text-[13px] text-ink-65">g</span>
             </div>
           )}
 
@@ -610,7 +610,7 @@ export function FoodLogForm() {
             <MacroInput label="F" value={fat} onChange={(value) => { setFat(value); setMacroBasisPerG(null) }} />
           </div>
 
-          <button type="button" onClick={() => router.push('/chat')} className="text-[13.5px] font-semibold text-ink-60">
+          <button type="button" onClick={() => router.push('/chat')} className="text-[13.5px] font-semibold text-ink-65">
             Ask Geo to estimate
           </button>
 
@@ -676,7 +676,7 @@ function PersonalFoodRow({ food, onSelect }: { food: UserFood; onSelect: (f: Use
     >
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
-        <p className="truncate text-[13px] text-ink-55">
+        <p className="truncate text-[13px] text-ink-65">
           1 serving · {formatMacroKcal(food.macros_per_serving.calories)} kcal
           {food.brand ? ` · ${food.brand}` : ''}
         </p>
@@ -698,7 +698,7 @@ function MacroInput({
   const id = `food-macro-${label.toLowerCase()}`
   return (
     <label htmlFor={id} className="min-w-0">
-      <span className="mb-1 block text-center text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-55">{label}</span>
+      <span className="mb-1 block text-center text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">{label}</span>
       <input
         id={id}
         aria-label={label}

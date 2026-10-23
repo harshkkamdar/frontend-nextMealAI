@@ -54,7 +54,7 @@ function LogTypeIcon({ type }: { type: LogType }) {
   const Icon = entry.icon
   return (
     <>
-      <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-60" />
+      <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-65" />
       <span className="sr-only">{entry.label}</span>
     </>
   )
@@ -276,14 +276,14 @@ export function LogList({ filterType }: LogListProps = {}) {
                 <p className="truncate text-[15.5px] font-semibold text-ink">
                   {getLogDescription(log)}
                 </p>
-                <p className="mt-0.5 text-[13px] text-ink-55">
+                <p className="mt-0.5 text-[13px] text-ink-65">
                   {relativeTime(log.created_at)}
                 </p>
               </div>
 
               {/* Metric */}
               {getLogMetric(log) && (
-                <span className="whitespace-nowrap text-[13.5px] font-medium text-ink-55">
+                <span className="whitespace-nowrap text-[13.5px] font-medium text-ink-65">
                   {getLogMetric(log)}
                 </span>
               )}
