@@ -6,6 +6,7 @@ import { GeoLine } from '@/components/ui/fiqr/geo-line'
 import { PageHeader } from '@/components/ui/fiqr/page-header'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { OfflineBand } from '@/components/shared/offline-band'
 
 export function ManualLogShell({
   title,
@@ -29,6 +30,7 @@ export function ManualLogShell({
   return (
     <div>
       <PageHeader title={title} onBack={() => router.back()} className="mb-2" />
+      <div className="-mx-gutter [&:not(:empty)]:mb-4"><OfflineBand /></div>
       <GeoLine>{prompt}</GeoLine>
       <div className="mt-4">{children}</div>
       <PrimaryButton type="button" onClick={onSave} disabled={saving} className="mt-6 justify-center">

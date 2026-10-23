@@ -14,6 +14,7 @@ import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { deleteUserFood, getPersonalFoods, saveFood, updateFood } from '@/lib/api/foods.api'
 import type { UserFood } from '@/types/foods.types'
+import { OfflineBand } from '@/components/shared/offline-band'
 
 const SOURCE_LABELS: Record<string, string> = {
   manual: 'Manual',
@@ -219,6 +220,7 @@ export default function FoodsPage() {
   return (
     <PageWrapper className="pb-32">
       <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Foods</h1>
+      <div className="-mx-gutter [&:not(:empty)]:mt-4"><OfflineBand /></div>
 
       <div className="relative mt-4">
         <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />

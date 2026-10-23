@@ -7,6 +7,7 @@ import { LogList } from '@/components/logs/log-list'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { OfflineBand } from '@/components/shared/offline-band'
 
 const LOG_TYPES: { type: string; label: string; icon: LucideIcon }[] = [
   { type: 'workout', label: 'Workout', icon: Dumbbell },
@@ -24,6 +25,7 @@ export default function LogsPage() {
   return (
     <PageWrapper className="pb-32">
       <h1 className="mb-5 text-[22px] font-semibold tracking-[-0.4px] text-ink">Log</h1>
+      <div className="-mx-gutter [&:not(:empty)]:mb-4"><OfflineBand /></div>
 
       <PrimaryButton type="button" icon="+" trailing="Scan · Search" onClick={() => router.push('/logs/new/food')}>
         Log food

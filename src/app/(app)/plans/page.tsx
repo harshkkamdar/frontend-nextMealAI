@@ -31,7 +31,7 @@ export default function PlansPage() {
 
   return <PageWrapper>
     <PageHeader title="Plans" className="mb-6" />
-    <div className="-mx-gutter"><OfflineBand /></div>
+    <div className="-mx-gutter [&:not(:empty)]:mb-5"><OfflineBand /></div>
     {loading && !data ? <div className="space-y-3"><CardSkeleton /><CardSkeleton /></div> : error && !data ? <ErrorState onRetry={() => void refetch()}>I couldn&apos;t load your plans. Check your connection and try again.</ErrorState> : <div className="space-y-6">
       <section className="space-y-2.5">
         <SectionLabel>Active</SectionLabel>

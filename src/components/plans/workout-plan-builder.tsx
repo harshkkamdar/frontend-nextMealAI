@@ -353,7 +353,7 @@ function ExerciseRow({
   return (
     <div className="space-y-3 py-3 first:pt-0">
       <div className="flex items-start gap-2">
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <SearchablePicker<ExerciseSearchResult>
             label={`Exercise ${index + 1}`}
             placeholder="Search exercises"

@@ -423,7 +423,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                         aria-pressed={set.completed}
                         className="mx-auto flex size-11 items-center justify-center"
                       >
-                        <span className={cn('flex size-8 items-center justify-center rounded-full border border-ink-16 transition-transform duration-200', set.completed && 'border-ink bg-ink text-cream', celebrate && exerciseIndex === currentIndex && set.completed && 'scale-110')}>
+                        <span className={cn('flex size-10 items-center justify-center rounded-full border border-ink-16 transition-transform duration-200', set.completed && 'border-ink bg-ink text-cream', celebrate && exerciseIndex === currentIndex && set.completed && 'scale-110')}>
                           {set.completed ? <TickIcon /> : null}
                         </span>
                       </button>

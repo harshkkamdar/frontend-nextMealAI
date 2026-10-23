@@ -171,6 +171,8 @@ async function installRoutes(page, row, state) {
         const failure = p === '/auth/signup' ? [409, 'EMAIL_TAKEN', 'An account with this email already exists'] : p === '/auth/reset-password' ? [500, 'INTERNAL', "We couldn't send the reset link. Try again in a moment."] : [401, 'INVALID_CREDENTIALS', 'Invalid email or password']
         return json(route, failure[0], { error: true, code: failure[1], message: failure[2] })
       }
+      // Opening the Geo sheet starts a session; without an id the composer stays disabled.
+      if (p === '/v1/chat/companion') return json(route, 200, { session_id: 'capture-companion-session' })
       return json(route, 200, {})
     }
     if (p === '/v1/profile/onboarding' && row.onboarding === 'incomplete') {

@@ -22,6 +22,7 @@ import { compressImage } from '@/lib/image/compress'
 import { isNative } from '@/lib/platform'
 import { pickPhoto } from '@/lib/platform/camera'
 import type { FoodSearchResult, UserFood } from '@/types/foods.types'
+import { OfflineBand } from '@/components/shared/offline-band'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
 
@@ -63,6 +64,7 @@ export function FoodLogForm() {
   const [results, setResults] = useState<FoodSearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [searchFailed, setSearchFailed] = useState(false)
+  const [searchedQuery, setSearchedQuery] = useState('')
   const [pending, setPending] = useState<FoodDraft[]>([])
   // Personal-food id of the currently-selected search result, so a DB-sourced
   // food stays linked (enables recents/favorites/dedup) instead of being logged
@@ -148,6 +150,7 @@ export function FoodLogForm() {
         setResults([])
         setSearchFailed(true)
       } finally {
+        setSearchedQuery(q.trim())
         setSearching(false)
       }
     }, 300)
@@ -434,6 +437,7 @@ export function FoodLogForm() {
           {mealType} <span aria-hidden="true" className="ml-1">▾</span>
         </button>
       </div>
+      <div className="-mx-gutter [&:not(:empty)]:mb-4"><OfflineBand /></div>
 
       {mealMenuOpen ? (
         <div className="mb-4 flex gap-2 overflow-x-auto" aria-label="Meal type">
@@ -486,7 +490,12 @@ export function FoodLogForm() {
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
 
       {searchFailed && !searching && query.trim().length >= 2 ? (
-        <p role="status" className="mt-4 text-[15.5px] font-medium text-ink-80">Search isn&apos;t reachable right now. Try again, or use Photo or Menu.</p>
+        <div role="status" className="mt-4">
+          <p className="text-[15.5px] font-medium text-ink-80">Search isn&apos;t reachable right now. Try again, or use Photo or Menu.</p>
+          <button type="button" onClick={() => handleSearch(query)} className="mt-1 min-h-11 text-[14px] font-semibold text-ink underline decoration-ink-35 underline-offset-4">Try again</button>
+        </div>
+      ) : !searching && !searchFailed && query.trim().length >= 2 && results.length === 0 && searchedQuery === query.trim() ? (
+        <p role="status" className="mt-4 text-[15.5px] font-medium text-ink-80">No foods match &ldquo;{query.trim()}&rdquo;. Try a shorter name, or use Photo.</p>
       ) : null}
 
       {(searching || results.length > 0) ? (
