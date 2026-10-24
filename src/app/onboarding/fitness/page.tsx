@@ -1,11 +1,12 @@
-import { StepIndicator } from '@/components/onboarding/step-indicator'
-import { FitnessForm } from '@/components/onboarding/fitness-form'
+'use client'
 
-export default function FitnessPage() {
+import { Suspense } from 'react'
+import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
+
+export default function FitnessOnboardingPage() {
   return (
-    <>
-      <StepIndicator currentStep={2} />
-      <FitnessForm />
-    </>
+    <Suspense>
+      <OnboardingFlow module="fitness" />
+    </Suspense>
   )
 }

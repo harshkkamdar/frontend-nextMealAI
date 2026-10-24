@@ -1,11 +1,12 @@
-import { StepIndicator } from '@/components/onboarding/step-indicator'
-import { NutritionForm } from '@/components/onboarding/nutrition-form'
+'use client'
 
-export default function NutritionPage() {
+import { Suspense } from 'react'
+import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
+
+export default function NutritionOnboardingPage() {
   return (
-    <>
-      <StepIndicator currentStep={3} />
-      <NutritionForm />
-    </>
+    <Suspense>
+      <OnboardingFlow module="nutrition" />
+    </Suspense>
   )
 }

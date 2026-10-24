@@ -33,7 +33,7 @@ describe('ConsentPage', () => {
   it('keeps the continue button disabled until both acknowledgements are checked', () => {
     render(<ConsentPage />)
 
-    const button = screen.getByRole('button', { name: 'Agree and continue' })
+    const button = screen.getByRole('button', { name: 'I agree' })
     const boxes = screen.getAllByRole('checkbox')
 
     expect(button).toBeDisabled()
@@ -48,7 +48,7 @@ describe('ConsentPage', () => {
     render(<ConsentPage />)
 
     screen.getAllByRole('checkbox').forEach((box) => fireEvent.click(box))
-    fireEvent.click(screen.getByRole('button', { name: 'Agree and continue' }))
+    fireEvent.click(screen.getByRole('button', { name: 'I agree' }))
 
     await waitFor(() => {
       expect(mocks.updateProfile).toHaveBeenCalledWith({
@@ -67,7 +67,7 @@ describe('ConsentPage', () => {
       window.history.replaceState(null, '', `/onboarding/consent${search}`)
       const { unmount } = render(<ConsentPage />)
       screen.getAllByRole('checkbox').forEach((box) => fireEvent.click(box))
-      fireEvent.click(screen.getByRole('button', { name: 'Agree and continue' }))
+      fireEvent.click(screen.getByRole('button', { name: 'I agree' }))
       await waitFor(() => expect(mocks.push).toHaveBeenCalledWith(target))
       unmount()
     }

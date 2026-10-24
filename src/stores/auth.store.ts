@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { useOnboardingDraft } from './onboarding-draft.store'
 import { createPlatformStorage } from '@/lib/platform/storage'
 
 interface User {
@@ -29,8 +30,11 @@ export const useAuthStore = create<AuthState>()(
       hasHydrated: false,
       setSession: (user, accessToken, refreshToken) =>
         set({ user, accessToken, refreshToken, isLoading: false }),
-      clearSession: () =>
-        set({ user: null, accessToken: null, refreshToken: null, isLoading: false }),
+      clearSession: () => {
+        // Onboarding answers (name, date of birth) must not survive into the next account on this device.
+        useOnboardingDraft.getState().reset()
+        set({ user: null, accessToken: null, refreshToken: null, isLoading: false })
+      },
       setLoading: (isLoading) => set({ isLoading }),
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
     }),

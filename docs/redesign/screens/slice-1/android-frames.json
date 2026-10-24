@@ -1,0 +1,216 @@
+{
+  "device": "fiqr_lowend35 (Pixel 4a profile, 2 cores, 2 GB, Android 15, Chrome and WebView 124)",
+  "jankyMeans": "frame interval > 25 ms",
+  "results": [
+    {
+      "run": 0,
+      "name": "name-to-sex",
+      "frames": 63,
+      "janky": 9,
+      "max": 83.3
+    },
+    {
+      "run": 0,
+      "name": "sex-autoadvance",
+      "frames": 56,
+      "janky": 19,
+      "max": 66.6
+    },
+    {
+      "run": 0,
+      "name": "goal-autoadvance",
+      "frames": 56,
+      "janky": 14,
+      "max": 83.4
+    },
+    {
+      "run": 0,
+      "name": "equipment-toggle",
+      "frames": 77,
+      "janky": 7,
+      "max": 50
+    },
+    {
+      "run": 0,
+      "name": "back",
+      "frames": 62,
+      "janky": 11,
+      "max": 66.7
+    },
+    {
+      "run": 0,
+      "name": "weight-scrub",
+      "frames": 101,
+      "janky": 19,
+      "max": 83.3
+    },
+    {
+      "run": 1,
+      "name": "name-to-sex",
+      "frames": 65,
+      "janky": 9,
+      "max": 66.7
+    },
+    {
+      "run": 1,
+      "name": "sex-autoadvance",
+      "frames": 54,
+      "janky": 17,
+      "max": 83.3
+    },
+    {
+      "run": 1,
+      "name": "goal-autoadvance",
+      "frames": 51,
+      "janky": 14,
+      "max": 100
+    },
+    {
+      "run": 1,
+      "name": "equipment-toggle",
+      "frames": 75,
+      "janky": 4,
+      "max": 50
+    },
+    {
+      "run": 1,
+      "name": "back",
+      "frames": 62,
+      "janky": 12,
+      "max": 66.6
+    },
+    {
+      "run": 1,
+      "name": "weight-scrub",
+      "frames": 100,
+      "janky": 16,
+      "max": 66.7
+    },
+    {
+      "run": 2,
+      "name": "name-to-sex",
+      "frames": 71,
+      "janky": 10,
+      "max": 83.3
+    },
+    {
+      "run": 2,
+      "name": "sex-autoadvance",
+      "frames": 60,
+      "janky": 15,
+      "max": 100
+    },
+    {
+      "run": 2,
+      "name": "goal-autoadvance",
+      "frames": 55,
+      "janky": 17,
+      "max": 83.4
+    },
+    {
+      "run": 2,
+      "name": "equipment-toggle",
+      "frames": 73,
+      "janky": 6,
+      "max": 66.6
+    },
+    {
+      "run": 2,
+      "name": "back",
+      "frames": 63,
+      "janky": 13,
+      "max": 66.7
+    },
+    {
+      "run": 2,
+      "name": "weight-scrub",
+      "frames": 103,
+      "janky": 19,
+      "max": 66.7
+    },
+    {
+      "run": 3,
+      "name": "name-to-sex",
+      "frames": 63,
+      "janky": 12,
+      "max": 66.7
+    },
+    {
+      "run": 3,
+      "name": "sex-autoadvance",
+      "frames": 62,
+      "janky": 14,
+      "max": 100
+    },
+    {
+      "run": 3,
+      "name": "goal-autoadvance",
+      "frames": 56,
+      "janky": 17,
+      "max": 66.8
+    },
+    {
+      "run": 3,
+      "name": "equipment-toggle",
+      "frames": 74,
+      "janky": 6,
+      "max": 66.6
+    },
+    {
+      "run": 3,
+      "name": "back",
+      "frames": 63,
+      "janky": 10,
+      "max": 66.6
+    },
+    {
+      "run": 3,
+      "name": "weight-scrub",
+      "frames": 99,
+      "janky": 15,
+      "max": 66.7
+    },
+    {
+      "run": 4,
+      "name": "name-to-sex",
+      "frames": 65,
+      "janky": 13,
+      "max": 66.7
+    },
+    {
+      "run": 4,
+      "name": "sex-autoadvance",
+      "frames": 59,
+      "janky": 14,
+      "max": 66.7
+    },
+    {
+      "run": 4,
+      "name": "goal-autoadvance",
+      "frames": 60,
+      "janky": 15,
+      "max": 66.6
+    },
+    {
+      "run": 4,
+      "name": "equipment-toggle",
+      "frames": 74,
+      "janky": 7,
+      "max": 50
+    },
+    {
+      "run": 4,
+      "name": "back",
+      "frames": 63,
+      "janky": 9,
+      "max": 66.7
+    },
+    {
+      "run": 4,
+      "name": "weight-scrub",
+      "frames": 101,
+      "janky": 18,
+      "max": 83.2
+    }
+  ]
+}

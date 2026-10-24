@@ -1,11 +1,12 @@
-import { StepIndicator } from '@/components/onboarding/step-indicator'
-import { PersonalForm } from '@/components/onboarding/personal-form'
+'use client'
 
-export default function PersonalPage() {
+import { Suspense } from 'react'
+import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
+
+export default function PersonalOnboardingPage() {
   return (
-    <>
-      <StepIndicator currentStep={1} />
-      <PersonalForm />
-    </>
+    <Suspense>
+      <OnboardingFlow module="personal" />
+    </Suspense>
   )
 }
