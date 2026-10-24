@@ -4,7 +4,7 @@ Brief: `docs/redesign/BRIEF.md`. Branch `redesign/fiqr-v2` (from `phase2/fiqr` a
 
 ## Current
 
-Phase 3 checkpoint: Ved picks a direction. Mocks in `docs/redesign/directions/` (a/b/c: home, + sheet, onboarding weight step), seeds in `seeds.md`, blind critic run 1 in `critic-1.md` (C 7.0, A 6.5, B 5.5; both Bevel references ranked below all three).
+Phase 4 (design system before pages). Direction C picked and nav amended (D1-D4 in `decisions.md`). Next: tokens, glass material spec, motion spec, glass tab bar prototype with Android frame timing.
 
 ## Phase 0
 

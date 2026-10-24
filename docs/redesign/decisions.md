@@ -115,3 +115,12 @@ Layout, hierarchy, materials, motion, copy and client-side data strategy (cache-
 | C8 | Branch `redesign/fiqr-v2`; `phase2/fiqr` stays shippable | Q15 | **yes** (Ved, 24 Oct 2026) |
 
 Spring values (Q13) are starting points. The 8% frame-diff threshold, <= 2 dropped frames per transition and the critic pass bar (top 3 of 5, >= 8/10, 3 runs) were proposed by the agent and approved by Ved with "yes to all".
+
+## Phase 3 pick and navigation change (24 Oct 2026)
+
+| # | Decision | Costly to reverse | Yes? |
+|---|---|---|---|
+| D1 | Direction **C Bento** (`directions/c-*.png`). The critic-1 fixes apply (targets on macros, no weight range meter, hero number largest, sleep as "7h 12m" with a 7-night strip, one accent outside the ring, bottom padding under the tab bar). Merging the Geo line into the ring card is a critic fix taken by the agent; cheap to reverse. | yes | **yes** (Ved: "option c") |
+| D2 | Tabs become **Home, Food, Train, Geo** (replaces Check-in tab; amends C2). | yes | **yes** (Ved) |
+| D3 | Check-in leaves the nav: a Home card when a check-in is due (plus the existing push), otherwise a "This week" link on Home's header row. Not in the + sheet. | yes | **yes** (Ved) |
+| D4 | The + sheet keeps its "Tell Geo" field on top plus the log grid; the Geo tab holds full conversations and history. | no | **yes** (Ved) |
