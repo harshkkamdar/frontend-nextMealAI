@@ -43,6 +43,7 @@ export function RulerInput({ label, value, onChange, min, max, start, units }: R
   const ruler = useRef<HTMLDivElement>(null)
   const programmatic = useRef(false)
   const lastTick = useRef<number | null>(null)
+  const settle = useRef(0)
   // Half the ruler's visible width: tick 0 sits there, so scrollLeft = tick index * GAP centres that tick.
   const [half, setHalf] = useState(0)
 
@@ -75,9 +76,14 @@ export function RulerInput({ label, value, onChange, min, max, start, units }: R
     if (!el || programmatic.current) return
     const i = Math.round(el.scrollLeft / GAP)
     const d = Math.min(dMax, Math.max(dMin, dMin + i * unit.step))
-    if (lastTick.current !== i) { lastTick.current = i; void haptic('light') }
+    if (lastTick.current !== i) { lastTick.current = i; void haptic('selection') }
     setText(unit.format(d))
     onChange(Math.round(unit.fromDisplay(d) * 10) / 10)
+    // Once the fling settles, glide onto the nearest tick so the needle never rests between two.
+    window.clearTimeout(settle.current)
+    settle.current = window.setTimeout(() => {
+      if (Math.abs(el.scrollLeft - i * GAP) > 0.5) el.scrollTo({ left: i * GAP, behavior: 'smooth' })
+    }, 120)
   }
 
   function onType(next: string) {

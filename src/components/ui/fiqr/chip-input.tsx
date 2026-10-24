@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 
 interface ChipInputProps {
@@ -42,12 +43,12 @@ export function ChipInput({ label, placeholder, value, onChange, suggestions = [
       {value.length > 0 ? (
         <ul aria-label={`${label} added`} className="mt-3 flex flex-wrap gap-2">
           {value.map((item) => (
-            <li key={item}>
+            <li key={item} className="pop">
               <button
                 type="button"
                 onClick={() => onChange(value.filter((v) => v !== item))}
                 aria-label={`Remove ${item}`}
-                className="flex h-11 items-center gap-2 rounded-full bg-ink pl-4 pr-3 text-[15px] font-semibold text-cream"
+                className="flex h-11 items-center gap-2 rounded-full bg-ink pl-4 pr-3 text-[15px] font-semibold text-cream transition-transform active:scale-95"
               >
                 {item}
                 <svg viewBox="0 0 16 16" className="size-3.5" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8" /></svg>
@@ -59,7 +60,7 @@ export function ChipInput({ label, placeholder, value, onChange, suggestions = [
       {remaining.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-2">
           {remaining.map((s) => (
-            <button key={s} type="button" onClick={() => add(s)} className={cn('h-11 rounded-full bg-ink-06 px-4 text-[15px] font-semibold text-ink')}>
+            <button key={s} type="button" onClick={() => { void haptic('light'); add(s) }} className={cn('h-11 rounded-full bg-ink-06 px-4 text-[15px] font-semibold text-ink transition-transform active:scale-95')}>
               {s}
             </button>
           ))}

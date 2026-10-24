@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
@@ -10,11 +10,11 @@ import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { plural } from '@/lib/utils'
 
-function Macro({ grams, label, color }: { grams: number; label: string; color: string }) {
+function Macro({ grams, label, color, i }: { grams: number; label: string; color: string; i: number }) {
   const shown = useCountUp(grams)
   return (
-    <div className="rounded-[var(--radius-row)] bg-cream px-3 py-3">
-      <span aria-hidden="true" className="block h-1.5 w-6 rounded-full" style={{ background: color }} />
+    <div className="rise rounded-[var(--radius-row)] bg-cream px-3 py-3" style={{ '--i': i, '--rise-delay': '180ms' } as CSSProperties}>
+      <span aria-hidden="true" className="block h-1.5 w-6 origin-left rounded-full motion-safe:animate-[fiqr-grow_700ms_cubic-bezier(.22,1,.36,1)_400ms_backwards]" style={{ background: color }} />
       <p className="font-wide mt-2.5 text-[24px] font-bold leading-none tabular-nums text-ink">
         {shown}<span className="ml-0.5 text-[14px] font-semibold text-ink-65" style={{ fontStretch: '100%' }}>g</span>
       </p>
@@ -80,23 +80,23 @@ export default function ReviewPage() {
       ) : null}
 
       {state === 'ready' && targets ? (
-        <section aria-label="Daily targets" className="rounded-[var(--radius-card)] bg-card p-5 outline outline-1 -outline-offset-1 outline-ink-08">
+        <section aria-label="Daily targets" style={{ '--i': 2 } as CSSProperties} className="rise rounded-[var(--radius-card)] bg-card p-5 outline outline-1 -outline-offset-1 outline-ink-08">
           <p className="font-wide text-[56px] font-[750] leading-none tracking-[-1.5px] tabular-nums text-ink">{calories.toLocaleString('en-AU')}</p>
           <p className="mt-1.5 text-[15px] font-medium text-ink-65">calories a day</p>
           <div className="mt-5 grid grid-cols-3 gap-2">
-            <Macro grams={targets.protein} label="protein" color="var(--color-ink)" />
-            <Macro grams={targets.carbs} label="carbs" color="var(--color-macro-teal)" />
-            <Macro grams={targets.fat} label="fat" color="var(--color-macro-ochre)" />
+            <Macro i={2} grams={targets.protein} label="protein" color="var(--color-ink)" />
+            <Macro i={3} grams={targets.carbs} label="carbs" color="var(--color-macro-teal)" />
+            <Macro i={4} grams={targets.fat} label="fat" color="var(--color-macro-ochre)" />
           </div>
         </section>
       ) : null}
 
       {state === 'ready' && trainingDays.length ? (
-        <section aria-label="Training week" className="mt-3 rounded-[var(--radius-card)] bg-card p-5 outline outline-1 -outline-offset-1 outline-ink-08">
+        <section aria-label="Training week" style={{ '--i': 6 } as CSSProperties} className="rise mt-3 rounded-[var(--radius-card)] bg-card p-5 outline outline-1 -outline-offset-1 outline-ink-08">
           <p className="text-[17px] font-bold text-ink">{trainingDays.length} training days a week</p>
           <ul className="mt-3 flex flex-col">
             {trainingDays.map((day, i) => (
-              <li key={i} className="flex min-h-12 items-center justify-between border-t border-ink-06 text-[15.5px] first:border-t-0">
+              <li key={i} style={{ '--i': i + 7 } as CSSProperties} className="rise flex min-h-12 items-center justify-between border-t border-ink-06 text-[15.5px] first:border-t-0">
                 <span className="font-semibold text-ink">{day.name || `Day ${i + 1}`}</span>
                 <span className="text-ink-65">{plural(day.exercises?.length ?? 0, 'exercise')}</span>
               </li>

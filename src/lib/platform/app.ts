@@ -52,9 +52,14 @@ export async function hideSplash(): Promise<void> {
   await SplashScreen.hide()
 }
 
-export async function haptic(kind: 'light' | 'success' | 'warning'): Promise<void> {
+/** `selection` is the picker tick (ruler, wheels); `light` is a tap on a control. */
+export async function haptic(kind: 'light' | 'selection' | 'success' | 'warning'): Promise<void> {
   if (!isNative()) return
   const { Haptics, ImpactStyle, NotificationType } = await import('@capacitor/haptics')
+  if (kind === 'selection') {
+    await Haptics.selectionChanged()
+    return
+  }
   if (kind === 'light') {
     await Haptics.impact({ style: ImpactStyle.Light })
     return

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, type CSSProperties, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
@@ -56,19 +56,22 @@ export function OnboardingStep({ stepKey, progress, question, why, onBack, cta =
           <motion.div
             key={stepKey}
             custom={dir}
+            // The container only slides (direction cue); the question, why-line and body fade up in sequence via `.rise`.
             variants={{
-              enter: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: 28 * d }),
+              enter: (d: number) => (reduce ? { opacity: 0 } : { opacity: 1, x: 16 * d }),
               center: { opacity: 1, x: 0 },
-              exit: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: -28 * d }),
+              exit: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: -16 * d, transition: { duration: 0.16, ease: 'easeIn' } }),
             }}
             initial="enter"
             animate="center"
             exit="exit"
             transition={reduce ? reducedFade : spring.page}
+            // The new question waits for the old one's 160 ms exit, so the two never overlap.
+            style={{ '--rise-delay': '150ms' } as CSSProperties}
             className="flex-1 px-5 pb-[calc(150px+var(--safe-bottom))] pt-9"
           >
-            <h1 className="font-wider text-balance text-[30px] font-[680] leading-[1.1] tracking-[-0.7px] text-ink">{question}</h1>
-            {why ? <p className="mt-2.5 text-pretty text-[15.5px] leading-[1.45] text-ink-80">{why}</p> : null}
+            <h1 className="rise font-wider text-balance text-[30px] font-[680] leading-[1.1] tracking-[-0.7px] text-ink">{question}</h1>
+            {why ? <p className="rise mt-2.5 text-pretty text-[15.5px] leading-[1.45] text-ink-80" style={{ '--i': 1 } as CSSProperties}>{why}</p> : null}
             <div className="mt-8">{children}</div>
           </motion.div>
         </AnimatePresence>

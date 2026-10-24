@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 
@@ -37,7 +37,7 @@ export function OptionList<T extends string>(props: Single<T> | Multi<T>) {
 
   return (
     <div role={props.multi ? 'group' : 'radiogroup'} aria-label={label} className={cn('flex flex-col gap-2.5', className)}>
-      {options.map((option) => {
+      {options.map((option, i) => {
         const selected = props.multi ? props.value.includes(option.value) : props.value === option.value
         return (
           <button
@@ -46,10 +46,11 @@ export function OptionList<T extends string>(props: Single<T> | Multi<T>) {
             role={props.multi ? 'checkbox' : 'radio'}
             aria-checked={selected}
             onClick={() => toggle(option.value)}
+            style={{ '--i': i + 2 } as CSSProperties}
             className={cn(
-              'flex min-h-[62px] w-full items-start gap-3.5 rounded-[var(--radius-row)] bg-card px-4 py-3 text-left transition-[transform,outline-color] duration-150 active:scale-[.985]',
+              'rise flex min-h-[62px] w-full items-start gap-3.5 rounded-[var(--radius-row)] bg-card px-4 py-3 text-left transition-[transform,outline-color,box-shadow] duration-200 active:scale-[.97] active:duration-75',
               'outline -outline-offset-1',
-              selected ? 'outline-[1.5px] outline-ink' : 'outline-1 outline-ink-08',
+              selected ? 'outline-2 outline-ink shadow-[0_6px_18px_-8px_rgba(17,28,53,.25)]' : 'outline-1 outline-ink-08',
             )}
           >
             {option.icon ? <span className="grid size-10 shrink-0 self-center place-items-center rounded-full bg-ink-06 text-ink [&_svg]:size-5">{option.icon}</span> : null}
@@ -66,9 +67,9 @@ export function OptionList<T extends string>(props: Single<T> | Multi<T>) {
                 selected && props.multi ? 'bg-ink text-cream' : '',
               )}
             >
-              {selected && !props.multi ? <span className="size-2.5 rounded-full bg-ink" /> : null}
+              {selected && !props.multi ? <span className="pop size-2.5 rounded-full bg-ink" /> : null}
               {selected && props.multi ? (
-                <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5l3 3 6-7" /></svg>
+                <svg viewBox="0 0 16 16" className="pop size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5l3 3 6-7" /></svg>
               ) : null}
             </span>
           </button>

@@ -4,7 +4,7 @@ Brief: `docs/redesign/BRIEF.md`. Branch `redesign/fiqr-v2` (from `phase2/fiqr` a
 
 ## Current
 
-Phase 5, slice 1a (onboarding) at its checkpoint: built and graded, see "Phase 5, slice 1a" below. Two rubric items need Ved (tap target vs one-question-per-screen; copy), one is blocked (60 fps needs a real low-end phone), one stalled (critic 6.5-7.0 vs 8).
+Slice 1a checkpoint answered by Ved (24 Oct 2026, `decisions.md` E1-E4): 33 taps accepted, copy approved, pop rule ok, and a feel pass asked for. Feel pass done (below). Next: slice 1b, welcome carousel and auth.
 
 ## Phase 0
 
@@ -53,3 +53,23 @@ Scope: 18 one-question steps (`/onboarding/personal|fitness|nutrition?q=`), cons
 Found while grading (not caused by the redesign):
 - Tailwind CSS 4 needs Chrome 111+ / Safari 16.4+ (tailwindcss.com/docs/compatibility). Android phones whose System WebView is older render the whole app unstyled. Needs a minimum-WebView check or an update prompt.
 - Android app build fails on the Health plugin (`kotlin()` in `@flomentumsolutions/capacitor-health-extended`), so captures use Chrome on the emulator, same engine as the WebView.
+
+## Slice 1a feel pass (24 Oct 2026, after Ved's "feel is missing")
+
+What changed, all transform/opacity only:
+- Every step: the old question exits in 160 ms, then the question, why-line and body rise in 40 ms apart (`.rise`). No overlap (seen and fixed in the walkthrough frames).
+- Options and number cells: press scale (0.97 / 0.94), the radio dot and check pop in, the selected card gets a 2 px ink outline and a soft lift. Options stagger in.
+- Orange CTA: press scale 0.97.
+- Date of birth: native date field replaced by month, day and year wheels (scroll-snap, haptic tick per row, keyboard arrows), as in Cal AI.
+- Ruler: picker-style haptic tick (`selectionChanged`) and a glide onto the nearest tick when a fling settles.
+- Reflection: a weight path chart draws in from today's weight to the target date (moving chart, Q13).
+- Chips pop in; consent cards rise; the generating list shimmers until the real work returns; the reveal staggers the calories, macro tiles (bars grow) and training days.
+
+| Check | Result |
+|---|---|
+| Walkthrough video (taps, wheels and ruler scrolls, mocked API) | `screens/slice-1/walkthrough.mp4`; 29 taps, 41 s scripted with 650 ms pauses (`walkthrough.json`) |
+| Captures, axe / small targets / orange | 90 web captures: 0 / 0 / at most one orange action on 90 of 90 (0 where the CTA is disabled) |
+| Frame-diffed transitions | 6 of 6 smooth, 0 pops |
+| iOS simulator (Safari, real WebKit) | 23 captures redone (`ios/`); wheels driven in Safari save the right date (1992-07-01) |
+| lint / type-check / tests | 0 errors (26 pre-existing warnings) / pass / 443 passed, 1 skipped (2 new wheel tests) |
+| 60 fps | still blocked on a real low-end phone |

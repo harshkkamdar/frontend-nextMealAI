@@ -124,3 +124,12 @@ Spring values (Q13) are starting points. The 8% frame-diff threshold, <= 2 dropp
 | D2 | Tabs become **Home, Food, Train, Geo** (replaces Check-in tab; amends C2). | yes | **yes** (Ved) |
 | D3 | Check-in leaves the nav: a Home card when a check-in is due (plus the existing push), otherwise a "This week" link on Home's header row. Not in the + sheet. | yes | **yes** (Ved) |
 | D4 | The + sheet keeps its "Tell Geo" field on top plus the log grid; the Geo tab holds full conversations and history. | no | **yes** (Ved) |
+
+## Slice 1a checkpoint (24 Oct 2026)
+
+| # | Decision | Costly to reverse | Yes? |
+|---|---|---|---|
+| E1 | Onboarding tap target becomes about 33 taps (one question per screen wins over the 24-tap target); seconds are judged in the Phase 6 timed test | no | **yes** (Ved: "accept 33 taps") |
+| E2 | Slice 1 copy (`copy/slice-1.md`) | no | **yes** (Ved: "copy approved") |
+| E3 | Pop rule: a jump counts as a pop only when it lands in a single frame; colour changes spread over several frames are motion | no | **yes** (Ved: "rule ok") |
+| E4 | Feedback: "looks decent - feel is missing - intuitiveness, ux, motion like in bevel and cal ai". Slice 1a gets a feel pass before slice 1b. | no | instruction (Ved) |

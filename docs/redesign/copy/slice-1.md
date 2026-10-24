@@ -49,3 +49,12 @@ Old text is from `phase2/fiqr` at 832302c. The consent and medical-advice paragr
 | Reveal CTAs | "Looks good, let's go" / "I'd like to make changes" | "Start" / "Change something with Geo" |
 | Reveal, no plan | "No plans created yet" + "Geo is still working on your plan, or it may not have generated. You can head to the dashboard and ask Geo to create one." + "Continue to dashboard" | "Geo could not finish your plan" + "Your answers are saved. Start now and ask Geo for a plan from Today; it takes one message." + "Go to Today" |
 | Reveal, load error | toast "Failed to load plans" | "Your plan didn't load" + "Your answers are saved. Try again, or start and ask Geo for your plan from Today." + Try again |
+
+## Added in the feel pass (24 Oct 2026, not yet approved)
+
+| Where | New copy |
+|---|---|
+| Date of birth, under the wheels before any wheel moves | Scroll to your birthday |
+| Date of birth, after a wheel moves | {age} years old (unchanged) |
+| Reflection chart, axis | Today / {target date, e.g. 16 Jan}; maintenance: Every week |
+| Reflection chart, screen-reader label | {from} kg today to {to} kg by {date} |

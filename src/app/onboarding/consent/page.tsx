@@ -10,15 +10,15 @@ import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 
-function ConsentCard({ title, checked, onChange, agree, children }: { title: string; checked: boolean; onChange: (checked: boolean) => void; agree: string; children: React.ReactNode }) {
+function ConsentCard({ title, checked, onChange, agree, i, children }: { title: string; checked: boolean; onChange: (checked: boolean) => void; agree: string; i: number; children: React.ReactNode }) {
   return (
-    <section className="rounded-[var(--radius-card)] bg-card p-5 outline outline-1 -outline-offset-1 outline-ink-08">
+    <section style={{ '--i': i } as React.CSSProperties} className="rise rounded-[var(--radius-card)] bg-card p-5 outline outline-1 -outline-offset-1 outline-ink-08">
       <h2 className="text-[17px] font-bold text-ink">{title}</h2>
       <div className="mt-2 text-[15.5px] leading-[1.5] text-ink-80">{children}</div>
       <label className="-mx-2 mt-3 flex min-h-12 cursor-pointer items-center gap-3 rounded-[12px] px-2 text-[16px] font-semibold text-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ink">
         <input type="checkbox" checked={checked} onChange={(e) => { void haptic('light'); onChange(e.target.checked) }} className="sr-only" />
         <span aria-hidden="true" className={cn('grid size-6 shrink-0 place-items-center rounded-[7px] border-[1.5px] transition-colors', checked ? 'border-ink bg-ink text-cream' : 'border-ink-20')}>
-          {checked ? <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5l3 3 6-7" /></svg> : null}
+          {checked ? <svg viewBox="0 0 16 16" className="pop size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5l3 3 6-7" /></svg> : null}
         </span>
         {agree}
       </label>
@@ -62,7 +62,7 @@ export default function ConsentPage() {
       onContinue={handleContinue}
     >
       <div className="flex flex-col gap-3">
-        <ConsentCard title="How your data is used" checked={aiConsent} onChange={setAiConsent} agree="I understand and agree">
+        <ConsentCard i={2} title="How your data is used" checked={aiConsent} onChange={setAiConsent} agree="I understand and agree">
           <p>
             To coach you, FIQR sends what you log (food, photos, weight and body measurements, workouts and your messages to Geo) to the AI model providers listed in our privacy policy. They process it to generate your plan and Geo&apos;s replies. We never sell your data or use it for advertising.
           </p>
@@ -70,7 +70,7 @@ export default function ConsentPage() {
             Read the privacy policy
           </Link>
         </ConsentCard>
-        <ConsentCard title="Not medical advice" checked={healthDisclaimerAck} onChange={setHealthDisclaimerAck} agree="I understand">
+        <ConsentCard i={3} title="Not medical advice" checked={healthDisclaimerAck} onChange={setHealthDisclaimerAck} agree="I understand">
           <p>
             FIQR is a wellness and fitness coaching app, not a medical device. Geo doesn&apos;t diagnose or treat conditions or advise on medication. If you&apos;re pregnant, under 18, or managing a health condition or eating disorder, check any plan with your doctor first.
           </p>

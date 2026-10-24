@@ -1,54 +1,52 @@
 {
   "back": {
-    "frames": 34,
-    "chrome_px": 97535,
-    "content_px": 430737,
+    "frames": 57,
+    "chrome_px": 97542,
+    "content_px": 383104,
     "max_chrome_share": 0.201,
-    "max_content_share": 0.075,
+    "max_content_share": 0.049,
     "issues": [],
     "verdict": "smooth"
   },
   "equipment-toggle": {
-    "frames": 16,
-    "chrome_px": 97388,
-    "content_px": 6183,
+    "frames": 23,
+    "chrome_px": 97389,
+    "content_px": 12656,
     "max_chrome_share": 0.201,
-    "max_content_share": 0.208,
+    "max_content_share": 0.165,
     "issues": [],
     "verdict": "smooth"
   },
   "goal-autoadvance": {
-    "frames": 47,
-    "chrome_px": 212845,
-    "content_px": 417418,
+    "frames": 74,
+    "chrome_px": 212844,
+    "content_px": 350072,
     "max_chrome_share": 0.092,
-    "max_content_share": 0.076,
-    "issues": [
-      "late change frame 17 after 7 still frames (4185 px)"
-    ],
-    "verdict": "pop"
+    "max_content_share": 0.057,
+    "issues": [],
+    "verdict": "smooth"
   },
   "name-to-sex": {
-    "frames": 33,
-    "chrome_px": 116869,
-    "content_px": 151516,
+    "frames": 54,
+    "chrome_px": 116879,
+    "content_px": 138512,
     "max_chrome_share": 0.167,
-    "max_content_share": 0.081,
+    "max_content_share": 0.05,
     "issues": [],
     "verdict": "smooth"
   },
   "sex-autoadvance": {
-    "frames": 44,
-    "chrome_px": 212847,
-    "content_px": 168206,
+    "frames": 65,
+    "chrome_px": 212859,
+    "content_px": 194327,
     "max_chrome_share": 0.092,
-    "max_content_share": 0.08,
+    "max_content_share": 0.05,
     "issues": [],
     "verdict": "smooth"
   },
   "weight-scrub": {
-    "frames": 17,
-    "chrome_px": 97390,
+    "frames": 16,
+    "chrome_px": 97388,
     "content_px": 63672,
     "max_chrome_share": 0.201,
     "max_content_share": 0.121,

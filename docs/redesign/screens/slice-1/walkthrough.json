@@ -1,0 +1,5 @@
+{
+  "taps": 29,
+  "seconds": 41.2,
+  "note": "scripted; 650 ms pause after each tap, wheel and ruler scrolls not counted as taps"
+}
