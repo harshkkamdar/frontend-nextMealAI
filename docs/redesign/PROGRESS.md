@@ -4,7 +4,7 @@ Brief: `docs/redesign/BRIEF.md`. Branch `redesign/fiqr-v2` (from `phase2/fiqr` a
 
 ## Current
 
-Phase 3 (directions). Phase 2 signed by Ved 24 Oct 2026 ("yes to all": C1-C8, metrics, rubric). Open checkpoint after this phase: Ved picks one direction.
+Phase 3 checkpoint: Ved picks a direction. Mocks in `docs/redesign/directions/` (a/b/c: home, + sheet, onboarding weight step), seeds in `seeds.md`, blind critic run 1 in `critic-1.md` (C 7.0, A 6.5, B 5.5; both Bevel references ranked below all three).
 
 ## Phase 0
 
