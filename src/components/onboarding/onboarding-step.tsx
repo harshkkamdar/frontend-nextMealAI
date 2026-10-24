@@ -9,16 +9,20 @@ import { reducedFade, spring } from '@/lib/motion'
 interface OnboardingStepProps {
   /** Unique per question so the content animates between steps. */
   stepKey: string
-  progress: number
+  /** 0-1; leave out on screens outside the setup flow (sign-in, password). */
+  progress?: number
   question: string
   why?: string
   onBack?: () => void
   cta?: string
   canContinue: boolean
   busy?: boolean
+  busyLabel?: string
   onContinue: () => void
   /** Optional quiet action under the CTA, e.g. "Skip". */
   secondary?: { label: string; onClick: () => void }
+  /** Shown above the CTA, e.g. a form-level error. */
+  notice?: ReactNode
   children: ReactNode
 }
 
@@ -27,14 +31,14 @@ let goingBack = false
 export function markBack() { goingBack = true }
 
 /** One question per screen: round back, thin progress, question, why-line, body, fixed orange CTA. */
-export function OnboardingStep({ stepKey, progress, question, why, onBack, cta = 'Continue', canContinue, busy, onContinue, secondary, children }: OnboardingStepProps) {
+export function OnboardingStep({ stepKey, progress, question, why, onBack, cta = 'Continue', canContinue, busy, busyLabel = 'Saving…', onContinue, secondary, notice, children }: OnboardingStepProps) {
   const reduce = useReducedMotion()
   const dir = goingBack ? -1 : 1
   // Cleared after commit, not during render, so React's double render in dev reads the same direction.
   useEffect(() => { goingBack = false }, [stepKey])
   return (
     // overflow-x-clip: the sliding question must never widen the page, or mobile browsers rescale the viewport and the fixed CTA jumps.
-    <div className="flex min-h-dvh flex-col overflow-x-clip bg-cream pt-[calc(var(--safe-top)+8px)]">
+    <div data-page className="page-in flex min-h-dvh flex-col overflow-x-clip bg-cream pt-[calc(var(--safe-top)+8px)]">
       <div className="flex items-center gap-4 px-5">
         {onBack ? (
           <RoundButton flat aria-label="Back" onClick={() => { markBack(); onBack() }}>
@@ -43,12 +47,15 @@ export function OnboardingStep({ stepKey, progress, question, why, onBack, cta =
         ) : (
           <span className="size-11 shrink-0" />
         )}
-        <div role="progressbar" aria-label="Setup progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)} className="h-1 flex-1 overflow-hidden rounded-full bg-ink-08">
-          <motion.div className="h-full origin-left rounded-full bg-ink" initial={false} animate={{ scaleX: Math.max(0.08, progress) }} transition={reduce ? reducedFade : spring.sheet} />
-        </div>
+        {progress !== undefined ? (
+          <div role="progressbar" aria-label="Setup progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)} className="h-1 flex-1 overflow-hidden rounded-full bg-ink-08">
+            <motion.div className="h-full origin-left rounded-full bg-ink" initial={false} animate={{ scaleX: Math.max(0.08, progress) }} transition={reduce ? reducedFade : spring.sheet} />
+          </div>
+        ) : null}
       </div>
 
       <form
+        noValidate
         className="relative flex flex-1 flex-col"
         onSubmit={(e) => { e.preventDefault(); if (canContinue && !busy) onContinue() }}
       >
@@ -77,14 +84,25 @@ export function OnboardingStep({ stepKey, progress, question, why, onBack, cta =
         </AnimatePresence>
 
         <div className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-cream from-70% to-transparent px-5 pb-[calc(var(--safe-bottom)+20px)] pt-8">
+          {notice}
           <PrimaryButton type="submit" disabled={!canContinue || busy} aria-busy={busy || undefined} className="h-[58px] rounded-full py-0">
-            {busy ? 'Saving…' : cta}
+            {/* The label crossfades when it changes (Continue to Finish, Send to Back to sign in) instead of swapping in one frame. */}
+            <AnimatePresence initial={false} mode="wait">
+              <motion.span key={busy ? busyLabel : cta} initial={{ opacity: 0, y: reduce ? 0 : 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduce ? 0 : -6 }} transition={reduce ? reducedFade : { duration: 0.12 }}>
+                {busy ? busyLabel : cta}
+              </motion.span>
+            </AnimatePresence>
           </PrimaryButton>
-          {secondary ? (
-            <button type="button" onClick={secondary.onClick} className="mx-auto mt-1 flex h-11 items-center px-4 text-[15px] font-semibold text-ink-65">
-              {secondary.label}
-            </button>
-          ) : null}
+          <AnimatePresence initial={false}>
+            {secondary ? (
+              // The slot grows from 0, so the CTA above glides up instead of jumping when a secondary action appears.
+              <motion.div key={secondary.label} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 48 }} exit={{ opacity: 0, height: 0 }} transition={reduce ? reducedFade : spring.sheet} className="overflow-hidden">
+                <button type="button" onClick={secondary.onClick} className="mx-auto mt-1 flex h-11 items-center px-4 text-[15px] font-semibold text-ink-65">
+                  {secondary.label}
+                </button>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </div>
       </form>
     </div>

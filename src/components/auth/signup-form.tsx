@@ -1,39 +1,52 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { Input } from '@/components/ui/input'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { OnboardingStep } from '@/components/onboarding/onboarding-step'
+import { FormNotice } from '@/components/auth/form-notice'
+import { TextField } from '@/components/ui/fiqr/text-field'
 import { signup } from '@/lib/api/auth.api'
+import { leaveThen } from '@/lib/page-transition'
+import { haptic } from '@/lib/platform/app'
+import { cn } from '@/lib/utils'
 
 const signupSchema = z
   .object({
-    email: z.string().email('Please enter a valid email'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    email: z.string().email('Enter an email like name@example.com'),
+    password: z.string().min(8, 'Use at least 8 characters'),
+    confirmPassword: z.string().min(1, 'Type the password again'),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
+    message: "The two passwords don't match",
     path: ['confirmPassword'],
   })
 
 type SignupValues = z.infer<typeof signupSchema>
 
-const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-65 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+/** Ticks once the password is long enough, so the rule is met before Create account, not after. */
+function LengthHint({ met }: { met: boolean }) {
+  return (
+    <p className="mt-2 flex items-center gap-2 text-[14.5px] font-medium text-ink-65">
+      <span aria-hidden="true" className={cn('grid size-[18px] place-items-center rounded-full border-[1.5px] transition-colors duration-200', met ? 'border-ink bg-ink text-cream' : 'border-ink-35')}>
+        {met ? <svg viewBox="0 0 16 16" className="pop size-3" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5l3 3 6-7" /></svg> : null}
+      </span>
+      At least 8 characters<span className="sr-only">{met ? ', done' : ''}</span>
+    </p>
+  )
+}
 
 export function SignupForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [failure, setFailure] = useState<{ message: string; attempt: number } | null>(null)
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
@@ -46,89 +59,43 @@ export function SignupForm() {
 
   async function onSubmit(data: SignupValues) {
     setIsLoading(true)
+    setFailure(null)
     try {
       await signup(data.email, data.password)
-      router.push('/onboarding/personal')
+      void haptic('success')
+      leaveThen(() => router.push('/onboarding/personal'))
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create account')
+      void haptic('warning')
+      setFailure((f) => ({ message: error instanceof Error ? error.message : "That didn't work. Check your connection and try again.", attempt: (f?.attempt ?? 0) + 1 }))
     } finally {
       setIsLoading(false)
     }
   }
 
+  const passwordLongEnough = watch('password').length >= 8
+
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
-          Create your account
-        </h1>
-        <p className="mt-1 text-[15.5px] text-ink-65">
-          Start your fitness journey
-        </p>
+    <OnboardingStep
+      stepKey="signup"
+      question="Create your account"
+      why="Geo saves your plan and your logs to it."
+      onBack={() => leaveThen(() => router.push('/welcome'))}
+      cta="Create account"
+      busyLabel="Creating account…"
+      canContinue
+      busy={isLoading}
+      onContinue={handleSubmit(onSubmit)}
+      notice={failure ? <FormNotice key={failure.attempt}>{failure.message}</FormNotice> : null}
+      secondary={{ label: 'I have an account', onClick: () => leaveThen(() => router.push('/login')) }}
+    >
+      <div className="flex flex-col gap-5">
+        <TextField id="email" label="Email" type="email" placeholder="you@example.com" autoComplete="email" inputMode="email" error={errors.email?.message} i={2} {...register('email')} />
+        <div>
+          <TextField id="password" label="Password" type="password" placeholder="Choose a password" autoComplete="new-password" error={errors.password?.message} i={3} {...register('password')} />
+          {errors.password ? null : <div className="rise" style={{ '--i': 3 } as CSSProperties}><LengthHint met={passwordLongEnough} /></div>}
+        </div>
+        <TextField id="confirmPassword" label="Confirm password" type="password" placeholder="Type it again" autoComplete="new-password" error={errors.confirmPassword?.message} i={4} {...register('confirmPassword')} />
       </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-2">
-          <SectionLabel><label htmlFor="email">Email</label></SectionLabel>
-          <Input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            autoComplete="email"
-            className={inputClassName}
-            {...register('email')}
-          />
-          {errors.email && (
-            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.email.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <SectionLabel><label htmlFor="password">Password</label></SectionLabel>
-          <Input
-            id="password"
-            type="password"
-            placeholder="At least 8 characters"
-            autoComplete="new-password"
-            className={inputClassName}
-            {...register('password')}
-          />
-          {errors.password && (
-            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.password.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <SectionLabel><label htmlFor="confirmPassword">Confirm password</label></SectionLabel>
-          <Input
-            id="confirmPassword"
-            type="password"
-            placeholder="Re-enter your password"
-            autoComplete="new-password"
-            className={inputClassName}
-            {...register('confirmPassword')}
-          />
-          {errors.confirmPassword && (
-            <p role="alert" className="text-[13px] font-semibold text-ink">
-              {errors.confirmPassword.message}
-            </p>
-          )}
-        </div>
-
-        <PrimaryButton
-          type="submit"
-          disabled={isLoading}
-          className="justify-center"
-        >
-          {isLoading ? 'Creating account...' : 'Create account'}
-        </PrimaryButton>
-      </form>
-
-      <p className="mt-6 text-center">
-        <Link href="/login" className="text-[15.5px] font-semibold text-ink-65">
-          Have an account? Log in
-        </Link>
-      </p>
-    </div>
+    </OnboardingStep>
   )
 }

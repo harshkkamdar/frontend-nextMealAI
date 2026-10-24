@@ -25,6 +25,13 @@ const TRANSITIONS = {
     { name: 'back', url: '/onboarding/fitness?q=activity', draft: { ...EMPTY, goal: 'fat_loss' }, act: (p) => p.getByRole('button', { name: 'Back' }).click() },
     { name: 'weight-scrub', url: '/onboarding/nutrition?q=weight', draft: EMPTY, act: async (p) => { const r = p.locator('.scrollbar-hide').first(); for (let i = 0; i < 12; i++) { await r.evaluate((el) => { el.scrollLeft += 15 }); await p.waitForTimeout(16) } } },
   ],
+  'slice-1b': [
+    { name: 'welcome-continue', url: '/welcome', guest: true, act: (p) => p.getByRole('button', { name: 'Continue' }).click() },
+    { name: 'welcome-last', url: '/welcome', guest: true, act: async (p) => { await p.evaluate(() => { const el = document.querySelector('[aria-roledescription=carousel]'); el.scrollLeft = 2 * el.clientWidth }); await p.waitForTimeout(600); await p.getByRole('button', { name: 'Continue' }).click() } },
+    { name: 'welcome-to-signup', url: '/welcome', guest: true, act: (p) => p.getByRole('button', { name: 'I have an account' }).click() },
+    { name: 'login-error', url: '/login', guest: true, act: async (p) => { await p.getByLabel('Email', { exact: true }).fill('sam@example.com'); await p.getByLabel('Password', { exact: true }).fill('wrong password'); await p.getByRole('button', { name: 'Sign in' }).click() } },
+    { name: 'forgot-sent', url: '/forgot-password', guest: true, act: async (p) => { await p.getByLabel('Email', { exact: true }).fill('sam@example.com'); await p.getByRole('button', { name: 'Send reset link' }).click() } },
+  ],
 }
 
 const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' }
@@ -37,15 +44,16 @@ const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-creden
     fs.mkdirSync(dir, { recursive: true })
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, reducedMotion: 'no-preference' })
     await context.addInitScript(([auth, draft]) => {
-      localStorage.setItem('nextmealai-auth', JSON.stringify(auth))
-      localStorage.setItem('fiqr-onboarding-draft', JSON.stringify({ state: draft, version: 0 }))
+      if (auth) localStorage.setItem('nextmealai-auth', JSON.stringify(auth))
+      if (draft) localStorage.setItem('fiqr-onboarding-draft', JSON.stringify({ state: draft, version: 0 }))
       const hide = () => { const s = document.createElement('style'); s.textContent = 'nextjs-portal{display:none!important}'; document.head.appendChild(s) }
       document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', hide) : hide()
-    }, [AUTH, t.draft])
+    }, [t.guest ? null : AUTH, t.draft ?? null])
     const page = await context.newPage()
     await page.route(`${API}/**`, (route) => {
       const p = new URL(route.request().url()).pathname
       if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors })
+      if (p === '/auth/login') return route.fulfill({ status: 401, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ error: true, message: 'Invalid login credentials' }) })
       const body = p === '/v1/profile/onboarding' ? { personal: { complete: false }, fitness: { complete: false }, nutrition: { complete: false } } : {}
       return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(body) })
     })

@@ -1,0 +1,47 @@
+{
+  "forgot-sent": {
+    "frames": 53,
+    "chrome_px": 54855,
+    "content_px": 157655,
+    "max_chrome_share": 0.091,
+    "max_content_share": 0.051,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "login-error": {
+    "frames": 33,
+    "chrome_px": 888,
+    "content_px": 64323,
+    "max_chrome_share": 0.614,
+    "max_content_share": 0.253,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-continue": {
+    "frames": 85,
+    "chrome_px": 0,
+    "content_px": 482487,
+    "max_chrome_share": 0,
+    "max_content_share": 0.107,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-last": {
+    "frames": 111,
+    "chrome_px": 120226,
+    "content_px": 652721,
+    "max_chrome_share": 0.143,
+    "max_content_share": 0.078,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-to-signup": {
+    "frames": 62,
+    "chrome_px": 301842,
+    "content_px": 202888,
+    "max_chrome_share": 0.06,
+    "max_content_share": 0.07,
+    "issues": [],
+    "verdict": "smooth"
+  }
+}

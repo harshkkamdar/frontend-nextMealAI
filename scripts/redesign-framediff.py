@@ -8,7 +8,7 @@ A pop is either
     or progress animation spread over several frames is motion, not a pop. Ignored when the chrome change
     is tiny (< 400 px, e.g. a pressed-state tint), or
   - content: one frame carrying more than 50% of the content's total change (no motion, a hard cut), or
-  - late shift: any change after the transition has settled for 6 frames (layout shift after paint).
+  - late shift: a one-frame change after the transition has settled for 6 frames (layout shift after paint).
 Writes report.json next to the transitions and prints one line per transition."""
 import json, os, sys
 import numpy as np
@@ -60,7 +60,10 @@ for name in sorted(os.listdir(root)):
         if c < 50:
             quiet += 1
         else:
-            if quiet >= 6 and i > 0 and sum(total[:i]) > 0:
+            # E3 (Ved, 24 Oct 2026): a jump is a pop only when it lands in one frame. A late change that keeps
+            # moving over the next frames (a live clock rolling a digit) is motion; a one-frame shift is a pop.
+            nxt = total[i + 1] if i + 1 < len(total) else 0
+            if quiet >= 6 and i > 0 and sum(total[:i]) > 0 and nxt < c / 4:
                 issues.append(f'late change frame {i + 1} after {quiet} still frames ({c} px)')
             quiet = 0
     report[name] = {'frames': len(files), 'chrome_px': ct, 'content_px': nt, 'max_chrome_share': round(max(chrome) / ct, 3) if ct else 0, 'max_content_share': round(max(content) / nt, 3) if nt else 0, 'issues': issues, 'verdict': 'pop' if issues else 'smooth'}

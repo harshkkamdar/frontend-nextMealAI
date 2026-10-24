@@ -1,0 +1,338 @@
+[
+  {
+    "shot": "forgot-empty",
+    "width": 360,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "forgot-empty",
+    "width": 390,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "forgot-invalid",
+    "width": 360,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "forgot-invalid",
+    "width": 390,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "forgot-sent",
+    "width": 360,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "forgot-sent",
+    "width": 390,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-empty",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-empty",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-error",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-error",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-filled",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-filled",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-invalid",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-invalid",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-offline",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-offline",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-error",
+    "width": 360,
+    "url": "/reset-password#access_token=capture&type=recovery",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-error",
+    "width": 390,
+    "url": "/reset-password#access_token=capture&type=recovery",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-expired",
+    "width": 360,
+    "url": "/reset-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-expired",
+    "width": 390,
+    "url": "/reset-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-invalid",
+    "width": 360,
+    "url": "/reset-password#access_token=capture&type=recovery",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-invalid",
+    "width": 390,
+    "url": "/reset-password#access_token=capture&type=recovery",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-valid",
+    "width": 360,
+    "url": "/reset-password#access_token=capture&type=recovery",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-valid",
+    "width": 390,
+    "url": "/reset-password#access_token=capture&type=recovery",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-empty",
+    "width": 360,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-empty",
+    "width": 390,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-error",
+    "width": 360,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-error",
+    "width": 390,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-filled",
+    "width": 360,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-filled",
+    "width": 390,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-invalid",
+    "width": 360,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-invalid",
+    "width": 390,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "welcome-1",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-1",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-2",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-2",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-3",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-3",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-4",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "welcome-4",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "welcome-offline",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-offline",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  }
+]

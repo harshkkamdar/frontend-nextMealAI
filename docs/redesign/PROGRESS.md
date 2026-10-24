@@ -4,7 +4,7 @@ Brief: `docs/redesign/BRIEF.md`. Branch `redesign/fiqr-v2` (from `phase2/fiqr` a
 
 ## Current
 
-Slice 1a checkpoint answered by Ved (24 Oct 2026, `decisions.md` E1-E4): 33 taps accepted, copy approved, pop rule ok, and a feel pass asked for. Feel pass done (below). Next: slice 1b, welcome carousel and auth.
+Phase 5, slice 1b (welcome carousel and sign-in) at its checkpoint for Ved, together with the slice 1a feel pass. See "Phase 5, slice 1b" below.
 
 ## Phase 0
 
@@ -73,3 +73,22 @@ What changed, all transform/opacity only:
 | iOS simulator (Safari, real WebKit) | 23 captures redone (`ios/`); wheels driven in Safari save the right date (1992-07-01) |
 | lint / type-check / tests | 0 errors (26 pre-existing warnings) / pass / 443 passed, 1 skipped (2 new wheel tests) |
 | 60 fps | still blocked on a real low-end phone |
+
+## Phase 5, slice 1b: welcome and sign-in (checkpoint for Ved, 24 Oct 2026)
+
+Scope: new `/welcome` (4 slides, live mini-components: calorie ring and macro bars fill, rest timer rolls its digits, chat question then typing then reply, weight line draws, workouts meter fills), `/` now opens it; `/login`, `/signup`, `/forgot-password` (new "Check your email" state), `/reset-password` moved onto the one-question shell (round back, big title, fixed CTA, inline errors, shake on a failed sign-in, Show/Hide on passwords, live 8-character tick). Route changes in slice 1 now fade through cream (`src/lib/page-transition.ts`) instead of cutting. Copy list: `copy/slice-1b.md`.
+
+| Rubric item | Measurement | Result |
+|---|---|---|
+| 1. Core-job taps | Sign-up path: welcome adds 0 required taps ("Get started" is one tap whether you swipe or not; swiping replaces Continue). Sign-up form unchanged: 3 fields + 1 tap | pass (no added taps beyond the welcome's single Get started, agreed in Q20) |
+| 2. States captured | web 390 + 360: 42 captures (welcome 1-4 + offline, login empty/filled/invalid/API error/offline, sign-up empty/filled/invalid/API error, forgot empty/invalid/sent, reset expired/valid/invalid/API error); iOS simulator Safari: 9; Android 15 emulator Chrome 124: 9 | pass for web; devices cover each screen's default state |
+| 3. WCAG AA / 44 pt / orange | axe serious/critical 0; small targets 0; orange actions per screen at most 1 on 42/42 (0 on welcome 1-3 by design, ink Continue) | pass |
+| 4. Frame-diffed transitions | 5 transitions (welcome Continue, welcome to last slide, welcome to sign-in, failed sign-in, forgot sent) plus slice 1a's 6 re-run: 11 of 11 smooth. Fixed on the way: route hard cut (now fade-through), CTA jumping 48 px when a secondary action appears (slot now grows), Geo card growing mid-sequence, timer digits swapping in one frame (now roll). The late-change check now applies E3 (one-frame only) | pass |
+| 5. 60 fps low-end Android | not measured | blocked, same as 1a (needs a real phone) |
+| 6. Blind critic | not run for 1b at this checkpoint | open (said explicitly, not skipped silently) |
+| 7. Copy approved | `copy/slice-1b.md` | waiting for Ved |
+| 8. lint / type-check / tests | 0 errors (25 pre-existing warnings) / pass / 445 passed, 1 skipped (new: auth form tests, wheel tests) | pass |
+
+Device notes: iOS Safari's toolbar leaves about 660 px; the welcome got a compact layout under 740 px tall (also covers iPhone SE). The Android emulator showed system ANR dialogs (Messages, System UI) from load; Messages was disabled on the emulator and the dialog dismissed. Not FIQR.
+
+Not changed (Q6, no behaviour changes): the confirm-password field stays. Option for Ved: drop it, since Show/Hide now covers typos.

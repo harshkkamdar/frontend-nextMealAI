@@ -1,30 +1,28 @@
 'use client'
 
 import { Suspense, useEffect, useState } from 'react'
-import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Input } from '@/components/ui/input'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { OnboardingStep } from '@/components/onboarding/onboarding-step'
+import { FormNotice } from '@/components/auth/form-notice'
+import { TextField } from '@/components/ui/fiqr/text-field'
 import { updatePassword } from '@/lib/api/auth.api'
+import { leaveThen } from '@/lib/page-transition'
 
 const resetPasswordSchema = z
   .object({
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    password: z.string().min(8, 'Use at least 8 characters'),
+    confirmPassword: z.string().min(1, 'Type the password again'),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
+    message: "The two passwords don't match",
     path: ['confirmPassword'],
   })
 
 type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
-
-const inputClassName = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] placeholder:text-ink-65 focus:border-ink outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
 
 type LinkState =
   | { status: 'pending' }
@@ -39,6 +37,7 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams()
   const [linkState, setLinkState] = useState<LinkState>({ status: 'pending' })
   const [isLoading, setIsLoading] = useState(false)
+  const [failure, setFailure] = useState<{ message: string; attempt: number } | null>(null)
 
   const {
     register,
@@ -74,120 +73,60 @@ function ResetPasswordForm() {
   async function onSubmit(data: ResetPasswordValues) {
     if (linkState.status !== 'valid') return
     setIsLoading(true)
+    setFailure(null)
     try {
       await updatePassword(data.password, linkState.accessToken)
-      toast.success('Password updated. Please sign in with your new password.')
-      router.push('/login')
+      toast.success('Password updated. Sign in with your new password.')
+      leaveThen(() => router.push('/login'))
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to update password'
-      )
+      setFailure((f) => ({ message: error instanceof Error ? error.message : "That didn't work. Check your connection and try again.", attempt: (f?.attempt ?? 0) + 1 }))
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (linkState.status === 'pending') {
-    return (
-      <div className="text-center text-[15.5px] text-ink-65">Loading...</div>
-    )
-  }
+  if (linkState.status === 'pending') return null
 
   if (linkState.status === 'invalid') {
     return (
-      <div>
-        <div className="mb-8">
-          <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
-            Invalid or expired reset link
-          </h1>
-          <p className="mt-1 text-[15.5px] text-ink-65">
-            Please request a new password reset link.
-          </p>
-        </div>
-        <p className="text-center">
-          <Link
-            href="/forgot-password"
-            className="flex h-14 w-full items-center justify-center rounded-[15px] border border-ink-16 bg-cream text-[18px] font-bold text-ink"
-          >
-            Request a new link
-          </Link>
-        </p>
-      </div>
+      <OnboardingStep
+        stepKey="reset-invalid"
+        question="This reset link has expired"
+        why="Reset links work once and expire. Ask for a new one and use the latest email."
+        onBack={() => leaveThen(() => router.push('/login'))}
+        cta="Send a new link"
+        canContinue
+        onContinue={() => leaveThen(() => router.push('/forgot-password'))}
+      >
+        {null}
+      </OnboardingStep>
     )
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
-          Choose a new password
-        </h1>
-        <p className="mt-1 text-[15.5px] text-ink-65">
-          Choose a strong password you haven&apos;t used before
-        </p>
+    <OnboardingStep
+      stepKey="reset"
+      question="Choose a new password"
+      why="Use at least 8 characters, one you haven't used here before."
+      onBack={() => leaveThen(() => router.push('/login'))}
+      cta="Update password"
+      busyLabel="Updating…"
+      canContinue
+      busy={isLoading}
+      onContinue={handleSubmit(onSubmit)}
+      notice={failure ? <FormNotice key={failure.attempt}>{failure.message}</FormNotice> : null}
+    >
+      <div className="flex flex-col gap-5">
+        <TextField id="password" label="New password" type="password" placeholder="Choose a password" autoComplete="new-password" error={errors.password?.message} i={2} {...register('password')} />
+        <TextField id="confirmPassword" label="Confirm new password" type="password" placeholder="Type it again" autoComplete="new-password" error={errors.confirmPassword?.message} i={3} {...register('confirmPassword')} />
       </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-2">
-          <SectionLabel><label htmlFor="password">New password</label></SectionLabel>
-          <Input
-            id="password"
-            type="password"
-            placeholder="At least 8 characters"
-            autoComplete="new-password"
-            className={inputClassName}
-            {...register('password')}
-          />
-          {errors.password && (
-            <p role="alert" className="text-[13px] font-semibold text-ink">{errors.password.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <SectionLabel><label htmlFor="confirmPassword">Confirm new password</label></SectionLabel>
-          <Input
-            id="confirmPassword"
-            type="password"
-            placeholder="Re-enter your password"
-            autoComplete="new-password"
-            className={inputClassName}
-            {...register('confirmPassword')}
-          />
-          {errors.confirmPassword && (
-            <p role="alert" className="text-[13px] font-semibold text-ink">
-              {errors.confirmPassword.message}
-            </p>
-          )}
-        </div>
-
-        <PrimaryButton
-          type="submit"
-          disabled={isLoading}
-          className="justify-center"
-        >
-          {isLoading ? 'Updating...' : 'Update password'}
-        </PrimaryButton>
-      </form>
-
-      <p className="mt-6 text-center">
-        <Link
-          href="/login"
-          className="text-[15.5px] font-semibold text-ink-65"
-        >
-          Back to sign in
-        </Link>
-      </p>
-    </div>
+    </OnboardingStep>
   )
 }
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="text-center text-[15.5px] text-ink-65">Loading...</div>
-      }
-    >
+    <Suspense fallback={null}>
       <ResetPasswordForm />
     </Suspense>
   )

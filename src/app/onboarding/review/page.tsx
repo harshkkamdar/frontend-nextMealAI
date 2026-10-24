@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
+import { leaveThen } from '@/lib/page-transition'
 import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { getPlans } from '@/lib/api/plans.api'
@@ -49,7 +50,7 @@ export default function ReviewPage() {
 
   function finish(to: '/dashboard' | '/chat') {
     useOnboardingStore.getState().setStatus('complete')
-    router.push(to)
+    leaveThen(() => router.push(to))
   }
 
   const question = state === 'error' ? "Your plan didn't load" : state === 'ready' && !hasPlans ? 'Geo could not finish your plan' : 'Your plan is ready'

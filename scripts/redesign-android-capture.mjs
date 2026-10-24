@@ -26,6 +26,14 @@ const SHOTS = {
     { name: 'consent', url: '/onboarding/consent', done: ['personal', 'fitness', 'nutrition'], consent: false },
     { name: 'reveal', url: '/onboarding/review', done: ['personal', 'fitness', 'nutrition'] },
   ],
+  'slice-1b': [
+    ...[0, 1, 2, 3].map((i) => ({ name: `welcome-${i + 1}`, url: '/welcome', guest: true, done: [], act: (p) => p.evaluate((n) => { const el = document.querySelector('[aria-roledescription=carousel]'); el.scrollLeft = n * el.clientWidth }, i) })),
+    { name: 'login', url: '/login', guest: true, done: [] },
+    { name: 'signup', url: '/signup', guest: true, done: [] },
+    { name: 'forgot', url: '/forgot-password', guest: true, done: [] },
+    { name: 'reset-expired', url: '/reset-password', guest: true, done: [] },
+    { name: 'reset-valid', url: '/reset-password#access_token=capture&type=recovery', guest: true, done: [] },
+  ],
 }
 const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' }
 
@@ -44,9 +52,10 @@ const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-creden
     return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(body) })
   })
   for (shot of SHOTS[SLICE]) {
-    await page.evaluate(([auth, draft]) => { localStorage.setItem('nextmealai-auth', JSON.stringify(auth)); localStorage.setItem('fiqr-onboarding-draft', JSON.stringify({ state: draft, version: 0 })) }, [AUTH, FULL])
+    await page.evaluate(([auth, draft]) => { if (auth) localStorage.setItem('nextmealai-auth', JSON.stringify(auth)); else localStorage.removeItem('nextmealai-auth'); localStorage.setItem('fiqr-onboarding-draft', JSON.stringify({ state: draft, version: 0 })) }, [shot.guest ? null : AUTH, FULL])
     await page.goto(BASE + shot.url, { waitUntil: 'load' })
     await page.waitForTimeout(2500)
+    if (shot.act) { await shot.act(page); await page.waitForTimeout(2200) }
     fs.writeFileSync(path.join(OUT, `${shot.name}.png`), execFileSync(ADB, ['exec-out', 'screencap', '-p']))
     console.log(shot.name)
   }

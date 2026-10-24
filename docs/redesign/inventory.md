@@ -22,7 +22,7 @@ Legend: `w` web capture exists at both widths, `-` state does not apply, `.` app
 
 | # | Route | Screen | D2 row | D | E | Ld | Er | Off | Lg | 1st | Ret | iOS | Android |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | `/` | redirect to `/login` | - | - | - | - | - | - | - | - | - | - | - |
+| 1 | `/` | redirect to `/welcome` (slice 1b; was `/login`) | - | - | - | - | - | - | - | - | - | - | - |
 | 2 | `/login` | Login | D2-25 | w | - | - | w | . | - | - | - | . | . |
 | 3 | `/signup` | Sign-up | D2-26 | w | - | - | w | . | - | - | - | . | . |
 | 4 | `/forgot-password` | Password reset, request | D2-27 | w | - | - | w | . | - | - | - | . | . |
@@ -102,3 +102,9 @@ Bottom nav (4 tabs + Talk to Geo), PageHeader, PrimaryButton, SecondaryButton, A
 - **Android**: no Android SDK, emulator or AVD on this Mac (`emulator` not on PATH, `~/Library/Android/sdk` missing, `adb devices` empty). Needs Android Studio (or `sdkmanager`) plus a low-end AVD profile, or a real low-end phone over USB.
 - **Test account**: `TEST_EMAIL` / `TEST_PASSWORD` are not set and not stored anywhere the agent may read. Also needed: a second, fresh account for `1st` captures.
 - **Core API**: must run locally on :4010 (`cd packages/core && PORT=4010 npx tsx --env-file=../../.env src/index.ts` in the backend repo, per `docs/phase2/HANDOFF.md`).
+
+
+## Added in slice 1b (24 Oct 2026)
+
+- `/welcome`: 4-slide welcome carousel (Food, Train, Geo, Check-in) before sign-up. States: each slide, offline (static, no network use). Captured web 390/360, iOS simulator, Android emulator (`screens/slice-1b/`).
+- `/forgot-password` gains a "Check your email" state (replaces a toast).

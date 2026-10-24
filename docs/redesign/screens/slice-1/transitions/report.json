@@ -1,8 +1,8 @@
 {
   "back": {
     "frames": 57,
-    "chrome_px": 97542,
-    "content_px": 383104,
+    "chrome_px": 97544,
+    "content_px": 383011,
     "max_chrome_share": 0.201,
     "max_content_share": 0.049,
     "issues": [],
@@ -19,34 +19,34 @@
   },
   "goal-autoadvance": {
     "frames": 74,
-    "chrome_px": 212844,
-    "content_px": 350072,
+    "chrome_px": 212847,
+    "content_px": 347607,
     "max_chrome_share": 0.092,
     "max_content_share": 0.057,
     "issues": [],
     "verdict": "smooth"
   },
   "name-to-sex": {
-    "frames": 54,
-    "chrome_px": 116879,
-    "content_px": 138512,
+    "frames": 55,
+    "chrome_px": 116878,
+    "content_px": 138788,
     "max_chrome_share": 0.167,
     "max_content_share": 0.05,
     "issues": [],
     "verdict": "smooth"
   },
   "sex-autoadvance": {
-    "frames": 65,
-    "chrome_px": 212859,
-    "content_px": 194327,
+    "frames": 66,
+    "chrome_px": 212854,
+    "content_px": 189783,
     "max_chrome_share": 0.092,
-    "max_content_share": 0.05,
+    "max_content_share": 0.049,
     "issues": [],
     "verdict": "smooth"
   },
   "weight-scrub": {
     "frames": 16,
-    "chrome_px": 97388,
+    "chrome_px": 97391,
     "content_px": 63672,
     "max_chrome_share": 0.201,
     "max_content_share": 0.121,

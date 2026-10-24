@@ -10,6 +10,7 @@ import { CM, FT_IN, KG, LB, RulerInput } from '@/components/ui/fiqr/ruler-input'
 import { WheelBand, WheelPicker } from '@/components/ui/fiqr/wheel-picker'
 import { WeightPath } from '@/components/onboarding/weight-path'
 import { submitFitnessOnboarding, submitNutritionOnboarding, submitPersonalOnboarding } from '@/lib/api/profile.api'
+import { leaveThen } from '@/lib/page-transition'
 import { haptic } from '@/lib/platform/app'
 import { ageOn, nextInModule, previousRoute, progressOf, routeOf, STEPS, stepsFor, visibleSteps, type OnboardingModule, type StepId } from '@/lib/onboarding-steps'
 import { useOnboardingDraft, type OnboardingDraft } from '@/stores/onboarding-draft.store'
@@ -150,10 +151,10 @@ export function OnboardingFlow({ module }: { module: OnboardingModule }) {
       void haptic('success')
       if (module === 'nutrition') {
         draft.reset()
-        router.push('/onboarding/consent')
+        leaveThen(() => router.push('/onboarding/consent'))
       } else {
         const firstOfNext = visibleSteps(draft.goal).find((s) => s.module === (module === 'personal' ? 'fitness' : 'nutrition'))!
-        router.push(routeOf(firstOfNext.id))
+        leaveThen(() => router.push(routeOf(firstOfNext.id)))
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "That didn't save. Check your connection and try again.")
@@ -165,7 +166,8 @@ export function OnboardingFlow({ module }: { module: OnboardingModule }) {
   const common = {
     stepKey: id,
     progress: progressOf(id, draft.goal),
-    onBack: back ? () => router.push(back) : undefined,
+    // Crossing into another module is a route change: fade through it. Within a module only the question animates.
+    onBack: back ? () => (back.startsWith(`/onboarding/${module}?`) ? router.push(back) : leaveThen(() => router.push(back))) : undefined,
     busy,
     onContinue: next,
   }

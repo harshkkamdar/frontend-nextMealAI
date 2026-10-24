@@ -30,6 +30,14 @@ const SHOTS = {
     { name: 'reveal', url: '/onboarding/review', draft: EMPTY, scenario: { done: ['personal', 'fitness', 'nutrition'], consent: true, plans: 'full' } },
     { name: 'reveal-empty', url: '/onboarding/review', draft: EMPTY, scenario: { done: ['personal', 'fitness', 'nutrition'], consent: true, plans: 'none' } },
   ],
+  'slice-1b': [
+    ...[0, 1, 2, 3].map((i) => ({ name: `welcome-${i + 1}`, url: '/welcome', guest: true, draft: EMPTY, scenario: {}, js: `(() => { const el = document.querySelector('[aria-roledescription=carousel]'); el.scrollLeft = ${i} * el.clientWidth; return 1 })()` })),
+    { name: 'login', url: '/login', guest: true, draft: EMPTY, scenario: {} },
+    { name: 'signup', url: '/signup', guest: true, draft: EMPTY, scenario: {} },
+    { name: 'forgot', url: '/forgot-password', guest: true, draft: EMPTY, scenario: {} },
+    { name: 'reset-expired', url: '/reset-password', guest: true, draft: EMPTY, scenario: {} },
+    { name: 'reset-valid', url: '/reset-password#access_token=capture&type=recovery', guest: true, draft: EMPTY, scenario: {} },
+  ],
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -67,12 +75,13 @@ async function page() {
   for (const shot of SHOTS[SLICE]) {
     await fetch(MOCK + '/__scenario', { method: 'POST', body: JSON.stringify({ fail: null, ...shot.scenario }) })
     const p = await page()
-    await p.evaluate(`localStorage.setItem('nextmealai-auth', ${JSON.stringify(JSON.stringify(AUTH))}); localStorage.setItem('fiqr-onboarding-draft', ${JSON.stringify(JSON.stringify({ state: shot.draft, version: 0 }))}); location.href = ${JSON.stringify(APP + shot.url)}; 1`)
+    await p.evaluate(`${shot.guest ? "localStorage.removeItem('nextmealai-auth');" : `localStorage.setItem('nextmealai-auth', ${JSON.stringify(JSON.stringify(AUTH))});`} localStorage.setItem('fiqr-onboarding-draft', ${JSON.stringify(JSON.stringify({ state: shot.draft, version: 0 }))}); location.href = ${JSON.stringify(APP + shot.url)}; 1`)
     p.close()
     await sleep(3500)
     // Hide the Next.js dev indicator so it does not sit in the capture.
     const q = await page()
     await q.evaluate(`(() => { const s = document.createElement('style'); s.textContent = 'nextjs-portal{display:none!important}'; document.head.appendChild(s); return 1 })()`)
+    if (shot.js) { await q.evaluate(shot.js); await sleep(2200) }
     q.close()
     await sleep(600)
     const file = path.join(OUT, `${shot.name}.png`)

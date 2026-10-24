@@ -133,4 +133,8 @@
 @keyframes fiqr-grow { from { transform: scaleX(0); } }
 @keyframes fiqr-sweep { to { transform: translateX(100%); } }
 @utility pop { animation: fiqr-pop 320ms cubic-bezier(.22,1,.36,1) backwards; }
+@utility page-in { animation: fiqr-fade-in 220ms ease-out backwards; }
+@keyframes fiqr-fade-in { from { opacity: 0; } }
+@utility shake { animation: fiqr-shake 420ms cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes fiqr-shake { 15%, 85% { transform: translateX(-2px); } 30%, 70% { transform: translateX(5px); } 45%, 55% { transform: translateX(-7px); } }
 @keyframes fiqr-pop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }

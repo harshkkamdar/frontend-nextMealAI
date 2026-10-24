@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
+import { leaveThen } from '@/lib/page-transition'
 import { motion, useReducedMotion } from 'framer-motion'
 import { generatePlans } from '@/lib/api/plans.api'
 import { haptic } from '@/lib/platform/app'
@@ -33,14 +34,14 @@ export default function GeneratingPage() {
         await new Promise((r) => setTimeout(r, reduce ? 0 : 160))
       }
       void haptic('success')
-      router.push('/onboarding/review')
+      leaveThen(() => router.push('/onboarding/review'))
     }
 
     void generate()
   }, [reduce, router])
 
   return (
-    <div className="flex min-h-dvh flex-col justify-center px-6 pb-[calc(var(--safe-bottom)+40px)] pt-[calc(var(--safe-top)+40px)]">
+    <div data-page className="page-in flex min-h-dvh flex-col justify-center px-6 pb-[calc(var(--safe-bottom)+40px)] pt-[calc(var(--safe-top)+40px)]">
       <h1 className="rise font-wider text-balance text-[30px] font-[750] leading-[1.12] tracking-[-0.6px] text-ink">Geo is building your plan</h1>
       <p className="rise mt-2.5 text-[15.5px] text-ink-65" style={{ '--i': 1 } as CSSProperties}>This takes a few seconds.</p>
       <ul aria-live="polite" className="mt-10 flex flex-col gap-3">

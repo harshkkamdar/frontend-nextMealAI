@@ -44,6 +44,38 @@ const SHOTS = {
     { name: 'reveal-empty', url: '/onboarding/review', done: ['personal', 'fitness', 'nutrition'], noPlans: true },
     { name: 'reveal-error', url: '/onboarding/review', done: ['personal', 'fitness', 'nutrition'], fail: '/v1/plans' },
   ],
+  'slice-1b': [
+    ...[0, 1, 2, 3].map((i) => ({ name: `welcome-${i + 1}`, url: '/welcome', guest: true, act: (p) => slideTo(p, i) })),
+    { name: 'welcome-offline', url: '/welcome', guest: true, offline: true },
+    { name: 'login-empty', url: '/login', guest: true },
+    { name: 'login-filled', url: '/login', guest: true, act: (p) => fill(p, { Email: 'sam@example.com', Password: 'correct horse' }) },
+    { name: 'login-invalid', url: '/login', guest: true, act: (p) => submit(p, 'Sign in') },
+    { name: 'login-error', url: '/login', guest: true, fail: '/auth/login', failStatus: 401, failMessage: 'Invalid login credentials', act: async (p) => { await fill(p, { Email: 'sam@example.com', Password: 'wrong password' }); await submit(p, 'Sign in') } },
+    { name: 'login-offline', url: '/login', guest: true, offline: true },
+    { name: 'signup-empty', url: '/signup', guest: true },
+    { name: 'signup-filled', url: '/signup', guest: true, act: (p) => fill(p, { Email: 'sam@example.com', Password: 'longenough1', 'Confirm password': 'longenough1' }) },
+    { name: 'signup-invalid', url: '/signup', guest: true, act: async (p) => { await fill(p, { Email: 'sam@', Password: 'short', 'Confirm password': 'other' }); await submit(p, 'Create account') } },
+    { name: 'signup-error', url: '/signup', guest: true, fail: '/auth/signup', failStatus: 400, failMessage: 'User already registered', act: async (p) => { await fill(p, { Email: 'sam@example.com', Password: 'longenough1', 'Confirm password': 'longenough1' }); await submit(p, 'Create account') } },
+    { name: 'forgot-empty', url: '/forgot-password', guest: true },
+    { name: 'forgot-invalid', url: '/forgot-password', guest: true, act: (p) => submit(p, 'Send reset link') },
+    { name: 'forgot-sent', url: '/forgot-password', guest: true, act: async (p) => { await fill(p, { Email: 'sam@example.com' }); await submit(p, 'Send reset link') } },
+    { name: 'reset-expired', url: '/reset-password', guest: true },
+    { name: 'reset-valid', url: '/reset-password#access_token=capture&type=recovery', guest: true },
+    { name: 'reset-invalid', url: '/reset-password#access_token=capture&type=recovery', guest: true, act: async (p) => { await fill(p, { 'New password': 'longenough1', 'Confirm new password': 'different1' }); await submit(p, 'Update password') } },
+    { name: 'reset-error', url: '/reset-password#access_token=capture&type=recovery', guest: true, fail: '/auth/update-password', failStatus: 401, failMessage: 'This reset link has already been used', act: async (p) => { await fill(p, { 'New password': 'longenough1', 'Confirm new password': 'longenough1' }); await submit(p, 'Update password') } },
+  ],
+}
+
+async function fill(page, fields) {
+  for (const [label, value] of Object.entries(fields)) await page.getByLabel(label, { exact: true }).fill(value)
+}
+async function submit(page, name) {
+  await page.getByRole('button', { name, exact: true }).click()
+  await page.waitForTimeout(900)
+}
+async function slideTo(page, i) {
+  await page.evaluate((n) => { const el = document.querySelector('[aria-roledescription=carousel]'); el.scrollLeft = n * el.clientWidth }, i)
+  await page.waitForTimeout(2400)
 }
 
 function emptyDraft() {
@@ -63,7 +95,7 @@ async function mockApi(page, shot) {
     const req = route.request()
     const p = new URL(req.url()).pathname
     if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors })
-    if (shot.fail && p.startsWith(shot.fail)) return json(route, 500, { error: true, code: 'INTERNAL', message: "We couldn't save that. Check your connection and try again." })
+    if (shot.fail && p.startsWith(shot.fail)) return json(route, shot.failStatus ?? 500, { error: true, code: 'INTERNAL', message: shot.failMessage ?? "We couldn't save that. Check your connection and try again." })
     if (p === '/v1/profile/onboarding') return json(route, 200, onboardingStatus(shot.done ?? []))
     if (p === '/v1/profile') return json(route, 200, { id: 'capture-user', name: 'Sam', ai_consent_at: shot.consent === false ? null : '2026-10-24T00:00:00Z', health_disclaimer_ack_at: shot.consent === false ? null : '2026-10-24T00:00:00Z' })
     if (p.startsWith('/v1/plans/generate')) return shot.hangPlans ? new Promise(() => {}) : json(route, 200, {})
@@ -91,11 +123,11 @@ async function checks(page) {
     for (const size of WIDTHS) {
       const context = await browser.newContext({ viewport: { width: size.w, height: size.h }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, timezoneId: 'Australia/Sydney', reducedMotion: 'reduce' })
       await context.addInitScript(([auth, draft]) => {
-        localStorage.setItem('nextmealai-auth', JSON.stringify(auth))
+        if (auth) localStorage.setItem('nextmealai-auth', JSON.stringify(auth))
         if (draft) localStorage.setItem('fiqr-onboarding-draft', JSON.stringify({ state: draft, version: 0 }))
         const hide = () => { const s = document.createElement('style'); s.textContent = 'nextjs-portal{display:none!important}'; document.head.appendChild(s) }
         document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', hide) : hide()
-      }, [AUTH, shot.draft ?? null])
+      }, [shot.guest ? null : AUTH, shot.draft ?? null])
       const page = await context.newPage()
       await mockApi(page, shot)
       const file = path.join(OUT, `${shot.name}-${size.w}.png`)
