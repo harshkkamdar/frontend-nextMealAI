@@ -66,6 +66,18 @@
   --radius-feature: 22px;
   --radius-full: 9999px;
 
+  /* FIQR v2 (docs/redesign/design-system.md): concentric radii, one soft shadow */
+  --radius-card: 24px;
+  --radius-bento: 22px;
+  --radius-row: 16px;
+  --radius-control: 14px;
+  --radius-sheet: 38px;
+  --shadow-card: 0 1px 2px rgba(17,28,53,.04), 0 8px 24px rgba(17,28,53,.06);
+  --shadow-glass: inset 0 1px 0 rgba(255,255,255,.9), inset 0 0 0 .5px rgba(255,255,255,.6), 0 8px 24px rgba(17,28,53,.10);
+  --color-ink-04: rgba(17,28,53,.04);
+  --color-ink-06: rgba(17,28,53,.06);
+  --color-ink-20: rgba(17,28,53,.2);
+
   --shadow-action: 0 8px 20px rgba(232,98,42,.26);
   --shadow-raised: 0 6px 16px rgba(17,28,53,.28);
 
@@ -103,4 +115,11 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .px-gutter { padding-left: var(--gutter); padding-right: var(--gutter); }
+  /* Controls-layer material. Opaque by default; glass only where applyGlassMode() turned it on. */
+  .glass { background: rgba(255,255,255,.96); box-shadow: var(--shadow-glass); }
+  .glass-cream { background: rgba(253,246,236,.98); box-shadow: var(--shadow-glass); }
+  html[data-glass="on"] .glass { background: rgba(255,255,255,.72); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }
+  html[data-glass="on"] .glass-cream { background: rgba(253,246,236,.86); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }
+  .font-wide { font-stretch: 112%; }
+  .font-wider { font-stretch: 118%; }
 }

@@ -1,0 +1,85 @@
+# FIQR v2 design system (Phase 4)
+
+24 Oct 2026. Direction C (Bento) with the critic-1 fixes, nav per D2-D4. Tokens live in `src/app/globals.css` (`@theme`), motion in `src/lib/motion.ts`, glass mode in `src/lib/platform/glass.ts`. Everything here is additive: screens not yet redesigned keep working on the old tokens until their slice lands.
+
+## Colour
+
+Only the four brand colours and the two macro colours, plus alpha tints of them (Q2).
+
+| Token | Value | Use |
+|---|---|---|
+| `ink` | #111C35 | text, icons, protein, selected states |
+| `accent` | #E8622A | the one primary action per screen; calories in charts (data, never next to an orange button in one card) |
+| `cream` | #FDF6EC | page |
+| `card` | #FFFFFF | cards, tiles, rows |
+| `macro-teal` | #3E7C77 | carbs only |
+| `macro-ochre` | #A07A3C | fat only |
+| `ink-04` ... `ink-65` | ink at 4-65% | tracks, separators, secondary text (ink-65 is the floor for small text, 4.5:1 on cream and white) |
+| `glass-fill` | white 72% | glass surfaces when glass is on |
+| `glass-solid` | white 96% | the same surfaces when glass is off |
+
+## Type (Archivo only, variable width axis)
+
+Archivo is loaded with its `wdth` axis. Wide (`font-stretch: 112-118%`) is reserved for titles and hero numbers; everything else is normal width.
+
+| Role | Size / line | Weight | Width | Notes |
+|---|---|---|---|---|
+| Hero number | 40/1 | 750 | 112% | tabular; the largest type on the screen (critic fix 4) |
+| Large title | 32/1.1 | 750 | 118% | condenses to 17/600 inline title on scroll |
+| Title 2 | 22/1.2 | 700 | 100% | sheet titles, onboarding questions use 30/1.15 750 118% |
+| Tile value | 28/1 | 700 | 110% | tabular, unit at 14/600 ink-65 normal width |
+| Body | 16/1.45 | 400 | 100% | Geo lines 15/1.45 |
+| Label | 13/1.3 | 600 | 100% | sentence case, ink-65; no all-caps eyebrows |
+| Caption | 12/1.3 | 500 | 100% | |
+
+## Space, shape, depth
+
+- 4 pt grid. Page gutter 16 pt for bento grids, 20 pt for text. Tile gap 10 pt. Section gap 24 pt.
+- Radii (concentric): card 24, tile 22, row 16, control 14, capsule and round buttons full. Sheets 38 with an 8 pt inset.
+- Shadow: one token, `0 1px 2px ink/4%, 0 8px 24px ink/6%`. No borders on cards; selection is a 1.5 pt ink outline, never a fill.
+- Bottom clearance: content ends 120 pt + safe area above the bottom, so the tab bar never covers content at rest (critic fix 7).
+
+## Glass material (C1, Q3, Q14)
+
+Glass only on the controls layer: tab capsule, orb, floating header buttons, sheets.
+
+```
+glass on:  background white/72%; backdrop-filter blur(20px) saturate(1.6);
+           inset 0 1px 0 white/90% highlight; 0 8px 24px ink/10% shadow
+glass off: background white/96% (sheets cream/98%); no backdrop-filter; same highlight and shadow
+```
+
+Mode is set once at start on `<html data-glass="on|off">`:
+- off when `navigator.hardwareConcurrency <= 4` or `navigator.deviceMemory <= 4`
+- off on iOS when Reduce Transparency is on (native check, local Capacitor plugin, slice 1)
+- otherwise on
+
+Never animate a blur value. Animate only `transform` and `opacity`.
+
+### Measured on the low-end emulator (prototype `docs/redesign/proto/tab-bar.html`)
+
+Device: AVD `fiqr_lowend` (Pixel 4a profile, 2 cores, 2 GB, Android 11), Chrome 91, the same engine version as the system WebView on that image. Benchmark per run: 4 s eased scroll, 6 tab switches, 4 sheet open/close pairs; janky = frames over 25 ms. Raw data: `docs/redesign/proto/bench-results.jsonl`.
+
+| Glass mode | Runs | Scroll janky (median) | Worst stall | Tabs janky | Sheet janky (8 transitions) | Verdict |
+|---|---|---|---|---|---|---|
+| on (blur 20 + saturate) | 3 | 4 | **150-200 ms in 3/3 runs** | 0 | 2 | fails: visible freezes |
+| lite (blur 10, opaque sheet) | 6 | 4 | 167 ms once; 2/6 runs badly janky | 1 | 2.5 | not reliable |
+| off (opaque fallback) | 6 | 2 | 67 ms | 0.5 | 2.5 (< 1 per transition) | passes the rubric (<= 2 dropped per transition) |
+
+Decision from the data: low-end Android ships with glass off, which the auto-detection already chooses (the emulator reported 2 cores and got `off` without a query flag). Glass on is unmeasured on mid-range Android and on iPhone; both are measured in slice 1 on the iOS simulator and, if available, a real mid-range phone. One noisy run (off, 22 janky) coincided with host load; emulator timings are a pessimistic proxy, not a device.
+
+## Motion (Q13, framer-motion springs)
+
+| Preset | Stiffness / damping | Use |
+|---|---|---|
+| `tap` | 500 / 35 | press feedback, chips, steppers |
+| `sheet` | 320 / 32 | sheets, the + sheet, tab pill |
+| `page` | 260 / 30 | push and pop between screens |
+| `countUp` | 900 ms, ease-out cubic | hero and tile numbers, once per visit |
+| `draw` | 700 ms, ease-out | ring and chart draw-in, once per visit |
+
+Reduced motion: every preset becomes a 150 ms opacity fade; count-ups jump to the final value.
+
+## Components (built in slice order)
+
+Tab bar (capsule + orb), round glass button, large-title header (condensing), hero ring card (ring, macro strips with targets, Geo line), metric tiles (steps bar, weight trend, sleep 7-night strip, water level), week strip with ticks, + sheet, inset sheet, row card, dashed empty slot, onboarding step shell (progress, back, question, why-line, fixed CTA), option card, ruler input, digit-tile timer, target-muscle map.

@@ -3,7 +3,6 @@ Generate Phase 3 direction mocks: docs/redesign/directions/{a,b,c}.html.
 Each file holds three 390x844 screens: home, + sheet, onboarding weight step."""
 import math, sys, os
 
-OUT = sys.argv[1]
 
 FONT = '<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">'
 
@@ -294,9 +293,11 @@ def onboard(cls):
 <div class="ob-top"><div class="gbtn glass">{ICON['back']}</div><div class="prog"><i style="width:30%"></i></div></div>
 {body}<div class="cta">Continue</div><div class="home-ind"></div></div>'''
 
-DIRS = {'a': ('Direction A - Instrument', A_CSS, home_a), 'b': ('Direction B - Journal', B_CSS, home_b), 'c': ('Direction C - Bento', C_CSS, home_c)}
-for k, (title, css, home) in DIRS.items():
-    h = home()
-    html = f'<!doctype html><html><head><meta charset="utf-8"><title>{title}</title>{FONT}<style>{BASE_CSS}{css}</style></head><body>{h}{sheet(h, k)}{onboard(k)}</body></html>'
-    open(os.path.join(OUT, f'{k}.html'), 'w').write(html)
-print('written')
+if __name__ == '__main__':
+    OUT = sys.argv[1]
+    DIRS = {'a': ('Direction A - Instrument', A_CSS, home_a), 'b': ('Direction B - Journal', B_CSS, home_b), 'c': ('Direction C - Bento', C_CSS, home_c)}
+    for k, (title, css, home) in DIRS.items():
+        h = home()
+        html = f'<!doctype html><html><head><meta charset="utf-8"><title>{title}</title>{FONT}<style>{BASE_CSS}{css}</style></head><body>{h}{sheet(h, k)}{onboard(k)}</body></html>'
+        open(os.path.join(OUT, f'{k}.html'), 'w').write(html)
+    print('written')

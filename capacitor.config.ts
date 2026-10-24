@@ -5,7 +5,10 @@ const config: CapacitorConfig = {
   appName: 'FIQR',
   webDir: 'out',
   backgroundColor: '#FDF6EC',
-  server: { iosScheme: 'https', androidScheme: 'https' },
+  // CAP_SERVER_URL is for local measurement builds only (redesign prototypes on a host server); store builds never set it.
+  server: process.env.CAP_SERVER_URL
+    ? { url: process.env.CAP_SERVER_URL, cleartext: true, iosScheme: 'https', androidScheme: 'https' }
+    : { iosScheme: 'https', androidScheme: 'https' },
   ios: { contentInset: 'never', scrollEnabled: true },
   plugins: {
     SplashScreen: { launchAutoHide: false, backgroundColor: '#FDF6EC', showSpinner: false },

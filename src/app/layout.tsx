@@ -4,7 +4,8 @@ import { Toaster } from 'sonner'
 import { SplashHider } from '@/components/native/splash-hider'
 import './globals.css'
 
-const archivo = Archivo({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-archivo', display: 'swap' })
+// Variable weight plus the width axis: wide titles and hero numbers use font-stretch (FIQR v2).
+const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo', display: 'swap' })
 
 export const metadata: Metadata = { title: 'FIQR', description: 'Food, training and weekly check-ins with Geo, your coach.' }
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#FDF6EC' }
