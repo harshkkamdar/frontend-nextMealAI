@@ -11,69 +11,82 @@ import { cn } from '@/lib/utils'
 type BentoProps = { live: boolean; active: boolean }
 
 function Card({ className, children, style }: { className?: string; children: ReactNode; style?: CSSProperties }) {
-  return <div className={cn('rounded-[var(--radius-bento)] bg-card p-4 shadow-[var(--shadow-card)]', className)} style={style}>{children}</div>
+  return <div className={cn('rounded-[var(--radius-bento)] bg-card p-4 shadow-[0_1px_2px_rgba(17,28,53,.05),0_12px_32px_-8px_rgba(17,28,53,.14)] outline outline-1 -outline-offset-1 outline-ink-06', className)} style={style}>{children}</div>
 }
 
 const fill = (live: boolean, delay = 0): CSSProperties => ({ transform: `scaleX(${live ? 1 : 0})`, transition: `transform 900ms cubic-bezier(.22,1,.36,1) ${delay}ms` })
 
-export function FoodBento({ live }: BentoProps) {
-  const kcal = useCountUp(live ? 1240 : null)
-  const r = 38
-  const c = 2 * Math.PI * r
-  const macros = [
-    { label: 'Protein', g: 96, of: 140, color: 'var(--color-ink)' },
-    { label: 'Carbs', g: 128, of: 190, color: 'var(--color-macro-teal)' },
-    { label: 'Fat', g: 41, of: 65, color: 'var(--color-macro-ochre)' },
-  ]
-  const rows = [['Oats with berries', 380], ['Chicken rice bowl', 612], ['Greek yogurt', 148]] as const
+/** A rice bowl from above, filled: rice, sliced chicken and greens. Ink, cream and orange only. */
+function Bowl() {
   return (
-    <div aria-hidden="true" className="grid grid-cols-2 gap-3">
-      <Card className="col-span-2 flex items-center gap-4">
-        <div className="relative size-[96px] shrink-0">
-          <svg viewBox="0 0 96 96" className="size-full -rotate-90">
-            <circle cx="48" cy="48" r={r} fill="none" stroke="var(--color-ink)" strokeOpacity=".07" strokeWidth="10" />
-            <circle cx="48" cy="48" r={r} fill="none" stroke="var(--color-accent)" strokeWidth="10" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={live ? c * (1 - 1240 / 1950) : c} style={{ transition: 'stroke-dashoffset 1100ms cubic-bezier(.22,1,.36,1)' }} />
-          </svg>
-          <div className="absolute inset-0 grid place-content-center text-center">
-            <span className="font-wide text-[19px] font-bold leading-none tabular-nums text-ink">{kcal.toLocaleString('en-AU')}</span>
-            <span className="mt-0.5 text-[11px] font-medium text-ink-65">of 1,950</span>
+    <svg viewBox="0 0 120 120" className="size-full">
+      <circle cx="60" cy="60" r="52" fill="var(--color-cream)" stroke="var(--color-ink)" strokeWidth="3.5" />
+      <path d="M60 16a44 44 0 0 0-38 66l38-22z" fill="var(--color-card)" />
+      {[[34, 40], [42, 33], [30, 52], [40, 48], [48, 42], [36, 62], [46, 56], [52, 30]].map(([x, y]) => <ellipse key={`${x}-${y}`} cx={x} cy={y} rx="3.4" ry="2" fill="var(--color-ink)" fillOpacity=".28" transform={`rotate(${x * 7} ${x} ${y})`} />)}
+      {[0, 1, 2, 3].map((i) => <rect key={i} x={66 + i * 3} y={26 + i * 11} width="24" height="8" rx="4" fill="var(--color-accent)" fillOpacity={0.95 - i * 0.12} transform={`rotate(28 ${78 + i * 3} ${30 + i * 11})`} />)}
+      <path d="M44 86c6-14 22-16 30-6-8 12-22 14-30 6z" fill="var(--color-ink)" />
+      <path d="M46 85l24-8" stroke="var(--color-cream)" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function FoodBento({ live }: BentoProps) {
+  const kcal = useCountUp(live ? 612 : null)
+  const day = useCountUp(live ? 1240 : null)
+  const macros = [
+    { label: 'Protein', g: 48, of: 60, color: 'var(--color-ink)' },
+    { label: 'Carbs', g: 71, of: 90, color: 'var(--color-macro-teal)' },
+    { label: 'Fat', g: 14, of: 30, color: 'var(--color-macro-ochre)' },
+  ]
+  const r = 22
+  const c = 2 * Math.PI * r
+  return (
+    <div aria-hidden="true" className="grid grid-cols-[1fr_1.15fr] gap-3">
+      {/* Hero: the scan reads the meal, then its numbers arrive. One story instead of a widget grid. */}
+      <Card className="col-span-2 flex items-center gap-4 p-4">
+        <div className="relative size-[132px] shrink-0">
+          {['left-0 top-0 border-l-[3.5px] border-t-[3.5px] rounded-tl-[14px]', 'right-0 top-0 border-r-[3.5px] border-t-[3.5px] rounded-tr-[14px]', 'bottom-0 left-0 border-b-[3.5px] border-l-[3.5px] rounded-bl-[14px]', 'bottom-0 right-0 border-b-[3.5px] border-r-[3.5px] rounded-br-[14px]'].map((k) => <span key={k} className={cn('absolute size-6 border-ink', k)} />)}
+          <div className="absolute inset-[10px]"><Bowl /></div>
+          <span className="absolute inset-x-2 top-1/2 h-[2px] rounded-full bg-accent" style={{ transform: `translateY(${live ? 58 : -58}px)`, opacity: live ? 0 : 1, transition: 'transform 1000ms ease-in-out 150ms, opacity 200ms linear 1150ms' }} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] font-bold leading-tight text-ink">Chicken rice bowl</p>
+          <p className="font-wide mt-1 text-[30px] font-[760] leading-none tabular-nums text-ink">{kcal}<span className="ml-1 text-[13px] font-semibold text-ink-65" style={{ fontStretch: '100%' }}>kcal</span></p>
+          <div className="mt-3 flex flex-col gap-2">
+            {macros.map((m, i) => (
+              <div key={m.label} className="flex items-center gap-2">
+                <span className="w-[52px] text-[12px] font-semibold text-ink">{m.label}</span>
+                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink-06">
+                  <span className="block h-full origin-left rounded-full" style={{ width: `${(m.g / m.of) * 100}%`, background: m.color, ...fill(live, 900 + i * 90) }} />
+                </span>
+                <span className="w-8 text-right text-[12px] font-medium tabular-nums text-ink-65">{m.g} g</span>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-          {macros.map((m, i) => (
-            <div key={m.label}>
-              <div className="flex justify-between text-[12.5px] font-semibold text-ink"><span>{m.label}</span><span className="tabular-nums text-ink-65">{m.g} g</span></div>
-              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-06">
-                <div className="h-full origin-left rounded-full" style={{ width: `${(m.g / m.of) * 100}%`, background: m.color, ...fill(live, 150 + i * 90) }} />
-              </div>
+      </Card>
+      <Card className="flex items-center gap-3">
+        <div className="relative size-[56px] shrink-0">
+          <svg viewBox="0 0 56 56" className="size-full -rotate-90">
+            <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-ink)" strokeOpacity=".07" strokeWidth="7" />
+            <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-accent)" strokeWidth="7" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={live ? c * (1 - 1240 / 1950) : c} style={{ transition: 'stroke-dashoffset 1100ms cubic-bezier(.22,1,.36,1) 300ms' }} />
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <p className="font-wide text-[19px] font-bold leading-none tabular-nums text-ink">{day.toLocaleString('en-AU')}</p>
+          <p className="mt-1 text-[12px] font-medium text-ink-65">of 1,950 today</p>
+        </div>
+      </Card>
+      <Card className="py-3.5">
+        <p className="flex justify-between text-[12px] font-semibold text-ink-65"><span>Today</span><span>kcal</span></p>
+        <div className="mt-1.5 flex flex-col gap-1.5">
+          {([['Oats and berries', 380], ['Rice bowl', 612], ['Greek yogurt', 148]] as const).map(([name, k], i) => (
+            <div key={name} className="flex items-baseline justify-between gap-2" style={{ opacity: live ? 1 : 0, transform: `translateY(${live ? 0 : 6}px)`, transition: `opacity 400ms ${300 + i * 140}ms, transform 500ms cubic-bezier(.22,1,.36,1) ${300 + i * 140}ms` }}>
+              <span className="truncate text-[12.5px] font-semibold text-ink">{name}</span>
+              <span className="shrink-0 text-[12px] font-medium tabular-nums text-ink-65">{k}</span>
             </div>
           ))}
         </div>
-      </Card>
-      <Card className="relative flex flex-col items-center justify-center pb-3 pt-5">
-        <div className="relative size-[86px]">
-          {['left-0 top-0 border-l-[3px] border-t-[3px] rounded-tl-[10px]', 'right-0 top-0 border-r-[3px] border-t-[3px] rounded-tr-[10px]', 'bottom-0 left-0 border-b-[3px] border-l-[3px] rounded-bl-[10px]', 'bottom-0 right-0 border-b-[3px] border-r-[3px] rounded-br-[10px]'].map((k) => <span key={k} className={cn('absolute size-4 border-ink', k)} />)}
-          {/* A rice bowl from above: rice, sliced chicken and greens in three sections. */}
-          <svg viewBox="0 0 64 64" className="absolute inset-3" fill="none" stroke="var(--color-ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="32" cy="32" r="28" strokeOpacity=".2" />
-            <circle cx="32" cy="32" r="22" />
-            <path d="M32 10v22l19 11M32 32L13 43" strokeOpacity=".35" />
-            <path d="M20 22h3M24 17h3M17 28h3M24 26h3M27 21h2" strokeWidth="2.4" />
-            <path d="M37 18l8 4M38 23l9 4M38 28l8 4" strokeWidth="3.2" strokeOpacity=".85" />
-            <path d="M26 46c2-6 8-7 11-3-3 5-8 6-11 3zM26 46l9-4" />
-          </svg>
-          <span className="absolute inset-x-1 top-1/2 h-[2px] rounded-full bg-accent/70" style={{ transform: `translateY(${live ? 30 : -30}px)`, opacity: live ? 0 : 1, transition: 'transform 1100ms ease-in-out 200ms, opacity 200ms linear 1250ms' }} />
-        </div>
-        <p className="mt-3 text-[13px] font-semibold text-ink">Chicken rice bowl</p>
-        <p className="text-[12px] font-medium tabular-nums text-ink-65">612 kcal</p>
-      </Card>
-      <Card className="flex flex-col justify-center gap-2.5">
-        {rows.map(([name, k], i) => (
-          <div key={name} className="flex items-baseline justify-between gap-2" style={{ opacity: live ? 1 : 0, transform: `translateY(${live ? 0 : 8}px)`, transition: `opacity 400ms ${300 + i * 160}ms, transform 500ms cubic-bezier(.22,1,.36,1) ${300 + i * 160}ms` }}>
-            <span className="truncate text-[12.5px] font-semibold text-ink">{name}</span>
-            <span className="shrink-0 text-[12px] font-medium tabular-nums text-ink-65">{k}</span>
-          </div>
-        ))}
       </Card>
     </div>
   )

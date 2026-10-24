@@ -85,7 +85,7 @@ Scope: new `/welcome` (4 slides, live mini-components: calorie ring and macro ba
 | 3. WCAG AA / 44 pt / orange | axe serious/critical 0; small targets 0; orange actions per screen at most 1 on 42/42 (0 on welcome 1-3 by design, ink Continue) | pass |
 | 4. Frame-diffed transitions | 5 transitions (welcome Continue, welcome to last slide, welcome to sign-in, failed sign-in, forgot sent) plus slice 1a's 6 re-run: 11 of 11 smooth. Fixed on the way: route hard cut (now fade-through), CTA jumping 48 px when a secondary action appears (slot now grows), Geo card growing mid-sequence, timer digits swapping in one frame (now roll). The late-change check now applies E3 (one-frame only) | pass |
 | 5. 60 fps low-end Android | not measured | blocked, same as 1a (needs a real phone) |
-| 6. Blind critic | not run for 1b at this checkpoint | open (said explicitly, not skipped silently) |
+| 6. Blind critic | 9 runs over 3 rounds vs Bevel IMG_6856-6859 (`screens/slice-1b/critic.md`): ranks 4/2/3, 1/3/1, 3/2/1; scores 6.5-8.0 | rank bar pass (top 3 in runs 4-9); **score bar stalled below 8/10** after three honest attempts |
 | 7. Copy approved | `copy/slice-1b.md` | waiting for Ved |
 | 8. lint / type-check / tests | 0 errors (25 pre-existing warnings) / pass / 445 passed, 1 skipped (new: auth form tests, wheel tests) | pass |
 

@@ -1,10 +1,10 @@
 {
   "forgot-sent": {
     "frames": 53,
-    "chrome_px": 54855,
-    "content_px": 157655,
-    "max_chrome_share": 0.091,
-    "max_content_share": 0.051,
+    "chrome_px": 55125,
+    "content_px": 158823,
+    "max_chrome_share": 0.092,
+    "max_content_share": 0.052,
     "issues": [],
     "verdict": "smooth"
   },
@@ -18,29 +18,29 @@
     "verdict": "smooth"
   },
   "welcome-continue": {
-    "frames": 85,
+    "frames": 86,
     "chrome_px": 0,
-    "content_px": 482487,
+    "content_px": 504128,
     "max_chrome_share": 0,
-    "max_content_share": 0.107,
+    "max_content_share": 0.112,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-last": {
-    "frames": 111,
+    "frames": 121,
     "chrome_px": 120226,
-    "content_px": 652721,
+    "content_px": 655067,
     "max_chrome_share": 0.143,
-    "max_content_share": 0.078,
+    "max_content_share": 0.077,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-to-signup": {
-    "frames": 62,
+    "frames": 63,
     "chrome_px": 301842,
-    "content_px": 202888,
+    "content_px": 199493,
     "max_chrome_share": 0.06,
-    "max_content_share": 0.07,
+    "max_content_share": 0.069,
     "issues": [],
     "verdict": "smooth"
   }
