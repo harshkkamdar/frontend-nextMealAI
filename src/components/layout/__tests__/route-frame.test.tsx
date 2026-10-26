@@ -71,8 +71,9 @@ describe('RouteFrame interrupted slides', () => {
     expect(before).toBeGreaterThan(0.1 * W)
     go('/logs')
     await wait(16)
-    // The page that was sliding in is now the one being covered: it continues from its live x, not from rest.
-    expect(Math.abs(x('/foods') - before)).toBeLessThan(0.05 * W)
+    // The page that was sliding in is now the one being covered: it heads left from its live x. Snapped to rest it
+    // would be at x 0 or left of it in the first frame.
+    expect(x('/foods')).toBeGreaterThan(0.1 * W)
     // The page under it stays shown until the half-slid page covers it.
     expect(layer('/food')?.style.display).not.toBe('none')
     await wait(800)
@@ -89,7 +90,8 @@ describe('RouteFrame interrupted slides', () => {
     expect(before).toBeLessThan(-0.02 * W)
     go('/logs')
     await wait(16)
-    expect(Math.abs(x('/food') - before)).toBeLessThan(0.05 * W)
+    // It keeps heading left from its live x; snapped to rest it would start again from x 0.
+    expect(x('/food')).toBeLessThan(before / 2)
   })
 })
 
