@@ -3,10 +3,14 @@
  * Usage (dev server on :3020): node scripts/redesign-transitions.mjs slice-1
  * Writes docs/redesign/screens/<slice>/transitions/<name>/NNNN.png plus frames.json (timestamps),
  * then run: python3 scripts/redesign-framediff.py docs/redesign/screens/<slice>/transitions
+ * slice-2 entries set `home` and use the mock API instead of route stubs:
+ *   node scripts/redesign-mock-api.mjs 4011 and a dev server on :3021 built with NEXT_PUBLIC_CORE_API_URL=http://localhost:4011, then
+ *   BASE_URL=http://localhost:3021 API_URL=http://localhost:4011 node scripts/redesign-transitions.mjs slice-2
  */
 import { chromium } from 'playwright'
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 const BASE = process.env.BASE_URL || 'http://localhost:3020'
 const API = process.env.API_URL || 'http://localhost:4010'
@@ -32,7 +36,21 @@ const TRANSITIONS = {
     { name: 'login-error', url: '/login', guest: true, act: async (p) => { await p.getByLabel('Email', { exact: true }).fill('sam@example.com'); await p.getByLabel('Password', { exact: true }).fill('wrong password'); await p.getByRole('button', { name: 'Sign in' }).click() } },
     { name: 'forgot-sent', url: '/forgot-password', guest: true, act: async (p) => { await p.getByLabel('Email', { exact: true }).fill('sam@example.com'); await p.getByRole('button', { name: 'Send reset link' }).click() } },
   ],
+  'slice-2': [
+    // Home -> Food -> Home as two recordings, so the second tap is not read as a late shift by the frame diff.
+    { name: 'tab-home-to-food', url: '/dashboard', home: 'returning', warm: '/food', act: (p) => p.getByRole('link', { name: 'Food' }).click() },
+    { name: 'tab-food-to-home', url: '/food', home: 'returning', warm: '/dashboard', act: async (p) => { await p.getByRole('link', { name: 'Home' }).click() } },
+    { name: 'plus-open-close', url: '/dashboard', home: 'returning', act: async (p) => { const orb = p.getByRole('button', { name: 'Log something' }); const b = await orb.boundingBox(); await orb.click(); await p.waitForTimeout(1000); await p.mouse.click(b.x + b.width / 2, b.y + b.height / 2) } },
+    // First load: a full navigation to Home (ring draw, count-up, staggered rise) with the route already compiled.
+    { name: 'home-first-load', url: '/food', home: 'returning', warm: '/dashboard', act: (p) => p.goto(BASE + '/dashboard') },
+    { name: 'header-condense-scroll', url: '/dashboard', home: 'returning', act: async (p) => { await p.mouse.move(195, 400); for (let i = 0; i < 40; i++) { await p.mouse.wheel(0, 10); await p.waitForTimeout(16) } } },
+    { name: 'quicklog-open', url: '/dashboard', home: 'returning', act: (p) => p.getByRole('button', { name: /^Weight/ }).click() },
+  ],
 }
+
+// Per-slice tables live in scripts/shots/<slice>.mjs (default export: { shots, transitions }) so parallel slice work never edits this file.
+const sliceFile = path.resolve('scripts/shots', `${SLICE}.mjs`)
+if (!TRANSITIONS[SLICE] && fs.existsSync(sliceFile)) TRANSITIONS[SLICE] = (await import(pathToFileURL(sliceFile).href)).default.transitions ?? []
 
 const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' }
 
@@ -42,7 +60,7 @@ const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-creden
     const dir = path.join(OUT, t.name)
     fs.rmSync(dir, { recursive: true, force: true })
     fs.mkdirSync(dir, { recursive: true })
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, reducedMotion: 'no-preference' })
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, reducedMotion: 'no-preference', ...(t.home ? { timezoneId: 'Australia/Sydney' } : {}) })
     await context.addInitScript(([auth, draft]) => {
       if (auth) localStorage.setItem('nextmealai-auth', JSON.stringify(auth))
       if (draft) localStorage.setItem('fiqr-onboarding-draft', JSON.stringify({ state: draft, version: 0 }))
@@ -50,7 +68,10 @@ const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-creden
       document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', hide) : hide()
     }, [t.guest ? null : AUTH, t.draft ?? null])
     const page = await context.newPage()
-    await page.route(`${API}/**`, (route) => {
+    // Never let a capture reach the real local API.
+    await page.route('http://localhost:4010/**', (route) => route.abort())
+    if (t.home) await fetch(API + '/__scenario', { method: 'POST', body: JSON.stringify({ home: t.home, done: ['personal', 'fitness', 'nutrition'], consent: true, fail: null }) })
+    if (!t.home) await page.route(`${API}/**`, (route) => {
       const p = new URL(route.request().url()).pathname
       if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors })
       if (p === '/auth/login') return route.fulfill({ status: 401, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ error: true, message: 'Invalid login credentials' }) })
@@ -59,6 +80,7 @@ const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-creden
     })
     await page.goto(BASE + t.url, { waitUntil: 'networkidle' })
     await page.waitForTimeout(1200)
+    if (t.warm) { await page.goto(BASE + t.warm, { waitUntil: 'networkidle' }); await page.goto(BASE + t.url, { waitUntil: 'networkidle' }); await page.waitForTimeout(1200) }
     // Visit the destination once so route code is loaded; the recorded transition then measures motion, not compile time.
     const cdp = await context.newCDPSession(page)
     const frames = []

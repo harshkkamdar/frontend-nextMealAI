@@ -8,6 +8,7 @@ import { chromium } from 'playwright'
 import AxeBuilder from '@axe-core/playwright'
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 const BASE = process.env.BASE_URL || 'http://localhost:3020'
 const API = process.env.API_URL || 'http://localhost:4010'
@@ -121,6 +122,10 @@ const SHOTS = {
     { name: 'reset-error', url: '/reset-password#access_token=capture&type=recovery', guest: true, fail: '/auth/update-password', failStatus: 401, failMessage: 'This reset link has already been used', act: async (p) => { await fill(p, { 'New password': 'longenough1', 'Confirm new password': 'longenough1' }); await submit(p, 'Update password') } },
   ],
 }
+
+// Per-slice tables live in scripts/shots/<slice>.mjs (default export: { shots, transitions }) so parallel slice work never edits this file.
+const sliceFile = path.resolve('scripts/shots', `${SLICE}.mjs`)
+if (!SHOTS[SLICE] && fs.existsSync(sliceFile)) SHOTS[SLICE] = (await import(pathToFileURL(sliceFile).href)).default.shots ?? []
 
 async function fill(page, fields) {
   for (const [label, value] of Object.entries(fields)) await page.getByLabel(label, { exact: true }).fill(value)

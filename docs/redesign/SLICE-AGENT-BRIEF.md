@@ -23,8 +23,8 @@ You are building one slice of the FIQR v2 redesign. Several agents work at the s
 
 ## Evidence you must produce
 
-1. Captures: add a `'slice-<n>'` entry to `SHOTS` in `scripts/redesign-capture.mjs` (add fixtures next to the slice-2 ones; keep your edits inside your own block) covering every route x state you own: default, empty / first run, loading, error, offline, long text, each overlay open. Run `node scripts/redesign-capture.mjs slice-<n>` (dev server :3020). Every shot must show axe 0, small 0, orange <= 1. Read your screenshots and fix what looks wrong.
-2. Transitions: add your transitions to `scripts/redesign-transitions.mjs` (`'slice-<n>'`), record them, run `python3 scripts/redesign-framediff.py docs/redesign/screens/slice-<n>/transitions`; 0 pops.
+1. Captures: create `scripts/shots/slice-<n>.mjs` with `export default { shots: [...], transitions: [...] }` (do NOT edit `scripts/redesign-capture.mjs` or `redesign-transitions.mjs`; they load your file). A shot is `{ name, url, api, fail, failAfterFirst, hang, offline, act }` exactly as the `'slice-2'` entries and `homeApi()` fixtures in `scripts/redesign-capture.mjs` show (copy the fixtures you need into your file). Cover every route x state you own: default, empty / first run, loading, error, offline, long text, each overlay open. Run `node scripts/redesign-capture.mjs slice-<n>` (dev server :3020). Every shot must show axe 0, small 0, orange <= 1. Read your screenshots and fix what looks wrong.
+2. Transitions: put them in the `transitions` array of your shots file (same shape as the existing entries in `scripts/redesign-transitions.mjs`; check how that script mocks the API and supply what your screens need), record them with `node scripts/redesign-transitions.mjs slice-<n>`, run `python3 scripts/redesign-framediff.py docs/redesign/screens/slice-<n>/transitions`; 0 pops.
 3. A self-check against the motion-feel checklist, one line per item.
 
 ## Report back (final message)
