@@ -1,46 +1,55 @@
 {
   "food-log-save": {
-    "frames": 168,
-    "chrome_px": 535830,
-    "content_px": 1307043,
-    "max_chrome_share": 0.069,
-    "max_content_share": 0.119,
+    "frames": 205,
+    "chrome_px": 719669,
+    "content_px": 2790357,
+    "max_chrome_share": 0.067,
+    "max_content_share": 0.075,
     "issues": [],
     "verdict": "smooth"
   },
   "food-search-results": {
-    "frames": 53,
+    "frames": 54,
     "chrome_px": 0,
-    "content_px": 69434,
+    "content_px": 272254,
     "max_chrome_share": 0,
-    "max_content_share": 0.107,
+    "max_content_share": 0.38,
     "issues": [],
     "verdict": "smooth"
   },
   "food-select-tray": {
-    "frames": 75,
-    "chrome_px": 166630,
-    "content_px": 224401,
-    "max_chrome_share": 0.132,
-    "max_content_share": 0.264,
+    "frames": 85,
+    "chrome_px": 231880,
+    "content_px": 745242,
+    "max_chrome_share": 0.1,
+    "max_content_share": 0.139,
     "issues": [],
     "verdict": "smooth"
   },
   "photo-tray": {
-    "frames": 77,
-    "chrome_px": 185763,
-    "content_px": 147981,
-    "max_chrome_share": 0.121,
-    "max_content_share": 0.176,
+    "frames": 78,
+    "chrome_px": 136530,
+    "content_px": 197796,
+    "max_chrome_share": 0.135,
+    "max_content_share": 0.481,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "plate-sheet-open": {
+    "frames": 106,
+    "chrome_px": 351282,
+    "content_px": 801124,
+    "max_chrome_share": 0.092,
+    "max_content_share": 0.129,
     "issues": [],
     "verdict": "smooth"
   },
   "water-save": {
-    "frames": 113,
-    "chrome_px": 340262,
-    "content_px": 1034432,
-    "max_chrome_share": 0.094,
-    "max_content_share": 0.136,
+    "frames": 129,
+    "chrome_px": 515839,
+    "content_px": 2020909,
+    "max_chrome_share": 0.068,
+    "max_content_share": 0.084,
     "issues": [],
     "verdict": "smooth"
   }
