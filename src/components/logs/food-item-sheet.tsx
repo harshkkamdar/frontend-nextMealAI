@@ -110,12 +110,12 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
               aria-checked={servings === n}
               aria-label={`${portionLabel(n)} serving${n <= 1 ? '' : 's'}`}
               onClick={() => pick(n)}
-              className={`h-11 min-w-11 flex-1 rounded-full text-body-sm font-bold transition-transform active:scale-[.94] ${servings === n ? 'bg-ink text-cream' : 'bg-card text-ink shadow-[0_0_0_1px_rgba(17,28,53,.1)]'}`}
+              className={`h-11 min-w-11 flex-1 rounded-full text-body-sm font-bold transition-transform active:scale-[.94] ${servings === n ? 'bg-ink text-cream' : 'card-glass text-ink'}`}
             >
               {portionLabel(n)}
             </button>
           ))}
-          <label className={cn('flex h-11 min-w-0 flex-[1.8] items-center gap-1 rounded-full bg-card pl-3 pr-4 shadow-[0_0_0_1px_rgba(17,28,53,.1)] focus-within:shadow-[0_0_0_1.5px_var(--color-ink)]', servings == null && 'shadow-[0_0_0_1.5px_var(--color-ink)]')}>
+          <label className={cn('flex h-11 min-w-0 flex-[1.8] items-center gap-1 rounded-full bg-[var(--surface-card)] pl-3 pr-4 shadow-[0_0_0_1px_rgba(17,28,53,.1)] focus-within:shadow-[0_0_0_1.5px_var(--color-ink)]', servings == null && 'shadow-[0_0_0_1.5px_var(--color-ink)]')}>
             <input
               type="number"
               inputMode="decimal"

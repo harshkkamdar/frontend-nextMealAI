@@ -10,11 +10,11 @@ import { cn } from '@/lib/utils'
 
 /** Logging building blocks (slice 3): the slice 2 card language applied to lists, fields and pickers. */
 
-export const CARD = 'rounded-[24px] bg-card shadow-[var(--shadow-card)]'
+export const CARD = 'rounded-card card-glass'
 /** White list card; children are `ROW`s separated by hairlines. */
-export const LIST = 'overflow-hidden rounded-[24px] bg-card shadow-[var(--shadow-card)]'
+export const LIST = 'overflow-hidden rounded-card card-glass'
 export const ROW = 'flex min-h-16 w-full items-center gap-3 border-b border-ink-06 px-5 py-3 text-left last:border-b-0 transition-colors active:bg-ink-04'
-export const FIELD = 'w-full rounded-[16px] bg-card px-4 text-[17px] text-ink shadow-[var(--shadow-card)] outline-none placeholder:text-ink-65 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-ink'
+export const FIELD = 'w-full rounded-[16px] bg-[var(--surface-card)] px-4 text-[17px] text-ink shadow-[var(--shadow-card)] outline-none placeholder:text-ink-65 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-ink'
 
 export function SectionTitle({ children, action, className }: { children: ReactNode; action?: ReactNode; className?: string }) {
   return (
@@ -78,7 +78,7 @@ export function Stepper({ value, unit, onChange, step = 1, min = 0, max = 99, fo
     if (clamped !== value) void haptic('selection')
     onChange(clamped)
   }
-  const button = 'grid size-14 shrink-0 place-items-center rounded-full bg-card text-ink shadow-[var(--shadow-card)] transition-transform active:scale-[.94] disabled:opacity-40'
+  const button = 'grid size-14 shrink-0 place-items-center rounded-full card-glass text-ink transition-transform active:scale-[.94] disabled:opacity-40'
   return (
     <div className="flex items-center justify-center gap-6">
       <button type="button" aria-label={lessLabel} disabled={value <= min} onClick={() => set(value - step)} className={button}><Minus className="size-5" /></button>
@@ -103,7 +103,7 @@ export function Scale({ value, onChange, label }: { value: number; onChange: (n:
           aria-checked={n === value}
           aria-label={`${n} of 10`}
           onClick={() => { void haptic('selection'); onChange(n) }}
-          className={cn('h-12 rounded-[14px] text-[16px] font-semibold tabular-nums transition-transform active:scale-[.94]', n === value ? 'bg-ink text-cream' : 'bg-card text-ink shadow-[var(--shadow-card)]')}
+          className={cn('h-12 rounded-[14px] text-[16px] font-semibold tabular-nums transition-transform active:scale-[.94]', n === value ? 'bg-ink text-cream' : 'card-glass text-ink')}
         >
           {n}
         </button>
@@ -132,7 +132,7 @@ export function Chips<T extends string>({ options, value, onChange, label, clear
             type="button"
             aria-pressed={on}
             onClick={() => { void haptic('selection'); onChange(on && clearable ? '' : option.value) }}
-            className={cn('h-11 shrink-0 whitespace-nowrap rounded-full px-4 text-[15px] font-semibold transition-transform active:scale-[.96]', on ? 'bg-ink text-cream' : 'bg-card text-ink shadow-[var(--shadow-card)]')}
+            className={cn('h-11 shrink-0 whitespace-nowrap rounded-full px-4 text-[15px] font-semibold transition-transform active:scale-[.96]', on ? 'bg-ink text-cream' : 'card-glass text-ink')}
           >
             {option.label}
           </button>

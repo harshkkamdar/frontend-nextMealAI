@@ -181,7 +181,7 @@ export function LogSheet() {
               ) : null}
               <motion.div {...item(0.08)} className="origin-top">
                 <form
-                  className="flex h-field items-center gap-1 rounded-full bg-card pl-[18px] pr-2 shadow-[0_0_0_1px_rgba(17,28,53,.1)] focus-within:shadow-[0_0_0_1.5px_var(--color-ink)]"
+                  className="flex h-field items-center gap-1 rounded-full bg-[var(--surface-card)] pl-[18px] pr-2 shadow-[0_0_0_1px_rgba(17,28,53,.1)] focus-within:shadow-[0_0_0_1.5px_var(--color-ink)]"
                   onSubmit={(event) => { event.preventDefault(); tellGeo() }}
                 >
                   <input
@@ -215,7 +215,7 @@ export function LogSheet() {
                           type="button"
                           onClick={() => logAgain(food)}
                           aria-label={`Log ${food.name} again, ${formatMacroKcal(food.macros_per_serving.calories)} kcal`}
-                          className="flex min-h-[72px] w-[156px] flex-col justify-between gap-1 rounded-bento bg-card px-3 py-2.5 text-left shadow-[0_0_0_1px_rgba(17,28,53,.08)] transition-transform active:scale-[.96]"
+                          className="flex min-h-[72px] w-[156px] flex-col justify-between gap-1 rounded-bento card-glass px-3 py-2.5 text-left transition-transform active:scale-[.96]"
                         >
                           <b className="line-clamp-2 text-body-sm font-semibold leading-[1.2] text-ink">{food.name}</b>
                           <span className="text-caption text-ink-65 tabular-nums">{food.serving_size_g || 100} g · {formatMacroKcal(food.macros_per_serving.calories)} kcal</span>

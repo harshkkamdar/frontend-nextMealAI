@@ -76,7 +76,7 @@ export function PlateSheet({ open, items, meal, saving, failedNote, loggedCount,
               role="radio"
               aria-checked={m === meal}
               onClick={() => { void haptic('selection'); onMeal(m) }}
-              className={`h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold transition-transform active:scale-[.96] ${m === meal ? 'bg-ink text-cream' : 'bg-card text-ink shadow-[0_0_0_1px_rgba(17,28,53,.1)]'}`}
+              className={`h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold transition-transform active:scale-[.96] ${m === meal ? 'bg-ink text-cream' : 'card-glass text-ink'}`}
             >
               {m}
             </button>

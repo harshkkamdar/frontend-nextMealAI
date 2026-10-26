@@ -15,7 +15,7 @@ import { CARD, FIELD } from './log-ui'
 
 /**
  * Pushed log screen (journey-log M): centred title with a round glass back (Q19), Geo's question as the large title
- * with a context line under it, the inputs, and the one orange Save pinned at the bottom (the tab bar is hidden on
+ * with a context line under it, the inputs, and the one orange Save floating at the bottom (the tab bar is hidden on
  * /logs/new/*). A failed save shows the reason above the inputs' end and Save becomes Try again.
  */
 export function ManualLogShell({
@@ -51,8 +51,9 @@ export function ManualLogShell({
       {failed ? (
         <p role="alert" className="mt-4 rounded-[16px] bg-macro-ochre/15 px-4 py-3 text-body-sm text-ink">Couldn&apos;t save. Check your connection and try again.</p>
       ) : null}
-      <div className="fixed inset-x-0 bottom-0 z-30 bg-cream pb-[calc(16px+var(--safe-bottom))] pt-3">
-        <div className="mx-auto w-full max-w-md px-4">
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 pb-[calc(16px+var(--safe-bottom))] pt-3">
+        {/* No band behind Save: the app's tinted backdrop shows through, and the page pads its end clear of it. */}
+        <div className="pointer-events-auto mx-auto w-full max-w-md px-4">
           <PrimaryButton type="button" onClick={onSave} disabled={saving} aria-busy={saving}>
             {saving ? savingLabel : failed ? 'Try again' : actionLabel}
           </PrimaryButton>
@@ -160,7 +161,7 @@ export function NumericSuffixInput({
   label: string
 }) {
   return (
-    <label className="flex h-[72px] items-center gap-2 rounded-[22px] bg-card px-5 shadow-[var(--shadow-card)] focus-within:outline focus-within:outline-[1.5px] focus-within:outline-ink">
+    <label className="flex h-[72px] items-center gap-2 rounded-[22px] bg-[var(--surface-card)] px-5 shadow-[var(--shadow-card)] focus-within:outline focus-within:outline-[1.5px] focus-within:outline-ink">
       <span className="sr-only">{label}</span>
       <input
         aria-label={label}

@@ -226,8 +226,9 @@ export function FoodLogForm() {
       <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
       {mealMenu}
 
-      {/* Pinned under the bar so a focused field never scrolls beneath it: iOS draws the caret above fixed layers. */}
-      <div className="sticky top-[calc(60px+var(--safe-top))] z-[30] -mx-4 bg-cream px-4 pb-2 pt-1">
+      {/* Pinned under the bar so a focused field never scrolls beneath it: iOS draws the caret above fixed layers.
+          No band of its own: the bar above fills with glass once the page scrolls. */}
+      <div className="sticky top-[calc(60px+var(--safe-top))] z-[30] -mx-4 px-4 pb-2 pt-1">
         <SearchField
           label="Search foods"
           value={query}
@@ -356,7 +357,7 @@ function MethodChip({ icon: Icon, label, onClick, testId }: { icon: ComponentTyp
       type="button"
       onClick={onClick}
       data-testid={testId}
-      className="flex h-11 items-center justify-center gap-2 rounded-full bg-card px-4 text-body-sm font-semibold text-ink shadow-[0_0_0_1px_rgba(17,28,53,.08)] transition-transform active:scale-[.96]"
+      className="flex h-11 items-center justify-center gap-2 rounded-full card-glass px-4 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]"
     >
       <Icon aria-hidden="true" className="size-[18px] translate-y-[0.5px]" />
       {label}
