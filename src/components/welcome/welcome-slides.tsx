@@ -14,7 +14,8 @@ type BentoProps = { live: boolean; active: boolean }
 /** The slide's distance from the stage centre (-1..1, 0 = settled), set by the carousel. Cards parallax off it. */
 export const SlideDepth = createContext<MotionValue<number>>(motionValue(0))
 
-/** Frosted bento card (Q12, Q20): white over the mist, no blur. Card k trails the slide by 20 + 8k px and fades
+/** Frosted bento card (Q12, Q20): white over the mist, no blur, one radius for every card and a shadow one step lighter
+ *  than --shadow-card so the stack reads as one surface. Card k trails the slide by 20 + 8k px and fades
  *  sooner the further back it sits, so the layers move at different speeds (motion-feel.md 3a). Like the text, a card
  *  is gone before the next slide's card appears, so two slides' numbers never overlap. */
 function Card({ k = 0, className, children }: { k?: number; className?: string; children: ReactNode }) {
@@ -25,7 +26,7 @@ function Card({ k = 0, className, children }: { k?: number; className?: string; 
   // The bento hands off at 0.4 of the way between slides and the text at 0.5, so a region never shows two slides at once
   // and the stage is never empty. Cards behind (higher k) leave first and arrive last.
   const opacity = useTransform(d, (v) => handoff(v, 0.4 - k * 0.06, 0.6 - k * 0.06))
-  return <motion.div className={cn('rounded-[var(--radius-bento)] bg-card/80 p-4 shadow-[var(--shadow-card)] outline outline-1 -outline-offset-1 outline-card', className)} style={{ x, scale, opacity }}>{children}</motion.div>
+  return <motion.div className={cn('rounded-[22px] bg-card/80 p-4 shadow-[0_1px_2px_rgba(17,28,53,.03),0_6px_18px_rgba(17,28,53,.045)] outline outline-1 -outline-offset-1 outline-card', className)} style={{ x, scale, opacity }}>{children}</motion.div>
 }
 
 const fill = (live: boolean, delay = 0): CSSProperties => ({ transform: `scaleX(${live ? 1 : 0})`, transition: `transform 900ms cubic-bezier(.22,1,.36,1) ${delay}ms` })
@@ -55,6 +56,8 @@ export function FoodBento({ live }: BentoProps) {
   const maxG = Math.max(...macros.map((m) => m.g))
   const r = 22
   const c = 2 * Math.PI * r
+  // Round caps add half the 7-unit stroke at each end, so the dash is shortened by one stroke width to show the true fraction.
+  const arc = (f: number) => Math.max(0, c * f - 7)
   return (
     <div aria-hidden="true" className="grid grid-cols-[1fr_1.15fr] gap-3">
       {/* Hero: the scan reads the meal, then its numbers arrive. One story instead of a widget grid. */}
@@ -87,7 +90,7 @@ export function FoodBento({ live }: BentoProps) {
         <div className="relative size-[56px] shrink-0">
           <svg viewBox="0 0 56 56" className="size-full -rotate-90">
             <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-ink)" strokeOpacity=".07" strokeWidth="7" />
-            <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-accent)" strokeWidth="7" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={live ? c * (1 - 1240 / 1950) : c} style={{ transition: 'stroke-dashoffset 1100ms cubic-bezier(.22,1,.36,1) 300ms' }} />
+            <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-accent)" strokeWidth="7" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={live ? c - arc(1240 / 1950) : c} style={{ transition: 'stroke-dashoffset 1100ms cubic-bezier(.22,1,.36,1) 300ms' }} />
           </svg>
         </div>
         <div className="min-w-0">
@@ -102,7 +105,7 @@ export function FoodBento({ live }: BentoProps) {
           {([['Oats and berries', 380], ['Rice bowl', 612], ['Greek yogurt', 148]] as const).map(([name, k], i) => (
             <div key={name} className="flex items-baseline justify-between gap-2" style={{ opacity: live ? 1 : 0, transform: `translateY(${live ? 0 : 6}px)`, transition: `opacity 400ms ${300 + i * 140}ms, transform 500ms cubic-bezier(.22,1,.36,1) ${300 + i * 140}ms` }}>
               <span className="truncate text-[12.5px] font-semibold text-ink">{name}</span>
-              <span className="shrink-0 text-right text-[12px] font-medium tabular-nums text-ink-65">{k}</span>
+              <span className="w-[3.5ch] shrink-0 text-right text-[12px] font-medium tabular-nums text-ink-65">{k}</span>
             </div>
           ))}
         </div>
@@ -166,7 +169,7 @@ export function TrainBento({ live, active }: BentoProps) {
         <div className="mt-3.5 grid grid-cols-4 gap-1">
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className="h-1.5 overflow-hidden rounded-full bg-ink-06">
-              <span className="block h-full origin-left rounded-full bg-ink" style={{ transform: `scaleX(${i < 2 || (i === 2 && live) ? 1 : 0})`, transition: `transform 700ms cubic-bezier(.22,1,.36,1) ${i === 2 ? 500 : 0}ms` }} />
+              <span className="block h-full origin-left rounded-full bg-ink" style={{ transform: `scaleX(${i < 1 || (i === 1 && live) ? 1 : 0})`, transition: `transform 700ms cubic-bezier(.22,1,.36,1) ${i === 1 ? 500 : 0}ms` }} />
             </span>
           ))}
         </div>

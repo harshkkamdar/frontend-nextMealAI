@@ -109,7 +109,7 @@ export function WelcomeCarousel() {
             <span aria-hidden={!last || undefined} className={cn('col-start-1 row-start-1 transition-opacity duration-150 ease-out', !last && 'opacity-0')}>Get started</span>
           </span>
         </PrimaryButton>
-        <button type="button" onClick={() => leaveThen(() => router.push('/login'))} className="mx-auto mt-1 flex h-11 items-center px-4 text-[15px] font-semibold text-ink-65">
+        <button type="button" onClick={() => leaveThen(() => router.push('/login'))} className="mx-auto mt-1 flex h-11 items-center px-4 text-[15px] font-medium text-ink-65">
           I have an account
         </button>
       </div>
@@ -137,13 +137,13 @@ function Slide({ p, i, reduce, title, line, current, children }: { p: MotionValu
       aria-label={`${i + 1} of ${SLIDES.length}: ${title}`}
       aria-hidden={!current || undefined}
       style={{ scale }}
-      className={cn('absolute inset-0 flex flex-col px-5 pb-[calc(var(--safe-bottom)+176px)] pt-[6vh] [@media(max-height:740px)]:pb-[calc(var(--safe-bottom)+150px)] [@media(max-height:740px)]:pt-[2vh]', !current && 'pointer-events-none')}
+      className={cn('absolute inset-0 flex flex-col justify-center px-5 pb-[calc(var(--safe-bottom)+146px)] [@media(max-height:740px)]:pb-[calc(var(--safe-bottom)+126px)]', !current && 'pointer-events-none')}
     >
-      <motion.div {...intro(0, 0)}><motion.h1 style={{ x: titleX, opacity }} className="font-wider text-[42px] font-[760] leading-none tracking-[-1.4px] text-ink [@media(max-height:740px)]:text-[38px]">{title}</motion.h1></motion.div>
+      <motion.div {...intro(0, 0)}><motion.h1 style={{ x: titleX, opacity }} className="font-wider text-[36px] font-[760] leading-none tracking-[-1.1px] text-ink [@media(max-height:740px)]:text-[32px]">{title}</motion.h1></motion.div>
       <motion.div {...intro(8, 0.04)} className="mt-3"><motion.p style={{ x: lineX, opacity }} className="max-w-[30ch] text-pretty text-[16.5px] leading-[1.45] text-ink-80">{line}</motion.p></motion.div>
-      {/* Title, line and bento read as one column with an even rhythm; the space left over sits above the pager.
-          Critic round 2 (26 Oct 2026) replaced the earlier centred bento, whose gaps above and below read as dead zones. */}
-      <motion.div className="mt-7 w-full [@media(max-height:740px)]:mt-5" {...intro(12, 0.12)}>
+      {/* Title, line and bento are one column centred in the space above the pager (critic round 3, 26 Oct 2026). The bento
+          slot has the tallest bento's height, so every slide's column is the same size and the titles never move. */}
+      <motion.div className="mt-7 min-h-[300px] w-full [@media(max-height:740px)]:mt-5" {...intro(12, 0.12)}>
         <SlideDepth.Provider value={d}>{children}</SlideDepth.Provider>
       </motion.div>
     </motion.section>
@@ -184,7 +184,7 @@ function Pill({ p, reduce }: { p: MotionValue<number>; reduce: boolean }) {
   const x = useTransform(c, (v) => v * STEP)
   const scaleX = useTransform(c, (v) => 1 + 1.6 * (1 - Math.abs(2 * (v - Math.floor(v)) - 1)))
   return (
-    <div aria-hidden="true" className="relative mx-auto mb-5 flex w-fit gap-1.5 [@media(max-height:740px)]:mb-3">
+    <div aria-hidden="true" className="relative mx-auto mb-4 flex w-fit gap-1.5 [@media(max-height:740px)]:mb-3">
       {SLIDES.map((s, i) => <Dot key={s.title} c={c} i={i} reduce={reduce} />)}
       {!reduce && <motion.span className="absolute left-0 top-0 size-1.5 rounded-full bg-ink" style={{ x, scaleX }} />}
     </div>
