@@ -143,115 +143,60 @@ export function MonthViewSheet({
 
   return (
     <BottomSheet open={isOpen} onClose={onClose} ariaLabel="Select date">
-            {/* Header: prev | title | next | close */}
-            <div className="flex items-center justify-between px-gutter pb-3">
+      <div className="flex items-center gap-1 px-3 pb-3 pt-1">
+        <h2 id="month-sheet-title" className="min-w-0 flex-1 pl-2 text-[22px] font-bold tracking-[-0.3px] text-ink tabular-nums">
+          {monthTitle(anchor)}
+        </h2>
+        <button type="button" onClick={handlePrev} aria-label="Previous month" className="grid size-11 place-items-center rounded-full text-ink transition-transform active:scale-[.94]">
+          <ChevronLeft className="size-5" strokeWidth={1.75} />
+        </button>
+        <button type="button" onClick={handleNext} aria-label="Next month" className="grid size-11 place-items-center rounded-full text-ink transition-transform active:scale-[.94]">
+          <ChevronRight className="size-5" strokeWidth={1.75} />
+        </button>
+        <button type="button" onClick={onClose} aria-label="Close" className="grid size-11 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94]">
+          <X className="size-5" strokeWidth={1.75} />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-7 px-3 pb-1" aria-hidden="true">
+        {WEEKDAY_LABELS.map((label, i) => (
+          <div key={`${label}-${i}`} className="py-1 text-center text-[12px] font-semibold text-ink-65">
+            {label}
+          </div>
+        ))}
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-5" aria-busy={loading || undefined}>
+        <div className="grid grid-cols-7 gap-y-1">
+          {grid.flat().map((cell) => {
+            const isSelected = cell.date === initialDate
+            if (!cell.inMonth) return <span key={cell.date} aria-hidden="true" />
+            return (
               <button
+                key={cell.date}
                 type="button"
-                onClick={handlePrev}
-                aria-label="Previous month"
-                className="rounded-full p-2 text-ink-65"
+                onClick={() => handleDayTap(cell.date)}
+                aria-pressed={isSelected}
+                aria-current={cell.isToday ? 'date' : undefined}
+                aria-label={`${cell.date}${cell.isToday ? ', today' : ''}${cell.calories !== null ? `, ${cell.calories} kcal` : ''}${cell.workouts > 0 ? ', workout logged' : ''}`}
+                className={cn(
+                  'relative flex h-[54px] flex-col items-center justify-center gap-1 rounded-[14px] tabular-nums text-ink transition-transform active:scale-[.94]',
+                  isSelected && 'bg-card shadow-[var(--shadow-card)] outline outline-[1.5px] -outline-offset-[1.5px] outline-ink',
+                )}
               >
-                <ChevronLeft className="size-5" />
+                <span className={cn('text-[16px] leading-none', cell.isToday ? 'font-bold' : 'font-semibold')}>{cell.dayNum}</span>
+                {cell.calories !== null
+                  ? <span className="text-[11px] font-medium leading-none text-ink-65">{cell.calories.toLocaleString('en-AU')}</span>
+                  : <span className="h-[11px]" />}
+                {cell.isToday ? (
+                  <svg viewBox="0 0 10 7" className="absolute top-0.5 h-[5px] w-[7px] text-accent" aria-hidden="true"><path d="M0 0h10L5 7Z" fill="currentColor" /></svg>
+                ) : null}
+                {cell.workouts > 0 ? <span className="absolute bottom-1 size-1 rounded-full bg-ink" aria-hidden="true" /> : null}
               </button>
-
-              <h2
-                id="month-sheet-title"
-                className="text-[22px] font-semibold tracking-[-0.4px] text-ink tabular-nums"
-              >
-                {monthTitle(anchor)}
-              </h2>
-
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  aria-label="Next month"
-                  className="rounded-full p-2 text-ink-65"
-                >
-                  <ChevronRight className="size-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Close"
-                  className="rounded-full p-2 text-ink-65"
-                >
-                  <X className="size-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Weekday header row */}
-            <div className="grid grid-cols-7 gap-1 px-gutter pb-1">
-              {WEEKDAY_LABELS.map((label, i) => (
-                <div
-                  key={`${label}-${i}`}
-                  className="py-1 text-center text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65"
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
-
-            {/* Grid body */}
-            <div
-              className="min-h-0 flex-1 overflow-y-auto px-gutter pb-6"
-              aria-busy={loading || undefined}
-            >
-              <div className="grid grid-cols-7 gap-1">
-                {grid.flat().map((cell) => {
-                  const isSelected = cell.date === initialDate
-                  return (
-                    <button
-                      key={cell.date}
-                      type="button"
-                      onClick={() => handleDayTap(cell.date)}
-                      disabled={!cell.inMonth}
-                      aria-label={
-                        cell.inMonth
-                          ? `${cell.date}${cell.calories !== null ? `, ${cell.calories} kcal` : ''}${cell.workouts > 0 ? ', workout logged' : ''}`
-                          : undefined
-                      }
-                      className={cn(
-                        'aspect-square flex flex-col items-center justify-center gap-0.5 rounded-[12px] tabular-nums',
-                        cell.inMonth
-                          ? 'text-ink'
-                          : 'cursor-default bg-transparent text-ink-35',
-                        cell.isToday && cell.inMonth && 'bg-ink text-cream',
-                        isSelected && cell.inMonth && !cell.isToday && 'border border-ink'
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          'text-sm font-semibold leading-none',
-                          cell.isToday && cell.inMonth ? 'text-cream' : undefined
-                        )}
-                      >
-                        {cell.dayNum}
-                      </span>
-                      {cell.inMonth && (
-                        <span
-                          className={cn(
-                            'text-[11px] leading-none',
-                            cell.isToday ? 'text-cream-55' : 'text-ink-65'
-                          )}
-                        >
-                          {cell.calories !== null ? `${cell.calories}` : '\u2014'}
-                        </span>
-                      )}
-                      {cell.inMonth && cell.workouts > 0 && (
-                        <span
-                          className={cn(
-                            'size-1 rounded-full bg-accent'
-                          )}
-                          aria-hidden="true"
-                        />
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+            )
+          })}
+        </div>
+      </div>
     </BottomSheet>
   )
 }

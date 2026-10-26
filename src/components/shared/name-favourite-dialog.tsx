@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 
 interface NameFavouriteDialogProps {
@@ -13,10 +14,9 @@ interface NameFavouriteDialogProps {
 }
 
 /**
- * Custom in-app dialog for naming a favourite — replaces the native
- * window.prompt() (browser chrome, off-brand, not testable). Matches the
- * ConfirmDialog pattern: backdrop, Escape-to-close, body-scroll-lock, accent
- * action. Submits the trimmed name (Enter or Save).
+ * Custom in-app sheet for naming a favourite — replaces the native
+ * window.prompt() (browser chrome, off-brand, not testable). Submits the
+ * trimmed name (Enter or Save); can't be dismissed while saving.
  */
 export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '', mealType }: NameFavouriteDialogProps) {
   const [name, setName] = useState(defaultName)
@@ -27,16 +27,10 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
 
   useEffect(() => {
     if (!open) return
-    const focusT = setTimeout(() => { inputRef.current?.focus(); inputRef.current?.select() }, 50)
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !loading) onClose() }
-    document.addEventListener('keydown', onKey)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      clearTimeout(focusT)
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
-    }
-  }, [open, onClose, loading])
+    // After the sheet's arrival, so the keyboard does not push a half-open sheet.
+    const focusT = setTimeout(() => { inputRef.current?.focus(); inputRef.current?.select() }, 350)
+    return () => clearTimeout(focusT)
+  }, [open])
 
   const submit = useCallback(async () => {
     const trimmed = name.trim()
@@ -49,21 +43,13 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
     }
   }, [name, onSubmit])
 
-  if (!open) return null
-
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center">
-      <div className="absolute inset-0 bg-ink/40" onClick={() => !loading && onClose()} aria-hidden="true" />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="name-fav-title"
-        className="relative z-10 w-full max-w-md rounded-t-[22px] bg-cream p-[22px]"
-      >
-        <h2 id="name-fav-title" className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Save as a meal</h2>
-        <p className="mt-1.5 text-[15.5px] text-ink-65">
+    <BottomSheet open={open} onClose={() => { if (!loading) onClose() }} dismissible={!loading} ariaLabel="Save as a meal">
+      <div className="px-5 pb-5 pt-2">
+        <h2 id="name-fav-title" className="text-[22px] font-bold tracking-[-0.3px] text-ink">Save as a meal</h2>
+        <p className="mt-1 text-[15px] leading-[1.45] text-ink-65">
           {mealType
-            ? `Save your ${mealType} as a reusable meal — find it under the Meals tab and log it in one tap next time.`
+            ? `Name your ${mealType.toLowerCase()}. It shows under Meals when you add food, ready in one tap.`
             : 'Name this meal so you can reuse it later.'}
         </p>
         <input
@@ -71,30 +57,28 @@ export function NameFavouriteDialog({ open, onClose, onSubmit, defaultName = '',
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') submit() }}
-          placeholder="e.g. Usual Lunch"
+          placeholder="Usual lunch"
           maxLength={60}
           aria-label="Meal name"
-          className="mt-4 h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none placeholder:text-ink-65"
+          className="mt-4 h-14 w-full rounded-[14px] bg-card px-4 text-[17px] text-ink shadow-[var(--shadow-card)] outline-none placeholder:text-ink-65 focus-visible:outline-[1.5px] focus-visible:outline-ink"
         />
-        <div className="mt-5 space-y-3">
-          <PrimaryButton
-            type="button"
-            onClick={submit}
-            disabled={loading || !name.trim()}
-            className="justify-center"
-          >
-            {loading ? 'Saving…' : 'Save'}
-          </PrimaryButton>
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={loading}
-            className="w-full py-2 text-[15.5px] font-semibold text-ink-65 disabled:opacity-50"
-          >
-            Cancel
-          </button>
-        </div>
+        <PrimaryButton
+          type="button"
+          onClick={submit}
+          disabled={loading || !name.trim()}
+          className="mt-5 justify-center"
+        >
+          {loading ? 'Saving' : 'Save meal'}
+        </PrimaryButton>
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={loading}
+          className="mt-2 h-11 w-full text-[15px] font-semibold text-ink-65 disabled:opacity-50"
+        >
+          Cancel
+        </button>
       </div>
-    </div>
+    </BottomSheet>
   )
 }

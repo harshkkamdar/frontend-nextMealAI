@@ -89,7 +89,7 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
     const onAddFood = vi.fn()
     render(<MealGroup mealType="Lunch" items={[]} onAddFood={onAddFood} />)
 
-    fireEvent.click(screen.getByRole('button', { name: /nothing logged/i }))
+    fireEvent.click(screen.getByRole('button', { name: /add lunch/i }))
 
     expect(onAddFood).toHaveBeenCalledOnce()
   })

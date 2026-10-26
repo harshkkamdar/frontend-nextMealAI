@@ -2,18 +2,19 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { PageWrapper } from '@/components/layout/page-wrapper'
-import { CalendarStrip } from '@/components/shared/calendar-strip'
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion'
+import { CalendarDays } from 'lucide-react'
+import { LargeTitleHeader } from '@/components/layout/screen-header'
+import { DayHero, DaySkeleton } from '@/components/diary/day-hero'
 import { MealGroup } from '@/components/diary/meal-group'
 import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
 import { NameFavouriteDialog } from '@/components/shared/name-favourite-dialog'
 import { CopyMealDialog } from '@/components/diary/copy-meal-dialog'
-import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { MacroBar } from '@/components/ui/fiqr/macro-bar'
-import { PrimaryButton as FoodActionButton } from '@/components/ui/fiqr/primary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
+import { RoundButton } from '@/components/ui/fiqr/round-button'
+import { WeekStrip, addDays } from '@/components/ui/fiqr/week-strip'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
@@ -23,6 +24,8 @@ import { copyMeal } from '@/lib/api/meals.api'
 import { createFavourite } from '@/lib/api/favourites.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
+import { reducedFade } from '@/lib/motion'
+import { haptic } from '@/lib/platform/app'
 import { todayLocalISO } from '@/lib/timezone'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import type { Log, FoodPayload } from '@/types/logs.types'
@@ -30,6 +33,29 @@ import type { MealPlan } from '@/types/plans.types'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
+
+// Entrance choreography runs on the first paint of a session only; revisits paint at rest (motion-feel 3e).
+let firstPaintDone = false
+
+/** "Today, Mon 26 Oct", "Yesterday, Sun 25 Oct", "Thu 22 Oct" (year added outside the current one). */
+function daySubtitle(iso: string, today: string): string {
+  const date = new Date(`${iso}T12:00:00`)
+  const sameYear = iso.slice(0, 4) === today.slice(0, 4)
+  const label = date.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', ...(sameYear ? {} : { year: 'numeric' }) }).replace(',', '')
+  const relative = iso === today ? 'Today' : iso === addDays(today, -1) ? 'Yesterday' : iso === addDays(today, 1) ? 'Tomorrow' : null
+  return relative ? `${relative}, ${label}` : label
+}
+
+/** True once `flag` has held for `ms`, so a fast load never flashes a skeleton (motion-feel 3h). */
+function useHeld(flag: boolean, ms: number): boolean {
+  const [held, setHeld] = useState(false)
+  useEffect(() => {
+    if (!flag) return
+    const timer = setTimeout(() => setHeld(true), ms)
+    return () => { clearTimeout(timer); setHeld(false) }
+  }, [flag, ms])
+  return flag && held
+}
 
 export default function DiaryPage() {
   const tz = useUserTimezone()
@@ -192,12 +218,12 @@ export default function DiaryPage() {
       })
       toast[r.copied > 0 ? 'success' : 'error'](
         r.copied > 0
-          ? `Copied ${source} to today's ${targetMeal} — ${r.copied} item${r.copied === 1 ? '' : 's'}`
-          : `Nothing to copy from ${source}`,
+          ? `Copied ${r.copied} item${r.copied === 1 ? '' : 's'} to today's ${targetMeal.toLowerCase()}`
+          : `${source} is empty, so there's nothing to copy`,
       )
       if (r.copied > 0) refetch()
     } catch {
-      toast.error('Failed to copy meal')
+      toast.error("Couldn't copy that meal. Try again.")
     }
   }
 
@@ -210,10 +236,10 @@ export default function DiaryPage() {
     if (!mealType) return
     try {
       await createFavourite({ name, source_date: selectedDate, source_meal_type: mealType.toLowerCase(), default_meal_type: mealType.toLowerCase() })
-      toast.success(`Saved "${name}" as a meal — find it under the Meals tab when adding food`)
+      toast.success(`Saved "${name}". It's under Meals when you add food.`)
       setNameFavFor(null)
     } catch (e) {
-      toast.error((e as Error)?.message?.includes('exists') ? 'A meal with that name already exists' : 'Failed to save meal')
+      toast.error((e as Error)?.message?.includes('exists') ? 'You already have a meal with that name' : "Couldn't save that meal. Try again.")
     }
   }
 
@@ -244,92 +270,94 @@ export default function DiaryPage() {
     setEditingLog(null)
   }
 
-  const selectedDay = new Date(`${selectedDate}T12:00:00`)
-  const monthLabel = selectedDay.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' }).toUpperCase()
-  const dayLabel = `${selectedDay.toLocaleDateString('en-AU', { weekday: 'long' })} ${selectedDay.getDate()}`
+  const reduce = useReducedMotion()
+  const showSkeleton = useHeld(!data && loading, 150)
+  // The date shown when data first arrived: that block paints in place, later days crossfade in.
+  const [animateIn] = useState(() => !firstPaintDone)
+  const firstDateRef = useRef<string | null>(null)
+  if (data && firstDateRef.current === null) firstDateRef.current = selectedDate
+  useEffect(() => { if (data) firstPaintDone = true }, [data])
+  const loggedDays = useMemo(() => new Set(indicators.keys()), [indicators])
+
+  const selectDate = (date: string) => {
+    if (date === selectedDate) return
+    void haptic('selection')
+    setSelectedDate(date)
+  }
+
+  const isFirstBlock = selectedDate === firstDateRef.current
 
   return (
-    <PageWrapper className="space-y-6">
-      <header className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65">{monthLabel}</p>
-          <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">{dayLabel}</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => setMonthOpen(true)}
-          aria-label="Open month view"
-          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-ink-16 bg-ink-08 text-ink-65"
-        >
-          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="5" width="18" height="16" rx="2" />
-            <path d="M3 10h18M8 3v4M16 3v4" />
-          </svg>
-        </button>
-      </header>
+    <div className="mx-auto w-full max-w-md px-4">
+      <LargeTitleHeader
+        title="Food"
+        subtitle={daySubtitle(selectedDate, today)}
+        actions={<RoundButton aria-label="Open month view" onClick={() => setMonthOpen(true)}><CalendarDays strokeWidth={1.75} /></RoundButton>}
+      >
+        <WeekStrip className="mt-4" selected={selectedDate} today={today} onSelect={selectDate} marked={loggedDays} markLabel="food logged" />
+      </LargeTitleHeader>
 
-      <OfflineBand />
+      <div className="-mx-4 mt-3">
+        <OfflineBand />
+      </div>
 
-      <CalendarStrip
-        selectedDate={selectedDate}
-        onSelectDate={setSelectedDate}
-        indicators={indicators}
-        tz={tz}
-      />
-
-      {loading ? (
-        <div className="space-y-4">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      ) : !data && error ? (
-        <ErrorState onRetry={() => void refetch()}>I couldn&apos;t load this day. Check your connection and try again.</ErrorState>
+      {!data && loading ? (
+        showSkeleton ? <DaySkeleton /> : null
+      ) : !data ? (
+        <div className="mt-6"><ErrorState onRetry={() => void refetch()}>I couldn&apos;t load this day. Check your connection and try again.</ErrorState></div>
       ) : (
-        <div className="space-y-6">
-          <section>
-            <SectionLabel className="mb-3">This day</SectionLabel>
-            <div className="flex flex-col gap-[13px]">
-              <MacroBar name="Calories" current={dayTotals.calories} target={targets.calories} />
-              <MacroBar name="Protein" current={dayTotals.protein} target={targets.protein} unit="g" />
-              <MacroBar name="Carbs" current={dayTotals.carbs} target={targets.carbs} unit="g" />
-              <MacroBar name="Fat" current={dayTotals.fat} target={targets.fat} unit="g" />
+        <div className="mt-5">
+          <motion.div
+            initial={animateIn ? (reduce ? { opacity: 0 } : { opacity: 0, scale: 0.98 }) : false}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={reduce ? reducedFade : { type: 'spring', stiffness: 300, damping: 35 }}
+          >
+            <DayHero
+              calories={{ current: dayTotals.calories, target: targets.calories }}
+              macros={{ protein: [dayTotals.protein, targets.protein], carbs: [dayTotals.carbs, targets.carbs], fat: [dayTotals.fat, targets.fat] }}
+              animateIn={animateIn}
+              footer={mealPlan ? (
+                <button
+                  type="button"
+                  onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
+                  className="-mx-5 -mb-5 mt-4 flex min-h-12 w-[calc(100%+40px)] items-center gap-2 border-t border-ink-06 px-5 text-left text-[14px] font-semibold text-ink-65 active:bg-ink-04"
+                >
+                  <span className="min-w-0 flex-1">See your nutrition plan</span>
+                  <ChevronRightIcon className="size-4 text-ink-35" />
+                </button>
+              ) : null}
+            />
+          </motion.div>
+
+          {/* Day change: the old day fades out over 120 ms while the new one fades in over 180 ms, stacked in one cell. */}
+          <LayoutGroup>
+            <div className="mt-6 grid">
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={selectedDate}
+                  style={{ gridArea: '1 / 1' }}
+                  className="flex flex-col gap-5"
+                  initial={isFirstBlock ? false : { opacity: 0 }}
+                  animate={{ opacity: 1, transition: { duration: reduce ? 0.15 : 0.18, ease: 'easeOut' } }}
+                  exit={{ opacity: 0, transition: { duration: 0.12, ease: 'easeOut' } }}
+                >
+                  {MEAL_TYPES.map((mealType, index) => (
+                    <MealGroup
+                      key={mealType}
+                      mealType={mealType}
+                      items={groupedMeals[mealType] || []}
+                      onAddFood={() => handleAddFood(mealType)}
+                      onEditLog={handleEditLog}
+                      isToday={selectedDate === today}
+                      onCopyToToday={() => handleCopyToToday(mealType)}
+                      onSaveFavourite={() => handleSaveFavourite(mealType)}
+                      enterDelay={animateIn && isFirstBlock ? 0.24 + index * 0.03 : undefined}
+                    />
+                  ))}
+                </motion.div>
+              </AnimatePresence>
             </div>
-
-            {mealPlan && (
-              <button
-                onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
-                className="mt-4 text-[13.5px] font-semibold text-ink-65"
-              >
-                View nutrition plan &rarr;
-              </button>
-            )}
-          </section>
-
-          <div className="space-y-6">
-            {MEAL_TYPES.map((mealType) => (
-              <MealGroup
-                key={mealType}
-                mealType={mealType}
-                items={groupedMeals[mealType] || []}
-                onAddFood={() => handleAddFood(mealType)}
-                onEditLog={handleEditLog}
-                isToday={selectedDate === today}
-                onCopyToToday={() => handleCopyToToday(mealType)}
-                onSaveFavourite={() => handleSaveFavourite(mealType)}
-              />
-            ))}
-          </div>
-
-          <div className="sticky z-20 -mx-gutter bg-cream px-gutter pb-7 pt-3" style={{ bottom: 'calc(68px + var(--safe-bottom))' }}>
-            <FoodActionButton
-              icon="+"
-              trailing="Scan · Search"
-              onClick={() => router.push(`/logs/new/food?date=${selectedDate}`)}
-            >
-              Log food
-            </FoodActionButton>
-          </div>
+          </LayoutGroup>
         </div>
       )}
 
@@ -350,7 +378,7 @@ export default function DiaryPage() {
         isOpen={monthOpen}
         initialDate={selectedDate}
         onClose={() => setMonthOpen(false)}
-        onSelectDate={setSelectedDate}
+        onSelectDate={selectDate}
         tz={tz}
       />
 
@@ -367,6 +395,6 @@ export default function DiaryPage() {
         onClose={() => setCopyFrom(null)}
         onPick={doCopyToToday}
       />
-    </PageWrapper>
+    </div>
   )
 }
