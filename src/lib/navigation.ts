@@ -57,8 +57,13 @@ export function stampHistory() {
   else window.history.replaceState({ ...state, fiqrIndex: ++navHistory.index }, '')
 }
 
-/** Back to where the user came from; a screen opened directly (deep link, reload) goes to `fallback` instead. */
+/**
+ * Back to where the user came from inside the app; a screen opened directly (deep link, reload of the first entry)
+ * goes to `fallback` instead. Reads the in-app index stampHistory puts on each entry, not history.length, which also
+ * counts the entries of the site the user came from.
+ */
 export function goBack(router: { back: () => void; push: (href: string) => void }, fallback: string): void {
-  if (typeof window !== 'undefined' && window.history.length > 1) router.back()
+  const index = typeof window === 'undefined' ? undefined : (window.history.state as { fiqrIndex?: unknown } | null)?.fiqrIndex
+  if (typeof index === 'number' && index > 1) router.back()
   else router.push(fallback)
 }

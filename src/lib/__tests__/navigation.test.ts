@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { shouldCompleteSwipe, spring } from '@/lib/motion'
-import { classifyNav } from '@/lib/navigation'
+import { classifyNav, goBack } from '@/lib/navigation'
 
 describe('classifyNav', () => {
   it('pushes a deeper screen over the current one', () => {
@@ -65,5 +65,25 @@ describe('spring.push', () => {
     expect(peak).toBeLessThanOrEqual(1.0005)
     expect(settledAt).toBeGreaterThan(300)
     expect(settledAt).toBeLessThan(550)
+  })
+})
+
+describe('goBack', () => {
+  const router = () => ({ back: vi.fn(), push: vi.fn() })
+
+  it('goes to the fallback on the first in-app entry, even with other sites behind it (external deep link)', () => {
+    window.history.pushState({}, '', '/elsewhere')
+    window.history.pushState({ fiqrIndex: 1 }, '', '/plans/view')
+    const r = router()
+    goBack(r, '/plans')
+    expect(r.push).toHaveBeenCalledWith('/plans')
+    expect(r.back).not.toHaveBeenCalled()
+  })
+
+  it('goes back after an in-app navigation', () => {
+    window.history.pushState({ fiqrIndex: 2 }, '', '/plans/view')
+    const r = router()
+    goBack(r, '/plans')
+    expect(r.back).toHaveBeenCalled()
   })
 })
