@@ -92,3 +92,7 @@ Scope: new `/welcome` (4 slides, live mini-components: calorie ring and macro ba
 Device notes: iOS Safari's toolbar leaves about 660 px; the welcome got a compact layout under 740 px tall (also covers iPhone SE). The Android emulator showed system ANR dialogs (Messages, System UI) from load; Messages was disabled on the emulator and the dialog dismissed. Not FIQR.
 
 Not changed (Q6, no behaviour changes): the confirm-password field stays. Option for Ved: drop it, since Show/Hide now covers typos.
+
+## Slices 2 to 10 (26 Oct 2026)
+
+All slices built; every ledger row has a closed status (0 pending). Critics stalled below 8/10 on every slice after three rounds (scores in LEDGER.md). An independent grader on a different model found concrete defects per slice; all fixed or ledgered (GRADER-remaining.md). Motion: native iOS push with edge swipe-back (41110bfc), iOS 26 tab bar minimise (ce9caad2), three transition pops fixed (f2beede8, ce4b60c7, d01dd142). Final gates on 5bb6357e: palette grep 0, lint 0 errors, type-check pass, 539 tests passed. Android and 60 fps stay blocked (emulator never booted). Owner review pack: REVIEW-remaining.md. Next: the owner picked 19 Spatial Depth plus the 01 tab bar as the app-wide direction; prototypes and per-journey mocks are being built for sign-off before it is applied.

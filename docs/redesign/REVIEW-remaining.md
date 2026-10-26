@@ -160,6 +160,13 @@ Answer each by number: yes, no, or a letter.
 29. **S9:** profile Save is a glass pill in the bar. Approve? *Recommend: yes.*
 30. **S9:** every confirm button is ink, not orange. Approve? *Recommend: yes.*
 
+### Added after the grader pass (26 Oct 2026)
+
+39. **Consent screen on a failed read.** If the profile request fails (bad connection), the app shows the consent screen because it treats a failed read as "no consent" (`auth-gate.tsx`). Change it to an error state with Try again? *Recommend: yes. Asking for consent again on a network error is wrong.*
+40. **S7 copy:** empty date fields read "Choose" (plan dates) and "Pick a date" (per-day date). Approve? *Recommend: yes.*
+41. **Tab bar circle.** When the bar collapses it shows the tab you are on (Home on Home, Food on Food), as Apple does. You described "just the Home icon". Keep Apple's behaviour? *Recommend: yes.*
+42. **Page motion.** Opening a page is now a native iOS push with edge swipe-back (41110bfc). You then picked 19 Spatial Depth for the whole app, where the page behind steps back in depth. The Spatial Depth prototype and the per-journey mocks are being built for your sign-off before it replaces the push.
+
 ### Copy lists
 
 Approve each list as written? *Recommend: yes for all.* Say "yes except n" to hold one back.
@@ -181,7 +188,7 @@ S10 changed no copy.
 - **60 fps (F6).** There is no real low-end phone and no emulator trace. Earlier `fiqr_lowend` runs gave 4 to 17 fps under host load and were discarded. Rubric item 5 stays blocked on every slice.
 - **Paywall radio spacing on iOS.** The fix that pins the plan radio to the tile edge for WebKit landed at 18:09 on 26 Oct (44c0ed2). The iOS paywall shot was taken at 17:30, before it. The fix is not yet confirmed on iOS.
 - **Native-only screens.** Splash, Notifications prompt, Health connect sheet and native Health tile states render only in the app build. None were captured on a device.
-- **Open evidence.** Slice 2 checks need a rerun (see the S2 note). Frame-diff for S2, S3 and S4 is still pending in the ledger.
+- **Open evidence.** Closed: slice 2 checks were rerun (06613f69, axe 0, small 0) and the S2, S3 and S4 frame-diff rows are filled (859ea621).
 
 ## Production data
 
@@ -189,8 +196,29 @@ No production rows were created. The live capture on the real account was read-o
 
 ## Independent grader
 
-Pending: filled in from docs/redesign/GRADER-remaining.md
+A fresh grader on a different model (Sonnet) saw only the BRIEF rubric, six Bevel references and the after captures. Full notes: [GRADER-remaining.md](GRADER-remaining.md).
+
+| Slice | Overall | Top fail | Outcome |
+|---|---|---|---|
+| S2 Home | 8 | Home error capture showed consent | fixed 06613f69 (capture fixture; error now in a card) |
+| S3 Logging | 7 | Tray overlapped the editor card | fixed c3fd082c (editor scrolls clear of the tray) |
+| S4 Geo | 7 | Toast covered the back button | fixed 50dffe1c (shared toast below the header); report sheet capture fixed 06613f69 |
+| S5 Diary | 8 | Month sheet last row in the corners | fixed 328f8c4c (padding, future days dimmed) |
+| S6 Train | 7 | Set rows pushed off screen | fixed 328f8c4c (compact clock, map and rest card) |
+| S7 Plans | 7 | Native date inputs, textarea grip | fixed 328f8c4c (app date rows, no grip) |
+| S8 Check-in | 7 | Apply below the fold | fixed 50dffe1c (decision and Apply first) |
+| S9 Settings | 7 | Paywall title orphan, admin row | fixed 50dffe1c (balanced title; admin row was a capture fixture) |
+| S10 Admin | not graded | no captures | ledgered: differs Q6 (token pass only) |
+
+Fails that conflict with signed decisions were left and are listed above as questions (C3, C2, Q12, Q18, D1, C4/Q17).
 
 ## Final gates
 
-Pending
+Run on 5bb6357e after the last slice:
+
+- Palette grep (hex outside the AGENTS.md set): 0 hits. The last 8 were `#000` in alpha fade masks, now brand ink (3eb9f808, no visual change).
+- `dark:` classes: 0. `next/image`: 0.
+- `npm run lint`: exit 0 (0 errors, 25 warnings).
+- `npm run type-check`: exit 0.
+- `npm test`: exit 0, 91 files, 539 passed, 1 skipped.
+- Ledger: 0 pending rows.
