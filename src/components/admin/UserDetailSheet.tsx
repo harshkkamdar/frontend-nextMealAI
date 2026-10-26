@@ -12,8 +12,8 @@
  *   7. Chat     — last 7 days of Geo conversations, grouped by session
  *   8. Photos   — last 7 days of message_attachments (signed URLs from BE)
  *
- * Visual contract matches src/components/dashboard/ — bg-surface +
- * border-border + rounded-2xl + p-4, uppercase 10px labels, tabular-nums
+ * Visual contract matches src/components/dashboard/ — bg-card +
+ * border-ink-08 + rounded-[24px] + p-4, uppercase 10px labels, tabular-nums
  * KPI numbers, Lucide icons at w-4 h-4.
  *
  * Pattern follows src/components/geo/geo-companion-sheet.tsx (Framer Motion
@@ -110,7 +110,7 @@ export function UserDetailSheet({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-2xl bg-background border-l border-border overflow-y-auto"
+            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-2xl bg-cream border-l border-ink-08 overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-label="User detail"
@@ -119,15 +119,15 @@ export function UserDetailSheet({
             <SheetHeader state={state} onClose={onClose} />
             <div className="p-4 space-y-4">
               {state.kind === 'loading' && (
-                <div className="bg-surface border border-border rounded-2xl p-8 text-center">
-                  <p className="text-sm text-text-secondary">Loading user summary…</p>
+                <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-8 text-center">
+                  <p className="text-sm text-ink-65">Loading user summary…</p>
                 </div>
               )}
               {state.kind === 'error' && (
-                <div className="bg-surface border border-border rounded-2xl p-8 text-center">
-                  <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-2" />
-                  <p className="text-sm text-text-primary mb-1">Couldn&apos;t load user</p>
-                  <p className="text-xs text-text-secondary">{state.message}</p>
+                <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-8 text-center">
+                  <AlertCircle className="w-8 h-8 text-accent mx-auto mb-2" />
+                  <p className="text-sm text-ink mb-1">Couldn&apos;t load user</p>
+                  <p className="text-xs text-ink-65">{state.message}</p>
                 </div>
               )}
               {state.kind === 'ok' && <SheetBody data={state.data} />}
@@ -145,10 +145,10 @@ function SheetHeader({ state, onClose }: { state: State; onClose: () => void }) 
       ? state.data.user.email || state.data.user.id.slice(0, 8) + '…'
       : 'User'
   return (
-    <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-background/95 backdrop-blur-xl border-b border-border">
+    <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-cream/95 backdrop-blur-xl border-b border-ink-08">
       <div className="flex items-center gap-2 min-w-0">
-        <Mail className="w-4 h-4 text-text-secondary shrink-0" />
-        <span className="text-sm font-semibold text-text-primary truncate" data-testid="user-sheet-title">
+        <Mail className="w-4 h-4 text-ink-65 shrink-0" />
+        <span className="text-sm font-semibold text-ink truncate" data-testid="user-sheet-title">
           {title}
         </span>
       </div>
@@ -156,9 +156,9 @@ function SheetHeader({ state, onClose }: { state: State; onClose: () => void }) 
         type="button"
         onClick={onClose}
         aria-label="Close user detail"
-        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-hover transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-ink-04 transition-colors"
       >
-        <X className="w-4 h-4 text-text-secondary" />
+        <X className="w-4 h-4 text-ink-65" />
       </button>
     </div>
   )
@@ -189,8 +189,8 @@ function SheetBody({ data }: { data: AdminUserSummary }) {
 
 function UserIdentityCard({ data }: { data: AdminUserSummary }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4" data-testid="section-identity">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-2">
+    <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4" data-testid="section-identity">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-2">
         Identity
       </span>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
@@ -210,8 +210,8 @@ function UserIdentityCard({ data }: { data: AdminUserSummary }) {
 
 function ProfileCard({ profile }: { profile: NonNullable<AdminUserSummary['profile']> }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4" data-testid="section-profile">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-3">
+    <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4" data-testid="section-profile">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-3">
         Profile
       </span>
       <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -277,15 +277,15 @@ function TargetsCard({ targets }: { targets: NonNullable<AdminUserSummary['targe
     { label: 'Fat', value: targets.fat_g, suffix: 'g' },
   ]
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4" data-testid="section-targets">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-3">
+    <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4" data-testid="section-targets">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-3">
         Daily targets
       </span>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {tiles.map((t) => (
           <div key={t.label} className="text-center">
-            <p className="text-xs text-text-secondary mb-0.5">{t.label}</p>
-            <p className="text-base font-semibold tabular-nums text-text-primary">
+            <p className="text-xs text-ink-65 mb-0.5">{t.label}</p>
+            <p className="text-base font-semibold tabular-nums text-ink">
               {t.value != null ? `${t.value}${t.suffix ?? ''}` : '—'}
             </p>
           </div>
@@ -304,19 +304,19 @@ function PlansRow({
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" data-testid="section-plans">
-      <div className="bg-surface border border-border rounded-2xl p-4">
+      <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4">
         <div className="flex items-center gap-1.5 mb-2">
-          <Utensils className="w-4 h-4 text-text-secondary" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
+          <Utensils className="w-4 h-4 text-ink-65" />
+          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65">
             Active nutrition plan
           </span>
         </div>
         {meal ? (
           <>
-            <p className="text-sm font-semibold text-text-primary mb-1">
+            <p className="text-sm font-semibold text-ink mb-1">
               {meal.name ?? 'Untitled plan'}
             </p>
-            <p className="text-xs text-text-secondary">
+            <p className="text-xs text-ink-65">
               {meal.days_count} day{meal.days_count === 1 ? '' : 's'}
               {meal.daily_targets?.calories
                 ? ` · ${meal.daily_targets.calories} kcal/day`
@@ -324,27 +324,27 @@ function PlansRow({
             </p>
           </>
         ) : (
-          <p className="text-xs text-text-tertiary">No active plan</p>
+          <p className="text-xs text-ink-65">No active plan</p>
         )}
       </div>
-      <div className="bg-surface border border-border rounded-2xl p-4">
+      <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4">
         <div className="flex items-center gap-1.5 mb-2">
-          <Dumbbell className="w-4 h-4 text-text-secondary" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
+          <Dumbbell className="w-4 h-4 text-ink-65" />
+          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65">
             Active workout plan
           </span>
         </div>
         {workout ? (
           <>
-            <p className="text-sm font-semibold text-text-primary mb-1">
+            <p className="text-sm font-semibold text-ink mb-1">
               {workout.name ?? 'Untitled program'}
             </p>
-            <p className="text-xs text-text-secondary">
+            <p className="text-xs text-ink-65">
               {workout.days_count} day{workout.days_count === 1 ? '' : 's'} · cursor at day {workout.current_position + 1}
             </p>
           </>
         ) : (
-          <p className="text-xs text-text-tertiary">No active plan</p>
+          <p className="text-xs text-ink-65">No active plan</p>
         )}
       </div>
     </div>
@@ -358,7 +358,7 @@ function InProgressCard({
 }) {
   return (
     <div
-      className="bg-accent-light border border-accent/20 rounded-2xl p-4"
+      className="bg-accent-10 border border-accent/20 rounded-[24px] p-4"
       data-testid="section-in-progress"
     >
       <div className="flex items-center gap-1.5 mb-2">
@@ -367,10 +367,10 @@ function InProgressCard({
           Currently doing
         </span>
       </div>
-      <p className="text-sm font-semibold text-text-primary mb-1">
+      <p className="text-sm font-semibold text-ink mb-1">
         {ip.day_name ?? `Day ${ip.plan_day_index != null ? ip.plan_day_index + 1 : '?'}`}
       </p>
-      <p className="text-xs text-text-secondary">
+      <p className="text-xs text-ink-65">
         Started {fmtRelative(ip.started_at)} · {ip.exercises_completed}/{ip.exercises_total} exercises complete
         {ip.total_volume_kg ? ` · ${ip.total_volume_kg.toLocaleString()} kg volume` : ''}
       </p>
@@ -414,32 +414,32 @@ function RecentActivityCard({
   ].sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
 
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4" data-testid="section-activity">
+    <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4" data-testid="section-activity">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65">
           Recent activity (last 7 days)
         </span>
-        <span className="text-[10px] text-text-tertiary tabular-nums">
+        <span className="text-[10px] text-ink-65 tabular-nums">
           {items.length} item{items.length === 1 ? '' : 's'}
         </span>
       </div>
       {items.length === 0 ? (
-        <p className="text-xs text-text-tertiary">No activity in the last 7 days</p>
+        <p className="text-xs text-ink-65">No activity in the last 7 days</p>
       ) : (
         <ul className="space-y-2">
           {items.slice(0, 30).map((item, i) => (
             <li
               key={i}
-              className="flex items-start gap-2 text-sm border-b border-border/40 last:border-b-0 pb-2 last:pb-0"
+              className="flex items-start gap-2 text-sm border-b border-ink-08/40 last:border-b-0 pb-2 last:pb-0"
             >
-              <span className="text-[10px] text-text-tertiary tabular-nums w-20 shrink-0 mt-0.5">
+              <span className="text-[10px] text-ink-65 tabular-nums w-20 shrink-0 mt-0.5">
                 {fmtRelative(item.created_at)}
               </span>
-              <span className="text-text-primary flex-1">
+              <span className="text-ink flex-1">
                 {item.kind === 'log' ? renderLogSummary(item.logType, item.payload) : (
                   <>
                     Workout: {item.day_name ?? 'unnamed day'} —{' '}
-                    <span className={item.status === 'completed' ? 'text-success' : item.status === 'abandoned' ? 'text-warning' : 'text-text-secondary'}>
+                    <span className={item.status === 'completed' ? 'text-macro-teal' : item.status === 'abandoned' ? 'text-macro-ochre' : 'text-ink-65'}>
                       {item.status}
                     </span>
                     {' '}({item.exercises_completed}/{item.exercises_total} exercises)
@@ -449,7 +449,7 @@ function RecentActivityCard({
             </li>
           ))}
           {items.length > 30 && (
-            <li className="text-xs text-text-tertiary text-center pt-1">
+            <li className="text-xs text-ink-65 text-center pt-1">
               +{items.length - 30} older items (capped for display)
             </li>
           )}
@@ -495,66 +495,66 @@ function ChatHistoryCard({ chat }: { chat: AdminUserSummary['recent_chat_7d'] })
   }
 
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4" data-testid="section-chat">
+    <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4" data-testid="section-chat">
       <div className="flex items-center gap-1.5 mb-3">
-        <MessageCircle className="w-4 h-4 text-text-secondary" />
-        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
+        <MessageCircle className="w-4 h-4 text-ink-65" />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65">
           Chat with Geo (last 7 days)
         </span>
-        <span className="text-[10px] text-text-tertiary tabular-nums ml-auto">
+        <span className="text-[10px] text-ink-65 tabular-nums ml-auto">
           {chat.length} message{chat.length === 1 ? '' : 's'} · {sessions.length} session{sessions.length === 1 ? '' : 's'}
         </span>
       </div>
       {sessions.length === 0 ? (
-        <p className="text-xs text-text-tertiary">No chat in the last 7 days</p>
+        <p className="text-xs text-ink-65">No chat in the last 7 days</p>
       ) : (
         <ul className="space-y-2">
           {sessions.map(([sessionKey, msgs]) => {
             const isExpanded = expanded.has(sessionKey)
             const last = msgs[msgs.length - 1]
             return (
-              <li key={sessionKey} className="border border-border rounded-xl overflow-hidden">
+              <li key={sessionKey} className="border border-ink-08 rounded-[16px] overflow-hidden">
                 <button
                   type="button"
                   onClick={() => toggle(sessionKey)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-surface-hover transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-ink-04 transition-colors"
                   data-testid="chat-session-toggle"
                 >
                   {isExpanded ? (
-                    <ChevronDown className="w-3 h-3 text-text-secondary shrink-0" />
+                    <ChevronDown className="w-3 h-3 text-ink-65 shrink-0" />
                   ) : (
-                    <ChevronRight className="w-3 h-3 text-text-secondary shrink-0" />
+                    <ChevronRight className="w-3 h-3 text-ink-65 shrink-0" />
                   )}
-                  <span className="text-xs font-mono text-text-secondary truncate">
+                  <span className="text-xs font-mono text-ink-65 truncate">
                     {sessionKey.slice(0, 8)}…
                   </span>
-                  <span className="text-[10px] text-text-tertiary tabular-nums ml-auto">
+                  <span className="text-[10px] text-ink-65 tabular-nums ml-auto">
                     {msgs.length} · {fmtRelative(last.created_at)}
                   </span>
                 </button>
                 {isExpanded && (
-                  <div className="px-3 py-2 space-y-2 bg-background border-t border-border">
+                  <div className="px-3 py-2 space-y-2 bg-cream border-t border-ink-08">
                     {msgs.map((m) => (
                       <div key={m.id} className="text-sm">
                         <div className="flex items-baseline gap-2 mb-0.5">
                           <span
                             className={`text-[10px] font-semibold uppercase tracking-[0.04em] ${
-                              m.role === 'user' ? 'text-accent' : 'text-text-secondary'
+                              m.role === 'user' ? 'text-accent' : 'text-ink-65'
                             }`}
                           >
                             {m.role}
                           </span>
-                          <span className="text-[10px] text-text-tertiary tabular-nums">
+                          <span className="text-[10px] text-ink-65 tabular-nums">
                             {fmtRelative(m.created_at)}
                           </span>
                           {m.tool_names.length > 0 && (
-                            <span className="text-[10px] text-text-tertiary">
+                            <span className="text-[10px] text-ink-65">
                               tools: {m.tool_names.join(', ')}
                             </span>
                           )}
                         </div>
-                        <p className="text-text-primary whitespace-pre-wrap break-words">
-                          {m.content || <span className="text-text-tertiary italic">(empty)</span>}
+                        <p className="text-ink whitespace-pre-wrap break-words">
+                          {m.content || <span className="text-ink-65 italic">(empty)</span>}
                         </p>
                       </div>
                     ))}
@@ -575,10 +575,10 @@ function PhotosCard({
   attachments: AdminUserSummary['recent_attachments_7d']
 }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4" data-testid="section-photos">
+    <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4" data-testid="section-photos">
       <div className="flex items-center gap-1.5 mb-3">
-        <ImageIcon className="w-4 h-4 text-text-secondary" />
-        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
+        <ImageIcon className="w-4 h-4 text-ink-65" />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65">
           Photos (last 7 days)
         </span>
       </div>
@@ -586,7 +586,7 @@ function PhotosCard({
         {attachments.slice(0, 15).map((a) => (
           <div
             key={a.id}
-            className="aspect-square rounded-lg overflow-hidden bg-background border border-border"
+            className="aspect-square rounded-[14px] overflow-hidden bg-cream border border-ink-08"
           >
             {(() => {
               const safe = safeImageUrl(a.signed_url)
@@ -599,7 +599,7 @@ function PhotosCard({
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <ImageIcon className="w-4 h-4 text-text-tertiary" />
+                  <ImageIcon className="w-4 h-4 text-ink-65" />
                 </div>
               )
             })()}
@@ -625,11 +625,11 @@ function Field({
 }) {
   return (
     <div className="flex items-baseline gap-1.5 min-w-0">
-      {Icon && <Icon className="w-3 h-3 text-text-tertiary shrink-0" />}
-      <span className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary shrink-0">
+      {Icon && <Icon className="w-3 h-3 text-ink-65 shrink-0" />}
+      <span className="text-[10px] uppercase tracking-[0.04em] text-ink-65 shrink-0">
         {label}
       </span>
-      <span className="text-sm text-text-primary truncate">{value}</span>
+      <span className="text-sm text-ink truncate">{value}</span>
     </div>
   )
 }
@@ -637,12 +637,12 @@ function Field({
 function ChipRow({ label, items }: { label: string; items: string[] }) {
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-[0.04em] text-text-tertiary mb-1">{label}</p>
+      <p className="text-[10px] uppercase tracking-[0.04em] text-ink-65 mb-1">{label}</p>
       <div className="flex flex-wrap gap-1">
         {items.map((item) => (
           <span
             key={item}
-            className="px-2 py-0.5 rounded-full text-[11px] bg-background border border-border text-text-primary"
+            className="px-2 py-0.5 rounded-full text-[11px] bg-cream border border-ink-08 text-ink"
           >
             {item}
           </span>

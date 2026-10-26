@@ -3,13 +3,13 @@
  *
  * Visual contract extracted 2026-05-21 from src/components/dashboard/
  * (progress-card, next-up-card, quick-stats, weight-chart). Cards:
- * `bg-surface border border-border rounded-2xl p-4`. Uppercase section
+ * `bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4`. Uppercase section
  * label: `text-[10px] font-semibold uppercase tracking-[0.08em]
- * text-text-secondary`. KPI number: `text-xl font-semibold tabular-nums
- * text-text-primary` (or `text-accent` for the hero metric). Muted
- * secondary: `text-xs text-text-secondary`. Lucide icons at `w-4 h-4`.
+ * text-ink-65`. KPI number: `text-xl font-semibold tabular-nums
+ * text-ink` (or `text-accent` for the hero metric). Muted
+ * secondary: `text-xs text-ink-65`. Lucide icons at `w-4 h-4`.
  * Grid gap 12px. Tokens are CSS-var driven (see `globals.css`) — never
- * hardcode hex; use `bg-surface`, `text-accent`, etc.
+ * hardcode hex; use `bg-card`, `text-accent`, etc.
  */
 
 'use client'
@@ -38,17 +38,17 @@ export function AdminMetricsCards({ summary }: { summary: AdminMetricsSummary })
         <div
           key={t.label}
           data-testid="admin-kpi-tile"
-          className="bg-surface border border-border rounded-2xl p-4"
+          className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4"
         >
           <div className="flex items-center gap-1.5 mb-2">
-            <t.icon className="w-4 h-4 text-text-secondary" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
+            <t.icon className="w-4 h-4 text-ink-65" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65">
               {t.label}
             </span>
           </div>
           <p
             className={`text-xl font-semibold tabular-nums ${
-              t.accent ? 'text-accent' : 'text-text-primary'
+              t.accent ? 'text-accent' : 'text-ink'
             }`}
           >
             {t.value}

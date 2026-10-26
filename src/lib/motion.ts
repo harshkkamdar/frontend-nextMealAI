@@ -5,6 +5,10 @@ export const spring = {
   tap: { type: 'spring', stiffness: 500, damping: 35 },
   sheet: { type: 'spring', stiffness: 320, damping: 32 },
   page: { type: 'spring', stiffness: 260, damping: 30 },
+  /** Critically damped: stage scrub settle, repositioning, list entrance (motion-feel.md). */
+  glide: { type: 'spring', stiffness: 300, damping: 35, mass: 1 },
+  /** Small earned overshoot (~0.15 bounce): tab lens, orb morph. */
+  lens: { type: 'spring', stiffness: 380, damping: 33, mass: 1 },
 } as const satisfies Record<string, Transition>
 
 /** Reduced motion: every preset becomes a short fade. */

@@ -39,7 +39,7 @@ export function CsvExportButton() {
       type="button"
       onClick={handleClick}
       disabled={busy}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-surface border border-border text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[14px] bg-card border border-ink-08 text-ink hover:bg-ink-04 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <Download className="w-3.5 h-3.5" />
       {busy ? 'Exporting…' : 'Export CSV'}

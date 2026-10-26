@@ -59,11 +59,11 @@ export default function AdminPage() {
   if (state.kind === 'loading') {
     return (
       <main className="max-w-6xl mx-auto p-4">
-        <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-text-primary mb-4">
+        <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-ink mb-4">
           Admin
         </h1>
-        <div className="bg-surface border border-border rounded-2xl p-8 text-center">
-          <p className="text-sm text-text-secondary">Loading admin metrics…</p>
+        <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-8 text-center">
+          <p className="text-sm text-ink-65">Loading admin metrics…</p>
         </div>
       </main>
     )
@@ -72,10 +72,10 @@ export default function AdminPage() {
   if (state.kind === 'denied') {
     return (
       <main className="max-w-6xl mx-auto p-4">
-        <div className="bg-surface border border-border rounded-2xl p-8 text-center">
-          <ShieldOff className="w-10 h-10 text-text-tertiary mx-auto mb-3" />
-          <h1 className="text-base font-semibold text-text-primary mb-1">Access denied</h1>
-          <p className="text-sm text-text-secondary">
+        <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-8 text-center">
+          <ShieldOff className="w-10 h-10 text-ink-65 mx-auto mb-3" />
+          <h1 className="text-base font-semibold text-ink mb-1">Access denied</h1>
+          <p className="text-sm text-ink-65">
             Your account isn&apos;t on the admin allow-list. If you think this is wrong, ask Ved.
           </p>
         </div>
@@ -86,16 +86,16 @@ export default function AdminPage() {
   if (state.kind === 'error') {
     return (
       <main className="max-w-6xl mx-auto p-4">
-        <div className="bg-surface border border-border rounded-2xl p-8 text-center">
-          <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-3" />
-          <h1 className="text-base font-semibold text-text-primary mb-1">
+        <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-8 text-center">
+          <AlertCircle className="w-10 h-10 text-accent mx-auto mb-3" />
+          <h1 className="text-base font-semibold text-ink mb-1">
             Couldn&apos;t load admin metrics
           </h1>
-          <p className="text-sm text-text-secondary mb-4">{state.message}</p>
+          <p className="text-sm text-ink-65 mb-4">{state.message}</p>
           <button
             type="button"
             onClick={load}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-surface border border-border text-text-primary hover:bg-surface-hover transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[14px] bg-card border border-ink-08 text-ink hover:bg-ink-04 transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Retry
@@ -111,8 +111,8 @@ export default function AdminPage() {
   return (
     <main className="max-w-6xl mx-auto p-4 space-y-4">
       <div className="flex items-baseline justify-between mb-2">
-        <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-text-primary">Admin</h1>
-        <span className="text-[10px] text-text-tertiary tabular-nums">
+        <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-ink">Admin</h1>
+        <span className="text-[10px] text-ink-65 tabular-nums">
           Generated {generated}
         </span>
       </div>
@@ -120,18 +120,18 @@ export default function AdminPage() {
       {data.is_stub && (
         <div
           role="status"
-          className="flex items-start gap-3 rounded-2xl border border-warning/30 bg-warning/10 p-4"
+          className="flex items-start gap-3 rounded-[24px] border border-macro-ochre/30 bg-macro-ochre/10 p-4"
         >
-          <Beaker className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+          <Beaker className="w-5 h-5 text-macro-ochre shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-semibold text-text-primary mb-0.5">Stub data</p>
-            <p className="text-text-secondary">
+            <p className="font-semibold text-ink mb-0.5">Stub data</p>
+            <p className="text-ink-65">
               These numbers (47 / 12 / 28 / 5, three test users) are deterministic
               fixtures, not real usage. Set{' '}
-              <code className="px-1 py-0.5 rounded bg-surface text-text-primary font-mono text-xs">
+              <code className="px-1 py-0.5 rounded bg-card text-ink font-mono text-xs">
                 ADMIN_DASHBOARD_STUB=false
               </code>{' '}
-              in the backend <code className="px-1 py-0.5 rounded bg-surface text-text-primary font-mono text-xs">.env</code> and restart to query real data.
+              in the backend <code className="px-1 py-0.5 rounded bg-card text-ink font-mono text-xs">.env</code> and restart to query real data.
             </p>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function AdminPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65">
             Active users export
           </span>
           <CsvExportButton />

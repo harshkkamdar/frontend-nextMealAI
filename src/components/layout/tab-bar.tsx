@@ -64,7 +64,7 @@ export function TabBar() {
   return (
     <>
     {/* Scroll edge (Liquid Glass "scroll edge effect"): content fades into the page under the bar instead of colliding with it. */}
-    <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] h-[calc(112px+var(--safe-bottom))] bg-[linear-gradient(to_top,var(--color-cream)_42%,rgba(253,246,236,0))]" />
+    <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] h-[calc(104px+var(--safe-bottom))] bg-[linear-gradient(to_top,var(--color-cream)_calc(100%-24px),rgba(253,246,236,0))]" />
     <div
       className={cn('pointer-events-none fixed inset-x-0 mx-auto flex max-w-md items-end gap-3 px-4', logOpen ? 'z-[80]' : 'z-[50]')}
       style={{ bottom: 'calc(12px + var(--safe-bottom))' }}
@@ -94,7 +94,7 @@ export function TabBar() {
               {active ? (
                 <motion.span
                   layoutId="tab-pill"
-                  transition={reduce ? reducedFade : spring.sheet}
+                  transition={reduce ? reducedFade : spring.lens}
                   className="absolute inset-0 rounded-full bg-ink-06"
                 />
               ) : null}

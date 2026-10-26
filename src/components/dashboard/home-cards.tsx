@@ -178,8 +178,10 @@ function Sparkline({ series }: { series: number[] }) {
   const max = Math.max(...series)
   const span = max - min || 1
   const points = series.map((value, index) => `${(index / (series.length - 1)) * 100},${20 - ((value - min) / span) * 16}`).join(' ')
+  const lastY = 20 - ((series[series.length - 1] - min) / span) * 16
   return (
-    <svg viewBox="0 0 100 24" preserveAspectRatio="none" className="block h-6 w-full overflow-visible" aria-hidden="true">
+    <span className="relative block h-6" aria-hidden="true">
+    <svg viewBox="0 0 100 24" preserveAspectRatio="none" className="block h-6 w-full overflow-visible">
       <defs>
         <clipPath id={clip}>
           {/* Draws left to right by scaling the clip, so the line itself is never re-measured. */}
@@ -189,26 +191,8 @@ function Sparkline({ series }: { series: number[] }) {
       <line x1="0" x2="100" y1="23.5" y2="23.5" stroke="var(--color-ink-10)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
       <polyline clipPath={`url(#${clip})`} points={points} fill="none" stroke="var(--color-ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     </svg>
-  )
-}
-
-function NightStrip({ nights }: { nights: (number | null)[] }) {
-  const drawn = useDrawn()
-  const lastNight = nights[6] ? 6 : nights[5] ? 5 : -1
-  return (
-    <span className="flex h-6 items-end gap-[5px]" aria-hidden="true">
-      {nights.map((hours, index) => (
-        <span
-          key={index}
-          className="flex-1 origin-bottom rounded-[3px] transition-transform duration-500"
-          style={{
-            height: hours ? `${Math.max(18, Math.min(100, (hours / 10) * 100))}%` : '18%',
-            background: hours ? (index === lastNight ? 'var(--color-ink)' : 'var(--color-ink-20)') : 'var(--color-ink-06)',
-            transform: drawn ? 'scaleY(1)' : 'scaleY(0)',
-            transitionDelay: `${200 + index * 40}ms`,
-          }}
-        />
-      ))}
+    {/* Today's weigh-in: an HTML dot so it stays round under the stretched viewBox. */}
+    <span className="absolute right-0 size-2 -translate-y-1/2 translate-x-1/2 rounded-full bg-ink transition-opacity duration-200" style={{ top: `${(lastY / 24) * 100}%`, opacity: drawn ? 1 : 0, transitionDelay: `${DRAW_MS + 200}ms` }} />
     </span>
   )
 }
@@ -270,10 +254,15 @@ export function WaterTile({ glasses, onLog }: { glasses: number; onLog: () => vo
   )
 }
 
+export const SLEEP_GOAL_HOURS = 8
+
 export function SleepTile({ hours, nights, source, onLog }: { hours: number | null; nights: (number | null)[]; source: HealthSource | null; onLog: () => void }) {
+  const logged = nights.filter((night): night is number => night !== null)
+  // Seven nights collapse to one honest number (critic round 2: unlabelled squares said nothing).
+  const average = logged.length >= 3 ? `${formatSleep(logged.reduce((a, b) => a + b, 0) / logged.length)} avg this week` : 'Last night'
   return (
-    <Tile icon={SleepFill} label="Sleep" value={hours === null ? '—' : formatSleep(hours)} caption={hours === null ? 'Tap to log last night' : sourceCaption(source, 'Last night')} onClick={onLog} actionLabel="log sleep">
-      <NightStrip nights={nights} />
+    <Tile icon={SleepFill} label="Sleep" value={hours === null ? '—' : formatSleep(hours)} caption={hours === null ? 'Tap to log last night' : sourceCaption(source, average)} onClick={onLog} actionLabel="log sleep">
+      <Progress fraction={(hours ?? 0) / SLEEP_GOAL_HOURS} />
     </Tile>
   )
 }

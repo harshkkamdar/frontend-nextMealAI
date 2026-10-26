@@ -49,24 +49,24 @@ export function ActiveUsersTable({
 
   if (users.length === 0) {
     return (
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-2">
+      <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-2">
           Active Users (30d)
         </span>
-        <p className="text-xs text-text-secondary">No active users in the last 30 days</p>
+        <p className="text-xs text-ink-65">No active users in the last 30 days</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-3">
+    <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-3">
         Active Users (30d)
       </span>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-xs font-semibold text-text-secondary border-b border-border">
+            <tr className="text-left text-xs font-semibold text-ink-65 border-b border-ink-08">
               <th className="py-2 pr-4 font-semibold">Email</th>
               <th className="py-2 pr-4 font-semibold">Last active</th>
               <SortableHeader
@@ -99,24 +99,24 @@ export function ActiveUsersTable({
                   data-testid="active-user-row"
                   data-user-id={u.user_id}
                   onClick={interactive ? () => onRowClick?.(u) : undefined}
-                  className={`border-b border-border/50 last:border-b-0 ${
-                    interactive ? 'cursor-pointer hover:bg-surface-hover transition-colors' : ''
+                  className={`border-b border-ink-08/50 last:border-b-0 ${
+                    interactive ? 'cursor-pointer hover:bg-ink-04 transition-colors' : ''
                   }`}
                 >
                   <td className="py-2 pr-4" data-testid="user-email">
                     <div className="flex flex-col">
-                      <span className="text-text-primary">{label}</span>
+                      <span className="text-ink">{label}</span>
                       {u.display_name && (
-                        <span className="text-[10px] text-text-tertiary">
+                        <span className="text-[10px] text-ink-65">
                           {u.display_name}
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="py-2 pr-4 text-text-secondary tabular-nums">{u.last_active}</td>
-                  <td className="py-2 pr-4 text-text-primary tabular-nums">{u.food_log_count}</td>
-                  <td className="py-2 pr-4 text-text-primary tabular-nums">{u.workout_session_count}</td>
-                  <td className="py-2 pr-4 text-text-primary tabular-nums">{u.chat_turn_count}</td>
+                  <td className="py-2 pr-4 text-ink-65 tabular-nums">{u.last_active}</td>
+                  <td className="py-2 pr-4 text-ink tabular-nums">{u.food_log_count}</td>
+                  <td className="py-2 pr-4 text-ink tabular-nums">{u.workout_session_count}</td>
+                  <td className="py-2 pr-4 text-ink tabular-nums">{u.chat_turn_count}</td>
                 </tr>
               )
             })}
@@ -143,7 +143,7 @@ function SortableHeader({
       <button
         type="button"
         onClick={onClick}
-        className="inline-flex items-center gap-1 font-semibold text-text-secondary hover:text-text-primary transition-colors"
+        className="inline-flex items-center gap-1 font-semibold text-ink-65 hover:text-ink transition-colors"
       >
         {label}
         {active &&

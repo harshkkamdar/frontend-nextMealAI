@@ -18,11 +18,11 @@ export function DauLineChart({ data }: { data: DauPoint[] }) {
 
   if (points.length === 0) {
     return (
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-2">
+      <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-2">
           Daily Active Users
         </span>
-        <p className="text-xs text-text-secondary">No DAU data yet</p>
+        <p className="text-xs text-ink-65">No DAU data yet</p>
       </div>
     )
   }
@@ -31,9 +31,9 @@ export function DauLineChart({ data }: { data: DauPoint[] }) {
     <div
       data-testid="dau-line-chart"
       data-point-count={points.length}
-      className="bg-surface border border-border rounded-2xl p-4"
+      className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4"
     >
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-3">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-3">
         Daily Active Users
       </span>
       <div className="h-40">
@@ -44,13 +44,13 @@ export function DauLineChart({ data }: { data: DauPoint[] }) {
               tick={{ fontSize: 10, fill: 'currentColor' }}
               axisLine={false}
               tickLine={false}
-              className="text-text-tertiary"
+              className="text-ink-65"
             />
             <YAxis
               tick={{ fontSize: 10, fill: 'currentColor' }}
               axisLine={false}
               tickLine={false}
-              className="text-text-tertiary"
+              className="text-ink-65"
               width={28}
             />
             <Tooltip

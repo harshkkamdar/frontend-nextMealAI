@@ -25,11 +25,11 @@ export function TopToolsChart({ data }: { data: ToolCallEntry[] }) {
 
   if (rows.length === 0) {
     return (
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-2">
+      <div className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-2">
           Top Tools (7d)
         </span>
-        <p className="text-xs text-text-secondary">No tool calls in the last 7 days</p>
+        <p className="text-xs text-ink-65">No tool calls in the last 7 days</p>
       </div>
     )
   }
@@ -38,9 +38,9 @@ export function TopToolsChart({ data }: { data: ToolCallEntry[] }) {
     <div
       data-testid="top-tools-chart"
       data-point-count={rows.length}
-      className="bg-surface border border-border rounded-2xl p-4"
+      className="bg-card rounded-[24px] shadow-[var(--shadow-card)] p-4"
     >
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-secondary block mb-3">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-3">
         Top Tools (7d)
       </span>
 
@@ -65,7 +65,7 @@ export function TopToolsChart({ data }: { data: ToolCallEntry[] }) {
               tick={{ fontSize: 10, fill: 'currentColor' }}
               axisLine={false}
               tickLine={false}
-              className="text-text-tertiary"
+              className="text-ink-65"
             />
             <YAxis
               type="category"
@@ -73,7 +73,7 @@ export function TopToolsChart({ data }: { data: ToolCallEntry[] }) {
               tick={{ fontSize: 11, fill: 'currentColor' }}
               axisLine={false}
               tickLine={false}
-              className="text-text-primary"
+              className="text-ink"
               width={120}
             />
             <Tooltip
