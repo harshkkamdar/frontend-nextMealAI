@@ -1,39 +1,37 @@
 {
   "apply": {
-    "frames": 52,
-    "chrome_px": 124452,
-    "content_px": 1626242,
-    "max_chrome_share": 0.108,
-    "max_content_share": 0.048,
+    "frames": 60,
+    "chrome_px": 146071,
+    "content_px": 1398423,
+    "max_chrome_share": 0.075,
+    "max_content_share": 0.05,
     "issues": [],
     "verdict": "smooth"
   },
   "control-home-to-settings": {
-    "frames": 18,
-    "chrome_px": 31991,
-    "content_px": 219541,
-    "max_chrome_share": 0.214,
-    "max_content_share": 0.468,
-    "issues": [
-      "chrome jump frame 5: 9% of chrome change"
-    ],
-    "verdict": "pop"
+    "frames": 56,
+    "chrome_px": 43794,
+    "content_px": 195664,
+    "max_chrome_share": 0.095,
+    "max_content_share": 0.088,
+    "issues": [],
+    "verdict": "smooth"
   },
   "home-card-to-checkin": {
-    "frames": 69,
-    "chrome_px": 36303,
-    "content_px": 329607,
-    "max_chrome_share": 0.165,
-    "max_content_share": 0.133,
+    "frames": 73,
+    "chrome_px": 44081,
+    "content_px": 425000,
+    "max_chrome_share": 0.083,
+    "max_content_share": 0.096,
     "issues": [],
     "verdict": "smooth"
   },
   "this-week-to-checkin": {
-    "frames": 44,
-    "chrome_px": 35913,
-    "content_px": 289164,
-    "max_chrome_share": 0.3,
-    "max_content_share": 0.374,
+    "frames": 75,
+    "chrome_px": 46445,
+    "content_px": 312457,
+    "max_chrome_share": 0.093,
+    "max_content_share": 0.081,
     "issues": [],
     "verdict": "smooth"
   }

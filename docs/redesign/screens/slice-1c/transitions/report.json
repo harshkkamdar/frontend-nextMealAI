@@ -1,113 +1,111 @@
 {
   "login-to-welcome": {
-    "frames": 52,
-    "chrome_px": 146919,
-    "content_px": 220190,
+    "frames": 57,
+    "chrome_px": 146895,
+    "content_px": 223553,
     "max_chrome_share": 0.128,
-    "max_content_share": 0.064,
+    "max_content_share": 0.063,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-continue": {
-    "frames": 64,
+    "frames": 79,
     "chrome_px": 0,
-    "content_px": 150889,
+    "content_px": 200476,
     "max_chrome_share": 0,
-    "max_content_share": 0.53,
-    "issues": [
-      "content hard cut frame 2: 53% of content change"
-    ],
-    "verdict": "pop"
+    "max_content_share": 0.13,
+    "issues": [],
+    "verdict": "smooth"
   },
   "welcome-double-continue": {
-    "frames": 87,
-    "chrome_px": 420,
-    "content_px": 387786,
-    "max_chrome_share": 0.074,
-    "max_content_share": 0.208,
+    "frames": 91,
+    "chrome_px": 0,
+    "content_px": 382404,
+    "max_chrome_share": 0,
+    "max_content_share": 0.113,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-drag-release": {
-    "frames": 114,
+    "frames": 128,
     "chrome_px": 0,
-    "content_px": 354912,
+    "content_px": 368080,
     "max_chrome_share": 0,
-    "max_content_share": 0.044,
+    "max_content_share": 0.027,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-drag-scrub": {
-    "frames": 128,
+    "frames": 130,
     "chrome_px": 0,
-    "content_px": 500539,
+    "content_px": 471919,
     "max_chrome_share": 0,
-    "max_content_share": 0.022,
+    "max_content_share": 0.02,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-first-paint": {
-    "frames": 49,
-    "chrome_px": 39113,
-    "content_px": 239862,
-    "max_chrome_share": 0.505,
-    "max_content_share": 0.278,
+    "frames": 52,
+    "chrome_px": 37923,
+    "content_px": 262985,
+    "max_chrome_share": 0.511,
+    "max_content_share": 0.254,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-flick": {
-    "frames": 45,
+    "frames": 84,
     "chrome_px": 0,
-    "content_px": 197907,
+    "content_px": 217292,
     "max_chrome_share": 0,
-    "max_content_share": 0.101,
+    "max_content_share": 0.091,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-hard-flick": {
-    "frames": 57,
+    "frames": 84,
     "chrome_px": 0,
-    "content_px": 159335,
+    "content_px": 199883,
     "max_chrome_share": 0,
-    "max_content_share": 0.224,
+    "max_content_share": 0.342,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-last": {
-    "frames": 157,
-    "chrome_px": 58802,
-    "content_px": 581363,
-    "max_chrome_share": 0.371,
-    "max_content_share": 0.097,
+    "frames": 214,
+    "chrome_px": 89682,
+    "content_px": 758471,
+    "max_chrome_share": 0.204,
+    "max_content_share": 0.11,
     "issues": [
-      "late change frame 66 after 7 still frames (72 px)"
+      "late change frame 146 after 7 still frames (72909 px)"
     ],
     "verdict": "pop"
   },
   "welcome-rubber-band": {
-    "frames": 61,
+    "frames": 62,
     "chrome_px": 0,
-    "content_px": 363925,
+    "content_px": 345329,
     "max_chrome_share": 0,
     "max_content_share": 0.032,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-to-login": {
-    "frames": 43,
-    "chrome_px": 93729,
-    "content_px": 142775,
-    "max_chrome_share": 0.218,
-    "max_content_share": 0.113,
+    "frames": 54,
+    "chrome_px": 147242,
+    "content_px": 184667,
+    "max_chrome_share": 0.125,
+    "max_content_share": 0.071,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-to-signup": {
-    "frames": 111,
-    "chrome_px": 100513,
-    "content_px": 551101,
-    "max_chrome_share": 0.214,
-    "max_content_share": 0.045,
+    "frames": 143,
+    "chrome_px": 132336,
+    "content_px": 625804,
+    "max_chrome_share": 0.138,
+    "max_content_share": 0.044,
     "issues": [],
     "verdict": "smooth"
   }

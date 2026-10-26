@@ -1,55 +1,55 @@
 {
   "confirm-dialog-in-out": {
-    "frames": 41,
-    "chrome_px": 348098,
-    "content_px": 143965,
-    "max_chrome_share": 0.057,
+    "frames": 42,
+    "chrome_px": 352744,
+    "content_px": 144436,
+    "max_chrome_share": 0.056,
     "max_content_share": 0.067,
     "issues": [],
     "verdict": "smooth"
   },
   "delete-sheet-open": {
-    "frames": 28,
-    "chrome_px": 259247,
-    "content_px": 503166,
-    "max_chrome_share": 0.136,
-    "max_content_share": 0.139,
+    "frames": 31,
+    "chrome_px": 279082,
+    "content_px": 534673,
+    "max_chrome_share": 0.127,
+    "max_content_share": 0.095,
     "issues": [],
     "verdict": "smooth"
   },
   "paywall-plan-switch": {
-    "frames": 31,
+    "frames": 34,
     "chrome_px": 0,
-    "content_px": 17510,
+    "content_px": 18626,
     "max_chrome_share": 0,
-    "max_content_share": 0.077,
+    "max_content_share": 0.07,
     "issues": [],
     "verdict": "smooth"
   },
   "profile-back": {
-    "frames": 55,
-    "chrome_px": 22846,
-    "content_px": 192896,
-    "max_chrome_share": 0.066,
-    "max_content_share": 0.061,
+    "frames": 54,
+    "chrome_px": 21794,
+    "content_px": 171717,
+    "max_chrome_share": 0.063,
+    "max_content_share": 0.069,
     "issues": [],
     "verdict": "smooth"
   },
   "settings-row-push": {
-    "frames": 50,
-    "chrome_px": 22498,
-    "content_px": 182355,
+    "frames": 53,
+    "chrome_px": 21465,
+    "content_px": 188959,
     "max_chrome_share": 0.07,
-    "max_content_share": 0.108,
+    "max_content_share": 0.079,
     "issues": [],
     "verdict": "smooth"
   },
   "settings-switch": {
     "frames": 19,
     "chrome_px": 0,
-    "content_px": 692,
+    "content_px": 384,
     "max_chrome_share": 0,
-    "max_content_share": 0.142,
+    "max_content_share": 0.216,
     "issues": [],
     "verdict": "smooth"
   }

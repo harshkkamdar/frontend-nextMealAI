@@ -1,53 +1,50 @@
 {
   "food-log-save": {
-    "frames": 111,
-    "chrome_px": 222243,
-    "content_px": 1235935,
-    "max_chrome_share": 0.161,
-    "max_content_share": 0.167,
-    "issues": [
-      "chrome jump frame 38: 16% of chrome change",
-      "chrome jump frame 52: 9% of chrome change",
-      "late change frame 52 after 10 still frames (225809 px)"
-    ],
-    "verdict": "pop"
+    "frames": 168,
+    "chrome_px": 535830,
+    "content_px": 1307043,
+    "max_chrome_share": 0.069,
+    "max_content_share": 0.119,
+    "issues": [],
+    "verdict": "smooth"
   },
   "food-search-results": {
-    "frames": 48,
+    "frames": 53,
     "chrome_px": 0,
-    "content_px": 75052,
+    "content_px": 69434,
     "max_chrome_share": 0,
-    "max_content_share": 0.094,
+    "max_content_share": 0.107,
     "issues": [],
     "verdict": "smooth"
   },
   "food-select-tray": {
-    "frames": 63,
-    "chrome_px": 78946,
-    "content_px": 369370,
-    "max_chrome_share": 0.217,
-    "max_content_share": 0.157,
+    "frames": 75,
+    "chrome_px": 166630,
+    "content_px": 224401,
+    "max_chrome_share": 0.132,
+    "max_content_share": 0.264,
     "issues": [],
     "verdict": "smooth"
   },
   "photo-tray": {
-    "frames": 65,
-    "chrome_px": 69816,
-    "content_px": 247249,
-    "max_chrome_share": 0.128,
-    "max_content_share": 0.203,
-    "issues": [],
-    "verdict": "smooth"
-  },
-  "water-save": {
-    "frames": 92,
-    "chrome_px": 197699,
-    "content_px": 1218988,
-    "max_chrome_share": 0.155,
-    "max_content_share": 0.17,
+    "frames": 72,
+    "chrome_px": 168701,
+    "content_px": 147872,
+    "max_chrome_share": 0.13,
+    "max_content_share": 0.522,
     "issues": [
-      "late change frame 68 after 16 still frames (222616 px)"
+      "content hard cut frame 48: 52% of content change",
+      "late change frame 48 after 44 still frames (77155 px)"
     ],
     "verdict": "pop"
+  },
+  "water-save": {
+    "frames": 113,
+    "chrome_px": 340262,
+    "content_px": 1034432,
+    "max_chrome_share": 0.094,
+    "max_content_share": 0.136,
+    "issues": [],
+    "verdict": "smooth"
   }
 }

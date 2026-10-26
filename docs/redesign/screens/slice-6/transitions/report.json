@@ -1,50 +1,48 @@
 {
   "finish": {
-    "frames": 85,
-    "chrome_px": 38014,
-    "content_px": 183727,
-    "max_chrome_share": 0.137,
-    "max_content_share": 0.074,
+    "frames": 84,
+    "chrome_px": 37824,
+    "content_px": 183663,
+    "max_chrome_share": 0.139,
+    "max_content_share": 0.073,
     "issues": [],
     "verdict": "smooth"
   },
   "rest-minimise": {
-    "frames": 135,
-    "chrome_px": 223576,
-    "content_px": 987460,
-    "max_chrome_share": 0.065,
-    "max_content_share": 0.057,
+    "frames": 146,
+    "chrome_px": 224378,
+    "content_px": 971242,
+    "max_chrome_share": 0.064,
+    "max_content_share": 0.058,
     "issues": [
-      "late change frame 134 after 16 still frames (78 px)"
+      "late change frame 138 after 16 still frames (78 px)"
     ],
     "verdict": "pop"
   },
   "set-tick-rest": {
-    "frames": 94,
-    "chrome_px": 128321,
-    "content_px": 715759,
-    "max_chrome_share": 0.112,
-    "max_content_share": 0.07,
-    "issues": [
-      "late change frame 19 after 8 still frames (2629 px)"
-    ],
-    "verdict": "pop"
+    "frames": 83,
+    "chrome_px": 109085,
+    "content_px": 605707,
+    "max_chrome_share": 0.135,
+    "max_content_share": 0.092,
+    "issues": [],
+    "verdict": "smooth"
   },
   "start-session": {
-    "frames": 58,
-    "chrome_px": 134186,
-    "content_px": 373406,
-    "max_chrome_share": 0.108,
-    "max_content_share": 0.099,
+    "frames": 57,
+    "chrome_px": 132000,
+    "content_px": 348266,
+    "max_chrome_share": 0.111,
+    "max_content_share": 0.096,
     "issues": [],
     "verdict": "smooth"
   },
   "train-first-load": {
-    "frames": 69,
-    "chrome_px": 62516,
-    "content_px": 317879,
-    "max_chrome_share": 0.136,
-    "max_content_share": 0.103,
+    "frames": 64,
+    "chrome_px": 42769,
+    "content_px": 248903,
+    "max_chrome_share": 0.272,
+    "max_content_share": 0.382,
     "issues": [],
     "verdict": "smooth"
   }
