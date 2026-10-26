@@ -82,7 +82,7 @@ export function TargetStepper({ label, macro, unit, value, step, onChange }: {
   const id = useId()
   const nudge = (delta: number) => onChange(Math.max(0, (value ?? 0) + delta))
   return (
-    <div className="grid min-h-stepper grid-cols-[44px_1fr_44px] items-center rounded-[18px] bg-card p-1.5 shadow-[0_1px_2px_rgba(17,28,53,.04)]">
+    <div className="grid min-h-stepper grid-cols-[44px_1fr_44px] items-center rounded-[18px] bg-[var(--surface-card,var(--color-card))] p-1.5 shadow-[0_1px_2px_rgba(17,28,53,.04)]">
       <Round label={`Less ${label.toLowerCase()}`} onClick={() => nudge(-step)}>−</Round>
       <div className="flex flex-col items-center">
         <label htmlFor={id} className="flex items-center gap-1.5 text-label text-ink-65"><HueDot macro={macro} />{label}</label>

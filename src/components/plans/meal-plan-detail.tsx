@@ -67,7 +67,7 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
                 type="button"
                 aria-pressed={selectedDay === index}
                 onClick={() => { void haptic('selection'); setSelectedDay(index) }}
-                className={`min-h-chip shrink-0 whitespace-nowrap rounded-full px-4 text-body-sm font-semibold tabular-nums transition-transform active:scale-[.96] ${selectedDay === index ? 'bg-ink text-cream' : 'bg-card text-ink shadow-[0_1px_2px_rgba(17,28,53,.06)]'}`}
+                className={`min-h-chip shrink-0 whitespace-nowrap rounded-full px-4 text-body-sm font-semibold tabular-nums transition-transform active:scale-[.96] ${selectedDay === index ? 'bg-ink text-cream' : 'bg-[var(--surface-card,var(--color-card))] text-ink shadow-[0_1px_2px_rgba(17,28,53,.06)]'}`}
               >
                 {formatDayDate(item.date, index)}
               </button>

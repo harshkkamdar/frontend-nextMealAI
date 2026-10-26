@@ -58,7 +58,7 @@ export function SearchSheet<T>({ open, onClose, title, label, placeholder, searc
           <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder={placeholder} className="h-field w-full rounded-[16px] bg-card pl-12 pr-4 text-body font-semibold text-ink shadow-[inset_0_0_0_2px_var(--color-ink)] outline-none placeholder:font-medium placeholder:text-ink-65" />
         </label>
         {query.trim() ? (
-          <div className="mt-2.5 overflow-hidden rounded-card bg-card px-2.5" aria-live="polite">
+          <div className="mt-2.5 overflow-hidden rounded-card bg-[var(--surface-card,var(--color-card))] px-2.5" aria-live="polite">
             {loading ? <p className="flex min-h-12 items-center px-1.5 text-body-sm text-ink-65">Searching</p> : null}
             {failed ? <p className="flex min-h-12 items-center px-1.5 text-body-sm text-ink-65">Search didn&apos;t load. Check your connection.</p> : null}
             {settled && !failed && results.length === 0 ? <p className="flex min-h-12 items-center px-1.5 text-body-sm text-ink-65">No matches</p> : null}

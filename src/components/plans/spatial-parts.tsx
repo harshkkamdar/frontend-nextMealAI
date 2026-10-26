@@ -13,7 +13,9 @@ import { cn } from '@/lib/utils'
  * plans slice owns both folders.
  */
 
-export const CARD = 'rounded-card bg-card shadow-[var(--shadow-card)]'
+/** Card surface: the shared --surface-card token (translucent over the Spatial backdrop) once it lands, white until then. */
+export const CARD_BG = 'bg-[var(--surface-card,var(--color-card))]'
+export const CARD = 'rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]'
 export const INK_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-ink px-5 text-body font-bold text-cream transition-transform enabled:active:scale-[.97] disabled:opacity-45'
 /**
  * The screen's one orange action, as a plain class string (buttons and the busy state in the dock share it).

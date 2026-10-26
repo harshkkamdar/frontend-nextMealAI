@@ -1,3 +1,7 @@
+import http from 'node:http'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
+
 /**
  * Slice 7 (Plans) captures and transitions. Loaded by scripts/redesign-capture.mjs and redesign-transitions.mjs.
  * Every request is mocked; nothing reaches the real API.
@@ -130,7 +134,7 @@ const shots = [
 ]
 
 // ── Transitions. The recorder's route stubs return {} (and onboarding incomplete), so slice 7 records against its own
-// mock (`home` set): run the fixtures above as a server and a dev server pointed at it, then
+// mock (`home` set): `node scripts/shots/slice-7.mjs 4017` serves the fixtures above, then a build pointed at it and
 //   BASE_URL=http://localhost:3027 API_URL=http://localhost:4017 node scripts/redesign-transitions.mjs slice-7 ──
 const day1 = (p) => p.getByRole('button', { name: 'Upper A day 1' })
 const transitions = [
@@ -145,3 +149,22 @@ const transitions = [
 
 const slice7 = { shots, transitions }
 export default slice7
+
+/** Fixture API for transitions: `node scripts/shots/slice-7.mjs [port]` (POST /__scenario is accepted and ignored). */
+function serve(port) {
+  const table = plansApi()
+  http.createServer((req, res) => {
+    const send = (status, body) => { res.writeHead(status, { 'access-control-allow-origin': req.headers.origin || '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*', 'content-type': 'application/json' }); res.end(JSON.stringify(body)) }
+    const p = new URL(req.url, 'http://x').pathname
+    req.resume()
+    req.on('end', () => {
+      if (req.method === 'OPTIONS') return send(204, {})
+      if (p === '/__scenario') return send(200, {})
+      if (p === '/auth/login' || p === '/auth/refresh') return send(200, { user: { id: 'capture-user', email: 'capture@example.com' }, session: { access_token: 'capture-token', refresh_token: 'capture-refresh' } })
+      if (p === '/v1/profile/onboarding') return send(200, { personal: { complete: true }, fitness: { complete: true }, nutrition: { complete: true } })
+      const key = Object.keys(table).filter((k) => p === k || p.startsWith(k + '/')).sort((a, b) => b.length - a.length)[0]
+      return send(200, key ? table[key] : {})
+    })
+  }).listen(port, () => console.log(`slice-7 fixture API on :${port}`))
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) serve(Number(process.argv[2] || 4017))
