@@ -104,6 +104,9 @@
   html { scrollbar-width: none; }
   html::-webkit-scrollbar { display: none; }
   body { @apply bg-background text-text-primary font-sans antialiased; }
+  /* The route frame moves focus to a new page's heading (or the page) after a push or pop, for screen readers and the
+     keyboard; that landing spot is not a control, so it draws no ring. */
+  [data-route][tabindex="-1"]:focus, [data-route] [tabindex="-1"]:focus { outline: none; }
 }
 
 /* Reduced motion keeps state changes visible but drops loops and travel. */
