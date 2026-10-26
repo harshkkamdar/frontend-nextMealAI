@@ -41,7 +41,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S2-R5 | R5 60 fps on fiqr_lowend | blocked-60fps (F6): no real low-end phone; emulator proxy trace from the S2 device agent (pending its report) |
 | S2-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (Fable, docs/redesign/critic-prompt.md, refs Bevel IMG_6907/6891/6866/6865): r1 ranks 1/1/1 scores 7/7/7; r2 1/1/1 7/7/7; r3 2/1/1 6/7/7. Remaining critiques are signed decisions: macro hues (Q18) and capsule + separate orb (C2). needs-owner: collapse protein/carbs/fat to navy tints (changes Q18)? Keep the orb outside the capsule (C2)? |
 | S2-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-2.md? Also: sleep tile became one line plus weekly average instead of the D1 7-night strip (critic round 2, taken alone, cheap to reverse) - keep? |
-| S2-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S2-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S3 logging
 
@@ -67,7 +67,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S3-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S3-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6862/6879/6915/6916): r1 ranks 1/1/1 scores 7/7/7; r2 1/1/1 7.5/7.5/7.5; r3 1/2/1 7.5/7/7.5. Remaining critiques: round glass back button (C3), soft shadows on pills and cards. Fix commits 01483e6, 6672e18 |
 | S3-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-3.md? Also: food search sheet moved to the inset sheet (no snap levels); /foods lost the orange Add (round + in header); recent-log right value only for food and workouts |
-| S3-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S3-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S4 Geo tab
 
@@ -86,7 +86,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S4-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S4-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: critic scores of 3 fix rounds printed - r1 7/7.5/7, r2 7.5/7.5/7.5, r3 7.5/7/7.5 (ranks 1/1/1; top 3 every run, never >= 8). Recurring r3 notes: round shadowed back button (C3, signed), lone wrapped "Not sure" chip, disabled send reads muddy, timestamp and caption gaps |
 | S4-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-4.md? Resizable sheets settle by transform (pinned footer shifts slightly on release) vs animating height (forbidden by motion-feel) - keep? Inline food rows parse Geo's "Logged ... N cal" receipt text; a structured receipt from the backend would be sturdier (backend change, out of scope). New: Ask Geo field on /chat and a Rename/Delete sheet - approve? |
-| S4-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S4-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S5 Food diary
 
@@ -104,7 +104,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S5-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S5-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (Fable, critic-prompt.md, refs Bevel IMG_6868/6869/6865/6904): r1 ranks 1/1/1 scores 8/7.5/7.5; r2 1/1/1 7.5/7.5/7.5; r3 1/1/1 7.5/7.5/7.5. Remaining critiques: macro hues (Q18), capsule + orb (C2). Fix commits 1260c0a, 565cfcf |
 | S5-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-5.md? Also: the sticky orange Log food button was removed (Add food rows, dashed slots and the orb cover it) - OK? |
-| S5-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S5-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S6 Train + live session
 
@@ -123,7 +123,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S6-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S6-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: critic scores of 3 fix rounds printed - r1 7.5/7.5/7, r2 7.5/7.5/7.5, r3 7.5/7/7.5 (ranks 1/2/1; top 3 every run, never >= 8). Recurring r3 notes: bottom inset under the tab bar on Program list, one selected-day marker, bar chart scale, title vs body face (signed type decision) |
 | S6-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-6.md? Freestyle log moved to the header +; calendar sheet uses the shared week strip (no tap-Today jump); pager scrolls sideways only (also fixed resume landing on exercise 1). Should Start on Train be orange when Home uses an ink play button? |
-| S6-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S6-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S7 Plans
 
@@ -143,7 +143,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S7-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S7-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6865/6869/6905/6906): r1 ranks 1/3/4 scores 7/6.5/6; r2 1/2/1 7.5/7/7; r3 2/1/1 7/7.5/7. Remaining critiques: round glass back (C3), orange CTA size, card radii vs tab bar. Fix commits be0cd6e, a58d95c |
 | S7-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-7.md? Also: new Earlier plans list is an extra non-blocking getPlans() read (Q6 says no data-flow change) - keep or drop? Cancel removed from builders (Back does it) - OK? |
-| S7-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S7-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S8 Check-in
 
@@ -160,7 +160,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S8-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S8-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6891/6907/6869/6865): r1 1/1/1 7/7.5/7.5; r2 1/1/1 7/7/7.5; r3 1/1/1 7.5/8/7.5. Remaining critique: the orange G in Geo's avatar (client design reference) - needs-owner: make the G cream/ink? Fix commits edda1da, a5d6add |
 | S8-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-8.md? After Apply the screen keeps the applied week until you leave - OK? Settings button dropped from check-in - OK? Health wording "Includes Apple Health weigh-ins" - OK? |
-| S8-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S8-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S9 Settings and the rest
 
@@ -184,7 +184,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S9-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S9-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: critic scores of 3 fix rounds printed (refs Bevel IMG_6915-6918) - r1 6.5/7/6.5 (ranks 2/2/2), r2 7/6.5/7 (ranks 2/2/1), r3 7/7/7 (ranks 1/1/2; first r3 attempt lost to API connection drops and rerun). Recurring r3 notes: dark ink-65 switch reads as off, tab capsule plus separate orb (C2, signed), round back button (C3, signed), last row clipped under the tab bar, value column baseline |
 | S9-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-9.md? Picker rows instead of chip rows (36 px chips failed 44 pt), profile Save as a glass pill in the bar, every confirm in ink - taken alone, approve? |
-| S9-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S9-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S10 admin
 
@@ -198,7 +198,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S10-R5 | R5 60 fps on fiqr_lowend | blocked: admin is web only and not in the Capacitor build; no frame budget applies |
 | S10-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | differs: Q6 (admin beyond a token pass is out of scope; not part of the critic loop) |
 | S10-R7 | R7 copy list approved | built de45f9b: no copy changed in admin |
-| S10-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+| S10-R8 | R8 AGENTS laws, palette grep, lint/type/test | built 3eb9f808: palette grep 0 hits (hex outside the AGENTS.md set; the last 8 were #000 in alpha masks, now brand ink), dark: classes 0, next/image 0; npm run lint exit 0 (0 errors, 25 warnings), npm run type-check exit 0, npm test exit 0 (91 files, 539 passed, 1 skipped) |
 
 ## S1c welcome rebuild (owner request 26 Oct 2026: "static, PowerPoint slides, not liquid glass, AI slop")
 
