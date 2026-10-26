@@ -9,14 +9,16 @@ const mocks = vi.hoisted(() => ({
   push: vi.fn(),
   query: vi.fn(),
   toastSuccess: vi.fn(),
+  toastError: vi.fn(),
+  health: { label: null as string | null, connected: false },
 }))
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mocks.push }),
+  useRouter: () => ({ push: mocks.push, back: vi.fn(), replace: vi.fn() }),
 }))
 
 vi.mock('sonner', () => ({
-  toast: { success: mocks.toastSuccess, error: vi.fn() },
+  toast: { success: mocks.toastSuccess, error: mocks.toastError },
 }))
 
 vi.mock('@/lib/api/check-in.api', () => ({
@@ -38,6 +40,11 @@ vi.mock('@/contexts/geo-screen-context', () => ({
 
 vi.mock('@/components/shared/offline-band', () => ({
   OfflineBand: () => null,
+}))
+
+vi.mock('@/lib/platform/health', () => ({
+  healthLabel: () => mocks.health.label,
+  isHealthConnected: async () => mocks.health.connected,
 }))
 
 vi.mock('@/lib/sync/sync-bus', () => ({
@@ -97,6 +104,7 @@ function renderStatus(status: CheckInStatus) {
 beforeEach(() => {
   vi.clearAllMocks()
   mocks.applyCheckIn.mockResolvedValue(undefined)
+  mocks.health = { label: null, connected: false }
 })
 
 describe('check-in states', () => {
@@ -104,7 +112,7 @@ describe('check-in states', () => {
     const { container, refetch } = renderStatus(baseStatus)
 
     expect(screen.getByText('Week 6 check-in')).toBeInTheDocument()
-    expect(container.querySelector('polyline')).toHaveAttribute('stroke', '#E8622A')
+    expect(container.querySelector('polyline')).toHaveAttribute('stroke', 'var(--color-ink)')
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
 
@@ -127,7 +135,7 @@ describe('check-in states', () => {
     const { container } = renderStatus(midWeek)
 
     expect(screen.getByText('6 days to go')).toBeInTheDocument()
-    expect(container.querySelector('polyline')).toHaveAttribute('stroke', 'rgba(17,28,53,.35)')
+    expect(container.querySelector('polyline')).toHaveAttribute('stroke', 'var(--color-ink-35)')
     expect(screen.queryByRole('button', { name: /targets/i })).not.toBeInTheDocument()
     expect(mocks.applyCheckIn).not.toHaveBeenCalled()
   })
@@ -150,12 +158,44 @@ describe('check-in states', () => {
     const { container } = renderStatus(insufficient)
 
     expect(screen.getByText('3 of 7 days logged')).toBeInTheDocument()
-    expect(container.querySelector('polyline')).toHaveAttribute('stroke', 'rgba(17,28,53,.35)')
+    expect(container.querySelector('polyline')).toHaveAttribute('stroke', 'var(--color-ink-35)')
 
     fireEvent.click(screen.getByRole('button', { name: 'Keep current targets' }))
 
     expect(mocks.applyCheckIn).not.toHaveBeenCalled()
     expect(mocks.toastSuccess).toHaveBeenCalledWith('Targets unchanged')
     expect(mocks.push).toHaveBeenCalledWith('/dashboard')
+  })
+
+  it('settles the proposal into the new targets in place after apply', async () => {
+    renderStatus(baseStatus)
+    expect(screen.getByText('2,200')).not.toHaveAttribute('aria-hidden')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
+
+    await waitFor(() => expect(screen.getByText('Your new targets')).toBeInTheDocument())
+    expect(screen.getByText('2,380')).toBeInTheDocument()
+    expect(screen.getByText('2,200').closest('[aria-hidden="true"]')).not.toBeNull()
+    expect(screen.getByRole('button', { name: 'Done' }).closest('[inert]')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Apply new targets' }).closest('[inert]')).not.toBeNull()
+  })
+
+  it('keeps the proposal and says so when apply fails', async () => {
+    mocks.applyCheckIn.mockRejectedValue(new Error('500'))
+    const { refetch } = renderStatus(baseStatus)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
+
+    await waitFor(() => expect(mocks.toastError).toHaveBeenCalledWith("That didn't save. Try again."))
+    expect(refetch).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Apply new targets' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Done' }).closest('[inert]')).not.toBeNull()
+  })
+
+  it('labels weigh-ins that come from the Health app', async () => {
+    mocks.health = { label: 'Apple Health', connected: true }
+    renderStatus(baseStatus)
+
+    expect(await screen.findByText('Includes Apple Health weigh-ins')).toBeInTheDocument()
   })
 })

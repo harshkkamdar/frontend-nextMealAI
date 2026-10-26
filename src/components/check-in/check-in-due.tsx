@@ -3,129 +3,149 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { GeoAvatar } from '@/components/shared/geo-avatar'
-import { FeatureCard } from '@/components/ui/fiqr/feature-card'
+import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { applyCheckIn, type CheckInStatus } from '@/lib/api/check-in.api'
 import { syncBus } from '@/lib/sync/sync-bus'
-import { useUIStore } from '@/stores/ui.store'
+import { cn } from '@/lib/utils'
 
-import { formatMetric } from './format'
+import { formatDelta, formatMetric } from './format'
+import { AskGeo, CARD, Count, GeoRead, INK_BUTTON, SectionTitle } from './parts'
 import { StatTiles } from './stat-tiles'
 import { WeightTrendCard } from './weight-trend-card'
 
 interface CheckInDueProps {
   status: CheckInStatus
   refetch: () => Promise<void>
+  /** True once Apply succeeded: the proposal settles into the new targets in place. */
+  applied: boolean
+  onApplied: () => void
+  onDone: () => void
+  enter: boolean
+  source: string | null
 }
 
-function TargetChange({ label, current, next, unit = '' }: {
+const fade = 'transition-opacity duration-200 ease-out'
+
+/** Old value, arrow, new value. On apply the old value and arrow fade out; the new value never moves. */
+function TargetChange({ label, current, next, unit, applied }: {
   label: string
   current: number | null
   next: number
-  unit?: string
+  unit: string
+  applied: boolean
 }) {
   const unchanged = current === next
-
   return (
-    <div className="flex items-center gap-3 border-b border-ink-09 py-3 last:border-b-0">
-      <span className="flex-1 text-[15.5px] font-semibold">{label}</span>
+    <div className="flex min-h-16 items-center gap-3 border-b border-ink-06 px-5 py-3 last:border-b-0">
+      <span className="flex-1 text-[15.5px] font-semibold text-ink">{label}</span>
       {unchanged ? (
-        <span className="text-[15.5px] font-semibold text-ink">No change</span>
+        <span className="text-[15px] font-semibold text-ink-65">No change</span>
       ) : (
-        <span className="flex items-center gap-3 text-[15px]">
-          <s className="text-ink-65">{formatMetric(current)}{unit}</s>
-          <span className="text-ink-35">→</span>
-          <b className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-[3px]">{next.toLocaleString()}{unit}</b>
+        <span className="flex shrink-0 items-baseline gap-2 whitespace-nowrap">
+          <span aria-hidden={applied} className={cn('flex items-center gap-2', fade, applied && 'opacity-0')}>
+            <s className="text-[15px] text-ink-65 tabular-nums">{formatMetric(current)}</s>
+            <ChevronRightIcon className="size-4 self-center text-ink-35" />
+          </span>
+          <span className="font-wide text-[22px] font-bold leading-none tracking-[-0.4px] text-ink tabular-nums">{next.toLocaleString()}</span>
+          <span className="text-[13px] font-semibold text-ink-65">{unit}</span>
         </span>
       )}
     </div>
   )
 }
 
-export function CheckInDue({ status, refetch }: CheckInDueProps) {
+export function CheckInDue({ status, refetch, applied, onApplied, onDone, enter, source }: CheckInDueProps) {
   const [submitting, setSubmitting] = useState(false)
   const { proposal, targets, week_so_far: week, weight } = status
+  const hold = proposal?.direction === 'hold'
 
   const handleApply = async () => {
-    if (submitting) return
+    if (submitting || applied) return
     setSubmitting(true)
     try {
       await applyCheckIn()
+      onApplied()
       toast.success('Targets updated')
       await refetch()
       syncBus.emit('plans:updated')
     } catch {
-      toast.error("Couldn't update targets")
+      toast.error("That didn't save. Try again.")
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="flex flex-1 flex-col">
-      <FeatureCard className="mt-[14px] px-5 py-[18px]">
-        <div className="flex items-center gap-[10px]">
-          <GeoAvatar size={24} />
-          <span className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">GEO&apos;S READ</span>
-        </div>
-        <p className="mt-3 text-pretty text-[22px] font-semibold leading-[1.25] tracking-[-0.2px] text-cream">
-          {status.verdict}
-        </p>
-      </FeatureCard>
+    <div className="flex flex-col gap-3">
+      <GeoRead verdict={status.verdict} className={cn(enter && 'enter-hero')}>
+        {weight.delta_week_kg === null ? null : (
+          <div className="mt-4">
+            <span className="sr-only">{formatDelta(weight.delta_week_kg)} kg this week</span>
+            <div aria-hidden="true" className="flex items-baseline gap-1.5">
+              <span className="font-wide text-[40px] font-[750] leading-none tracking-[-1px] text-ink">
+                <Count value={weight.delta_week_kg} format={formatDelta} />
+              </span>
+              <span className="text-[15px] font-semibold text-ink-65">kg this week</span>
+            </div>
+          </div>
+        )}
+      </GeoRead>
 
-      <section className="mt-4 space-y-[9px]">
-        <SectionLabel>The week&apos;s data</SectionLabel>
-        <WeightTrendCard
-          currentKg={weight.current_kg}
-          deltaKg={weight.delta_week_kg}
-          points={weight.points}
-          tone="accent"
-        />
-        <StatTiles
-          cols={4}
-          items={[
-            { label: 'Kcal', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)}` },
-            { label: 'Protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)}g` },
-            { label: 'Train', value: week.sessions_done, sub: `of ${week.sessions_planned}` },
-            { label: 'Sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} nights` },
-          ]}
-        />
+      <section className="mt-3">
+        <SectionTitle>Your week</SectionTitle>
+        <div className="flex flex-col gap-3">
+          <WeightTrendCard currentKg={weight.current_kg} deltaKg={weight.delta_week_kg} points={weight.points} tone="strong" source={source} />
+          <StatTiles
+            enter={enter}
+            items={[
+              { label: 'Avg calories', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)} kcal` },
+              { label: 'Avg protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)} g` },
+              { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned` },
+              { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked` },
+            ]}
+          />
+        </div>
       </section>
 
       {proposal ? (
-        <section className="mt-[18px]">
-          <SectionLabel>What&apos;s changing</SectionLabel>
-          <div className="mt-[9px]">
-            <TargetChange label="Daily calories" current={targets.calories} next={proposal.new_calories} />
-            <TargetChange label="Daily protein" current={targets.protein_g} next={proposal.new_protein_g} unit="g" />
+        <section className="mt-3">
+          {/* The heading crossfades in place, both lines share one grid cell. */}
+          <div className="grid">
+            <div aria-hidden={applied} className={cn('col-start-1 row-start-1', fade, applied && 'opacity-0')}><SectionTitle>{hold ? 'Your targets' : 'What changes'}</SectionTitle></div>
+            <div aria-hidden={!applied} className={cn('col-start-1 row-start-1', fade, !applied && 'opacity-0')}><SectionTitle>{hold ? 'Targets kept' : 'Your new targets'}</SectionTitle></div>
+          </div>
+          <div className={cn(CARD, 'overflow-hidden')}>
+            <TargetChange label="Daily calories" current={targets.calories} next={proposal.new_calories} unit="kcal" applied={applied} />
+            <TargetChange label="Daily protein" current={targets.protein_g} next={proposal.new_protein_g} unit="g" applied={applied} />
           </div>
         </section>
       ) : null}
 
-      <div className="mt-auto flex flex-col gap-2 pb-4 pt-[14px]">
-        {proposal?.direction === 'hold' ? (
-          <SecondaryButton disabled={submitting} onClick={() => void handleApply()} onNavy={false}>
-            Keep current targets
-          </SecondaryButton>
-        ) : (
-          <PrimaryButton
-            className="h-[58px] justify-center"
-            disabled={submitting}
-            onClick={() => void handleApply()}
-          >
-            Apply new targets
-          </PrimaryButton>
-        )}
-        <button
-          className="self-center px-3 py-1 text-[15.5px] font-semibold text-ink-65"
-          onClick={() => useUIStore.getState().openSheet('geo-companion')}
-          type="button"
-        >
-          Ask Geo about this
-        </button>
+      <div className="mt-3 flex flex-col gap-1">
+        {/* Apply and Done share one cell so the swap never moves the page. */}
+        <div className="grid">
+          <div inert={applied} className={cn('col-start-1 row-start-1', fade, applied && 'opacity-0')}>
+            {hold ? (
+              <button type="button" aria-busy={submitting} disabled={submitting} onClick={() => void handleApply()} className={INK_BUTTON}>
+                {submitting ? 'Saving' : 'Keep current targets'}
+              </button>
+            ) : (
+              <PrimaryButton
+                aria-busy={submitting}
+                className="h-[58px] disabled:bg-accent disabled:text-cream disabled:shadow-[var(--shadow-action)]"
+                disabled={submitting}
+                onClick={() => void handleApply()}
+              >
+                {submitting ? 'Updating your targets' : 'Apply new targets'}
+              </PrimaryButton>
+            )}
+          </div>
+          <div inert={!applied} className={cn('col-start-1 row-start-1', fade, !applied && 'opacity-0')}>
+            <button type="button" onClick={onDone} className={INK_BUTTON}>Done</button>
+          </div>
+        </div>
+        <AskGeo />
       </div>
     </div>
   )

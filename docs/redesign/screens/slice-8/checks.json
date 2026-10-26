@@ -1,0 +1,306 @@
+[
+  {
+    "shot": "ask-geo",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ask-geo",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-applied",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-applied",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-apply-error",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-apply-error",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-end",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-end",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-hold-end",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "due-hold-end",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "due-long-end",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-long-end",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-long",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-long",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-no-trend",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-no-trend",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-saving",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due-saving",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "due",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "error",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "error",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "first-week",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "first-week",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "insufficient-end",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "insufficient-end",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "insufficient",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "insufficient",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "loading",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "loading",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "mid-week-behind",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "mid-week-behind",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "mid-week-end",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "mid-week-end",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "mid-week",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "mid-week",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "offline",
+    "width": 360,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "offline",
+    "width": 390,
+    "url": "/check-in",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  }
+]
