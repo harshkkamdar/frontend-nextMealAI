@@ -533,7 +533,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
       {/* Solid cream, not glass: Chrome skips painting a backdrop-filter bar while it animates, so it would pop in. */}
       {exercises.length > 0 ? (
-      <motion.nav initial={reduce ? false : { y: 96 }} animate={{ y: 0 }} transition={spring.sheet} className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-[28px] bg-cream px-4 pt-3 shadow-[0_-8px_24px_rgba(17,28,53,.06)]" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
+      <motion.nav initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={spring.sheet} className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-[28px] bg-cream px-4 pt-3 shadow-[0_-8px_24px_rgba(17,28,53,.06)]" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
         {allComplete || currentIndex === exercises.length - 1 ? (
           <PrimaryButton type="button" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
         ) : (
