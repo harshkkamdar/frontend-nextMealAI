@@ -1,11 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import { hidesTabBar } from '@/components/layout/tab-bar'
-import { ChevronLeftIcon } from '@/components/ui/fiqr/icons'
-import { RoundButton } from '@/components/ui/fiqr/round-button'
-import { useTitleDrift } from '@/components/ui/fiqr/scroll-drift'
 import { cn } from '@/lib/utils'
 
 /**
@@ -96,46 +93,3 @@ export function Busy({ children }: { children: ReactNode }) {
   )
 }
 
-/**
- * Pushed screen with a large title (Plans, a plan view): round glass back button, actions on the right; the bar shows
- * the title and fills with glass only once the large title has scrolled under it. The large title drifts on scroll.
- * Local wrapper: PushedHeader always shows its bar title (shared-file request in the slice report).
- */
-export function PushedLargeHeader({ title, barTitle = title, sub, onBack, backLabel = 'Back', actions }: {
-  title: string
-  barTitle?: string
-  sub?: ReactNode
-  onBack: () => void
-  backLabel?: string
-  actions?: ReactNode
-}) {
-  const marker = useRef<HTMLDivElement>(null)
-  const drift = useTitleDrift<HTMLDivElement>()
-  const [past, setPast] = useState(false)
-  useEffect(() => {
-    const node = marker.current
-    if (!node || typeof IntersectionObserver === 'undefined') return
-    const observer = new IntersectionObserver(([entry]) => setPast(!entry.isIntersecting), { rootMargin: '-60px 0px 0px 0px' })
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
-  return (
-    <>
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-[40]" style={{ paddingTop: 'var(--safe-top)' }}>
-        <div aria-hidden="true" className={cn('glass-cream absolute inset-0 rounded-none shadow-none transition-opacity duration-200', past ? 'opacity-100' : 'opacity-0')} />
-        <div className="relative mx-auto flex h-[60px] max-w-md items-center gap-2 px-4">
-          <div className="pointer-events-auto flex min-w-11 items-center"><RoundButton aria-label={backLabel} onClick={onBack}><ChevronLeftIcon /></RoundButton></div>
-          <p aria-hidden="true" className={cn('min-w-0 flex-1 truncate text-center text-[17px] font-semibold text-ink transition-[opacity,transform] duration-200', past ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-0')}>{barTitle}</p>
-          <div className="pointer-events-auto flex min-w-11 items-center justify-end gap-2">{actions}</div>
-        </div>
-      </div>
-      <div aria-hidden="true" className="h-[calc(60px+var(--safe-top))]" />
-      <div ref={drift} className="origin-top-left px-1 pt-1">
-        {/* Whole-pixel line heights keep everything below on whole pixels, so layout glides settle without a 1 px text snap. */}
-        <h1 className="font-display break-words text-title leading-8 text-ink [overflow-wrap:anywhere]">{title}</h1>
-        {sub ? <p className="mt-1.5 text-body-sm leading-5 text-ink-65 tabular-nums">{sub}</p> : null}
-      </div>
-      <div ref={marker} aria-hidden="true" />
-    </>
-  )
-}

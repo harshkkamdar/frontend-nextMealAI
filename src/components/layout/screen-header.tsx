@@ -69,7 +69,8 @@ export function LargeTitleHeader({ title, subtitle, actions, children }: LargeTi
         {/* The title drifts and fades a little as the page scrolls under the bar (Spatial Depth). */}
         <div ref={drift} className="origin-top-left">
           <h1 className="font-display pr-28 text-title text-ink">{title}</h1>
-          {subtitle ? <p className="mt-1 text-body-sm text-ink-65">{subtitle}</p> : null}
+          {/* One line; with header buttons it stops short of them, like the title. */}
+          {subtitle ? <p className={cn('mt-1 truncate text-body-sm text-ink-65', actions && 'pr-28')}>{subtitle}</p> : null}
         </div>
         {/* The bar condenses once the line under the title passes under it. */}
         <div ref={ref} aria-hidden="true" />
@@ -84,21 +85,50 @@ interface PushedHeaderProps {
   onBack: () => void
   backLabel?: string
   actions?: ReactNode
+  /** Large left title under the bar (Plans, a plan, Today's week pages); the bar title appears once it scrolls under. */
+  large?: boolean
+  /** Large only: a line under the title. */
+  subtitle?: ReactNode
+  /** Large only: the condensed bar's title when it differs from the large one. */
+  barTitle?: string
 }
 
-/** Pushed screens: centred title with a round glass back button; the bar fills with glass on scroll (Q19). */
-export function PushedHeader({ title, onBack, backLabel = 'Back', actions }: PushedHeaderProps) {
+/** The large title block: drifts and fades a little as the page scrolls under the bar (Spatial Depth). */
+function LargeTitle({ title, subtitle }: { title: string; subtitle?: ReactNode }) {
+  const drift = useTitleDrift<HTMLDivElement>()
+  return (
+    <div ref={drift} className="origin-top-left px-1 pt-1">
+      {/* Whole-pixel line heights keep everything below on whole pixels, so layout glides settle without a 1 px text snap. */}
+      <h1 className="font-display break-words text-title leading-8 text-ink [overflow-wrap:anywhere]">{title}</h1>
+      {subtitle ? <p className="mt-1.5 text-body-sm leading-5 text-ink-65 tabular-nums">{subtitle}</p> : null}
+    </div>
+  )
+}
+
+/**
+ * Pushed screens: round glass back button, the bar fills with glass on scroll (Q19). Default: centred bar title.
+ * `large`: a large left title under the bar, and the bar shows `barTitle` only once that title has scrolled under it.
+ */
+export function PushedHeader({ title, onBack, backLabel = 'Back', actions, large = false, subtitle, barTitle = title }: PushedHeaderProps) {
   const { ref, past } = useScrolledPast<HTMLDivElement>()
   return (
     <>
       <TopBar
-        title={title}
+        title={large ? barTitle : title}
         filled={past}
-        titleVisible
+        titleVisible={large ? past : true}
         leading={<RoundButton aria-label={backLabel} onClick={onBack}><ChevronLeftIcon /></RoundButton>}
         actions={actions}
       />
-      <div ref={ref} aria-hidden="true" className="h-[calc(60px+var(--safe-top))]" />
+      {large ? (
+        <>
+          <div aria-hidden="true" className="h-[calc(60px+var(--safe-top))]" />
+          <LargeTitle title={title} subtitle={subtitle} />
+          <div ref={ref} aria-hidden="true" />
+        </>
+      ) : (
+        <div ref={ref} aria-hidden="true" className="h-[calc(60px+var(--safe-top))]" />
+      )}
     </>
   )
 }

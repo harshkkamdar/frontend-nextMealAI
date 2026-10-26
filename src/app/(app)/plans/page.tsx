@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { MealPlanCard, PreviousPlanRow, SkeletonCard, WorkoutPlanCard } from '@/components/plans/plan-overview-card'
 import { previousPlans } from '@/components/plans/plan-format'
-import { CARD, FailCard, ORANGE_BUTTON, PushedLargeHeader, SectionHeading } from '@/components/plans/spatial-parts'
+import { CARD, FailCard, ORANGE_BUTTON, SectionHeading } from '@/components/plans/spatial-parts'
+import { PushedHeader } from '@/components/layout/screen-header'
 import { goBack } from '@/lib/navigation'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { ChevronRightIcon, FoodFill, TrainFill } from '@/components/ui/fiqr/icons'
@@ -37,7 +38,7 @@ export default function PlansPage() {
 
   return (
     <div className="mx-auto w-full max-w-md px-4 pb-[var(--tabbar-clearance)]">
-      <PushedLargeHeader title="Plans" onBack={() => goBack(router, '/settings')} />
+      <PushedHeader large title="Plans" onBack={() => goBack(router, '/settings')} />
       <div className="-mx-4 mt-3"><OfflineBand /></div>
 
       {loading && !data ? (

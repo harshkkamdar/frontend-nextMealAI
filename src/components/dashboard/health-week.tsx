@@ -56,13 +56,13 @@ export function HealthWeek({ metric }: { metric: 'steps' | 'sleep' }) {
 
   return (
     <div className="mx-auto w-full max-w-md px-4 pb-6">
-      <PushedHeader title={title} onBack={() => goBack(router, '/dashboard')} backLabel="Back to Today" />
+      <PushedHeader large title={title} onBack={() => goBack(router, '/dashboard')} backLabel="Back to Today" />
       <div className="-mx-4"><OfflineBand /></div>
-      <p className="mt-2 flex items-baseline gap-2">
+      <p className="mt-2 flex items-baseline gap-2 px-1">
         <span className="font-display text-title text-ink tabular-nums">{latest === null ? '—' : show(latest)}</span>
         <span className="text-caption font-semibold text-ink-65">{metric === 'steps' ? 'of 10,000 today' : 'last night'}</span>
       </p>
-      <p className="mt-0.5 text-caption text-ink-65">{source}</p>
+      <p className="mt-0.5 px-1 text-caption text-ink-65">{source}</p>
       <section className={cn(CARD, 'mt-3 p-4')} aria-label={`${title}, last seven days`}>
         <ol className="flex h-[168px] items-end gap-2">
           {days.map((day, index) => (
