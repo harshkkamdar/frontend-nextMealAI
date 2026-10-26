@@ -1,16 +1,18 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Ellipsis } from 'lucide-react'
 
+import { parseLoggedFoods, type LoggedFood } from '@/components/chat/logged-foods'
 import { ReportSheet } from '@/components/chat/report-sheet'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
-import { safeImageUrl } from '@/lib/utils'
+import { reducedFade, spring } from '@/lib/motion'
+import { cn, safeImageUrl } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat.types'
 
 // Simple inline markdown renderer for Geo's responses
-function renderInline(text: string): React.ReactNode[] {
-  const parts: React.ReactNode[] = []
+function renderInline(text: string): ReactNode[] {
+  const parts: ReactNode[] = []
   // Process **bold**, *italic*, `code` inline patterns
   const re = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`)/g
   let last = 0
@@ -23,7 +25,7 @@ function renderInline(text: string): React.ReactNode[] {
     } else if (match[0].startsWith('*')) {
       parts.push(<em key={key++}>{match[3]}</em>)
     } else {
-      parts.push(<code key={key++} className="rounded bg-ink-08 px-1">{match[4]}</code>)
+      parts.push(<code key={key++} className="rounded-[6px] bg-ink-06 px-1 text-[15px]">{match[4]}</code>)
     }
     last = match.index + match[0].length
   }
@@ -31,61 +33,124 @@ function renderInline(text: string): React.ReactNode[] {
   return parts
 }
 
-function GeoMessageContent({ content }: { content: string }) {
-  const lines = content.split('\n')
-  const elements: React.ReactNode[] = []
-  let listItems: React.ReactNode[] = []
-  let listKey = 0
+/** Geo speaks in plain text on the page (Q25): no bubble, 16/1.5 ink, light markdown. */
+function GeoText({ content }: { content: string }) {
+  const elements: ReactNode[] = []
+  let list: { ordered: boolean; items: ReactNode[] } | null = null
+  let key = 0
 
-  const flushList = () => {
-    if (listItems.length > 0) {
-      elements.push(
-        <ul key={`list-${listKey++}`} className="list-disc list-inside space-y-0.5 my-1">
-          {listItems}
-        </ul>
-      )
-      listItems = []
-    }
+  const flush = () => {
+    if (!list) return
+    const Tag = list.ordered ? 'ol' : 'ul'
+    elements.push(
+      <Tag key={`list-${key++}`} className={cn('space-y-1 pl-5 marker:text-ink-65', list.ordered ? 'list-decimal' : 'list-disc')}>
+        {list.items}
+      </Tag>,
+    )
+    list = null
   }
 
-  lines.forEach((line, i) => {
-    const headingMatch = line.match(/^(#{1,3})\s+(.+)$/)
-    const bulletMatch = line.match(/^[-*•]\s+(.+)$/)
-    const numberedMatch = line.match(/^\d+\.\s+(.+)$/)
-
-    if (headingMatch) {
-      flushList()
-      const text = headingMatch[2]
-      elements.push(
-        <p key={i} className="mb-1 mt-2 text-[15.5px] font-semibold text-ink">
-          {renderInline(text)}
-        </p>,
-      )
-    } else if (bulletMatch || numberedMatch) {
-      const text = (bulletMatch?.[1] ?? numberedMatch?.[1]) ?? ''
-      listItems.push(
-        <li key={i} className="text-[15.5px] text-ink">{renderInline(text)}</li>
-      )
+  content.split('\n').forEach((line, i) => {
+    const heading = line.match(/^(#{1,3})\s+(.+)$/)
+    const bullet = line.match(/^[-*•]\s+(.+)$/)
+    const numbered = line.match(/^\d+\.\s+(.+)$/)
+    if (heading) {
+      flush()
+      elements.push(<p key={i} className="pt-1 font-semibold">{renderInline(heading[2])}</p>)
+    } else if (bullet || numbered) {
+      const ordered = Boolean(numbered)
+      if (list && list.ordered !== ordered) flush()
+      list ??= { ordered, items: [] }
+      list.items.push(<li key={i} className="pl-0.5">{renderInline((bullet?.[1] ?? numbered?.[1]) ?? '')}</li>)
     } else if (line.trim() === '') {
-      flushList()
-      if (elements.length > 0) {
-        elements.push(<div key={`gap-${i}`} className="h-1" />)
-      }
+      flush()
     } else {
-      flushList()
-      elements.push(
-        <p key={i} className="text-[15.5px] leading-[1.4] text-ink">
-          {renderInline(line)}
-        </p>
-      )
+      flush()
+      elements.push(<p key={i}>{renderInline(line)}</p>)
     }
   })
-
-  flushList()
-  return <div className="space-y-0.5">{elements}</div>
+  flush()
+  return <div className="space-y-2.5 break-words text-[16px] leading-[1.5] text-ink">{elements}</div>
 }
 
-export function ChatBubble({ message, sessionId }: { message: ChatMessage; sessionId?: string }) {
+const fmt = (n: number) => (Number.isInteger(n) ? n : Number(n.toFixed(1))).toLocaleString('en-AU')
+
+function MacroValue({ value, letter, color }: { value: number | null; letter: string; color: string }) {
+  if (value === null) return null
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: color }} />
+      {fmt(value)} g {letter}
+    </span>
+  )
+}
+
+/** Foods Geo logged in this reply, as white rows with their numbers (Q25). */
+function LoggedFoods({ foods }: { foods: LoggedFood[] }) {
+  return (
+    <ul aria-label="Logged" className="overflow-hidden rounded-[16px] bg-card shadow-[var(--shadow-card)]">
+      {foods.map((food, index) => {
+        const hasMacros = food.protein !== null || food.carbs !== null || food.fat !== null
+        return (
+          <li key={index} className="flex min-h-14 items-center gap-3 border-b border-ink-06 px-4 py-3 last:border-b-0">
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-semibold leading-snug text-ink">{food.name}</span>
+              {hasMacros ? (
+                <span className="mt-1 flex flex-wrap gap-x-3 text-[13px] font-medium text-ink-65 tabular-nums">
+                  <MacroValue value={food.protein} letter="P" color="var(--color-ink)" />
+                  <MacroValue value={food.carbs} letter="C" color="var(--color-macro-teal)" />
+                  <MacroValue value={food.fat} letter="F" color="var(--color-macro-ochre)" />
+                </span>
+              ) : food.meal ? <span className="mt-0.5 block text-[13px] text-ink-65">{food.meal}</span> : null}
+            </span>
+            <span className="shrink-0 text-right">
+              <span className="block text-[15px] font-semibold text-ink tabular-nums">
+                {food.estimated ? '~' : ''}{fmt(food.kcal)}<span className="text-[13px] font-medium text-ink-65"> kcal</span>
+              </span>
+              {food.meal && hasMacros ? <span className="block text-[12px] font-medium text-ink-65">{food.meal}</span> : null}
+            </span>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+function describeFailure(a: { tool: string; error?: string }) {
+  // Friendly per-error overrides: Geo's text usually explains the why, so this stays short and free of internal codes.
+  const errorCopy: Record<string, string> = {
+    duplicate_window: 'it looks like a duplicate from the last minute',
+    not_found: "I couldn't find that entry",
+    validation: "those numbers didn't look right",
+    missing_meal_plan_targets: 'your nutrition plan needs daily targets',
+    profile_incomplete: 'your profile is missing something',
+    image_analysis_failed: "I couldn't read that image",
+  }
+  const base =
+    a.tool === 'create_log' ? "I couldn't save that log" :
+    a.tool === 'update_log' ? "I couldn't update that entry" :
+    a.tool === 'delete_log' ? "I couldn't delete that entry" :
+    a.tool === 'create_plan' ? "I couldn't create that plan" :
+    a.tool === 'update_plan' ? "I couldn't update that plan" :
+    a.tool === 'deactivate_active_plan' ? "I couldn't switch off that plan" :
+    "Something I tried didn't go through"
+  if (!a.error || a.error === 'unknown') return base
+  const friendly = errorCopy[a.error]
+  return friendly ? `${base}: ${friendly}` : base
+}
+
+interface ChatBubbleProps {
+  message: ChatMessage
+  sessionId?: string
+  /** True for a message that arrived while the screen was open; history paints at rest (motion-feel N8). */
+  fresh?: boolean
+  /** Shared-element id: a tapped option chip glides into this pill. */
+  layoutId?: string
+}
+
+/** One turn of the running conversation: the user's ink-tint pill, or Geo's plain text with logged-food rows. */
+export function ChatBubble({ message, sessionId, fresh = false, layoutId }: ChatBubbleProps) {
+  const reduce = useReducedMotion()
   const isUser = message.role === 'user'
   const [menuOpen, setMenuOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
@@ -93,103 +158,68 @@ export function ChatBubble({ message, sessionId }: { message: ChatMessage; sessi
 
   useEffect(() => {
     if (!menuOpen) return
-    const closeMenu = (event: MouseEvent) => {
+    const closeMenu = (event: PointerEvent) => {
       if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false)
     }
-    document.addEventListener('mousedown', closeMenu)
-    return () => document.removeEventListener('mousedown', closeMenu)
+    document.addEventListener('pointerdown', closeMenu)
+    return () => document.removeEventListener('pointerdown', closeMenu)
   }, [menuOpen])
 
   const formattedTime = message.timestamp
-    ? new Date(message.timestamp).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+    ? new Date(message.timestamp).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })
     : null
 
   if (isUser) {
     // Strip "[Photo attached]" from content (legacy messages stored it in text)
     const displayContent = message.content.replace(/\s*\[Photo attached\]\s*/g, '').trim()
 
-    // FB-R6-02 — render persisted attachments[] first (signed URLs from BE).
-    // Fall back to the local-only `image` blob URL for the optimistic temp
-    // message between submit and the next history refetch.
+    // FB-R6-02: persisted attachments[] first (signed URLs from the backend), then the local-only `image` blob URL
+    // for the optimistic message between submit and the next history refetch.
     const persistedAttachments = message.attachments ?? []
-    const hasPersisted = persistedAttachments.length > 0
+    const isMulti = persistedAttachments.length > 1
+    const legacy = persistedAttachments.length === 0 ? safeImageUrl(message.image) : null
 
     return (
-      <div className="flex flex-col items-end max-w-[85%] ml-auto">
-        <div className="rounded-[18px] rounded-br-[6px] bg-ink px-4 py-3 text-[15.5px] leading-[1.4] text-cream">
-          {hasPersisted ? (
-            <div className={persistedAttachments.length > 1 ? 'grid grid-cols-2 gap-1 mb-2' : 'mb-2'}>
-              {persistedAttachments.map((att) => {
-                const safe = safeImageUrl(att.signed_url)
-                if (!safe) return null
-                // FB-R6-UAT-A follow-up — grid items must fit the column,
-                // not a fixed 200px width, otherwise two images at 200px +
-                // gap (~404px) overflow the ~300px mobile bubble. Single
-                // image keeps the 200px cap so it doesn't fill the bubble.
-                const isMulti = persistedAttachments.length > 1
-                return (
-                  <img
-                    key={att.id}
-                    src={safe}
-                    alt="Uploaded"
-                    className={
-                      isMulti
-                        ? 'rounded-xl w-full aspect-square object-cover'
-                        : 'rounded-xl max-w-[200px] max-h-[200px] object-cover'
-                    }
-                  />
-                )
-              })}
-            </div>
-          ) : safeImageUrl(message.image) ? (
-            <img
-              src={safeImageUrl(message.image)!}
-              alt="Uploaded food"
-              className="rounded-xl max-w-[200px] max-h-[200px] object-cover mb-2"
-            />
-          ) : null}
-          {displayContent && (
-            <p className="whitespace-pre-wrap break-words">{displayContent}</p>
-          )}
-          {formattedTime && (
-            <div className="mt-1 text-right text-[11px] text-cream-55">
-              {formattedTime}
-            </div>
-          )}
-        </div>
-      </div>
+      <motion.div
+        initial={fresh && !layoutId ? (reduce ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }) : false}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={reduce ? reducedFade : spring.tap}
+        className="ml-auto flex max-w-[82%] origin-bottom-right flex-col items-end gap-1.5"
+      >
+        {persistedAttachments.length > 0 ? (
+          // FB-R6-UAT-A: grid items fit the column (two fixed 200 px images overflow a phone); one image keeps its 200 px cap.
+          <div className={isMulti ? 'grid w-[232px] max-w-full grid-cols-2 gap-1.5' : ''}>
+            {persistedAttachments.map((att) => {
+              const safe = safeImageUrl(att.signed_url)
+              if (!safe) return null
+              return (
+                <img
+                  key={att.id}
+                  src={safe}
+                  alt="Your photo"
+                  className={isMulti ? 'aspect-square w-full rounded-[14px] bg-ink-06 object-cover' : 'max-h-[200px] max-w-[200px] rounded-[16px] bg-ink-06 object-cover'}
+                />
+              )
+            })}
+          </div>
+        ) : legacy ? (
+          <img src={legacy} alt="Your photo" className="max-h-[200px] max-w-[200px] rounded-[16px] bg-ink-06 object-cover" />
+        ) : null}
+        {displayContent ? (
+          <motion.p
+            layoutId={reduce ? undefined : layoutId}
+            transition={spring.glide}
+            className="whitespace-pre-wrap break-words rounded-[22px] bg-ink-08 px-4 py-2.5 text-[16px] leading-[1.45] text-ink"
+          >
+            {displayContent}
+          </motion.p>
+        ) : null}
+      </motion.div>
     )
   }
 
   const failures = message.metadata?.actions_failed ?? []
-  const hasFailures = message.role === 'assistant' && failures.length > 0
-
-  const describeFailure = (a: { tool: string; error?: string }) => {
-    // Friendly per-error overrides — the assistant text usually explains the
-    // why, so we keep this short and free of internal codes.
-    const errorCopy: Record<string, string> = {
-      duplicate_window: 'looks like a duplicate from the last minute',
-      not_found: "couldn't find that entry",
-      validation: "those numbers didn't look right",
-      missing_meal_plan_targets: 'nutrition plan needs daily targets',
-      profile_incomplete: 'profile is missing something',
-      image_analysis_failed: "couldn't read that image",
-    }
-    const base =
-      a.tool === 'create_log' ? "couldn't save that log" :
-      a.tool === 'update_log' ? "couldn't update that entry" :
-      a.tool === 'delete_log' ? "couldn't delete that entry" :
-      a.tool === 'create_plan' ? "couldn't create that plan" :
-      a.tool === 'update_plan' ? "couldn't update that plan" :
-      a.tool === 'deactivate_active_plan' ? "couldn't deactivate that plan" :
-      `${a.tool} failed`
-    if (!a.error || a.error === 'unknown') return base
-    const friendly = errorCopy[a.error]
-    return friendly ? `${base} — ${friendly}` : base
-  }
+  const { text, foods } = parseLoggedFoods(message.content)
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content)
@@ -198,71 +228,56 @@ export function ChatBubble({ message, sessionId }: { message: ChatMessage; sessi
 
   return (
     <>
-      <div className="flex max-w-[85%] flex-col items-start">
-        <div className="flex items-start gap-2">
-          <GeoAvatar variant="face" state={hasFailures ? 'thinking' : (message.metadata?.actions_taken?.length ? 'happy' : 'default')} size={24} />
-          <div className="relative rounded-[18px] rounded-bl-[6px] border border-ink-12 bg-card px-4 py-3 text-[15.5px] leading-[1.4] text-ink">
-            <GeoMessageContent content={message.content} />
-            {hasFailures && (
-              <div className="mt-2 rounded-[12px] border border-ink-16 bg-ink-08 px-3 py-2 text-[13.5px] text-ink">
-                <span className="font-semibold">Heads up:</span>{' '}
-                {failures.map((a, i) => (
-                  <span key={i}>
-                    {i > 0 && '; '}
-                    {describeFailure(a)}
-                  </span>
-                ))}
-              </div>
-            )}
-            <div ref={menuRef} className="relative mt-1 flex justify-end">
+      <motion.div
+        initial={fresh ? (reduce ? { opacity: 0 } : { opacity: 0, y: 6 }) : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={reduce ? reducedFade : { opacity: { duration: 0.18, ease: 'easeOut' }, y: spring.glide }}
+        className="flex flex-col gap-3 pr-2"
+      >
+        {/* What was logged leads; Geo's line about it follows. */}
+        {foods.length > 0 ? <LoggedFoods foods={foods} /> : null}
+        {text ? <GeoText content={text} /> : null}
+        {failures.length > 0 ? (
+          <p className="rounded-[16px] bg-ink-04 px-4 py-3 text-[14px] leading-[1.45] text-ink">
+            <span className="font-semibold">Heads up.</span>{' '}
+            {failures.map((a) => describeFailure(a)).join('. ')}.
+          </p>
+        ) : null}
+        <div ref={menuRef} className="relative -my-2 -ml-3 flex items-center">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((current) => !current)}
+            className="flex h-11 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium text-ink-65 transition-transform active:scale-[.96]"
+            aria-label="Message options"
+            aria-expanded={menuOpen}
+          >
+            {formattedTime ? <span aria-hidden="true">{formattedTime}</span> : null}
+            <Ellipsis className="size-4" strokeWidth={1.75} />
+          </button>
+          {menuOpen ? (
+            <motion.div
+              role="menu"
+              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 4 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={reduce ? reducedFade : spring.tap}
+              className="absolute bottom-11 left-2 z-20 w-44 bg-card shadow-[var(--shadow-glass)] origin-bottom-left overflow-hidden rounded-[18px] py-1"
+            >
+              <button type="button" role="menuitem" onClick={handleCopy} className="block h-11 w-full px-4 text-left text-[15px] font-medium text-ink active:bg-ink-06">
+                Copy
+              </button>
               <button
                 type="button"
-                onClick={() => setMenuOpen((current) => !current)}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
-                aria-label="Message options"
-                aria-expanded={menuOpen}
+                role="menuitem"
+                onClick={() => { setMenuOpen(false); setReportOpen(true) }}
+                className="block h-11 w-full border-t border-ink-06 px-4 text-left text-[15px] font-medium text-ink active:bg-ink-06"
               >
-                <Ellipsis className="h-4 w-4" />
+                Report
               </button>
-              {menuOpen ? (
-                <div
-                  role="menu"
-                  className="absolute bottom-8 right-0 z-20 min-w-28 overflow-hidden rounded-[12px] border border-ink-12 bg-card py-1"
-                >
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={handleCopy}
-                    className="block h-9 w-full px-3 text-left text-[13.5px] font-semibold text-ink active:bg-ink-08"
-                  >
-                    Copy
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setMenuOpen(false)
-                      setReportOpen(true)
-                    }}
-                    className="block h-9 w-full px-3 text-left text-[13.5px] font-semibold text-ink active:bg-ink-08"
-                  >
-                    Report
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
+            </motion.div>
+          ) : null}
         </div>
-        {formattedTime && (
-          <span className="ml-8 mt-1 text-[11px] text-ink-65">{formattedTime}</span>
-        )}
-      </div>
-      <ReportSheet
-        open={reportOpen}
-        onClose={() => setReportOpen(false)}
-        sessionId={sessionId}
-        messageId={message.id}
-      />
+      </motion.div>
+      <ReportSheet open={reportOpen} onClose={() => setReportOpen(false)} sessionId={sessionId} messageId={message.id} />
     </>
   )
 }

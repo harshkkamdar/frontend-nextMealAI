@@ -1,7 +1,9 @@
 'use client'
 
 import { useRef, useEffect, useCallback, useState } from 'react'
-import { ArrowUp, Camera, X, Loader2 } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
+import { ArrowUpIcon, CameraFill } from '@/components/ui/fiqr/icons'
+import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { uploadChatAttachment } from '@/lib/api/chat.api'
 import { useComposerStore } from '@/stores/composer.store'
@@ -20,6 +22,8 @@ export function ChatInput({
   showCamera = false,
   defaultValue = '',
   sessionId,
+  variant = 'floating',
+  placeholder = 'Message Geo',
 }: {
   // FB-R6-02 — onSend carries an array of fully-uploaded AttachedImage entries.
   // FB-R6-03 — array length 1..MAX_IMAGES.
@@ -34,6 +38,9 @@ export function ChatInput({
    * a sessionId, the composer keeps state locally (current default).
    */
   sessionId?: string
+  /** `floating`: the glass capsule over the Geo tab (controls layer). `inline`: a white field inside a sheet. */
+  variant?: 'floating' | 'inline'
+  placeholder?: string
 }) {
   const storeMode = Boolean(sessionId)
 
@@ -231,24 +238,23 @@ export function ChatInput({
     disabled || uploadingCount > 0 || (!value.trim() && attached.length === 0)
 
   return (
-    <div className="px-4 py-3 bg-background border-t border-border">
-      {/* FB-R6-03 — thumbnail strip + upload-in-flight placeholders + counter */}
+    <div className={cn('rounded-[28px] p-1.5', variant === 'floating' ? 'glass' : 'bg-card shadow-[var(--shadow-card)]')}>
+      {/* FB-R6-03: thumbnail strip + upload-in-flight placeholders + counter */}
       {(attached.length > 0 || uploadingCount > 0) && (
-        <div className="mb-2">
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="px-2.5 pb-1 pt-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             {attached.map((a) => (
-              <div key={a.storage_path} className="relative inline-block" data-testid="attached-thumb">
-                <img
-                  src={a.preview_url}
-                  alt="Attached"
-                  className="h-16 w-16 object-cover rounded-lg border border-border"
-                />
+              <div key={a.storage_path} className="relative" data-testid="attached-thumb">
+                <img src={a.preview_url} alt="Photo to send" className="size-14 rounded-[12px] bg-ink-06 object-cover" />
                 <button
+                  type="button"
                   onClick={() => removeAttachment(a.storage_path)}
                   aria-label="Remove attached image"
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-text-primary text-background flex items-center justify-center"
+                  className="absolute -right-4 -top-4 grid size-11 place-items-center"
                 >
-                  <X className="w-3 h-3" />
+                  <span className="grid size-[22px] place-items-center rounded-full bg-ink text-cream shadow-[var(--shadow-card)]">
+                    <X className="size-3" strokeWidth={2.5} />
+                  </span>
                 </button>
               </div>
             ))}
@@ -256,29 +262,32 @@ export function ChatInput({
               <div
                 key={`pending-${i}`}
                 data-testid="attached-uploading"
-                className="h-16 w-16 flex items-center justify-center rounded-lg border border-border bg-surface"
+                role="status"
+                aria-label="Uploading photo"
+                className="grid size-14 place-items-center rounded-[12px] bg-ink-06"
               >
-                <Loader2 className="w-5 h-5 text-text-secondary animate-spin" />
+                <Loader2 className="size-5 animate-spin text-ink-65" strokeWidth={1.75} />
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-text-tertiary mt-1 tabular-nums">
-            {totalPending} / {MAX_IMAGES} {capReached ? '· max reached' : ''}
+          <p className="mt-1.5 text-[12px] font-medium text-ink-65 tabular-nums">
+            {totalPending} of {MAX_IMAGES} photos{capReached ? ', that is the most per message' : ''}
           </p>
         </div>
       )}
 
-      <div className="flex items-end gap-2 bg-surface border border-border rounded-2xl px-4 py-2">
+      <div className="flex items-end gap-1">
         {showCamera && (
           <>
             <button
+              type="button"
               onClick={() => void handleAttachPhoto()}
               disabled={disabled || capReached}
-              className="p-1 mb-0.5 text-text-tertiary hover:text-accent transition-colors disabled:opacity-50 shrink-0"
+              className="grid size-11 shrink-0 place-items-center rounded-full text-ink transition-[transform,opacity] duration-150 active:scale-[.94] disabled:opacity-35"
               aria-label="Attach photo"
               title={capReached ? `Max ${MAX_IMAGES} images per message` : 'Attach photo'}
             >
-              <Camera className="w-5 h-5" />
+              <CameraFill className="size-[22px]" />
             </button>
             <input
               ref={fileInputRef}
@@ -297,19 +306,24 @@ export function ChatInput({
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onPaste={showCamera ? handlePaste : undefined}
-          placeholder="Message Geo..."
+          placeholder={placeholder}
           disabled={disabled}
           rows={1}
           aria-label="Type a message"
-          className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-tertiary outline-none disabled:opacity-50 resize-none py-1 leading-5"
+          className={cn('min-h-11 min-w-0 flex-1 resize-none bg-transparent py-[11px] text-[16px] leading-[22px] text-ink outline-none placeholder:text-ink-65 transition-opacity duration-150 disabled:opacity-60', !showCamera && 'pl-3.5')}
         />
         <button
+          type="button"
           onClick={handleSend}
           disabled={sendDisabled}
-          className="flex items-center justify-center size-11 rounded-full bg-accent text-cream disabled:opacity-40 transition-opacity shrink-0 mb-0.5"
+          className="group relative grid size-11 shrink-0 place-items-center rounded-full bg-ink-08 text-ink-35 transition-transform enabled:active:scale-[.94]"
           aria-label="Send message"
         >
-          <ArrowUp className="w-4 h-4" />
+          {/* Orange crossfades in over the grey (opacity, not background-color), so ready and sent never snap. */}
+          <span aria-hidden="true" className="absolute inset-0 grid place-items-center rounded-full bg-accent text-cream opacity-100 transition-opacity duration-150 group-disabled:opacity-0">
+            <ArrowUpIcon className="size-5" />
+          </span>
+          <ArrowUpIcon className="size-5" />
         </button>
       </div>
     </div>

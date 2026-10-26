@@ -1,22 +1,31 @@
 'use client'
 
-import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { motion, useReducedMotion } from 'framer-motion'
 
+/**
+ * Geo is writing: three dots where its first line of text will land (one 24 px line, the 16/1.5 text box),
+ * so the reply replaces them with no layout jump. Opacity only.
+ */
 export function TypingIndicator() {
+  const reduce = useReducedMotion()
   return (
-    <div className="flex max-w-[85%] items-end gap-2">
-      <GeoAvatar variant="face" state="thinking" size={24} />
-      <div className="rounded-[18px] rounded-bl-[6px] border border-ink-12 bg-card px-4 py-3">
-        <div className="flex gap-1">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="h-2 w-2 animate-pulse rounded-full bg-ink-35"
-              style={{ animationDelay: `${i * 150}ms` }}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+    <motion.div
+      role="status"
+      aria-label="Geo is writing"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15, ease: 'easeOut', delay: reduce ? 0 : 0.12 }}
+      className="flex h-6 items-center gap-1.5"
+    >
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          className="size-2 rounded-full bg-ink-65"
+          initial={{ opacity: 0.35 }}
+          animate={reduce ? { opacity: 0.6 } : { opacity: [0.35, 1, 0.35] }}
+          transition={reduce ? { duration: 0 } : { duration: 1, repeat: Infinity, ease: 'easeInOut', delay: i * 0.16 }}
+        />
+      ))}
+    </motion.div>
   )
 }

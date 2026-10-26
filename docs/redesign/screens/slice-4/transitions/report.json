@@ -1,0 +1,61 @@
+{
+  "chip-tap": {
+    "frames": 78,
+    "chrome_px": 34863,
+    "content_px": 1187889,
+    "max_chrome_share": 0.211,
+    "max_content_share": 0.114,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "companion-open": {
+    "frames": 26,
+    "chrome_px": 158733,
+    "content_px": 634907,
+    "max_chrome_share": 0.342,
+    "max_content_share": 0.382,
+    "issues": [
+      "chrome jump frame 4: 34% of chrome change",
+      "chrome jump frame 6: 16% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "companion-resize": {
+    "frames": 61,
+    "chrome_px": 242518,
+    "content_px": 1023449,
+    "max_chrome_share": 0.217,
+    "max_content_share": 0.218,
+    "issues": [
+      "chrome jump frame 4: 22% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "new-conversation": {
+    "frames": 3,
+    "chrome_px": 0,
+    "content_px": 0,
+    "max_chrome_share": 0,
+    "max_content_share": 0,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "open-conversation": {
+    "frames": 33,
+    "chrome_px": 70007,
+    "content_px": 411777,
+    "max_chrome_share": 0.121,
+    "max_content_share": 0.139,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "reply-arrives": {
+    "frames": 38,
+    "chrome_px": 47538,
+    "content_px": 1134472,
+    "max_chrome_share": 0.155,
+    "max_content_share": 0.125,
+    "issues": [],
+    "verdict": "smooth"
+  }
+}

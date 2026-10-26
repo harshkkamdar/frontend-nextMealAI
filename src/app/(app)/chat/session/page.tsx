@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { motion, useReducedMotion } from 'framer-motion'
 import { toast } from 'sonner'
-import { ChatHeader } from '@/components/chat/chat-header'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { ChatInput } from '@/components/chat/chat-input'
-import { SuggestedReplies } from '@/components/chat/suggested-replies'
+import { sessionTitles } from '@/components/chat/session-titles'
+import { PushedHeader } from '@/components/layout/screen-header'
+import { OfflineBand } from '@/components/shared/offline-band'
 import { getChatSession, getChatSessions, sendMessage } from '@/lib/api/chat.api'
 import { extractWorkoutProgram, isLikelyWorkoutProgramPrompt } from '@/lib/api/vision.api'
 import { WorkoutProgramPreviewCard } from '@/components/plans/workout-program-preview-card'
@@ -16,6 +18,7 @@ import { handleGeoToolResults } from '@/lib/sync/dispatch-from-chat'
 import type { AttachedImage, ChatMessage } from '@/types/chat.types'
 import type { WorkoutProgramContent } from '@/types/plans.types'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { ApiException } from '@/types/api.types'
 
 // FB-R6-02 — FB-15 (program extraction) still wants a base64 payload. The
@@ -50,7 +53,7 @@ export default function ActiveChatPage() {
 function ActiveChatRoute() {
   const params = useSearchParams()
   const sessionId = params.get('id') ?? ''
-  if (!sessionId) return <p className="p-4 text-[15.5px] text-ink-65">Nothing selected. <Link href="/chat">Back to chats.</Link></p>
+  if (!sessionId) return <p className="px-5 pt-[calc(24px+var(--safe-top))] text-[16px] text-ink-65">No conversation picked. <Link href="/chat" className="font-semibold text-ink underline">See your conversations</Link></p>
   return <ActiveChatSession sessionId={sessionId} autoSend={params.get('send') === '1' ? params.get('prefill') : null} />
 }
 
@@ -59,10 +62,16 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
   const autoSent = useRef(false)
   const [prefill, setPrefill] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [sessionTitle, setSessionTitle] = useState<string | undefined>()
+  const [sessionTitle, setSessionTitle] = useState<string | undefined>(() => sessionTitles.get(sessionId))
   const [isTyping, setIsTyping] = useState(false)
   const [loading, setLoading] = useState(true)
   const [historyFailed, setHistoryFailed] = useState(false)
+  // Messages from this index on arrived while the screen was open and play their entrance; history paints at rest.
+  const [freshFrom, setFreshFrom] = useState(Infinity)
+  // The option chip just tapped, so its pill can take over the chip's shared-element id.
+  const [chipSent, setChipSent] = useState<string | null>(null)
+  const composerRef = useRef<HTMLDivElement>(null)
+  const [composerH, setComposerH] = useState(88)
   // FB-15: preview card for an extracted workout program. One at a time.
   const [programPreview, setProgramPreview] = useState<
     { program: WorkoutProgramContent; confidence: number } | null
@@ -82,12 +91,18 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
         getChatSessions().catch(() => []),
       ]).then(([sessionData, sessions]) => {
         if (cancelled) return
-        setMessages(sessionData.messages ?? [])
+        const history = sessionData.messages ?? []
+        setFreshFrom((current) => (current === Infinity ? history.length : current))
+        setMessages(history)
         const match = sessions.find((s) => s.session_id === sessionId || s.id === sessionId)
         if (match?.title) setSessionTitle(match.title)
       })
 
-    fetchSession().finally(() => { if (!cancelled) setLoading(false) })
+    fetchSession().finally(() => {
+      if (cancelled) return
+      setLoading(false)
+      setFreshFrom((current) => (current === Infinity ? 0 : current))
+    })
 
     // If coming from companion sheet mid-response, re-fetch after a delay
     // to pick up the Geo reply that was still in-flight
@@ -163,13 +178,13 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
       const planToolsFired =
         topics.includes('plans:created') || topics.includes('plans:updated')
       if (planToolsFired && !anyFailed) {
-        toast.success('Plan saved!', {
-          description: 'Your plan is ready to view.',
-          action: { label: 'View Plans', onClick: () => router.push('/plans') },
+        toast.success('Plan saved', {
+          description: "It's ready in Plans.",
+          action: { label: 'View', onClick: () => router.push('/plans') },
         })
       }
     } catch {
-      toast.error('Failed to send message. Please try again.')
+      toast.error("That didn't send. Check your connection and try again.")
     } finally {
       setIsTyping(false)
     }
@@ -184,25 +199,44 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
   // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once when loading settles
   }, [loading, autoSend])
 
-  if (loading) {
-    return (
-      <div className="flex h-dvh flex-col overflow-hidden bg-cream">
-        <ChatHeader sessionId={sessionId} title={sessionTitle} />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-        </div>
-      </div>
-    )
+  // The composer floats over the thread; the thread ends above it whatever its height (photos, long drafts).
+  useEffect(() => {
+    const node = composerRef.current
+    if (!node || typeof ResizeObserver === 'undefined') return
+    // Border box: the safe-area padding under the capsule counts too.
+    const observer = new ResizeObserver(() => setComposerH(Math.round(node.getBoundingClientRect().height)))
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  const reply = (text: string) => {
+    setChipSent(text)
+    void handleSend(text)
+  }
+  const send = (message: string, attachments?: AttachedImage[]) => {
+    setChipSent(null)
+    void handleSend(message, attachments)
   }
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-cream">
-      <Suspense fallback={null}>
-        <PrefillReader onPrefill={setPrefill} />
-      </Suspense>
-      <ChatHeader sessionId={sessionId} title={sessionTitle} />
+    // The thread scrolls in its own box, not the window: during the push the route frame is transformed, and a
+    // window scroll would carry the fixed header and composer away with it until the transform clears.
+    <div className="h-dvh overflow-y-auto overscroll-contain">
+    <div
+      className="mx-auto w-full max-w-md px-5"
+      style={{ paddingBottom: composerH + 24, ['--chat-end-gap' as string]: `${composerH + 20}px` }}
+    >
+      {loading ? null : (
+        <Suspense fallback={null}>
+          <PrefillReader onPrefill={setPrefill} />
+        </Suspense>
+      )}
+      <PushedHeader title={sessionTitle ?? 'Geo'} onBack={() => router.push('/chat')} backLabel="Back to conversations" />
+      <div className="-mx-5">
+        <OfflineBand />
+      </div>
       {programPreview && (
-        <div className="px-4 pt-3">
+        <div className="pt-3">
           <WorkoutProgramPreviewCard
             program={programPreview.program}
             confidence={programPreview.confidence}
@@ -211,37 +245,59 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
           />
         </div>
       )}
-      {historyFailed && messages.length === 0 ? (
-        <div className="px-gutter"><ErrorState>I couldn&apos;t load this conversation. You can still send a message, or go back and try again.</ErrorState></div>
-      ) : null}
-      <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId} />
-      {/* R6-10 — option chips for the latest assistant message; tap sends it.
-          Reads live `suggestedReplies` or persisted `metadata.suggested_replies`. */}
-      {(() => {
-        const last = messages[messages.length - 1]
-        const chips = !isTyping && last?.role === 'assistant'
-          ? last.suggestedReplies ?? last.metadata?.suggested_replies ?? []
-          : []
-        return chips.length > 0 ? (
-          <div className="px-gutter">
-            <SuggestedReplies options={chips} onSelect={handleSend} />
-          </div>
-        ) : null
-      })()}
-      {/* FB-R6-FE-D: pass sessionId so a draft started in the floating Geo
-          widget survives the navigation here. */}
-      <div
-        className="border-t border-ink-10 bg-cream"
-        style={{ paddingBottom: 'calc(8px + var(--safe-bottom))' }}
-      >
-        <ChatInput
-          onSend={handleSend}
-          disabled={isTyping}
-          showCamera
-          defaultValue={prefill}
-          sessionId={sessionId}
-        />
+      <div className="pt-4">
+        {loading ? (
+          <ThreadSkeleton />
+        ) : (
+          // History crossfades in over the skeleton's place; its blocks never move (motion-feel 3h).
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
+            {historyFailed && messages.length === 0 ? (
+              <div className="mb-6"><ErrorState>I couldn&apos;t load this conversation. You can still send a message, or go back and try again.</ErrorState></div>
+            ) : messages.length === 0 && !isTyping && !autoSend ? (
+              <NewChatIntro />
+            ) : null}
+            <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} />
+          </motion.div>
+        )}
+      </div>
+      {/* Floating glass composer (Q25): the only glass on this screen; the thread under it stays solid. */}
+      <div ref={composerRef} className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] mx-auto max-w-md px-3" style={{ paddingBottom: 'calc(10px + var(--safe-bottom))' }}>
+        {/* Scroll edge: text fades into the page under the composer instead of colliding with it. */}
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 top-[-24px] bg-[linear-gradient(to_top,var(--color-cream)_calc(100%-36px),rgba(253,246,236,0))]" />
+        {/* FB-R6-FE-D: pass sessionId so a draft started in the companion sheet survives the navigation here. */}
+        <div className="pointer-events-auto relative">
+          <ChatInput onSend={send} disabled={isTyping || loading} showCamera defaultValue={prefill} sessionId={sessionId} />
+        </div>
       </div>
     </div>
+    </div>
+  )
+}
+
+/** A new conversation: Geo opens in its own plain-text voice, where its first reply will sit. */
+function NewChatIntro() {
+  return (
+    <div className="mb-6 flex flex-col gap-3">
+      <GeoAvatar variant="face" state="happy" size={36} />
+      <p className="text-[16px] leading-[1.5] text-ink">
+        Hi, I&apos;m Geo. Tell me what you ate, ask what to eat next, or ask how your week is going. A photo works too.
+      </p>
+    </div>
+  )
+}
+
+/** History on its way: one pill and Geo's lines, the shapes they become. Appears only after 150 ms. */
+function ThreadSkeleton() {
+  const reduce = useReducedMotion()
+  const pulse = reduce ? undefined : { opacity: [1, 0.6, 1] }
+  const loop = { duration: 1.2, repeat: Infinity, delay: 0.6, ease: 'easeInOut' as const }
+  return (
+    <motion.div role="status" aria-label="Loading conversation" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.12, delay: 0.15 }} className="flex flex-col gap-6">
+      <motion.span animate={pulse} transition={loop} className="ml-auto block h-11 w-[58%] rounded-[22px] bg-ink-06" />
+      <div className="flex flex-col gap-2.5">
+        {[92, 84, 60].map((w) => <motion.span key={w} animate={pulse} transition={loop} className="block h-4 rounded-full bg-ink-06" style={{ width: `${w}%` }} />)}
+      </div>
+      <motion.span animate={pulse} transition={loop} className="ml-auto block h-11 w-[40%] rounded-[22px] bg-ink-06" />
+    </motion.div>
   )
 }

@@ -1,0 +1,402 @@
+[
+  {
+    "shot": "companion-offline",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "companion-offline",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "companion-thread",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "companion-thread",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "companion",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "companion",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-actions",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-actions",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-delete",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-delete",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-error",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-error",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-first-run",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-first-run",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-loading",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-loading",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-long",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-long",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-offline",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-offline",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-rename",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-rename",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-typed",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "list-typed",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "list",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-draft",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-draft",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-history-error",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-history-error",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-loading",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-loading",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-long",
+    "width": 360,
+    "url": "/chat/session?id=s-long",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-long",
+    "width": 390,
+    "url": "/chat/session?id=s-long",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-menu",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-menu",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-new",
+    "width": 360,
+    "url": "/chat/session?id=new-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-new",
+    "width": 390,
+    "url": "/chat/session?id=new-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-offline",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-offline",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-reply",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-reply",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-report",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-report",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-send-failed",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-send-failed",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-typing",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-typing",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  }
+]

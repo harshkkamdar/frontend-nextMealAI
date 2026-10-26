@@ -4,16 +4,16 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { useRouter } from 'next/navigation'
 import { ResizableSheet } from '@/components/ui/resizable-sheet'
-import { X, ExternalLink, SquarePen } from 'lucide-react'
+import { SquarePen } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { CloseIcon } from '@/components/ui/fiqr/icons'
 import { toast } from 'sonner'
 import { useUIStore } from '@/stores/ui.store'
 import { useGeoScreenContext } from '@/contexts/geo-screen-context'
 import { useOnline } from '@/lib/platform/network'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
-import { ChatBubble } from '@/components/chat/chat-bubble'
 import { ChatInput } from '@/components/chat/chat-input'
-import { SuggestedReplies } from '@/components/chat/suggested-replies'
-import { TypingIndicator } from '@/components/chat/typing-indicator'
+import { ChatThread } from '@/components/chat/chat-thread'
 import {
   startCompanionSession,
   sendMessage,
@@ -94,14 +94,11 @@ export function GeoCompanionSheet() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const [initializing, setInitializing] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  // Replies that arrive while the sheet is open play their entrance; a restored thread paints at rest.
+  const [freshFrom, setFreshFrom] = useState(0)
+  const [chipSent, setChipSent] = useState<string | null>(null)
   const messageCountRef = useRef(0)
   const initializingRef = useRef(false)
-
-  // Auto-scroll on new messages
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, isTyping])
 
   // Initialize a companion session. FE-RCA F2 — when forceNew is false, try to
   // restore a recent prior session from localStorage before creating a new one
@@ -114,6 +111,7 @@ export function GeoCompanionSheet() {
 
       setInitializing(true)
       setMessages([])
+      setFreshFrom(0)
       setSessionId(null)
       messageCountRef.current = 0
 
@@ -128,6 +126,7 @@ export function GeoCompanionSheet() {
               if (Array.isArray(priorMessages) && priorMessages.length > 0) {
                 setSessionId(stored.session_id)
                 setMessages(priorMessages)
+                setFreshFrom(priorMessages.length)
                 messageCountRef.current = priorMessages.length
                 // Refresh the timestamp so an active user keeps their thread.
                 writeStoredCompanionSession(stored.session_id)
@@ -145,7 +144,7 @@ export function GeoCompanionSheet() {
         setSessionId(res.session_id)
         writeStoredCompanionSession(res.session_id)
       } catch {
-        toast.error('Failed to connect to Geo')
+        toast.error("I couldn't connect. Check your connection and try again.")
         closeSheet()
       } finally {
         setInitializing(false)
@@ -226,7 +225,7 @@ export function GeoCompanionSheet() {
       // means failed tools no longer trigger a phantom refetch.
       handleGeoToolResults(res)
     } catch {
-      toast.error('Failed to send message')
+      toast.error("That didn't send. Check your connection and try again.")
     } finally {
       setIsTyping(false)
     }
@@ -244,100 +243,84 @@ export function GeoCompanionSheet() {
     }
   }
 
+  const reply = (text: string) => {
+    setChipSent(text)
+    void handleSend(text)
+  }
+  const send = (message: string, attachments?: AttachedImage[]) => {
+    setChipSent(null)
+    void handleSend(message, attachments)
+  }
+
   return (
-    <ResizableSheet open={isOpen} onClose={handleClose} ariaLabel="Geo chat" levels={[0.55, 0.94]} defaultLevelIndex={1}>
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-ink-10 px-gutter pb-3">
-              <div className="flex items-center gap-2.5">
-                <GeoAvatar variant="face" state="happy" size={32} />
-                <div>
-                  <span className="text-[17px] font-bold text-ink">Geo</span>
-                  {/* Status follows the device connection; teal is reserved for carbs, so the dot is ink. */}
-                  <div className="flex items-center gap-1">
-                    <div className={`h-1.5 w-1.5 rounded-full ${online ? 'bg-ink' : 'bg-ink-35'}`} />
-                    <span className="text-[12px] font-medium text-ink-65">{online ? 'Online' : 'Offline'}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                {messages.length > 0 ? <button
-                  onClick={handleStartNewChat}
-                  disabled={initializing}
-                  className="flex h-11 items-center gap-1 rounded-full px-3 text-[14px] font-semibold text-ink active:bg-ink-08 disabled:pointer-events-none disabled:text-ink-35"
-                  aria-label="Start a new chat"
-                >
-                  <SquarePen className="w-3.5 h-3.5" />
-                  New
-                </button> : null}
-                <button
-                  onClick={handleClose}
-                  className="-mr-2.5 flex size-11 items-center justify-center rounded-full text-ink-65 active:bg-ink-08"
-                  aria-label="Close"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+    <ResizableSheet open={isOpen} onClose={handleClose} ariaLabel="Geo" levels={[0.55, 0.94]} defaultLevelIndex={1}>
+      <div className="flex shrink-0 items-center gap-3 px-5 pb-3">
+        <GeoAvatar variant="face" state="happy" size={36} />
+        <div className="min-w-0 flex-1">
+          <p className="font-wide text-[19px] font-bold leading-tight text-ink">Geo</p>
+          <p className="text-[13px] font-medium text-ink-65">{online ? 'Here to help' : "You're offline"}</p>
+        </div>
+        {messages.length > 0 ? (
+          <button
+            type="button"
+            onClick={handleStartNewChat}
+            disabled={initializing}
+            className="grid size-11 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94] disabled:text-ink-35"
+            aria-label="Start a new conversation"
+          >
+            <SquarePen className="size-5" strokeWidth={1.75} />
+          </button>
+        ) : null}
+        <button
+          type="button"
+          onClick={handleClose}
+          className="grid size-11 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94]"
+          aria-label="Close"
+        >
+          <CloseIcon className="size-5" />
+        </button>
+      </div>
 
-            {/* Chat area */}
-            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-gutter py-3">
-              {initializing ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : messages.length === 0 && !isTyping ? (
-                <div className="flex flex-col items-center justify-center py-6 gap-2">
-                  <GeoAvatar variant="face" state="happy" size={48} />
-                  <p className="text-center text-[15.5px] text-ink-65">
-                    Hey! What can I help you with?
-                  </p>
-                </div>
-              ) : (
-                <>
-                  {messages.map((msg, i) => (
-                    <ChatBubble key={msg.id ?? i} message={msg} sessionId={sessionId ?? undefined} />
-                  ))}
-                  {isTyping && <TypingIndicator />}
-                  {/* R6-10 — chips for the latest assistant message only. */}
-                  {(() => {
-                    const last = messages[messages.length - 1]
-                    const chips = !isTyping && last?.role === 'assistant'
-                      ? last.suggestedReplies ?? last.metadata?.suggested_replies ?? []
-                      : []
-                    return chips.length > 0 ? (
-                      <SuggestedReplies options={chips} onSelect={handleSend} />
-                    ) : null
-                  })()}
-                </>
-              )}
-              <div ref={bottomRef} />
-            </div>
+      {/* The conversation scrolls inside the sheet; the composer stays pinned to the sheet's bottom edge. */}
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-2">
+        {initializing ? (
+          <div role="status" aria-label="Connecting to Geo" className="flex flex-col gap-2.5 pt-1">
+            {[88, 64].map((w) => <span key={w} className="block h-4 rounded-full bg-ink-06" style={{ width: `${w}%` }} />)}
+          </div>
+        ) : (
+          // Crossfades in where the skeleton lines were (motion-feel 3h).
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
+            {messages.length === 0 && !isTyping ? (
+              <p className="text-[16px] leading-[1.5] text-ink">What can I help with? I can log a meal, suggest what to eat, or look at your week.</p>
+            ) : (
+              <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId ?? undefined} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} />
+            )}
+          </motion.div>
+        )}
+      </div>
 
-            {/* Open full chat link */}
-            <div className="flex items-center gap-3 px-gutter pt-1">
-              <button
-                onClick={handleOpenFullChat}
-                className="flex items-center gap-1 text-[13.5px] font-semibold text-ink-65"
-              >
-                Open full chat
-                <ExternalLink className="w-3 h-3" />
-              </button>
-              <button
-                onClick={() => { handleClose(); setTimeout(() => router.push('/chat'), 50) }}
-                className="flex items-center gap-1 text-[13.5px] font-semibold text-ink-65"
-              >
-                All chats
-              </button>
-            </div>
-
-            {/* Input — FB-R6-FE-D: passes sessionId so the composer draft
-                survives the navigation to /chat/[sessionId]. */}
-            <ChatInput
-              onSend={handleSend}
-              disabled={isTyping || initializing || !sessionId}
-              showCamera
-              sessionId={sessionId ?? undefined}
-            />
+      <div className="shrink-0 px-3 pb-3">
+        <div className="flex justify-center gap-1 pb-1">
+          <button type="button" onClick={handleOpenFullChat} className="h-11 rounded-full px-3 text-[14px] font-semibold text-ink-65 active:bg-ink-06">
+            Open full screen
+          </button>
+          <button
+            type="button"
+            onClick={() => { handleClose(); setTimeout(() => router.push('/chat'), 50) }}
+            className="h-11 rounded-full px-3 text-[14px] font-semibold text-ink-65 active:bg-ink-06"
+          >
+            All conversations
+          </button>
+        </div>
+        {/* FB-R6-FE-D: passes sessionId so the composer draft survives the navigation to the full chat. */}
+        <ChatInput
+          onSend={send}
+          disabled={isTyping || initializing || !sessionId}
+          showCamera
+          sessionId={sessionId ?? undefined}
+          variant="inline"
+        />
+      </div>
     </ResizableSheet>
   )
 }

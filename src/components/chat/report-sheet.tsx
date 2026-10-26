@@ -3,9 +3,13 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { Check } from 'lucide-react'
+
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { reportResponse, type ReportReason } from '@/lib/api/feedback.api'
+import { haptic } from '@/lib/platform/app'
+import { cn } from '@/lib/utils'
 
 const REASONS: Array<{ label: string; value: ReportReason }> = [
   { label: 'Wrong or misleading', value: 'wrong' },
@@ -26,7 +30,7 @@ export function ReportSheet({
   messageId?: string
 }) {
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabel="Report this response">
+    <BottomSheet open={open} onClose={onClose} ariaLabel="Report this reply">
       {open ? (
         <ReportForm onClose={onClose} sessionId={sessionId} messageId={messageId} />
       ) : null}
@@ -60,7 +64,7 @@ function ReportForm({
         ...(trimmedNote ? { note: trimmedNote } : {}),
       })
       setSending(false)
-      toast.success("Thanks — we'll look at it.")
+      toast.success("Thanks. We'll take a look.")
       onClose()
     } catch {
       setSending(false)
@@ -68,9 +72,10 @@ function ReportForm({
   }
 
   return (
-    <div className="px-gutter pb-5 pt-3">
-      <h2 className="text-[22px] font-semibold text-ink">Report this response</h2>
-      <div className="mt-4 flex flex-wrap gap-2">
+    <div className="flex min-h-0 flex-col overflow-y-auto px-5 pb-5 pt-2">
+      <h2 className="font-wide text-[22px] font-bold leading-[1.2] text-ink">Report this reply</h2>
+      <p className="mt-1 text-[15px] leading-[1.45] text-ink-65">Tell us what was wrong. It helps Geo get better.</p>
+      <div className="mt-4 overflow-hidden rounded-[16px] bg-card shadow-[var(--shadow-card)]">
         {REASONS.map((option) => {
           const selected = reason === option.value
           return (
@@ -78,12 +83,14 @@ function ReportForm({
               key={option.value}
               type="button"
               aria-pressed={selected}
-              onClick={() => setReason(option.value)}
-              className={`h-9 rounded-full px-3 text-[13.5px] font-semibold ${
-                selected ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
-              }`}
+              onClick={() => { void haptic('selection'); setReason(option.value) }}
+              className={cn(
+                'relative flex min-h-[52px] w-full items-center justify-between gap-3 border-b border-ink-06 px-4 text-left text-[16px] font-medium text-ink last:border-b-0 active:bg-ink-04',
+                selected && 'z-[1] rounded-[16px] outline outline-[1.5px] -outline-offset-[1.5px] outline-ink',
+              )}
             >
               {option.label}
+              <Check aria-hidden="true" strokeWidth={2.25} className={cn('size-[18px] transition-opacity duration-150', selected ? 'opacity-100' : 'opacity-0')} />
             </button>
           )
         })}
@@ -91,22 +98,14 @@ function ReportForm({
       <textarea
         value={note}
         onChange={(event) => setNote(event.target.value)}
-        placeholder="What went wrong? (optional)"
-        className="mt-4 min-h-24 w-full resize-none rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
+        placeholder="Anything else? (optional)"
+        aria-label="What went wrong (optional)"
+        className="mt-3 min-h-24 w-full resize-none rounded-[16px] bg-card p-4 text-[16px] leading-[1.45] text-ink shadow-[var(--shadow-card)] outline-none placeholder:text-ink-65 focus:outline focus:outline-[1.5px] focus:outline-ink"
       />
-      <PrimaryButton
-        type="button"
-        disabled={!reason || sending}
-        onClick={handleSend}
-        className="mt-4 justify-center"
-      >
-        Send report
+      <PrimaryButton type="button" disabled={!reason || sending} onClick={handleSend} className="mt-5 justify-center">
+        {sending ? 'Sending' : 'Send report'}
       </PrimaryButton>
-      <button
-        type="button"
-        onClick={onClose}
-        className="mt-3 h-10 w-full text-[15.5px] font-semibold text-ink-65"
-      >
+      <button type="button" onClick={onClose} className="mt-1 h-11 w-full text-[16px] font-semibold text-ink-65">
         Cancel
       </button>
     </div>

@@ -1,11 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from 'react'
-
-/** Space the nav takes at the bottom (`--nav-clearance` in globals.css, safe area included). The sheet rests ABOVE this. */
-function navClearancePx(): number {
-  return cssLengthPx('var(--nav-clearance)')
-}
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { reducedFade, spring } from '@/lib/motion'
 
 /** Resolves a CSS length (custom properties and env() included) to pixels. */
 function cssLengthPx(length: string): number {
@@ -17,13 +14,16 @@ function cssLengthPx(length: string): number {
   return px
 }
 
+// Apple/Emil projection (motion-feel.md 3): where a flick would come to rest, px. Velocity in px/s.
+const project = (v: number, rate = 0.998) => ((v / 1000) * rate) / (1 - rate)
+
 export interface ResizableSheetProps {
   open: boolean
   onClose: () => void
   /**
-   * Snap heights as fractions of the area ABOVE the nav, least → most visible
-   * (e.g. [0.4, 0.7, 0.94]). Drag the handle to resize; on release the sheet
-   * snaps to the nearest. Dragging below the smallest dismisses.
+   * Snap heights as fractions of the screen above the sheet's 8 pt inset, least to most visible
+   * (e.g. [0.4, 0.7, 0.94]). Drag the handle to resize; on release the sheet settles on the level a flick
+   * would reach. Dragging below the smallest dismisses.
    */
   levels?: number[]
   /** Which level to open at (index into `levels`). Default 0. */
@@ -33,14 +33,13 @@ export interface ResizableSheetProps {
 }
 
 /**
- * Draggable, snap-to-levels bottom sheet.
+ * Draggable, snap-to-levels inset sheet: the FIQR v2 inset look of `BottomSheet` (8 pt in from the edges,
+ * 38 pt corners, glass-cream, over the tab bar) with resizable height.
  *
- * Unlike a translate-based sheet (vaul), this resizes by HEIGHT and is anchored
- * just ABOVE the bottom nav — so (a) the nav (z-[100]) stays the top-most layer
- * and is never covered, (b) the sheet never draws behind the nav at any level,
- * and (c) a pinned footer (e.g. "Log Food") is always visible because the
- * sheet's bottom edge is always at the nav top. Drag the handle up/down to lock
- * it at a level; drag below the smallest level to dismiss.
+ * Height is the resized quantity, so a pinned footer (food search's "Log food", the companion composer) always
+ * sits at the sheet's bottom edge. The height follows the finger 1:1 while dragging; it is never animated.
+ * On release the new height is committed at once and the sheet glides the difference on `translateY` with the
+ * release velocity (a FLIP), so every settle, open and close is transform-only (motion-feel.md 3d, M11).
  */
 export function ResizableSheet({
   open,
@@ -50,91 +49,135 @@ export function ResizableSheet({
   ariaLabel,
   children,
 }: ResizableSheetProps) {
+  const reduce = useReducedMotion()
   const [render, setRender] = useState(false)
-  const [shown, setShown] = useState(false)
-  const [heightPx, setHeightPx] = useState(0)
-  const [dragging, setDragging] = useState(false)
-  const dragRef = useRef({ startY: 0, startH: 0 })
+  const height = useMotionValue(0)
+  const y = useMotionValue(0)
+  const fade = useMotionValue(0)
+  // The dim follows the sheet: full while it rests, clearing as it travels off screen (vaul's behaviour).
+  const travel = useTransform(() => Math.min(1, Math.max(0, 1 - y.get() / Math.max(1, height.get()))))
+  const dim = useTransform(() => (reduce ? fade.get() : travel.get()))
+  const drag = useRef<{ startY: number; startH: number; lastY: number; lastT: number; v: number } | null>(null)
+  const closing = useRef(false)
+  const mounted = useRef(false)
 
   const avail = useCallback(
     // The tallest level stops below the status bar, so the sheet never sits under the clock.
-    () => (typeof window !== 'undefined' ? window.innerHeight - navClearancePx() - cssLengthPx('var(--safe-top)') : 800),
+    () => window.innerHeight - cssLengthPx('var(--nav-clearance)') - cssLengthPx('var(--safe-top)'),
     [],
   )
-  const levelsPx = useCallback(() => levels.map((f) => Math.round(f * avail())), [levels, avail])
+  const levelsPx = useCallback(() => {
+    const a = avail()
+    return levels.map((f) => Math.round(f * a))
+  }, [levels, avail])
 
+  // Mount, then slide up from below the screen on the sheet spring.
   useEffect(() => {
-    if (open) {
-      setRender(true)
-      setHeightPx(Math.round((levels[defaultLevelIndex] ?? levels[0]) * avail()))
-      requestAnimationFrame(() => requestAnimationFrame(() => setShown(true)))
-      document.body.style.overflow = 'hidden'
-      return () => { document.body.style.overflow = '' }
+    if (!open) return
+    closing.current = false
+    const h = levelsPx()[defaultLevelIndex] ?? levelsPx()[0]
+    height.set(h)
+    setRender(true)
+    if (reduce) {
+      y.set(0)
+      fade.set(0)
+      const c = animate(fade, 1, reducedFade)
+      return () => c.stop()
     }
-    setShown(false)
-    document.body.style.overflow = ''
-    const t = setTimeout(() => setRender(false), 260)
-    return () => clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Reopened mid-close: reverse from where it is instead of jumping back below the screen.
+    if (!mounted.current) y.set(h + 48)
+    mounted.current = true
+    const c = animate(y, 0, spring.sheet)
+    return () => c.stop()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per open
+  }, [open])
+
+  // Slide out (or fade, reduced motion), then unmount.
+  useEffect(() => {
+    if (open || !render) return
+    const done = () => { mounted.current = false; setRender(false) }
+    const c = reduce
+      ? animate(fade, 0, { ...reducedFade, onComplete: done })
+      : animate(y, height.get() + 48, { ...spring.sheet, velocity: drag.current?.v ?? 0, onComplete: done })
+    drag.current = null
+    return () => c.stop()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per close
   }, [open])
 
   useEffect(() => {
     if (!render) return
+    document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      document.removeEventListener('keydown', onKey)
+    }
   }, [render, onClose])
 
   const onPointerDown = (e: ReactPointerEvent) => {
-    dragRef.current = { startY: e.clientY, startH: heightPx }
-    setDragging(true)
+    // Grab mid-settle: fold the live offset into the height so nothing jumps (interruptible, N11).
+    y.stop()
+    const visible = height.get() - y.get()
+    height.set(visible)
+    y.set(0)
+    drag.current = { startY: e.clientY, startH: visible, lastY: e.clientY, lastT: e.timeStamp, v: 0 }
     try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch { /* noop */ }
   }
   const onPointerMove = (e: ReactPointerEvent) => {
-    if (!dragging) return
-    const dy = dragRef.current.startY - e.clientY // drag up → taller
-    const next = dragRef.current.startH + dy
-    setHeightPx(Math.max(40, Math.min(next, Math.round(0.96 * avail()))))
+    const d = drag.current
+    if (!d) return
+    const dt = e.timeStamp - d.lastT
+    if (dt > 0) d.v = ((e.clientY - d.lastY) / dt) * 1000 // px/s, positive = downwards
+    d.lastY = e.clientY
+    d.lastT = e.timeStamp
+    // Motion value, not state: the height tracks the finger without a React render per move.
+    height.set(Math.max(40, Math.min(d.startH + d.startY - e.clientY, Math.round(0.96 * avail()))))
   }
   const endDrag = () => {
-    if (!dragging) return
-    setDragging(false)
+    const d = drag.current
+    if (!d || closing.current) return
+    const h = height.get()
     const pts = levelsPx()
-    if (heightPx < pts[0] * 0.55) { onClose(); return }
-    const nearest = pts.reduce((a, b) => (Math.abs(b - heightPx) < Math.abs(a - heightPx) ? b : a), pts[0])
-    setHeightPx(nearest)
+    const landing = h - project(d.v)
+    if (landing < pts[0] * 0.55) {
+      closing.current = true
+      onClose()
+      return
+    }
+    const target = pts.reduce((a, b) => (Math.abs(b - landing) < Math.abs(a - landing) ? b : a), pts[0])
+    drag.current = null
+    // FLIP: commit the level's height, start the top edge where the finger left it, glide home.
+    height.set(target)
+    y.set(target - h)
+    animate(y, 0, reduce ? { duration: 0 } : { ...spring.sheet, velocity: d.v })
   }
 
   if (!render) return null
 
   return (
     <div className="fixed inset-0 z-[60]">
-      {/* Backdrop stops at the nav top so the nav (z-[100]) stays fully visible. */}
-      <div
-        onClick={onClose}
-        className={`absolute inset-x-0 top-0 bottom-[var(--nav-clearance)] bg-black/40 transition-opacity duration-200 ${shown ? 'opacity-100' : 'opacity-0'}`}
-      />
-      {/* Cream under the nav's top edge: the sheet rests above the raised Geo button, so without this the page shows in the strip between them. */}
-      <div aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-[var(--nav-clearance)] bg-background transition-opacity duration-200 ${shown ? 'opacity-100' : 'opacity-0'}`} />
-      <div
+      {/* The dim covers everything, the tab bar included (it sits at z 50). */}
+      <motion.div onClick={onClose} style={{ opacity: dim }} className="absolute inset-0 bg-ink/30" />
+      <motion.div
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
-        style={{ height: heightPx }}
-        className={`absolute left-0 right-0 z-[70] bottom-[var(--nav-clearance)] flex flex-col bg-background rounded-t-3xl shadow-2xl will-change-transform ${dragging ? '' : 'transition-[height,transform] duration-200'} ${shown ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ height, y, opacity: reduce ? fade : 1 }}
+        className="glass-cream absolute inset-x-2 bottom-[var(--nav-clearance)] z-[70] mx-auto flex max-w-[calc(28rem-16px)] flex-col overflow-hidden rounded-[38px]"
       >
         <div
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          className="flex justify-center pt-3 pb-2 shrink-0 cursor-grab active:cursor-grabbing touch-none"
+          className="flex h-6 shrink-0 cursor-grab touch-none items-start justify-center pt-2.5 active:cursor-grabbing"
           aria-hidden="true"
         >
-          <div className="w-10 h-1.5 rounded-full bg-border" />
+          <div className="h-[5px] w-9 rounded-full bg-ink-20" />
         </div>
         {children}
-      </div>
+      </motion.div>
     </div>
   )
 }
