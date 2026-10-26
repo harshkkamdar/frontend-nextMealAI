@@ -178,7 +178,7 @@
   {
     "shot": "food-menu-to-geo",
     "width": 360,
-    "url": "/chat/session?id=fb9d80e8-ffa6-483f-8afa-d0a9c2598508&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0

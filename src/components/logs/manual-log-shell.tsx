@@ -32,14 +32,19 @@ export function ManualLogShell({
   const router = useRouter()
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-6">
+    <div className="mx-auto w-full max-w-md px-4 pb-[calc(112px+var(--safe-bottom))]">
       <PushedHeader title={title} onBack={() => router.back()} />
       <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
       <p className="font-wide mt-3 px-1 text-[28px] font-bold leading-[1.15] tracking-[-0.5px] text-ink">{prompt}</p>
       <div className="mt-6">{children}</div>
-      <PrimaryButton type="button" onClick={onSave} disabled={saving} aria-busy={saving} className="mt-8 justify-center">
-        {saving ? savingLabel : actionLabel}
-      </PrimaryButton>
+      {/* The tab bar is hidden on /logs/new/*, so Save owns the bottom edge on a solid cream band. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 bg-cream pb-[calc(16px+var(--safe-bottom))] pt-3">
+        <div className="mx-auto w-full max-w-md px-4">
+          <PrimaryButton type="button" onClick={onSave} disabled={saving} aria-busy={saving} className="justify-center">
+            {saving ? savingLabel : actionLabel}
+          </PrimaryButton>
+        </div>
+      </div>
     </div>
   )
 }

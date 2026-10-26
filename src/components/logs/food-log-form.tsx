@@ -431,7 +431,8 @@ export function FoodLogForm() {
       + (hasCurrent && typeof calories === 'number' ? calories : 0),
   )
   const trimmed = query.trim()
-  const showYourFoods = trimmed.length < 2 && !estimateId && (favourites.length > 0 || recents.length > 0)
+  // While a food is open in the editor the lists step aside, so nothing sits half under the tray; Add to tray brings them back.
+  const showYourFoods = trimmed.length < 2 && !estimateId && !foodName && (favourites.length > 0 || recents.length > 0)
   const showTray = pending.length > 0 || isFoodDraftFilled(currentDraft())
 
   return (
@@ -445,7 +446,7 @@ export function FoodLogForm() {
             onClick={() => { void haptic('selection'); setMealMenuOpen((open) => !open) }}
             aria-expanded={mealMenuOpen}
             aria-label={`Meal: ${mealType}`}
-            className="glass flex h-11 shrink-0 items-center gap-1 rounded-full pl-4 pr-3 text-[15px] font-semibold text-ink transition-transform active:scale-[.96]"
+            className="-mr-2 flex h-11 shrink-0 items-center gap-1 rounded-full px-3 text-[15px] font-semibold text-ink-80 transition-[transform,background-color] active:scale-[.96] active:bg-ink-06"
           >
             {mealType}
             <ChevronDown aria-hidden="true" className={`size-4 transition-transform duration-200 ${mealMenuOpen ? 'rotate-180' : ''}`} />
@@ -476,31 +477,29 @@ export function FoodLogForm() {
         />
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-[10px]">
-        <MethodTile
+      <div className="mt-3 flex gap-2">
+        <MethodChip
           icon={CameraFill}
           label={estimating ? 'Reading…' : 'Photo'}
-          caption="Snap your plate"
           onClick={() => void handlePhotoButton()}
           disabled={estimating}
           testId="photo-estimate-button"
         />
-        <MethodTile
+        <MethodChip
           icon={MenuFill}
           label="Menu"
-          caption="Scan a menu"
           onClick={() => router.push(`/chat/session?id=${crypto.randomUUID()}&prefill=` + encodeURIComponent('Scan this menu and suggest what fits my remaining macros'))}
         />
       </div>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
 
       {searchFailed && !searching && trimmed.length >= 2 ? (
-        <div role="status" className="mt-5 px-1">
+        <div role="status" className="mt-4 px-1">
           <p className="text-[15.5px] leading-[1.45] text-ink">I can&apos;t reach search right now. Try again, or snap a photo instead.</p>
           <button type="button" onClick={() => handleSearch(query)} className="-ml-3 mt-1 min-h-11 rounded-full px-3 text-[15px] font-semibold text-ink underline decoration-ink-35 underline-offset-4">Try again</button>
         </div>
       ) : !searching && !searchFailed && trimmed.length >= 2 && results.length === 0 && searchedQuery === trimmed ? (
-        <p role="status" className="mt-5 px-1 text-[15.5px] leading-[1.45] text-ink">
+        <p role="status" className="mt-4 px-1 text-[15.5px] leading-[1.45] text-ink">
           Nothing matches &ldquo;{trimmed}&rdquo;. Try a shorter name, or snap a photo.
         </p>
       ) : null}
@@ -508,9 +507,9 @@ export function FoodLogForm() {
       {/* popLayout: results leaving (a food was picked) fade over the editor rising into their place, no one-frame cut. */}
       <AnimatePresence mode="popLayout" initial={false}>
       {searching ? (
-        <motion.div key="searching" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }} exit={{ opacity: 0, transition: { duration: 0.12 } }} className="mt-5"><RowsSkeleton label="Searching" /></motion.div>
+        <motion.div key="searching" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }} exit={{ opacity: 0, transition: { duration: 0.12 } }} className="mt-4"><RowsSkeleton label="Searching" /></motion.div>
       ) : results.length > 0 ? (
-        <motion.section key="results" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }} exit={{ opacity: 0, transition: { duration: 0.14 } }} className="mt-5" aria-label="Search results">
+        <motion.section key="results" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }} exit={{ opacity: 0, transition: { duration: 0.14 } }} className="mt-4" aria-label="Search results">
           <RiseList className={LIST}>
             {results.map((food, index) => (
               <button
@@ -524,9 +523,9 @@ export function FoodLogForm() {
                   <span className="block truncate text-[13px] text-ink-65">
                     {food.serving_size_g ? `${food.serving_size_g} g` : '1 serving'} · {formatMacroKcal(food.macros_per_serving.calories)} kcal
                     {food.brand ? ` · ${food.brand}` : ''}
-                    {SOURCE_LABELS[String(food.source)] ? ` · ${SOURCE_LABELS[String(food.source)]}` : ''}
                   </span>
                 </span>
+                <SourceTag source={String(food.source)} />
                 <AddMark />
               </button>
             ))}
@@ -536,7 +535,7 @@ export function FoodLogForm() {
       </AnimatePresence>
 
       {estimating ? (
-        <motion.div role="status" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className={`${CARD} mt-5 p-5`}>
+        <motion.div role="status" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className={`${CARD} mt-4 p-5`}>
           <p className="text-[15.5px] font-semibold text-ink">Reading your photo</p>
           <p className="mt-0.5 text-[13px] text-ink-65">A few seconds. I&apos;ll fill in what I can see.</p>
           <div className="mt-4 space-y-2.5" aria-hidden="true">
@@ -551,7 +550,7 @@ export function FoodLogForm() {
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={reduce ? reducedFade : spring.glide}
-          className={`${CARD} mt-5 space-y-5 p-5`}
+          className={`${CARD} mt-4 space-y-5 p-5`}
         >
           {estimateId ? (
             <div data-testid="estimate-chip" className="flex h-9 w-fit items-center gap-1 rounded-full bg-ink-06 pl-3 text-[13px] font-semibold text-ink">
@@ -641,7 +640,7 @@ export function FoodLogForm() {
       ) : null}
 
       {showYourFoods ? (
-        <div className="mt-7 space-y-6" data-testid="your-foods">
+        <div className="mt-6 space-y-6" data-testid="your-foods">
           {recents.length > 0 ? (
             <section>
               <SectionTitle>Recent</SectionTitle>
@@ -671,7 +670,7 @@ export function FoodLogForm() {
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
             transition={reduce ? reducedFade : spring.sheet}
             className="glass sticky z-30 mt-6 rounded-[28px] p-4"
-            style={{ bottom: 'calc(96px + var(--safe-bottom))' }}
+            style={{ bottom: 'calc(12px + var(--safe-bottom))' }}
           >
             <p className="flex items-baseline justify-between gap-3 px-1">
               <span className="text-[17px] font-bold text-ink tabular-nums">
@@ -698,18 +697,23 @@ export function FoodLogForm() {
 const MEAL_OPTIONS = MEAL_TYPES.map((value) => ({ value, label: value }))
 const AMOUNT_OPTIONS = [{ value: 'servings', label: 'Servings' }, { value: 'grams', label: 'Grams' }] as const
 
+/** Plain + glyph; -mr-0.5 puts its centre on the search field's clear icon (28 px from the edge). */
 function AddMark() {
-  return (
-    <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-ink-06 text-ink">
-      <Plus className="size-4" />
-    </span>
-  )
+  return <Plus aria-hidden="true" strokeWidth={1.75} className="-mr-0.5 size-5 shrink-0 text-ink-65" />
 }
 
-function MethodTile({ icon: Icon, label, caption, onClick, disabled, testId }: {
+/** Quiet trailing source tag; your own foods get a soft ink chip so they stand out from database rows. */
+function SourceTag({ source }: { source: string }) {
+  const label = SOURCE_LABELS[source]
+  if (!label) return null
+  return source === 'personal'
+    ? <span className="shrink-0 rounded-full bg-ink-06 px-2 py-0.5 text-[12px] font-semibold text-ink">{label}</span>
+    : <span className="shrink-0 text-[12px] font-medium text-ink-65">{label}</span>
+}
+
+function MethodChip({ icon: Icon, label, onClick, disabled, testId }: {
   icon: ComponentType<SVGProps<SVGSVGElement>>
   label: string
-  caption: string
   onClick: () => void
   disabled?: boolean
   testId?: string
@@ -720,22 +724,19 @@ function MethodTile({ icon: Icon, label, caption, onClick, disabled, testId }: {
       onClick={onClick}
       disabled={disabled}
       data-testid={testId}
-      className="flex min-h-16 items-center gap-3 rounded-[22px] bg-card p-3 text-left shadow-[var(--shadow-card)] transition-transform active:scale-[.97] disabled:opacity-60"
+      className="flex h-11 items-center gap-2 rounded-full bg-card pl-3.5 pr-4 text-[15px] font-semibold text-ink shadow-[var(--shadow-card)] transition-transform active:scale-[.96] disabled:opacity-60"
     >
-      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-ink-06 text-ink"><Icon className="size-5" /></span>
-      <span className="min-w-0">
-        <span className="block text-[15.5px] font-semibold text-ink">{label}</span>
-        <span className="block truncate text-[12.5px] text-ink-65">{caption}</span>
-      </span>
+      <Icon aria-hidden="true" className="size-[18px]" />
+      {label}
     </button>
   )
 }
 
 function TrayChip({ name, onRemove }: { name: string; onRemove: () => void }) {
   return (
-    <span className="flex h-9 max-w-full items-center rounded-full bg-ink-06 pl-3 text-[13.5px] font-semibold text-ink">
+    <span className="flex h-11 max-w-full items-center rounded-full bg-ink-06 pl-3 text-[13.5px] font-semibold text-ink">
       <span className="max-w-40 truncate">{name}</span>
-      <button type="button" onClick={onRemove} aria-label={`Remove ${name}`} className="-my-1 grid size-11 shrink-0 place-items-center rounded-full"><X className="size-4" /></button>
+      <button type="button" onClick={onRemove} aria-label={`Remove ${name}`} className="grid size-11 shrink-0 place-items-center rounded-full"><X className="size-4" /></button>
     </span>
   )
 }

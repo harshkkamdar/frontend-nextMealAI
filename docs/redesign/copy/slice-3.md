@@ -9,11 +9,11 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 | Title | Log food (left, 22 pt) | Log food (centred pushed header) |
 | Meal pill | Lunch ▾ | Lunch (glass pill, chevron); screen reader "Meal: Lunch" |
 | Search placeholder | Search foods, brands, or describe it | Search foods or brands |
-| Method chips | Photo / Menu | Photo, "Snap your plate" / Menu, "Scan a menu" |
+| Method chips | Photo / Menu | Photo / Menu (critic round 2: subtitles dropped) |
 | Photo busy | Analysing… | Reading… plus a card: "Reading your photo. A few seconds. I'll fill in what I can see." |
 | Search error | Search isn't reachable right now. Try again, or use Photo or Menu. | I can't reach search right now. Try again, or snap a photo instead. |
 | No results | No foods match "x". Try a shorter name, or use Photo. | Nothing matches "x". Try a shorter name, or snap a photo. |
-| Result source | YOURS / USDA (all-caps eyebrow) | "· Yours" / "· USDA" at the end of the caption |
+| Result source | YOURS / USDA (all-caps eyebrow) | trailing tag: "Yours" (soft chip) / "USDA" (plain) |
 | Section labels | RECENT / FAVOURITES | Recent / Favourites |
 | Estimate chip | Photo estimate · confidence 75% | From your photo · about 75% sure |
 | Name field | (no label) | Food |
