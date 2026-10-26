@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, type ReactNode } from 'react'
-import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import { DRAW_MS } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
@@ -18,6 +18,25 @@ function CountUp({ value, from }: { value: number; from: number }) {
     return () => controls.stop()
   }, [mv, value, reduce])
   return <motion.span>{text}</motion.span>
+}
+
+/** Text that crossfades when it changes (old out over 120 ms, new in over 180 ms, overlapping), never a hard swap. */
+export function FadeText({ text }: { text: string }) {
+  return (
+    <span className="inline-grid">
+      <AnimatePresence initial={false}>
+        <motion.span
+          key={text}
+          style={{ gridArea: '1 / 1' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }}
+          exit={{ opacity: 0, transition: { duration: 0.12, ease: 'easeOut' } }}
+        >
+          {text}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  )
 }
 
 function Ring({ fraction, animateIn }: { fraction: number; animateIn: boolean }) {
@@ -88,7 +107,7 @@ export function DayHero({ calories, macros, animateIn, footer }: DayHeroProps) {
             <span className="text-[15px] font-semibold text-ink-65">kcal</span>
           </p>
           <p className="mt-1.5 text-[14px] text-ink-65 tabular-nums">
-            {target <= 0 ? 'No daily target set' : current <= 0 ? `Nothing logged · target ${fmt(target)}` : left >= 0 ? `${fmt(left)} left of ${fmt(target)}` : `${fmt(-left)} over ${fmt(target)}`}
+            <FadeText text={target <= 0 ? 'No daily target set' : current <= 0 ? `Nothing logged · target ${fmt(target)}` : left >= 0 ? `${fmt(left)} left of ${fmt(target)}` : `${fmt(-left)} over ${fmt(target)}`} />
           </p>
         </div>
         <Ring fraction={target > 0 ? Math.min(1, current / target) : 0} animateIn={animateIn} />

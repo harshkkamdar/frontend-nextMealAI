@@ -57,16 +57,8 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
   }
 
   return (
-    <div className={cn('select-none', className)}>
-      <div aria-hidden="true" className="grid h-3 grid-cols-7 items-end">
-        {days.map((iso) => (
-          <span key={iso} className="flex justify-center">
-            {iso === today
-              ? <svg viewBox="0 0 10 7" className="h-[7px] w-[10px] text-accent"><path d="M0 0h10L5 7Z" fill="currentColor" /></svg>
-              : <span className="h-[6px] w-px bg-ink-20" />}
-          </span>
-        ))}
-      </div>
+    // Clip sideways so a drag past the edge never widens the page (mobile browsers zoom out to fit it).
+    <div className={cn('-mx-4 select-none overflow-x-clip px-4', className)}>
       <motion.div
         drag={reduce ? false : 'x'}
         dragConstraints={{ left: 0, right: 0 }}
@@ -75,19 +67,29 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
         dragTransition={{ bounceStiffness: 300, bounceDamping: 35 }}
         onDragStart={() => { dragged.current = true }}
         onDragEnd={onDragEnd}
-        className="mt-1.5 grid touch-pan-y"
+        className="grid touch-pan-y"
       >
         <AnimatePresence initial={false} custom={dir}>
           <motion.div
             key={days[0]}
             custom={dir}
-            className="grid grid-cols-7"
             style={{ gridArea: '1 / 1' }}
             initial={reduce ? { opacity: 0 } : { opacity: 0, x: dir * 24 }}
             animate={{ opacity: 1, x: 0 }}
             exit={reduce ? { opacity: 0, transition: reducedFade } : { opacity: 0, x: dir * -24, transition: { opacity: { duration: 0.12 }, x: spring.glide } }}
             transition={reduce ? reducedFade : { opacity: { duration: 0.18 }, x: spring.glide }}
           >
+            {/* The ruler moves with its week, so the today marker leaves with the week it belongs to. */}
+            <div aria-hidden="true" className="mb-1.5 grid h-3 grid-cols-7 items-end">
+              {days.map((iso) => (
+                <span key={iso} className="flex justify-center">
+                  {iso === today
+                    ? <svg viewBox="0 0 10 7" className="h-[7px] w-[10px] text-accent"><path d="M0 0h10L5 7Z" fill="currentColor" /></svg>
+                    : <span className="h-[6px] w-px bg-ink-20" />}
+                </span>
+              ))}
+            </div>
+            <div className="grid grid-cols-7">
             {days.map((iso) => {
               const date = local(iso)
               const isSelected = iso === selected
@@ -129,6 +131,7 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
                 </button>
               )
             })}
+            </div>
           </motion.div>
         </AnimatePresence>
       </motion.div>

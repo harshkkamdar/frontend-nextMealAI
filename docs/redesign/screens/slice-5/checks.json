@@ -1,0 +1,290 @@
+[
+  {
+    "shot": "copy-meal",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "copy-meal",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-empty",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-empty",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-error",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-error",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-future",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-future",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-loading",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-loading",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-long",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-long",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-many",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-many",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-no-target",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-no-target",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-offline",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-offline",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-past",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-past",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-scrolled",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-scrolled",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "inline-edit",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "inline-edit",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "month-sheet",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "month-sheet",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "name-favourite",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "name-favourite",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "row-actions-past",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-actions-past",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-actions",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-actions",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-expanded",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-expanded",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  }
+]

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion'
 import { CalendarDays } from 'lucide-react'
 import { LargeTitleHeader } from '@/components/layout/screen-header'
-import { DayHero, DaySkeleton } from '@/components/diary/day-hero'
+import { DayHero, DaySkeleton, FadeText } from '@/components/diary/day-hero'
 import { MealGroup } from '@/components/diary/meal-group'
 import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
@@ -291,7 +291,7 @@ export default function DiaryPage() {
     <div className="mx-auto w-full max-w-md px-4">
       <LargeTitleHeader
         title="Food"
-        subtitle={daySubtitle(selectedDate, today)}
+        subtitle={<FadeText text={daySubtitle(selectedDate, today)} />}
         actions={<RoundButton aria-label="Open month view" onClick={() => setMonthOpen(true)}><CalendarDays strokeWidth={1.75} /></RoundButton>}
       >
         <WeekStrip className="mt-4" selected={selectedDate} today={today} onSelect={selectDate} marked={loggedDays} markLabel="food logged" />
