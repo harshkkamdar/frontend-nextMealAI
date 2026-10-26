@@ -95,6 +95,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const APP_PORT = Number(process.env.APP_PORT || 3040)
   let shot = { name: 'none', url: '/' }
   let rec = { clock: null, init: [] }
+  let created = []
 
   http.createServer((req, res) => {
     const origin = req.headers.origin
@@ -113,13 +114,33 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
           const found = (await sliceShots(slice)).find((s) => s.name === name)
           if (!found) return send(404, { error: `no shot ${slice}/${name}` })
           shot = found
+          created = []
           rec = await preload(shot)
           return send(200, { slice, name, url: shot.url, clock: rec.clock, init: rec.init.length })
         } catch (e) { return send(500, { error: e.message }) }
       }
       if (p.startsWith('/__photo')) { res.writeHead(200, { 'content-type': 'image/jpeg' }); return res.end(fs.readFileSync(PHOTO)) }
       if (p === '/auth/refresh' || p === '/auth/login') return send(200, { user: AUTH.state.user, session: { access_token: 'capture-token', refresh_token: 'capture-refresh' } })
-      return send(200, apiBody(shot, p))
+      // Logs made on the device stay until the shot changes, so a quick log shows up on the next read (simulator demos).
+      if (p === '/v1/logs' && req.method === 'POST') {
+        let input = {}
+        try { input = JSON.parse(raw || '{}') } catch {}
+        const now = new Date()
+        const log = { id: `device-${Date.now()}`, user_id: 'capture-user', source: 'manual', ...input, local_date: input.local_date ?? now.toLocaleDateString('en-CA'), created_at: now.toISOString(), updated_at: now.toISOString() }
+        created.push(log)
+        return send(201, log)
+      }
+      if (p.startsWith('/v1/logs/') && req.method === 'DELETE') {
+        created = created.filter((l) => l.id !== p.slice('/v1/logs/'.length))
+        return send(200, {})
+      }
+      const body = apiBody(shot, p)
+      if (p === '/v1/logs' && req.method === 'GET' && created.length) {
+        if (Array.isArray(body)) return send(200, [...created, ...body])
+        if (Array.isArray(body?.logs)) return send(200, { ...body, logs: [...created, ...body.logs] })
+        if (Array.isArray(body?.data)) return send(200, { ...body, data: [...created, ...body.data] })
+      }
+      return send(200, body)
     })
   }).listen(API_PORT, () => console.log(`device mock API on :${API_PORT}`))
 
