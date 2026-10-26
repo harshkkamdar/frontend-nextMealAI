@@ -1,0 +1,37 @@
+# Integration pass (after all lanes land)
+- [x] cn/twMerge keeps text-title etc (c794369b test, 59caa297 fix)
+- [ ] chat.api getChatSessions limit/offset/hasMore; delete chat/sessions-page.ts wrapper (G)
+- [ ] hidesTabBar: hide on /settings and /settings/profile per mock (S)
+- [ ] purchases.ts: numeric price + currency, active plan and renewal date (S) - check if Capacitor plugin exposes them
+- [ ] delete unused ui/fiqr/status-screen.tsx (S)
+- [x] GeoAvatar orange G stays orange everywhere, incl. paywall (owner 27 Oct)
+- [ ] delete-sheet-open transition re-run on a quiet machine (S)
+- [ ] history refetch 4 s after open can drop a failed message (G)
+- [ ] full lint / type-check / test green across lanes; stale .next validator
+- [ ] iOS simulator screenshots per slice (all lanes skipped)
+- [ ] fresh integrated simulator build for the owner
+- [ ] BottomSheet open flagged at frame 3 in Food (month-open, row-actions-open) and Settings (delete-sheet-open): check on a quiet machine whether the kit sheet has a real first-frame jump
+- [ ] Food month sheet: no error state on failed load
+- [ ] Owner note: food rows show the glyph fallback for every log until the backend stores a photo_url (backend ticket)
+- [x] Orange buttons ink text (01e755f0); plans ORANGE_BUTTON told to P lane; grep all lanes for cream-on-orange text at integration
+- [ ] Toaster: mock wants a dark toast at the bottom above the tab bar; today white at top covers hero; long message pushes Undo off (S owns Toaster; status capsule decision says capsule under header - reconcile: owner picked Status capsule under header)
+- [ ] redesign-mock-api.mjs Home fixture: past food + 7 days of steps so recordings show the Geo chip and full week
+- [ ] Today: water sheet open flagged frame 3 both runs (same kit sheet flag as Food/Settings)
+- [ ] Week pages use centred PushedHeader, mock uses large left title (kit)
+- [ ] Old components/shared/macro-breakdown-sheet.tsx unused -> delete
+- [ ] Commit ddf4ee4a swept onboarding files too (same as bbe34f0a); verify HEAD builds once O lane commits
+- [ ] LargeTitleHeader: clamp long subtitle to one line, leave room for header buttons (W)
+- [ ] PushedHeader: scrolled content shows through translucent header on long receipt (W) - check with atmosphere agent's header glass
+- [ ] Train fixture start time in the future -> clock starts at 0 in recordings
+- [ ] Backend ticket: log-from-estimate double-scales totals (frontend compensates in log-math estimateEdits); takes no meal or date (photo from a past day logs to today)
+- [ ] OfflineBand on log screens: mock wants "This saves on your phone and sends later" (S owns band)
+- [ ] Stop :3077 dev server when no lane needs it
+- [ ] Log lane: "Add something I missed" under photo items, in-app camera viewfinder not built (owner question)
+- [ ] Onboarding: edge swipe-back between routes not built (back button works)
+- [ ] Onboarding: welcome beat visuals may clip on 667 pt tall phones (iPhone SE)
+- [ ] Owner question: mock's "choice" screen line ("Food, training and a coach called Geo, in one plan.") not approved copy, screen skipped
+- [ ] iOS shots of welcome/onboarding (sim was busy)
+- [ ] hidesTabBar: add /check-in and /plans builders? (P asks /check-in and /plans; mock hides on pushed pages) - decide with S request for /settings
+- [ ] PushedHeader large-title option; replace P's local PushedLargeHeader
+- [ ] Backend ticket (check-in): status proposal lacks last week's state; uncached status reads insert check_ins rows; status vs POST use different "now" + 6 h cache; POST returns 200 applied:false on save failure; carbs floor at 0 breaks macro sum; plan target update only if plan has daily targets, only first active plan, update not scoped by user_id (AGENTS.md rule!); mid-week days logged mixes weeks
+- [ ] Plans: training days show numbers (no weekday data); edit mode Save only on last step (owner's mock had Save each step - question)
