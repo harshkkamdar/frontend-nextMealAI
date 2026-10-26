@@ -304,6 +304,22 @@
     "orangeActions": 0
   },
   {
+    "shot": "month-sheet-error",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "month-sheet-error",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "month-sheet",
     "width": 360,
     "url": "/food",

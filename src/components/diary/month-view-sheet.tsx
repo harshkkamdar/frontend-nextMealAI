@@ -62,6 +62,9 @@ export function MonthViewSheet({
   const [anchor, setAnchor] = useState<string>(() => firstOfMonth(initialDate))
   const [breakdown, setBreakdown] = useState<DailyBreakdownRow[]>([])
   const [loading, setLoading] = useState(false)
+  // A failed food load says so (with a retry) instead of painting an empty month.
+  const [failed, setFailed] = useState(false)
+  const [attempt, setAttempt] = useState(0)
 
   // Reset anchor to the diary's selected month each time the sheet opens.
   useEffect(() => {
@@ -79,6 +82,7 @@ export function MonthViewSheet({
     if (!isOpen) return
     let cancelled = false
     setLoading(true)
+    setFailed(false)
     const today = todayLocalISO(tz)
     const daysBack = Math.max(
       31,
@@ -87,7 +91,7 @@ export function MonthViewSheet({
     const dayOf = (l: Log) =>
       l.local_date ?? new Date(l.created_at).toISOString().split('T')[0]
     Promise.all([
-      getLogs({ type: 'food', days: daysBack }).catch(() => [] as Log[]),
+      getLogs({ type: 'food', days: daysBack }),
       getLogs({ type: 'workout', days: daysBack }).catch(() => [] as Log[]),
     ])
       .then(([foodLogs, workoutLogs]) => {
@@ -116,7 +120,9 @@ export function MonthViewSheet({
         )
       })
       .catch(() => {
-        if (!cancelled) setBreakdown([])
+        if (cancelled) return
+        setBreakdown([])
+        setFailed(true)
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -124,7 +130,7 @@ export function MonthViewSheet({
     return () => {
       cancelled = true
     }
-  }, [isOpen, anchor, tz])
+  }, [isOpen, anchor, tz, attempt])
 
   const today = todayLocalISO(tz)
   const grid = useMemo(
@@ -210,10 +216,17 @@ export function MonthViewSheet({
         </div>
       </div>
       {/* pb-7 lifts the footer clear of the 38 pt sheet corners. */}
+      {failed && !loading ? (
+        <div role="alert" className="flex items-center justify-between px-5 pb-6 pt-1.5 text-caption text-ink-65">
+          <span>Couldn&apos;t load this month</span>
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="-mr-3 flex min-h-11 items-center px-3 text-body-sm font-semibold text-ink active:opacity-60">Try again</button>
+        </div>
+      ) : (
       <p className="flex justify-between px-5 pb-7 pt-3 text-caption text-ink-65 tabular-nums">
         {loading ? <span>Loading this month</span> : <span>{monthDays.length ? `${monthDays.length} day${monthDays.length === 1 ? '' : 's'} logged` : 'No logs this month'}</span>}
         {!loading && monthDays.length ? <span>Average {average.toLocaleString('en-AU')} kcal</span> : null}
       </p>
+      )}
     </BottomSheet>
   )
 }

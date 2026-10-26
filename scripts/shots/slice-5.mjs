@@ -87,6 +87,8 @@ const slice5 = {
     { name: 'food-error', url: '/food', api: DEFAULT, fail: ['/v1/logs'] },
     { name: 'food-offline', url: '/food', api: DEFAULT, offline: true },
     { name: 'month-sheet', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Open month view' }).click(); await wait(p) } },
+    // The month's log reads fail after the day has loaded: the footer says so and offers a retry.
+    { name: 'month-sheet-error', url: '/food', api: DEFAULT, act: async (p) => { await p.route(/\/v1\/logs\?/, (r) => r.abort()); await p.getByRole('button', { name: 'Open month view' }).click(); await wait(p) } },
     { name: 'meal-actions', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Breakfast actions' }).click(); await wait(p) } },
     { name: 'copy-meal', url: '/food', api: DEFAULT, act: async (p) => { await pickDay(p, 1); await p.getByRole('button', { name: 'Lunch actions' }).click(); await wait(p, 600); await p.getByRole('button', { name: 'Copy to today' }).click(); await wait(p) } },
     { name: 'name-favourite', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Breakfast actions' }).click(); await wait(p, 600); await p.getByRole('button', { name: 'Save as meal' }).click(); await wait(p); await p.getByLabel('Meal name').fill('Usual breakfast') } },
