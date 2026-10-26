@@ -1,7 +1,7 @@
 'use client'
 
 import type { ComponentType, ReactNode, SVGProps } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { ChartFill, ChevronRightIcon, SleepFill, StepsFill, WaterFill, WeightFill } from '@/components/ui/fiqr/icons'
@@ -154,37 +154,40 @@ function Tile({ icon: Icon, label, value, unit, caption, children, onClick, acti
     : <div className={className}>{body}</div>
 }
 
-/** A filled bar of 20 segments; 0 to 1. */
-function Segments({ fraction }: { fraction: number }) {
+/** One thin progress line, 0 to 1; grows from the left once per visit. */
+function Progress({ fraction }: { fraction: number }) {
   const drawn = useDrawn()
-  const filled = Math.round(Math.min(1, Math.max(0, fraction)) * 20)
+  const f = Math.min(1, Math.max(0, fraction))
   return (
-    <span className="flex h-6 items-end gap-[2px]" aria-hidden="true">
-      {Array.from({ length: 20 }, (_, index) => (
+    <span className="flex h-6 items-end" aria-hidden="true">
+      <span className="relative block h-[6px] w-full overflow-hidden rounded-full bg-ink-06">
         <span
-          key={index}
-          className="h-full flex-1 origin-bottom rounded-[2px] transition-transform duration-500"
-          style={{ background: index < filled ? 'var(--color-ink)' : 'var(--color-ink-06)', transform: drawn ? 'scaleY(1)' : 'scaleY(.2)', transitionDelay: `${200 + index * 20}ms` }}
+          className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-ink transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)]"
+          style={{ transform: `scaleX(${drawn ? f : 0})`, transitionDelay: '200ms' }}
         />
-      ))}
+      </span>
     </span>
   )
 }
 
 function Sparkline({ series }: { series: number[] }) {
   const drawn = useDrawn()
+  const clip = useId()
   if (series.length < 2) return <span className="flex h-6 items-center" aria-hidden="true"><span className="h-0 w-full border-t-[1.5px] border-dashed border-ink-20" /></span>
   const min = Math.min(...series)
   const max = Math.max(...series)
   const span = max - min || 1
-  const points = series.map((value, index) => `${(index / (series.length - 1)) * 100},${22 - ((value - min) / span) * 18}`).join(' ')
+  const points = series.map((value, index) => `${(index / (series.length - 1)) * 100},${20 - ((value - min) / span) * 16}`).join(' ')
   return (
     <svg viewBox="0 0 100 24" preserveAspectRatio="none" className="block h-6 w-full overflow-visible" aria-hidden="true">
-      <polyline
-        points={points} fill="none" stroke="var(--color-ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"
-        pathLength={1} strokeDasharray={1} strokeDashoffset={drawn ? 0 : 1}
-        style={{ transition: `stroke-dashoffset ${DRAW_MS}ms ease-out 200ms` }}
-      />
+      <defs>
+        <clipPath id={clip}>
+          {/* Draws left to right by scaling the clip, so the line itself is never re-measured. */}
+          <rect x="0" y="-4" width="100" height="32" style={{ transformOrigin: '0 0', transform: `scaleX(${drawn ? 1 : 0})`, transition: `transform ${DRAW_MS}ms ease-out 200ms` }} />
+        </clipPath>
+      </defs>
+      <line x1="0" x2="100" y1="23.5" y2="23.5" stroke="var(--color-ink-10)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+      <polyline clipPath={`url(#${clip})`} points={points} fill="none" stroke="var(--color-ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     </svg>
   )
 }
@@ -242,7 +245,7 @@ export function StepsTile({ today, yesterday, source, connectLabel, onConnect }:
       value={today === null ? '—' : fmt(shown)}
       caption={today === null ? (yesterday ? `Yesterday ${fmt(yesterday)}` : sourceCaption(source, 'Syncs from your phone')) : sourceCaption(source, 'of 10,000')}
     >
-      <Segments fraction={(today ?? 0) / 10000} />
+      <Progress fraction={(today ?? 0) / 10000} />
     </Tile>
   )
 }
@@ -262,7 +265,7 @@ export function WaterTile({ glasses, onLog }: { glasses: number; onLog: () => vo
   const shown = useCountUp(glasses)
   return (
     <Tile icon={WaterFill} label="Water" value={fmt(shown)} unit={`of ${WATER_GOAL_GLASSES}`} caption={glasses >= WATER_GOAL_GLASSES ? 'Done for today' : glasses ? 'glasses so far' : 'Tap to add a glass'} onClick={onLog} actionLabel="log water">
-      <Segments fraction={glasses / WATER_GOAL_GLASSES} />
+      <Progress fraction={glasses / WATER_GOAL_GLASSES} />
     </Tile>
   )
 }

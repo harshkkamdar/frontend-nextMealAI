@@ -63,7 +63,7 @@ export function LargeTitleHeader({ title, subtitle, actions, children }: LargeTi
     <>
       <TopBar title={title} filled={past} actions={actions} />
       <header className="pt-[calc(8px+var(--safe-top))]">
-        <h1 className="font-wider pr-28 text-[32px] font-[750] leading-[1.1] tracking-[-0.6px] text-ink">{title}</h1>
+        <h1 className="font-wide pr-28 text-[30px] font-bold leading-[1.1] tracking-[-0.5px] text-ink">{title}</h1>
         {subtitle ? <p className="mt-1 text-[15px] text-ink-65">{subtitle}</p> : null}
         {/* The bar condenses once the line under the title passes under it. */}
         <div ref={ref} aria-hidden="true" />
