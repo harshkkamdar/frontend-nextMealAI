@@ -65,7 +65,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S3-R3 | R3 axe 0 / contrast / 44 pt | built 442e20f: axe serious/critical 0, small 0, orange <= 1 on 138 checks (screens/slice-3/checks.json) |
 | S3-R4 | R4 frame-diff 0 pops | pending |
 | S3-R5 | R5 60 fps on fiqr_lowend | pending |
-| S3-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
+| S3-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6862/6879/6915/6916): r1 ranks 1/1/1 scores 7/7/7; r2 1/1/1 7.5/7.5/7.5; r3 1/2/1 7.5/7/7.5. Remaining critiques: round glass back button (C3), soft shadows on pills and cards. Fix commits 01483e6, 6672e18 |
 | S3-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-3.md? Also: food search sheet moved to the inset sheet (no snap levels); /foods lost the orange Add (round + in header); recent-log right value only for food and workouts |
 | S3-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
