@@ -71,26 +71,33 @@ export function ResizableSheet({
     return levels.map((f) => Math.round(f * a))
   }, [levels, avail])
 
-  // Mount, then slide up from below the screen on the sheet spring.
+  // Mount at the start position: below the screen (or transparent, reduced motion).
   useEffect(() => {
     if (!open) return
     closing.current = false
     const h = levelsPx()[defaultLevelIndex] ?? levelsPx()[0]
     height.set(h)
-    setRender(true)
     if (reduce) {
       y.set(0)
       fade.set(0)
-      const c = animate(fade, 1, reducedFade)
-      return () => c.stop()
+    } else if (!mounted.current) {
+      // Reopened mid-close: reverse from where it is instead of jumping back below the screen.
+      // jump, not set: a set from 0 left a huge downward velocity, so the spring first dived ~430 px below the start.
+      y.jump(h + 48)
     }
-    // Reopened mid-close: reverse from where it is instead of jumping back below the screen.
-    if (!mounted.current) y.set(h + 48)
     mounted.current = true
-    const c = animate(y, 0, spring.sheet)
-    return () => c.stop()
+    setRender(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per open
   }, [open])
+
+  // Then slide up on the sheet spring, started only once the sheet has committed. Started next to setRender, the
+  // spring sometimes ran a frame or two before the first paint, so the sheet appeared already ~150 px up.
+  useEffect(() => {
+    if (!open || !render) return
+    const c = reduce ? animate(fade, 1, reducedFade) : animate(y, 0, spring.sheet)
+    return () => c.stop()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per open, once mounted
+  }, [open, render])
 
   // Slide out (or fade, reduced motion), then unmount.
   useEffect(() => {

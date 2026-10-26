@@ -9,20 +9,20 @@
     "verdict": "smooth"
   },
   "companion-open": {
-    "frames": 39,
-    "chrome_px": 115455,
-    "content_px": 372274,
-    "max_chrome_share": 0.136,
-    "max_content_share": 0.133,
+    "frames": 37,
+    "chrome_px": 118012,
+    "content_px": 377410,
+    "max_chrome_share": 0.146,
+    "max_content_share": 0.112,
     "issues": [],
     "verdict": "smooth"
   },
   "companion-resize": {
-    "frames": 73,
-    "chrome_px": 210135,
-    "content_px": 832043,
-    "max_chrome_share": 0.096,
-    "max_content_share": 0.058,
+    "frames": 70,
+    "chrome_px": 206818,
+    "content_px": 838539,
+    "max_chrome_share": 0.099,
+    "max_content_share": 0.051,
     "issues": [],
     "verdict": "smooth"
   },
