@@ -9,7 +9,7 @@ import { PathParamsContext, PathnameContext, SearchParamsContext } from 'next/di
 import { animate, motion, motionValue, useReducedMotion, useTransform, type AnimationPlaybackControls, type MotionValue, type Transition } from 'framer-motion'
 import { hidesTabBar } from '@/components/layout/tab-bar'
 import { isNative } from '@/lib/platform'
-import { useSheetHeld, sheetDepth } from '@/lib/depth'
+import { anyHeld, useSheetHeld, sheetDepth } from '@/lib/depth'
 import { SWIPE_EDGE_PX, depthPair, reducedFade, sheetBehind, shouldCompleteSwipe, spring, SWIPE_SLOP_PX } from '@/lib/motion'
 import { TAB_ROOTS, classifyNav, navHistory, stampHistory, type NavKind } from '@/lib/navigation'
 import { cn } from '@/lib/utils'
@@ -350,7 +350,8 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       if (e.touches.length !== 1 || !under || TAB_ROOTS.has(t.key) || touch.clientX > SWIPE_EDGE_PX) return
       // A push still sliding in can be caught (interruptible, as on iOS); a running pop or tab fade cannot.
       if (active.current && navRef.current.front !== t.key) return
-      if (useUIStore.getState().activeSheet || (e.target as Element).closest?.('[data-vaul-drawer],[data-no-swipe-back]')) return
+      // Any open sheet (its scrim covers the edge) owns the gesture, not the page behind it.
+      if (useUIStore.getState().activeSheet || anyHeld() || (e.target as Element).closest?.('[data-vaul-drawer],[data-no-swipe-back]')) return
       track = { x0: touch.clientX, y0: touch.clientY, x: touch.clientX, t: e.timeStamp, v: 0, dragging: false, base: 0 }
     }
     const onMove = (e: TouchEvent) => {

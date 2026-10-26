@@ -38,7 +38,8 @@ export function releaseSheetDepth(progress: MotionValue<number>) {
 }
 
 const subscribe = (l: () => void) => { listeners.add(l); return () => { listeners.delete(l) } }
-const anyHeld = () => held.size > 0
+/** True while any sheet is open or still closing (for non-React callers, e.g. the swipe-back guard). */
+export const anyHeld = () => held.size > 0
 
 /** True while any sheet is open or still closing. */
 export function useSheetHeld(): boolean {
@@ -52,20 +53,28 @@ export function useSheetHeld(): boolean {
 export function useSheetDepth(open: boolean, transition: Transition = spring.sheet) {
   const progress = useMotionValue(0)
   const openRef = useRef(open)
+  const running = useRef<{ stop: () => void } | null>(null)
+  // One animation at a time; a closed sheet's hold ends when its progress lands at 0.
+  const to = (target: number, velocity?: number) => {
+    running.current?.stop()
+    if (!openRef.current && target === 0 && progress.get() === 0) { releaseSheetDepth(progress); return }
+    running.current = animate(progress, target, { ...transition, ...(velocity === undefined ? null : { velocity }), onComplete: () => { if (!openRef.current) releaseSheetDepth(progress) } })
+  }
   useEffect(() => {
     openRef.current = open
-    if (!open && progress.get() === 0) return
     if (open) holdSheetDepth(progress)
-    const c = animate(progress, open ? 1 : 0, { ...transition, onComplete: () => { if (!openRef.current) releaseSheetDepth(progress) } })
-    return () => c.stop()
+    to(open ? 1 : 0)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per open change; the transition is a constant per sheet
   }, [open])
-  useEffect(() => () => releaseSheetDepth(progress), [progress])
+  // A sheet unmounted while up (its page navigated away) still eases the screen back instead of snapping.
+  useEffect(() => () => {
+    running.current?.stop()
+    if (progress.get() === 0) { releaseSheetDepth(progress); return }
+    animate(progress, 0, { ...transition, onComplete: () => releaseSheetDepth(progress) })
+  }, [progress, transition])
   return {
     progress,
-    drag: (p: number) => { progress.stop(); progress.set(p) },
-    settle: (toOpen: boolean, velocity = 0) => {
-      animate(progress, toOpen ? 1 : 0, { ...transition, velocity, onComplete: () => { if (!openRef.current) releaseSheetDepth(progress) } })
-    },
+    drag: (p: number) => { running.current?.stop(); progress.stop(); progress.set(p) },
+    settle: (toOpen: boolean, velocity = 0) => to(toOpen ? 1 : 0, velocity),
   }
 }
