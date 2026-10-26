@@ -71,7 +71,7 @@ function NumberCells({ label, values, value, onChange }: { label: string; values
           aria-checked={value === n}
           onClick={() => { void haptic('light'); onChange(n) }}
           style={{ '--i': i + 2 } as CSSProperties}
-          className={cn('rise font-wide h-16 rounded-[var(--radius-row)] text-[24px] font-bold tabular-nums transition-[background-color,color,transform] duration-200 active:scale-[.94] active:duration-75', value === n ? 'bg-ink text-cream' : 'bg-card text-ink outline outline-1 -outline-offset-1 outline-ink-08')}
+          className={cn('rise font-wide h-16 rounded-[var(--radius-row)] text-[24px] font-bold tabular-nums transition-[background-color,color,transform] duration-200 active:scale-[.94] active:duration-75', value === n ? 'bg-ink text-cream' : 'card-glass text-ink')}
         >
           {n}
         </button>
@@ -224,7 +224,7 @@ export function OnboardingFlow({ module }: { module: OnboardingModule }) {
             value={draft.name}
             onChange={(e) => set({ name: e.target.value })}
             placeholder="Your name"
-            className="rise h-16 w-full rounded-[var(--radius-row)] bg-card px-5 text-[22px] font-semibold text-ink outline outline-1 -outline-offset-1 outline-ink-08 focus:outline-ink placeholder:font-normal placeholder:text-ink-65"
+            className="rise h-16 w-full rounded-[var(--radius-row)] card-glass px-5 text-[22px] font-semibold text-ink outline outline-0 -outline-offset-2 outline-ink focus:outline-2 placeholder:font-normal placeholder:text-ink-65"
           />
         </OnboardingStep>
       )
@@ -322,7 +322,7 @@ export function OnboardingFlow({ module }: { module: OnboardingModule }) {
               <WeightPath fromKg={draft.weightKg} toKg={draft.goal === 'maintenance' || draft.targetKg === null ? draft.weightKg : draft.targetKg} weeks={weeks} />
             </div>
           ) : null}
-          <div className="rise flex items-center gap-3 rounded-[var(--radius-card)] bg-card p-4 outline outline-1 -outline-offset-1 outline-ink-08" style={{ '--i': 3 } as CSSProperties}>
+          <div className="rise flex items-center gap-3 rounded-[var(--radius-card)] card-glass p-4" style={{ '--i': 3 } as CSSProperties}>
             <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-ink text-[14px] font-bold text-cream">G</span>
             <p className="text-[15.5px] leading-[1.45] text-ink">
               {draft.name ? `${draft.name.trim()}, the` : 'The'} rest is about food: allergies, how you eat and what you enjoy.

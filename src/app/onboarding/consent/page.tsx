@@ -13,7 +13,7 @@ import { useOnboardingStore } from '@/stores/onboarding.store'
 
 function ConsentCard({ title, checked, onChange, agree, i, children }: { title: string; checked: boolean; onChange: (checked: boolean) => void; agree: string; i: number; children: React.ReactNode }) {
   return (
-    <section style={{ '--i': i } as React.CSSProperties} className="rise rounded-[var(--radius-card)] bg-card p-5 outline outline-1 -outline-offset-1 outline-ink-08">
+    <section style={{ '--i': i } as React.CSSProperties} className="rise rounded-[var(--radius-card)] card-glass p-5">
       <h2 className="text-[17px] font-bold text-ink">{title}</h2>
       <div className="mt-2 text-[15.5px] leading-[1.5] text-ink-80">{children}</div>
       <label className="relative -mx-2 mt-3 flex min-h-12 cursor-pointer items-center gap-3 rounded-[12px] px-2 text-[16px] font-semibold text-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ink">

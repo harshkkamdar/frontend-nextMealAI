@@ -24,7 +24,7 @@ export function WeightPath({ fromKg, toKg, weeks, today = new Date() }: { fromKg
   const label = `${fromKg.toFixed(1)} kg today to ${toKg.toFixed(1)} kg by ${end}`
 
   return (
-    <figure className="rounded-[var(--radius-card)] bg-card px-3 pb-3 pt-4 outline outline-1 -outline-offset-1 outline-ink-08">
+    <figure className="rounded-[var(--radius-card)] card-glass px-3 pb-3 pt-4">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="block w-full overflow-visible">
         {[TOP, (TOP + BOTTOM) / 2, BOTTOM].map((y) => <line key={y} x1={X0} x2={X1} y1={y} y2={y} stroke="var(--color-ink)" strokeOpacity=".07" strokeDasharray="2 4" />)}
         <motion.path

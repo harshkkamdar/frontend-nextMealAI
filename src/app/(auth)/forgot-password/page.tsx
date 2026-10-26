@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
       secondary={sentTo ? { label: 'Send it again', onClick: () => void onSubmit({ email: getValues('email') }) } : undefined}
     >
       {sentTo ? (
-        <div className="rise grid size-20 place-items-center rounded-full bg-card outline outline-1 -outline-offset-1 outline-ink-08" style={{ '--i': 2 } as React.CSSProperties}>
+        <div className="rise grid size-20 place-items-center rounded-full card-glass" style={{ '--i': 2 } as React.CSSProperties}>
           <svg viewBox="0 0 32 32" className="size-9 text-ink" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="7" width="24" height="18" rx="3" /><path d="M5 9l11 8 11-8" /></svg>
         </div>
       ) : (
