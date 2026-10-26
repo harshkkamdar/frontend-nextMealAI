@@ -22,8 +22,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           // Below the 60px header row (PushedHeader and LargeTitleHeader) so a toast never covers the back button.
           offset={{ top: 'calc(64px + var(--safe-top))' }}
           mobileOffset={{ top: 'calc(64px + var(--safe-top))' }}
-          // height auto: sonner pins the measured first-paint height, which clips text that wraps once the font loads.
-          toastOptions={{ style: { height: 'auto', padding: '12px 16px', lineHeight: 1.35, background: '#FFFFFF', color: '#111C35', border: '1px solid rgba(17,28,53,.16)', borderRadius: 16, fontFamily: 'var(--font-archivo)', fontSize: 14.5, fontWeight: 600 } }}
+          // The status capsule (mock "Status capsule"): toasts share the offline band's glass capsule and ink dot (a ring
+          // for errors), so every message lives in one place under the header. Our dot replaces sonner's type icons.
+          icons={{ success: null, error: null, info: null, warning: null }}
+          toastOptions={{
+            unstyled: true,
+            classNames: {
+              toast: "glass flex items-center gap-2.5 rounded-[24px] py-0.5 pl-4 pr-0.5 text-body-sm font-semibold leading-[1.35] text-ink before:size-2 before:shrink-0 before:rounded-full before:bg-ink before:content-['']",
+              error: 'before:bg-transparent before:shadow-[inset_0_0_0_2px_#111C35]',
+              content: 'min-w-0 flex-1 py-[13px] pr-3.5',
+              actionButton: 'relative h-11 min-w-11 shrink-0 rounded-[20px] bg-ink-08 px-3.5 font-bold text-ink',
+            },
+            // height auto: sonner pins the measured first-paint height, which clips text that wraps once the font loads.
+            // left/right 0 with auto margins and fit-content: the capsule hugs its words and stays centred.
+            style: { height: 'auto', minHeight: 48, left: 0, right: 0, marginInline: 'auto', width: 'fit-content', maxWidth: 'calc(100% - 32px)', fontFamily: 'var(--font-archivo)', boxShadow: 'inset 0 1px 0 #fff, 0 0 0 .5px rgba(17,28,53,.1), 0 16px 34px -14px rgba(17,28,53,.4)' },
+          }}
         />
         <SplashHider />
       </body>
