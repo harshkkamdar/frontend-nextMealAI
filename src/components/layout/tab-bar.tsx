@@ -43,7 +43,9 @@ function useMinimised(): [boolean, () => void] {
     setMinimised(false)
   }
   useEffect(() => {
-    step.current = initialMinimise
+    // Anchor where the page now is: the route frame has already restored a popped page's scroll, and the scroll event
+    // that restore fires must not read as a scroll down from 0.
+    step.current = { ...initialMinimise, anchor: window.scrollY }
   }, [pathname])
   useEffect(() => {
     let frame = 0
@@ -51,8 +53,10 @@ function useMinimised(): [boolean, () => void] {
       frame = 0
       // Clamp to the real scroll range so iOS's bottom rubber band (scrollY past the end, then back) never reads as a scroll up.
       const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      const was = step.current.minimised
       step.current = minimiseStep(step.current, { type: 'scroll', y: Math.min(window.scrollY, max) })
-      setMinimised(step.current.minimised)
+      // Commit only a flip, and after the frame callback (motion-feel M11: no setState inside rAF).
+      if (step.current.minimised !== was) queueMicrotask(() => setMinimised(step.current.minimised))
     }
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(read) }
     window.addEventListener('scroll', onScroll, { passive: true })
