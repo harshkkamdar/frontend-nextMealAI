@@ -3,14 +3,16 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { motion, useReducedMotion } from 'framer-motion'
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import { toast } from 'sonner'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { CameraFill, ChartFill, GeoFill, StepsFill } from '@/components/ui/fiqr/icons'
+import { GROUP_CARD } from '@/components/settings/settings-section'
+import { per, renewalLine } from '@/components/settings/paywall-copy'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { reducedFade, spring } from '@/lib/motion'
+import { goBack } from '@/lib/navigation'
 import { platform } from '@/lib/platform'
 import {
   getSubscriptionOptions,
@@ -22,21 +24,58 @@ import {
 } from '@/lib/platform/purchases'
 import { cn } from '@/lib/utils'
 
-// shortcut: placeholder benefits until the client decides what sits behind the paywall (SOW §4.6, week 6).
+// shortcut: placeholder benefits until the client decides what sits behind the paywall (SOW 4.6, week 6).
 const BENEFITS = [
-  { icon: GeoFill, title: 'Unlimited Geo coaching', sub: 'Ask anything about food and training, any time' },
-  { icon: CameraFill, title: 'Photo and menu logging', sub: 'Snap a meal or a menu and Geo does the maths' },
-  { icon: ChartFill, title: 'Weekly check-in', sub: 'Targets that adjust to your real progress' },
-  { icon: StepsFill, title: 'Apple Health and Health Connect', sub: 'Steps, sleep, weight and workouts in one place' },
+  { title: 'Unlimited Geo coaching', sub: 'Ask anything about food and training, any time' },
+  { title: 'Photo and menu logging', sub: 'Snap a meal or a menu and Geo does the maths' },
+  { title: 'Weekly check-in', sub: 'Targets that adjust to your real progress' },
+  { title: 'Apple Health and Health Connect', sub: 'Steps, sleep, weight and workouts in one place' },
 ]
 
 const APPLE_EULA = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'
 
-const CARD = 'rounded-[24px] bg-card shadow-[var(--shadow-card)]'
+/**
+ * One plan of the depth stack (mock "Depth stack"): the chosen plan sits in front with its price large; the other
+ * steps back 60 pt behind it, smaller and lighter, with its name and radio peeking over the top, and comes forward on
+ * tap. The pair trade places half way, where both cards are the same size, so the swap never shows.
+ */
+function PlanCard({ option, on, busy, onPick }: { option: SubscriptionOption; on: boolean; busy: boolean; onPick: () => void }) {
+  const reduce = useReducedMotion()
+  const front = useMotionValue(on ? 1 : 0)
+  useEffect(() => {
+    const run = animate(front, on ? 1 : 0, reduce ? reducedFade : spring.sheet)
+    return () => run.stop()
+  }, [on, front, reduce])
+  const y = useTransform(front, [0, 1], [-60, 0])
+  const scale = useTransform(front, [0, 1], [0.92, 1])
+  const opacity = useTransform(front, [0, 1], [0.78, 1])
+  const zIndex = useTransform(front, (v) => (v > 0.5 ? 2 : 1))
+  return (
+    <motion.button
+      type="button"
+      role="radio"
+      aria-checked={on}
+      disabled={busy}
+      onClick={onPick}
+      style={{ y, scale, opacity, zIndex }}
+      className="absolute inset-x-0 bottom-0 flex h-[180px] origin-top flex-col rounded-card bg-card p-4 text-left shadow-[0_1px_2px_rgba(17,28,53,.04)]"
+    >
+      {/* Ring and lift shadow of the front card: their own layer, faded, so no shadow value animates. */}
+      <motion.span aria-hidden="true" style={{ opacity: front }} className="pointer-events-none absolute inset-0 rounded-card shadow-[0_0_0_1.5px_#111C35,0_22px_34px_-18px_rgba(17,28,53,.45)]" />
+      <span className="flex w-full items-center gap-2">
+        <span className="min-w-0 flex-1 text-caption font-semibold text-ink">{option.period === 'yearly' ? 'Yearly' : 'Monthly'}</span>
+        <span aria-hidden="true" className="relative size-[22px] shrink-0 rounded-full shadow-[inset_0_0_0_1.5px_rgba(17,28,53,.22)]">
+          <span className={cn('absolute inset-0 rounded-full shadow-[inset_0_0_0_7px_#111C35] transition-opacity duration-150', on ? 'opacity-100' : 'opacity-0')} />
+        </span>
+      </span>
+      <span className="mt-auto block text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink tabular-nums [font-stretch:106%]">{option.price}</span>
+      <span className="mt-1 block text-caption leading-[1.35] text-ink-65">{per(option)}</span>
+    </motion.button>
+  )
+}
 
 export default function PaywallPage() {
   const router = useRouter()
-  const reduce = useReducedMotion()
   const [options, setOptions] = useState<SubscriptionOption[] | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState(false)
@@ -57,12 +96,13 @@ export default function PaywallPage() {
     return () => { active = false }
   }, [])
 
+  const chosen = options?.find((o) => o.id === selected)
+
   const start = async () => {
-    const option = options?.find((o) => o.id === selected)
-    if (!option) return
+    if (!chosen) return
     setBusy(true)
     setFailed(false)
-    const ok = await subscribe(option)
+    const ok = await subscribe(chosen)
     setBusy(false)
     if (ok) {
       toast.success('Welcome to FIQR Plus')
@@ -85,117 +125,87 @@ export default function PaywallPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-[calc(var(--safe-bottom)+32px)]">
-      <PushedHeader title="FIQR Plus" onBack={() => router.back()} />
-      <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
+    <div className="mx-auto w-full max-w-md px-gutter pb-[calc(var(--safe-bottom)+32px)]">
+      <PushedHeader title="FIQR Plus" onBack={() => goBack(router, '/settings')} />
+      <div className="-mx-gutter mb-2.5 [&:empty]:hidden"><OfflineBand /></div>
 
-      <div className="enter-rows mt-1 flex flex-col gap-5">
-        <header className="flex items-start gap-3 px-1">
-          <GeoAvatar size={32} />
-          <h1 className="font-wide text-[24px] font-bold leading-[1.15] tracking-[-0.4px] text-balance text-ink">Coaching that keeps up with what you actually do</h1>
+      <div className="enter-rows mt-0.5 flex flex-col">
+        <header className="mx-1 flex items-start gap-2.5">
+          <GeoAvatar size={28} />
+          <h1 className="text-hero leading-[1.15] text-balance text-ink">Coaching that keeps up with you</h1>
         </header>
 
-        <ul aria-label="What you get" className={cn(CARD, 'overflow-hidden')}>
-          {BENEFITS.map(({ icon: Icon, title, sub }, index) => (
-            <li key={title} className={cn('flex items-center gap-3 px-4 py-3', index > 0 && 'border-t border-ink-06')}>
-              <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-ink-06 text-ink"><Icon className="size-[18px]" /></span>
-              <span className="min-w-0">
-                <span className="block text-[15.5px] font-semibold text-ink">{title}</span>
-                <span className="block text-[13.5px] leading-snug text-ink-65">{sub}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-
         {subscribed ? (
-          <section className={cn(CARD, 'p-5')} aria-label="Your plan">
-            <p className="font-wide text-[19px] font-bold text-ink">You&apos;re on FIQR Plus</p>
-            <p className="mt-1 text-[14px] text-ink-65">Change or cancel it any time in {store}.</p>
+          <section className={cn(GROUP_CARD, 'mt-4 p-4')} aria-label="Your plan">
+            <p className="text-headline text-ink">You&apos;re on FIQR Plus</p>
+            <p className="mt-1 text-body-sm text-ink-65">Change or cancel it any time in {store}.</p>
             <button
               type="button"
               onClick={() => void manageSubscription()}
-              className="mt-4 h-12 w-full rounded-[14px] bg-ink text-[16px] font-semibold text-cream transition-transform duration-100 active:scale-[.97]"
+              className="mt-4 h-btn w-full rounded-full bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]"
             >
               Manage subscription
             </button>
           </section>
         ) : options === null ? (
-          <div role="status" aria-busy="true" aria-label="Loading plans" className="grid grid-cols-2 gap-[10px]">
-            {[0, 1].map((key) => <div key={key} className="h-[112px] animate-[pulse_1.2s_ease-in-out_infinite] rounded-[22px] bg-card shadow-[var(--shadow-card)]" />)}
+          <div role="status" aria-busy="true" aria-label="Loading plans" className="mt-4 grid grid-cols-2 gap-2.5">
+            {[0, 1].map((key) => (
+              <div key={key} className={cn(GROUP_CARD, 'flex h-[128px] flex-col justify-between p-4')}>
+                <span className="h-3 w-16 animate-[pulse_1.2s_ease-in-out_infinite] rounded-full bg-ink-06" />
+                <span className="h-5 w-24 animate-[pulse_1.2s_ease-in-out_infinite] rounded-full bg-ink-06" />
+              </div>
+            ))}
           </div>
         ) : options.length === 0 ? (
-          <p className={cn(CARD, 'px-5 py-4 text-[15.5px] leading-[1.45] text-ink')}>
+          <p className={`${GROUP_CARD} mt-4 px-4 py-3.5 text-body leading-[1.45] text-ink`}>
             FIQR Plus is sold in the FIQR app on iPhone and Android. Open it there to subscribe.
           </p>
         ) : (
           <section aria-label="Choose a plan">
-            <div role="radiogroup" aria-label="Plan" className="grid grid-cols-2 gap-[10px]">
-              {options.map((o) => {
-                const on = o.id === selected
-                return (
-                  <button
-                    key={o.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    disabled={busy}
-                    onClick={() => { setSelected(o.id); setFailed(false) }}
-                    className="relative flex min-h-[112px] flex-col rounded-[22px] bg-card p-4 text-left shadow-[var(--shadow-card)] transition-transform duration-100 active:scale-[.98]"
-                  >
-                    {/* One ring travels between the plans (shared layout), never an orange fill. */}
-                    {on ? (
-                      <motion.span
-                        layoutId="plan-ring"
-                        aria-hidden="true"
-                        className="absolute inset-0 rounded-[22px] border-[1.5px] border-ink"
-                        transition={reduce ? reducedFade : spring.lens}
-                      />
-                    ) : null}
-                    {/* Explicit widths: WebKit does not stretch this row inside a column-flex button, so the radio would hug the label. */}
-                    <span className="flex w-full items-center gap-2">
-                      <span className="min-w-0 flex-1 text-[14px] font-semibold text-ink-65">{o.period === 'yearly' ? 'Yearly' : 'Monthly'}</span>
-                      <span aria-hidden="true" className="relative ml-auto size-[22px] shrink-0 rounded-full border-[1.5px] border-ink-20">
-                        <span className={cn('absolute -inset-[1.5px] grid place-items-center rounded-full bg-ink transition-opacity duration-150', on ? 'opacity-100' : 'opacity-0')}>
-                          <span className="size-2 rounded-full bg-cream" />
-                        </span>
-                      </span>
-                    </span>
-                    <span className="font-wide mt-auto block pt-3 text-[24px] font-bold leading-none tracking-[-0.4px] text-ink tabular-nums">{o.price}</span>
-                    <span className="mt-1 block text-[13px] font-medium text-ink-65">per {o.period === 'yearly' ? 'year' : 'month'}</span>
-                  </button>
-                )
-              })}
+            <div role="radiogroup" aria-label="Plan" className="relative mt-1 h-[244px]">
+              {options.map((o) => (
+                <PlanCard key={o.id} option={o} on={o.id === selected} busy={busy} onPick={() => { setSelected(o.id); setFailed(false) }} />
+              ))}
             </div>
 
             {failed ? (
-              <p role="alert" className="mt-4 px-1 text-[14px] leading-[1.45] text-ink">
-                That didn&apos;t go through, and you haven&apos;t been charged. Try again, or restore if you&apos;ve subscribed before.
+              <p role="alert" className="mx-1 mt-3 text-body-sm leading-[1.45] text-ink">
+                <b className="font-bold">That didn&apos;t go through, and you haven&apos;t been charged.</b> Try again, or restore if you&apos;ve subscribed before.
               </p>
             ) : null}
+            {chosen ? <p className="mx-1 mt-3 text-caption leading-[1.45] text-ink-65">{renewalLine(chosen)}</p> : null}
 
-            <PrimaryButton className="mt-5 justify-center" disabled={busy || !selected} onClick={() => void start()}>
-              {busy ? `Waiting for ${store}…` : 'Start FIQR Plus'}
+            <PrimaryButton className="mt-4 justify-center" disabled={busy || !chosen} onClick={() => void start()}>
+              {busy ? `Waiting for ${store}…` : chosen ? `Start FIQR Plus, ${chosen.price} ${per(chosen)}` : 'Start FIQR Plus'}
             </PrimaryButton>
           </section>
         )}
 
-        <div>
-          {!subscribed ? (
-            <button type="button" disabled={busy} onClick={() => void restore()} className="min-h-11 w-full text-center text-[15.5px] font-semibold text-ink disabled:text-ink-65">
-              Restore purchases
-            </button>
-          ) : null}
+        <h2 className="mb-[7px] mt-[22px] px-4 text-caption font-semibold text-ink-65">What you get</h2>
+        <ul aria-label="What you get" className={GROUP_CARD}>
+          {BENEFITS.map(({ title, sub }, index) => (
+            <li key={title} className={cn('relative py-3 pl-[18px] pr-4', index > 0 && "before:absolute before:left-4 before:right-0 before:top-0 before:h-px before:bg-ink-08 before:content-['']")}>
+              <span className="block text-body font-semibold text-ink-65">{title}</span>
+              <span className="mt-px block text-[13.5px] leading-[1.4] text-ink-65">{sub}</span>
+            </li>
+          ))}
+        </ul>
 
-          <p className="mt-3 px-1 text-[12.5px] leading-[1.5] text-ink-65">
-            Payment is charged to your {os === 'android' ? 'Google Play account' : 'Apple ID'} when you confirm. The subscription renews
-            automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel any time in your
-            account settings.
-          </p>
-          <p className="mt-1 flex gap-4 px-1 text-[12.5px]">
-            <Link href="/privacy" className="inline-flex min-h-11 items-center font-semibold text-ink-65 underline underline-offset-4">Privacy policy</Link>
-            <a href={APPLE_EULA} className="inline-flex min-h-11 items-center font-semibold text-ink-65 underline underline-offset-4">Terms of use</a>
-          </p>
-        </div>
+        {!subscribed && options?.length !== 0 ? (
+          <button type="button" disabled={busy} onClick={() => void restore()} className="mt-3 min-h-11 w-full text-center text-body font-bold text-ink disabled:text-ink-65">
+            Restore purchases
+          </button>
+        ) : null}
+
+        <p className="mx-1 mt-3 text-[12.5px] leading-[1.5] text-ink-65">
+          Payment is charged to your {os === 'android' ? 'Google Play account' : 'Apple ID'} when you confirm. The subscription renews
+          automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel any time in your
+          account settings.
+        </p>
+        <p className="mx-1 mt-1 flex gap-4 text-[14px]">
+          <Link href="/privacy" className="inline-flex min-h-11 items-center font-semibold text-ink-65 underline underline-offset-4">Privacy policy</Link>
+          <a href={APPLE_EULA} className="inline-flex min-h-11 items-center font-semibold text-ink-65 underline underline-offset-4">Terms of use</a>
+        </p>
       </div>
     </div>
   )

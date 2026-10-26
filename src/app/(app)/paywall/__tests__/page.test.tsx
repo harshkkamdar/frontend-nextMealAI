@@ -45,7 +45,7 @@ describe('PaywallPage', () => {
   it('says the purchase did not go through when the store returns no entitlement', async () => {
     mocks.subscribe.mockResolvedValue(false)
     render(<PaywallPage />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Start FIQR Plus' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Start FIQR Plus, $99.99 a year' }))
     expect(await screen.findByRole('alert')).toHaveTextContent("haven't been charged")
     expect(mocks.subscribe).toHaveBeenCalledWith(YEARLY)
     expect(mocks.replace).not.toHaveBeenCalled()
@@ -54,7 +54,7 @@ describe('PaywallPage', () => {
   it('shows the waiting label while the store sheet is open', async () => {
     mocks.subscribe.mockReturnValue(new Promise(() => {}))
     render(<PaywallPage />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Start FIQR Plus' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Start FIQR Plus, $99.99 a year' }))
     expect(await screen.findByRole('button', { name: 'Waiting for the App Store…' })).toBeDisabled()
   })
 
