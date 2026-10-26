@@ -10,6 +10,7 @@ import { useComposerStore } from '@/stores/composer.store'
 import { compressImage } from '@/lib/image/compress'
 import { isNative } from '@/lib/platform'
 import { pickPhoto } from '@/lib/platform/camera'
+import { useOnline } from '@/lib/platform/network'
 import type { AttachedImage } from '@/types/chat.types'
 
 // FB-R6-03 — BE caps image_paths at 5 per message. Mirror that on the FE so
@@ -18,12 +19,13 @@ const MAX_IMAGES = 5
 
 export function ChatInput({
   onSend,
-  disabled,
+  disabled: disabledProp,
   showCamera = false,
   defaultValue = '',
   sessionId,
   variant = 'floating',
   placeholder = 'Message Geo',
+  autoFocus = false,
 }: {
   // FB-R6-02 — onSend carries an array of fully-uploaded AttachedImage entries.
   // FB-R6-03 — array length 1..MAX_IMAGES.
@@ -41,8 +43,14 @@ export function ChatInput({
   /** `floating`: the glass capsule over the Geo tab (controls layer). `inline`: a white field inside a sheet. */
   variant?: 'floating' | 'inline'
   placeholder?: string
+  /** Focus the field on mount (the companion sheet opens ready to type). */
+  autoFocus?: boolean
 }) {
   const storeMode = Boolean(sessionId)
+  // Offline the capsule stays in place but says so and takes nothing (sends would fail silently).
+  const online = useOnline()
+  const offline = !online
+  const disabled = disabledProp || offline
 
   // Store-backed slices (read only when sessionId is set).
   const storeDraft = useComposerStore((s) => (sessionId ? s.drafts[sessionId] : undefined))
@@ -272,7 +280,7 @@ export function ChatInput({
             ))}
           </div>
           <p className="mt-1.5 text-[12px] font-medium text-ink-65 tabular-nums">
-            {totalPending} of {MAX_IMAGES} photos{capReached ? ', that is the most per message' : ''}
+            {totalPending} of {MAX_IMAGES} photos{uploadingCount > 0 ? ', uploading' : capReached ? ', that is the most per message' : ''}
           </p>
         </div>
       )}
@@ -307,8 +315,9 @@ export function ChatInput({
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onPaste={showCamera ? handlePaste : undefined}
-          placeholder={placeholder}
+          placeholder={offline ? "You're offline" : placeholder}
           disabled={disabled}
+          autoFocus={autoFocus}
           rows={1}
           aria-label="Type a message"
           className={cn('min-h-11 min-w-0 flex-1 resize-none bg-transparent py-[11px] text-[16px] leading-[22px] text-ink outline-none placeholder:text-ink-65 transition-opacity duration-150 disabled:opacity-60', !showCamera && 'pl-3.5')}

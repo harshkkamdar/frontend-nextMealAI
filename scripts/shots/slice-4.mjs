@@ -25,6 +25,13 @@ const SESSIONS = [
   session('s-3', 'Why is my weight up this week?', 'Mostly water from the extra salt on Saturday. The trend is still down.', 60 * 50),
   session('s-4', 'Swap squats for something knee friendly', 'Try box squats to a high box, or leg press with a short range.', 60 * 24 * 4),
   session('s-5', 'Sleep and training', 'Seven hours or more on training days helps recovery the most.', 60 * 24 * 12),
+  // Stored as Geo wrote it: the row shows plain text. A year old: the date says the year.
+  session('s-6', 'Build me an upper lower split', '**Monday, upper A**\n- Incline press, 3 x 8', 60 * 24 * 40),
+  session('s-7', 'Cutting phase, Nov to Christmas', 'Swapped: *Reverse lunges* 3 x 10', 60 * 24 * 400),
+]
+const OLDER = [
+  session('s-8', 'Protein on rest days', 'Keep it at 140 g, rest days included.', 60 * 24 * 420),
+  session('s-9', 'First week check-in', 'You logged 6 of 7 days. That is a strong start.', 60 * 24 * 480),
 ]
 const LONG_SESSIONS = [session('s-long', LONG_TITLE, 'Here is a version that keeps pressing light and moves the heavy day to Monday so the shoulder gets two days between sessions.', 12), ...SESSIONS.slice(1)]
 
@@ -36,6 +43,15 @@ const HISTORY = [
   msg('m-4', 'assistant', 'Sounds good. Which salmon was it?', 25, { metadata: { suggested_replies: ['Grilled fillet, about 150 g', 'Smoked salmon', 'Not sure'] } }),
 ]
 // The user's photo turn gets its own shot, so the main conversation is not judged on a stand-in image.
+// Geo acted (pick A2): each thing it did is one card with its own actions.
+const LOGGED = msg('g-2', 'assistant', 'Logged banana to breakfast · 105 cal · 1.3g P · 27g C · 0.4g F\n\nBreakfast is 537 kcal now.', 20, { metadata: { actions_taken: [{ type: 'log_created', details: { logType: 'food' } }], suggested_replies: ['Undo', 'Adjust'] } })
+const LOGGED_HISTORY = [...HISTORY.slice(0, 2), msg('g-1', 'user', 'Add a banana too', 21), LOGGED]
+const UNDONE_HISTORY = [...LOGGED_HISTORY, msg('g-3', 'user', 'Undo', 18), msg('g-4', 'assistant', 'Removed the banana. Breakfast is back to 416 kcal.', 17, { metadata: { actions_taken: [{ type: 'log_deleted', details: {} }] } })]
+const DRAFT = "**Upper lower, 4 days.** Replaces your full body plan.\n- Mon, upper A: 6 exercises, 45 min\n- Tue, lower A: 5 exercises, 40 min\n- Thu, upper B: 6 exercises, 45 min\n- Fri, lower B: 5 exercises, 40 min\n\nNothing changes until you say so."
+const DRAFT_HISTORY = [msg('d-1', 'user', 'Build me an upper lower split, 4 days, 45 minutes max', 30), msg('d-2', 'assistant', DRAFT, 29, { metadata: { suggested_replies: ['Use this plan', 'Change something'] } })]
+const SAVED_HISTORY = [...DRAFT_HISTORY, msg('d-3', 'user', 'Use this plan', 28), msg('d-4', 'assistant', 'Done. Upper A is first, on Monday.', 27, { metadata: { actions_taken: [{ type: 'plan_created', details: { planType: 'workout' } }] } })]
+const HEADS_HISTORY = [...LOGGED_HISTORY, msg('h-1', 'user', 'Add the banana again', 16), msg('h-2', 'assistant', 'That one went in a minute ago, so I left it as one. Did you have a second one?', 15, { metadata: { actions_failed: [{ tool: 'create_log', error: 'duplicate_window' }], suggested_replies: ['Yes, a second one', 'No, just one'] } })]
+
 const PHOTO_HISTORY = [
   ...HISTORY.slice(0, 2),
   msg('p-3', 'user', 'This was lunch, about a cup of rice', 26, { attachments: [{ id: 'a-1', signed_url: `${PHOTO_HOST}/bowl.jpg`, mime_type: 'image/jpeg', width: 480, height: 480 }] }),
@@ -61,6 +77,11 @@ const geoApi = (over = {}) => ({
   '/v1/chat/sessions/s-long': { messages: LONG_HISTORY },
   '/v1/chat/sessions/s-photo': { messages: PHOTO_HISTORY },
   '/v1/chat/sessions/comp-1': { messages: HISTORY.slice(0, 2) },
+  '/v1/chat/sessions/s-log': { messages: LOGGED_HISTORY },
+  '/v1/chat/sessions/s-undone': { messages: UNDONE_HISTORY },
+  '/v1/chat/sessions/s-draft': { messages: DRAFT_HISTORY },
+  '/v1/chat/sessions/s-saved': { messages: SAVED_HISTORY },
+  '/v1/chat/sessions/s-heads': { messages: HEADS_HISTORY },
   '/v1/chat/companion': { session_id: 'comp-1', context_loaded: true },
   '/v1/chat': REPLY,
   '/v1/logs': { logs: [] },
@@ -95,6 +116,7 @@ const shots = [
   { name: 'list-offline', url: '/chat', api: geoApi(), offline: true },
   { name: 'list-long', url: '/chat', api: geoApi({ '/v1/chat/sessions': { sessions: LONG_SESSIONS } }) },
   { name: 'list-typed', url: '/chat', api: geoApi(), act: (p) => p.getByLabel('Ask Geo anything').fill('What should I have for dinner?') },
+  { name: 'list-older', url: '/chat', api: geoApi({ '/v1/chat/sessions': { sessions: SESSIONS, pagination: { hasMore: true } } }), act: async (p) => { await p.route(`${API}/v1/chat/sessions?*`, (r) => (new URL(r.request().url()).searchParams.get('offset') === '0' ? r.fallback() : r.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ sessions: OLDER, pagination: { hasMore: false } }) }))); await p.getByRole('button', { name: 'Show older conversations' }).click(); await p.waitForTimeout(900); await p.evaluate(() => document.querySelector('.overflow-y-auto, main')?.scrollTo?.(0, 9999)); await p.mouse.wheel(0, 2000); await p.waitForTimeout(600) } },
   { name: 'list-actions', url: '/chat', api: geoApi(), act: async (p) => { await p.getByRole('button', { name: /^Options for Breakfast/ }).click(); await p.waitForTimeout(800) } },
   { name: 'list-rename', url: '/chat', api: geoApi(), act: async (p) => { await p.getByRole('button', { name: /^Options for Breakfast/ }).click(); await p.waitForTimeout(700); await p.getByRole('button', { name: 'Rename' }).click(); await p.waitForTimeout(900) } },
   { name: 'list-delete', url: '/chat', api: geoApi(), act: async (p) => { await p.getByRole('button', { name: /^Options for Breakfast/ }).click(); await p.waitForTimeout(700); await p.getByRole('button', { name: 'Delete' }).click(); await p.waitForTimeout(700) } },
@@ -105,6 +127,11 @@ const shots = [
   { name: 'session-loading', url: SESSION, api: geoApi(), hang: ['/v1/chat/sessions'] },
   { name: 'session-typing', url: SESSION, api: geoApi(), act: async (p) => { await photos(p); await onSend(p, () => new Promise(() => {})); await p.getByRole('button', { name: 'Grilled fillet, about 150 g' }).click(); await p.waitForTimeout(900) } },
   { name: 'session-reply', url: SESSION, api: geoApi(), act: async (p) => { await photos(p); await p.getByRole('button', { name: 'Grilled fillet, about 150 g' }).click(); await p.waitForTimeout(1400) } },
+  { name: 'session-logged', url: '/chat/session?id=s-log', api: geoApi(), act: photos },
+  { name: 'session-undone', url: '/chat/session?id=s-undone', api: geoApi(), act: photos },
+  { name: 'session-plan-draft', url: '/chat/session?id=s-draft', api: geoApi() },
+  { name: 'session-plan-saved', url: '/chat/session?id=s-saved', api: geoApi() },
+  { name: 'session-heads-up', url: '/chat/session?id=s-heads', api: geoApi(), act: photos },
   { name: 'session-history-error', url: SESSION, api: geoApi(), fail: ['/v1/chat/sessions/s-1'] },
   { name: 'session-send-failed', url: SESSION, api: geoApi(), act: async (p) => { await photos(p); await onSend(p, (r) => r.fulfill({ status: 500, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ error: true, message: 'Server error' }) })); await typeAndSend(p, 'Smoked salmon, about 100 g'); await p.waitForTimeout(1000) } },
   { name: 'session-offline', url: SESSION, api: geoApi(), offline: true, act: photos },
@@ -113,10 +140,12 @@ const shots = [
   { name: 'session-menu', url: SESSION, api: geoApi(), act: async (p) => { await photos(p); await p.getByRole('button', { name: 'Message options' }).last().click(); await p.waitForTimeout(500) } },
   // Report opens with no reason picked and Send disabled; -picked shows the state after one choice.
   { name: 'session-report', url: SESSION, api: geoApi(), act: openReport },
+  { name: 'session-report-failed', url: SESSION, api: geoApi(), act: async (p) => { await openReport(p); await p.route(`${API}/v1/feedback/**`, (r) => (r.request().method() === 'OPTIONS' ? r.fulfill({ status: 204, headers: cors }) : r.fulfill({ status: 500, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ error: true, message: 'Server error' }) }))); await p.getByRole('button', { name: 'Wrong or misleading' }).click(); await p.getByLabel('What went wrong (optional)').fill('The salmon numbers look doubled'); await p.getByRole('button', { name: 'Send report' }).click(); await p.waitForTimeout(800) } },
   { name: 'session-report-picked', url: SESSION, api: geoApi(), act: async (p) => { await openReport(p); await p.getByRole('button', { name: 'Wrong or misleading' }).click(); await p.waitForTimeout(300) } },
   // Companion sheet, opened from Home's "Ask Geo" (first-run Home has no program, so the card offers it)
   { name: 'companion', url: '/dashboard', api: geoApi(), act: openCompanion },
   { name: 'companion-thread', url: '/dashboard', api: geoApi(), act: async (p) => { await p.evaluate(() => localStorage.setItem('nextmealai:companion:current-session-id', JSON.stringify({ session_id: 'comp-1', ts: Date.now() }))); await openCompanion(p) } },
+  { name: 'companion-full', url: '/dashboard', api: geoApi(), act: async (p) => { await p.evaluate(() => localStorage.setItem('nextmealai:companion:current-session-id', JSON.stringify({ session_id: 'comp-1', ts: Date.now() }))); await openCompanion(p); const sheet = await p.getByRole('dialog', { name: 'Geo' }).boundingBox(); const x = sheet.x + sheet.width / 2; await p.mouse.move(x, sheet.y + 10); await p.mouse.down(); for (let i = 1; i <= 12; i++) { await p.mouse.move(x, sheet.y + 10 - i * 30); await p.waitForTimeout(16) } await p.mouse.up(); await p.waitForTimeout(900) } },
   { name: 'companion-offline', url: '/dashboard', api: geoApi(), offline: true, act: openCompanion },
 ]
 

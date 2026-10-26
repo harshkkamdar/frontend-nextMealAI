@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ChatBubble } from '@/components/chat/chat-bubble'
 import { SuggestedReplies, replyLayoutId } from '@/components/chat/suggested-replies'
+import { describeThread } from '@/components/chat/thread-actions'
 import { TypingIndicator } from '@/components/chat/typing-indicator'
 import type { ChatMessage } from '@/types/chat.types'
 
@@ -18,6 +19,8 @@ export function ChatThread({
   onReply,
   freshFrom = Infinity,
   chipSent = null,
+  failed = [],
+  onRetry,
 }: {
   messages: ChatMessage[]
   isTyping?: boolean
@@ -28,6 +31,9 @@ export function ChatThread({
   freshFrom?: number
   /** Text of the chip the user just tapped: its pill takes over the chip's shared-element id. */
   chipSent?: string | null
+  /** Ids of the user's messages that did not send. */
+  failed?: string[]
+  onRetry?: (messageId: string) => void
 }) {
   const reduce = useReducedMotion()
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -48,8 +54,13 @@ export function ChatThread({
   }
 
   const last = messages[messages.length - 1]
+  const cards = useMemo(() => describeThread(messages), [messages])
+  const lastCard = cards[cards.length - 1]
   // R6-10: chips for the latest assistant message; live `suggestedReplies` or persisted `metadata.suggested_replies`.
-  const chips = onReply && !isTyping && last?.role === 'assistant' ? last.suggestedReplies ?? last.metadata?.suggested_replies ?? [] : []
+  // Chips a card button took over (Undo, Adjust, Use this plan, Change) are not offered twice.
+  const chips = onReply && !isTyping && last?.role === 'assistant'
+    ? (last.suggestedReplies ?? last.metadata?.suggested_replies ?? []).filter((chip) => !lastCard?.actions.includes(chip))
+    : []
   // Not findLastIndex: the low-end Android WebView is Chrome 91.
   const lastUser = messages.map((message) => message.role).lastIndexOf('user')
 
@@ -64,6 +75,10 @@ export function ChatThread({
           showTime={messages[index + 1]?.role !== 'assistant'}
           fresh={index >= freshFrom}
           layoutId={chipSent && index === lastUser && index >= freshFrom && message.content === chipSent ? replyLayoutId(chipSent) : undefined}
+          card={cards[index]}
+          onAction={onReply && !isTyping ? onReply : undefined}
+          failed={Boolean(message.id && failed.includes(message.id))}
+          onRetry={message.id && onRetry ? () => onRetry(message.id as string) : undefined}
         />
       ))}
       {isTyping ? <TypingIndicator anchor={last?.role !== 'assistant'} /> : null}

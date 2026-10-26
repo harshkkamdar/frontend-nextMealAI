@@ -5,7 +5,7 @@ vi.mock('@/lib/platform/app', () => ({ haptic: vi.fn() }))
 vi.mock('@/components/chat/report-sheet', () => ({ ReportSheet: () => null }))
 
 import { ChatThread } from '@/components/chat/chat-thread'
-import { formatSessionDate } from '@/components/chat/session-list'
+import { formatSessionDate, plainPreview } from '@/components/chat/session-list'
 import type { ChatMessage } from '@/types/chat.types'
 
 Element.prototype.scrollIntoView = vi.fn()
@@ -63,5 +63,45 @@ describe('formatSessionDate', () => {
     expect(formatSessionDate(new Date(2026, 9, 22, 9).toISOString(), now)).toBe('Thu')
     expect(formatSessionDate(new Date(2026, 9, 2, 9).toISOString(), now)).toBe('2 Oct')
     expect(formatSessionDate(undefined, now)).toBe('')
+  })
+
+  it('says the year once a date is a year old', () => {
+    expect(formatSessionDate(new Date(2025, 0, 3, 9).toISOString(), now)).toBe('3 Jan 2025')
+    expect(formatSessionDate(new Date(2026, 0, 3, 9).toISOString(), now)).toBe('3 Jan')
+  })
+})
+
+describe('plainPreview', () => {
+  it('drops markdown from a stored reply', () => {
+    expect(plainPreview('**Monday, upper A**\n- Incline press, 3 x 8\n1. Row *slowly*')).toBe('Monday, upper A Incline press, 3 x 8 Row slowly')
+    expect(plainPreview('See [your plan](https://x.test) `now` [[choices: A | B]]')).toBe('See your plan now')
+    expect(plainPreview('3 x 8 * 2')).toBe('3 x 8 * 2')
+  })
+})
+
+describe('ChatThread actions', () => {
+  const banana = geo('Logged banana to breakfast · 105 cal · 1.3g P · 27g C · 0.4g F\nBreakfast is 537 kcal now.', { metadata: { suggested_replies: ['Undo', 'Adjust'], actions_taken: [{ type: 'log_created', details: {} }] } })
+
+  it('puts Undo and Adjust on the card, not twice as chips, and Undo sends the turn', () => {
+    const onReply = vi.fn()
+    render(<ChatThread onReply={onReply} messages={[{ role: 'user', content: 'a banana' }, banana]} />)
+    const card = screen.getByRole('region', { name: 'Logged to breakfast' })
+    expect(card).toHaveTextContent('105 kcal')
+    expect(screen.getAllByRole('button', { name: /Undo/ })).toHaveLength(1)
+    fireEvent.click(screen.getByRole('button', { name: /Undo/ }))
+    expect(onReply).toHaveBeenCalledWith('Undo')
+  })
+
+  it('strikes the card through after Geo removed the log', () => {
+    render(<ChatThread messages={[banana, { role: 'user', content: 'Undo' }, geo('Removed it.', { metadata: { actions_taken: [{ type: 'log_deleted', details: {} }] } })]} />)
+    expect(screen.getByRole('region', { name: 'Removed from breakfast' })).toBeInTheDocument()
+  })
+
+  it("shows Didn't send under a failed message and Retry hands back its id", () => {
+    const onRetry = vi.fn()
+    render(<ChatThread messages={[{ id: 'temp-1', role: 'user', content: 'Add a banana too' }]} failed={['temp-1']} onRetry={onRetry} />)
+    expect(screen.getByRole('alert')).toHaveTextContent("Didn't send.")
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(onRetry).toHaveBeenCalledWith('temp-1')
   })
 })

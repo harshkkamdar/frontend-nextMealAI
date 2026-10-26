@@ -50,11 +50,14 @@ function ReportForm({
   const [reason, setReason] = useState<ReportReason | null>(null)
   const [note, setNote] = useState('')
   const [sending, setSending] = useState(false)
+  // A failed send says so here and keeps the reason and note, so Try again is one tap.
+  const [failed, setFailed] = useState(false)
 
   const handleSend = async () => {
     if (!reason || sending) return
 
     setSending(true)
+    setFailed(false)
     try {
       const trimmedNote = note.trim()
       await reportResponse({
@@ -68,6 +71,7 @@ function ReportForm({
       onClose()
     } catch {
       setSending(false)
+      setFailed(true)
     }
   }
 
@@ -102,8 +106,11 @@ function ReportForm({
         aria-label="What went wrong (optional)"
         className="mt-3 min-h-24 w-full resize-none rounded-[16px] bg-card p-4 text-[16px] leading-[1.45] text-ink shadow-[var(--shadow-card)] outline-none placeholder:text-ink-65 focus:outline focus:outline-[1.5px] focus:outline-ink"
       />
-      <PrimaryButton type="button" disabled={!reason || sending} onClick={handleSend} className="mt-5 justify-center">
-        {sending ? 'Sending' : 'Send report'}
+      {failed ? (
+        <p role="alert" className="mt-3 px-1 text-caption leading-[1.4] text-ink">That didn&apos;t send. Check your connection and try again.</p>
+      ) : null}
+      <PrimaryButton type="button" disabled={!reason || sending} onClick={handleSend} className={failed ? 'mt-3 justify-center' : 'mt-5 justify-center'}>
+        {sending ? 'Sending' : failed ? 'Try again' : 'Send report'}
       </PrimaryButton>
       <button type="button" onClick={onClose} className="mt-1 h-11 w-full text-[16px] font-semibold text-ink-65">
         Cancel

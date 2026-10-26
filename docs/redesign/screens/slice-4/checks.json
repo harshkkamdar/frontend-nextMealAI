@@ -1,5 +1,21 @@
 [
   {
+    "shot": "companion-full",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "companion-full",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "companion-offline",
     "width": 360,
     "url": "/dashboard",
@@ -160,6 +176,22 @@
     "orangeActions": 0
   },
   {
+    "shot": "list-older",
+    "width": 360,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "list-older",
+    "width": 390,
+    "url": "/chat",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "list-rename",
     "width": 360,
     "url": "/chat",
@@ -224,6 +256,22 @@
     "orangeActions": 0
   },
   {
+    "shot": "session-heads-up",
+    "width": 360,
+    "url": "/chat/session?id=s-heads",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-heads-up",
+    "width": 390,
+    "url": "/chat/session?id=s-heads",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "session-history-error",
     "width": 360,
     "url": "/chat/session?id=s-1",
@@ -251,6 +299,22 @@
     "shot": "session-loading",
     "width": 390,
     "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-logged",
+    "width": 360,
+    "url": "/chat/session?id=s-log",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-logged",
+    "width": 390,
+    "url": "/chat/session?id=s-log",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -336,6 +400,38 @@
     "orangeActions": 0
   },
   {
+    "shot": "session-plan-draft",
+    "width": 360,
+    "url": "/chat/session?id=s-draft",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-plan-draft",
+    "width": 390,
+    "url": "/chat/session?id=s-draft",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-plan-saved",
+    "width": 360,
+    "url": "/chat/session?id=s-saved",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-plan-saved",
+    "width": 390,
+    "url": "/chat/session?id=s-saved",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "session-reply",
     "width": 360,
     "url": "/chat/session?id=s-1",
@@ -350,6 +446,22 @@
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
+  },
+  {
+    "shot": "session-report-failed",
+    "width": 360,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-report-failed",
+    "width": 390,
+    "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
   },
   {
     "shot": "session-report-picked",
@@ -411,6 +523,22 @@
     "shot": "session-typing",
     "width": 390,
     "url": "/chat/session?id=s-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-undone",
+    "width": 360,
+    "url": "/chat/session?id=s-undone",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-undone",
+    "width": 390,
+    "url": "/chat/session?id=s-undone",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0

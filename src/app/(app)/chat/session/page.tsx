@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, useReducedMotion } from 'framer-motion'
-import { toast } from 'sonner'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { ChatInput } from '@/components/chat/chat-input'
 import { sessionTitles } from '@/components/chat/session-titles'
@@ -67,6 +66,10 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
   const [isTyping, setIsTyping] = useState(false)
   const [loading, setLoading] = useState(true)
   const [historyFailed, setHistoryFailed] = useState(false)
+  const [historyTry, setHistoryTry] = useState(0)
+  // Messages that did not reach Geo stay in the thread with "Didn't send. Retry" under them.
+  const [failed, setFailed] = useState<string[]>([])
+  const unsent = useRef(new Map<string, AttachedImage[] | undefined>())
   // Messages from this index on arrived while the screen was open and play their entrance; history paints at rest.
   const [freshFrom, setFreshFrom] = useState(Infinity)
   // The option chip just tapped, so its pill can take over the chip's shared-element id.
@@ -89,12 +92,14 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
         // A new chat id has no history yet (404); any other failure is shown, not treated as an empty chat.
         getChatSession(sessionId).catch((error: unknown) => {
           if (!(error instanceof ApiException && error.statusCode === 404)) setHistoryFailed(true)
+          else setHistoryFailed(false)
           return { messages: [] as ChatMessage[] }
         }),
         getChatSessions().catch(() => []),
       ]).then(([sessionData, sessions]) => {
         if (cancelled) return
         const history = sessionData.messages ?? []
+        if (history.length > 0) setHistoryFailed(false)
         setFreshFrom((current) => (current === Infinity ? history.length : current))
         setMessages(history)
         const match = sessions.find((s) => s.session_id === sessionId || s.id === sessionId)
@@ -114,7 +119,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
     }, 4000)
 
     return () => { cancelled = true; clearTimeout(timer) }
-  }, [sessionId])
+  }, [sessionId, historyTry])
 
   const handleSend = async (message: string, attachments?: AttachedImage[]) => {
     // FB-R6-UAT-A — hand the optimistic bubble the FULL attachment set so
@@ -136,6 +141,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
     }
 
     setMessages((prev) => [...prev, userMessage])
+    unsent.current.set(userMessage.id as string, attachments)
     setIsTyping(true)
 
     // FB-15: if the user attached an image with a workout-programmy message,
@@ -169,25 +175,16 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
         // R6-10 — tappable option chips (top-level or persisted metadata).
         suggestedReplies: res.suggested_replies ?? res.response.metadata?.suggested_replies,
       }
+      unsent.current.delete(userMessage.id as string)
       setMessages((prev) => [...prev, geoMessage])
 
       // FB-R6.7 Build B — centralized chat→UI sync. Emits invalidation
       // topics on syncBus (consuming pages refetch automatically) and
       // bridges the legacy DOM CustomEvents during the rollout.
-      const { topics, anyFailed } = handleGeoToolResults(res)
-
-      // Suppress the success toast if any tool failed — actions_failed
-      // already surfaces inline in the chat bubble (chat-bubble.tsx:153).
-      const planToolsFired =
-        topics.includes('plans:created') || topics.includes('plans:updated')
-      if (planToolsFired && !anyFailed) {
-        toast.success('Plan saved', {
-          description: "It's ready in Plans.",
-          action: { label: 'View', onClick: () => router.push('/plans') },
-        })
-      }
+      // A saved plan shows as a card in the thread (pick A2), not a toast.
+      handleGeoToolResults(res)
     } catch {
-      toast.error("That didn't send. Check your connection and try again.")
+      setFailed((ids) => [...ids, userMessage.id as string])
     } finally {
       setIsTyping(false)
     }
@@ -219,6 +216,17 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
   const send = (message: string, attachments?: AttachedImage[]) => {
     setChipSent(null)
     void handleSend(message, attachments)
+  }
+  // Retry takes the failed pill out and sends it again as a new turn, photos included.
+  const retry = (id: string) => {
+    const message = messages.find((m) => m.id === id)
+    if (!message || isTyping) return
+    const attachments = unsent.current.get(id)
+    unsent.current.delete(id)
+    setFailed((ids) => ids.filter((x) => x !== id))
+    setMessages((prev) => prev.filter((m) => m.id !== id))
+    setChipSent(null)
+    void handleSend(message.content, attachments)
   }
 
   return (
@@ -257,11 +265,11 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
           // History crossfades in over the skeleton's place; its blocks never move (motion-feel 3h).
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
             {historyFailed && messages.length === 0 ? (
-              <div className="mb-6"><ErrorState>I couldn&apos;t load this conversation. You can still send a message, or go back and try again.</ErrorState></div>
+              <div className="mb-6"><ErrorState onRetry={() => { setLoading(true); setHistoryTry((n) => n + 1) }}>I couldn&apos;t load this conversation. You can still send a message.</ErrorState></div>
             ) : messages.length === 0 && !isTyping && !autoSend ? (
               <NewChatIntro />
             ) : null}
-            <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} />
+            <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} failed={failed} onRetry={retry} />
           </motion.div>
         )}
       </div>

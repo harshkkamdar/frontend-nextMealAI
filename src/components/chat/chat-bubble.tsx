@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 
-import { parseLoggedFoods, type LoggedFood } from '@/components/chat/logged-foods'
+import { ActionCard } from '@/components/chat/action-card'
+import { parseLoggedFoods } from '@/components/chat/logged-foods'
+import type { ActionCardModel } from '@/components/chat/thread-actions'
 import { ReportSheet } from '@/components/chat/report-sheet'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { reducedFade, spring } from '@/lib/motion'
@@ -73,58 +75,6 @@ function GeoText({ content }: { content: string }) {
   return <div className="space-y-2.5 break-words text-[16px] leading-[1.5] text-ink">{elements}</div>
 }
 
-const fmt = (n: number) => (Number.isInteger(n) ? n : Number(n.toFixed(1))).toLocaleString('en-AU')
-
-function MacroValue({ value, letter, color }: { value: number | null; letter: string; color: string }) {
-  if (value === null) return null
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: color }} />
-      {fmt(value)} g {letter}
-    </span>
-  )
-}
-
-/** Foods Geo logged in this reply: flat white rows on a hairline, like the pills (Q25). */
-function LoggedFoods({ foods }: { foods: LoggedFood[] }) {
-  // One meal for the whole reply is said once, under the card; mixed meals stay on their rows.
-  const sharedMeal = foods.every((food) => food.meal === foods[0].meal) ? foods[0].meal : null
-  return (
-    <div className="flex flex-col gap-1.5">
-      <ul aria-label="Logged" className="overflow-hidden rounded-[16px] border border-ink-06 bg-card">
-        {foods.map((food, index) => {
-          const hasMacros = food.protein !== null || food.carbs !== null || food.fat !== null
-          const rowMeal = sharedMeal ? null : food.meal
-          return (
-            // Name and kcal share a baseline; macros (or the row's own meal) sit under the name.
-            <li key={index} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-1 border-b border-ink-06 px-4 py-3 last:border-b-0">
-              <span className="min-w-0 text-[15px] font-semibold leading-snug text-ink">{food.name}</span>
-              <span className="text-right text-[15px] font-semibold text-ink tabular-nums">
-                {food.estimated ? '~' : ''}{fmt(food.kcal)}<span className="text-[13px] font-medium text-ink-65"> kcal</span>
-              </span>
-              {hasMacros || rowMeal ? (
-                <>
-                  <span className="flex min-w-0 flex-wrap gap-x-3 text-[13px] font-medium text-ink-65 tabular-nums">
-                    {hasMacros ? (
-                      <>
-                        <MacroValue value={food.protein} letter="P" color="var(--color-ink)" />
-                        <MacroValue value={food.carbs} letter="C" color="var(--color-macro-teal)" />
-                        <MacroValue value={food.fat} letter="F" color="var(--color-macro-ochre)" />
-                      </>
-                    ) : rowMeal}
-                  </span>
-                  <span className="text-right text-[13px] font-medium text-ink-65">{hasMacros ? rowMeal : null}</span>
-                </>
-              ) : null}
-            </li>
-          )
-        })}
-      </ul>
-      {sharedMeal ? <p className="px-4 text-[13px] font-medium text-ink-65">Logged to {sharedMeal.toLowerCase()}</p> : null}
-    </div>
-  )
-}
-
 function describeFailure(a: { tool: string; error?: string }) {
   // Friendly per-error overrides: Geo's text usually explains the why, so this stays short and free of internal codes.
   const errorCopy: Record<string, string> = {
@@ -169,10 +119,17 @@ interface ChatBubbleProps {
   clusterStart?: boolean
   /** Last of a run of Geo's turns: carries the timestamp. */
   showTime?: boolean
+  /** What Geo did in this reply, as one card (pick A2). */
+  card?: ActionCardModel | null
+  /** Sends a card button's text as the next turn. */
+  onAction?: (text: string) => void
+  /** The user's message did not reach Geo: "Didn't send. Retry" sits under it. */
+  failed?: boolean
+  onRetry?: () => void
 }
 
 /** One turn of the running conversation: the user's ink-tint pill, or Geo's plain text with logged-food rows. */
-export function ChatBubble({ message, sessionId, fresh = false, layoutId, clusterStart = false, showTime = true }: ChatBubbleProps) {
+export function ChatBubble({ message, sessionId, fresh = false, layoutId, clusterStart = false, showTime = true, card = null, onAction, failed = false, onRetry }: ChatBubbleProps) {
   const reduce = useReducedMotion()
   const isUser = message.role === 'user'
   const [menuOpen, setMenuOpen] = useState(false)
@@ -238,12 +195,19 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId, cluste
             {displayContent}
           </motion.p>
         ) : null}
+        {failed ? (
+          <p role="alert" className="-my-2 flex items-center text-caption font-medium text-ink-65">
+            Didn&apos;t send.
+            <button type="button" onClick={onRetry} className="h-11 px-2 font-semibold text-ink underline underline-offset-4">Retry</button>
+          </p>
+        ) : null}
       </motion.div>
     )
   }
 
   const failures = message.metadata?.actions_failed ?? []
-  const { text, foods } = parseLoggedFoods(message.content)
+  // Receipt lines become the card's rows; the rest is Geo's text.
+  const { text } = card?.kind === 'logged' ? parseLoggedFoods(message.content) : { text: message.content }
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content)
@@ -275,9 +239,13 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId, cluste
         {...longPress}
       >
         {clusterStart ? <GeoAnchor /> : null}
-        {/* What was logged leads; Geo's line about it follows. */}
-        {foods.length > 0 ? <LoggedFoods foods={foods} /> : null}
-        {text ? <GeoText content={text} /> : null}
+        {/* What Geo did leads, as one card; Geo's line about it follows. A draft plan's description sits on its card. */}
+        {card?.kind === 'draft' ? (
+          <ActionCard card={card} body={text ? <GeoText content={text} /> : null} onAction={onAction} />
+        ) : card ? (
+          <ActionCard card={card} onAction={onAction} />
+        ) : null}
+        {text && card?.kind !== 'draft' ? <GeoText content={text} /> : null}
         {failures.length > 0 ? (
           <p className="rounded-[16px] bg-ink-04 px-4 py-3 text-[14px] leading-[1.45] text-ink">
             <span className="font-semibold">Heads up.</span>{' '}

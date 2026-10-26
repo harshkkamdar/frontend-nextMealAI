@@ -49,3 +49,17 @@ describe('ReportSheet', () => {
     })
   })
 })
+
+describe('ReportSheet failure', () => {
+  it('says a failed send inline, keeps the note, and offers Try again', async () => {
+    vi.mocked(reportResponse).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ id: 'report-2' })
+    render(<ReportSheet open onClose={() => {}} sessionId="s" messageId="m" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Wrong or misleading' }))
+    fireEvent.change(screen.getByLabelText('What went wrong (optional)'), { target: { value: 'The kcal were off' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Send report' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent("That didn't send")
+    expect(screen.getByLabelText('What went wrong (optional)')).toHaveValue('The kcal were off')
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    await waitFor(() => expect(reportResponse).toHaveBeenLastCalledWith({ session_id: 's', message_id: 'm', reason: 'wrong', note: 'The kcal were off' }))
+  })
+})

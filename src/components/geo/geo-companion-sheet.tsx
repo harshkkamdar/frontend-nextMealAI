@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { useRouter } from 'next/navigation'
 import { ResizableSheet } from '@/components/ui/resizable-sheet'
-import { SquarePen } from 'lucide-react'
+import { CloudOff, MapPin, SquarePen } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { CloseIcon } from '@/components/ui/fiqr/icons'
 import { toast } from 'sonner'
@@ -81,6 +81,22 @@ function clearStoredCompanionSession(): void {
   }
 }
 
+/** What the companion says it is looking at (the screen sent as context with the session). */
+const SCREEN_NAMES: Record<string, string> = {
+  dashboard: 'Today',
+  food_diary: 'Food',
+  food_database: 'Foods',
+  logs: 'Your logs',
+  activity: 'Train',
+  workout_follow: 'Your workout',
+  plans: 'Plans',
+  plan_detail: 'This plan',
+  settings: 'Settings',
+  chat_list: 'Geo',
+  chat: 'Geo',
+}
+export const screenName = (screen: string) => SCREEN_NAMES[screen] ?? null
+
 export function GeoCompanionSheet() {
   const activeSheet = useUIStore((s) => s.activeSheet)
   const closeSheet = useUIStore((s) => s.closeSheet)
@@ -98,6 +114,11 @@ export function GeoCompanionSheet() {
   const [freshFrom, setFreshFrom] = useState(0)
   const [chipSent, setChipSent] = useState<string | null>(null)
   const messageCountRef = useRef(0)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  // The screen the sheet was opened over, named in the header and the context chip.
+  const [screen, setScreen] = useState<string | null>(null)
+  const [failed, setFailed] = useState<string[]>([])
+  const unsent = useRef(new Map<string, AttachedImage[] | undefined>())
   const initializingRef = useRef(false)
 
   // Initialize a companion session. FE-RCA F2 — when forceNew is false, try to
@@ -110,6 +131,8 @@ export function GeoCompanionSheet() {
       initializingRef.current = true
 
       setInitializing(true)
+      setScreen(screenName(getScreenContext().screen))
+      setFailed([])
       setMessages([])
       setFreshFrom(0)
       setSessionId(null)
@@ -160,6 +183,11 @@ export function GeoCompanionSheet() {
     initCompanion(false)
   }, [isOpen, initCompanion])
 
+  // The field is focused once the session is ready (pick C1): ask, don't hunt for the field.
+  useEffect(() => {
+    if (isOpen && sessionId && !initializing) bodyRef.current?.querySelector('textarea')?.focus({ preventScroll: true })
+  }, [isOpen, sessionId, initializing])
+
   // Explicit "New chat" — extract memories from the current thread (if any),
   // then mint a brand-new session immediately so the user sees a blank thread.
   const handleStartNewChat = useCallback(() => {
@@ -198,6 +226,7 @@ export function GeoCompanionSheet() {
     }
 
     setMessages((prev) => [...prev, userMsg])
+    unsent.current.set(userMsg.id as string, attachments)
     messageCountRef.current += 1
     setIsTyping(true)
 
@@ -217,6 +246,7 @@ export function GeoCompanionSheet() {
         // R6-10 — option chips (top-level or in persisted metadata).
         suggestedReplies: res.suggested_replies ?? res.response.metadata?.suggested_replies,
       }
+      unsent.current.delete(userMsg.id as string)
       setMessages((prev) => [...prev, geoMsg])
       messageCountRef.current += 1
 
@@ -225,10 +255,22 @@ export function GeoCompanionSheet() {
       // means failed tools no longer trigger a phantom refetch.
       handleGeoToolResults(res)
     } catch {
-      toast.error("That didn't send. Check your connection and try again.")
+      setFailed((ids) => [...ids, userMsg.id as string])
     } finally {
       setIsTyping(false)
     }
+  }
+
+  const retry = (id: string) => {
+    const message = messages.find((m) => m.id === id)
+    if (!message || isTyping) return
+    const attachments = unsent.current.get(id)
+    unsent.current.delete(id)
+    setFailed((ids) => ids.filter((x) => x !== id))
+    setMessages((prev) => prev.filter((m) => m.id !== id))
+    messageCountRef.current -= 1
+    setChipSent(null)
+    void handleSend(message.content, attachments)
   }
 
   const handleOpenFullChat = () => {
@@ -253,12 +295,13 @@ export function GeoCompanionSheet() {
   }
 
   return (
-    <ResizableSheet open={isOpen} onClose={handleClose} ariaLabel="Geo" levels={[0.55, 0.94]} defaultLevelIndex={1}>
+    <ResizableSheet open={isOpen} onClose={handleClose} ariaLabel="Geo" levels={[0.55, 0.94]} defaultLevelIndex={0}>
+      <div ref={bodyRef} className="flex min-h-0 flex-1 flex-col">
       <div className="flex shrink-0 items-center gap-3 px-5 pb-3">
         <GeoAvatar variant="face" state="happy" size={36} />
         <div className="min-w-0 flex-1">
           <p className="font-wide text-[19px] font-bold leading-tight text-ink">Geo</p>
-          <p className="text-[13px] font-medium text-ink-65">{online ? 'Here to help' : "You're offline"}</p>
+          <p className="truncate text-caption font-medium text-ink-65">{!online ? "You're offline" : screen ? `Looking at ${screen}` : 'Here to help'}</p>
         </div>
         {messages.length > 0 ? (
           <button
@@ -282,7 +325,13 @@ export function GeoCompanionSheet() {
       </div>
 
       {/* The conversation scrolls inside the sheet; the composer stays pinned to the sheet's bottom edge. */}
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-2">
+      {!online ? (
+        <p role="status" className="mx-4 mb-2 flex min-h-11 shrink-0 items-center gap-2.5 rounded-[14px] bg-ink-04 px-3 text-caption font-medium text-ink">
+          <CloudOff aria-hidden="true" className="size-4 shrink-0 text-ink-65" strokeWidth={1.75} />
+          You&apos;re offline. I&apos;ll be here when you&apos;re back.
+        </p>
+      ) : null}
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-1">
         {initializing ? (
           <div role="status" aria-label="Connecting to Geo" className="flex flex-col gap-2.5 pt-1">
             {[88, 64].map((w) => <span key={w} className="block h-4 rounded-full bg-ink-06" style={{ width: `${w}%` }} />)}
@@ -291,25 +340,29 @@ export function GeoCompanionSheet() {
           // Crossfades in where the skeleton lines were (motion-feel 3h).
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
             {messages.length === 0 && !isTyping ? (
-              <p className="text-[16px] leading-[1.5] text-ink">What can I help with? I can log a meal, suggest what to eat, or look at your week.</p>
+              <>
+                {screen ? (
+                  // The screen Geo was opened over travels as context; the chip says so.
+                  <p className="mb-3 inline-flex min-h-8 items-center gap-1.5 rounded-full bg-ink-04 px-3 text-label text-ink">
+                    <MapPin aria-hidden="true" className="size-3.5" strokeWidth={2} />
+                    {screen}, {new Date().toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' }).replace(',', '')}
+                  </p>
+                ) : null}
+                <p className="text-body leading-[1.45] text-ink">
+                  {screen ? 'Ask about this screen, or tell me what you ate.' : 'Tell me what you ate, or ask anything.'} I can log it, suggest what to eat, or look at your week.
+                </p>
+              </>
             ) : (
-              <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId ?? undefined} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} />
+              <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId ?? undefined} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} failed={failed} onRetry={retry} />
             )}
           </motion.div>
         )}
       </div>
 
       <div className="shrink-0 px-3 pb-3">
-        <div className="flex justify-center gap-1 pb-1">
-          <button type="button" onClick={handleOpenFullChat} className="h-11 rounded-full px-3 text-[14px] font-semibold text-ink-65 active:bg-ink-06">
-            Open full screen
-          </button>
-          <button
-            type="button"
-            onClick={() => { handleClose(); setTimeout(() => router.push('/chat'), 50) }}
-            className="h-11 rounded-full px-3 text-[14px] font-semibold text-ink-65 active:bg-ink-06"
-          >
-            All conversations
+        <div className="flex justify-center pb-1">
+          <button type="button" onClick={handleOpenFullChat} className="h-11 rounded-full px-4 text-caption font-semibold text-ink-65 active:bg-ink-06">
+            Open in Geo tab
           </button>
         </div>
         {/* FB-R6-FE-D: passes sessionId so the composer draft survives the navigation to the full chat. */}
@@ -320,6 +373,7 @@ export function GeoCompanionSheet() {
           sessionId={sessionId ?? undefined}
           variant="inline"
         />
+      </div>
       </div>
     </ResizableSheet>
   )
