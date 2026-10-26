@@ -9,7 +9,7 @@ interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export function PrimaryButton({ icon, trailing, children, className, ...props }: PrimaryButtonProps) {
   return (
     <button
-      className={cn('w-full min-h-btn bg-accent text-cream rounded-full px-[18px] py-2 font-bold text-body flex items-center gap-3 disabled:bg-ink-08 disabled:text-ink-35 transition-[background-color,color,transform] duration-200 enabled:active:scale-[.97] enabled:active:duration-75', !icon && 'justify-center', className)}
+      className={cn('w-full min-h-btn bg-accent text-ink rounded-full px-[18px] py-2 font-bold text-body flex items-center gap-3 disabled:bg-ink-08 disabled:text-ink-35 transition-[background-color,color,transform] duration-200 enabled:active:scale-[.97] enabled:active:duration-75', !icon && 'justify-center', className)}
       {...props}
     >
       {icon ? (

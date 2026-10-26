@@ -11,3 +11,4 @@
 - Log a meal: page broken, owner could not pick.
 - Log a meal (locked): A2 Tell Geo + Log again; B2 Item sheet with portion chips; C2 Photo result item rows with steppers; D2 Plate pill tray that opens a sheet; keep K camera, estimating hand-off and menu scan to Geo; M manual logs (water, weight, sleep, mood, energy, workout); L /logs recent logs; F /foods your foods and Add a food.
 - Geo avatar (27 Oct): the orange G stays orange everywhere, including next to the paywall CTA; it is identity, not an action.
+- Orange buttons (27 Oct): navy (ink #111C35) text on orange, 5.5:1; cream on orange fails AA. Applies to every orange action with a text label.
