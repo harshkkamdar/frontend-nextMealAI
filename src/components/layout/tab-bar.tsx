@@ -22,7 +22,9 @@ const TABS = TAB_ROUTES.map((tab) => ({ ...tab, icon: ICONS[tab.href] }))
 /** Routes that own the whole screen (live workout, an open conversation) hide the bar. */
 export function hidesTabBar(pathname: string): boolean {
   // Full-screen task flows (a conversation, a live workout, logging, plan builders) own the whole screen.
-  return ['/chat/session', '/train/session', '/logs/new/', '/plans/new', '/plans/edit', '/paywall'].some((prefix) => pathname.startsWith(prefix))
+  if (['/chat/session', '/train/session', '/logs/new/', '/plans/new', '/plans/edit', '/paywall'].some((prefix) => pathname.startsWith(prefix))) return true
+  // Pushed pages that dock their own actions (settings, check-in) hide it too, per the mock.
+  return ['/settings', '/check-in'].some((route) => pathname === route || pathname.startsWith(`${route}/`))
 }
 
 /**

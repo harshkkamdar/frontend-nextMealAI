@@ -181,7 +181,7 @@ export default function SettingsPage() {
 
   if (loading || !settings || !profile) {
     return (
-      <div className="mx-auto w-full max-w-md px-gutter pb-[var(--tabbar-clearance)]">
+      <div className="mx-auto w-full max-w-md px-gutter pb-[calc(24px+var(--safe-bottom))]">
         {header}
         <div className="-mx-gutter mb-2.5 [&:empty]:hidden"><OfflineBand /></div>
         <div className="mt-1">
@@ -207,7 +207,7 @@ export default function SettingsPage() {
   const checkInDay = settings.check_in_weekday ?? 0
 
   return (
-    <div className="mx-auto w-full max-w-md px-gutter pb-[var(--tabbar-clearance)]">
+    <div className="mx-auto w-full max-w-md px-gutter pb-[calc(24px+var(--safe-bottom))]">
       {header}
       <div className="-mx-gutter mb-2.5 [&:empty]:hidden"><OfflineBand /></div>
 

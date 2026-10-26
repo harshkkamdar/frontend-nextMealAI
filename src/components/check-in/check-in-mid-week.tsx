@@ -74,7 +74,7 @@ export function CheckInMidWeek({ status, current, enter, source }: { status: Che
 
       <SectionTitle>Current targets</SectionTitle>
       <TargetLedger targets={current} />
-      <div aria-hidden="true" className="h-[var(--tabbar-clearance)]" />
+      <div aria-hidden="true" className="h-[calc(24px+var(--safe-bottom))]" />
     </div>
   )
 }

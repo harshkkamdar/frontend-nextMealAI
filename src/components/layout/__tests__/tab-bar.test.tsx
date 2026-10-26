@@ -1,7 +1,7 @@
 import { Profiler } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import { TabBar } from '../tab-bar'
+import { TabBar, hidesTabBar } from '../tab-bar'
 
 const route = vi.hoisted(() => ({ pathname: '/dashboard' }))
 vi.mock('next/navigation', () => ({ usePathname: () => route.pathname }))
@@ -83,5 +83,19 @@ describe('TabBar minimise on scroll', () => {
       vi.runAllTimers()
     })
     expect(document.activeElement).toBe(screen.getByRole('link', { name: 'Home' }))
+  })
+})
+
+describe('hidesTabBar', () => {
+  it('hides on pushed full-screen flows that dock their own actions', () => {
+    for (const path of ['/settings', '/settings/profile', '/check-in', '/plans/new/meal', '/plans/edit', '/chat/session']) {
+      expect(hidesTabBar(path), path).toBe(true)
+    }
+  })
+
+  it('keeps the bar on tabs, the plans list and plan detail', () => {
+    for (const path of ['/dashboard', '/food', '/train', '/chat', '/plans', '/plans/view', '/settingsx']) {
+      expect(hidesTabBar(path), path).toBe(false)
+    }
   })
 })
