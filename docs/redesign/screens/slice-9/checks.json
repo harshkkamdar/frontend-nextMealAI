@@ -226,7 +226,7 @@
   {
     "shot": "profile-error",
     "width": 360,
-    "url": "/settings/profile",
+    "url": "/settings",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -234,7 +234,7 @@
   {
     "shot": "profile-error",
     "width": 390,
-    "url": "/settings/profile",
+    "url": "/settings",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
