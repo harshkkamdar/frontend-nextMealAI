@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { useRouter } from 'next/navigation'
 import { ResizableSheet } from '@/components/ui/resizable-sheet'
-import { CloudOff, MapPin, SquarePen } from 'lucide-react'
+import { CloudOff, Eye, House, SquarePen } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { CloseIcon } from '@/components/ui/fiqr/icons'
 import { toast } from 'sonner'
@@ -344,7 +344,7 @@ export function GeoCompanionSheet() {
                 {screen ? (
                   // The screen Geo was opened over travels as context; the chip says so.
                   <p className="mb-3 inline-flex min-h-8 items-center gap-1.5 rounded-full bg-ink-04 px-3 text-label text-ink">
-                    <MapPin aria-hidden="true" className="size-3.5" strokeWidth={2} />
+                    {screen === 'Today' ? <House aria-hidden="true" className="size-3.5" strokeWidth={2} /> : <Eye aria-hidden="true" className="size-3.5" strokeWidth={2} />}
                     {screen}, {new Date().toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' }).replace(',', '')}
                   </p>
                 ) : null}

@@ -1,58 +1,62 @@
 {
   "chip-tap": {
     "frames": 85,
-    "chrome_px": 22547,
-    "content_px": 1103309,
-    "max_chrome_share": 0.222,
-    "max_content_share": 0.09,
+    "chrome_px": 19656,
+    "content_px": 1026466,
+    "max_chrome_share": 0.274,
+    "max_content_share": 0.084,
     "issues": [],
     "verdict": "smooth"
   },
   "companion-open": {
-    "frames": 37,
-    "chrome_px": 118012,
-    "content_px": 377410,
-    "max_chrome_share": 0.146,
-    "max_content_share": 0.112,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 31,
+    "chrome_px": 145590,
+    "content_px": 588659,
+    "max_chrome_share": 0.216,
+    "max_content_share": 0.367,
+    "issues": [
+      "chrome jump frame 9: 22% of chrome change"
+    ],
+    "verdict": "pop"
   },
   "companion-resize": {
-    "frames": 70,
-    "chrome_px": 206818,
-    "content_px": 838539,
-    "max_chrome_share": 0.099,
-    "max_content_share": 0.051,
+    "frames": 63,
+    "chrome_px": 279175,
+    "content_px": 929378,
+    "max_chrome_share": 0.088,
+    "max_content_share": 0.048,
     "issues": [],
     "verdict": "smooth"
   },
   "new-conversation": {
-    "frames": 35,
-    "chrome_px": 38965,
-    "content_px": 145557,
-    "max_chrome_share": 0.145,
-    "max_content_share": 0.123,
-    "issues": [
-      "chrome jump frame 4: 14% of chrome change"
-    ],
-    "verdict": "pop"
+    "frames": 41,
+    "chrome_px": 142653,
+    "content_px": 610618,
+    "max_chrome_share": 0.109,
+    "max_content_share": 0.147,
+    "issues": [],
+    "verdict": "smooth"
   },
   "open-conversation": {
-    "frames": 37,
-    "chrome_px": 68203,
-    "content_px": 307493,
-    "max_chrome_share": 0.079,
-    "max_content_share": 0.083,
+    "frames": 44,
+    "chrome_px": 209335,
+    "content_px": 1173162,
+    "max_chrome_share": 0.061,
+    "max_content_share": 0.058,
     "issues": [],
     "verdict": "smooth"
   },
   "reply-arrives": {
-    "frames": 35,
-    "chrome_px": 29529,
-    "content_px": 1234247,
-    "max_chrome_share": 0.17,
-    "max_content_share": 0.124,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 72,
+    "chrome_px": 28850,
+    "content_px": 1143136,
+    "max_chrome_share": 0.184,
+    "max_content_share": 0.093,
+    "issues": [
+      "chrome jump frame 10: 9% of chrome change",
+      "late change frame 38 after 12 still frames (723 px)",
+      "late change frame 50 after 6 still frames (105943 px)"
+    ],
+    "verdict": "pop"
   }
 }

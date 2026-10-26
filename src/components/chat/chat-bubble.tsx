@@ -241,7 +241,8 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId, cluste
         {clusterStart ? <GeoAnchor /> : null}
         {/* What Geo did leads, as one card; Geo's line about it follows. A draft plan's description sits on its card. */}
         {card?.kind === 'draft' ? (
-          <ActionCard card={card} body={text ? <GeoText content={text} /> : null} onAction={onAction} />
+          // Once saved, the draft's "nothing changes until you say so" line no longer holds.
+          <ActionCard card={card} body={text ? <GeoText content={card.accepted ? text.replace(/[^.\n]*\buntil you say\b[^.\n]*\.?/gi, '').trim() : text} /> : null} onAction={onAction} />
         ) : card ? (
           <ActionCard card={card} onAction={onAction} />
         ) : null}

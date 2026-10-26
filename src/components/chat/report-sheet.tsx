@@ -77,8 +77,8 @@ function ReportForm({
 
   return (
     <div className="flex min-h-0 flex-col overflow-y-auto px-5 pb-5 pt-2">
-      <h2 className="font-wide text-[22px] font-bold leading-[1.2] text-ink">Report this reply</h2>
-      <p className="mt-1 text-[15px] leading-[1.45] text-ink-65">Tell us what was wrong. It helps Geo get better.</p>
+      <h2 className="text-headline text-ink">Report this reply</h2>
+      <p className="mt-0.5 text-caption leading-[1.4] text-ink-65">Tell us what was wrong. It helps Geo get better.</p>
       <div className="mt-4 overflow-hidden rounded-[16px] bg-card shadow-[var(--shadow-card)]">
         {REASONS.map((option) => {
           const selected = reason === option.value

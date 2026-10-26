@@ -158,7 +158,7 @@ export default function ChatListPage() {
                   key={example}
                   type="button"
                   onClick={() => { setDraft(example); askRef.current?.focus() }}
-                  className="min-h-11 rounded-[14px] bg-ink-04 px-3 text-left text-body-sm font-semibold text-ink transition-transform active:scale-[.98]"
+                  className="min-h-11 rounded-[14px] bg-cream px-3 text-left text-body-sm font-semibold text-ink transition-transform active:scale-[.98]"
                 >
                   {example}
                 </button>

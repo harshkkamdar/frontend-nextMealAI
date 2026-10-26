@@ -6,6 +6,7 @@ import { ChatBubble } from '@/components/chat/chat-bubble'
 import { SuggestedReplies, replyLayoutId } from '@/components/chat/suggested-replies'
 import { describeThread } from '@/components/chat/thread-actions'
 import { TypingIndicator } from '@/components/chat/typing-indicator'
+import { useOnline } from '@/lib/platform/network'
 import type { ChatMessage } from '@/types/chat.types'
 
 /**
@@ -36,6 +37,8 @@ export function ChatThread({
   onRetry?: (messageId: string) => void
 }) {
   const reduce = useReducedMotion()
+  // Offline a chip or card button would send into nothing: they stay visible but take no taps.
+  const online = useOnline()
   const bottomRef = useRef<HTMLDivElement>(null)
   const painted = useRef(false)
 
@@ -76,7 +79,7 @@ export function ChatThread({
           fresh={index >= freshFrom}
           layoutId={chipSent && index === lastUser && index >= freshFrom && message.content === chipSent ? replyLayoutId(chipSent) : undefined}
           card={cards[index]}
-          onAction={onReply && !isTyping ? onReply : undefined}
+          onAction={onReply && !isTyping && online ? onReply : undefined}
           failed={Boolean(message.id && failed.includes(message.id))}
           onRetry={message.id && onRetry ? () => onRetry(message.id as string) : undefined}
         />
@@ -86,7 +89,7 @@ export function ChatThread({
       <AnimatePresence>
         {chips.length > 0 && onReply ? (
           <motion.div key={last?.id ?? messages.length} exit={{ opacity: 0, transition: { duration: 0.12 } }}>
-            <SuggestedReplies options={chips} onSelect={onReply} />
+            <SuggestedReplies options={chips} onSelect={onReply} disabled={!online} />
           </motion.div>
         ) : null}
       </AnimatePresence>
