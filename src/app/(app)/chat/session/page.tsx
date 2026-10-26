@@ -14,7 +14,7 @@ import { extractWorkoutProgram, isLikelyWorkoutProgramPrompt } from '@/lib/api/v
 import { WorkoutProgramPreviewCard } from '@/components/plans/workout-program-preview-card'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { handleGeoToolResults } from '@/lib/sync/dispatch-from-chat'
-import type { AttachedImage, ChatMessage } from '@/types/chat.types'
+import type { AttachedImage, ChatMessage, ChatSession } from '@/types/chat.types'
 import type { WorkoutProgramContent } from '@/types/plans.types'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { ApiException } from '@/types/api.types'
@@ -94,7 +94,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
           else setHistoryFailed(false)
           return { messages: [] as ChatMessage[] }
         }),
-        getChatSessions().catch(() => []),
+        getChatSessions().then((page) => page.sessions).catch(() => [] as ChatSession[]),
       ]).then(([sessionData, sessions]) => {
         if (cancelled) return
         const history = sessionData.messages ?? []

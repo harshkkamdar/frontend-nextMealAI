@@ -6,7 +6,6 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { SquarePen } from 'lucide-react'
 import { SessionList } from '@/components/chat/session-list'
 import { sessionTitles } from '@/components/chat/session-titles'
-import { appendPage, getSessionsPage } from '@/components/chat/sessions-page'
 import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { OfflineBand } from '@/components/shared/offline-band'
@@ -14,6 +13,7 @@ import { ArrowUpIcon } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
+import { SESSIONS_PAGE, getChatSessions } from '@/lib/api/chat.api'
 import { haptic } from '@/lib/platform/app'
 import { toast } from 'sonner'
 import type { ChatSession } from '@/types/chat.types'
@@ -53,6 +53,12 @@ function ListSkeleton() {
 
 const EXAMPLES = ['Had a flat white and a croissant', 'What should I eat before training?', 'How am I tracking this week?']
 
+/** Appends a later page, skipping rows already shown (a new conversation shifts every offset by one). */
+function appendPage(shown: ChatSession[], page: ChatSession[]): ChatSession[] {
+  const seen = new Set(shown.map((s) => s.session_id))
+  return [...shown, ...page.filter((s) => !seen.has(s.session_id))]
+}
+
 export default function ChatListPage() {
   useSetGeoScreen('chat_list', {})
   const router = useRouter()
@@ -64,7 +70,7 @@ export default function ChatListPage() {
   const [older, setOlder] = useState<{ sessions: ChatSession[]; hasMore: boolean } | null>(null)
   const [loadingOlder, setLoadingOlder] = useState(false)
 
-  const fetchSessions = useCallback(() => getSessionsPage(0), [])
+  const fetchSessions = useCallback(() => getChatSessions(), [])
   const { data, loading, error, refetch } = useCachedQuery<{ sessions: ChatSession[]; hasMore: boolean }>('chat-sessions-page', fetchSessions, [])
   const shown = older ? appendPage(data?.sessions ?? [], older.sessions) : data?.sessions ?? []
   const sessions = shown.filter((s) => !removed.includes(s.session_id) && !removed.includes(s.id))
@@ -80,7 +86,7 @@ export default function ChatListPage() {
     setLoadingOlder(true)
     try {
       // Offset counts rows the server has, deleted ones included until the next refetch.
-      const page = await getSessionsPage(shown.length)
+      const page = await getChatSessions(SESSIONS_PAGE, shown.length)
       for (const s of page.sessions) if (s.title) sessionTitles.set(s.session_id, s.title)
       setOlder((prev) => ({ sessions: appendPage(prev?.sessions ?? [], page.sessions), hasMore: page.hasMore }))
     } catch {

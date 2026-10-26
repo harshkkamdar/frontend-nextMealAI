@@ -18,9 +18,16 @@ export async function uploadChatAttachment(file: File): Promise<{
   return apiFetch('/v1/chat/attachments/upload', { method: 'POST', body: form })
 }
 
-export async function getChatSessions(): Promise<ChatSession[]> {
-  const res = await apiFetch<{ sessions: ChatSession[] } | ChatSession[]>('/v1/chat/sessions')
-  return Array.isArray(res) ? res : res.sessions ?? []
+export const SESSIONS_PAGE = 20
+
+/** One page of conversations, newest first. Without limit and offset only the 20 newest were ever reachable. */
+export async function getChatSessions(limit = SESSIONS_PAGE, offset = 0): Promise<{ sessions: ChatSession[]; hasMore: boolean }> {
+  const res = await apiFetch<{ sessions?: ChatSession[]; pagination?: { hasMore?: boolean } } | ChatSession[]>(
+    `/v1/chat/sessions?limit=${limit}&offset=${offset}`,
+  )
+  if (Array.isArray(res)) return { sessions: res, hasMore: false }
+  const sessions = res.sessions ?? []
+  return { sessions, hasMore: res.pagination?.hasMore ?? sessions.length === limit }
 }
 
 export async function getChatSession(sessionId: string, params?: { limit?: number; offset?: number }): Promise<{ messages: ChatMessage[] }> {
