@@ -18,20 +18,17 @@ export interface BottomSheetProps {
 }
 
 /**
- * The single bottom-sheet primitive for the whole app — built on `vaul`.
+ * The single bottom-sheet primitive for the whole app, built on `vaul`.
  *
- * Layering (CRITICAL): the bottom nav (z-[100]) is the TOP-MOST layer of the
- * app and is never covered. So this sheet sits BELOW it (overlay z-[60], sheet
- * z-[70]) and is lifted to rest just ABOVE the nav (bottom inset = nav height) —
- * it never draws over or behind the nav.
+ * FIQR v2 inset sheet (design-system.md): floats 8 pt in from the screen edges, 38 pt corners, glass
+ * material on the controls layer. It covers the tab bar (overlay z 60, sheet z 70; the bar is z 50), so
+ * nothing peeks between the sheet and the nav.
  *
- * Sizing: the sheet is CONTENT-SIZED (grows to fit its content, capped at 88vh
- * then the body scrolls). No fixed-height empty space, no snap detents — snap
- * detents make vaul translate the sheet down to the viewport bottom, which puts
- * its content behind the nav. Drag the handle DOWN to dismiss.
+ * Sizing: CONTENT-SIZED (grows to fit, capped at 92% of the viewport, then the body scrolls). No snap
+ * detents. Drag the handle down to dismiss.
  *
- * Layout contract: the sheet is a `flex flex-col`. Pass a header and a body; a
- * scrollable body must be `flex-1 min-h-0 overflow-y-auto`.
+ * Layout contract: the sheet is a `flex flex-col`. Pass a header and a body; a scrollable body must be
+ * `flex-1 min-h-0 overflow-y-auto`.
  */
 export function BottomSheet({
   open,
@@ -50,16 +47,12 @@ export function BottomSheet({
       modal
     >
       <Drawer.Portal>
-        {/* Overlay stops at the nav top, so the nav is never dimmed and stays
-            fully on top. */}
-        <Drawer.Overlay className="fixed inset-x-0 top-0 z-[60] bg-black/40 bottom-[var(--nav-clearance)]" />
-        {/* Cream under the nav's top edge so the page never shows between the sheet and the nav. */}
-        <div aria-hidden="true" className="fixed inset-x-0 bottom-0 z-[60] h-[var(--nav-clearance)] bg-background" />
+        <Drawer.Overlay className="fixed inset-0 z-[60] bg-ink/30" />
         <Drawer.Content
           aria-label={ariaLabel}
-          className={`fixed left-0 right-0 z-[70] flex flex-col bg-background rounded-t-3xl outline-none bottom-[var(--nav-clearance)] max-h-[calc(88vh-var(--nav-clearance))] ${className}`}
+          className={`glass-cream fixed inset-x-2 z-[70] mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[38px] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}
         >
-          <Drawer.Handle className="!w-10 !h-1.5 !bg-border !mt-3 !mb-1 shrink-0" />
+          <Drawer.Handle className="!mt-2.5 !mb-1 !h-[5px] !w-9 shrink-0 !bg-ink-20" />
           {/* Radix/vaul require an accessible title; visually hidden. */}
           <Drawer.Title className="sr-only">{ariaLabel ?? 'Sheet'}</Drawer.Title>
           {children}

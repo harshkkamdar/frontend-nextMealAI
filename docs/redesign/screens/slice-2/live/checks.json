@@ -1,0 +1,44 @@
+{
+  "home-390": {
+    "serious": [
+      {
+        "id": "label-content-name-mismatch",
+        "nodes": [
+          ".gap-5 > .active\\:scale-\\[\\.97\\][type=\"button\"]",
+          ".min-h-11.w-full.text-left:nth-child(1)",
+          ".min-h-11.w-full.text-left:nth-child(2)"
+        ]
+      }
+    ],
+    "small": [],
+    "orange": 0
+  },
+  "home-plus-sheet-390": {
+    "serious": [],
+    "small": [
+      "input \"Tell Geo what you ate or did\" 258x26"
+    ],
+    "orange": 0
+  },
+  "home-360": {
+    "serious": [
+      {
+        "id": "label-content-name-mismatch",
+        "nodes": [
+          ".gap-5 > .active\\:scale-\\[\\.97\\][type=\"button\"]",
+          ".min-h-11.w-full.text-left:nth-child(1)",
+          ".min-h-11.w-full.text-left:nth-child(2)"
+        ]
+      }
+    ],
+    "small": [],
+    "orange": 0
+  },
+  "home-plus-sheet-360": {
+    "serious": [],
+    "small": [
+      "input \"Tell Geo what you ate or did\" 228x26"
+    ],
+    "orange": 0
+  }
+}

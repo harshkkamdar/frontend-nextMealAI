@@ -28,9 +28,9 @@ export function HealthConnectSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose} ariaLabel={`Connect ${label}`}>
-      <div className="px-gutter pb-6 pt-4">
-        <h2 className="text-[22px] font-semibold leading-tight text-ink">Connect {label}</h2>
-        <p className="mt-3 text-[15.5px] leading-6 text-ink-65">
+      <div className="px-5 pb-5 pt-3">
+        <h2 className="font-wide text-[22px] font-bold leading-tight text-ink">Connect {label}</h2>
+        <p className="mt-2 text-[15.5px] leading-6 text-ink-65">
           FIQR reads your steps, active energy, weight, sleep and workouts so Geo and your weekly
           check-in can use them. Workouts you finish in FIQR are saved back. Nothing is shared with
           anyone else, and you can disconnect in Settings.
@@ -45,7 +45,7 @@ export function HealthConnectSheet({
         ) : null}
         <button
           type="button"
-          className="mt-4 w-full text-center text-[15.5px] font-semibold text-ink-65"
+          className="mt-2 min-h-11 w-full text-center text-[15.5px] font-semibold text-ink"
           onClick={onClose}
         >
           Not now

@@ -11,8 +11,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mocks.push }) }))
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 vi.mock('@/hooks/use-cached-query', () => ({
-  useCachedQuery: () => ({ data: mocks.data, loading: false, error: null, stale: false, savedAt: null, refetch: vi.fn() }),
+  useCachedQuery: (key: string) => ({ data: key === 'dashboard' ? mocks.data : [], loading: false, error: null, stale: false, savedAt: null, refetch: vi.fn() }),
 }))
+vi.mock('@/lib/use-count-up', () => ({ useCountUp: (target: number | null) => target ?? 0 }))
 vi.mock('@/hooks/use-sync-refetch', () => ({ useSyncRefetch: () => {} }))
 vi.mock('@/hooks/useUserTimezone', () => ({ useUserTimezone: () => 'UTC' }))
 vi.mock('@/contexts/geo-screen-context', () => ({ useSetGeoScreen: () => {} }))
@@ -21,7 +22,7 @@ vi.mock('@/stores/auth.store', () => ({
 }))
 vi.mock('@/stores/ui.store', () => ({ useUIStore: { getState: () => ({ openSheet: vi.fn() }) } }))
 vi.mock('@/components/shared/offline-band', () => ({ OfflineBand: () => null }))
-vi.mock('@/lib/platform/health', () => ({ healthLabel: () => null, isHealthConnected: vi.fn() }))
+vi.mock('@/lib/platform/health', () => ({ healthLabel: () => null, isHealthConnected: vi.fn(), lastHealthSync: vi.fn() }))
 
 import DashboardPage from '@/app/(app)/dashboard/page'
 import { todayLocalISO } from '@/lib/timezone'
@@ -34,13 +35,10 @@ function dashboardData(stepLogs: Log[]) {
       daily_breakdown: [],
     },
     plans: [],
-    suggestions: [],
-    todayLogs: [],
     profile: null,
-    weightLogs: [],
+    logs: stepLogs,
     checkIn: null,
-    recentSleepLogs: [],
-    stepLogs,
+    status: null,
   }
 }
 
@@ -71,15 +69,15 @@ describe('Dashboard Steps tile', () => {
 
     expect(screen.getByText('Steps')).toBeInTheDocument()
     expect(screen.getByText('8,412')).toBeInTheDocument()
-    expect(screen.getByText('today')).toBeInTheDocument()
+    expect(screen.getByText('of 10,000')).toBeInTheDocument()
   })
 
-  it('renders an empty web state with today as the subtitle', () => {
+  it('renders a dash, never a fake 0, when today has no steps', () => {
     mocks.data = dashboardData([])
     render(<DashboardPage />)
 
     expect(screen.getByText('Steps')).toBeInTheDocument()
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
-    expect(screen.getByText('today')).toBeInTheDocument()
+    expect(screen.getByText('Syncs from your phone')).toBeInTheDocument()
   })
 })

@@ -33,9 +33,9 @@ export function NotificationsPrompt() {
 
   return (
     <BottomSheet open={open} onClose={() => setOpen(false)} ariaLabel="Notification permission">
-      <div className="px-gutter pb-6 pt-4">
-        <h2 className="text-[22px] font-semibold leading-tight text-ink">Let Geo nudge you?</h2>
-        <p className="mt-3 text-[15.5px] leading-6 text-ink-65">
+      <div className="px-5 pb-5 pt-3">
+        <h2 className="font-wide text-[22px] font-bold leading-tight text-ink">Let Geo nudge you?</h2>
+        <p className="mt-2 text-[15.5px] leading-6 text-ink-65">
           Geo can tell you when a check-in is ready or when you&apos;ve gone quiet for a few days.
           No marketing, ever. You can turn this off in Settings.
         </p>
@@ -44,7 +44,7 @@ export function NotificationsPrompt() {
         </PrimaryButton>
         <button
           type="button"
-          className="mt-4 w-full text-center text-[15.5px] font-semibold text-ink-65"
+          className="mt-2 min-h-11 w-full text-center text-[15.5px] font-semibold text-ink"
           onClick={() => setOpen(false)}
         >
           Not now

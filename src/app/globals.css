@@ -87,8 +87,10 @@
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  /* Bottom nav is ~82px tall plus the safe area, and the raised Geo button pokes ~14px above it; sheets rest above both. */
-  --nav-clearance: calc(96px + var(--safe-bottom));
+  /* Inset sheets float this far above the screen bottom (8 pt + safe area); they cover the tab bar. */
+  --nav-clearance: calc(8px + var(--safe-bottom));
+  /* Scroll content ends this far up so the floating tab bar never covers it at rest (critic fix 7). */
+  --tabbar-clearance: calc(120px + var(--safe-bottom));
   --gutter: 22px;
 }
 

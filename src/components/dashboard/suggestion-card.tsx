@@ -25,7 +25,7 @@ export function SuggestionCard({
   }
 
   return (
-    <div className="bg-card border border-ink-12 rounded-[16px] p-[14px]">
+    <div className="rounded-[24px] bg-card p-5 shadow-[var(--shadow-card)]">
       <div className="flex gap-[11px]">
         <GeoAvatar variant="face" state="suggest" size={24} />
         <div className="min-w-0 flex-1">
@@ -36,7 +36,7 @@ export function SuggestionCard({
               type="button"
               disabled={loading}
               onClick={() => handleAction('approve')}
-              className="rounded-full bg-ink px-3 h-9 text-[13.5px] font-semibold text-cream disabled:opacity-50"
+              className="h-11 rounded-full bg-ink px-4 text-[14px] font-semibold text-cream transition-transform active:scale-[.97] disabled:opacity-50"
             >
               Yes, update
             </button>
@@ -44,7 +44,7 @@ export function SuggestionCard({
               type="button"
               disabled={loading}
               onClick={() => handleAction('dismiss')}
-              className="rounded-full bg-ink-08 px-3 h-9 text-[13.5px] font-semibold text-ink disabled:opacity-50"
+              className="h-11 rounded-full bg-ink-06 px-4 text-[14px] font-semibold text-ink transition-transform active:scale-[.97] disabled:opacity-50"
             >
               Not now
             </button>

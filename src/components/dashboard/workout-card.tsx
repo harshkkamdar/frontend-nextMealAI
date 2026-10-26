@@ -1,7 +1,6 @@
 'use client'
 
-import { FeatureCard } from '@/components/ui/fiqr/feature-card'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { PlayFill } from '@/components/ui/fiqr/icons'
 import { computeSelectedPlanDayIndex } from '@/lib/workout-session'
 import type { WorkoutPlan } from '@/types/plans.types'
 import { plural } from '@/lib/utils'
@@ -45,14 +44,33 @@ export function WorkoutCard({
     onClick = () => onStart(workoutPlan, dayIndex)
   }
 
+  const starts = action === 'Start Workout'
+
   return (
-    <FeatureCard>
-      <div className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Next up</div>
-      <div className="mt-[3px] line-clamp-2 text-[28px] font-bold tracking-[-0.6px] leading-[1.1]">{name}</div>
-      <div className="mt-[3px] text-[14px] text-cream-60">{meta}</div>
-      <SecondaryButton type="button" onNavy arrow className="mt-[18px]" onClick={onClick}>
-        {action}
-      </SecondaryButton>
-    </FeatureCard>
+    <section className="flex items-center gap-4 rounded-[24px] bg-card p-5 shadow-[var(--shadow-card)]">
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-semibold text-ink-65">Next up</p>
+        <p className="font-wide mt-1 line-clamp-2 text-[22px] font-bold leading-[1.15] tracking-[-0.3px] text-ink">{name}</p>
+        <p className="mt-1 text-[14px] text-ink-65">{meta}</p>
+      </div>
+      {starts ? (
+        <button
+          type="button"
+          aria-label={action}
+          onClick={onClick}
+          className="grid size-14 shrink-0 place-items-center rounded-full bg-ink text-cream transition-transform active:scale-[.94]"
+        >
+          <PlayFill className="ml-0.5 size-6" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={onClick}
+          className="h-11 shrink-0 rounded-full bg-ink-06 px-4 text-[14px] font-semibold text-ink transition-transform active:scale-[.97]"
+        >
+          {action}
+        </button>
+      )}
+    </section>
   )
 }

@@ -133,3 +133,14 @@ Spring values (Q13) are starting points. The 8% frame-diff threshold, <= 2 dropp
 | E2 | Slice 1 copy (`copy/slice-1.md`) | no | **yes** (Ved: "copy approved") |
 | E3 | Pop rule: a jump counts as a pop only when it lands in a single frame; colour changes spread over several frames are motion | no | **yes** (Ved: "rule ok") |
 | E4 | Feedback: "looks decent - feel is missing - intuitiveness, ux, motion like in bevel and cal ai". Slice 1a gets a feel pass before slice 1b. | no | instruction (Ved) |
+
+## Slice 1b checkpoint and the remaining-slices goal (26 Oct 2026)
+
+| # | Decision | Costly to reverse | Yes? |
+|---|---|---|---|
+| F1 | Slice 1b copy (`copy/slice-1b.md`) approved as written; confirm-password stays (Q6) | no | **yes** (Ved) |
+| F2 | Every remaining slice runs in one unattended goal, in brief order with shell + Home first as the reference. Each slice ends with a review pack (captures, copy list, critic scores); Ved's per-slice approvals and copy approvals become needs-owner rows reviewed afterwards | no | **yes** (Ved: "all remaining, one goal") |
+| F3 | Capture account: the handoff test account, stored in `.env.capture` (gitignored). It lives in the production database: reads are free; writes only on that account and only where a state cannot be mocked; every row created is listed in the ledger and deleted afterwards through the app's own delete paths. No other account, no migrations, no backend unit tests (they reseed production auth) | no | **yes** (Ved) |
+| F4 | Android Health plugin build break (`kotlin()` in `@flomentumsolutions/capacitor-health-extended`): one scoped fix in its own commit (patch-package or a Gradle override, no plugin swap); after 2 failed tries it is ledgered blocked and Health is verified on iOS only | no | **yes** (Ved) |
+| F5 | Blind critic bar unchanged (top 3 of 5, >= 8/10, 3 runs in a row); up to 3 honest fix rounds per slice, then the slice is reported "stalled" with its scores, never "passed" | no | **yes** (Ved) |
+| F6 | No real low-end Android phone: rubric item 5 (60 fps) stays blocked per slice; emulator traces are recorded as a pessimistic proxy only | no | **yes** (Ved) |

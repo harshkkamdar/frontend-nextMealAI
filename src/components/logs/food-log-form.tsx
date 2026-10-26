@@ -311,6 +311,15 @@ export function FoodLogForm() {
     fileInputRef.current?.click()
   }
 
+  // The + sheet's Photo opens this page with photo=1: go straight to the camera (native). Web needs a user tap.
+  const photoRequested = searchParams.get('photo') === '1'
+  useEffect(() => {
+    if (!photoRequested || !isNative()) return
+    const timer = setTimeout(() => { void handlePhotoButton() }, 0)
+    return () => clearTimeout(timer)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- once per arrival
+  }, [photoRequested])
+
   const clearEstimate = () => {
     setEstimateId(null)
     setEstimateConfidence(null)

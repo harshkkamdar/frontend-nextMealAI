@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { BottomNav } from '@/components/layout/bottom-nav'
+import { TabBar, hidesTabBar } from '@/components/layout/tab-bar'
+import { LogSheet } from '@/components/layout/log-sheet'
 import { GeoCompanionSheet } from '@/components/geo/geo-companion-sheet'
 import { AuthGate } from '@/components/auth/auth-gate'
 import { GeoScreenContextProvider } from '@/contexts/geo-screen-context'
@@ -16,7 +17,7 @@ import { useUIStore } from '@/stores/ui.store'
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const hideBottomPad = /^\/(chat|train)\/session/.test(pathname)
+  const hideBottomPad = hidesTabBar(pathname)
 
   useEffect(() => {
     const cleanupNativeShell = initNativeShell({
@@ -74,9 +75,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGate mode="app">
       <GeoScreenContextProvider>
-        <div className={`min-h-screen bg-background ${hideBottomPad ? '' : 'pb-[calc(104px+var(--safe-bottom))]'}`}>
+        <div className={`min-h-screen bg-background ${hideBottomPad ? '' : 'pb-[var(--tabbar-clearance)]'}`}>
           {children}
-          <BottomNav />
+          <TabBar />
+          <LogSheet />
           <GeoCompanionSheet />
           <NotificationsPrompt />
         </div>

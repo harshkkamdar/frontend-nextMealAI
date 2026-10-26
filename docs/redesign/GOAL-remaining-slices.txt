@@ -1,0 +1,38 @@
+/goal Build every remaining FIQR v2 redesign slice in frontend-nextMealAI on branch redesign/fiqr-v2, per docs/redesign/BRIEF.md and the signed decisions (Q1-Q31b, C1-C8, D1-D4, E1-E4, F1-F6 in docs/redesign/decisions.md). Read first: BRIEF.md, decisions.md, design-system.md, inventory.md, PROGRESS.md, teardown.md, copy/slice-1.md, AGENTS.md, SOUL.md. Slices 1a and 1b are built (dc5270a..042470d); do not redo them. Excluded: Ved's approvals, push, PR, merge, backend changes.
+
+SLICES, in order (ids S2..S10):
+S2 shell + Home: 4-tab glass capsule (Home, Food, Train, Geo), orb, + sheet (Tell Geo + log grid), both header patterns, Home in every state incl. Health tiles, check-in due card, Home quick-log and macro sheets, splash, notifications and Health sheets
+S3 logging: log food search/photo, manual logs incl workout, /logs, /foods, their sheets
+S4 Geo tab: chat list, session, companion sheet, report sheet
+S5 Food diary + its sheets and dialogs
+S6 Train + live session, rest timer, target-muscle map (C7)
+S7 Plans list, detail, builders, edit
+S8 Check-in, 3 states
+S9 Settings, Profile, delete sheet, paywall, privacy, support, delete-account, 404, crash, confirm dialog, offline band
+S10 admin token pass
+
+HOW TO WORK:
+1. Write docs/redesign/LEDGER.md: rows S<n>-<k>, one per inventory route, overlay and transition the slice owns, plus a rubric row per slice for each of the 8 BRIEF rubric items.
+2. S2 is serial and becomes the reference. From S3 on, fan out with Agent subagents: capture (web 390 and 360, iOS simulator, Android emulator fiqr_lowend), axe and tap targets, frame diffs, copy list, critic. Reuse scripts/redesign-*.mjs and redesign-framediff.py.
+3. Per slice: build, capture every state, run the critic (BRIEF prompt, fresh subagent on a larger model than yours, screenshots only), fix, re-measure; write the review pack in docs/redesign/screens/slice-<n>/ and copy/slice-<n>.md; commit per slice; update PROGRESS.md.
+4. F4 first in S2: one scoped Android Health plugin fix, own commit; 2 failed tries = blocked.
+5. Print the ledger at the end of every turn.
+
+GUARDRAILS:
+- fishi@gmail.com (.env.capture) is a production account (F3): writes only where a state cannot be mocked; log each created row in the ledger and delete it via the app. No other account, no migrations, no backend unit tests.
+- Core API locally on :4010 from the backend repo; never edit its code or .env.
+- AGENTS.md laws, Q2 tints only, no dark mode, no next/image, transform/opacity motion only.
+- Do not touch phase2/fiqr, CHANGELOG.md or store drafts; never print the password.
+- Unsettled choices become needs-owner rows; skip and go on. Never ask mid-goal.
+
+DONE WHEN, each shown in this conversation's output:
+1. Ledger: no pending rows. Status from this closed list only: built <sha>; blocked: <named item>; needs-owner: <question> (each slice's copy list and approval are needs-owner); differs: <existing decision id>; stalled: critic scores of 3 fix rounds printed (F5); blocked-60fps (F6) with emulator trace attached.
+2. Per slice: axe serious/critical 0, tap targets under 44 pt 0, orange actions at most 1 per screen, frame-diff 0 pops, printed.
+3. Per slice: capture paths at both widths, iOS and Android listed and read.
+4. Palette grep gate 0 hits; npm run lint, npm run type-check, npm test exit 0, printed after the last slice.
+5. Every production row created by the run listed as deleted.
+6. A fresh subagent on a different model sees only the BRIEF rubric, references and after captures, and grades each slice; fails fixed or ledgered.
+7. git status clean, commits per slice, diff stat vs 042470d printed.
+8. docs/redesign/REVIEW-remaining.md written for Ved: per slice before/after, scores, needs-owner questions.
+
+Stop and report if 90 turns pass, or a gate fails twice on something outside this goal's files.

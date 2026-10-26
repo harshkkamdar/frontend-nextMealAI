@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
@@ -37,7 +37,8 @@ async function fileToBase64(file: File): Promise<string> {
 function PrefillReader({ onPrefill }: { onPrefill: (v: string) => void }) {
   const searchParams = useSearchParams()
   useEffect(() => {
-    onPrefill(searchParams.get('prefill') ?? '')
+    // send=1 (from the + sheet) sends the text instead of leaving it in the composer.
+    onPrefill(searchParams.get('send') === '1' ? '' : searchParams.get('prefill') ?? '')
   }, [searchParams, onPrefill])
   return null
 }
@@ -47,13 +48,15 @@ export default function ActiveChatPage() {
 }
 
 function ActiveChatRoute() {
-  const sessionId = useSearchParams().get('id') ?? ''
+  const params = useSearchParams()
+  const sessionId = params.get('id') ?? ''
   if (!sessionId) return <p className="p-4 text-[15.5px] text-ink-65">Nothing selected. <Link href="/chat">Back to chats.</Link></p>
-  return <ActiveChatSession sessionId={sessionId} />
+  return <ActiveChatSession sessionId={sessionId} autoSend={params.get('send') === '1' ? params.get('prefill') : null} />
 }
 
-function ActiveChatSession({ sessionId }: { sessionId: string }) {
+function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSend?: string | null }) {
   const router = useRouter()
+  const autoSent = useRef(false)
   const [prefill, setPrefill] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [sessionTitle, setSessionTitle] = useState<string | undefined>()
@@ -171,6 +174,15 @@ function ActiveChatSession({ sessionId }: { sessionId: string }) {
       setIsTyping(false)
     }
   }
+
+  // The + sheet's "Tell Geo" sends once the (empty) history has loaded; the URL drops send=1 so a reload never resends.
+  useEffect(() => {
+    if (loading || !autoSend || autoSent.current) return
+    autoSent.current = true
+    router.replace(`/chat/session?id=${sessionId}`)
+    void handleSend(autoSend)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once when loading settles
+  }, [loading, autoSend])
 
   if (loading) {
     return (
