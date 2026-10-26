@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { project, rubberband } from '@/lib/motion'
-import { flickTarget, scrub } from '../stage'
+import { flickTarget, handoff, scrub } from '../stage'
 
 const W = 390
 
@@ -39,5 +39,19 @@ describe('welcome stage physics', () => {
     expect(flickTarget(1.6, 1, 0, W, 3)).toBe(2)
     expect(flickTarget(-0.1, 0, 2000, W, 3)).toBe(0)
     expect(flickTarget(3.1, 3, -2000, W, 3)).toBe(3)
+  })
+
+  it('hands text and cards off in turn: no layer shows two slides at once, and the stage is never empty', () => {
+    const text = (d: number) => handoff(d, 0.5, 0.5)
+    const card = (d: number, k: number) => handoff(d, 0.4 - k * 0.06, 0.6 - k * 0.06)
+    for (let x = 0; x <= 1.0001; x += 0.01) {
+      // between slide i (d = x, leaving) and slide i + 1 (d = x - 1, arriving)
+      expect(Math.min(text(x), text(x - 1))).toBe(0)
+      for (const k of [0, 1, 2]) expect(Math.min(card(x, k), card(x - 1, k))).toBe(0)
+      const anything = Math.max(text(x), text(x - 1), card(x, 0), card(x - 1, 0))
+      expect(anything).toBeGreaterThan(0.05)
+    }
+    expect(text(0)).toBe(1)
+    expect(card(0, 2)).toBe(1)
   })
 })

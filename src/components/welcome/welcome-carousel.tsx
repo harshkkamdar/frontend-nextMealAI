@@ -10,7 +10,7 @@ import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import { CheckInBento, FoodBento, GeoBento, SlideDepth, TrainBento } from './welcome-slides'
-import { flickTarget, scrub } from './stage'
+import { flickTarget, handoff, scrub } from './stage'
 
 const SLIDES: { title: string; line: string; Bento: ComponentType<{ live: boolean; active: boolean }> }[] = [
   { title: 'Food', line: 'Snap a meal or describe it. Geo counts the calories and macros for you.', Bento: FoodBento },
@@ -123,7 +123,7 @@ export function WelcomeCarousel() {
 function Slide({ p, i, reduce, title, line, current, children }: { p: MotionValue<number>; i: number; reduce: boolean; title: string; line: string; current: boolean; children: ReactNode }) {
   const d = useTransform(p, (v) => clamp(v - i, -1, 1))
   const m = reduce ? 0 : 1
-  const opacity = useTransform(d, (v) => Math.max(0, 1 - Math.abs(v) * 2))
+  const opacity = useTransform(d, (v) => handoff(v, 0.5, 0.5))
   const scale = useTransform(d, (v) => 1 - Math.abs(v) * 0.06 * m)
   const titleX = useTransform(d, (v) => -v * 48 * m)
   const lineX = useTransform(d, (v) => -v * 36 * m)

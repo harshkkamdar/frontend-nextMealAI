@@ -15,3 +15,7 @@ export function flickTarget(p: number, start: number, vx: number, w: number, las
   const landing = Math.round(p - project(vx) / w)
   return Math.max(0, from - 1, Math.min(last, from + 1, landing))
 }
+
+/** Opacity of a layer at slide distance d: gone once a slide has moved `gone` of the way out (d > 0), visible again once
+ *  the next one is within `arrive` (d < 0). With gone + arrive = 1 two slides never show the same layer at once. */
+export const handoff = (d: number, gone: number, arrive: number) => Math.max(0, 1 - Math.abs(d) / (d > 0 ? gone : arrive))

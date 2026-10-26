@@ -5,6 +5,7 @@ import { AnimatePresence, motion, motionValue, useReducedMotion, useTransform, t
 import { useCountUp } from '@/lib/use-count-up'
 import { DRAW_MS } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import { handoff } from './stage'
 
 /** Each bento is decorative (the slide's title and line carry the meaning), so it is hidden from screen readers.
  *  `live` turns true the first time the slide is in view and stays true: values fill once, then hold. */
@@ -15,13 +16,15 @@ export const SlideDepth = createContext<MotionValue<number>>(motionValue(0))
 
 /** Frosted bento card (Q12, Q20): white over the mist, no blur. Card k trails the slide by 20 + 8k px and fades
  *  sooner the further back it sits, so the layers move at different speeds (motion-feel.md 3a). Like the text, a card
- *  is gone before mid-drag, so the outgoing and incoming slides' numbers never overlap. */
+ *  is gone before the next slide's card appears, so two slides' numbers never overlap. */
 function Card({ k = 0, className, children }: { k?: number; className?: string; children: ReactNode }) {
   const d = useContext(SlideDepth)
   const m = useReducedMotion() ? 0 : 1
   const x = useTransform(d, (v) => -v * (20 + k * 8) * m)
   const scale = useTransform(d, (v) => 1 - Math.abs(v) * 0.04 * m)
-  const opacity = useTransform(d, (v) => Math.max(0, 1 - Math.abs(v) * (2 + k * 0.4)))
+  // The bento hands off at 0.4 of the way between slides and the text at 0.5, so a region never shows two slides at once
+  // and the stage is never empty. Cards behind (higher k) leave first and arrive last.
+  const opacity = useTransform(d, (v) => handoff(v, 0.4 - k * 0.06, 0.6 - k * 0.06))
   return <motion.div className={cn('rounded-[var(--radius-bento)] bg-card/80 p-4 shadow-[var(--shadow-card)] outline outline-1 -outline-offset-1 outline-card', className)} style={{ x, scale, opacity }}>{children}</motion.div>
 }
 
