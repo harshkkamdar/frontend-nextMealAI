@@ -1,0 +1,25 @@
+diff --git a/node_modules/@flomentumsolutions/capacitor-health-extended/android/build.gradle b/node_modules/@flomentumsolutions/capacitor-health-extended/android/build.gradle
+index 7f761b0..d0daf2b 100644
+--- a/node_modules/@flomentumsolutions/capacitor-health-extended/android/build.gradle
++++ b/node_modules/@flomentumsolutions/capacitor-health-extended/android/build.gradle
+@@ -22,6 +22,7 @@ buildscript {
+ }
+ 
+ apply plugin: 'com.android.library'
++apply plugin: 'org.jetbrains.kotlin.android'
+ 
+ android {
+     namespace = "com.flomentumsolutions.capacitorhealthextended.capacitor"
+diff --git a/node_modules/@flomentumsolutions/capacitor-health-extended/android/src/main/java/com/flomentumsolutions/capacitor-health-extended/HealthPlugin.kt b/node_modules/@flomentumsolutions/capacitor-health-extended/android/src/main/java/com/flomentumsolutions/capacitor-health-extended/HealthPlugin.kt
+index 489482b..f2c5ea6 100644
+--- a/node_modules/@flomentumsolutions/capacitor-health-extended/android/src/main/java/com/flomentumsolutions/capacitor-health-extended/HealthPlugin.kt
++++ b/node_modules/@flomentumsolutions/capacitor-health-extended/android/src/main/java/com/flomentumsolutions/capacitor-health-extended/HealthPlugin.kt
+@@ -146,7 +146,7 @@ class HealthPlugin : Plugin() {
+         CapHealthPermission.READ_EXERCISE_TIME to HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+         CapHealthPermission.READ_HRV to HealthPermission.getReadPermission(HeartRateVariabilityRmssdRecord::class),
+         CapHealthPermission.READ_BLOOD_PRESSURE to HealthPermission.getReadPermission(BloodPressureRecord::class),
+-        CapHealthPermission.READ_ROUTE to HealthPermission.PERMISSION_READ_EXERCISE_ROUTE,
++        CapHealthPermission.READ_ROUTE to HealthPermission.PERMISSION_READ_EXERCISE_ROUTES,
+         CapHealthPermission.READ_MINDFULNESS to HealthPermission.getReadPermission(MindfulnessSessionRecord::class),
+         CapHealthPermission.READ_RESTING_HEART_RATE to HealthPermission.getReadPermission(RestingHeartRateRecord::class),
+         CapHealthPermission.READ_RESPIRATORY_RATE to HealthPermission.getReadPermission(RespiratoryRateRecord::class),
