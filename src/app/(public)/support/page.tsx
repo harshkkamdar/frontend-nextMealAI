@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const QUESTIONS = [
   { q: 'Geo logged the wrong thing', a: 'Open the entry in Food, tap it, and fix the amount or the food. Geo learns your usual servings over time.' },
   { q: 'Photo estimates look off', a: "They're estimates. Tell Geo the portion or the brand and it corrects the numbers." },
-  { q: "Notifications aren't arriving", a: "Check Settings, then Notifications in FIQR, and your phone's notification settings for FIQR." },
+  { q: "Notifications aren't arriving", a: "Check Settings, then Reminders in FIQR, and your phone's notification settings for FIQR." },
 ]
 
 export default function SupportPage() {
@@ -21,7 +21,7 @@ export default function SupportPage() {
       <a
         data-action
         href={`mailto:${SUPPORT_EMAIL}`}
-        className="mt-6 flex h-14 w-full items-center justify-center rounded-[18px] bg-ink text-[17px] font-bold text-cream transition-transform duration-100 active:scale-[.97]"
+        className="mt-5 flex h-btn w-full items-center justify-center rounded-full bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]"
       >
         Email {SUPPORT_EMAIL}
       </a>

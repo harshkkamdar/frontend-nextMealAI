@@ -1,16 +1,16 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
-import { useRouter } from 'next/navigation'
-import { ChevronLeftIcon } from '@/components/ui/fiqr/icons'
-import { RoundButton } from '@/components/ui/fiqr/round-button'
+import { usePathname, useRouter } from 'next/navigation'
+import { PushedHeader } from '@/components/layout/screen-header'
 
-const noop = () => () => {}
+const TITLES: Record<string, string> = { '/privacy': 'Privacy policy', '/support': 'Support', '/delete-account': 'fiqr.app' }
 
-/** Opened from Settings inside the app there is no browser back, so offer one when there is history. */
-export function PublicBack() {
+/**
+ * The public pages wear the app's pushed header (centred title, round glass back), so opening them from Settings reads
+ * as one more screen. Opened cold in a browser there is no history, so back goes to the FIQR home page instead.
+ */
+export function PublicHeader() {
   const router = useRouter()
-  const canGoBack = useSyncExternalStore(noop, () => window.history.length > 1, () => false)
-  if (!canGoBack) return null
-  return <RoundButton flat aria-label="Back" onClick={() => router.back()}><ChevronLeftIcon /></RoundButton>
+  const pathname = usePathname().replace(/\/$/, '')
+  return <PushedHeader title={TITLES[pathname] ?? 'FIQR'} onBack={() => (window.history.length > 1 ? router.back() : router.push('/'))} />
 }

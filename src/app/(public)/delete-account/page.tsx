@@ -77,7 +77,7 @@ export default function DeleteAccountPage() {
           <button
             type="submit"
             disabled={submissionState === 'submitting'}
-            className="flex h-14 w-full items-center justify-center rounded-[18px] bg-ink text-[17px] font-bold text-cream transition-transform duration-100 enabled:active:scale-[.97] disabled:opacity-60"
+            className="flex h-btn w-full items-center justify-center rounded-full bg-ink text-body font-bold text-cream transition-transform duration-100 enabled:active:scale-[.97] disabled:opacity-60"
           >
             Request deletion
           </button>
