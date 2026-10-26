@@ -1,0 +1,546 @@
+[
+  {
+    "shot": "edit-loading",
+    "width": 360,
+    "url": "/plans/edit?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "edit-loading",
+    "width": 390,
+    "url": "/plans/edit?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "edit-meal-targets",
+    "width": 360,
+    "url": "/plans/edit?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-meal-targets",
+    "width": 390,
+    "url": "/plans/edit?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-workout-days",
+    "width": 360,
+    "url": "/plans/edit?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-workout-days",
+    "width": 390,
+    "url": "/plans/edit?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-workout",
+    "width": 360,
+    "url": "/plans/edit?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-workout",
+    "width": 390,
+    "url": "/plans/edit?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-meal-days-filled",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-meal-days-filled",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-meal-days-invalid",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-meal-days-invalid",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-meal-empty",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-meal-empty",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-meal-error",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-meal-error",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-meal-filled",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-meal-filled",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-meal-saving",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-meal-saving",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-meal-search",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-meal-search",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-meal-targets",
+    "width": 360,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-meal-targets",
+    "width": 390,
+    "url": "/plans/new/meal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-workout-days-filled",
+    "width": 360,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-workout-days-filled",
+    "width": 390,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-workout-days-invalid",
+    "width": 360,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-workout-days-invalid",
+    "width": 390,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-workout-empty",
+    "width": 360,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "new-workout-empty",
+    "width": 390,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plans-error",
+    "width": 360,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plans-error",
+    "width": 390,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plans-loading",
+    "width": 360,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plans-loading",
+    "width": 390,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plans-long",
+    "width": 360,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans-long",
+    "width": 390,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans-none",
+    "width": 360,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans-none",
+    "width": 390,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans-offline",
+    "width": 360,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans-offline",
+    "width": 390,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans-scrolled",
+    "width": 360,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans-scrolled",
+    "width": 390,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans",
+    "width": 360,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "plans",
+    "width": 390,
+    "url": "/plans",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "view-error",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-error",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-gone",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-gone",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-loading",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-loading",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-meal-day",
+    "width": 360,
+    "url": "/plans/view?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-meal-day",
+    "width": 390,
+    "url": "/plans/view?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-meal-long",
+    "width": 360,
+    "url": "/plans/view?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-meal-long",
+    "width": 390,
+    "url": "/plans/view?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-meal",
+    "width": 360,
+    "url": "/plans/view?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-meal",
+    "width": 390,
+    "url": "/plans/view?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-offline",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-offline",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-workout-history",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-workout-history",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-workout-inactive",
+    "width": 360,
+    "url": "/plans/view?id=old-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "view-workout-inactive",
+    "width": 390,
+    "url": "/plans/view?id=old-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "view-workout-long",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-workout-long",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-workout-open",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-workout-open",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-workout",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-workout",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  }
+]

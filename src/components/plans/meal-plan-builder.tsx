@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { ChevronLeft } from 'lucide-react'
 import {
   PlanNameField,
   PlanDateRangeField,
@@ -16,10 +15,11 @@ import { createPlan, updatePlan, activatePlan } from '@/lib/api/plans.api'
 import { searchFoods } from '@/lib/api/foods.api'
 import type { FoodSearchResult } from '@/types/foods.types'
 import type { MealPlan, MealPlanDay, MealPlanMeal } from '@/types/plans.types'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
-import { cn } from '@/lib/utils'
+import { PlanBuilderStep } from '@/components/plans/plan-builder-step'
+import { ActiveToggle, BuilderNotes, DayCardShell, stepErrors } from '@/components/plans/plan-builder-parts'
+import { goBack } from '@/components/plans/plan-format'
+import { Chip } from '@/components/ui/fiqr/chip'
+import { haptic } from '@/lib/platform/app'
 
 // FB-08 — Nutrition plan manual builder. Symmetric with the workout builder.
 // Users set daily macro targets, then build out day-by-day meals. Meal
@@ -32,6 +32,7 @@ export interface MealPlanBuilderProps {
 }
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
+const STEPS = ['name', 'targets', 'days'] as const
 
 interface DraftMeal extends MealPlanMeal {
   _key: string
@@ -121,7 +122,7 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
   const [days, setDays] = useState<DraftDay[]>(initial.days)
   const [setActive, setSetActive] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [touched, setTouched] = useState(false)
+  const [step, setStep] = useState(0)
 
   const errors = useMemo(() => validate({ name, targets, days }), [name, targets, days])
   const isValid = errors.length === 0
@@ -160,9 +161,7 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
     )
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setTouched(true)
+  async function handleSubmit() {
     if (!isValid) {
       toast.error(errors[0])
       return
@@ -215,108 +214,64 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
     }
   }
 
+  const current = STEPS[step]
+  const blocking = stepErrors(current, errors)
+  const last = step === STEPS.length - 1
+  const copy = {
+    name: { question: mode === 'create' ? 'What should we call this plan?' : 'Rename it, or keep going', why: 'A name you will recognise later. Dates and notes are optional.' },
+    targets: { question: 'What are your daily targets?', why: 'Home and the food diary measure each day against these.' },
+    days: { question: 'What does a day of eating look like?', why: 'Search a food to fill in its numbers. You can change any of them.' },
+  }[current]
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-7">
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => router.push('/plans')}
-          className="inline-flex h-9 w-9 items-center justify-center text-ink-65"
-          aria-label="Back to plans"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <h1 className="text-[22px] font-semibold text-ink">{mode === 'create' ? 'New nutrition plan' : 'Edit nutrition plan'}</h1>
-      </div>
-
-      <section className="space-y-2.5"><SectionLabel>Plan</SectionLabel><div className="space-y-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-        <PlanNameField value={name} onChange={setName} placeholder="e.g. Cut phase" /><PlanDateRangeField
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(next) => {
-            setStartDate(next.startDate)
-            setEndDate(next.endDate)
-          }}
-        />
-        <div className="space-y-1.5">
-          <label htmlFor="plan-notes" className="block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Notes</label>
-          <textarea
-            id="plan-notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={2}
-            placeholder="Optional notes"
-            className="min-h-24 w-full rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
-          />
+    <PlanBuilderStep
+      title={mode === 'create' ? 'New nutrition plan' : 'Edit nutrition plan'}
+      step={step}
+      steps={STEPS.length}
+      stepKey={current}
+      question={copy.question}
+      why={copy.why}
+      onBack={() => (step > 0 ? setStep(step - 1) : goBack(router, '/plans'))}
+      cta={last ? 'Save plan' : 'Continue'}
+      canContinue={last ? isValid : blocking.length === 0}
+      busy={submitting}
+      notice={current !== 'name' ? blocking[0] : undefined}
+      onContinue={() => (last ? void handleSubmit() : setStep(step + 1))}
+    >
+      {current === 'name' ? (
+        <div className="space-y-6">
+          <PlanNameField value={name} onChange={setName} placeholder="e.g. Cut phase" />
+          <PlanDateRangeField startDate={startDate} endDate={endDate} onChange={(next) => { setStartDate(next.startDate); setEndDate(next.endDate) }} />
+          <BuilderNotes value={notes} onChange={setNotes} placeholder="Anything Geo should keep in mind" />
         </div>
-      </div></section>
-
-      <section className="space-y-2.5"><SectionLabel>Daily targets</SectionLabel><div className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-        <div className="grid grid-cols-2 gap-3">
-          <NumberField
-            label="Calories"
-            suffix="kcal"
-            value={targets.calories}
-            onChange={(v) => setTargets((t) => ({ ...t, calories: v }))}
-            min={0}
-          />
-          <NumberField
-            label="Protein"
-            suffix="g"
-            value={targets.protein}
-            onChange={(v) => setTargets((t) => ({ ...t, protein: v }))}
-            min={0}
-          />
-          <NumberField
-            label="Carbs"
-            suffix="g"
-            value={targets.carbs}
-            onChange={(v) => setTargets((t) => ({ ...t, carbs: v }))}
-            min={0}
-          />
-          <NumberField
-            label="Fat"
-            suffix="g"
-            value={targets.fat}
-            onChange={(v) => setTargets((t) => ({ ...t, fat: v }))}
-            min={0}
-          />
-        </div>
-      </div></section>
-
-      <section className="space-y-4"><SectionLabel>Days</SectionLabel>
-        {days.map((day, dayIndex) => (
-          <MealDayCard
-            key={day._key}
-            day={day}
-            index={dayIndex}
-            canRemove={days.length > 1}
-            onPatch={(patch) => patchDay(day._key, patch)}
-            onRemove={() => removeDay(day._key)}
-            onAddMeal={() => addMeal(day._key)}
-            onRemoveMeal={(mealKey) => removeMeal(day._key, mealKey)}
-            onPatchMeal={(mealKey, patch) => patchMeal(day._key, mealKey, patch)}
-          />
-        ))}
-        <SecondaryButton type="button" onNavy={false} onClick={addDay}>Add day</SecondaryButton>
-      </section>
-
-      {touched && errors.length > 0 ? (
-        <ul className="space-y-1 rounded-[12px] bg-ink-08 p-3 text-[13.5px] text-ink" role="alert">
-          {errors.map((err) => (
-            <li key={err}>{err}</li>
+      ) : current === 'targets' ? (
+        <div className="grid grid-cols-2 gap-[10px]">
+          {([['calories', 'Calories', 'kcal'], ['protein', 'Protein', 'g'], ['carbs', 'Carbs', 'g'], ['fat', 'Fat', 'g']] as const).map(([key, label, suffix]) => (
+            <div key={key} className="rounded-[22px] bg-card p-4 shadow-[var(--shadow-card)]">
+              <NumberField label={label} suffix={suffix} value={targets[key]} onChange={(v) => setTargets((t) => ({ ...t, [key]: v }))} min={0} />
+            </div>
           ))}
-        </ul>
-      ) : null}
-
-      <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-[12px] text-[15.5px] font-semibold text-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ink">
-        <input type="checkbox" checked={setActive} onChange={(e) => setSetActive(e.target.checked)} className="sr-only" />
-        <span aria-hidden="true" className={cn('flex size-[22px] shrink-0 items-center justify-center rounded-[6px]', setActive ? 'bg-ink' : 'border border-ink-16 bg-card')}>{setActive ? <svg viewBox="0 0 16 16" className="size-4 text-cream" fill="none"><path d="m3 8 3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}</span>
-        Set as active plan
-      </label>
-
-      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid} className="justify-center">{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="min-h-11 w-full text-[13.5px] font-semibold text-ink-65">Cancel</button></div>
-    </form>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {days.map((day, dayIndex) => (
+            <MealDayCard
+              key={day._key}
+              day={day}
+              index={dayIndex}
+              canRemove={days.length > 1}
+              onPatch={(patch) => patchDay(day._key, patch)}
+              onRemove={() => removeDay(day._key)}
+              onAddMeal={() => addMeal(day._key)}
+              onRemoveMeal={(mealKey) => removeMeal(day._key, mealKey)}
+              onPatchMeal={(mealKey, patch) => patchMeal(day._key, mealKey, patch)}
+            />
+          ))}
+          <AddRowButton label="Add day" onClick={addDay} />
+          {mode === 'create' ? <ActiveToggle checked={setActive} onChange={setSetActive} /> : null}
+        </div>
+      )}
+    </PlanBuilderStep>
   )
 }
 
@@ -340,30 +295,30 @@ function MealDayCard({
   onPatchMeal: (mealKey: string, patch: Partial<DraftMeal>) => void
 }) {
   return (
-    <div className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-      <div className="flex items-center gap-2">
+    <DayCardShell
+      index={index}
+      header={(
         <input
           type="date"
           aria-label={`Day ${index + 1} date`}
           value={day.date}
           onChange={(e) => onPatch({ date: e.target.value })}
-          className="h-14 min-w-0 flex-1 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none focus:border-ink"
+          className="h-12 min-w-0 flex-1 rounded-[14px] bg-ink-04 px-3 text-[16px] font-semibold text-ink outline outline-0 -outline-offset-1 outline-ink focus:outline-2"
         />
-        {canRemove ? <RemoveRowButton label={`Remove day ${index + 1}`} onClick={onRemove} /> : null}
-      </div>
-      <div className="divide-y divide-ink-09">
-        {day.meals.map((meal, mealIndex) => (
-          <MealRow
-            key={meal._key}
-            meal={meal}
-            index={mealIndex}
-            onPatch={(patch) => onPatchMeal(meal._key, patch)}
-            onRemove={() => onRemoveMeal(meal._key)}
-          />
-        ))}
-        <div className="pt-3"><AddRowButton label="Add meal" onClick={onAddMeal} /></div>
-      </div>
-    </div>
+      )}
+      onRemove={canRemove ? onRemove : undefined}
+    >
+      {day.meals.map((meal, mealIndex) => (
+        <MealRow
+          key={meal._key}
+          meal={meal}
+          index={mealIndex}
+          onPatch={(patch) => onPatchMeal(meal._key, patch)}
+          onRemove={() => onRemoveMeal(meal._key)}
+        />
+      ))}
+      <AddRowButton label="Add meal" onClick={onAddMeal} />
+    </DayCardShell>
   )
 }
 
@@ -379,10 +334,14 @@ function MealRow({
   onRemove: () => void
 }) {
   return (
-    <div className="space-y-3 py-3 first:pt-0">
+    <div className="space-y-3 border-b border-ink-06 pb-4">
       <div className="flex items-start gap-2">
-        <div className="flex-1 space-y-3">
-          <div className="space-y-1.5"><div className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Meal type</div><div className="flex flex-wrap gap-2">{MEAL_TYPES.map((type) => <button key={type} type="button" onClick={() => onPatch({ type })} className={`h-9 rounded-full px-3 text-[13.5px] font-semibold ${meal.type === type ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}>{type}</button>)}</div></div>
+        <div className="min-w-0 flex-1 space-y-3">
+          <div role="group" aria-label={`Meal ${index + 1} type`} className="flex flex-wrap gap-2">
+            {MEAL_TYPES.map((type) => (
+              <Chip key={type} selected={meal.type === type} onClick={() => { void haptic('selection'); onPatch({ type }) }} className="transition-transform active:scale-[.96]">{type}</Chip>
+            ))}
+          </div>
           <SearchablePicker<FoodSearchResult>
             label={`Meal ${index + 1}`}
             placeholder="Search foods"
@@ -390,9 +349,7 @@ function MealRow({
             renderItem={(item) => (
               <div>
                 <div className="text-ink">{item.name}</div>
-                {item.brand ? (
-                  <div className="text-[11px] text-ink-65">{item.brand}</div>
-                ) : null}
+                {item.brand ? <div className="text-[13px] text-ink-65">{item.brand}</div> : null}
               </div>
             )}
             getItemKey={(item) => item.id ?? item.name}
@@ -412,33 +369,10 @@ function MealRow({
         <RemoveRowButton label={`Remove meal ${index + 1}`} onClick={onRemove} />
       </div>
       <div className="grid grid-cols-4 gap-2">
-        <NumberField
-          label="Cal"
-          value={meal.calories}
-          onChange={(v) => onPatch({ calories: v })}
-          min={0}
-        />
-        <NumberField
-          label="P"
-          suffix="g"
-          value={meal.protein}
-          onChange={(v) => onPatch({ protein: v })}
-          min={0}
-        />
-        <NumberField
-          label="C"
-          suffix="g"
-          value={meal.carbs}
-          onChange={(v) => onPatch({ carbs: v })}
-          min={0}
-        />
-        <NumberField
-          label="F"
-          suffix="g"
-          value={meal.fat}
-          onChange={(v) => onPatch({ fat: v })}
-          min={0}
-        />
+        <NumberField label="Cal" value={meal.calories} onChange={(v) => onPatch({ calories: v })} min={0} />
+        <NumberField label="P" suffix="g" value={meal.protein} onChange={(v) => onPatch({ protein: v })} min={0} />
+        <NumberField label="C" suffix="g" value={meal.carbs} onChange={(v) => onPatch({ carbs: v })} min={0} />
+        <NumberField label="F" suffix="g" value={meal.fat} onChange={(v) => onPatch({ fat: v })} min={0} />
       </div>
     </div>
   )

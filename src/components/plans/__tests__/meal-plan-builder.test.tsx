@@ -3,7 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
 const pushMock = vi.fn()
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock, back: vi.fn() }),
+  useRouter: () => ({ push: pushMock, back: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => '/plans',
 }))
 
 const toastError = vi.fn()
@@ -40,6 +41,15 @@ beforeEach(() => {
 })
 
 const fullTargets = { calories: 2000, protein: 150, carbs: 200, fat: 60 }
+
+/** Steps: name, targets, days. Names the plan (if given) and continues to the days step. */
+async function toDays(name?: string) {
+  if (name !== undefined) fireEvent.change(screen.getByPlaceholderText('e.g. Cut phase'), { target: { value: name } })
+  fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+  await screen.findByText('What are your daily targets?')
+  fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+  await screen.findByText('What does a day of eating look like?')
+}
 
 describe('MealPlanBuilder validation', () => {
   it('requires a name and targets', () => {
@@ -81,13 +91,22 @@ describe('MealPlanBuilder validation', () => {
 })
 
 describe('MealPlanBuilder component', () => {
-  it('renders default day + meal and lets you add/remove days', () => {
+  it('renders default day + meal and lets you add/remove days', async () => {
     render(<MealPlanBuilder mode="create" />)
+    await toDays('Cut')
     expect(screen.getByLabelText('Day 1 date')).toBeInTheDocument()
     fireEvent.click(screen.getByText('Add day'))
     expect(screen.getByLabelText('Day 2 date')).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('Remove day 2'))
     expect(screen.queryByLabelText('Day 2 date')).not.toBeInTheDocument()
+  })
+
+  it('keeps Continue disabled until the plan has a name, and says what blocks the days step', async () => {
+    render(<MealPlanBuilder mode="create" />)
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    await toDays('Cut')
+    expect(screen.getByRole('status')).toHaveTextContent('Day 1 meal 1 needs a name')
+    expect((await screen.findByRole('button', { name: 'Save plan' }))).toBeDisabled()
   })
 
   it('submits create payload with foods selection', async () => {
@@ -107,13 +126,13 @@ describe('MealPlanBuilder component', () => {
     activatePlanMock.mockResolvedValue(undefined)
 
     render(<MealPlanBuilder mode="create" />)
-    fireEvent.change(screen.getByPlaceholderText('e.g. Cut phase'), { target: { value: 'Cut' } })
+    await toDays('Cut')
 
     fireEvent.change(screen.getByPlaceholderText('Search foods'), { target: { value: 'oat' } })
     await waitFor(() => screen.getByText('Oats'))
     fireEvent.click(screen.getByText('Oats'))
 
-    const submit = screen.getByRole('button', { name: 'Save plan' })
+    const submit = (await screen.findByRole('button', { name: 'Save plan' }))
     await waitFor(() => expect(submit).not.toBeDisabled())
     fireEvent.click(submit)
 
@@ -144,11 +163,11 @@ describe('MealPlanBuilder component', () => {
     createPlanMock.mockRejectedValue(new Error('nope'))
 
     render(<MealPlanBuilder mode="create" />)
-    fireEvent.change(screen.getByPlaceholderText('e.g. Cut phase'), { target: { value: 'Cut' } })
+    await toDays('Cut')
     fireEvent.change(screen.getByPlaceholderText('Search foods'), { target: { value: 'ri' } })
     await waitFor(() => screen.getByText('Rice'))
     fireEvent.click(screen.getByText('Rice'))
-    fireEvent.click(screen.getByRole('button', { name: 'Save plan' }))
+    fireEvent.click((await screen.findByRole('button', { name: 'Save plan' })))
     await waitFor(() => expect(toastError).toHaveBeenCalledWith('nope'))
   })
 
@@ -168,10 +187,10 @@ describe('MealPlanBuilder component', () => {
     updatePlanMock.mockResolvedValue({ id: 'plan-77' })
 
     render(<MealPlanBuilder mode="edit" initialPlan={initialPlan} />)
-    fireEvent.change(screen.getByPlaceholderText('e.g. Cut phase'), { target: { value: 'Recut' } })
+    await toDays('Recut')
     expect(screen.getByText('Eggs')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save plan' }))
+    fireEvent.click((await screen.findByRole('button', { name: 'Save plan' })))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-77')
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-77'))

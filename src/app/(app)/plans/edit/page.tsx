@@ -4,8 +4,9 @@ import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { PageWrapper } from '@/components/layout/page-wrapper'
-import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { PushedHeader } from '@/components/layout/screen-header'
+import { SkeletonCard } from '@/components/plans/plan-overview-card'
+import { goBack } from '@/components/plans/plan-format'
 import { WorkoutPlanBuilder } from '@/components/plans/workout-plan-builder'
 import { MealPlanBuilder } from '@/components/plans/meal-plan-builder'
 import { getPlan } from '@/lib/api/plans.api'
@@ -17,7 +18,15 @@ export default function EditPlanPage() {
 
 function EditPlanRoute() {
   const id = useSearchParams().get('id') ?? ''
-  if (!id) return <PageWrapper><p className="text-[13.5px] text-ink-65">Nothing selected. <Link href="/plans">Back to plans.</Link></p></PageWrapper>
+  const router = useRouter()
+  if (!id) {
+    return (
+      <div className="mx-auto w-full max-w-md px-4">
+        <PushedHeader title="Edit plan" onBack={() => router.push('/plans')} backLabel="Back to plans" />
+        <p className="mt-4 px-1 text-[15px] text-ink-65">No plan picked. <Link href="/plans" className="inline-flex min-h-11 items-center font-semibold text-ink underline">Back to plans</Link></p>
+      </div>
+    )
+  }
   return <EditPlanView id={id} />
 }
 
@@ -47,21 +56,22 @@ export function EditPlanView({ id }: { id: string }) {
 
   if (loading) {
     return (
-      <PageWrapper>
-        <CardSkeleton />
-      </PageWrapper>
+      <div className="mx-auto w-full max-w-md px-4">
+        <PushedHeader title="Edit plan" onBack={() => goBack(router, '/plans')} />
+        <div className="mx-1 mt-1 h-1 rounded-full bg-ink-08" />
+        <div className="space-y-3 px-1 pt-7" role="status" aria-busy="true" aria-label="Loading your plan">
+          <div aria-hidden="true" className="h-[31px] w-4/5 animate-pulse rounded-[10px] bg-ink-06" />
+          <div aria-hidden="true" className="h-[20px] w-3/5 animate-pulse rounded-[8px] bg-ink-06" />
+          <SkeletonCard className="!mt-7 h-[56px] !rounded-[14px]" />
+          <SkeletonCard className="h-[56px] !rounded-[14px]" />
+        </div>
+      </div>
     )
   }
 
   if (!plan) return null
 
-  return (
-    <PageWrapper>
-      {plan.type === 'workout' ? (
-        <WorkoutPlanBuilder mode="edit" initialPlan={plan as WorkoutPlan} />
-      ) : (
-        <MealPlanBuilder mode="edit" initialPlan={plan as MealPlan} />
-      )}
-    </PageWrapper>
-  )
+  return plan.type === 'workout'
+    ? <WorkoutPlanBuilder mode="edit" initialPlan={plan as WorkoutPlan} />
+    : <MealPlanBuilder mode="edit" initialPlan={plan as MealPlan} />
 }

@@ -1,0 +1,60 @@
+{
+  "builder-step": {
+    "frames": 29,
+    "chrome_px": 0,
+    "content_px": 229362,
+    "max_chrome_share": 0,
+    "max_content_share": 0.082,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "builder-step-back": {
+    "frames": 34,
+    "chrome_px": 0,
+    "content_px": 388308,
+    "max_chrome_share": 0,
+    "max_content_share": 0.056,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "day-collapse": {
+    "frames": 81,
+    "chrome_px": 80566,
+    "content_px": 546413,
+    "max_chrome_share": 0.074,
+    "max_content_share": 0.054,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "day-expand": {
+    "frames": 42,
+    "chrome_px": 20127,
+    "content_px": 282850,
+    "max_chrome_share": 0.152,
+    "max_content_share": 0.109,
+    "issues": [
+      "late change frame 39 after 6 still frames (922 px)"
+    ],
+    "verdict": "pop"
+  },
+  "meal-day-switch": {
+    "frames": 11,
+    "chrome_px": 4531,
+    "content_px": 21678,
+    "max_chrome_share": 0.244,
+    "max_content_share": 0.316,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "open-plan": {
+    "frames": 42,
+    "chrome_px": 124898,
+    "content_px": 442169,
+    "max_chrome_share": 0.156,
+    "max_content_share": 0.401,
+    "issues": [
+      "chrome jump frame 29: 16% of chrome change"
+    ],
+    "verdict": "pop"
+  }
+}

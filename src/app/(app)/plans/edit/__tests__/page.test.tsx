@@ -3,7 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 
 const pushMock = vi.fn()
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock, back: vi.fn() }),
+  useRouter: () => ({ push: pushMock, back: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => '/plans',
 }))
 
 const toastError = vi.fn()

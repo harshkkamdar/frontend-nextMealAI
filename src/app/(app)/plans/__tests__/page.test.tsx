@@ -3,7 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
 const pushMock = vi.fn()
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock, back: vi.fn() }),
+  useRouter: () => ({ push: pushMock, back: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => '/plans',
 }))
 
 vi.mock('sonner', () => ({
@@ -25,11 +26,48 @@ vi.mock('@/contexts/geo-screen-context', () => ({
 }))
 
 import PlansPage from '@/app/(app)/plans/page'
+import { previousPlans } from '@/components/plans/plan-format'
+import type { Plan } from '@/types/plans.types'
 
 beforeEach(() => {
   pushMock.mockReset()
   getPlansMock.mockReset()
   openSheetMock.mockReset()
+})
+
+describe('previousPlans', () => {
+  const plan = (id: string, type: 'meal' | 'workout', status: string, name?: string) => ({ id, user_id: 'u1', type, status, content: { name }, created_at: 'n', updated_at: 'n' }) as unknown as Plan
+
+  it('keeps one row per earlier plan and drops older versions of an active plan', () => {
+    const active = [plan('a', 'meal', 'active', 'Cut')]
+    const all = [
+      ...active,
+      plan('b', 'meal', 'superseded', 'Cut'),
+      plan('c', 'workout', 'completed', 'PPL'),
+      plan('d', 'workout', 'superseded', 'PPL'),
+      plan('e', 'meal', 'draft', 'Draft'),
+      plan('f', 'meal', 'superseded', 'Bulk'),
+    ]
+    expect(previousPlans(all, active).map((p) => p.id)).toEqual(['c', 'f'])
+  })
+
+  it('caps the list at five', () => {
+    const all = Array.from({ length: 8 }, (_, i) => plan(`p${i}`, 'meal', 'completed', `Plan ${i}`))
+    expect(previousPlans(all, [])).toHaveLength(5)
+  })
+})
+
+describe('PlansPage earlier plans', () => {
+  it('lists earlier plans from the full plan list and opens one', async () => {
+    getPlansMock.mockImplementation(async (params?: { active_only?: boolean }) => params?.active_only ? [] : [
+      { id: 'old-1', user_id: 'u1', type: 'workout', status: 'completed', start_date: '2026-06-01', end_date: '2026-07-01', content: { name: 'Summer strength' }, created_at: 'n', updated_at: 'n' },
+    ])
+    render(<PlansPage />)
+    const row = await screen.findByText('Summer strength')
+    expect(screen.getByText('Earlier')).toBeInTheDocument()
+    fireEvent.click(row)
+    expect(pushMock).toHaveBeenCalledWith('/plans/view?id=old-1')
+  })
 })
 
 describe('PlansPage CTAs', () => {
@@ -43,8 +81,8 @@ describe('PlansPage CTAs', () => {
 
     expect(screen.getByRole('link', { name: 'Build nutrition plan by hand' })).toHaveAttribute('href', '/plans/new/meal')
     expect(screen.getByRole('link', { name: 'Build training program by hand' })).toHaveAttribute('href', '/plans/new/workout')
-    expect(screen.getByText('Build a nutrition plan by hand →')).toBeInTheDocument()
-    expect(screen.getByText('Build a training program by hand →')).toBeInTheDocument()
+    expect(screen.getByText('Build a nutrition plan yourself')).toBeInTheDocument()
+    expect(screen.getByText('Build a training program yourself')).toBeInTheDocument()
     expect(screen.getByText('No nutrition plan yet')).toBeInTheDocument()
     expect(screen.getByText('No training program yet')).toBeInTheDocument()
   })

@@ -15,7 +15,7 @@ describe('PlanChangelog', () => {
     apiFetchMock.mockResolvedValue({ versions: [{ id: 'v1', version: 1, status: 'active', created_at: '2026-09-14T10:00:00Z' }] })
     const { container } = render(<PlanChangelog planId="plan-1" />)
     await waitFor(() => expect(apiFetchMock).toHaveBeenCalledWith('/v1/plans/plan-1/versions'))
-    await waitFor(() => expect(screen.queryByText('Loading history…')).not.toBeInTheDocument())
+    await waitFor(() => expect(container.querySelector('[aria-hidden]')).toBeNull())
     expect(container).toBeEmptyDOMElement()
   })
 

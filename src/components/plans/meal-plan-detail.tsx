@@ -2,21 +2,25 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { PageHeader } from '@/components/ui/fiqr/page-header'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { toast } from 'sonner'
-import { PlanChangelog } from '@/components/plans/plan-changelog'
-import { formatDateRange, formatDayDate, statusLabel } from '@/components/plans/plan-format'
-import { MetricTile } from '@/components/ui/fiqr/metric-tile'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { CARD } from '@/components/plans/plan-overview-card'
+import { PlanDetailFrame, SectionTitle } from '@/components/plans/plan-detail-parts'
+import { formatDayDate } from '@/components/plans/plan-format'
+import { Chip } from '@/components/ui/fiqr/chip'
 import { activatePlan } from '@/lib/api/plans.api'
 import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
+import { reducedFade } from '@/lib/motion'
+import { haptic } from '@/lib/platform/app'
+import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui.store'
 import type { MealPlan, MealPlanMeal, MealPlanSnack } from '@/types/plans.types'
 
+const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
+
 export function MealPlanDetail({ plan }: { plan: MealPlan }) {
   const router = useRouter()
+  const reduce = useReducedMotion()
   const [selectedDay, setSelectedDay] = useState(0)
   const [activating, setActivating] = useState(false)
   const targets = plan.content.daily_targets
@@ -24,41 +28,88 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
   const day = days[selectedDay]
   async function makeActive() {
     setActivating(true)
-    try { await activatePlan(plan.id); toast.success('Plan activated'); router.refresh() }
-    catch { toast.error('Failed to activate plan') }
+    try { await activatePlan(plan.id); toast.success('This is your plan now'); router.refresh() }
+    catch { toast.error("Couldn't make it active. Try again.") }
     finally { setActivating(false) }
   }
 
-  return <div className="space-y-7">
-    <PageHeader title={plan.content.name || 'Nutrition Plan'} sub={`${statusLabel(plan.status)} · ${formatDateRange(plan.start_date, plan.end_date)}`} onBack={() => router.back()} />
+  return (
+    <PlanDetailFrame plan={plan} kind="Nutrition plan" fallbackTitle="Nutrition Plan" activating={activating} onActivate={makeActive}>
+      <SectionTitle>Daily targets</SectionTitle>
+      {targets && targets.calories > 0 ? (
+        <section className={cn(CARD, 'p-5')} aria-label="Daily targets">
+          <p className="text-[13px] font-semibold text-ink-65">Calories</p>
+          <p className="mt-1 flex items-baseline gap-1.5">
+            <span className="font-wide text-[40px] font-[750] leading-none tracking-[-1px] text-ink tabular-nums">{fmt(targets.calories)}</span>
+            <span className="text-[15px] font-semibold text-ink-65">kcal a day</span>
+          </p>
+          <div className="mt-5 grid grid-cols-3 gap-3 border-t border-ink-06 pt-4">
+            <Macro label="Protein" grams={targets.protein} color="var(--color-ink)" />
+            <Macro label="Carbs" grams={targets.carbs} color="var(--color-macro-teal)" />
+            <Macro label="Fat" grams={targets.fat} color="var(--color-macro-ochre)" />
+          </div>
+        </section>
+      ) : (
+        <button type="button" onClick={() => useUIStore.getState().openSheet('geo-companion')} className="flex min-h-16 w-full items-center rounded-[24px] border-[1.5px] border-dashed border-ink-20 px-5 text-left transition-transform active:scale-[.98]">
+          <span>
+            <span className="block text-[15.5px] font-semibold text-ink">No targets yet</span>
+            <span className="block text-[13px] text-ink-65">Ask Geo to work them out with you</span>
+          </span>
+        </button>
+      )}
 
-    <section className="space-y-2.5">
-      <SectionLabel>Daily targets</SectionLabel>
-      {targets && targets.calories > 0 ? <div className="grid grid-cols-2 gap-[10px]">
-        <MetricTile label="Calories" value={targets.calories.toLocaleString('en-US')} />
-        <MetricTile label="Protein" value={targets.protein} unit="g" />
-        <MetricTile label="Carbs" value={targets.carbs} unit="g" />
-        <MetricTile label="Fat" value={targets.fat} unit="g" />
-      </div> : <button type="button" onClick={() => useUIStore.getState().openSheet('geo-companion')} className="w-full rounded-[16px] border border-ink-12 bg-card p-[14px] text-left text-[15.5px] font-semibold text-ink">Targets not set · Ask Geo</button>}
-    </section>
-
-    {plan.content.notes ? <section className="space-y-2.5"><SectionLabel>Notes</SectionLabel><div className="rounded-[16px] border border-ink-12 bg-card p-[14px] text-[15.5px] leading-relaxed text-ink-80">{plan.content.notes}</div></section> : null}
-
-    {day ? <section className="space-y-4">
-      <div className="flex gap-2 overflow-x-auto pb-1">{days.map((item, index) => <button type="button" key={`${item.date}-${index}`} onClick={() => setSelectedDay(index)} className={`h-9 shrink-0 rounded-full px-3 text-[13.5px] font-semibold ${selectedDay === index ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}>{formatDayDate(item.date, index)}</button>)}</div>
-      <div className="space-y-4">{day.meals.map((meal, index) => <MealBlock key={`${meal.type}-${index}`} meal={meal} />)}{day.snacks?.length ? <div className="space-y-2"><SectionLabel>Snacks</SectionLabel><div className="divide-y divide-ink-09 rounded-[16px] border border-ink-12 bg-card">{day.snacks.map((snack, index) => <FoodRow key={`${snack.name}-${index}`} food={snack} />)}</div></div> : null}</div>
-    </section> : null}
-
-    <PlanChangelog planId={plan.id} />
-    <div className="space-y-3"><SecondaryButton onNavy={false} onClick={() => router.push(`/plans/edit?id=${plan.id}`)}>Edit plan</SecondaryButton>{plan.status !== 'active' ? <PrimaryButton onClick={makeActive} disabled={activating}>{activating ? 'Activating…' : 'Make this my plan'}</PrimaryButton> : null}</div>
-  </div>
+      {day ? (
+        <>
+          <SectionTitle>Meals</SectionTitle>
+          <div role="group" aria-label="Plan days" className="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+            {days.map((item, index) => (
+              <Chip
+                key={`${item.date}-${index}`}
+                selected={selectedDay === index}
+                onClick={() => { void haptic('selection'); setSelectedDay(index) }}
+                className="shrink-0 transition-transform active:scale-[.96]"
+              >
+                {formatDayDate(item.date, index)}
+              </Chip>
+            ))}
+          </div>
+          {/* The old day fades out while the new one fades in on top of it (popLayout), so there is never an empty frame. */}
+          <div className="relative">
+          <AnimatePresence initial={false} mode="popLayout">
+          <motion.div key={selectedDay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: reduce ? reducedFade : { duration: 0.14, ease: 'easeOut' } }} transition={reduce ? reducedFade : { duration: 0.2, ease: 'easeOut' }} className="flex w-full flex-col gap-3">
+            {day.meals.length || day.snacks?.length ? (
+              <section className={cn(CARD, 'overflow-hidden')}>
+                {day.meals.map((meal, index) => <FoodRow key={`${meal.type}-${index}`} label={`${meal.type} · ${formatMacroKcal(meal.calories ?? 0)} kcal`} food={meal} />)}
+                {day.snacks?.map((snack, index) => <FoodRow key={`${snack.name}-${index}`} label={`Snack · ${formatMacroKcal(snack.calories ?? 0)} kcal`} food={snack} />)}
+              </section>
+            ) : (
+              <div className="flex min-h-16 items-center rounded-[24px] border-[1.5px] border-dashed border-ink-20 px-5 text-[15px] font-semibold text-ink-65">Nothing planned for this day</div>
+            )}
+          </motion.div>
+          </AnimatePresence>
+          </div>
+        </>
+      ) : null}
+    </PlanDetailFrame>
+  )
 }
 
-function MealBlock({ meal }: { meal: MealPlanMeal }) {
-  return <div className="space-y-2"><SectionLabel>{meal.type} · {formatMacroKcal(meal.calories ?? 0)} kcal</SectionLabel><div className="rounded-[16px] border border-ink-12 bg-card"><FoodRow food={meal} /></div></div>
+function Macro({ label, grams, color }: { label: string; grams: number; color: string }) {
+  return (
+    <div>
+      <span className="flex items-center gap-1.5 text-[13px] font-semibold text-ink-65"><span aria-hidden="true" className="size-2 rounded-full" style={{ background: color }} />{label}</span>
+      <span className="mt-1 block text-[19px] font-bold text-ink tabular-nums">{fmt(grams)}<span className="text-[14px] font-semibold text-ink-65"> g</span></span>
+    </div>
+  )
 }
 
-function FoodRow({ food }: { food: MealPlanMeal | MealPlanSnack }) {
+function FoodRow({ label, food }: { label: string; food: MealPlanMeal | MealPlanSnack }) {
   const macros = [food.protein != null ? `${formatMacroGrams(food.protein)} P` : null, food.carbs != null ? `${formatMacroGrams(food.carbs)} C` : null, food.fat != null ? `${formatMacroGrams(food.fat)} F` : null].filter(Boolean).join(' · ')
-  return <div className="min-h-14 px-[14px] py-3"><div className="text-[15.5px] font-semibold text-ink">{food.name}</div>{macros ? <div className="text-[13px] text-ink-65">{macros}</div> : null}</div>
+  return (
+    <div className="border-b border-ink-06 px-5 py-3.5 last:border-b-0">
+      <p className="text-[13px] font-semibold text-ink-65">{label}</p>
+      <p className="mt-0.5 break-words text-[15.5px] font-semibold text-ink">{food.name}</p>
+      {macros ? <p className="mt-0.5 text-[13px] text-ink-65 tabular-nums">{macros}</p> : null}
+    </div>
+  )
 }

@@ -2,7 +2,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), back: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => '/plans',
 }))
 
 vi.mock('sonner', () => ({
@@ -66,7 +67,7 @@ describe('WorkoutPlanDetail — plan name in header', () => {
     expect(screen.getByText('Days')).toBeInTheDocument()
     expect(screen.getByText('Push')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /Push/ }))
-    expect(screen.getByText('Bench Press').parentElement).toHaveTextContent('Bench Press · 3 × 10 · 90 s')
+    expect(screen.getByText('Bench Press').closest('li')).toHaveTextContent('Bench Press3 × 10 · 90 s')
     expect(screen.getByRole('button', { name: 'Start workout' })).toBeInTheDocument()
   })
 })

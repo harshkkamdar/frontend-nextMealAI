@@ -3,7 +3,8 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 
 const pushMock = vi.fn()
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock, back: vi.fn() }),
+  useRouter: () => ({ push: pushMock, back: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => '/plans',
 }))
 
 const toastError = vi.fn()
@@ -28,6 +29,13 @@ vi.mock('@/lib/api/exercises.api', () => ({
 
 import { WorkoutPlanBuilder, validate } from '@/components/plans/workout-plan-builder'
 import type { WorkoutPlan } from '@/types/plans.types'
+
+/** Steps: name, days. Names the program and continues to the days step. */
+async function toDays(name: string) {
+  fireEvent.change(screen.getByPlaceholderText('e.g. Push Pull Legs'), { target: { value: name } })
+  fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+  await screen.findByText('Plan your training days')
+}
 
 beforeEach(() => {
   pushMock.mockReset()
@@ -91,8 +99,9 @@ describe('WorkoutPlanBuilder validation', () => {
 })
 
 describe('WorkoutPlanBuilder component', () => {
-  it('renders one initial day and lets you add/remove days', () => {
+  it('renders one initial day and lets you add/remove days', async () => {
     render(<WorkoutPlanBuilder mode="create" />)
+    await toDays('Bulk')
     expect(screen.getByLabelText('Day 1 name')).toBeInTheDocument()
     fireEvent.click(screen.getByText('Add day'))
     expect(screen.getByLabelText('Day 2 name')).toBeInTheDocument()
@@ -102,8 +111,10 @@ describe('WorkoutPlanBuilder component', () => {
 
   it('submit is blocked until required fields are valid', async () => {
     render(<WorkoutPlanBuilder mode="create" />)
-    const submit = screen.getByRole('button', { name: 'Save plan' })
-    expect(submit).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    await toDays('Bulk')
+    expect(screen.getByRole('status')).toHaveTextContent('Day 1 needs at least one exercise')
+    expect((await screen.findByRole('button', { name: 'Save plan' }))).toBeDisabled()
   })
 
   it('adds an exercise via search and submits create payload', async () => {
@@ -114,9 +125,7 @@ describe('WorkoutPlanBuilder component', () => {
     activatePlanMock.mockResolvedValue(undefined)
 
     render(<WorkoutPlanBuilder mode="create" />)
-    fireEvent.change(screen.getByPlaceholderText('e.g. Push Pull Legs'), {
-      target: { value: 'Bulk' },
-    })
+    await toDays('Bulk')
 
     fireEvent.click(screen.getByText('Add exercise'))
     const searchInput = screen.getByPlaceholderText('Search exercises')
@@ -125,7 +134,7 @@ describe('WorkoutPlanBuilder component', () => {
     await waitFor(() => screen.getByText('Bench Press'))
     fireEvent.click(screen.getByText('Bench Press'))
 
-    const submit = screen.getByRole('button', { name: 'Save plan' })
+    const submit = (await screen.findByRole('button', { name: 'Save plan' }))
     await waitFor(() => expect(submit).not.toBeDisabled())
     fireEvent.click(submit)
 
@@ -145,15 +154,13 @@ describe('WorkoutPlanBuilder component', () => {
     createPlanMock.mockRejectedValue(new Error('boom'))
 
     render(<WorkoutPlanBuilder mode="create" />)
-    fireEvent.change(screen.getByPlaceholderText('e.g. Push Pull Legs'), {
-      target: { value: 'Bulk' },
-    })
+    await toDays('Bulk')
     fireEvent.click(screen.getByText('Add exercise'))
     fireEvent.change(screen.getByPlaceholderText('Search exercises'), { target: { value: 'squ' } })
     await waitFor(() => screen.getByText('Squat'))
     fireEvent.click(screen.getByText('Squat'))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save plan' }))
+    fireEvent.click((await screen.findByRole('button', { name: 'Save plan' })))
     await waitFor(() => expect(toastError).toHaveBeenCalledWith('boom'))
   })
 
@@ -180,15 +187,13 @@ describe('WorkoutPlanBuilder component', () => {
 
     render(<WorkoutPlanBuilder mode="edit" initialPlan={initialPlan} />)
     // The name input is empty because content.name isn't persisted; type a name.
-    fireEvent.change(screen.getByPlaceholderText('e.g. Push Pull Legs'), {
-      target: { value: 'Chest day' },
-    })
+    await toDays('Chest day')
 
     // Day card should render with existing exercise already selected
     expect(screen.getByDisplayValue('Chest')).toBeInTheDocument()
     expect(screen.getByText('Bench Press')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save plan' }))
+    fireEvent.click((await screen.findByRole('button', { name: 'Save plan' })))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-42')
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-42'))

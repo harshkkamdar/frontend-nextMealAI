@@ -2,7 +2,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), back: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => '/plans',
 }))
 
 vi.mock('@/components/plans/plan-changelog', () => ({

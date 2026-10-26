@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { ChevronLeft } from 'lucide-react'
 import {
   PlanNameField,
   PlanDateRangeField,
@@ -15,9 +14,10 @@ import {
 import { createPlan, updatePlan, activatePlan } from '@/lib/api/plans.api'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
 import type { WorkoutPlan, WorkoutPlanDay, WorkoutExercise } from '@/types/plans.types'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { PlanBuilderStep } from '@/components/plans/plan-builder-step'
+import { ActiveToggle, BuilderNotes, DayCardShell, stepErrors } from '@/components/plans/plan-builder-parts'
+import { goBack } from '@/components/plans/plan-format'
+import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 
 // FB-08 — Workout plan manual builder. Used by both the create route
@@ -41,6 +41,8 @@ interface DraftDay {
   is_rest_day: boolean
   exercises: DraftExercise[]
 }
+
+const STEPS = ['name', 'days'] as const
 
 let keySeed = 0
 const nextKey = () => `k-${++keySeed}-${Date.now()}`
@@ -103,7 +105,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
   const [days, setDays] = useState<DraftDay[]>(initial.days)
   const [setActive, setSetActive] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [touched, setTouched] = useState(false)
+  const [step, setStep] = useState(0)
 
   const errors = useMemo(() => validate({ name, days }), [name, days])
   const isValid = errors.length === 0
@@ -149,9 +151,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
     )
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setTouched(true)
+  async function handleSubmit() {
     if (!isValid) {
       toast.error(errors[0])
       return
@@ -203,80 +203,55 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
     }
   }
 
+  const current = STEPS[step]
+  const blocking = stepErrors(current, errors)
+  const last = step === STEPS.length - 1
+  const copy = {
+    name: { question: mode === 'create' ? 'What should we call this program?' : 'Rename it, or keep going', why: 'A name you will recognise later. Dates and notes are optional.' },
+    days: { question: 'Plan your training days', why: 'Add exercises to each day, or mark it as a rest day.' },
+  }[current]
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-7">
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => router.push('/plans')}
-          className="inline-flex h-9 w-9 items-center justify-center text-ink-65"
-          aria-label="Back to plans"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <h1 className="text-[22px] font-semibold text-ink">{mode === 'create' ? 'New training program' : 'Edit training program'}</h1>
-      </div>
-
-      <section className="space-y-2.5"><SectionLabel>Plan</SectionLabel><div className="space-y-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-        <PlanNameField value={name} onChange={setName} placeholder="e.g. Push Pull Legs" />
-        <PlanDateRangeField
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(next) => {
-            setStartDate(next.startDate)
-            setEndDate(next.endDate)
-          }}
-        />
-        <div className="space-y-1.5">
-          <label htmlFor="plan-notes" className="block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Notes</label>
-          <textarea
-            id="plan-notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={2}
-            placeholder="Optional notes about the program"
-            className="min-h-24 w-full rounded-[15px] border border-ink-16 bg-card p-3 text-[15.5px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
-          />
+    <PlanBuilderStep
+      title={mode === 'create' ? 'New training program' : 'Edit training program'}
+      step={step}
+      steps={STEPS.length}
+      stepKey={current}
+      question={copy.question}
+      why={copy.why}
+      onBack={() => (step > 0 ? setStep(step - 1) : goBack(router, '/plans'))}
+      cta={last ? 'Save plan' : 'Continue'}
+      canContinue={last ? isValid : blocking.length === 0}
+      busy={submitting}
+      notice={current === 'days' ? blocking[0] : undefined}
+      onContinue={() => (last ? void handleSubmit() : setStep(step + 1))}
+    >
+      {current === 'name' ? (
+        <div className="space-y-6">
+          <PlanNameField value={name} onChange={setName} placeholder="e.g. Push Pull Legs" />
+          <PlanDateRangeField startDate={startDate} endDate={endDate} onChange={(next) => { setStartDate(next.startDate); setEndDate(next.endDate) }} />
+          <BuilderNotes value={notes} onChange={setNotes} placeholder="Anything Geo should know about this program" />
         </div>
-      </div></section>
-
-      <section className="space-y-4"><SectionLabel>Days</SectionLabel>
-        {days.map((day, dayIndex) => (
-          <DayCard
-            key={day._key}
-            day={day}
-            index={dayIndex}
-            canRemove={days.length > 1}
-            onPatch={(patch) => patchDay(day._key, patch)}
-            onRemove={() => removeDay(day._key)}
-            onAddExercise={() => addExercise(day._key)}
-            onPatchExercise={(exKey, patch) => patchExercise(day._key, exKey, patch)}
-            onRemoveExercise={(exKey) => removeExercise(day._key, exKey)}
-          />
-        ))}
-        <SecondaryButton type="button" onNavy={false} onClick={addDay}>Add day</SecondaryButton>
-      </section>
-
-      {touched && errors.length > 0 ? (
-        <ul className="space-y-1 rounded-[12px] bg-ink-08 p-3 text-[13.5px] text-ink" role="alert">
-          {errors.map((err) => (
-            <li key={err}>{err}</li>
+      ) : (
+        <div className="space-y-3">
+          {days.map((day, dayIndex) => (
+            <DayCard
+              key={day._key}
+              day={day}
+              index={dayIndex}
+              canRemove={days.length > 1}
+              onPatch={(patch) => patchDay(day._key, patch)}
+              onRemove={() => removeDay(day._key)}
+              onAddExercise={() => addExercise(day._key)}
+              onPatchExercise={(exKey, patch) => patchExercise(day._key, exKey, patch)}
+              onRemoveExercise={(exKey) => removeExercise(day._key, exKey)}
+            />
           ))}
-        </ul>
-      ) : null}
-
-      <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-[12px] text-[15.5px] font-semibold text-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ink">
-        <input
-          type="checkbox"
-          checked={setActive}
-          onChange={(e) => setSetActive(e.target.checked)} className="sr-only"
-        />
-        <span aria-hidden="true" className={cn('flex size-[22px] shrink-0 items-center justify-center rounded-[6px]', setActive ? 'bg-ink' : 'border border-ink-16 bg-card')}>{setActive ? <svg viewBox="0 0 16 16" className="size-4 text-cream" fill="none"><path d="m3 8 3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}</span>
-        Set as active plan
-      </label>
-
-      <div className="space-y-3"><PrimaryButton type="submit" disabled={submitting || !isValid} className="justify-center">{submitting ? 'Saving…' : 'Save plan'}</PrimaryButton><button type="button" onClick={() => router.push('/plans')} disabled={submitting} className="min-h-11 w-full text-[13.5px] font-semibold text-ink-65">Cancel</button></div>
-    </form>
+          <AddRowButton label="Add day" onClick={addDay} />
+          {mode === 'create' ? <ActiveToggle checked={setActive} onChange={setSetActive} /> : null}
+        </div>
+      )}
+    </PlanBuilderStep>
   )
 }
 
@@ -300,29 +275,28 @@ function DayCard({
   onRemoveExercise: (exKey: string) => void
 }) {
   return (
-    <div className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-      <div className="flex items-center gap-2">
+    <DayCardShell
+      index={index}
+      header={(
         <input
           aria-label={`Day ${index + 1} name`}
           value={day.name}
           onChange={(e) => onPatch({ name: e.target.value })}
-          className="h-14 min-w-0 flex-1 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink outline-none focus:border-ink"
+          className="h-12 min-w-0 flex-1 rounded-[14px] bg-ink-04 px-3 text-[16px] font-semibold text-ink outline outline-0 -outline-offset-1 outline-ink focus:outline-2"
         />
-        {canRemove ? <RemoveRowButton label={`Remove day ${index + 1}`} onClick={onRemove} /> : null}
-      </div>
-
-      <label className="flex min-h-11 items-center gap-3 text-[14px] font-semibold text-ink-65">
-        <input
-          type="checkbox"
-          className="size-5 accent-ink"
-          checked={day.is_rest_day}
-          onChange={(e) => onPatch({ is_rest_day: e.target.checked })}
-        />
+      )}
+      onRemove={canRemove ? onRemove : undefined}
+    >
+      <button
+        type="button"
+        aria-pressed={day.is_rest_day}
+        onClick={() => { void haptic('selection'); onPatch({ is_rest_day: !day.is_rest_day }) }}
+        className={cn('min-h-11 rounded-full px-4 text-[14px] font-semibold transition-transform active:scale-[.96]', day.is_rest_day ? 'bg-ink text-cream' : 'bg-ink-06 text-ink')}
+      >
         Rest day
-      </label>
-
+      </button>
       {!day.is_rest_day ? (
-        <div className="divide-y divide-ink-09">
+        <>
           {day.exercises.map((ex, exIndex) => (
             <ExerciseRow
               key={ex._key}
@@ -332,10 +306,10 @@ function DayCard({
               onRemove={() => onRemoveExercise(ex._key)}
             />
           ))}
-          <div className="pt-3"><AddRowButton label="Add exercise" onClick={onAddExercise} /></div>
-        </div>
+          <AddRowButton label="Add exercise" onClick={onAddExercise} />
+        </>
       ) : null}
-    </div>
+    </DayCardShell>
   )
 }
 
@@ -351,7 +325,7 @@ function ExerciseRow({
   onRemove: () => void
 }) {
   return (
-    <div className="space-y-3 py-3 first:pt-0">
+    <div className="space-y-3 border-b border-ink-06 pb-4">
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <SearchablePicker<ExerciseSearchResult>
@@ -362,7 +336,7 @@ function ExerciseRow({
               <div>
                 <div className="text-ink">{item.name}</div>
                 {item.primary_muscles && item.primary_muscles.length > 0 ? (
-                  <div className="text-[11px] text-ink-65">
+                  <div className="text-[13px] text-ink-65">
                     {item.primary_muscles.join(', ')}
                   </div>
                 ) : null}
