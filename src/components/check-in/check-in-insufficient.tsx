@@ -56,7 +56,7 @@ export function CheckInInsufficient({ status, enter, source }: { status: CheckIn
               { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked`, fraction: ratio(week.sleep_avg_h, 8) },
             ]}
           />
-          <p className="px-1 text-[13px] text-ink-65">
+          <p className="text-[13px] text-ink-65">
             Food averages are hidden. {capitalise(numberWord(status.days_logged))} {status.days_logged === 1 ? 'day isn’t' : 'days aren’t'} a week.
           </p>
         </div>

@@ -1,49 +1,40 @@
 {
   "apply": {
-    "frames": 62,
-    "chrome_px": 118265,
-    "content_px": 1658140,
-    "max_chrome_share": 0.098,
-    "max_content_share": 0.049,
+    "frames": 52,
+    "chrome_px": 124452,
+    "content_px": 1626242,
+    "max_chrome_share": 0.108,
+    "max_content_share": 0.048,
     "issues": [],
     "verdict": "smooth"
   },
   "control-home-to-settings": {
-    "frames": 26,
-    "chrome_px": 78941,
-    "content_px": 317290,
-    "max_chrome_share": 0.222,
-    "max_content_share": 0.652,
+    "frames": 18,
+    "chrome_px": 31991,
+    "content_px": 219541,
+    "max_chrome_share": 0.214,
+    "max_content_share": 0.468,
     "issues": [
-      "chrome jump frame 4: 22% of chrome change",
-      "chrome jump frame 25: 15% of chrome change",
-      "content hard cut frame 4: 65% of content change"
+      "chrome jump frame 5: 9% of chrome change"
     ],
     "verdict": "pop"
   },
   "home-card-to-checkin": {
-    "frames": 50,
-    "chrome_px": 83860,
-    "content_px": 470842,
-    "max_chrome_share": 0.174,
-    "max_content_share": 0.43,
-    "issues": [
-      "chrome jump frame 4: 17% of chrome change",
-      "chrome jump frame 16: 10% of chrome change",
-      "chrome jump frame 20: 9% of chrome change"
-    ],
-    "verdict": "pop"
+    "frames": 69,
+    "chrome_px": 36303,
+    "content_px": 329607,
+    "max_chrome_share": 0.165,
+    "max_content_share": 0.133,
+    "issues": [],
+    "verdict": "smooth"
   },
   "this-week-to-checkin": {
-    "frames": 8,
-    "chrome_px": 18504,
-    "content_px": 219868,
-    "max_chrome_share": 0.886,
-    "max_content_share": 0.941,
-    "issues": [
-      "chrome jump frame 4: 89% of chrome change",
-      "content hard cut frame 4: 94% of content change"
-    ],
-    "verdict": "pop"
+    "frames": 44,
+    "chrome_px": 35913,
+    "content_px": 289164,
+    "max_chrome_share": 0.3,
+    "max_content_share": 0.374,
+    "issues": [],
+    "verdict": "smooth"
   }
 }
