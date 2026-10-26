@@ -41,14 +41,14 @@ export function StatTiles({ items, enter }: { items: StatTile[]; enter?: boolean
   return (
     <div className={cn(CARD, 'grid grid-cols-2 overflow-hidden', enter && 'enter-tiles')}>
       {items.map((item, index) => (
-        <div key={item.label} className={cn('flex flex-col px-5 py-4', index % 2 === 1 && 'border-l border-ink-06', index > 1 && 'border-t border-ink-06')}>
-          <span className="text-[13px] font-semibold text-ink-65">{item.label}</span>
+        <div key={item.label} className={cn('flex flex-col px-4 py-3.5', index % 2 === 1 && 'border-l border-ink-06', index > 1 && 'border-t border-ink-06')}>
+          <span className="text-label text-ink-65">{item.label}</span>
           <span className="mt-1 flex h-6 items-baseline gap-1">
-            <span className="font-wide text-[20px] font-bold leading-none tracking-[-0.3px] text-ink tabular-nums">{item.value}</span>
+            <span className="font-display text-[20px] font-[750] leading-none tracking-[-0.015em] text-ink tabular-nums">{item.value}</span>
             {item.unit && item.value !== '—' ? <span className="text-[13px] font-semibold text-ink-65">{item.unit}</span> : null}
           </span>
           {item.fraction == null ? null : <Meter fraction={item.fraction} index={index} />}
-          {item.sub ? <span className="mt-2 block truncate text-[12px] font-medium text-ink-65">{item.sub}</span> : null}
+          {item.sub ? <span className="mt-1.5 block truncate text-caption text-ink-65">{item.sub}</span> : null}
         </div>
       ))}
     </div>

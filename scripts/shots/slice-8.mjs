@@ -16,7 +16,7 @@ const lg = (type, offset, payload, hour = 8) => ({ id: `${type}-${offset}-${hour
 
 const PROFILE = { id: 'capture-user', full_name: 'Sam Rivera', ai_consent_at: '2026-10-24T00:00:00Z', health_disclaimer_ack_at: '2026-10-24T00:00:00Z', current_weight_kg: 78.2, daily_calorie_target: 1950, daily_protein_g: 140, daily_carbs_g: 190, daily_fat_g: 65, daily_targets_missing_fields: [] }
 const PLANS = [
-  { id: 'meal-1', type: 'meal', is_active: true, name: 'Lean and steady', content: { daily_targets: { calories: 1950, protein: 140, carbs: 190, fat: 65 }, days: [] } },
+  { id: 'meal-1', type: 'meal', status: 'active', is_active: true, name: 'Lean and steady', content: { name: 'Lean and steady', daily_targets: { calories: 1950, protein: 140, carbs: 190, fat: 65 }, days: [] } },
   { id: 'work-1', type: 'workout', is_active: true, name: 'Four-day upper lower', content: { days: [{ name: 'Upper A', exercises: [1, 2, 3, 4, 5] }, { name: 'Lower A', exercises: [1, 2, 3, 4] }, { name: 'Upper B', exercises: [1, 2, 3, 4, 5] }, { name: 'Lower B', exercises: [1, 2, 3, 4] }] } },
 ]
 const LOGS = [

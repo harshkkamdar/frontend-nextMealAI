@@ -1,7 +1,6 @@
 'use client'
 
 import { useId } from 'react'
-import { WeightFill } from '@/components/ui/fiqr/icons'
 import { DRAW_MS } from '@/lib/motion'
 import { formatDelta } from './format'
 import { CARD, useDrawn } from './parts'
@@ -18,7 +17,7 @@ interface WeightTrendCardProps {
   hideDelta?: boolean
 }
 
-const H = 72
+const H = 84
 
 /** y per point in a 0..100 x 0..H box, 6 px headroom so the end dot never clips. */
 function chartY(points: WeightTrendCardProps['points']): number[] {
@@ -37,16 +36,18 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
   const line = ys.map((y, index) => `${(index / (ys.length - 1)) * 100},${y.toFixed(2)}`).join(' ')
 
   return (
-    <section className={`${CARD} p-5`} aria-label="Weight trend">
-      <span className="flex items-center gap-1.5 text-[13px] font-semibold text-ink-65">
-        <WeightFill className="size-4" />Weight trend
-      </span>
-      <div className="mt-2 flex items-baseline gap-1">
-        <span className="font-wide text-[32px] font-bold leading-none tracking-[-0.8px] text-ink tabular-nums">
+    <section className={`${CARD} p-4`} aria-label="Weight trend">
+      <div className="flex items-center gap-2">
+        <span className="text-label text-ink-65">Weight</span>
+        {/* Right: where the weigh-ins come from (Q32), else how far back the line reaches. */}
+        <span className="ml-auto text-label text-ink-65">{source ?? (points.length >= 2 ? `${points.length} weeks` : null)}</span>
+      </div>
+      <div className="mt-1 flex items-baseline gap-1">
+        <span className="font-display text-[20px] font-[750] leading-none tracking-[-0.015em] text-ink tabular-nums">
           {currentKg === null ? '—' : currentKg.toFixed(1)}
         </span>
-        {currentKg === null ? null : <span className="text-[14px] font-semibold text-ink-65">kg</span>}
-        {deltaKg === null || hideDelta ? null : <span className="ml-auto text-[13px] font-semibold text-ink-65 tabular-nums">{formatDelta(deltaKg)} kg this week</span>}
+        {currentKg === null ? null : <span className="text-caption font-semibold text-ink-65">kg</span>}
+        {deltaKg === null || hideDelta ? null : <span className="ml-auto text-caption font-semibold text-ink-65 tabular-nums">{formatDelta(deltaKg)} kg this week</span>}
       </div>
 
       {ys.length === 0 ? (
@@ -57,7 +58,7 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
       ) : (
         <div className="mt-4 flex gap-2">
         {/* Min and max ticks, level with the gridlines they label. */}
-        <span aria-hidden="true" className="relative w-8 shrink-0 text-[11px] font-medium text-ink-65 tabular-nums" style={{ height: H }}>
+        <span aria-hidden="true" className="relative w-8 shrink-0 text-label font-medium text-ink-65 tabular-nums" style={{ height: H }}>
           <span className="absolute left-0 top-[6px] -translate-y-1/2">{Math.max(...kgs).toFixed(1)}</span>
           <span className="absolute left-0 -translate-y-1/2" style={{ top: H - 6 }}>{Math.min(...kgs).toFixed(1)}</span>
         </span>
@@ -85,13 +86,11 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
         </div>
       )}
       {ys.length ? (
-        <div aria-hidden="true" className="mt-2 flex justify-between pl-10 text-[11px] font-medium text-ink-65">
-          <span>{points.length - 1} wk ago</span>
+        <div aria-hidden="true" className="mt-2 flex justify-between pl-10 text-caption text-ink-65">
+          <span>{points.length - 1} weeks ago</span>
           <span>Now</span>
         </div>
       ) : null}
-
-      {source ? <p className="mt-3 text-[12px] font-medium text-ink-65">Includes {source} weigh-ins</p> : null}
     </section>
   )
 }

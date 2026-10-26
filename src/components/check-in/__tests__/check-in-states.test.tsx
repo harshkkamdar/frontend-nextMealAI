@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mocks.push, back: vi.fn(), replace: vi.fn() }),
+  usePathname: () => '/check-in',
 }))
 
 vi.mock('sonner', () => ({
@@ -26,8 +27,10 @@ vi.mock('@/lib/api/check-in.api', () => ({
   getCheckInStatus: vi.fn(),
 }))
 
+// Today's intake and the four current targets ride on a second query ('check-in-today').
+const TODAY = { eaten: { calories: 1240, protein: 92, carbs: 120, fat: 38 }, carbs: 248, fat: 72, planName: 'Lean cut' }
 vi.mock('@/hooks/use-cached-query', () => ({
-  useCachedQuery: () => mocks.query(),
+  useCachedQuery: (key: string) => key === 'check-in' ? mocks.query() : { data: TODAY, loading: false, error: null, refetch: vi.fn() },
 }))
 
 vi.mock('@/hooks/use-sync-refetch', () => ({
@@ -167,17 +170,40 @@ describe('check-in states', () => {
     expect(mocks.push).toHaveBeenCalledWith('/dashboard')
   })
 
-  it('settles the proposal into the new targets in place after apply', async () => {
+  it('shows all four targets Apply writes, as their effect on today', () => {
     renderStatus(baseStatus)
-    expect(screen.getByText('2,200')).not.toHaveAttribute('aria-hidden')
+    // 2380 kcal: fat round(2380 * 0.28 / 9) = 74, carbs round((2380 - 660 - 666) / 4) = 264
+    expect(screen.getByText(/of 264 g/)).toBeInTheDocument()
+    expect(screen.getByText(/of 74 g/)).toBeInTheDocument()
+    expect(screen.getByLabelText('was 248 g')).toBeInTheDocument()
+    expect(screen.getByText('1,140')).toBeInTheDocument()
+    expect(screen.getByText('Calories, carbs and fat go up; protein stays. Lean cut updates too.')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+    expect(screen.getByText('960')).toBeInTheDocument()
+    expect(screen.getByText(/of 248 g/)).toBeInTheDocument()
+  })
+
+  it('settles into what the backend saved and swaps Apply for Done', async () => {
+    mocks.applyCheckIn.mockResolvedValue({ applied: true, new_calorie_target: 2300, new_protein_target_g: 165 })
+    renderStatus(baseStatus)
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
 
-    await waitFor(() => expect(screen.getByText('Your new targets')).toBeInTheDocument())
-    expect(screen.getByText('2,380')).toBeInTheDocument()
-    expect(screen.getByText('2,200').closest('[aria-hidden="true"]')).not.toBeNull()
-    expect(screen.getByRole('button', { name: 'Done' }).closest('[inert]')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Apply new targets' }).closest('[inert]')).not.toBeNull()
+    await waitFor(() => expect(screen.getByText('Saved. Home, your food diary and Lean cut now use 2,300 kcal.')).toBeInTheDocument())
+    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Apply new targets' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'New targets' })).not.toBeInTheDocument()
+  })
+
+  it('says nothing changed when the backend applied nothing', async () => {
+    mocks.applyCheckIn.mockResolvedValue({ applied: false, new_calorie_target: null })
+    renderStatus(baseStatus)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
+
+    await waitFor(() => expect(screen.getByText('Nothing changed. Your targets are still 2,200 kcal.')).toBeInTheDocument())
+    expect(mocks.toastSuccess).not.toHaveBeenCalled()
   })
 
   it('keeps the proposal and says so when apply fails', async () => {
@@ -186,16 +212,25 @@ describe('check-in states', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
 
-    await waitFor(() => expect(mocks.toastError).toHaveBeenCalledWith("That didn't save. Try again."))
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("That didn't save, so your targets are still 2,200 kcal."))
     expect(refetch).not.toHaveBeenCalled()
-    expect(screen.getByRole('button', { name: 'Apply new targets' })).toBeEnabled()
-    expect(screen.getByRole('button', { name: 'Done' }).closest('[inert]')).not.toBeNull()
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled()
+    expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument()
+  })
+
+  it('keeps targets on a hold without calling Apply', () => {
+    renderStatus({ ...baseStatus, proposal: { new_calories: 2200, new_protein_g: 165, calorie_change_pct: 0, direction: 'hold' } })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Keep my targets' }))
+
+    expect(mocks.applyCheckIn).not.toHaveBeenCalled()
+    expect(mocks.toastSuccess).toHaveBeenCalledWith('Targets unchanged')
   })
 
   it('labels weigh-ins that come from the Health app', async () => {
     mocks.health = { label: 'Apple Health', connected: true }
     renderStatus(baseStatus)
 
-    expect(await screen.findByText('Includes Apple Health weigh-ins')).toBeInTheDocument()
+    expect(await screen.findByText('Apple Health')).toBeInTheDocument()
   })
 })
