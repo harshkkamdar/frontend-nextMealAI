@@ -1,0 +1,1093 @@
+<title>FIQR Ask Geo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap">
+<style>/* Page chrome: theme-aware. Phones below are light only (brief). */
+:root{--bg:#F4EEE4;--surface:#FFFDF9;--fg:#111C35;--muted:#566079;--line:rgba(17,28,53,.12);--tint:rgba(17,28,53,.05);--accent:#C9501E;--accent-ink:#fff;--rec:#1F5E59}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1524;--surface:#172036;--fg:#F1EBE0;--muted:#AAB2C4;--line:rgba(241,235,224,.14);--tint:rgba(241,235,224,.06);--accent:#F07A47;--accent-ink:#111C35;--rec:#7CC2BB;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1524;--surface:#172036;--fg:#F1EBE0;--muted:#AAB2C4;--line:rgba(241,235,224,.14);--tint:rgba(241,235,224,.06);--accent:#F07A47;--accent-ink:#111C35;--rec:#7CC2BB;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Archivo,system-ui,sans-serif;font-size:16px;line-height:1.5;padding:32px max(16px,env(safe-area-inset-right,0px)) 120px max(16px,env(safe-area-inset-left,0px));overflow-x:hidden}
+.pg{max-width:1320px;margin:0 auto}
+.pg h1{font-size:clamp(34px,6vw,60px);font-weight:800;font-stretch:115%;letter-spacing:-.025em;line-height:1;margin:0 0 14px}
+.pg h2{font-size:clamp(24px,3.4vw,34px);font-weight:800;font-stretch:110%;letter-spacing:-.02em;line-height:1.1;margin:72px 0 10px}
+.pg h3{font-size:19px;font-weight:700;font-stretch:106%;margin:28px 0 8px;line-height:1.25}
+.pg p,.pg li{max-width:70ch}
+.pg .lede{font-size:18px;color:var(--muted);margin:0 0 8px}
+.pg .muted{color:var(--muted)}
+.pg a{color:inherit;text-underline-offset:.18em;text-decoration-thickness:.07em}
+.pg :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.jobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:24px 0}
+.jobs div{background:var(--surface);border-radius:20px;padding:18px 20px}
+.jobs b{display:block;font-size:30px;font-weight:800;font-stretch:110%;line-height:1;font-variant-numeric:tabular-nums}
+.jobs span{display:block;color:var(--muted);font-size:14px;margin-top:6px}
+.flow{background:var(--surface);border-radius:24px;padding:16px;overflow-x:auto}
+.flow svg{display:block;width:100%;min-width:640px;height:auto;color:var(--fg)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.scard{background:var(--surface);border-radius:20px;padding:18px 20px;font-size:14.5px}
+.scard h3{margin:0 0 2px}
+.scard dl{margin:10px 0 0;display:grid;grid-template-columns:108px 1fr;gap:6px 12px}
+.scard dt{color:var(--muted)}
+.scard dd{margin:0}
+.tbl{overflow-x:auto;background:var(--surface);border-radius:20px;padding:6px 4px}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+.tbl th,.tbl td{text-align:left;padding:9px 12px;vertical-align:top;border-bottom:1px solid var(--line)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{font-weight:600;color:var(--muted);font-size:13px}
+.tbl td.n{text-align:right;font-variant-numeric:tabular-nums}
+.tbl td.blank{min-width:110px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(318px,1fr));gap:40px 24px;margin-top:20px}
+.opt{display:flex;flex-direction:column;gap:12px;min-width:0}
+.opt-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}
+.opt-h h3{margin:0}
+.rec{font-size:13px;font-weight:700;color:var(--rec);background:color-mix(in srgb,var(--rec) 14%,transparent);border-radius:999px;padding:3px 10px}
+.opt>p{margin:0;font-size:14.5px;color:var(--muted)}
+.opt .why{color:var(--fg)}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{font:600 13px Archivo,system-ui,sans-serif;color:var(--fg);background:var(--tint);border:0;border-radius:999px;padding:0 12px;min-height:34px;cursor:pointer}
+.sw button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.meas{font-size:13.5px;background:var(--surface);border-radius:16px;padding:6px 14px}
+.meas div{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--line)}
+.meas div:last-child{border-bottom:0}
+.meas span:first-child{color:var(--muted)}
+.meas b{font-weight:650;font-variant-numeric:tabular-nums;text-align:right}
+.pick{align-self:flex-start;font:600 14px Archivo,system-ui,sans-serif;border-radius:999px;padding:0 18px;min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.pick[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.note{background:var(--surface);border-radius:20px;padding:16px 20px;margin:16px 0;font-size:15px}
+.note ul,.note ol{margin:6px 0 0;padding-left:20px}
+.note li{margin:4px 0}
+.tray{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 18px;box-shadow:0 12px 40px -12px rgba(0,0,0,.35);max-width:calc(100% - 32px);font-size:14px}
+.tray output{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tray button{font:600 14px Archivo,system-ui,sans-serif;border-radius:999px;padding:0 16px;min-height:44px;border:0;background:var(--fg);color:var(--bg);cursor:pointer;flex:none}
+@media (max-width:420px){.opts{grid-template-columns:1fr}.scard dl{grid-template-columns:92px 1fr}}
+
+/* ---------- Phones (light only). All scoped under .gp; ids are prefixed per phone. ---------- */
+.gp{--ink:#111C35;--cr:#FDF6EC;--or:#E8622A;--te:#3E7C77;--oc:#A07A3C;--mu:rgba(17,28,53,.66);--t04:rgba(17,28,53,.04);--t06:rgba(17,28,53,.06);--t08:rgba(17,28,53,.08);--t12:rgba(17,28,53,.12);--out:cubic-bezier(.22,1,.36,1);
+position:absolute;left:0;top:0;width:390px;height:844px;transform:scale(var(--k,.7692));transform-origin:0 0;flex:none;border-radius:56px;border:1px solid rgba(17,28,53,.1);overflow:hidden;background:#FBF2E6;color:var(--ink);font-family:Archivo,system-ui,sans-serif;font-size:16px;line-height:1.35;isolation:isolate;text-align:left;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;box-shadow:0 30px 60px -30px rgba(17,28,53,.35)}
+.gp *{box-sizing:border-box}
+.gp button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit;touch-action:manipulation}
+.gp button:focus-visible,.gp textarea:focus-visible,.gp input:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+.gp h2,.gp h3,.gp p,.gp ul{margin:0;padding:0}
+.gp ul{list-style:none}
+.gp .ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.gp .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.gp .bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.gp .bg i{position:absolute;display:block}
+.gp .bg .b1{left:-80px;top:110px;width:270px;height:270px;border-radius:50%;background:radial-gradient(closest-side,rgba(232,98,42,.12),rgba(232,98,42,0))}
+.gp .bg .b2{right:-100px;top:400px;width:310px;height:310px;border-radius:50%;background:radial-gradient(closest-side,rgba(62,124,119,.13),rgba(62,124,119,0))}
+.gp .bg .b3{right:-46px;top:64px;width:140px;height:140px;border-radius:42px;transform:rotate(18deg);background:linear-gradient(160deg,rgba(255,255,255,.7),rgba(255,255,255,.06));box-shadow:0 30px 50px -34px rgba(17,28,53,.22)}
+.gp .stage{position:absolute;inset:0;z-index:1;transform-origin:50% 40%;transition:transform var(--sprd) var(--spr),filter .4s}
+.gp.is-sheet .stage,.gp.is-picker .stage{transform:scale(.94) translateY(8px);filter:blur(1.2px) brightness(.97)}
+.gp.is-drag .stage,.gp.is-drag .layer,.gp.is-drag .sheet{transition:none}
+.gp .layer{position:absolute;inset:0;transform-origin:50% 45%;transition:transform var(--sprd) var(--spr),opacity .4s,filter .4s}
+.gp .layer.push{z-index:3;transform:translateX(102%);background:rgba(251,242,230,.94);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);box-shadow:-20px 0 50px -20px rgba(17,28,53,.35)}
+.gp.is-push .layer.base{transform:scale(.94) translateX(-5%);opacity:.5;filter:blur(1px)}
+.gp.is-push .layer.push{transform:none}
+.gp .scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:62px 16px 124px}
+.gp .scroll::-webkit-scrollbar{display:none}
+.gp .status{position:absolute;top:0;left:0;right:0;height:54px;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:6px 34px 0 46px;font-weight:650;font-size:17px;pointer-events:none;font-variant-numeric:tabular-nums}
+.gp .sic{display:flex;align-items:flex-end;gap:2px}.gp .sic i{width:3px;background:var(--ink);border-radius:1px}.gp .sic i:nth-child(1){height:5px}.gp .sic i:nth-child(2){height:7px}.gp .sic i:nth-child(3){height:9px}
+.gp .sic b{width:20px;height:10px;border-radius:3px;margin-left:5px;border:1px solid rgba(17,28,53,.45);background:linear-gradient(90deg,var(--ink) 70%,transparent 0) 1px/calc(100% - 2px) calc(100% - 2px) no-repeat}
+.gp .topfade{position:absolute;top:0;left:0;right:0;height:128px;z-index:4;pointer-events:none;background:linear-gradient(#FBF2E6 80%,rgba(251,242,230,0));transition:opacity .25s}
+/* glass controls */
+.gp .glass{background:rgba(255,255,255,.6);-webkit-backdrop-filter:blur(16px) saturate(1.8);backdrop-filter:blur(16px) saturate(1.8);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 0 0 1px rgba(255,255,255,.5),0 0 0 .5px rgba(17,28,53,.1),0 8px 22px -10px rgba(17,28,53,.3)}
+.gp .rb{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none;transition:transform .2s var(--out)}
+.gp .rb:active,.gp .rb.is-down{transform:scale(.92)}
+/* large title header */
+.gp .lt{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:6px 2px 14px}
+.gp .lt h2{font-size:30px;font-weight:800;font-stretch:104%;letter-spacing:-.025em;line-height:1}
+.gp .lt p{margin-top:5px;font-size:14px;font-weight:500;color:var(--mu)}
+/* pushed header */
+.gp .ph{position:absolute;top:54px;left:0;right:0;z-index:6;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;padding:0 12px;height:52px}
+.gp .ph h2{font-size:17px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* white content cards (Q3: content stays solid) */
+.gp .card{background:#fff;border-radius:22px;box-shadow:0 1px 2px rgba(17,28,53,.05),0 10px 22px -18px rgba(17,28,53,.28)}
+/* Ask Geo field */
+.gp .ask{display:flex;align-items:center;gap:4px;height:60px;border-radius:30px;padding:0 8px 0 20px;background:#fff;box-shadow:0 1px 2px rgba(17,28,53,.05),0 10px 22px -18px rgba(17,28,53,.28)}
+.gp .ask input{flex:1;min-width:0;height:100%;border:0;background:none;font:500 16px Archivo,system-ui,sans-serif;color:var(--ink);outline:none;-webkit-user-select:text;user-select:text;caret-color:var(--or)}
+.gp .ask input::placeholder,.gp textarea::placeholder{color:rgba(17,28,53,.56)}
+.gp .send{position:relative;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--t06);color:rgba(17,28,53,.4);flex:none;transition:transform .15s}
+.gp .send::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--or);opacity:0;transition:opacity .15s}
+.gp .send .ic{position:relative;z-index:1;transition:color .15s}
+.gp .send.on{color:#fff}.gp .send.on::after{opacity:1}
+.gp .send.on:active{transform:scale(.92)}
+.gp .sl{font-size:13px;font-weight:600;color:var(--mu);margin:26px 4px 8px}
+/* conversation rows */
+.gp .rows li{display:flex;align-items:center;min-height:60px;position:relative}
+.gp .rows li+li::before{content:"";position:absolute;left:18px;right:0;top:0;height:1px;background:var(--t06)}
+.gp .row{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 0 9px 16px;min-height:60px;transition:transform .12s}
+.gp .row:active{transform:scale(.985)}
+.gp .rt{display:flex;align-items:baseline;gap:8px}
+.gp .rt b{flex:1;min-width:0;font-size:16px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp .rt time{flex:none;font-size:12px;font-weight:500;color:var(--mu);font-variant-numeric:tabular-nums}
+.gp .rp{font-size:14px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp .more{width:44px;height:44px;display:grid;place-items:center;color:var(--mu);flex:none;margin-right:2px}
+.gp .older{display:block;width:100%;min-height:44px;margin-top:8px;font-size:15px;font-weight:600;color:var(--ink);text-align:center;border-radius:22px}
+.gp .older:active{background:var(--t06)}
+.gp .first{padding:18px;display:flex;flex-direction:column;gap:12px}
+.gp .first p{font-size:16px;line-height:1.5}
+.gp .ex{display:flex;flex-direction:column;gap:6px}
+.gp .ex button{min-height:44px;border-radius:14px;background:var(--t04);padding:10px 14px;font-size:15px;font-weight:600;text-align:left}
+.gp .skel li{min-height:68px;padding:14px 18px;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.gp .skel li+li{box-shadow:inset 0 1px 0 var(--t06)}
+.gp .bar{display:block;height:13px;border-radius:7px;background:var(--t06)}
+.gp .bar.s{height:10px;background:var(--t04)}
+.gp .err{padding:16px;font-size:15px;line-height:1.5}
+.gp .err button{display:inline-flex;align-items:center;min-height:44px;font-weight:700;margin:2px 0 -10px;text-decoration:underline;text-underline-offset:.2em}
+.gp .off{display:flex;gap:10px;align-items:center;margin:0 0 12px;padding:10px 14px;border-radius:16px;background:var(--t06);font-size:14px;line-height:1.35}
+.gp .off .ic{width:18px;height:18px}
+/* tab bar (o01 Minimise to Circle) + ink orb (Q4: never orange) */
+.gp .tabs{position:absolute;left:16px;bottom:22px;width:248px;height:52px;border-radius:26px;z-index:7;overflow:hidden;clip-path:inset(0 0 0 0 round 26px);transition:clip-path var(--sprd) var(--spr),transform var(--sprd) var(--spr),opacity .3s}
+.gp .trow{position:absolute;left:4px;top:4px;display:flex;transition:transform var(--sprd) var(--spr)}
+.gp .tab{width:60px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:11px;font-weight:650;color:rgba(17,28,53,.58);border-radius:22px;transition:opacity .22s,color .2s}
+.gp .tab[aria-current="page"]{color:var(--ink);background:var(--t08)}
+.gp .tab .ic{width:19px;height:19px}
+.gp .tn{transition:opacity .2s}
+.gp .orb{position:absolute;right:16px;bottom:22px;width:52px;height:52px;border-radius:50%;z-index:7;display:grid;place-items:center;color:#fff;background:var(--ink);box-shadow:inset 0 1px 1px rgba(255,255,255,.3),0 10px 22px -10px rgba(17,28,53,.6);transition:transform var(--sprd) var(--spr),opacity .3s}
+.gp .orb .ic{width:22px;height:22px}
+.gp.is-min .tabs{clip-path:inset(4px 200px 4px 4px round 22px)}
+.gp.is-min .trow{transform:translateX(calc(-1*var(--ai,3)*60px))}
+.gp.is-min .tab:not([aria-current]),.gp.is-min .tn{opacity:0}
+.gp.is-min .tab[aria-current]{background:none}
+.gp.is-push .tabs,.gp.is-push .orb,.gp.is-picker .tabs,.gp.is-sheet .tabs,.gp.is-sheet .orb{opacity:0;transform:translateY(18px) scale(.9);pointer-events:none}
+/* sheet: floats forward while the screen steps back */
+.gp .scrim{position:absolute;inset:0;z-index:8;background:rgba(17,28,53,.14);opacity:0;pointer-events:none;transition:opacity .35s}
+.gp.is-sheet .scrim,.gp.is-picker .scrim{opacity:1;pointer-events:auto}
+.gp .sheet{position:absolute;left:10px;right:10px;bottom:10px;z-index:9;border-radius:38px;padding:8px 16px 20px;display:flex;flex-direction:column;max-height:calc(100% - 66px);background:rgba(255,255,255,.84);-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(17,28,53,.08),0 12px 24px -10px rgba(17,28,53,.2),0 50px 90px -30px rgba(17,28,53,.5);transform:translateY(70px) scale(.88);opacity:0;transform-origin:50% 100%;pointer-events:none;transition:transform var(--sprd) var(--spr),opacity .25s,height var(--sprd) var(--spr)}
+.gp.is-sheet .sheet:not([data-picker]),.gp.is-picker .sheet[data-picker]{transform:translateY(var(--dy,0px));opacity:1;pointer-events:auto}
+.gp .grab{display:block;width:100%;height:22px;flex:none;position:relative;touch-action:none;cursor:grab}
+.gp .grab::after{content:"";position:absolute;left:50%;top:7px;width:36px;height:5px;margin-left:-18px;border-radius:3px;background:rgba(17,28,53,.2)}
+.gp .sh-t{font-size:15px;font-weight:650;color:var(--mu);padding:0 4px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp .sh-h{font-size:18px;font-weight:800;font-stretch:108%;letter-spacing:-.015em;padding:2px 4px 4px;line-height:1.2}
+.gp .sh-p{font-size:14px;color:var(--mu);padding:0 4px 12px;line-height:1.45}
+.gp .grp{background:#fff;border-radius:18px;overflow:hidden}
+.gp .grp button{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0 16px;font-size:16px;font-weight:550}
+.gp .grp button+button{box-shadow:inset 0 1px 0 var(--t06)}
+.gp .grp button:active{background:var(--t04)}
+.gp .grp .ic{width:19px;height:19px;color:var(--mu)}
+.gp .grp .chk{margin-left:auto;color:var(--ink);opacity:0;transition:opacity .15s}
+.gp .grp [aria-pressed="true"]{font-weight:700}
+.gp .grp [aria-pressed="true"] .chk{opacity:1}
+.gp .cancel{display:block;width:100%;min-height:44px;margin-top:6px;font-size:16px;font-weight:650;color:var(--mu);text-align:center}
+.gp .btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:50px;border-radius:25px;font-size:16px;font-weight:700;background:var(--ink);color:#fff;margin-top:12px;transition:transform .15s,opacity .2s}
+.gp .btn.or{background:var(--or)}
+.gp .btn:disabled{opacity:.35;cursor:default}
+.gp .btn:active:not(:disabled){transform:scale(.97)}
+.gp .fld{width:100%;min-height:60px;border-radius:16px;border:0;background:#fff;padding:12px 16px;font:500 16px Archivo,system-ui,sans-serif;color:var(--ink);outline:1.5px solid var(--ink);outline-offset:-1.5px;-webkit-user-select:text;user-select:text;resize:none}
+.gp textarea.fld{outline:0;min-height:76px;font-weight:450;line-height:1.45}
+.gp .count{font-size:13px;color:var(--mu);text-align:right;padding:6px 4px 0;font-variant-numeric:tabular-nums}
+.gp .ferr{font-size:14px;padding:10px 4px 0;line-height:1.4}
+/* toast */
+.gp .toast{position:absolute;left:50%;top:60px;z-index:20;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 6px 0 18px;border-radius:24px;font-size:14px;font-weight:600;white-space:nowrap;transform:translate(-50%,-90px);transition:transform var(--sprd) var(--spr)}
+.gp .toast.on{transform:translate(-50%,0)}
+.gp .toast button{min-height:36px;padding:0 12px;border-radius:18px;background:var(--t08);font-weight:700}
+/* thread */
+.gp .thread{display:flex;flex-direction:column;gap:22px;padding:120px 16px 0}
+.gp .tu{align-self:flex-end;max-width:82%;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.gp .pill{background:rgba(17,28,53,.075);border-radius:20px;padding:9px 14px;font-size:16px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
+.gp .nf{font-size:13px;color:var(--mu);display:flex;align-items:center;gap:2px}
+.gp .nf button{min-height:44px;margin:-12px 0;padding:0 6px;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:.2em}
+.gp .tg{display:flex;flex-direction:column;gap:10px;min-width:0}
+.gp .anc{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;height:22px}
+.gp .face{width:22px;height:22px;flex:none;display:block}
+.gp .gt{font-size:16px;line-height:1.35;display:flex;flex-direction:column;gap:8px;overflow-wrap:anywhere}
+.gp .gt ul,.gp .gt ol{padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.gp .gt ul{list-style:disc}.gp .gt ol{list-style:decimal}
+.gp .gt b{font-weight:700}
+.gp .tm{align-self:flex-start;min-height:44px;margin:-12px 0 -16px -10px;padding:0 10px;font-size:13px;font-weight:500;color:var(--mu);font-variant-numeric:tabular-nums}
+.gp .hu{background:var(--t06);border-radius:16px;padding:12px 16px;font-size:14px;line-height:1.45}
+.gp .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:-6px}
+.gp .chip{min-height:44px;max-width:100%;padding:0 16px;border-radius:22px;background:#fff;font-size:15px;font-weight:650;box-shadow:0 1px 2px rgba(17,28,53,.06),0 8px 18px -14px rgba(17,28,53,.4);transition:transform .15s}
+.gp .chip:active{transform:scale(.95)}
+.gp .typing{display:flex;gap:6px;align-items:center;height:22px}
+.gp .typing i{width:7px;height:7px;border-radius:50%;background:rgba(17,28,53,.55);animation:gpdot 1s ease-in-out infinite}
+.gp .typing i:nth-child(2){animation-delay:.16s}.gp .typing i:nth-child(3){animation-delay:.32s}
+@keyframes gpdot{0%,100%{opacity:.3}50%{opacity:1}}
+.gp .fresh{animation:gpin .32s var(--out) both}
+@keyframes gpin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.gp .intro{display:flex;flex-direction:column;gap:12px;padding-top:6px}
+.gp .intro .face{width:36px;height:36px}
+.gp .intro p{font-size:16px;line-height:1.5}
+.gp .endpad{height:8px;flex:none}
+/* photos (CSS-drawn, no images) */
+.gp .pg1{display:grid;gap:6px}
+.gp .pg1.multi{grid-template-columns:1fr 1fr;width:250px}
+.gp .ph1{width:210px;height:180px;border-radius:20px}
+.gp .pg1.multi .ph1{width:100%;height:auto;aspect-ratio:1;border-radius:16px}
+.gp .f-lbl{background:linear-gradient(#fff 0 0) 22% 22%/56% 6px no-repeat,linear-gradient(#111C35 0 0) 22% 34%/56% 3px no-repeat,repeating-linear-gradient(#fff 0 9px,rgba(17,28,53,.25) 9px 10px) 22% 72%/56% 46% no-repeat,linear-gradient(160deg,#E9C77F,#C99C4E)}
+.gp .f-bun{background:radial-gradient(ellipse 34% 26% at 36% 46%,#C97A2B 0 70%,transparent 72%),radial-gradient(ellipse 30% 24% at 66% 56%,#D08A3A 0 70%,transparent 72%),radial-gradient(circle at 50% 50%,#F6EBD8,#E2CFAF 72%,#B99E76)}
+.gp .f-egg{background:radial-gradient(circle at 38% 44%,#F2B526 0 9%,#fff 10% 22%,transparent 23%),radial-gradient(circle at 64% 58%,#F2B526 0 8%,#fff 9% 20%,transparent 21%),radial-gradient(ellipse 60% 44% at 50% 52%,#C58A47 0 70%,transparent 72%),radial-gradient(circle,#FBF7EE,#E6D8C0 70%,#B9A27E)}
+.gp .f-bowl{background:radial-gradient(circle at 40% 40%,#7FA65A 0 12%,transparent 13%),radial-gradient(circle at 62% 60%,#E39380 0 12%,transparent 13%),radial-gradient(circle at 56% 36%,#F3D27A 0 9%,transparent 10%),radial-gradient(circle,#F3E0B8,#D7AE74 70%,#A3733A)}
+.gp .f-yog{background:radial-gradient(circle at 38% 38%,#B8364B 0 11%,transparent 12%),radial-gradient(circle at 64% 57%,#7E2A55 0 9%,transparent 10%),radial-gradient(circle,#FFFDF8,#F1E8D8 70%,#D5C7AF)}
+/* logged-food card variants */
+.gp .lc{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 1px 2px rgba(17,28,53,.05),0 10px 22px -18px rgba(17,28,53,.28);transition:opacity .3s}
+.gp .lch{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px 4px;font-size:13px;font-weight:650;color:var(--mu)}
+.gp .lch .ok{display:inline-flex;align-items:center;gap:6px}
+.gp .lch .ok .ic{width:15px;height:15px;color:var(--te);stroke-width:2.4}
+.gp .lch b{font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+.gp .lr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 16px;position:relative}
+.gp .lr+.lr::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--t06)}
+.gp .lr .fn{font-size:15px;font-weight:650;line-height:1.3;min-width:0;overflow-wrap:break-word}
+.gp .lr .fk{font-size:15px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gp .lr .fk small{font-size:13px;font-weight:500;color:var(--mu)}
+.gp .lr .fq{grid-column:1/-1;font-size:13px;color:var(--mu);display:flex;flex-wrap:wrap;gap:0 10px;font-variant-numeric:tabular-nums}
+.gp .md{display:inline-flex;align-items:center;gap:4px}
+.gp .md::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
+.gp .lca{display:flex;box-shadow:inset 0 1px 0 var(--t06)}
+.gp .lca button{flex:1;min-height:48px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+.gp .lca button+button{box-shadow:inset 1px 0 0 var(--t06)}
+.gp .lca button:active{background:var(--t04)}
+.gp .lca .ic{width:17px;height:17px}
+.gp .lca .pri{background:var(--ink);color:#fff}
+.gp .lc.undone .lr{opacity:.45}.gp .lc.undone .fn,.gp .lc.undone .fk{text-decoration:line-through;text-decoration-thickness:1.5px}
+.gp .lnote{font-size:13px;font-weight:600;color:var(--mu);padding:0 4px;margin-top:-4px}
+.gp .pd .lr .fn{font-weight:650}
+.gp .pdh{padding:12px 16px 2px}
+.gp .pdh b{display:block;font-size:18px;font-weight:750;line-height:1.25}
+.gp .pdh span{font-size:13px;color:var(--mu)}
+/* a3 ledger line */
+.gp .ledger{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:6px 12px 6px 8px;border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(17,28,53,.05),0 10px 22px -18px rgba(17,28,53,.28);text-align:left}
+.gp .ledger .rg{width:36px;height:36px;flex:none}
+.gp .ledger .lt1{flex:1;min-width:0;display:flex;flex-direction:column}
+.gp .ledger .lt1 b{font-size:15px;font-weight:700}
+.gp .ledger .lt1 span{font-size:13px;color:var(--mu);font-variant-numeric:tabular-nums}
+.gp .ledger .chev{width:18px;height:18px;color:var(--mu);transition:transform .25s var(--out)}
+.gp .ledger[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.gp .ledger.undone{opacity:.5}
+.gp .undo{position:absolute;left:50%;bottom:96px;z-index:7;display:flex;align-items:center;gap:6px;min-height:52px;padding:0 4px 0 16px;border-radius:26px;font-size:14px;font-weight:600;white-space:nowrap;transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:transform var(--sprd) var(--spr),opacity .2s}
+.gp .undo.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.gp .undo button{min-height:44px;padding:0 16px;border-radius:22px;background:var(--ink);color:#fff;font-weight:700}
+/* composer */
+.gp .cmpw{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:28px 12px 26px;background:linear-gradient(rgba(251,242,230,0),#FBF2E6 34px);pointer-events:none}
+.gp .cmpw>*{pointer-events:auto}
+.gp .cmp{border-radius:26px;padding:5px;background:rgba(253,246,236,.74);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 0 .5px rgba(17,28,53,.14),0 10px 26px -14px rgba(17,28,53,.35)}
+.gp .cmp.inline{background:#fff;box-shadow:0 0 0 1px var(--t08)}
+.gp .crow{display:flex;align-items:flex-end;gap:2px}
+.gp .cbtn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none;transition:transform .15s,opacity .2s}
+.gp .cbtn:active{transform:scale(.92)}
+.gp .cbtn:disabled{opacity:.35}
+.gp .ta{flex:1;min-width:0;min-height:44px;max-height:110px;border:0;background:none;resize:none;padding:11px 4px 11px 8px;font:450 16px/22px Archivo,system-ui,sans-serif;color:var(--ink);outline:none;-webkit-user-select:text;user-select:text;caret-color:var(--or)}
+.gp .ta:disabled{opacity:.6}
+.gp .thumbs{display:flex;flex-wrap:wrap;gap:10px;padding:8px 8px 2px}
+.gp .th{position:relative;width:60px;height:60px;border-radius:12px}
+.gp .th .x{position:absolute;right:-14px;top:-14px;width:44px;height:44px;display:grid;place-items:center}
+.gp .th .x span{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center}
+.gp .th .x .ic{width:12px;height:12px;stroke-width:2.6}
+.gp .th.up{background:var(--t06);display:grid;place-items:center}
+.gp .spin{width:20px;height:20px;border-radius:50%;border:2px solid var(--t12);border-top-color:var(--ink);animation:gpspin .8s linear infinite}
+@keyframes gpspin{to{transform:rotate(1turn)}}
+.gp .ccount{font-size:13px;color:var(--mu);padding:4px 10px 2px;font-variant-numeric:tabular-nums}
+.gp .rail{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 2px 8px;margin:0 -10px;padding-left:10px;padding-right:10px}
+.gp .rail::-webkit-scrollbar{display:none}
+.gp .rail .chip{flex:none;background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.gp .tray3{display:flex;gap:8px;padding:6px 4px 4px}
+.gp .tray3 button{flex:1;min-height:60px;border-radius:18px;background:var(--t04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:650}
+.gp .tray3 button:disabled{opacity:.45}
+.gp .camorb{width:54px;height:54px;border-radius:50%;flex:none;display:grid;place-items:center;align-self:flex-end}
+.gp .b3row{display:flex;gap:8px;align-items:flex-end}
+.gp .b3row .cmp{flex:1;min-width:0}
+.gp .vnote{font-size:13px;color:var(--mu);padding:0 6px 8px}
+/* native-like photo picker */
+.gp .pick2 .grp button{justify-content:center;font-weight:600;color:var(--ink)}
+.gp .cam{position:absolute;inset:0;z-index:25;background:#15181F;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:34px;opacity:0;pointer-events:none;transition:opacity .2s}
+.gp .cam.on{opacity:1;pointer-events:auto}
+.gp .cam .vf{position:absolute;inset:60px 18px 150px;border-radius:24px}
+.gp .cam .shut{width:70px;height:70px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}
+.gp .cam .shut::after{content:"";width:54px;height:54px;border-radius:50%;background:#fff}
+.gp .cam .cx{position:absolute;left:14px;top:46px;color:#fff;width:44px;height:44px;display:grid;place-items:center}
+/* home (companion host) */
+.gp .hero{display:grid;grid-template-columns:112px 1fr;gap:16px;align-items:center;padding:16px}
+.gp .ring{width:112px;height:112px;transform:rotate(-90deg);display:block}
+.gp .ring circle{fill:none;stroke-width:9}
+.gp .rw{position:relative}
+.gp .rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gp .rc b{font-size:24px;font-weight:800;font-stretch:108%;font-variant-numeric:tabular-nums;line-height:1.1}
+.gp .rc small{font-size:13px;color:var(--mu)}
+.gp .mcol{display:grid;gap:10px;font-size:13px}
+.gp .mcol div{display:flex;justify-content:space-between;gap:6px}
+.gp .mcol span{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.gp .mcol span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
+.gp .mcol em{font-style:normal;color:var(--mu);font-variant-numeric:tabular-nums}
+.gp .coach{display:flex;gap:10px;align-items:flex-start;padding:14px 16px 16px;box-shadow:inset 0 1px 0 var(--t06);font-size:14px;line-height:1.45;grid-column:1/-1;margin:0 -16px -16px}
+.gp .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.gp .tile{padding:14px;min-height:128px;border-radius:20px;display:flex;flex-direction:column;justify-content:space-between}
+.gp .tile span{font-size:12px;font-weight:600;color:var(--mu)}
+.gp .tile b{font-size:24px;font-weight:800;font-stretch:106%;font-variant-numeric:tabular-nums}
+.gp .tile b small{font-size:13px;font-weight:600;color:var(--mu)}
+/* companion */
+.gp .cp-h{display:flex;align-items:center;gap:10px;padding:0 0 10px;flex:none}
+.gp .cp-h .face{width:38px;height:38px}
+.gp .cp-h div{flex:1;min-width:0}
+.gp .cp-h b{display:block;font-size:18px;font-weight:800;font-stretch:108%;line-height:1.1}
+.gp .cp-h span{display:block;font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp .cp-h .rb{background:var(--t06)}
+.gp .cp-b{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:2px 2px 10px;display:flex;flex-direction:column;gap:16px}
+.gp .cp-b::-webkit-scrollbar{display:none}
+.gp .cp-b .thread{padding:0;gap:16px}
+.gp .cp-f{flex:none}
+.gp .cp-links{display:flex;justify-content:center;gap:2px;margin-bottom:2px}
+.gp .cp-links button{min-height:44px;padding:0 12px;font-size:14px;font-weight:650;color:var(--mu);border-radius:22px}
+.gp .ctx{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;min-height:30px;padding:0 12px;border-radius:15px;background:var(--t06);font-size:13px;font-weight:600}
+.gp .sheet.c1{height:56%;transition:transform var(--sprd) var(--spr),opacity .25s,height var(--sprd) var(--spr)}
+.gp .sheet.c1.full{height:calc(100% - 64px)}
+.gp .sheet.c2{left:auto;right:10px;top:58px;bottom:auto;width:344px;height:500px;border-radius:30px;transform-origin:calc(100% - 22px) 22px;transform:scale(.16);opacity:0}
+.gp.is-sheet .sheet.c2{transform:none;opacity:1}
+.gp .rp{display:flex;gap:8px}.gp .rp span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}.gp .rp time{flex:none;font-size:13px;font-weight:500;color:var(--mu);font-variant-numeric:tabular-nums}
+.gp .sheet.c2.full{top:58px;height:calc(100% - 68px);width:calc(100% - 20px)}
+.gp.c2open .stage{transform:none;filter:none}
+.gp.c2open .scrim{background:rgba(17,28,53,.05)}
+/* context menu over a reply */
+.gp .menu{position:absolute;z-index:12;left:16px;width:220px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(24px) saturate(1.8);backdrop-filter:blur(24px) saturate(1.8);box-shadow:0 0 0 .5px rgba(17,28,53,.1),0 20px 40px -16px rgba(17,28,53,.45);transform:scale(.9);opacity:0;transform-origin:20px 0;pointer-events:none;transition:transform .3s var(--spr),opacity .18s}
+.gp .menu.on{transform:none;opacity:1;pointer-events:auto}
+.gp .menu button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:48px;padding:0 16px;font-size:16px;font-weight:550}
+.gp .menu button+button{box-shadow:inset 0 1px 0 var(--t08)}
+.gp .menu .ic{width:18px;height:18px;color:var(--mu)}
+.gp .lift{position:relative;z-index:11;background:#fff;border-radius:18px;padding:10px 12px;margin:-10px -12px;box-shadow:0 20px 40px -18px rgba(17,28,53,.4);transform:scale(1.02);transition:transform .3s var(--spr)}
+.gp.is-menu .menuscrim{opacity:1;pointer-events:auto}
+.gp .menuscrim{position:absolute;inset:0;z-index:10;background:rgba(251,242,230,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s}
+@media (prefers-reduced-motion:reduce){.gp *,.gp *::before,.gp *::after{transition-duration:.16s!important;transition-timing-function:ease!important;animation:none!important}.gp .stage,.gp .layer,.gp .sheet,.gp .tabs,.gp .orb,.gp .toast,.gp .undo,.gp .menu{transform:none!important}.gp .layer.push{opacity:0}.gp.is-push .layer.push{opacity:1}.gp .toast{opacity:0}.gp .toast.on{opacity:1}.gp.is-push .layer.base{filter:none}.gp.is-sheet .stage,.gp.is-picker .stage{filter:none}.gp .typing i{opacity:.6}.gp .spin{border-top-color:var(--t12)}}
+@media (prefers-reduced-transparency:reduce){.gp .glass,.gp .sheet,.gp .cmp,.gp .layer.push,.gp .menu,.gp .rail .chip,.gp .menuscrim{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}.gp .glass,.gp .sheet,.gp .menu,.gp .rail .chip{background-color:#fff!important}.gp .cmp:not(.inline),.gp .layer.push{background:#FBF2E6!important}}
+.gp .ledger .ic.rg{width:24px;height:24px;margin:0 6px;color:var(--te)}
+
+.gs{position:relative;margin:0 auto;width:calc(390px*var(--k,.7692));height:calc(844px*var(--k,.7692));flex:none}
+.gs>.gp{box-shadow:0 40px 80px -36px rgba(17,28,53,.35)}
+.gp .botfade{position:absolute;left:0;right:0;bottom:0;height:120px;z-index:4;pointer-events:none;background:linear-gradient(rgba(251,242,230,0),#FBF2E6 70%)}
+</style>
+<main class="pg">
+<header>
+<h1>Ask Geo</h1>
+<p class="lede">The Geo tab, a conversation, Geo over any screen, and reporting a reply, in Spatial Depth with the Minimise to Circle tab bar. Every phone is live: type, send, tap chips, open a row, drag a sheet, swipe from the left edge to go back. The buttons above each phone switch its state.</p>
+<p class="muted">Built from the frontend routes <code>/chat</code> and <code>/chat/session</code>, <code>chat-thread</code>, <code>chat-bubble</code>, <code>chat-input</code>, <code>session-list</code>, <code>report-sheet</code>, <code>geo-companion-sheet</code>, and the backend orchestrator (tools, action tracking, the <code>[[choices: …]]</code> marker, the receipt-line rule) and chat controller. Sample data follows those shapes. 26 Oct 2026.</p>
+</header>
+
+<h2 id="summary">What people come here to do</h2>
+<div class="jobs">
+<div><b>Log by talking</b><span>“Had 2 eggs on sourdough and a flat white.” Geo searches, logs and echoes each item with its numbers. The most frequent job, several times a day.</span></div>
+<div><b>Ask and decide</b><span>What to eat next, how the week is going, swap an exercise. Geo answers, and offers 2 to 5 choices as chips when it needs a pick.</span></div>
+<div><b>Fix what Geo did</b><span>Undo, adjust, accept or change a draft plan. Rare per day, but it decides whether people trust Geo with the diary.</span></div>
+</div>
+<div class="flow" role="img" aria-label="Flow map: the Geo tab list opens a conversation; the + sheet's Tell Geo field and the Ask Geo field start a new one; the Geo button on any screen opens the companion sheet, which can open the same conversation in the Geo tab; a Geo reply opens Copy or Report; a row's options open Rename or Delete.">
+<svg viewBox="0 0 900 250" aria-hidden="true" font-family="Archivo, system-ui, sans-serif" font-size="13" fill="currentColor">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="currentColor" opacity=".55"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-opacity=".55" stroke-width="1.5" marker-end="url(#ar)">
+<path d="M170 60h120"/><path d="M170 190h120"/><path d="M450 60h118"/><path d="M450 70 570 178"/><path d="M380 92v66"/><path d="M640 92v54"/><path d="M380 158V92" stroke-dasharray="4 4"/>
+</g>
+<g><rect x="20" y="34" width="150" height="52" rx="16" fill="currentColor" fill-opacity=".07"/><text x="34" y="57" font-weight="700">Geo tab</text><text x="34" y="75" opacity=".7">/chat list, Ask field</text></g>
+<g><rect x="20" y="164" width="150" height="52" rx="16" fill="currentColor" fill-opacity=".07"/><text x="34" y="187" font-weight="700">Any screen</text><text x="34" y="205" opacity=".7">Geo button, + sheet</text></g>
+<g><rect x="290" y="34" width="160" height="58" rx="16" fill="currentColor" fill-opacity=".14"/><text x="304" y="58" font-weight="700">Conversation</text><text x="304" y="76" opacity=".7">/chat/session?id=</text></g>
+<g><rect x="290" y="158" width="160" height="58" rx="16" fill="currentColor" fill-opacity=".14"/><text x="304" y="182" font-weight="700">Companion sheet</text><text x="304" y="200" opacity=".7">30 min resume window</text></g>
+<g><rect x="570" y="34" width="150" height="58" rx="16" fill="currentColor" fill-opacity=".07"/><text x="584" y="58" font-weight="700">Rename or delete</text><text x="584" y="76" opacity=".7">row options sheet</text></g>
+<g><rect x="570" y="146" width="150" height="58" rx="16" fill="currentColor" fill-opacity=".07"/><text x="584" y="170" font-weight="700">Copy or Report</text><text x="584" y="188" opacity=".7">long-press a reply</text></g>
+<text x="390" y="130" opacity=".7">Open in Geo tab</text>
+<text x="740" y="64" opacity=".7">from the list</text><text x="740" y="178" opacity=".7">from any reply</text>
+</svg>
+</div>
+
+<h2 id="cards">Screen cards</h2>
+<div class="cards">
+<article class="scard"><h3>Geo tab, /chat</h3><dl><dt>Who, how often</dt><dd>Everyone with an account; a few times a day, more in the first weeks.</dd><dt>Jobs</dt><dd>Start a conversation; reopen one; tidy up (rename, delete).</dd><dt>Today</dt><dd>Large title “Geo”, new-conversation button, Ask Geo field with send, “Conversations” list (title, last line, when), row options (Rename inline, Delete with a confirm dialog), skeleton, error, offline band, empty card.</dd><dt>States</dt><dd>First run, loading, many, long titles, offline, error, rename, delete.</dd><dt>Taps today</dt><dd>Start: Geo tab, field, send = 3. Reopen: Geo tab, row = 2. Rename: options, Rename, Enter = 3.</dd></dl></article>
+<article class="scard"><h3>Conversation, /chat/session</h3><dl><dt>Who, how often</dt><dd>Same people, the main surface; each visit is 2 to 10 turns.</dd><dt>Jobs</dt><dd>Log food, water, sleep, mood, weight by talking or photo; ask; fix or accept what Geo did.</dd><dt>Today</dt><dd>Pushed header with title and back; new-chat intro; user pills; Geo plain text with light markdown; logged foods as rows parsed from “Logged …” receipt lines; “Heads up.” for failed actions; option chips from <code>[[choices]]</code>; typing dots; floating glass composer with camera (5 photos max, upload on pick), Cmd+Enter; Plan saved toast; long-press for Copy and Report.</dd><dt>States</dt><dd>New, history, typing, reply landed, photos uploading, sent photo, plan draft, plan saved, failed action, send failed, history error, offline, long content.</dd><dt>Taps today</dt><dd>Log by text: 2 (field, send). Photo log: 4 (camera, Choose, photo, send). Undo: 1 chip.</dd></dl></article>
+<article class="scard"><h3>Companion sheet</h3><dl><dt>Who, how often</dt><dd>Anyone mid-task on Home, Food, Train, Plans or a live workout; daily for active users.</dd><dt>Jobs</dt><dd>Ask about what is on screen without leaving it; log quickly; jump to the full chat.</dd><dt>Today</dt><dd>Resizable sheet (55% and 94%), Geo avatar and “Here to help” or “You’re offline”, new chat, close, “Open full screen”, “All conversations”, inline composer; sends screen context; resumes the last session within 30 minutes; extracts memories on close.</dd><dt>States</dt><dd>Connecting, new, resumed thread, typing, offline, connect failed (closes with a toast).</dd><dt>Taps today</dt><dd>Ask: trigger, field, send = 3.</dd></dl></article>
+<article class="scard"><h3>Report sheet</h3><dl><dt>Who, how often</dt><dd>Rare; a person who got a wrong or unsafe answer. High stakes for trust.</dd><dt>Jobs</dt><dd>Say what was wrong in under 10 seconds.</dd><dt>Today</dt><dd>Reached by long-press (or the time) then Report; four reasons, optional note, Send report, Cancel; success toast.</dd><dt>States</dt><dd>Menu, empty, reason picked, sending, sent, failed (today: silent, see findings).</dd><dt>Taps today</dt><dd>4 (hold, Report, reason, Send).</dd></dl></article>
+</div>
+
+<h3>What reading the code turned up</h3>
+<div class="note"><ol>
+<li><b>Only the 20 newest conversations ever show.</b> <code>GET /v1/chat/sessions</code> defaults to <code>limit 20</code> and the frontend sends none, so older ones are unreachable. The list below adds “Show older conversations” (next 20).</li>
+<li><b>Titles are the whole first message</b>, unbounded on the backend (rename caps at 50 on the frontend only). Rows clamp to one line; the conversation header truncates.</li>
+<li><b>Previews can show raw markdown</b> (<code>last_message</code> is stored as Geo wrote it). Strip <code>**</code> and list markers before display.</li>
+<li><b>Dates older than a year lose the year</b> (“3 Jan”). Show “3 Jan 2025”.</li>
+<li><b>A failed send leaves the message looking sent</b>: a toast fires and the optimistic pill stays with no mark. Designed: “Didn’t send. Retry” under the pill.</li>
+<li><b>A failed report is silent</b>: <code>report-sheet</code> catches and only clears “Sending”. Designed: an inline error and Try again.</li>
+<li><b>There is no token stream</b>: <code>POST /v1/chat</code> returns the whole reply after every tool call. Tool-heavy turns show only dots for several seconds. Designed as one typing state and a reply that lands whole (no typewriter); a status line per tool would need backend work (out of scope, Q6).</li>
+<li><b>Undo is a new chat turn</b>, not a direct delete: the chip sends “Undo” and Geo deletes. <code>actions_taken[].details.logId</code> is already returned, so a direct undo is possible later; every option here keeps today’s behaviour.</li>
+</ol></div>
+
+<h2 id="matrix">State matrix</h2>
+<div class="tbl"><table>
+<thead><tr><th>State</th><th>Geo tab list</th><th>Conversation</th><th>Companion</th><th>Report</th></tr></thead>
+<tbody>
+<tr><td>First run / empty</td><td>Empty (examples prefill the field)</td><td>New conversation intro</td><td>New (context chip)</td><td>n/a</td></tr>
+<tr><td>Loading</td><td>Loading (flat bars at row size)</td><td>History loads in under the intro’s place</td><td>Connecting (two bars)</td><td>Sending</td></tr>
+<tr><td>Typical</td><td>Many</td><td>History, Plan draft, Sent photo</td><td>Thread</td><td>Reason picked</td></tr>
+<tr><td>Busy</td><td>n/a</td><td>Typing</td><td>Typing (send anything)</td><td>Sending</td></tr>
+<tr><td>Geo acted</td><td>n/a</td><td>Logged card, Undone, Plan saved</td><td>Logged card</td><td>n/a</td></tr>
+<tr><td>Partial failure</td><td>n/a</td><td>Heads up (duplicate)</td><td>Same component</td><td>n/a</td></tr>
+<tr><td>Error</td><td>Error (inside the list frame)</td><td>Send failed, History error</td><td>Connect failed: toast and close (kept)</td><td>Failed</td></tr>
+<tr><td>Offline</td><td>Offline (cached rows, field off)</td><td>Offline (composer off)</td><td>Offline</td><td>Failed</td></tr>
+<tr><td>Long content / extremes</td><td>Long titles (worst case)</td><td>Long content (5 photos, long reply, 70-character food)</td><td>Full detent</td><td>Long note</td></tr>
+<tr><td>Overlays</td><td>Options sheet, Rename, Delete</td><td>Photo picker, Copy/Report menu</td><td>n/a</td><td>Menu</td></tr>
+</tbody></table></div>
+
+<h2 id="list">Geo tab: the conversation list</h2>
+<p>One recommended design. The capsule closes into a circle when you scroll the list; tap a row to open it (the list steps back in depth), swipe from the left edge or tap back to return; tap the dots on a row for Rename and Delete in one floating sheet (no second dialog).</p>
+<div class="opts">
+<div class="opt"><div class="opt-h"><h3>Conversation list</h3><span class="rec">Recommended</span></div>
+<p class="why">Keeps the two-tap Ask field above the list (J3), one white card of rows, and moves rename and delete into the same sheet so the keyboard and the confirm never fight the list.</p>
+<div class="sw" role="group" aria-label="State of the conversation list phone"></div>
+<div class="phost" data-cfg='{"id":"g-list","kind":"list","label":"Conversation list phone","state":"many","states":[["many","Many"],["empty","First run"],["loading","Loading"],["error","Error"],["offline","Offline"],["long","Worst case"],["sheet","Options"],["rename","Rename"],["delete","Delete"],["pushed","Opened"]]}'></div>
+<div class="meas" data-for="g-list"><div><span>Main job</span><b>Reopen a conversation</b></div><div><span>Taps, ours (today)</span><b>2 (2)</b></div><div><span>Est. time, ours (today)</span><b>3.2 s (3.2 s)</b></div><div><span>Rename</span><b>3 taps (3), no blur-commit</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+</div>
+</div>
+
+<h2 id="session">The conversation</h2>
+<p>The recommended conversation combines the picks below (action card A2, capsule composer B1). Switch states to see every one; send anything to watch a turn land; long-press a Geo reply for Copy and Report.</p>
+<div class="opts">
+<div class="opt"><div class="opt-h"><h3>Conversation</h3><span class="rec">Recommended</span></div>
+<p class="why">Geo’s words stay plain text on paper; only what Geo did becomes a card. The composer is the only glass on the page.</p>
+<div class="sw" role="group" aria-label="State of the conversation phone"></div>
+<div class="phost" data-cfg='{"id":"g-sess","kind":"sess","label":"Conversation phone","av":"a2","bv":"b1","state":"conv","states":[["conv","History"],["intro","New"],["typing","Typing"],["photo","Photos uploading"],["photosent","Sent photo"],["plan","Plan draft"],["saved","Plan saved"],["headsup","Heads up"],["failed","Send failed"],["histerr","History error"],["offline","Offline"],["worst","Long content"]]}'></div>
+<div class="meas" data-for="g-sess"><div><span>Main job</span><b>Tell Geo what you ate</b></div><div><span>Taps, ours (today)</span><b>2 in thread, 3 from the tab (same)</b></div><div><span>Est. time, ours (today)</span><b>14.3 s (14.3 s), mostly typing</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+</div>
+</div>
+
+<h2 id="dec-a">Open decision A: how Geo’s actions show in the thread</h2>
+<p>Geo logs food, water, sleep and weight, edits and deletes entries, drafts and saves plans. Today the reply’s “Logged …” receipt lines become rows, and Undo and Adjust arrive as two chips under the reply. The same states for each option: Logged, Undone, Plan draft, Plan saved, Heads up.</p>
+<div class="opts">
+<div class="opt"><div class="opt-h"><h3>A1 Receipt rows and chips</h3></div>
+<p>Today’s pattern, refined: rows with numbers, “Logged to breakfast” under them, Undo and Adjust as chips; plans as Geo’s text plus a toast. Trade-off: the undo floats free of the thing it undoes, and a saved plan leaves no mark in the thread once the toast is gone.</p>
+<div class="sw" role="group" aria-label="State of option A1"></div>
+<div class="phost" data-cfg='{"id":"g-a1","kind":"sess","label":"Option A1 phone","av":"a1","bv":"b1","state":"conv","states":[["conv","Logged"],["undone","Undone"],["plan","Plan draft"],["saved","Plan saved"],["headsup","Heads up"]]}'></div>
+<div class="meas" data-for="g-a1"><div><span>Main job</span><b>Undo a wrong log</b></div><div><span>Taps undo / accept plan / check log</span><b>1 / 1 / 0 (today 1 / 1 / 0)</b></div><div><span>Est. time to undo</span><b>1.7 s + Geo’s reply (1.7 s)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="A actions" data-opt="A1 Receipt rows and chips">Pick A1</button></div>
+<div class="opt"><div class="opt-h"><h3>A2 Action card</h3><span class="rec">Recommended</span></div>
+<p>Each thing Geo did is one white card: a confirmation line with the total, the rows, and its own Undo and Adjust (or Use this plan and Change) along the bottom; after Undo the card strikes through, after saving the draft card becomes “Plan saved” in place. <span class="why">Recommended: the action sits on the thing it changes, the thread keeps a record of what happened, and nothing depends on a toast.</span> Trade-off: a taller turn, and chips for actions are no longer tappable text the user could also type.</p>
+<div class="sw" role="group" aria-label="State of option A2"></div>
+<div class="phost" data-cfg='{"id":"g-a2","kind":"sess","label":"Option A2 phone","av":"a2","bv":"b1","state":"conv","states":[["conv","Logged"],["undone","Undone"],["plan","Plan draft"],["saved","Plan saved"],["headsup","Heads up"]]}'></div>
+<div class="meas" data-for="g-a2"><div><span>Main job</span><b>Undo a wrong log</b></div><div><span>Taps undo / accept plan / check log</span><b>1 / 1 / 0 (today 1 / 1 / 0)</b></div><div><span>Est. time to undo</span><b>1.6 s, target on the card (1.7 s)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="A actions" data-opt="A2 Action card">Pick A2</button></div>
+<div class="opt"><div class="opt-h"><h3>A3 Ledger line and undo pill</h3></div>
+<p>Each action folds to one line with a small ring showing the day’s calories before and after; tap to open the rows. Undo is a glass pill above the composer for 8 seconds. Trade-off: the most compact thread, but checking what was logged costs a tap, and after 8 seconds undo means typing.</p>
+<div class="sw" role="group" aria-label="State of option A3"></div>
+<div class="phost" data-cfg='{"id":"g-a3","kind":"sess","label":"Option A3 phone","av":"a3","bv":"b1","state":"logged","states":[["logged","Logged"],["undone","Undone"],["plan","Plan draft"],["saved","Plan saved"],["headsup","Heads up"]]}'></div>
+<div class="meas" data-for="g-a3"><div><span>Main job</span><b>Undo a wrong log</b></div><div><span>Taps undo / accept plan / check log</span><b>1 (2 after 8 s) / 1 / 1 (today 1 / 1 / 0)</b></div><div><span>Est. time to undo</span><b>1.7 s; 3.6 s after 8 s (1.7 s)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="A actions" data-opt="A3 Ledger line and undo pill">Pick A3</button></div>
+</div>
+
+<h2 id="dec-b">Open decision B: the composer</h2>
+<p>Photos (up to 5, uploaded the moment they are picked), a place for voice that does not exist yet, and Geo’s suggested replies. Same states for each: Empty, Typing, Photos, Geo asks, Offline. Tap the camera to add a photo.</p>
+<div class="opts">
+<div class="opt"><div class="opt-h"><h3>B1 Capsule</h3><span class="rec">Recommended</span></div>
+<p>One glass capsule: camera, text, send. Suggested replies stay in the thread under the question that asked for them. No microphone until voice is real; when it ships it takes the send slot while the field is empty. <span class="why">Recommended: the last reply always sits right above the composer, so chips are already in thumb reach and keep their question beside them; no dead control.</span> Trade-off: a photo still goes through the system’s Take or Choose prompt.</p>
+<div class="sw" role="group" aria-label="State of option B1"></div>
+<div class="phost" data-cfg='{"id":"g-b1","kind":"sess","label":"Option B1 phone","av":"a2","bv":"b1","state":"empty","states":[["empty","Empty"],["text","Typing"],["photos","Photos"],["asks","Geo asks"],["offline","Offline"]]}'></div>
+<div class="meas" data-for="g-b1"><div><span>Main job</span><b>Log a photo with a note</b></div><div><span>Taps, ours (today)</span><b>4 (4)</b></div><div><span>Est. time, ours (today)</span><b>13.2 s (13.2 s)</b></div><div><span>Answer Geo’s question</span><b>1 tap (1)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="B composer" data-opt="B1 Capsule">Pick B1</button></div>
+<div class="opt"><div class="opt-h"><h3>B2 Docked replies and mic</h3></div>
+<p>Geo’s choices move out of the thread into a glass rail docked on the composer; the microphone holds the send slot while the field is empty (today it says voice is on the way). Trade-off: chips are always at the thumb, but they are cut from their question, a long set scrolls sideways out of view, and the mic is a placeholder people will tap.</p>
+<div class="sw" role="group" aria-label="State of option B2"></div>
+<div class="phost" data-cfg='{"id":"g-b2","kind":"sess","label":"Option B2 phone","av":"a2","bv":"b2","state":"empty","states":[["empty","Empty"],["text","Typing"],["photos","Photos"],["asks","Geo asks"],["offline","Offline"]]}'></div>
+<div class="meas" data-for="g-b2"><div><span>Main job</span><b>Log a photo with a note</b></div><div><span>Taps, ours (today)</span><b>4 (4)</b></div><div><span>Est. time, ours (today)</span><b>13.2 s (13.2 s)</b></div><div><span>Answer Geo’s question</span><b>1 tap, shorter reach (1)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="B composer" data-opt="B2 Docked replies and mic">Pick B2</button></div>
+<div class="opt"><div class="opt-h"><h3>B3 Camera orb</h3></div>
+<p>The camera leaves the capsule and becomes its own glass circle, the way the + orb sits beside the tab capsule, and opens the camera straight away (library from inside the camera). Trade-off: one tap fewer for the commonest photo, a second floating object on the screen, and the library is one step further away.</p>
+<div class="sw" role="group" aria-label="State of option B3"></div>
+<div class="phost" data-cfg='{"id":"g-b3","kind":"sess","label":"Option B3 phone","av":"a2","bv":"b3","state":"empty","states":[["empty","Empty"],["text","Typing"],["photos","Photos"],["asks","Geo asks"],["offline","Offline"]]}'></div>
+<div class="meas" data-for="g-b3"><div><span>Main job</span><b>Log a photo with a note</b></div><div><span>Taps, ours (today)</span><b>3 (4)</b></div><div><span>Est. time, ours (today)</span><b>12.7 s (13.2 s)</b></div><div><span>Answer Geo’s question</span><b>1 tap (1)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="B composer" data-opt="B3 Camera orb">Pick B3</button></div>
+</div>
+
+<h2 id="dec-c">Open decision C: Geo over any screen</h2>
+<p>The companion carries the screen you are on as context (<code>startCompanionSession(screen, context)</code>). Each phone starts on Home; tap the Geo face at the top right. States: Closed, New, Thread, Full, Offline.</p>
+<div class="opts">
+<div class="opt"><div class="opt-h"><h3>C1 Floating sheet</h3><span class="rec">Recommended</span></div>
+<p>The sheet floats forward, inset from the edges with rounded corners all round, while the screen behind steps back (scale 0.94, slight blur). Two heights: drag the handle up for full, down to go back or close. The field is focused on open. <span class="why">Recommended: it is the system’s own sheet move, the screen stays recognisable behind, and the half height leaves the thing you asked about in view.</span> Trade-off: at full height the screen is hidden.</p>
+<div class="sw" role="group" aria-label="State of option C1"></div>
+<div class="phost" data-cfg='{"id":"g-c1","kind":"comp","label":"Option C1 phone","av":"a2","bv":"b1","cv":"c1","state":"closed","states":[["closed","Closed"],["open","New"],["thread","Thread"],["full","Full"],["offline","Offline"]]}'></div>
+<div class="meas" data-for="g-c1"><div><span>Main job</span><b>Ask about this screen</b></div><div><span>Taps, ours (today)</span><b>2 (3)</b></div><div><span>Est. time, ours (today)</span><b>12.7 s (13.2 s)</b></div><div><span>Back to the screen</span><b>1 drag or tap (1)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="C companion" data-opt="C1 Floating sheet">Pick C1</button></div>
+<div class="opt"><div class="opt-h"><h3>C2 Corner card</h3></div>
+<p>Geo grows out of the button that opened it into a glass card at the top right; the screen does not step back, so you can read it beside the answer. Expand to fill. Trade-off: a small reading area for long replies, the keyboard covers the screen anyway, and a card from the corner is a new move people have to learn.</p>
+<div class="sw" role="group" aria-label="State of option C2"></div>
+<div class="phost" data-cfg='{"id":"g-c2","kind":"comp","label":"Option C2 phone","av":"a2","bv":"b1","cv":"c2","state":"closed","states":[["closed","Closed"],["open","New"],["thread","Thread"],["full","Full"],["offline","Offline"]]}'></div>
+<div class="meas" data-for="g-c2"><div><span>Main job</span><b>Ask about this screen</b></div><div><span>Taps, ours (today)</span><b>2 (3)</b></div><div><span>Est. time, ours (today)</span><b>12.7 s (13.2 s)</b></div><div><span>Back to the screen</span><b>1 tap (1)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="C companion" data-opt="C2 Corner card">Pick C2</button></div>
+<div class="opt"><div class="opt-h"><h3>C3 Pushed page</h3></div>
+<p>Geo opens as a page that slides over the screen, which recedes in depth like any pushed page; swipe from the left edge to go back. One conversation surface everywhere. Trade-off: the screen you asked about is gone from view, and it reads as leaving the screen, not asking about it.</p>
+<div class="sw" role="group" aria-label="State of option C3"></div>
+<div class="phost" data-cfg='{"id":"g-c3","kind":"comp","label":"Option C3 phone","av":"a2","bv":"b1","cv":"c3","state":"closed","states":[["closed","Closed"],["open","New"],["thread","Thread"],["offline","Offline"]]}'></div>
+<div class="meas" data-for="g-c3"><div><span>Main job</span><b>Ask about this screen</b></div><div><span>Taps, ours (today)</span><b>2 (3)</b></div><div><span>Est. time, ours (today)</span><b>12.7 s (13.2 s)</b></div><div><span>Back to the screen</span><b>1 swipe or tap (1)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+<button class="pick" type="button" data-dec="C companion" data-opt="C3 Pushed page">Pick C3</button></div>
+</div>
+
+<h2 id="report">Reporting a reply</h2>
+<p>One recommended design. Long-press a Geo reply (or tap its time): the reply lifts toward you, the thread mists back, and a small menu offers Copy and Report. Report floats the sheet forward.</p>
+<div class="opts">
+<div class="opt"><div class="opt-h"><h3>Report sheet</h3><span class="rec">Recommended</span></div>
+<p class="why">Same four reasons and optional note as today; the reply you are reporting stays lifted so you know which one; a failed send now says so and keeps your note.</p>
+<div class="sw" role="group" aria-label="State of the report phone"></div>
+<div class="phost" data-cfg='{"id":"g-rep","kind":"rep","label":"Report phone","av":"a2","bv":"b1","state":"reply","states":[["reply","Reply"],["menu","Menu"],["sheet","Sheet"],["picked","Reason picked"],["sending","Sending"],["sent","Sent"],["rfailed","Failed"]]}'></div>
+<div class="meas" data-for="g-rep"><div><span>Main job</span><b>Report a wrong answer</b></div><div><span>Taps, ours (today)</span><b>4 (4)</b></div><div><span>Est. time, ours (today)</span><b>4.9 s (4.9 s)</b></div><div><span>Tap targets</span><b data-m="t44">not measured</b></div><div><span>Orange actions</span><b data-m="orange">not measured</b></div><div><span>Max frame gap</span><b data-m="fps">not measured</b></div></div>
+</div>
+</div>
+
+<h3>How the numbers were made</h3>
+<div class="note"><ul>
+<li><b>Taps</b> are counted from the code paths (today) and from the prototype (ours). Typing is not a tap; sending is.</li>
+<li><b>Estimated time</b> = 1.2 s per decision + 0.5 s per tap + 0.35 s per typed character (about 35 words a minute on a phone) + 1.0 s per scroll. Geo’s own reply time is the same in every option and left out.</li>
+<li><b>Tap targets</b>: every control a finger can reach in every state, measured in Playwright with the element at its centre point. Phones are built at a real iPhone’s 390 × 844 pt with the owner’s sizing spec (large title 30, body 16, captions 13, 52 pt tab capsule and orb, 60 pt fields and list rows) and shown scaled to 300 px, so sizes are read back in points.</li>
+<li><b>Orange actions</b>: reachable controls filled with #E8622A, the highest count across the phone’s states. The calorie ring is data, not an action (Q18).</li>
+<li><b>Max frame gap</b>: the longest gap between animation frames while the push, scroll, sheet or send runs, in headless Chrome on a desktop machine. This is a lower bound, not the low-end Android number (F6).</li>
+<li>Each action runs once to warm the layers, then is recorded; the median of 3 recorded runs is printed. The one miss: opening a conversation from the list holds one frame of about 83 ms, because the prototype builds the whole conversation in the tap’s frame. In the app, start loading the conversation on press-down (or keep the last one rendered) so the push starts on an idle frame.</li>
+</ul></div>
+
+<h2 id="tests">First-click and 5-second tests</h2>
+<div class="tbl"><table>
+<thead><tr><th>Decision</th><th>Task line shown to the person</th><th>Counts as success</th></tr></thead>
+<tbody>
+<tr><td>A actions</td><td>“Geo just logged a banana you didn’t eat. Get rid of it.” (show the Logged state)</td><td>First tap on Undo (A1 chip, A2 card button, A3 pill) within 5 s. A miss is a tap on the food row or the field.</td></tr>
+<tr><td>A actions, 5-second</td><td>Show the Logged state for 5 s, then hide it: “What did Geo do, and how many calories?”</td><td>Names breakfast and gets 537 or 105 kcal within 10 kcal.</td></tr>
+<tr><td>B composer</td><td>“Send Geo a photo of what you’re eating.” (Empty state)</td><td>First tap on the camera (B1, B2) or the camera orb (B3). B2 also records taps on the mic.</td></tr>
+<tr><td>B composer</td><td>“Geo asked you something. Answer it without typing.” (Geo asks state)</td><td>First tap on any chip within 5 s.</td></tr>
+<tr><td>C companion</td><td>“You’re on Today. Ask Geo whether you can fit a croissant in.” (Closed state)</td><td>First tap on the Geo face at the top right; second tap lands in the field or it is already focused.</td></tr>
+<tr><td>C companion, 5-second</td><td>Show the Thread state for 5 s: “Which screen were you on?”</td><td>Answers “Today” or “Home” (C1 and C2 keep it visible; C3 tests whether the context chip carries it).</td></tr>
+</tbody></table></div>
+
+<h2 id="script">Usability script, 5 people</h2>
+<p class="muted">Recruit 5 people who track food at least 3 days a week, 2 of them on a low-end Android phone. Think aloud, no hints. Run on the coded prototype at phone size. Note time on task, taps, and the first wrong tap.</p>
+<div class="tbl"><table>
+<thead><tr><th>Task</th><th>Success</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th></tr></thead>
+<tbody>
+<tr><td>1. Tell Geo you had 2 eggs on sourdough and a flat white for breakfast.</td><td>Sent from the Geo tab within 3 taps; says what got logged without scrolling.</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+<tr><td>2. Geo added a banana you didn’t eat. Remove it.</td><td>One tap on Undo; says the banana is gone.</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+<tr><td>3. Send a photo of a nutrition label and log 3 servings.</td><td>Photo attached and sent with a note; reads 1,539 kcal from the card.</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+<tr><td>4. Ask Geo for a 4-day plan, look at it, then make it your plan.</td><td>Finds the draft, accepts it, can say where the plan lives now.</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+<tr><td>5. From Today, ask Geo whether you can fit a croissant in, then get back to Today.</td><td>Opens Geo from Today in 1 tap, asks, returns in 1 gesture without hunting.</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+<tr><td>6. Rename last week’s plan conversation to “Plan, Nov”, then delete the “ok” conversation.</td><td>Both done; no accidental open of a conversation.</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+<tr><td>7. One of Geo’s answers was wrong. Report it.</td><td>Finds Report within 20 s (long-press or the time), sends with a reason.</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+</tbody></table></div>
+
+<h2 id="taste">Taste check</h2>
+<div class="note"><p>Checked against the taste skill’s app-screen rules and its tells registry. What follows the signed system is marked as such rather than changed.</p><ul>
+<li><b>Followed:</b> one face (Archivo) on the sizing spec’s short scale (30, 24, 18, 16, 15, 13, 12); colour on data (calorie ring, macro dots) and on one action per screen; no icon in a tinted square anywhere; no sparkline; real zeros and real numbers that add up (432 + 105 = 537 kcal; protein 25.5 g); loading is flat bars at the final size with no shimmer; errors sit inside the block that failed, with when the data was last good and a Try again; no emoji; no eyebrow labels, index numbers or monospace; words arrive whole (no typewriter); no bounce (spring damping 0.93); the only loops are the typing dots and the upload spinner, both meaning “working” and both still under reduced motion.</li>
+<li><b>Signed exceptions, kept:</b> cream ground with an orange accent (brand, Q2 and Q7); glass on the controls layer and a floating capsule tab bar (C1, C2, o01); soft shadow on white cards (Q12). Content stays solid white, so glass is limited to the tab bar, round header buttons, composer, sheets and the reply menu.</li>
+<li><b>Motion review (review-animations):</b> fixed: the tab capsule now closes with <code>clip-path</code> and a transform instead of animating width and height. Kept, with reasons: page pushes and sheets run on the shared spring (about 0.5 s, no overshoot) because they move whole surfaces and retarget mid-gesture; the companion’s two heights still change <code>height</code> so the composer stays pinned to the sheet’s bottom (the same trade native sheets make); the corner card in C2 grows from the 44 pt button that opened it (scale 0.16 is the button’s own size, not a pop from nothing). New turns rise 8 px over 0.32 s once; history paints at rest; nothing animates on typing.</li>
+<li><b>Relaxed on purpose:</b> 1 px row rules inside cards (allowed on app screens), and a quiet drifting depth field behind the screens, kept at lower opacity than the o19 mock as the brief asks.</li>
+</ul></div>
+</main>
+<div class="tray" role="region" aria-label="Your picks"><output id="pick-out" aria-live="polite">No picks yet</output><button type="button" id="pick-copy">Copy picks</button></div>
+
+<script>(() => {
+// Spring (k 210, c 27, damping ratio 0.93: no overshoot) sampled into CSS linear(), shared with o19.
+const spring = (k, c, n = 24) => { let x = 0, v = 0, t = 0, T = 0; const dt = 1 / 600, sim = []; while (t < 3) { const a = k * (1 - x) - c * v; v += a * dt; x += v * dt; t += dt; sim.push(x); if (Math.abs(1 - x) > .002 || Math.abs(v) > .01) T = t; } const N = Math.ceil(T / dt), p = []; for (let i = 0; i <= n; i++) p.push(i === n ? 1 : +sim[Math.min(N, Math.round(i / n * N))].toFixed(3)); p[0] = 0; return { e: `linear(${p.join(',')})`, d: +T.toFixed(2) }; };
+const SPR = spring(210, 27);
+document.documentElement.style.setProperty('--spr', SPR.e);
+document.documentElement.style.setProperty('--sprd', SPR.d + 's');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = n => (Number.isInteger(n) ? n : +n.toFixed(1)).toLocaleString('en-AU');
+
+const I = {
+  home: '<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/>',
+  food: '<path d="M4 11h16a8 8 0 0 1-16 0zM9.5 7.5c0-1.5 1-2 1-3.5M13.5 7.5c0-1.5 1-2 1-3.5"/>',
+  train: '<path d="M3 9.5v5M6.5 7v10M17.5 7v10M21 9.5v5M6.5 12h11"/>',
+  geo: '<path d="M5 19V7a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H8.5z"/><path d="M9 9h6M9 12h4"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  back: '<path d="M14.5 5.5 8 12l6.5 6.5"/>',
+  pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  more: '<circle cx="6" cy="12" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="18" cy="12" r=".9"/>',
+  trash: '<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>',
+  cam: '<path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2L9 5h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/>',
+  up: '<path d="M12 19V5M6 11l6-6 6 6"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  chev: '<path d="m9.5 6 6 6-6 6"/>',
+  off: '<path d="M4 4l16 16M8.5 8.6A5 5 0 0 0 7 18h10.5M12.5 7.1A5 5 0 0 1 17 11a3.5 3.5 0 0 1 2.8 5.3"/>',
+  mic: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/>',
+  img: '<rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 5-5 4 4 2-2 3 3"/>',
+  copy: '<rect x="8" y="8" width="11" height="11" rx="2"/><path d="M5 15V6a1 1 0 0 1 1-1h9"/>',
+  flag: '<path d="M6 21V4M6 4h11l-2 4 2 4H6"/>',
+  undo: '<path d="M9 7 5 11l4 4"/><path d="M5 11h9a5 5 0 0 1 0 10h-2"/>',
+  expand: '<path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/>',
+  shrink: '<path d="M4 14h6v6M20 10h-6V4M10 14l-7 7M14 10l7-7"/>',
+};
+const ic = (n, c = '') => `<svg class="ic${c ? ' ' + c : ''}" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
+const FACE = `<svg class="face" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#111C35"/><path d="M30 50q7-9 14 0M56 50q7-9 14 0" stroke="#FDF6EC" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M40 63q10 8 20 0" stroke="#FDF6EC" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`;
+const STATUS = '<div class="status" aria-hidden="true"><span>9:41</span><span class="sic"><i></i><i></i><i></i><b></b></span></div>';
+const BG = '<div class="bg" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>';
+
+// ---------- data (shapes from chat.types.ts, logged-foods.ts and the orchestrator prompt) ----------
+const F = {
+  eggs: { n: 'Poached eggs', q: '2 large, 100 g', k: 143, p: 12.6, c: .7, f: 9.5 },
+  sour: { n: 'Sourdough toast', q: '1 slice, 60 g', k: 159, p: 5.9, c: 30, f: 1.2 },
+  fw: { n: 'Flat white, full cream', q: 'Regular, 220 ml', k: 130, p: 7, c: 10, f: 7 },
+  ban: { n: 'Banana', q: '1 medium, 118 g', k: 105, p: 1.3, c: 27, f: .4 },
+  cro: { n: 'Butter croissant', q: '1 medium, 67 g', k: 272, p: 5.4, c: 31, f: 14 },
+  bun: { n: 'Toscana French brioche burger buns', q: '3 buns, 450 g', k: 1539, p: 44.1, c: 234, f: 44.1 },
+  coco: { n: 'Macro Wholefoods organic coconut yoghurt, mango and passionfruit', q: '1 tub, about 150 g', k: 276, p: 1.8, c: 20.4, f: 20.6, est: 1 },
+  pho: { n: 'Phở bò tái', q: '1 large bowl, about 650 g', k: 540, p: 38, c: 62, f: 12, est: 1 },
+};
+const PLAN = { title: 'Upper lower, 4 days', sub: 'Replaces Full body, 3 days', days: [['Mon', 'Upper A', '6 exercises, 45 min'], ['Tue', 'Lower A', '5 exercises, 40 min'], ['Thu', 'Upper B', '6 exercises, 45 min'], ['Fri', 'Lower B', '5 exercises, 40 min']] };
+const T = {
+  conv: () => [
+    { r: 'u', t: 'Had 2 poached eggs on sourdough and a flat white' },
+    { r: 'g', card: { type: 'log', meal: 'breakfast', items: ['eggs', 'sour', 'fw'] }, t: 'That’s 432 kcal and 25.5 g protein. You have 1,568 kcal left today.', time: '8:14 am' },
+    { r: 'u', t: 'Add a banana too' },
+    { r: 'g', card: { type: 'log', meal: 'breakfast', items: ['ban'] }, t: 'Breakfast is 537 kcal now.', chips: ['Undo', 'Adjust'], time: '8:15 am' },
+  ],
+  plan: () => [
+    { r: 'u', t: 'Build me an upper lower split, 4 days, 45 minutes max' },
+    { r: 'g', card: { type: 'plan', ...PLAN }, t: 'Here’s a draft. Nothing changes until you say so.', chips: ['Use this plan', 'Change something'], time: '6:02 pm' },
+  ],
+  photo: () => [
+    { r: 'u', photos: ['f-lbl'], t: 'Log 3 of these to dinner' },
+    { r: 'g', card: { type: 'log', meal: 'dinner', items: ['bun'], src: 'From your photo' }, t: 'The label says 513 kcal per bun, so 3 buns come to 1,539 kcal.', chips: ['Undo', 'Adjust'], time: '7:31 pm' },
+  ],
+  fail: () => [
+    { r: 'u', t: 'Had 2 poached eggs on sourdough and a flat white' },
+    { r: 'g', card: { type: 'log', meal: 'breakfast', items: ['eggs', 'sour', 'fw'] }, t: 'That’s 432 kcal and 25.5 g protein.', time: '8:14 am' },
+    { r: 'u', t: 'Add the flat white again' },
+    { r: 'g', t: 'That one went in a minute ago, so I left it as one. Did you have a second one?', fail: 'I couldn’t save that log: it looks like a duplicate from the last minute.', chips: ['Yes, a second one', 'No, just one'], time: '8:16 am' },
+  ],
+  adjust: () => [...T.conv(), { r: 'u', t: 'Adjust' }, { r: 'g', t: 'What should change about the banana?', chips: ['Smaller portion', 'Different food', 'Move to snack'], time: '8:16 am' }],
+  worst: () => [
+    { r: 'u', t: 'Can you look at my last two weeks and tell me why my weight hasn’t moved even though I’ve been under my calories almost every day except the weekends when we eat out' },
+    { r: 'g', t: 'Across the 11 days you logged, you averaged **1,912 kcal**, 88 kcal under target. Saturdays averaged **3,140 kcal**, which cancels about four weekdays of deficit.\n\n**What I’d change**\n1. Keep Saturday near 2,400 kcal by logging the meal out before you order\n2. Weigh in on the same three mornings a week; one-off readings swing by 1.2 kg\n3. Keep protein at 140 g, you hit it on 6 of 11 days', time: '1:40 pm' },
+    { r: 'u', photos: ['f-bowl', 'f-yog', 'f-egg', 'f-bun', 'f-lbl'], t: 'Lunch and the snack after. The bowl was the large one from the place on Chapel St' },
+    { r: 'g', card: { type: 'log', meal: 'lunch', items: ['pho', 'coco'] }, t: 'Both are estimates from the photos. Lunch comes to **816 kcal**, which leaves 752 kcal for dinner.', chips: ['Undo', 'Adjust', 'Suggest a 600 kcal dinner'], time: '1:47 pm' },
+  ],
+  comp: () => [
+    { r: 'u', t: 'Can I fit a croissant in today?' },
+    { r: 'g', t: 'Yes. A butter croissant is about 272 kcal and you have 1,240 left. Protein is the gap, 48 g to go, so pair it with a flat white.', chips: ['Log a croissant', 'Not now'], time: '3:05 pm' },
+  ],
+};
+const SESS = [
+  ['Had 2 poached eggs on sourdough and a flat white', 'Breakfast is 537 kcal now.', '8:15 am'],
+  ['What should I eat before legs tonight?', 'A banana and a tub of Greek yoghurt about an hour before.', '7:52 am'],
+  ['Swap Bulgarian split squats, my left knee is sore', 'Swapped for reverse lunges on Thursday. Same sets and reps.', 'Yesterday'],
+  ['How am I tracking this week?', 'You averaged 1,912 kcal across the 5 days you logged.', 'Yesterday'],
+  ['What is this?', 'That label reads 513 kcal per bun. Want me to log one?', 'Sat'],
+  ['Log 3 of the brioche buns to dinner', 'Logged 3 buns to dinner, 1,539 kcal.', 'Sat'],
+  ['Build me an upper lower split, 4 days, 45 minutes max', 'Done. Upper A is first, on Monday.', 'Fri'],
+  ['Slept about 6 hours, woke up twice', 'Logged 6 h of sleep, quality 5 of 10.', 'Thu'],
+  ['Copy yesterday’s lunch to today', 'Copied 3 items to lunch, 610 kcal.', 'Wed'],
+  ['Is 140 g of protein too much for me?', 'At 78 kg that is 1.8 g per kg, which suits a cut.', '21 Oct'],
+  ['Weighed 78.6 this morning', 'Logged 78.6 kg. Your 7-day average is 78.7 kg.', '20 Oct'],
+  ['Make Thursday a rest day', 'Thursday is a rest day now. Upper B moved to Friday.', '18 Oct'],
+  ['Dinner ideas under 600 kcal with chicken', 'Three ideas, all under 600 kcal and over 40 g protein.', '15 Oct'],
+  ['Log 2 glasses of water', 'Logged 2 glasses. That’s 5 of 8 today.', '14 Oct'],
+];
+const SESS_WORST = [
+  ['Can you look at my last two weeks and tell me why my weight hasn’t moved even though I’ve been under my calories almost every day except the weekends when we eat out', 'Saturdays averaged 3,140 kcal, which cancels about four weekdays of deficit.', '1:47 pm'],
+  ['Ăn phở bò tái lúc trưa, khoảng 650 ml nước dùng', 'Logged phở bò tái to lunch, about 540 kcal (estimated).', '1:02 pm'],
+  ['ok', 'Done.', 'Yesterday'],
+  ['Chat with Geo', '', 'Yesterday'],
+  ['Cutting phase, Nov to Christmas, weekly check-ins', 'Swapped: Reverse lunges 3 x 10, Leg press 3 x 12, Hamstring curl 3 x 12', 'Mon'],
+  ['bartholomew.fitzgerald@northwind-industries.example.com sent me this plan, can you load it', 'I read 4 days from the photo. Want me to save it as a draft?', '3 Jan 2025'],
+];
+
+// ---------- renderers ----------
+const macroSpans = f => `<span class="md" style="--c:#111C35">${fmt(f.p)} g P</span><span class="md" style="--c:#3E7C77">${fmt(f.c)} g C</span><span class="md" style="--c:#A07A3C">${fmt(f.f)} g F</span>`;
+const foodRows = items => items.map(k => { const f = F[k]; return `<li class="lr"><span class="fn">${esc(f.n)}</span><span class="fk">${f.est ? '~' : ''}${fmt(f.k)}<small> kcal</small></span><span class="fq">${esc(f.q)}</span><span class="fq">${macroSpans(f)}</span></li>`; }).join('');
+const total = items => items.reduce((s, k) => s + F[k].k, 0);
+const ringSvg = (from, to) => `<svg class="rg" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" stroke="rgba(17,28,53,.08)" stroke-width="4"/><circle cx="18" cy="18" r="14" fill="none" stroke="rgba(232,98,42,.35)" stroke-width="4" pathLength="100" stroke-dasharray="${to} 100" transform="rotate(-90 18 18)"/><circle cx="18" cy="18" r="14" fill="none" stroke="#E8622A" stroke-width="4" pathLength="100" stroke-dasharray="${from} 100" transform="rotate(-90 18 18)"/></svg>`;
+
+function cardHTML(ctx, t, i) {
+  const c = t.card, av = ctx.av;
+  if (c.type === 'log') {
+    const kc = total(c.items), est = c.items.some(k => F[k].est), mealCap = c.meal[0].toUpperCase() + c.meal.slice(1);
+    if (av === 'a1') return `<ul class="lc" aria-label="Logged">${foodRows(c.items)}</ul><p class="lnote">${c.undone ? 'Removed from ' : 'Logged to '}${c.meal}</p>`;
+    if (av === 'a3') {
+      const open = ctx.open.has(i);
+      return `<button class="ledger${c.undone ? ' undone' : ''}" data-act="expand:${i}" aria-expanded="${open}">${c.undone ? ringSvg(46, 46) : ringSvg(46, 46 + Math.min(40, kc / 20))}<span class="lt1"><b>${c.undone ? 'Removed from' : ''} ${mealCap} ${c.undone ? '' : '+' + (est ? '~' : '') + fmt(kc) + ' kcal'}</b><span>${c.items.length} food${c.items.length > 1 ? 's' : ''}, ${fmt(c.items.reduce((s, k) => s + F[k].p, 0))} g protein</span></span>${ic('chev', 'chev')}</button>${open ? `<ul class="lc${c.undone ? ' undone' : ''}">${foodRows(c.items)}</ul>` : ''}`;
+    }
+    return `<div class="lc${c.undone ? ' undone' : ''}"><div class="lch"><span class="ok">${c.undone ? '' : ic('check')}${c.undone ? 'Removed from ' + c.meal : (c.src ? c.src + ', logged to ' : 'Logged to ') + c.meal}</span><b>${est ? '~' : ''}${fmt(kc)} kcal</b></div><ul>${foodRows(c.items)}</ul>${c.undone || !t.last ? '' : `<div class="lca"><button data-act="say:Undo" aria-label="Undo, remove from ${c.meal}">${ic('undo')}Undo</button><button data-act="say:Adjust">Adjust</button></div>`}</div>`;
+  }
+  if (c.type === 'plan' || c.type === 'saved') {
+    const saved = c.type === 'saved';
+    const rows = c.days.map(d => `<li class="lr"><span class="fn">${d[0]}, ${d[1]}</span><span class="fk"></span><span class="fq">${d[2]}</span></li>`).join('');
+    if (av === 'a1') return saved ? '' : `<div class="gt"><p><b>${c.title}</b>, ${c.sub.toLowerCase()}</p><ul>${c.days.map(d => `<li>${d[0]}: ${d[1]}, ${d[2]}</li>`).join('')}</ul></div>`;
+    if (av === 'a3') { const open = ctx.open.has(i); return `<button class="ledger" data-act="expand:${i}" aria-expanded="${open}">${ic(saved ? 'check' : 'train', 'rg')}<span class="lt1"><b>${saved ? 'Plan saved' : 'Draft plan'}: ${c.title}</b><span>${c.sub}</span></span>${ic('chev', 'chev')}</button>${open ? `<ul class="lc">${rows}</ul>` : ''}`; }
+    return `<div class="lc pd"><div class="lch"><span class="ok">${saved ? ic('check') + 'Plan saved' : 'Draft plan'}</span></div><div class="pdh"><b>${c.title}</b><span>${saved ? 'Active from Monday' : c.sub}</span></div><ul>${rows}</ul>${saved ? `<div class="lca"><button data-act="toast:Opens Plans">Open plan</button></div>` : (t.last && !c.done ? `<div class="lca"><button class="pri" data-act="say:Use this plan">Use this plan</button><button data-act="say:Change something">Change</button></div>` : '')}</div>`;
+  }
+  return '';
+}
+const mdHTML = s => {
+  const inl = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  let out = '', list = null;
+  const flush = () => { if (list) { out += `<${list.t}>${list.i.join('')}</${list.t}>`; list = null; } };
+  s.split('\n').forEach(l => { const b = l.match(/^[-*]\s+(.+)/), n = l.match(/^\d+\.\s+(.+)/); if (b || n) { const t = n ? 'ol' : 'ul'; if (list && list.t !== t) flush(); list = list || { t, i: [] }; list.i.push(`<li>${inl((b || n)[1])}</li>`); } else if (!l.trim()) flush(); else { flush(); out += `<p>${inl(l)}</p>`; } });
+  flush(); return out;
+};
+// Chips the card already offers are not repeated as chips (a2 folds Undo/Adjust and the plan choices into the card).
+const chipsFor = (ctx, t) => { let c = t.chips || []; if (t.card && ctx.av === 'a2') c = c.filter(x => !/^(Undo|Adjust|Use this plan|Change something)$/.test(x)); if (t.card && t.card.type === 'log' && ctx.av === 'a3') c = c.filter(x => x !== 'Undo'); return c; };
+function threadHTML(ctx) {
+  const th = ctx.thread, lastG = th.map(t => t.r).lastIndexOf('g');
+  let h = '';
+  th.forEach((t, i) => {
+    const fr = t.fresh && !RM ? ' fresh' : '';
+    if (t.r === 'u') {
+      const ph = t.photos ? `<div class="pg1${t.photos.length > 1 ? ' multi' : ''}">${t.photos.map(p => `<span class="ph1 ${p}" role="img" aria-label="Your photo"></span>`).join('')}</div>` : '';
+      h += `<div class="tu${fr}">${ph}${t.t ? `<p class="pill">${esc(t.t)}</p>` : ''}${t.failed ? `<p class="nf">Didn’t send.<button data-act="retry:${i}">Retry</button></p>` : ''}</div>`;
+      return;
+    }
+    t.last = i === lastG && i === th.length - 1;
+    h += `<div class="tg${fr}" data-g="${i}">${th[i - 1] && th[i - 1].r === 'g' ? '' : `<div class="anc">${FACE}<span>Geo</span></div>`}${t.card ? cardHTML(ctx, t, i) : ''}${t.t ? `<div class="gt">${mdHTML(t.t)}</div>` : ''}${t.fail ? `<p class="hu"><b>Heads up.</b> ${esc(t.fail)}</p>` : ''}<button class="tm" data-act="menu:${i}" aria-label="Options for this reply, sent ${t.time}">${t.time}</button></div>`;
+    const chips = chipsFor(ctx, t);
+    if (t.last && chips.length && ctx.bv !== 'b2' && !ctx.busy) h += `<div class="chips${fr}">${chips.map(c => `<button class="chip" data-act="say:${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+  });
+  if (ctx.busy) h += `<div class="tg${RM ? '' : ' fresh'}" role="status" aria-label="Geo is writing">${th.length && th[th.length - 1].r === 'g' ? '' : `<div class="anc">${FACE}<span>Geo</span></div>`}<div class="typing" aria-hidden="true"><i></i><i></i><i></i></div></div>`;
+  return h;
+}
+function composerHTML(ctx, inline) {
+  const bv = ctx.bv, ph = ctx.photos, up = ph.filter(p => p.up).length;
+  const lastG = [...ctx.thread].reverse().find(t => t.r === 'g');
+  const railChips = bv === 'b2' && !ctx.busy && lastG && lastG === ctx.thread[ctx.thread.length - 1] ? chipsFor(ctx, lastG) : [];
+  const empty = !ctx.draft.trim() && !ph.length, dis = ctx.offline ? ' disabled' : '';
+  const thumbs = ph.length ? `<div class="thumbs">${ph.map((p, i) => p.up ? `<span class="th up" role="status" aria-label="Uploading photo"><span class="spin"></span></span>` : `<span class="th ${p.c}" role="img" aria-label="Photo to send"><button class="x" data-act="rmph:${i}" aria-label="Remove photo"><span>${ic('x')}</span></button></span>`).join('')}</div><p class="ccount">${ph.length} of 5 photos${up ? ', uploading' : ''}</p>` : '';
+  const sendOn = !empty && !up && !ctx.busy && !ctx.offline;
+  const sendBtn = bv === 'b2' && empty ? `<button class="cbtn" data-act="mic" aria-label="Voice message, coming later">${ic('mic')}</button>` : `<button class="send${sendOn ? ' on' : ''}" data-act="send" aria-label="Send to Geo"${sendOn ? '' : ' aria-disabled="true"'}>${ic('up')}</button>`;
+  const cam = bv === 'b3' ? '' : `<button class="cbtn" data-act="cam" aria-label="Add a photo"${dis}${ph.length >= 5 ? ' disabled' : ''}>${ic('cam')}</button>`;
+  const cmp = `<div class="cmp${inline ? ' inline' : ''}">${thumbs}<div class="crow">${cam}<textarea class="ta" rows="1" placeholder="${ctx.offline ? 'You’re offline' : 'Message Geo'}" aria-label="Message Geo"${dis}${bv === 'b3' ? ' style="padding-left:14px"' : ''}>${esc(ctx.draft)}</textarea>${sendBtn}</div></div>`;
+  const rail = railChips.length ? `<div class="rail" role="group" aria-label="Quick replies">${railChips.map(c => `<button class="chip" data-act="say:${esc(c)}">${esc(c)}</button>`).join('')}</div>` : '';
+  const vnote = ctx.vnote ? `<p class="vnote" role="status">Voice is on the way. Type or add a photo for now.</p>` : '';
+  if (bv === 'b3') return `${rail}${vnote}<div class="b3row"><button class="camorb glass" data-act="cam3" aria-label="Take a photo"${dis}>${ic('cam')}</button>${cmp}</div>`;
+  return rail + vnote + cmp;
+}
+function sessionHTML(ctx, title) {
+  const s = ctx.state;
+  let top = '';
+  if (ctx.offline) top += `<p class="off">${ic('off')}You’re offline. Messages send when you’re back.</p>`;
+  if (s === 'histerr') top += `<div class="card err" role="alert">I couldn’t load this conversation. You can still send a message.<br><button data-act="retryhist">Try again</button></div>`;
+  if (!ctx.thread.length && !ctx.busy && s !== 'histerr') top += `<div class="intro">${FACE}<p>Hi, I’m Geo. Tell me what you ate, ask what to eat next, or how your week is going. A photo works too.</p></div>`;
+  return `<div class="scroll" data-scroll style="padding:0 0 ${ctx.bv === 'b2' || ctx.av === 'a3' ? 184 : 132}px"><div class="thread">${top}${threadHTML(ctx)}</div></div><div class="topfade" aria-hidden="true"></div><header class="ph"><button class="rb glass" data-act="back" aria-label="Back to conversations">${ic('back')}</button><h2>${esc(title)}</h2><span></span></header><div class="cmpw">${composerHTML(ctx)}</div><div class="menuscrim" data-act="close" aria-hidden="true"></div>`;
+}
+function listHTML(ctx) {
+  const s = ctx.state, data = s === 'long' ? SESS_WORST : SESS;
+  let body;
+  if (s === 'loading') body = `<ul class="card skel" role="status" aria-label="Loading conversations">${[62, 48, 70, 54, 66].map(w => `<li><span class="bar" style="width:${w}%"></span><span class="bar s" style="width:82%"></span></li>`).join('')}</ul>`;
+  else if (s === 'error') body = `<div class="card err" role="alert">I couldn’t load your conversations. Last loaded at 9:12 am.<br><button data-act="retrylist">Try again</button></div>`;
+  else if (s === 'empty') body = `<div class="card first">${FACE.replace('class="face"', 'class="face" style="width:32px;height:32px"')}<p>Our conversations land here. Tell me what you ate, or try one of these.</p><div class="ex"><button data-act="prefill:Had a flat white and a croissant">Had a flat white and a croissant</button><button data-act="prefill:What should I eat before training?">What should I eat before training?</button><button data-act="prefill:How am I tracking this week?">How am I tracking this week?</button></div></div>`;
+  else body = `<ul class="card rows" aria-label="Conversations">${data.map((r, i) => ctx.gone.has(i) ? '' : `<li><button class="row" data-act="open:${i}"><span class="rt"><b>${esc(ctx.titles[i] || r[0])}</b></span><span class="rp"><span>${esc(r[1] || 'No messages yet')}</span><time>${r[2]}</time></span></button><button class="more" data-act="more:${i}" aria-label="Options for ${esc(ctx.titles[i] || r[0]).slice(0, 60)}">${ic('more')}</button></li>`).join('')}</ul>${s === 'long' ? '' : `<button class="older" data-act="toast:Loads the next 20">Show older conversations</button>`}`;
+  const off = s === 'offline' ? `<p class="off">${ic('off')}You’re offline. These are from 9:12 am.</p>` : '';
+  return `<div class="scroll" data-scroll><header class="lt"><div><h2>Geo</h2><p>Food, training and your week</p></div><button class="rb glass" data-act="new" aria-label="New conversation">${ic('pen')}</button></header>${off}<form class="ask" data-act="noop" onsubmit="return false"><input type="text" placeholder="Ask Geo anything" aria-label="Ask Geo anything" value="${esc(ctx.ask)}" enterkeyhint="send"${s === 'offline' ? ' disabled' : ''}><button type="button" class="send${ctx.ask.trim() && s !== 'offline' ? ' on' : ''}" data-act="ask" aria-label="Send to Geo">${ic('up')}</button></form><h3 class="sl">Conversations</h3>${body}</div><div class="topfade" aria-hidden="true" style="opacity:0"></div><div class="botfade" aria-hidden="true"></div>`;
+}
+const tabsHTML = ai => `<nav class="tabs glass" aria-label="Main" style="--ai:${ai}"><div class="trow">${[['home', 'Home'], ['food', 'Food'], ['train', 'Train'], ['geo', 'Geo']].map((t, i) => `<button class="tab" data-act="tab:${i}"${i === ai ? ' aria-current="page"' : ''} aria-label="${t[1]}">${ic(t[0])}<span class="tn">${t[1]}</span></button>`).join('')}</div></nav><button class="orb" data-act="toast:Opens the + sheet" aria-label="Log something">${ic('plus')}</button>`;
+const homeHTML = () => `<div class="scroll" data-scroll><header class="lt"><div><h2>Today</h2><p>Mon 26 Oct</p></div><button class="rb glass" data-act="geo" aria-label="Ask Geo about today" aria-haspopup="dialog">${FACE.replace('class="face"', 'class="face" style="width:26px;height:26px"')}</button></header><div class="card hero" data-tilt><span class="rw"><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" stroke="rgba(232,98,42,.14)"/><circle cx="50" cy="50" r="42" stroke="#E8622A" stroke-linecap="round" pathLength="100" stroke-dasharray="38 100"/></svg><span class="rc"><b>1,240</b><small>kcal left</small></span></span><div class="mcol"><div><span style="--c:#111C35">Protein</span><em>92/140 g</em></div><div><span style="--c:#3E7C77">Carbs</span><em>120/190 g</em></div><div><span style="--c:#A07A3C">Fat</span><em>38/65 g</em></div></div><p class="coach">${FACE.replace('class="face"', 'class="face" style="width:22px;height:22px"')}<span>Protein is 48 g short. Greek yoghurt now closes most of it.</span></p></div><div class="tiles"><div class="card tile" data-tilt><span>Steps</span><b>8,412</b><span>of 10,000</span></div><div class="card tile" data-tilt><span>Weight</span><b>78.2<small> kg</small></b><span>−0.6 kg this week</span></div><div class="card tile" data-tilt><span>Water</span><b>5<small> of 8</small></b><span>glasses</span></div><div class="card tile" data-tilt><span>Sleep</span><b>7h 12m</b><span>23:10 to 06:22</span></div></div></div><div class="botfade" aria-hidden="true"></div>`;
+function compSheetHTML(ctx) {
+  const thread = ctx.thread.length || ctx.busy ? `<div class="thread">${threadHTML(ctx)}</div>` : `<span class="ctx">${ic('home')}Today, Mon 26 Oct</span><p style="font-size:15px;line-height:1.5">Ask about today, or tell me what you ate. I can log it, suggest what to eat, or look at your week.</p>`;
+  const exp = ctx.cv === 'c2' ? `<button class="rb" data-act="cfull" aria-label="${ctx.full ? 'Make smaller' : 'Make bigger'}">${ic(ctx.full ? 'shrink' : 'expand')}</button>` : `<button class="rb" data-act="cnew" aria-label="New conversation">${ic('pen')}</button>`;
+  return `${ctx.cv === 'c1' ? '<span class="grab" data-grab aria-hidden="true"></span>' : '<span style="height:6px;flex:none"></span>'}<div class="cp-h">${FACE}<div><b id="${ctx.id}-ct">Geo</b><span>${ctx.offline ? 'You’re offline' : 'Looking at Today'}</span></div>${exp}<button class="rb" data-act="close" aria-label="Close Geo">${ic('x')}</button></div>${ctx.offline ? `<p class="off" style="margin:0 0 8px">${ic('off')}You’re offline. I’ll be here when you’re back.</p>` : ''}<div class="cp-b" data-scroll>${thread}</div><div class="cp-f"><div class="cp-links"><button data-act="toast:Opens this chat in the Geo tab">Open in Geo tab</button></div>${composerHTML(ctx, true)}</div>`;
+}
+function reportHTML(ctx) {
+  const r = ctx.rep;
+  if (r.view === 'menu') return '';
+  const reasons = [['wrong', 'Wrong or misleading'], ['unsafe', 'Unsafe advice'], ['offensive', 'Offensive'], ['other', 'Something else']];
+  return `<span class="grab" data-grab aria-hidden="true"></span><h2 class="sh-h" id="${ctx.id}-rh">Report this reply</h2><p class="sh-p">Tell us what was wrong. It helps Geo get better.</p><div class="grp" role="group" aria-label="Reason">${reasons.map(x => `<button data-act="reason:${x[0]}" aria-pressed="${r.reason === x[0]}">${x[1]}${ic('check', 'chk')}</button>`).join('')}</div><textarea class="fld" style="margin-top:10px" placeholder="Anything else? (optional)" aria-label="What went wrong (optional)">${esc(r.note || '')}</textarea>${r.failed ? `<p class="ferr" role="alert">That didn’t send. Check your connection and try again.</p>` : ''}<button class="btn or" data-act="sendrep"${!r.reason || r.sending ? ' disabled' : ''}>${r.sending ? 'Sending' : r.failed ? 'Try again' : 'Send report'}</button><button class="cancel" data-act="close">Cancel</button>`;
+}
+function listSheetHTML(ctx) {
+  const i = ctx.sheetRow, title = ctx.titles[i] || (ctx.state === 'long' ? SESS_WORST : SESS)[i][0];
+  if (ctx.sheetView === 'rename') return `<span class="grab" data-grab aria-hidden="true"></span><h2 class="sh-h" id="${ctx.id}-sh">Rename</h2><p class="sh-p">Only you see this name.</p><input class="fld" type="text" maxlength="50" value="${esc(title.slice(0, 50))}" aria-label="Conversation name" data-ren><p class="count"><span data-cnt>${Math.min(50, title.length)}</span> of 50</p><button class="btn" data-act="saverename">Save</button><button class="cancel" data-act="close">Cancel</button>`;
+  if (ctx.sheetView === 'delete') return `<span class="grab" data-grab aria-hidden="true"></span><h2 class="sh-h" id="${ctx.id}-sh">Delete this conversation?</h2><p class="sh-p">Geo’s replies and your messages in it go for good. What Geo logged stays in your diary.</p><button class="btn" data-act="dodelete">Delete</button><button class="cancel" data-act="close">Keep</button>`;
+  return `<span class="grab" data-grab aria-hidden="true"></span><p class="sh-t" id="${ctx.id}-sh">${esc(title)}</p><div class="grp"><button data-act="rename">${ic('pen')}Rename</button><button data-act="delete">${ic('trash')}Delete</button></div><button class="cancel" data-act="close">Cancel</button>`;
+}
+
+// ---------- replies (canned, shaped like the orchestrator's) ----------
+function replyFor(text, hadPhoto) {
+  const s = text.toLowerCase();
+  if (s === 'undo') return { undo: 1, t: 'Removed. That entry is out of your diary.' };
+  if (s === 'adjust') return { t: 'What should change?', chips: ['Smaller portion', 'Different food', 'Move to snack'] };
+  if (s === 'use this plan') return { accept: 1, card: { type: 'saved', ...PLAN }, t: 'Done. Upper A is first, on Monday.', toast: 'Plan saved. It’s ready in Plans.' };
+  if (s === 'change something') return { t: 'What would you change: the days, the length, or the exercises?', chips: ['Days', 'Length', 'Exercises'] };
+  if (hadPhoto) return { card: { type: 'log', meal: 'dinner', items: ['bun'], src: 'From your photo' }, t: 'The label says 513 kcal per bun, so 3 buns come to 1,539 kcal.', chips: ['Undo', 'Adjust'] };
+  if (/plan|split|program/.test(s)) return { card: { type: 'plan', ...PLAN }, t: 'Here’s a draft. Nothing changes until you say so.', chips: ['Use this plan', 'Change something'] };
+  if (/had|ate|log|croissant|flat white|coffee|egg|banana|toast|lunch|dinner|breakfast/.test(s)) return { card: { type: 'log', meal: 'snack', items: ['fw', 'cro'] }, t: 'That’s 402 kcal. You have 838 kcal and 36 g protein left today.', chips: ['Undo', 'Adjust'] };
+  return { t: 'You have 1,240 kcal and 48 g protein left today. A tub of Greek yoghurt and a banana close about half the protein gap.' };
+}
+
+// ---------- phone controller ----------
+const PH = {};
+function mount(host) {
+  const cfg = JSON.parse(host.dataset.cfg);
+  const ctx = Object.assign({ av: 'a2', bv: 'b1', cv: 'c1', thread: [], draft: '', photos: [], busy: false, offline: false, open: new Set(), titles: {}, gone: new Set(), ask: '', rep: { view: null }, timers: [] }, cfg);
+  const el = document.createElement('div');
+  el.className = 'gp'; el.id = ctx.id; el.setAttribute('role', 'region'); el.setAttribute('aria-label', cfg.label);
+  const gs = document.createElement('div'); gs.className = 'gs'; gs.appendChild(el); host.appendChild(gs);
+  // Built at a real iPhone's 390 x 844 pt, shown scaled: 300 px wide on a grid, fit-to-width when narrower.
+  const fitK = () => gs.style.setProperty('--k', (Math.min(300, host.clientWidth || 300) / 390).toFixed(4));
+  fitK(); addEventListener('resize', fitK);
+  ctx.el = el; PH[ctx.id] = ctx;
+  const sw = host.parentElement.querySelector('.sw');
+  ctx.k = () => el.getBoundingClientRect().width / 390;
+  sw.innerHTML = cfg.states.map(([k, l]) => `<button type="button" data-st="${k}" aria-pressed="${k === cfg.state}">${l}</button>`).join('');
+  sw.addEventListener('click', e => { const b = e.target.closest('[data-st]'); if (!b) return; sw.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); setState(ctx, b.dataset.st); });
+  wire(ctx);
+  setState(ctx, cfg.state);
+}
+const later = (ctx, fn, ms) => ctx.timers.push(setTimeout(fn, ms));
+function setState(ctx, s) {
+  ctx.timers.forEach(clearTimeout); ctx.timers = [];
+  ctx.el.classList.remove('is-menu', 'is-min', 'is-picker');
+  Object.assign(ctx, { state: s, thread: [], draft: '', photos: [], busy: false, offline: false, open: new Set(), full: false, vnote: false, rep: { view: null }, sheetView: null, pushed: false, toast: null, undoPill: null, cam: false });
+  const k = ctx.kind;
+  if (k === 'list') { ctx.titles = {}; ctx.gone = new Set(); ctx.ask = ''; if (s === 'sheet' || s === 'rename' || s === 'delete') { ctx.sheetRow = 0; ctx.sheetView = s === 'sheet' ? 'actions' : s; } if (s === 'pushed') { ctx.pushed = true; ctx.thread = T.conv(); } }
+  if (k === 'sess' || k === 'comp' || k === 'rep') {
+    const map = { conv: 'conv', logged: 'conv', typing: 'conv', photo: 'conv', photosent: 'photo', plan: 'plan', saved: 'plan', failed: 'conv', headsup: 'fail', offline: 'conv', worst: 'worst', undone: 'conv', text: 'conv', photos: 'conv', asks: 'adjust', empty: 'conv', reply: 'conv', menu: 'conv', sheet: 'conv', picked: 'conv', sending: 'conv', sent: 'conv', rfailed: 'conv' };
+    if (k === 'comp') ctx.thread = (s === 'thread' || s === 'full') ? T.comp() : (s === 'offline' ? T.comp() : []);
+    else if (map[s]) ctx.thread = T[map[s]]();
+    if (s === 'typing') { ctx.thread = ctx.thread.slice(0, 3); ctx.busy = true; }
+    if (s === 'failed') { ctx.thread = ctx.thread.slice(0, 2); ctx.thread.push({ r: 'u', t: 'Add a banana too', failed: true }); }
+    if (s === 'offline') ctx.offline = true;
+    if (s === 'photo' || s === 'photos') { ctx.photos = [{ c: 'f-lbl' }, { c: 'f-bun', up: 1 }]; ctx.draft = 'Log 3 of these to dinner'; }
+    if (s === 'text') ctx.draft = 'Had a flat white and a croissant';
+    if (s === 'undone') { const c = ctx.thread[3].card; c.undone = true; ctx.thread.push({ r: 'u', t: 'Undo' }, { r: 'g', t: 'Removed the banana. Breakfast is back to 432 kcal.', time: '8:16 am' }); }
+    if (s === 'saved') { ctx.thread[1].card.done = true; ctx.thread.push({ r: 'u', t: 'Use this plan' }, { r: 'g', card: { type: 'saved', ...PLAN }, t: 'Done. Upper A is first, on Monday.', time: '6:03 pm' }); if (ctx.av === 'a1') ctx.toast = 'Plan saved. It’s ready in Plans.'; }
+    if (s === 'intro') ctx.thread = [];
+    if (k === 'comp' && s !== 'closed') { ctx.sheetOpen = true; ctx.full = s === 'full'; } else ctx.sheetOpen = false;
+    if (k === 'rep') { if (s === 'menu') ctx.rep = { view: 'menu', i: 3 }; if (['sheet', 'picked', 'sending', 'rfailed'].includes(s)) ctx.rep = { view: 'sheet', i: 3, reason: s === 'sheet' ? null : 'wrong', sending: s === 'sending', failed: s === 'rfailed' }; if (s === 'sent') ctx.toast = 'Thanks. We’ll take a look.'; }
+    if (ctx.av === 'a3' && s === 'logged') ctx.undoPill = 'breakfast';
+  }
+  render(ctx);
+}
+function render(ctx) {
+  const el = ctx.el, k = ctx.kind;
+  let html = BG + '<div class="stage">';
+  if (k === 'list') html += `<section class="layer base" aria-label="Geo conversations">${listHTML(ctx)}</section><section class="layer push" aria-label="Conversation">${sessionHTML(Object.assign(ctx), ctx.openTitle || SESS[0][0])}</section>`;
+  if (k === 'sess' || k === 'rep') html += `<section class="layer base" aria-label="Conversation">${sessionHTML(ctx, ctx.state === 'worst' ? T.worst()[0].t : ctx.state === 'intro' ? 'New conversation' : (ctx.state === 'plan' || ctx.state === 'saved') ? 'Build me an upper lower split, 4 days' : 'Had 2 poached eggs on sourdough')}</section>`;
+  if (k === 'comp') html += `<section class="layer base" aria-label="Today">${homeHTML()}</section>${ctx.cv === 'c3' ? `<section class="layer push" aria-label="Geo">${sessionHTML(ctx, 'Geo, about Today')}</section>` : ''}`;
+  html += '</div>' + STATUS;
+  if (k === 'list') html += tabsHTML(3);
+  if (k === 'comp') html += tabsHTML(0);
+  html += '<div class="scrim" data-act="close" aria-hidden="true"></div>';
+  if (k === 'list') html += `<section class="sheet" role="dialog" aria-modal="true" aria-labelledby="${ctx.id}-sh">${ctx.sheetView ? listSheetHTML(ctx) : ''}</section>`;
+  if (k === 'rep' || k === 'sess') html += `<div class="menu" role="menu" aria-label="Reply options"><button role="menuitem" data-act="copy">Copy${ic('copy')}</button><button role="menuitem" data-act="report">Report${ic('flag')}</button></div><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="${ctx.id}-rh">${ctx.rep.view === 'sheet' ? reportHTML(ctx) : ''}</section>`;
+  if (k === 'comp' && ctx.cv !== 'c3') html += `<section class="sheet ${ctx.cv}${ctx.full ? ' full' : ''}" role="dialog" aria-modal="true" aria-labelledby="${ctx.id}-ct">${compSheetHTML(ctx)}</section>`;
+  if (ctx.bv === 'b1' || ctx.bv === 'b2') html += `<section class="sheet pick2" data-picker role="dialog" aria-label="Add a photo" style="z-index:24"></section>`;
+  if (ctx.bv === 'b3') html += `<div class="cam" role="dialog" aria-label="Camera"><span class="vf f-bun" aria-hidden="true"></span><button class="cx" data-act="camx" aria-label="Close camera">${ic('x')}</button><button class="shut" data-act="shutter" aria-label="Take photo"></button></div>`;
+  html += `<div class="undo glass" role="status"><span>Logged to <span data-um>${ctx.undoPill || 'breakfast'}</span></span><button data-act="say:Undo">Undo</button></div><div class="toast glass" role="status"><span data-tt></span></div>`;
+  el.innerHTML = html;
+  syncClasses(ctx);
+  scrollEnd(ctx, false);
+  if (ctx.toast) showToast(ctx, ctx.toast, true);
+  if (ctx.undoPill) el.querySelector('.undo').classList.add('on');
+  if (ctx.rep.view === 'menu') openMenu(ctx, ctx.rep.i, true);
+}
+function syncClasses(ctx) {
+  const el = ctx.el;
+  const sheetOn = (ctx.kind === 'list' && ctx.sheetView) || (ctx.kind === 'comp' && ctx.sheetOpen && ctx.cv !== 'c3') || ctx.rep.view === 'sheet';
+  const pushOn = (ctx.kind === 'list' && ctx.pushed) || (ctx.kind === 'comp' && ctx.cv === 'c3' && ctx.sheetOpen);
+  el.classList.toggle('is-sheet', !!sheetOn); el.classList.toggle('is-picker', !!ctx.picker);
+  el.classList.toggle('c2open', ctx.kind === 'comp' && ctx.cv === 'c2' && !!sheetOn);
+  el.classList.toggle('is-push', !!pushOn);
+  el.querySelectorAll('.sheet').forEach(s => { const on = s.hasAttribute('data-picker') ? !!ctx.picker : !!sheetOn && !ctx.picker; s.inert = !on; s.style.setProperty('--dy', '0px'); });
+  const push = el.querySelector('.layer.push'), base = el.querySelector('.layer.base');
+  if (push) push.inert = !pushOn;
+  if (base) base.inert = !!pushOn || !!sheetOn;
+  if (push && pushOn) push.inert = !!sheetOn;
+  el.querySelector('.stage').inert = !!sheetOn || !!ctx.picker;
+}
+function rerenderThread(ctx, smooth = true) {
+  const host = ctx.kind === 'comp' && ctx.cv !== 'c3' ? ctx.el.querySelector('.sheet') : ctx.el.querySelector(ctx.kind === 'list' ? '.layer.push' : (ctx.kind === 'comp' ? '.layer.push' : '.layer.base'));
+  if (!host) return;
+  if (ctx.kind === 'comp' && ctx.cv !== 'c3') { const st = host.querySelector('[data-scroll]').scrollTop; host.innerHTML = compSheetHTML(ctx); host.querySelector('[data-scroll]').scrollTop = st; }
+  else {
+    const sc = host.querySelector('[data-scroll]'), st = sc ? sc.scrollTop : 0;
+    host.querySelector('.thread').outerHTML = `<div class="thread">${host.querySelector('.thread .off') ? host.querySelector('.thread .off').outerHTML : ''}${!ctx.thread.length && !ctx.busy ? `<div class="intro">${FACE}<p>Hi, I’m Geo. Tell me what you ate, ask what to eat next, or how your week is going. A photo works too.</p></div>` : ''}${threadHTML(ctx)}</div>`;
+    host.querySelector('.cmpw').innerHTML = composerHTML(ctx);
+    if (sc) sc.scrollTop = st;
+  }
+  ctx.thread.forEach(t => { t.fresh = false; });
+  scrollEnd(ctx, smooth);
+}
+const fit = ctx => ctx.el.querySelectorAll('.ta').forEach(t => { if (!t.value) return; t.style.height = 'auto'; t.style.height = Math.min(110, t.scrollHeight) + 'px'; });
+function scrollEnd(ctx, smooth) {
+  fit(ctx);
+  const sel = ctx.kind === 'comp' && ctx.cv !== 'c3' ? '.sheet [data-scroll]' : ctx.kind === 'list' ? '.layer.push [data-scroll]' : ctx.kind === 'comp' ? '.layer.push [data-scroll]' : '.layer.base [data-scroll]';
+  const sc = ctx.el.querySelector(sel);
+  if (sc) sc.scrollTo({ top: sc.scrollHeight, behavior: smooth && !RM ? 'smooth' : 'auto' });
+}
+function showToast(ctx, text, stay) {
+  const t = ctx.el.querySelector('.toast');
+  t.querySelector('[data-tt]').textContent = text;
+  t.classList.add('on');
+  if (!stay) later(ctx, () => t.classList.remove('on'), 2200);
+}
+function openMenu(ctx, i, instant) {
+  const el = ctx.el, g = el.querySelector(`.tg[data-g="${i}"]`), m = el.querySelector('.menu');
+  if (!g || !m) return;
+  ctx.rep = { view: 'menu', i };
+  g.classList.add('lift');
+  const k = ctx.k(), r = g.getBoundingClientRect(), pr = el.getBoundingClientRect();
+  const below = (r.bottom - pr.top) / k + 10, top = below + 110 > 844 - 24 ? Math.max(62, (r.top - pr.top) / k - 116) : below;
+  m.style.top = top + 'px';
+  el.classList.add('is-menu'); m.classList.add('on');
+  m.inert = false;
+  if (!instant) m.querySelector('button').focus({ preventScroll: true });
+}
+function closeMenu(ctx) {
+  const el = ctx.el;
+  el.classList.remove('is-menu');
+  const m = el.querySelector('.menu'); if (m) { m.classList.remove('on'); m.inert = true; }
+  el.querySelectorAll('.lift').forEach(x => x.classList.remove('lift'));
+}
+function send(ctx, text) {
+  if (ctx.busy) return;
+  const photos = ctx.photos.filter(p => !p.up).map(p => p.c);
+  if (!text && !photos.length) return;
+  const msg = text || (photos.length ? 'What is this?' : '');
+  ctx.thread.forEach(t => { if (t.card && t.card.type === 'plan') t.card.done = true; });
+  ctx.thread.push({ r: 'u', t: msg, photos: photos.length ? photos : null, fresh: true });
+  ctx.draft = ''; ctx.photos = []; ctx.vnote = false;
+  const pill = ctx.el.querySelector('.undo'); if (pill) pill.classList.remove('on');
+  if (ctx.offline) { ctx.thread[ctx.thread.length - 1].failed = true; rerenderThread(ctx); return; }
+  ctx.busy = true; rerenderThread(ctx);
+  later(ctx, () => {
+    const r = replyFor(msg, photos.length > 0);
+    if (r.undo) { const last = [...ctx.thread].reverse().find(t => t.card && t.card.type === 'log' && !t.card.undone); if (last) { last.card.undone = true; r.t = `Removed ${last.card.items.map(k => F[k].n.toLowerCase()).join(' and ')} from ${last.card.meal}.`; } }
+    ctx.busy = false;
+    ctx.thread.push({ r: 'g', card: r.card, t: r.t, chips: r.chips, time: '9:41 am', fresh: true });
+    rerenderThread(ctx);
+    if (r.toast && ctx.av === 'a1') showToast(ctx, r.toast);
+    if (r.card && r.card.type === 'log' && ctx.av === 'a3') { const p = ctx.el.querySelector('.undo'); p.querySelector('[data-um]').textContent = r.card.meal; p.classList.add('on'); later(ctx, () => p.classList.remove('on'), 8000); }
+  }, 1300);
+}
+function addPhoto(ctx, c) {
+  if (ctx.photos.length >= 5) return;
+  ctx.photos.push({ c, up: 1 }); rerenderThread(ctx, false);
+  later(ctx, () => { const p = ctx.photos.find(x => x.up); if (p) delete p.up; rerenderThread(ctx, false); }, 800);
+}
+function act(ctx, a, el, ev) {
+  const [cmd, ...rest] = a.split(':'), arg = rest.join(':');
+  const E = ctx.el;
+  switch (cmd) {
+    case 'open': ctx.pushed = true; ctx.openTitle = ctx.titles[arg] || (ctx.state === 'long' ? SESS_WORST : SESS)[+arg][0]; ctx.thread = T.conv(); E.querySelector('.layer.push').innerHTML = sessionHTML(ctx, ctx.openTitle); syncClasses(ctx); scrollEnd(ctx, false); break;
+    case 'new': ctx.pushed = true; ctx.openTitle = 'New conversation'; ctx.thread = []; E.querySelector('.layer.push').innerHTML = sessionHTML(ctx, ctx.openTitle); syncClasses(ctx); break;
+    case 'ask': { const v = ctx.ask.trim(); if (!v || ctx.state === 'offline') return; ctx.ask = ''; E.querySelector('.ask input').value = ''; el.classList.remove('on'); act(ctx, 'new', el); E.querySelector('.layer.push h2').textContent = v; later(ctx, () => send(ctx, v), 350); break; }
+    case 'prefill': ctx.ask = arg; E.querySelector('.ask input').value = arg; E.querySelector('.ask .send').classList.add('on'); E.querySelector('.ask input').focus({ preventScroll: true }); break;
+    case 'back': if (ctx.kind === 'list' || (ctx.kind === 'comp' && ctx.cv === 'c3')) { ctx.pushed = false; if (ctx.kind === 'comp') ctx.sheetOpen = false; syncClasses(ctx); } else showToast(ctx, 'Goes back to conversations'); break;
+    case 'more': ctx.sheetRow = +arg; ctx.sheetView = 'actions'; E.querySelector('.sheet').innerHTML = listSheetHTML(ctx); syncClasses(ctx); break;
+    case 'rename': case 'delete': ctx.sheetView = cmd; E.querySelector('.sheet').innerHTML = listSheetHTML(ctx); syncClasses(ctx); if (cmd === 'rename') later(ctx, () => { const f = E.querySelector('[data-ren]'); f && f.focus({ preventScroll: true }); }, RM ? 0 : 300); break;
+    case 'saverename': { const v = E.querySelector('[data-ren]').value.trim(); if (v) ctx.titles[ctx.sheetRow] = v; ctx.sheetView = null; syncClasses(ctx); E.querySelector('.layer.base').innerHTML = listHTML(ctx); showToast(ctx, 'Renamed'); break; }
+    case 'dodelete': ctx.gone.add(ctx.sheetRow); ctx.sheetView = null; syncClasses(ctx); E.querySelector('.layer.base').innerHTML = listHTML(ctx); showToast(ctx, 'Conversation deleted'); break;
+    case 'close': if (E.classList.contains('is-menu')) { closeMenu(ctx); ctx.rep = { view: null }; break; } if (ctx.picker) { ctx.picker = false; syncClasses(ctx); break; } ctx.sheetView = null; ctx.sheetOpen = false; ctx.rep = { view: null }; syncClasses(ctx); break;
+    case 'tab': if (E.classList.contains('is-min')) E.classList.remove('is-min'); else if (+arg !== (ctx.kind === 'list' ? 3 : 0)) showToast(ctx, 'Opens ' + ['Home', 'Food', 'Train', 'Geo'][+arg]); break;
+    case 'say': if (ctx.kind === 'rep') return; send(ctx, arg); break;
+    case 'send': send(ctx, ctx.draft.trim()); break;
+    case 'retry': ctx.thread.splice(+arg, 1); ctx.offline = false; { const off = E.querySelector('.off'); off && off.remove(); } send(ctx, 'Add a banana too'); break;
+    case 'retryhist': ctx.state = 'conv'; ctx.thread = T.conv(); render(ctx); break;
+    case 'retrylist': setState(ctx, 'many'); break;
+    case 'expand': { const i = +arg; ctx.open.has(i) ? ctx.open.delete(i) : ctx.open.add(i); rerenderThread(ctx, false); break; }
+    case 'cam': ctx.picker = true; E.querySelector('[data-picker]').innerHTML = `<span class="grab" aria-hidden="true"></span><div class="grp"><button data-act="pickph:f-egg">Take photo</button><button data-act="pickph:f-lbl">Choose from library</button></div><button class="cancel" data-act="close">Cancel</button>`; syncClasses(ctx); break;
+    case 'pickph': ctx.picker = false; syncClasses(ctx); addPhoto(ctx, arg); break;
+    case 'cam3': E.querySelector('.cam').classList.add('on'); break;
+    case 'camx': E.querySelector('.cam').classList.remove('on'); break;
+    case 'shutter': E.querySelector('.cam').classList.remove('on'); addPhoto(ctx, 'f-egg'); break;
+    case 'rmph': ctx.photos.splice(+arg, 1); rerenderThread(ctx, false); break;
+    case 'mic': ctx.vnote = true; rerenderThread(ctx, false); later(ctx, () => { ctx.vnote = false; rerenderThread(ctx, false); }, 2600); break;
+    case 'geo': ctx.sheetOpen = true; if (ctx.cv === 'c3') E.querySelector('.layer.push').innerHTML = sessionHTML(ctx, 'Geo, about Today'); else E.querySelector('.sheet').innerHTML = compSheetHTML(ctx); syncClasses(ctx); later(ctx, () => { const ta = E.querySelector(ctx.cv === 'c3' ? '.layer.push .ta' : '.sheet .ta'); ta && ta.focus({ preventScroll: true }); }, RM ? 0 : 380); break;
+    case 'cnew': ctx.thread = []; ctx.busy = false; rerenderThread(ctx, false); break;
+    case 'cfull': ctx.full = !ctx.full; E.querySelector('.sheet').classList.toggle('full', ctx.full); E.querySelector('.sheet').innerHTML = compSheetHTML(ctx); break;
+    case 'menu': if (ctx.kind === 'rep' || ctx.kind === 'sess') openMenu(ctx, +arg); break;
+    case 'copy': closeMenu(ctx); ctx.rep = { view: null }; showToast(ctx, 'Copied'); break;
+    case 'report': { const i = ctx.rep.i; closeMenu(ctx); ctx.rep = { view: 'sheet', i, reason: null }; E.querySelector('.sheet:not([data-picker])').innerHTML = reportHTML(ctx); syncClasses(ctx); break; }
+    case 'reason': ctx.rep.reason = arg; ctx.rep.note = E.querySelector('.sheet textarea').value; E.querySelector('.sheet:not([data-picker])').innerHTML = reportHTML(ctx); break;
+    case 'sendrep': ctx.rep.note = E.querySelector('.sheet textarea').value; ctx.rep.sending = true; ctx.rep.failed = false; E.querySelector('.sheet:not([data-picker])').innerHTML = reportHTML(ctx); later(ctx, () => { ctx.rep = { view: null }; syncClasses(ctx); showToast(ctx, 'Thanks. We’ll take a look.'); }, 900); break;
+    case 'toast': showToast(ctx, arg); break;
+  }
+}
+function wire(ctx) {
+  const E = ctx.el;
+  E.addEventListener('click', e => { const t = e.target.closest('[data-act]'); if (!t || !E.contains(t) || t.disabled || t.dataset.act === 'noop') return; if (t.getAttribute('aria-disabled') === 'true') return; e.preventDefault(); act(ctx, t.dataset.act, t, e); });
+  E.addEventListener('input', e => {
+    if (e.target.matches('.ta')) { ctx.draft = e.target.value; e.target.style.height = 'auto'; e.target.style.height = Math.min(110, e.target.scrollHeight) + 'px'; const s = e.target.closest('.crow').querySelector('.send'); if (s) { const on = !!ctx.draft.trim() && !ctx.busy && !ctx.photos.some(p => p.up); s.classList.toggle('on', on); on ? s.removeAttribute('aria-disabled') : s.setAttribute('aria-disabled', 'true'); } if (ctx.bv === 'b2' && (ctx.draft.trim() ? 1 : 0) !== (ctx._had ? 1 : 0)) { ctx._had = !!ctx.draft.trim(); const pos = e.target.selectionStart; rerenderThread(ctx, false); const ta = E.querySelector('.cmpw .ta, .sheet .ta'); if (ta) { ta.focus(); ta.setSelectionRange(pos, pos); } } }
+    if (e.target.matches('.ask input')) { ctx.ask = e.target.value; E.querySelector('.ask .send').classList.toggle('on', !!ctx.ask.trim()); }
+    if (e.target.matches('[data-ren]')) E.querySelector('[data-cnt]').textContent = e.target.value.length;
+  });
+  E.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.matches('.ask input')) { e.preventDefault(); act(ctx, 'ask', E.querySelector('.ask .send')); }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && e.target.matches('.ta')) { e.preventDefault(); act(ctx, 'send'); }
+    if (e.key === 'Enter' && e.target.matches('[data-ren]')) { e.preventDefault(); act(ctx, 'saverename'); }
+    if (e.key === 'Escape') act(ctx, 'close');
+  });
+  // Scroll: tab capsule minimises (o01), background layers drift at their depths (o19).
+  let lastY = 0, tk = false;
+  E.addEventListener('scroll', e => {
+    const sc = e.target; if (!sc.matches || !sc.matches('[data-scroll]')) return;
+    if (tk) return; tk = true;
+    requestAnimationFrame(() => {
+      tk = false; const y = sc.scrollTop, d = y - lastY;
+      if (sc.closest('.layer.base') && (ctx.kind === 'list' || ctx.kind === 'comp')) { if (y < 40 || d < -6) { E.classList.remove('is-min'); lastY = y; } else if (d > 6) { E.classList.add('is-min'); lastY = y; } const tf = sc.parentElement.querySelector('.topfade'); if (tf) tf.style.opacity = y > 6 ? 1 : 0; }
+      if (!RM) { const b = E.querySelector('.bg'); b.children[0].style.transform = `translate3d(0,${-y * .12}px,0)`; b.children[2].style.transform = `translate3d(0,${-y * .4}px,0) rotate(18deg)`; }
+    });
+  }, { capture: true, passive: true });
+  // Long press a Geo reply for Copy / Report.
+  let lp = null;
+  E.addEventListener('pointerdown', e => {
+    const g = e.target.closest('.tg[data-g]');
+    if (g && (ctx.kind === 'rep' || ctx.kind === 'sess') && !e.target.closest('button')) { const x = e.clientX, y = e.clientY; lp = { x, y, t: setTimeout(() => { lp = null; openMenu(ctx, +g.dataset.g); }, 450) }; }
+    const tl = e.target.closest('[data-tilt]');
+    if (tl && !RM) { const r = tl.getBoundingClientRect(), dx = (e.clientX - r.left) / r.width - .5, dy = (e.clientY - r.top) / r.height - .5; tl.style.transition = 'transform .12s linear'; tl.style.transform = `perspective(600px) rotateX(${-dy * 6}deg) rotateY(${dx * 6}deg) translateZ(-6px)`; const up = () => { tl.style.transition = `transform ${SPR.d}s var(--spr)`; tl.style.transform = ''; removeEventListener('pointerup', up); removeEventListener('pointercancel', up); }; addEventListener('pointerup', up); addEventListener('pointercancel', up); }
+  });
+  E.addEventListener('pointermove', e => { if (lp && Math.hypot(e.clientX - lp.x, e.clientY - lp.y) > 10) { clearTimeout(lp.t); lp = null; } });
+  E.addEventListener('pointerup', () => { if (lp) { clearTimeout(lp.t); lp = null; } });
+  E.addEventListener('contextmenu', e => { const g = e.target.closest('.tg[data-g]'); if (g && (ctx.kind === 'rep' || ctx.kind === 'sess')) { e.preventDefault(); openMenu(ctx, +g.dataset.g); } });
+  // Drag: sheet grab (dismiss, or c1 detents) and left-edge swipe back on a pushed page; both track the finger.
+  let dr = null;
+  E.addEventListener('pointerdown', e => {
+    const grab = e.target.closest('[data-grab]'), push = e.target.closest('.layer.push');
+    const pr = E.getBoundingClientRect();
+    if (grab) { dr = { kind: 'sheet', k: ctx.k(), y0: e.clientY, sh: grab.closest('.sheet'), id: e.pointerId }; }
+    else if (push && E.classList.contains('is-push') && e.clientX - pr.left < 24 * ctx.k()) dr = { kind: 'back', x0: e.clientX, w: pr.width, id: e.pointerId };
+    else return;
+    E.classList.add('is-drag'); E.setPointerCapture && E.setPointerCapture(e.pointerId);
+  });
+  E.addEventListener('pointermove', e => {
+    if (!dr) return;
+    if (dr.kind === 'sheet') { const dy = (e.clientY - dr.y0) / dr.k; dr.dy = dy; dr.sh.style.setProperty('--dy', (dy > 0 ? dy : dy * .25) + 'px'); }
+    else { const dx = Math.max(0, e.clientX - dr.x0), p = Math.min(1, dx / dr.w); dr.p = p; E.querySelector('.layer.push').style.transform = `translateX(${390 * p}px)`; const b = E.querySelector('.layer.base'); b.style.transform = `scale(${.94 + .06 * p}) translateX(${-5 + 5 * p}%)`; b.style.opacity = .5 + .5 * p; b.style.filter = `blur(${1 - p}px)`; }
+  });
+  const end = () => {
+    if (!dr) return; E.classList.remove('is-drag');
+    if (dr.kind === 'sheet') {
+      const dy = dr.dy || 0; dr.sh.style.setProperty('--dy', '0px');
+      if (dr.sh.classList.contains('c1')) { if (dy < -40) { ctx.full = true; dr.sh.classList.add('full'); } else if (dy > 60 && ctx.full) { ctx.full = false; dr.sh.classList.remove('full'); } else if (dy > 60) act(ctx, 'close'); }
+      else if (dy > 70) act(ctx, 'close');
+    } else {
+      const p = E.querySelector('.layer.push'), b = E.querySelector('.layer.base');
+      [p, b].forEach(x => { x.style.transform = ''; x.style.opacity = ''; x.style.filter = ''; });
+      if ((dr.p || 0) > .35) act(ctx, 'back');
+    }
+    dr = null;
+  };
+  E.addEventListener('pointerup', end); E.addEventListener('pointercancel', end);
+}
+
+// ---------- measurement hooks (Playwright reads these) ----------
+const gaps = ms => new Promise(res => { const out = []; let last = performance.now(); const t0 = last; const f = t => { out.push(t - last); last = t; if (t - t0 < ms) requestAnimationFrame(f); else res({ maxGap: +Math.max(...out.slice(1)).toFixed(1), frames: out.length }); }; requestAnimationFrame(f); });
+window.GEO = {
+  ids: () => Object.keys(PH),
+  state: (id, s) => { const c = PH[id]; const b = c.el.closest(".opt").querySelector(`.sw [data-st="${s}"]`); b ? b.click() : setState(c, s); },
+  async run(id, what) {
+    const c = PH[id], E = c.el;
+    if (what === 'scroll') { const sc = [...E.querySelectorAll('[data-scroll]')].find(s => s.closest('[inert]') == null && s.scrollHeight > s.clientHeight) || E.querySelector('[data-scroll]'); sc.scrollTop = 0; const m = gaps(900); const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / 700); sc.scrollTop = 600 * k; if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); return m; }
+    const m = gaps(900);
+    if (what === 'push') { if (c.kind === 'list') act(c, 'open:0'); else if (c.kind === 'comp') act(c, 'geo'); }
+    if (what === 'sheet') { if (c.kind === 'list') act(c, 'more:0'); else if (c.kind === 'comp') act(c, 'geo'); else { act(c, 'menu:3'); setTimeout(() => act(c, 'report'), 200); } }
+    if (what === 'send') { c.draft = 'Had a flat white and a croissant'; act(c, 'send'); }
+    return m;
+  },
+};
+document.querySelectorAll('[data-cfg]').forEach(mount);
+
+// ---------- picks tray ----------
+const KEY = 'fiqr-geo-picks';
+let picks = {};
+try { picks = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { picks = {}; }
+const out = document.getElementById('pick-out');
+const paint = () => { document.querySelectorAll('.pick').forEach(b => b.setAttribute('aria-pressed', picks[b.dataset.dec] === b.dataset.opt)); const v = Object.entries(picks).map(([d, o]) => `${d}: ${o}`); out.textContent = v.length ? v.join('; ') : 'No picks yet'; };
+document.querySelectorAll('.pick').forEach(b => b.addEventListener('click', () => { const d = b.dataset.dec; picks[d] = picks[d] === b.dataset.opt ? undefined : b.dataset.opt; if (!picks[d]) delete picks[d]; try { localStorage.setItem(KEY, JSON.stringify(picks)); } catch (e) { } paint(); }));
+document.getElementById('pick-copy').addEventListener('click', async e => { const txt = 'FIQR Ask Geo picks: ' + out.textContent; try { await navigator.clipboard.writeText(txt); e.target.textContent = 'Copied'; } catch (err) { e.target.textContent = 'Copy failed'; } setTimeout(() => { e.target.textContent = 'Copy picks'; }, 1600); });
+paint();
+
+// ---------- measurements printed under each phone (filled by the build from Playwright) ----------
+const MEASURED = {"g-list": {"small": 0, "orange": 0, "push": 83.4, "scroll": 16.8, "sheet": 16.8}, "g-sess": {"small": 0, "orange": 0, "scroll": 16.8, "send": 16.8, "sheet": 16.8}, "g-a1": {"small": 0, "orange": 0, "scroll": 16.8, "send": 16.8, "sheet": 16.8}, "g-a2": {"small": 0, "orange": 0, "scroll": 16.8, "send": 16.8, "sheet": 16.8}, "g-a3": {"small": 0, "orange": 0, "scroll": 16.8, "send": 16.8, "sheet": 16.8}, "g-b1": {"small": 0, "orange": 1, "scroll": 16.8, "send": 16.7, "sheet": 16.8}, "g-b2": {"small": 0, "orange": 1, "scroll": 16.8, "send": 16.8, "sheet": 16.8}, "g-b3": {"small": 0, "orange": 1, "scroll": 16.8, "send": 33.3, "sheet": 33.3}, "g-c1": {"small": 0, "orange": 0, "sheet": 16.8, "scroll": 16.8}, "g-c2": {"small": 0, "orange": 0, "sheet": 16.8, "scroll": 16.8}, "g-c3": {"small": 0, "orange": 0, "sheet": 16.8, "scroll": 16.8}, "g-rep": {"small": 0, "orange": 1, "sheet": 16.8, "scroll": 16.8}};
+document.querySelectorAll('.meas[data-for]').forEach(m => {
+  const r = MEASURED[m.dataset.for]; if (!r) return;
+  const set = (k, v) => { const x = m.querySelector(`[data-m="${k}"]`); if (x) x.textContent = v; };
+  set('t44', r.small === 0 ? '0 below 44 pt' : `${r.small} below 44 pt`);
+  set('orange', `${r.orange} max in any state`);
+  set('fps', ['push', 'scroll', 'sheet', 'send'].filter(k => r[k] != null).map(k => `${k} ${r[k]} ms`).join(', '));
+});
+})();
+</script>

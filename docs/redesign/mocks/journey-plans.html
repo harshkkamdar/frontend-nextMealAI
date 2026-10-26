@@ -1,0 +1,1071 @@
+<title>FIQR Check-in and Plans</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap">
+<style>
+/* Page chrome: theme-aware tokens. The phones keep the light FIQR palette inside (brief: light only inside the phone). */
+:root{--bg:#F4EEE4;--surface:#FFFDF9;--fg:#111C35;--muted:#596178;--line:rgba(17,28,53,.12);--accent:#C9501D;--chip:rgba(17,28,53,.06);--rec:#2F6B66;--warn:#8A5A12;--body:"Archivo",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1424;--surface:#161E33;--fg:#F3ECE0;--muted:#A9B0C2;--line:rgba(243,236,224,.14);--accent:#F07A47;--chip:rgba(243,236,224,.08);--rec:#7CC2BB;--warn:#E3B266;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1424;--surface:#161E33;--fg:#F3ECE0;--muted:#A9B0C2;--line:rgba(243,236,224,.14);--accent:#F07A47;--chip:rgba(243,236,224,.08);--rec:#7CC2BB;--warn:#E3B266;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 140px;overflow-x:hidden}
+.pagewrap{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:56px}.pagewrap>*{min-width:0}
+h1,h2,h3,h4{margin:0;font-stretch:108%;letter-spacing:-.01em;line-height:1.1;text-wrap:balance}
+.intro h1{font-size:clamp(32px,5vw,52px);font-weight:800;font-stretch:112%}
+.intro p{max-width:66ch;color:var(--muted);margin:14px 0 0}
+section.blk>h2{font-size:clamp(24px,3vw,32px);font-weight:800;margin-bottom:8px}
+section.blk>p.lead{max-width:70ch;color:var(--muted);margin:0 0 20px}
+p{margin:0}
+a{color:inherit}
+.muted{color:var(--muted)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px}
+.panel{background:var(--surface);border-radius:20px;padding:20px;min-width:0}
+.panel h3{font-size:19px;font-weight:750;margin-bottom:8px}
+.panel ul,.panel ol{margin:6px 0 0;padding-left:20px}
+.panel li{margin:4px 0}
+.panel.alert{box-shadow:inset 4px 0 0 var(--accent)}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:15px;margin-top:8px}
+.kv dt{color:var(--muted);font-weight:600}
+.kv dd{margin:0;min-width:0}
+.tw{overflow-x:auto;background:var(--surface);border-radius:20px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:10px 14px;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-size:13px;color:var(--muted);font-weight:650;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right}
+.flow{background:var(--surface);border-radius:20px;padding:16px;overflow-x:auto}
+.flow svg{display:block;min-width:760px;width:100%;height:auto}
+.flow text{font-family:var(--body);fill:var(--fg)}
+/* option grid */
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:40px 24px;margin-top:8px}
+.opt{display:grid;gap:12px;align-content:start;min-width:0}
+.ohd{display:grid;gap:6px}
+.ohd h3{font-size:20px;font-weight:750;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.badge{font:700 13px var(--body);border-radius:999px;padding:3px 10px;background:var(--rec);color:var(--bg);letter-spacing:0;font-stretch:100%}
+.badge.ch{background:var(--warn)}
+.ohd p{color:var(--muted);font-size:15px}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{font:600 13px var(--body);color:var(--fg);background:var(--chip);border:0;border-radius:999px;padding:0 12px;min-height:36px;cursor:pointer}
+.sw button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.sw button:focus-visible,.pick:focus-visible,.tray button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{justify-self:center;width:300px;max-width:100%;height:649px;overflow:visible}
+.meas{font-size:14px;display:grid;gap:2px;background:var(--surface);border-radius:16px;padding:12px 14px}
+.meas div{display:flex;justify-content:space-between;gap:12px}
+.meas span:first-child{color:var(--muted)}
+.meas b{font-variant-numeric:tabular-nums;text-align:right}
+.trade{font-size:15px}
+.trade b{font-weight:700}
+.pick{justify-self:start;font:650 14px var(--body);border-radius:999px;padding:0 18px;min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.pick[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tray{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 18px;box-shadow:0 12px 40px -12px rgba(0,0,0,.35);width:max-content;max-width:calc(100% - 32px);font-size:14px}
+.tray output{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tray button{font:650 14px var(--body);border-radius:999px;padding:0 14px;min-height:40px;border:0;background:var(--fg);color:var(--bg);cursor:pointer;flex:none}
+.find{font-size:15px}
+.find code{font-size:13px;background:var(--chip);border-radius:6px;padding:1px 5px;overflow-wrap:anywhere}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.toc a{font-weight:650;font-size:14px;text-decoration:none;background:var(--chip);border-radius:999px;padding:9px 14px;min-height:40px;display:inline-flex;align-items:center}
+@media (max-width:420px){.opts{grid-template-columns:1fr}}
+
+/* ---------- Phones: FIQR spatial depth kit (from spatial-app.html), content solid per Q3, glass only on controls ---------- */
+.fq{--ink:#111C35;--cr:#FBF2E6;--or:#E8622A;--te:#3E7C77;--oc:#A07A3C;--mu:#111c35a8;--rule:#111c3512;--tint:#111c350b;--spr:linear(0,.063,.184,.323,.458,.577,.672,.754,.819,.869,.907,.934,.955,.969,.979,.986,.991,.994,.997,.998,.999,1,1);--out:cubic-bezier(.23,1,.32,1);--glass:#ffffffad;--gsh:inset 0 1px 0 #fff,inset 0 0 0 1px #ffffff8c,0 0 0 .5px #111c3514,0 10px 24px -14px #111c3559;
+position:relative;width:390px;height:844px;margin:0;border-radius:55px;transform:scale(var(--k,.7692));transform-origin:0 0;border:1px solid #111c351a;overflow:hidden;background:var(--cr);color:var(--ink);font:400 16px/1.35 Archivo,system-ui,sans-serif;isolation:isolate;contain:layout paint;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;text-align:left;box-shadow:0 30px 60px -30px rgba(17,28,53,.35)}
+.fq *{box-sizing:border-box}
+.fq h2,.fq h3,.fq p,.fq ul,.fq ol{margin:0;padding:0}.fq ul,.fq ol{list-style:none}
+.fq button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit;touch-action:manipulation}
+.fq button:disabled{cursor:default}
+.fq button:focus-visible,.fq input:focus-visible,.fq textarea:focus-visible,.fq .pscroll:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+.fq .pscroll:focus-visible{outline-offset:-3px;border-radius:44px}
+.fq .ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.fq .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.fq [hidden]{display:none!important}
+.fq .status{position:absolute;top:0;left:0;right:0;height:54px;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:4px 36px 0 50px;font-weight:650;font-size:17px;pointer-events:none;font-variant-numeric:tabular-nums}
+.fq .sic{display:flex;align-items:flex-end;gap:2px}.fq .sic i{width:3px;background:var(--ink);border-radius:1px}
+.fq .sic i:nth-child(1){height:5px}.fq .sic i:nth-child(2){height:7px}.fq .sic i:nth-child(3){height:9px}
+.fq .sic b{width:20px;height:10px;border-radius:3px;margin-left:5px;border:1px solid #111c3573;background:linear-gradient(90deg,var(--ink) 70%,transparent 0) 1px/calc(100% - 2px) calc(100% - 2px) no-repeat}
+/* layers */
+.fq .base{position:absolute;inset:0;z-index:1;transform-origin:50% 45%}
+.fq .bscroll{height:100%;overflow:hidden;padding:62px 16px 20px}
+.fq .pg{position:absolute;inset:0;z-index:8;background:var(--cr);box-shadow:-18px 0 40px -22px #111c3559;transform:translate3d(100%,0,0);transform-origin:0 50%}
+.fq .pg.l2{z-index:9}
+.fq .pscroll{height:100%;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:110px 16px 140px;touch-action:pan-y}
+.fq .pscroll::-webkit-scrollbar{display:none}
+.fq .pbar{position:absolute;top:0;left:0;right:0;height:106px;padding:54px 14px 0;display:flex;align-items:flex-start;gap:6px;z-index:4;pointer-events:none}
+.fq .pbar::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .25s var(--out);background:#fbf2e6b8;-webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);-webkit-mask:linear-gradient(#000 70%,transparent);mask:linear-gradient(#000 70%,transparent)}
+.fq .pg.is-scrolled .pbar::before{opacity:1}
+.fq .rb{position:relative;pointer-events:auto;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--glass);-webkit-backdrop-filter:blur(14px) saturate(1.8);backdrop-filter:blur(14px) saturate(1.8);box-shadow:var(--gsh);transition:transform .14s var(--out);flex:none}
+.fq .rb:active{transform:scale(.92)}
+.fq .rb.ghost{visibility:hidden}
+.fq .pt{position:relative;flex:1;min-width:0;text-align:center;line-height:44px;font-size:17px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .2s var(--out)}
+.fq .pg.is-scrolled .pt,.fq .pt.on{opacity:1}
+.fq .edge{position:absolute;left:0;top:106px;bottom:0;width:20px;z-index:6;touch-action:none;cursor:grab}
+/* type: sizing spec (title 30, hero 24, value 20-22, section 18, body 16, subline 15, caption 13, label 12) */
+.fq .h1{font-size:30px;font-weight:800;font-stretch:104%;letter-spacing:-.022em;line-height:1.08;margin:0 4px;overflow-wrap:anywhere}
+.fq .sub{margin:6px 4px 0;font-size:15px;color:var(--mu);font-variant-numeric:tabular-nums}
+.fq .sec{font-size:18px;font-weight:750;font-stretch:104%;letter-spacing:-.01em;margin:28px 4px 10px}
+.fq .lbl{font-size:12px;font-weight:600;color:var(--mu)}
+.fq .fig{font-size:24px;font-weight:800;font-stretch:104%;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.fq .fig small{font-size:15px;font-weight:600;letter-spacing:0;color:var(--mu);font-stretch:100%}
+.fq .val{font-size:20px;font-weight:750;font-stretch:106%;letter-spacing:-.015em;font-variant-numeric:tabular-nums}
+.fq .val small{font-size:13px;font-weight:600;color:var(--mu);letter-spacing:0}
+.fq .body{font-size:16px;line-height:1.45;text-wrap:pretty}
+.fq .note{font-size:13px;color:var(--mu);line-height:1.4}
+.fq .mt{margin-top:12px}
+.fq .card{display:block;width:100%;background:#fff;border-radius:22px;box-shadow:0 1px 2px #111c350a,0 10px 24px -18px #111c3540}
+.fq .pad{padding:16px}
+.fq .gap{display:grid;gap:10px}
+.fq .ghd{display:flex;align-items:center;gap:8px}
+.fq .gav{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:#fff;font-size:11px;font-weight:800}
+.fq .r{margin-left:auto}
+/* rows inside a card (row rules allowed on app screens) */
+.fq .row{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:11px 16px}
+.fq .row+.row{box-shadow:0 -1px 0 var(--rule)}
+.fq .rt{flex:1;min-width:0;display:flex;flex-direction:column}
+.fq .rt b{font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fq .rt b.wrap{white-space:normal;overflow-wrap:anywhere}
+.fq .rt span{font-size:13px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fq .chev{width:18px;height:18px;color:#111c3566}
+.fq .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+/* ledger */
+.fq .lrow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;min-height:60px;padding:10px 16px}
+.fq .lrow+.lrow{box-shadow:0 -1px 0 var(--rule)}
+.fq .ll{display:flex;align-items:center;gap:8px;font-weight:650;font-size:16px}
+.fq .lsub{grid-column:1;font-size:13px;color:var(--mu);padding-left:16px}
+.fq .lv{grid-row:1/span 2;grid-column:2;display:flex;align-items:baseline;gap:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fq .lv s{font-size:15px;color:var(--mu);text-decoration-thickness:1.5px;transition:opacity .25s var(--out)}
+.fq .lv .ar{width:14px;height:14px;align-self:center;color:#111c3566;transition:opacity .25s var(--out)}
+.fq .lv b{font-size:20px;font-weight:800;font-stretch:106%;letter-spacing:-.015em}
+.fq .lv small{font-size:13px;font-weight:600;color:var(--mu)}
+.fq .applied .lv s,.fq .applied .lv .ar{opacity:0}
+.fq .band{padding:12px 16px;background:var(--tint);font-size:13px;line-height:1.4;border-radius:0 0 22px 22px}
+.fq .band.ok{background:#3e7c771a}
+.fq .band.err{background:#e8622a17}
+.fq .why{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:52px;padding:0 16px;font-weight:650;font-size:16px}
+.fq .why .chev{transition:transform .25s var(--out)}
+.fq .why[aria-expanded=true] .chev{transform:rotate(90deg)}
+.fq .whyb{padding:0 16px 14px;font-size:15px;line-height:1.45}
+.fq .whyb li{display:flex;gap:8px;margin-top:6px}
+.fq .whyb li::before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:var(--ink);margin-top:10px}
+/* stats: one divided card */
+.fq .stats{display:grid;grid-template-columns:1fr 1fr}
+.fq .stats>div{padding:12px 16px 14px;min-width:0}
+.fq .stats>div:nth-child(even){box-shadow:-1px 0 0 var(--rule)}
+.fq .stats>div:nth-child(n+3){border-top:1px solid var(--rule)}
+.fq .stats.c3{grid-template-columns:repeat(3,1fr)}
+.fq .stats.c3>div{box-shadow:none;border-top:0}.fq .stats.c3>div+div{box-shadow:-1px 0 0 var(--rule)}
+.fq .meter{position:relative;display:block;height:3px;border-radius:2px;background:#111c3512;margin-top:8px}
+.fq .meter i{position:absolute;inset:0;border-radius:2px;background:#111c35a6;transform-origin:0 50%;transform:scaleX(var(--v))}
+.fq .meter::after{content:"";position:absolute;left:80%;top:-3px;width:1.5px;height:9px;background:var(--ink);border-radius:1px}
+/* chart */
+.fq .chart svg{display:block;width:100%;height:84px;overflow:visible}
+.fq .cx{display:flex;justify-content:space-between;font-size:13px;color:var(--mu);margin-top:6px}
+/* segments */
+.fq .segs{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.fq .segs i{height:6px;border-radius:3px;background:#111c3514}.fq .segs i.on{background:var(--ink)}
+/* dock: glass control layer floating over content */
+.fq .dock{position:absolute;left:16px;right:16px;bottom:28px;z-index:5;padding:6px;border-radius:32px;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);box-shadow:var(--gsh);display:grid;gap:4px}
+.fq .dock .msg{font-size:13px;font-weight:600;color:var(--mu);text-align:center;padding:4px 8px 0}
+.fq .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:50px;border-radius:25px;font-size:16px;font-weight:650;transition:transform .14s var(--out),background-color .2s,opacity .2s}
+.fq .btn:not(:disabled):active{transform:scale(.97)}
+.fq .btn.or{background:var(--or);color:#fff;box-shadow:inset 0 1px 0 #ffffff59}
+.fq .btn.ink{background:var(--ink);color:#fff}
+.fq .btn.soft{background:var(--tint)}
+.fq .btn:disabled{opacity:.45}
+.fq .btn.busy:disabled{opacity:1}
+.fq .spin{width:16px;height:16px;border-radius:50%;border:2px solid #ffffff59;border-top-color:#fff;animation:fqspin .8s linear infinite}
+@keyframes fqspin{to{transform:rotate(360deg)}}
+.fq .tbtn{display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;font-weight:600;font-size:15px;color:var(--mu);margin:0 auto}
+.fq .tbtn.ink{color:var(--ink)}
+/* chips and segmented */
+.fq .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px 4px}
+.fq .chips::-webkit-scrollbar{display:none}
+.fq .chip{flex:none;min-height:44px;padding:0 16px;border-radius:22px;background:#fff;font-weight:650;font-size:15px;box-shadow:0 1px 2px #111c350f;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fq .chip[aria-pressed=true],.fq .chip[aria-selected=true]{background:var(--ink);color:#fff}
+.fq .seg{display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:24px;background:var(--tint);position:relative}
+.fq .seg button{position:relative;z-index:1;min-height:44px;border-radius:22px;font-weight:650;font-size:15px;text-align:center;color:var(--mu);transition:color .2s}
+.fq .seg button[aria-pressed=true]{color:var(--ink)}
+.fq .seg .pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:44px;border-radius:22px;background:#fff;box-shadow:0 2px 8px -4px #111c3540;transform:translateX(calc(var(--i,0)*100%));transition:transform .45s var(--spr)}
+/* fields */
+.fq .field{display:block}
+.fq .field>span:not(.inp){display:block;font-size:13px;font-weight:600;color:var(--mu);margin:0 4px 6px}
+.fq .inp{display:flex;align-items:center;width:100%;min-height:60px;padding:0 16px;border-radius:16px;background:#fff;font-size:16px;font-weight:600;box-shadow:inset 0 0 0 1px #111c351a}
+.fq .inp.focus{box-shadow:inset 0 0 0 2px var(--ink)}
+.fq .inp .ph{color:#111c3580;font-weight:500}
+.fq .caret{display:inline-block;width:2px;height:20px;background:var(--or);margin-left:1px;animation:fqblink 1s steps(1) infinite}
+@keyframes fqblink{50%{opacity:0}}
+.fq .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fq .step{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;min-height:56px;background:#fff;border-radius:18px;padding:6px;box-shadow:0 1px 2px #111c350a}
+.fq .step .sb{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--tint);font-size:20px;font-weight:600}
+.fq .step .sv{text-align:center;display:flex;flex-direction:column}
+.fq .step .sv b{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.fq .step .sv span{font-size:12px;color:var(--mu);font-weight:600}
+.fq .add{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:48px;border-radius:16px;border:1.5px dashed #111c3540;font-weight:600;font-size:15px}
+.fq .empty{display:flex;flex-direction:column;justify-content:center;min-height:68px;padding:12px 18px;border-radius:22px;border:1.5px dashed #111c3538}
+.fq .empty b{font-size:16px}.fq .empty span{font-size:13px;color:var(--mu)}
+.fq .switch{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:8px 16px}
+.fq .switch .tg{flex:none;position:relative;width:50px;height:30px;border-radius:15px;background:#111c3533;transition:background .2s}
+.fq .switch .tg::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #111c3540;transition:transform .3s var(--spr)}
+.fq .switch[aria-checked=true] .tg{background:var(--ink)}.fq .switch[aria-checked=true] .tg::after{transform:translateX(20px)}
+/* progress for builder */
+.fq .prog{position:absolute;left:24px;right:24px;top:104px;height:4px;border-radius:2px;background:#111c3514;z-index:5;overflow:hidden}
+.fq .prog i{position:absolute;inset:0;background:var(--ink);border-radius:2px;transform-origin:0 50%;transform:scaleX(var(--p));transition:transform .5s var(--spr)}
+.fq .q{font-size:30px;font-weight:800;font-stretch:110%;letter-spacing:-.022em;line-height:1.1;margin:8px 4px 0;text-wrap:balance}
+.fq .qw{margin:8px 4px 22px;font-size:15px;color:var(--mu);line-height:1.4}
+.fq .slide{animation:fqin .42s var(--spr) both}
+.fq .slide.back{animation-name:fqinb}
+@keyframes fqin{from{opacity:0;transform:translate3d(24px,0,0)}}
+@keyframes fqinb{from{opacity:0;transform:translate3d(-24px,0,0)}}
+/* skeleton (flat, no shimmer) */
+.fq .sk{background:#111c350d;border-radius:22px}
+.fq .skl{display:block;background:#111c350f;border-radius:6px}
+/* offline band */
+.fq .offl{display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:10px 14px;border-radius:16px;background:#111c350d;font-size:13px;font-weight:600}
+/* small figures in meal rows */
+.fq .kc{font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fq .kc small{font-size:13px;color:var(--mu);font-weight:600}
+.fq .pill2{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;background:var(--tint);font-size:13px;font-weight:650;color:var(--ink)}
+.fq .num{flex:none;width:44px;text-align:left;font-size:13px;font-weight:700;color:var(--mu);line-height:1.15}
+.fq .num b{display:block;font-size:20px;color:var(--ink);font-weight:800}
+.fq .exl li{display:flex;justify-content:space-between;gap:10px;min-height:44px;align-items:center;padding:6px 0;font-size:15px}
+.fq .exl li+li{box-shadow:0 -1px 0 var(--rule)}
+.fq .exl li span{color:var(--mu);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fq .wk{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.fq .wk span{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;color:var(--mu);font-weight:600}
+.fq .wk i{width:22px;height:22px;border-radius:50%;background:var(--ink)}
+.fq .wk i.rest{background:none;box-shadow:inset 0 0 0 1.5px #111c3540}
+.fq .wk i.nx{background:var(--or);box-shadow:0 0 0 3px #e8622a33}
+.fq .bars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:54px;margin-top:12px}
+.fq .bars i{display:block;border-radius:5px 5px 2px 2px;background:#111c3533;height:calc(var(--h)*100%)}
+.fq .bars i.today{background:var(--ink)}
+.fq .bx{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:4px;font-size:13px;color:var(--mu);text-align:center;font-weight:600}
+.fq .gly{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--tint)}
+/* sheet: floats forward, glass */
+.fq .scrim{position:absolute;inset:0;z-index:20;background:#111c3524;opacity:0;pointer-events:none}
+.fq.sheet-on .scrim{pointer-events:auto}
+.fq .sheet{position:absolute;left:8px;right:8px;bottom:8px;z-index:21;max-height:760px;overflow:auto;scrollbar-width:none;border-radius:38px;padding:8px 16px 20px;background:#ffffffd6;-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px #111c3514,0 12px 24px -10px #111c3533,0 50px 90px -30px #111c358c;transform-origin:50% 100%;opacity:0;touch-action:none}
+.fq .grab{display:block;width:36px;height:5px;border-radius:3px;background:#111c352e;margin:0 auto 12px}
+.fq .sheet .sh{font-size:20px;font-weight:800;font-stretch:108%;letter-spacing:-.015em;margin:0 4px 10px}
+.fq .sheet .card{box-shadow:0 1px 2px #111c350f}
+.fq .res{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:8px 6px}
+.fq .res+.res{box-shadow:0 -1px 0 var(--rule)}
+/* compact tab bar on origin screens: capsule 56, icons 20, labels 10 */
+.fq .tabbar{position:absolute;left:16px;bottom:28px;z-index:3;display:grid;grid-template-columns:repeat(4,1fr);width:244px;height:52px;padding:4px;border-radius:26px;background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(1.8);backdrop-filter:blur(16px) saturate(1.8);box-shadow:var(--gsh)}
+.fq .tabbar span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:650;color:#111c358f;border-radius:22px}
+.fq .tabbar span.on{color:var(--ink);background:#111c3512}.fq .tabbar .ic{width:19px;height:19px}
+.fq .orbx{position:absolute;right:16px;bottom:28px;z-index:3;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;background:var(--or);box-shadow:inset 0 1px 1px #ffffff80,0 8px 22px -8px #e8622ab3}
+/* origin screens */
+.fq .otl{font-size:30px;font-stretch:104%!important;font-weight:800;font-stretch:110%;letter-spacing:-.022em;margin:8px 4px 14px}
+@media (prefers-reduced-motion:reduce){.fq *,.fq *::before,.fq *::after{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.15s!important}.fq .spin{animation:none;border-top-color:#ffffff59}.fq .caret{animation:none}}
+@media (prefers-reduced-transparency:reduce){.fq .rb,.fq .dock,.fq .sheet,.fq .pbar::before{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background-color:#fff!important}.fq .pbar::before{background:#FBF2E6!important}}
+</style>
+<div class="pagewrap">
+<header class="intro">
+<h1>Weekly check-in and plans</h1>
+<p>Every screen of the check-in and the plans area, designed in the Spatial Depth system: pages open with the screen behind stepping back, sheets float forward, glass sits only on the controls. Each phone is live. Use the chips above a phone to switch its state, tap through it, drag from its left edge to go back. Three decisions are open; each has three coded options, measurements and a recommendation. Pick one per decision; the tray at the bottom collects your picks.</p>
+<p>How the numbers under each phone were made: phones are built at a real iPhone's 390 x 844 pt with the sizing spec, then scaled to fit. Tap targets and orange actions are counted live from the phone's top layer in the current state. Frame gaps are the longest gap between animation frames during a push, a 700 ms scroll and a sheet opening, measured in headless Chrome (Playwright), median of 5 runs with the worst run in brackets; 16.8 ms is one frame at 60 Hz. The machine was shared with other jobs, so a single worst-run spike is noise until it repeats on a device. Times are estimates: 1.2 s per tap, 0.3 s per typed character, 2 s to read each screen.</p>
+<nav class="toc" aria-label="Sections">
+<a href="#summary">Journey</a><a href="#backend">What Apply changes</a><a href="#cards">Screen cards</a><a href="#matrix">State matrix</a><a href="#decA">Check-in decision</a><a href="#ckstates">Check-in states</a><a href="#decB">Plan card</a><a href="#views">Plan views</a><a href="#decC">Builder steps</a><a href="#builders">Workout builder and edit</a><a href="#tests">Tests</a>
+</nav>
+</header>
+
+<section class="blk" id="summary" aria-labelledby="summary-h">
+<h2 id="summary-h">The journey</h2>
+<p class="lead">Once a week Geo reads the week and may move the daily targets. In between, people look up the plan they follow and now and then build or change one. Three jobs carry this journey:</p>
+<div class="cols">
+<div class="panel"><h3>Decide on this week's targets</h3><p>Open the check-in from the Home card, see what changes and why, apply or keep. Weekly, about 2 minutes, from a push or the Home card.</p></div>
+<div class="panel"><h3>Look up my plan</h3><p>See today's targets, what to eat on a day, or the next workout. A few times a week, from Settings, Train or a Geo reply.</p></div>
+<div class="panel"><h3>Build or change a plan</h3><p>By hand, one question per step, or by asking Geo. A few times a month at most; most plans come from Geo.</p></div>
+</div>
+<div class="flow" style="margin-top:16px">
+<svg viewBox="0 0 960 400" role="img" aria-labelledby="flow-t">
+<title id="flow-t">Flow map. Home check-in card opens the check-in, which is due, mid-week or insufficient. Due leads to Apply, applying, applied and Done, or to an error and Try again. Applying rewrites the active meal plan targets. Settings opens Plans, which opens a plan view, edit and the builders.</title>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g font-size="13" font-weight="600" style="color:var(--muted)">
+<g fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)">
+<path d="M160 63H196"/><path d="M160 123H196"/><path d="M160 123L196 183"/><path d="M340 63H376"/><path d="M520 63H556"/><path d="M700 63H736"/><path d="M450 86V112"/><path d="M380 135C350 135 350 75 376 70" stroke-dasharray="4 4"/><path d="M340 183H376"/><path d="M520 183H556"/>
+<path d="M160 283H196"/><path d="M340 283H376"/><path d="M520 283H556"/><path d="M700 283H736"/><path d="M270 306V340H376"/><path d="M450 340V310"/><path d="M160 350H180V300H376"/><path d="M700 70C770 70 770 228 600 230C520 231 492 236 490 256" stroke-dasharray="4 4"/>
+</g>
+<g fill="var(--surface)" stroke="currentColor" stroke-width="1.2">
+<rect x="20" y="40" width="140" height="46" rx="12"/><rect x="20" y="100" width="140" height="46" rx="12"/>
+<rect x="200" y="40" width="140" height="46" rx="12"/><rect x="200" y="100" width="140" height="46" rx="12"/><rect x="200" y="160" width="140" height="46" rx="12"/>
+<rect x="380" y="40" width="140" height="46" rx="12"/><rect x="380" y="112" width="140" height="46" rx="12"/>
+<rect x="560" y="40" width="140" height="46" rx="12"/><rect x="740" y="40" width="140" height="46" rx="12"/>
+<rect x="380" y="160" width="140" height="46" rx="12"/><rect x="560" y="160" width="140" height="46" rx="12"/>
+<rect x="20" y="260" width="140" height="46" rx="12"/><rect x="200" y="260" width="140" height="46" rx="12"/><rect x="380" y="260" width="140" height="46" rx="12"/><rect x="560" y="260" width="140" height="46" rx="12"/><rect x="740" y="260" width="140" height="46" rx="12"/>
+<rect x="380" y="320" width="140" height="46" rx="12"/><rect x="20" y="327" width="140" height="46" rx="12"/>
+</g>
+<g text-anchor="middle" style="fill:var(--fg)">
+<text x="90" y="68">Home check-in card</text><text x="90" y="128">Home "This week"</text>
+<text x="270" y="68">Check-in, due</text><text x="270" y="128">Check-in, mid-week</text><text x="270" y="188">Check-in, too few days</text>
+<text x="450" y="68">Applying</text><text x="450" y="140">Didn't save</text>
+<text x="630" y="68">Applied</text><text x="810" y="68">Done, back to Home</text>
+<text x="450" y="188">Keep current targets</text><text x="630" y="188">Back to Home</text>
+<text x="90" y="288">Settings, My plans</text><text x="270" y="288">Plans</text><text x="450" y="288">Plan view</text><text x="630" y="288">Edit plan</text><text x="810" y="288">Saved, new version</text>
+<text x="450" y="348">New plan builder</text><text x="90" y="355">Train, plan link</text>
+</g>
+<text x="742" y="224" font-size="12" style="fill:var(--muted)">Apply also rewrites the</text><text x="742" y="240" font-size="12" style="fill:var(--muted)">active meal plan's targets</text>
+
+<text x="444" y="104" font-size="12" text-anchor="end" style="fill:var(--muted)">Try again</text>
+</g>
+</svg>
+</div>
+</section>
+
+<section class="blk" id="backend" aria-labelledby="backend-h">
+<h2 id="backend-h">What Apply really changes, read from the backend</h2>
+<p class="lead">Read-only from <code>lib/check-in-engine.ts</code>, <code>services/check-in-status.service.ts</code> and <code>services/check-in.service.ts</code>. The engine, not the model, makes the decision; Geo only writes the sentence. This is what a trustworthy screen has to show, and four places where today's screen and backend disagree.</p>
+<div class="cols find">
+<div class="panel"><h3>How the number is made</h3><ul>
+<li>The week counts only with at least 4 days of food logs and 3 weigh-ins (the screen asks for 5 logged days), and nutrition adherence of 70% or more. Otherwise targets hold.</li>
+<li>Progress is the weekly weight change against the goal (for example 0.5 kg a week down); within 0.2 kg is on track.</li>
+<li>A change needs two off-target weeks in a row and 2 or more weeks on the current targets. Exception: losing more than twice the goal acts at once.</li>
+<li>Fat loss moves calories 7.5% (down if behind, up if too fast); muscle gain 7.5% up or 5% down. Capped at 10%, rounded to 25 kcal, never below the estimated BMR (then it holds and suggests a diet break).</li>
+<li>Low mood or energy holds calories; two weeks of it suggests a deload.</li>
+</ul></div>
+<div class="panel"><h3>What Apply writes</h3><ul>
+<li>Calories to the new number. Protein stays, unless it was under its floor.</li>
+<li>Fat to 28% of calories, carbs take the rest, so <b>carbs and fat change too</b>. Today's screen shows only calories and protein.</li>
+<li>The profile targets, and the <b>active meal plan's daily targets</b> in place, so the plan view shows the new numbers.</li>
+<li>Target history from today, so earlier days keep their old target; the Home check-in cache is cleared.</li>
+<li>A row in <code>check_ins</code> with the decision.</li>
+</ul></div>
+<div class="panel alert"><h3>Mismatches to fix before trusting any design</h3><ol>
+<li>The status endpoint builds the proposal with <code>decideCheckIn(gathered.input)</code>, without the previous week's state, so the two-week rule can never pass and the card usually says "hold". The verdict sentence comes from a second run that has it, so the sentence can announce a change the card does not show.</li>
+<li>That second run (<code>runWeeklyCheckIn(..., {apply:false})</code>) writes a <code>check_ins</code> row on every uncached read. Apply then reads that row as "last week", so the two-week rule can pass on one week of data, and the screen state flips to mid-week once the 6-hour cache expires.</li>
+<li>"Keep current targets" on a hold week calls the same Apply endpoint. If the server-side decision differs from the card (point 1), keeping can change targets.</li>
+<li>Mid-week, "This week so far" shows the last completed week (the calendar's week ends on the last check-in day), and "3 of 4 days logged" mixes last week's count with this week's days.</li>
+</ol><p class="muted" style="margin-top:8px">Not fixed here (read-only brief, Q6 keeps data flow as is). Every option below assumes the status returns the decision Apply will make, with all four macros. Without that, no layout can be trusted.</p></div>
+</div>
+</section>
+
+<section class="blk" id="cards" aria-labelledby="cards-h">
+<h2 id="cards-h">Screen cards</h2>
+<p class="lead">Read from the pages, components, API calls and types in the frontend, and the controllers in the backend. Tap counts are counted along today's code paths.</p>
+<div class="cols">
+<div class="panel"><h3>/check-in</h3><dl class="kv">
+<dt>Who, how often</dt><dd>Everyone with targets. Weekly on check-in day (push and Home card); mid-week from Home's "This week" button.</dd>
+<dt>Jobs</dt><dd>1. See whether targets change and why. 2. Apply or keep. 3. Read the week.</dd>
+<dt>Today</dt><dd>Geo's read with the week's weight change and verdict; What changes (calories and protein only, old struck, new); orange Apply, or ink Keep current targets on a hold; Done after Apply; Ask Geo about this; weight trend (8 weeks, Health label); 4 stat tiles with target meters. Mid-week: days to go, 7 segments, days logged, current targets. Too few days: days logged, what Geo could see, Keep current targets (goes Home, records nothing).</dd>
+<dt>States</dt><dd>Due with change, due hold, applying, applied, apply error, mid-week, too few days, loading, load error, offline, no weigh-ins, no target set.</dd>
+<dt>Main job today</dt><dd>3 taps: Home card, Apply, Done.</dd></dl></div>
+<div class="panel"><h3>/plans</h3><dl class="kv">
+<dt>Who, how often</dt><dd>People following a plan. A few times a month, from Settings, My plans, or a Geo reply's "View".</dd>
+<dt>Jobs</dt><dd>1. See the active plans. 2. Open one. 3. Start a new plan with Geo or by hand. 4. Reopen an earlier plan.</dd>
+<dt>Today</dt><dd>Active: nutrition and training cards (kind, name, one line of numbers, time left) with a pencil each; dashed slots when missing. "Want a new plan?" with orange Ask Geo; two build-by-hand rows; Earlier (5, one per name).</dd>
+<dt>States</dt><dd>Loading, error, none active, one active, both, earlier or not, offline.</dd>
+<dt>Main job today</dt><dd>3 taps to open the meal plan from Home; the next workout needs 2 more (open, expand).</dd></dl></div>
+<div class="panel"><h3>/plans/view, nutrition</h3><dl class="kv">
+<dt>Jobs</dt><dd>1. Daily targets. 2. What to eat on a day. 3. Edit. 4. Make an older plan active.</dd>
+<dt>Today</dt><dd>Pencil in the header; name, status and dates; targets card (kcal, protein, carbs, fat); day chips; meals card; notes; History of versions with their changes; Make this my plan when inactive.</dd>
+<dt>States</dt><dd>Loading, gone (404), error, no targets, empty day, inactive, long food names.</dd>
+<dt>Main job today</dt><dd>4 taps to Tuesday's lunch from Home.</dd></dl></div>
+<div class="panel"><h3>/plans/view, training</h3><dl class="kv">
+<dt>Jobs</dt><dd>1. See the split. 2. See a day's exercises. 3. Start that day.</dd>
+<dt>Today</dt><dd>3 stats (days, training, exercises); days list, each opens to its exercises (sets by reps, kg, seconds) and an ink Start workout; rest days locked; History; Make this my plan. The plan's next day (<code>current_position</code>) is not shown.</dd>
+<dt>States</dt><dd>Loading, gone, error, no days, rest days, starting, start failed.</dd>
+<dt>Main job today</dt><dd>3 taps from Train: plan link, day, Start workout.</dd></dl></div>
+<div class="panel"><h3>/plans/new/meal and /plans/new/workout</h3><dl class="kv">
+<dt>Jobs</dt><dd>Build a plan by hand, then make it active.</dd>
+<dt>Today</dt><dd>Pushed header, thin progress, one question, body, fixed orange Continue. Meal: name with dates and notes; targets (placeholders 2,000 kcal, 150, 200, 60 g); days of meals with type chips, food search and four number fields. Workout: name; days with name, Rest day, exercises (search, sets, reps, kg). Set as active switch. Validation line above the button.</dd>
+<dt>States</dt><dd>Each step, blocked step, search loading, no results, saving, save error, long names.</dd>
+<dt>Main job today</dt><dd>Meal: 9 taps and two typed words from Home. Workout: 8 taps and two typed words.</dd></dl></div>
+<div class="panel"><h3>/plans/edit</h3><dl class="kv">
+<dt>Jobs</dt><dd>Change targets, rename, add or remove days.</dd>
+<dt>Today</dt><dd>Loads the plan (skeleton), then the same builder in edit mode; Save changes writes a new version and the old one becomes superseded (visible in History). Load error toasts and goes back to Plans.</dd>
+<dt>States</dt><dd>Loading, load failed, each step, saving, save error, saved.</dd>
+<dt>Main job today</dt><dd>Change the calorie target: 3 to the view, pencil, Continue, edit field, Continue, Save changes = 8 taps.</dd></dl></div>
+</div>
+</section>
+
+<section class="blk" id="matrix" aria-labelledby="matrix-h">
+<h2 id="matrix-h">State matrix</h2>
+<p class="lead">Where each state is designed on this page (phone, then the state chip).</p>
+<div class="tw"><table>
+<thead><tr><th>Screen</th><th>First run or empty</th><th>Loading</th><th>Error</th><th>Offline</th><th>Long content</th><th>Extreme numbers</th><th>After the action</th></tr></thead>
+<tbody>
+<tr><td>Check-in, due</td><td>Too few days (Check-in states)</td><td>Check-in states: Loading</td><td>A1 to A3: Didn't save; Check-in states: Load failed</td><td>Check-in states: Offline</td><td>A1: Why open</td><td>A1: Big numbers</td><td>A1 to A3: Applying, Applied</td></tr>
+<tr><td>Check-in, hold</td><td>-</td><td>as above</td><td>as above</td><td>as above</td><td>A1: At the floor</td><td>-</td><td>A1: On pace</td></tr>
+<tr><td>Check-in, mid-week</td><td>No weigh-ins (mid-week chart dashed)</td><td>as above</td><td>as above</td><td>as above</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Plans</td><td>B1 to B3: Nothing yet</td><td>B1 to B3: Loading</td><td>B1 to B3: Load failed</td><td>B1: Offline</td><td>B1 to B3: Long names</td><td>B1: Long names (4-digit macros)</td><td>-</td></tr>
+<tr><td>Plan view, nutrition</td><td>No targets; Empty day</td><td>Edit plan: Loading</td><td>Gone</td><td>-</td><td>Long food names</td><td>Long food names</td><td>Earlier plan: Make it my plan</td></tr>
+<tr><td>Plan view, training</td><td>No days</td><td>-</td><td>Start failed</td><td>-</td><td>Next day open (6 exercises)</td><td>-</td><td>Starting</td></tr>
+<tr><td>New nutrition plan</td><td>C1 to C3: Name</td><td>C1: Search sheet</td><td>C1 to C3: Didn't save</td><td>C1: Didn't save</td><td>C1: Day</td><td>-</td><td>C1 to C3: Saving</td></tr>
+<tr><td>New training plan</td><td>Name</td><td>Search sheet</td><td>Didn't save</td><td>-</td><td>Days</td><td>-</td><td>Saving</td></tr>
+<tr><td>Edit plan</td><td>-</td><td>Loading</td><td>Didn't save</td><td>-</td><td>-</td><td>-</td><td>Saved</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="blk" id="decA" aria-labelledby="decA-h">
+<h2 id="decA-h">Open decision A: how the check-in shows what changes</h2>
+<p class="lead">The screen's one question: "Do my targets change this week, and can I trust it?" Every option shows all four targets (the backend changes carbs and fat too), names where the change lands, and keeps exactly one orange action. They differ in how much the user sees before tapping.</p>
+<div class="opts" data-dec="A"></div>
+</section>
+
+<section class="blk" id="ckstates" aria-labelledby="ck-h">
+<h2 id="ck-h">Check-in, the other states (one design)</h2>
+<p class="lead">Mid-week, too few days, loading, load failed and offline, in the recommended ledger style. None of them has an orange action: nothing is being decided.</p>
+<div class="opts" data-dec="CK"></div>
+</section>
+
+<section class="blk" id="decB" aria-labelledby="decB-h">
+<h2 id="decB-h">Open decision B: the plan overview card on Plans</h2>
+<p class="lead">The screen's one question: "What am I following right now?" Tap a card to open the plan view; it opens with the list stepping back.</p>
+<div class="opts" data-dec="B"></div>
+</section>
+
+<section class="blk" id="views" aria-labelledby="views-h">
+<h2 id="views-h">Plan views (one design each)</h2>
+<p class="lead">The nutrition view answers "what do I eat on a day"; the training view answers "what is next, and start it". The training view now marks the plan's next day, which the backend already tracks (<code>current_position</code>).</p>
+<div class="opts" data-dec="V"></div>
+</section>
+
+<section class="blk" id="decC" aria-labelledby="decC-h">
+<h2 id="decC-h">Open decision C: the builder step pattern</h2>
+<p class="lead">Shown on the nutrition builder, the longer of the two. Tap Continue to walk the steps, or jump with the chips. The question per step stays as today: name, daily targets, a day of eating.</p>
+<div class="opts" data-dec="C"></div>
+</section>
+
+<section class="blk" id="builders" aria-labelledby="bld-h">
+<h2 id="bld-h">Training builder and edit (recommended pattern)</h2>
+<p class="lead">Both use the recommended focused-step pattern so the three builders and onboarding share one way of asking.</p>
+<div class="opts" data-dec="W"></div>
+</section>
+
+<section class="blk" id="tests" aria-labelledby="tests-h">
+<h2 id="tests-h">Validation outside this page</h2>
+<p class="lead">Run these on the coded options (open the phone at its first state; share the screen, do not explain). They test the three open decisions with people, not with this page's own measures.</p>
+<div class="tw"><table>
+<thead><tr><th>Decision</th><th>Test</th><th>Task line read to the person</th><th>Counts as success</th></tr></thead>
+<tbody>
+<tr><td>A, check-in</td><td>5-second</td><td>"Look at this for five seconds." Then: "What will your daily calories be, and what else changes?"</td><td>Says 2,125 and names carbs or fat, or that the plan updates. Run on A1, A2, A3; best option wins on rate, ties go to fewer taps.</td></tr>
+<tr><td>A, check-in</td><td>First click</td><td>"You are not sure why Geo wants to change your targets. Find out."</td><td>First tap on "Why this change" (A1), "Review the change" then the reason (A2), the verdict card or toggle (A3). Time to first click under 5 s.</td></tr>
+<tr><td>B, plan card</td><td>First click</td><td>"Without opening anything, tell me your next workout."</td><td>Reads "Lower A" from the list (B1, B2) or the row's subline (B3). Any tap counts as a miss.</td></tr>
+<tr><td>B, plan card</td><td>First click</td><td>"Change your nutrition plan's calorie target."</td><td>First tap on the nutrition card (all), then the pencil in the view.</td></tr>
+<tr><td>C, builder</td><td>5-second</td><td>Show the targets step for five seconds. "How much is left to do?"</td><td>"One more step" or similar, from the progress (C1, C3) or the answered list (C2).</td></tr>
+<tr><td>C, builder</td><td>First click</td><td>"Add breakfast to the first day."</td><td>First tap on Add meal (C1, C2) or the empty breakfast slot (C3).</td></tr>
+</tbody></table></div>
+
+<h3 style="font-size:22px;font-weight:800;margin:28px 0 8px">Usability script, 5 people</h3>
+<p class="muted" style="max-width:70ch;margin-bottom:14px">People who log food at least 3 days a week, on their own phone, with the prototype on the recommended options. Say: "We are testing the app, not you. Think aloud." No help unless stuck for 60 seconds. Record time on task from the first touch.</p>
+<div class="tw"><table>
+<thead><tr><th>Task</th><th>Start</th><th>Success</th><th class="n">Limit</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th></tr></thead>
+<tbody>
+<tr><td>1. Your weekly check-in is ready. Decide whether to accept it.</td><td>Home</td><td>Applies or keeps, and can say the new calorie number and one other change afterwards</td><td class="n">60 s</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2. Explain to me why the target changed.</td><td>Check-in</td><td>Mentions two slow weeks or the 0.5 kg goal, in their own words</td><td class="n">45 s</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>3. What is your next workout, and start it.</td><td>Home</td><td>Opens Plans or Train, names Lower A, reaches Starting</td><td class="n">45 s</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>4. What does your plan say for Thursday's dinner?</td><td>Home</td><td>Reads the Thursday dinner row</td><td class="n">45 s</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>5. Make a nutrition plan called Bulk with 2,800 kcal and one breakfast, and make it active.</td><td>Plans</td><td>Plan saved and active with those values</td><td class="n">150 s</td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<p class="muted" style="margin-top:12px;max-width:70ch">Debrief: "How sure were you that Apply did what it said, from 1 to 5? What would make it a 5?" Pass bar: 4 of 5 complete each task inside the limit, median trust 4 or more.</p>
+</section>
+</div>
+
+<div class="tray" role="region" aria-label="Your picks">
+<output id="tray-out">No picks yet</output>
+<button type="button" id="tray-copy">Copy picks</button>
+</div>
+<script>window.FQM={"a1":{"push":"16.8 ms (worst 33.3 ms)","scroll":"16.8 ms (worst 83.3 ms)","sheet":"n/a"},"a2":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"16.8 ms (worst 16.8 ms)"},"a3":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"n/a"},"ck":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"n/a"},"b1":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"n/a"},"b2":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"n/a"},"b3":{"push":"16.8 ms (worst 33.4 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"n/a"},"v1":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"n/a"},"v2":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"n/a"},"c1":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"16.8 ms (worst 16.8 ms)"},"c2":{"push":"16.8 ms (worst 16.8 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"16.8 ms (worst 83.3 ms)"},"c3":{"push":"16.8 ms (worst 33.4 ms)","scroll":"16.8 ms (worst 33.4 ms)","sheet":"33.4 ms (worst 333.4 ms)"},"w1":{"push":"16.8 ms (worst 99.9 ms)","scroll":"16.8 ms (worst 16.8 ms)","sheet":"16.8 ms (worst 266.5 ms)"},"e1":{"push":"33.4 ms (worst 116.7 ms)","scroll":"16.8 ms (worst 50.1 ms)","sheet":"n/a"}}</script>
+<script>
+(() => {
+'use strict';
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const n = x => Number(x).toLocaleString('en-AU');
+const IC = {
+  back: '<path d="M14.5 5.5 8 12l6.5 6.5"/>', pencil: '<path d="M4.5 19.5h4l10-10-4-4-10 10z"/><path d="m13 7 4 4"/>', chev: '<path d="m9.5 6 6 6-6 6"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>', check: '<path d="M5.5 12.5l4 4 9-9"/>', plus: '<path d="M12 5v14M5 12h14"/>', search: '<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>',
+  x: '<path d="M7 7l10 10M17 7 7 17"/>', alert: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2v.1"/>', off: '<path d="M3 3l18 18M8.5 16a5 5 0 0 1 7 0M5 12.5a10 10 0 0 1 4-2.3M19 12.5a10 10 0 0 0-3.4-2.1"/>',
+  play: '<path d="M8 5.5v13l10-6.5z" fill="currentColor" stroke="none"/>', food: '<path d="M4 11h16a8 8 0 0 1-16 0zM9.5 7.5c0-1.5 1-2 1-3.5M13.5 7.5c0-1.5 1-2 1-3.5"/>',
+  train: '<path d="M3 9.5v5M6.5 7v10M17.5 7v10M21 9.5v5M6.5 12h11"/>', cal: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>', geo: '<path d="M5 19V7a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H8.5z"/><path d="M9 9h6M9 12h4"/>'
+};
+const ic = (k, cls = 'ic') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
+const HUE = { cal: '#E8622A', p: '#111C35', c: '#3E7C77', f: '#A07A3C' };
+const dot = k => `<i class="dot" style="--c:${HUE[k]}" aria-hidden="true"></i>`;
+
+// ---------- spring with velocity hand-off (from spatial-app.html) ----------
+function spring(apply, rest) {
+  const s = { x: 0, v: 0, t: 0, k: 0, c: 0, raf: 0, last: 0 };
+  const step = now => {
+    let dt = clamp((now - s.last) / 1000, 0, 0.05); s.last = now;
+    while (dt > 1e-6) { const h = Math.min(1 / 240, dt); s.v += (-s.k * (s.x - s.t) - s.c * s.v) * h; s.x += s.v * h; dt -= h; }
+    if (Math.abs(s.x - s.t) < 4e-4 && Math.abs(s.v) < 4e-3) { s.x = s.t; s.v = 0; s.raf = 0; apply(s.x, false); rest && rest(s.t); return; }
+    apply(s.x, true); s.raf = requestAnimationFrame(step);
+  };
+  s.to = (t, o = {}) => {
+    const r = RM ? 0.24 : (o.response || 0.42), z = RM ? 1 : (o.damping || 1), w = 2 * Math.PI / r;
+    s.t = t; s.k = w * w; s.c = 2 * z * w; if (o.v !== undefined) s.v = RM ? 0 : o.v;
+    if (!s.raf) { s.last = performance.now(); s.raf = requestAnimationFrame(step); }
+  };
+  s.stop = () => { cancelAnimationFrame(s.raf); s.raf = 0; s.v = 0; };
+  s.set = x => { s.stop(); s.x = s.t = x; apply(x, false); rest && rest(x); };
+  return s;
+}
+const project = v => v * 0.998 / (1 - 0.998) / 1000;
+const tracker = () => { const h = []; return { add(p, t) { h.push([p, t]); while (h.length > 2 && t - h[0][1] > 80) h.shift(); }, v() { if (h.length < 2) return 0; const a = h[0], b = h[h.length - 1]; return (b[0] - a[0]) / Math.max(1, b[1] - a[1]) * 1000; } }; };
+const wc = (el, on) => { if (el) el.style.willChange = on ? 'transform, opacity' : ''; };
+
+// ---------- shared content pieces ----------
+const W_BEHIND = [88.1, 87.4, 86.9, 86.3, 85.8, 85.0, 84.8, 84.7];
+const W_ONPACE = [88.6, 88.0, 87.5, 87.0, 86.6, 86.1, 85.6, 85.1];
+function chart(pts, strong = true) {
+  if (!pts || pts.length < 2) return `<div class="mt"><span style="display:block;border-top:1.5px dashed #111c3533"></span><p class="note mt">Log your weight to see a trend</p></div>`;
+  const W = 230, H = 84, max = Math.max(...pts), min = Math.min(...pts), sp = max - min || 1;
+  const ys = pts.map(k => 6 + (max - k) / sp * (H - 12)), xs = pts.map((_, i) => i / (pts.length - 1) * W);
+  const line = xs.map((x, i) => `${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+  const c = strong ? '#111C35' : '#111c3566';
+  return `<div class="chart mt" style="display:grid;grid-template-columns:34px 1fr;gap:4px"><span style="position:relative;font-size:13px;color:var(--mu);font-variant-numeric:tabular-nums" aria-hidden="true"><span style="position:absolute;top:-2px">${max.toFixed(1)}</span><span style="position:absolute;bottom:-2px">${min.toFixed(1)}</span></span>
+<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Weight trend, ${pts[0].toFixed(1)} kg ${pts.length - 1} weeks ago to ${pts[pts.length - 1].toFixed(1)} kg now"><line x1="0" x2="${W}" y1="${ys[0]}" y2="${ys[0]}" stroke="#111c3533" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/><polyline points="${line}" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${W}" cy="${ys[ys.length - 1]}" r="4" fill="${c}"/></svg></div>
+<div class="cx" style="padding-left:38px" aria-hidden="true"><span>${pts.length - 1} weeks ago</span><span>Now</span></div>`;
+}
+const weightCard = (kg, pts, strong, extra = '') => `<section class="card pad" aria-label="Weight trend"><div class="ghd"><span class="lbl">Weight</span><span class="lbl r">${extra}</span></div><p class="val" style="margin-top:4px">${kg}<small> kg</small></p>${chart(pts, strong)}</section>`;
+function stats(items, cls = '') {
+  return `<div class="card stats ${cls}">${items.map(([l, v, u, s, f]) => `<div><span class="lbl">${l}</span><p class="val" style="margin-top:2px">${v}${u ? `<small> ${u}</small>` : ''}</p>${f == null ? '' : `<span class="meter" aria-hidden="true"><i style="--v:${clamp(f / 1.25, 0, 1).toFixed(3)}"></i></span>`}${s ? `<p class="note" style="margin-top:6px">${s}</p>` : ''}</div>`).join('')}</div>`;
+}
+const WEEK_STATS = [['Avg calories', '2,284', '', 'of 2,300 kcal', 2284 / 2300], ['Avg protein', '151', 'g', 'of 165 g', 151 / 165], ['Sessions', '3', '', 'of 4 planned', 3 / 4], ['Avg sleep', '6.8', 'h', '5 nights tracked', 6.8 / 8]];
+const hero = (delta, verdict, week = '19 to 25 Oct') => `<section class="card pad" aria-label="Geo's read" data-depth=".05"><div class="ghd"><span class="gav" aria-hidden="true">G</span><span class="lbl">Geo's read</span><span class="lbl r">${week}</span></div>${delta ? `<p class="fig" style="margin-top:14px">${delta}<small> kg this week</small></p>` : ''}<p class="body mt">${verdict}</p></section>`;
+const CHG = [['Calories', 'cal', 2300, 2125, 'kcal', '7.6% less'], ['Protein', 'p', 165, 165, 'g', ''], ['Carbs', 'c', 248, 218, 'g', 'Takes most of the cut'], ['Fat', 'f', 72, 66, 'g', 'Stays at 28% of calories']];
+const BIG = [['Calories', 'cal', 4850, 5225, 'kcal', '7.7% more'], ['Protein', 'p', 240, 240, 'g', ''], ['Carbs', 'c', 633, 700, 'g', 'Takes most of the rise'], ['Fat', 'f', 151, 163, 'g', 'Stays at 28% of calories']];
+const KEEP = CHG.map(r => [r[0], r[1], r[2], r[2], r[4], '']);
+function ledger(rows, mode) {
+  return rows.map(([l, k, a, b, u, s]) => {
+    const same = a === b;
+    const sub = mode === 'keep' ? '' : same ? 'No change' : s;
+    return `<div class="lrow"><span class="ll">${dot(k)}${l}</span>${sub ? `<span class="lsub">${sub}</span>` : ''}<span class="lv">${same || mode === 'keep' ? '' : `<s aria-label="was ${n(a)}">${n(a)}</s>${ic('arrow', 'ar')}`}<b>${n(b)}</b><small>${u}</small></span></div>`;
+  }).join('');
+}
+const why = (open, items, label = 'Why this change') => `<div class="card"><button class="why" data-act="why" aria-expanded="${open}">${label}${ic('chev', 'chev')}</button>${open ? `<ul class="whyb">${items.map(i => `<li>${i}</li>`).join('')}</ul>` : ''}</div>`;
+const WHY_CUT = ['Your goal: lose 0.5 kg a week.', 'Last two weeks: 0.2 kg, then 0.1 kg. Two slow weeks in a row is the trigger; one is noise.', 'A change never moves calories more than 10%, and never below what your body burns at rest.'];
+const WHY_HOLD = ['Your goal: lose 0.5 kg a week. This week: 0.5 kg.', 'Within 0.2 kg of the goal counts as on pace, so nothing moves.'];
+const WHY_FLOOR = ['Two slow weeks in a row would normally trim calories 7.5%.', 'That would put you at 2,125 kcal, but your estimated resting burn is about 1,780 kcal and the cut is capped well above it for you.', 'Below that, a short diet break usually works better than eating less.'];
+const askGeo = (t = 'Ask Geo about this') => `<button class="tbtn" data-act="geo">${t}</button>`;
+const weekBlock = (pts = W_BEHIND, kg = '84.7') => `<h2 class="sec">Your week</h2><div class="gap">${weightCard(kg, pts, true, '8 weeks')}${stats(WEEK_STATS)}</div>`;
+const btn = (cls, label, act, extra = '') => `<button class="btn ${cls}" data-act="${act}" ${extra}>${label}</button>`;
+const busy = (cls, label) => `<button class="btn ${cls} busy" disabled aria-busy="true"><span class="spin" aria-hidden="true"></span>${label}</button>`;
+const sk = (h, r = 22, mt = 10) => `<div class="sk" style="height:${h}px;border-radius:${r}px;margin-top:${mt}px" aria-hidden="true"></div>`;
+
+// ---------- origins (the screen behind) ----------
+const ORIGIN = {
+  home: () => `<p class="otl">Today</p><div class="card pad"><span class="lbl">Calories</span><p class="val">1,060<small> kcal left</small></p></div>
+<button class="card row" data-push style="margin-top:10px;min-height:68px" data-press><span class="gav" aria-hidden="true">G</span><span class="rt"><b>Week 6 check-in is ready</b><span>Geo has looked at your week</span></span>${ic('chev', 'ic chev')}</button>
+<div class="card pad" style="margin-top:10px;height:200px"><span class="lbl">Steps</span><p class="val">8,412</p></div><nav class="tabbar" aria-hidden="true"><span class="on">${ic('food').replace(IC.food, '<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/>')}Home</span><span>${ic('food')}Food</span><span>${ic('train')}Train</span><span>${ic('geo')}Geo</span></nav><span class="orbx" aria-hidden="true">${ic('plus')}</span>`,
+  settings: () => `<p class="otl">Settings</p><div class="card"><div class="row"><span class="rt"><b>Profile</b><span>Goals, body, units</span></span></div><button class="row" data-push>${''}<span class="rt"><b>My plans</b><span>Lean cut, Upper/lower</span></span>${ic('chev', 'ic chev')}</button><div class="row"><span class="rt"><b>Check-in day</b><span>Sunday</span></span></div><div class="row"><span class="rt"><b>Notifications</b></span></div><div class="row"><span class="rt"><b>Health</b><span>Apple Health connected</span></span></div></div>`,
+  plans: (what = 'meal') => `<p class="otl">Plans</p><div class="card"><button class="row" data-push><span class="rt"><b>${what === 'meal' ? 'Lean cut' : what === 'workout' ? 'Upper/lower, 4 days' : 'Build a nutrition plan'}</b><span>${what === 'new' ? 'By hand, three questions' : 'Active'}</span></span>${ic('chev', 'ic chev')}</button><div class="row"><span class="rt"><b>${what === 'workout' ? 'Lean cut' : 'Upper/lower, 4 days'}</b><span>Active</span></span></div></div>`
+};
+
+// ---------- the phone engine ----------
+const PHONES = {};
+const LIVE = {};
+function Phone(host, id, def) {
+  const P = { id, def, state: def.states[0][0], stack: [], sheetP: 0, data: {}, sheetOpen: false };
+  const shell = l => `<div class="pg${l === 2 ? ' l2' : ''}" data-l="${l}" hidden role="region"><div class="pbar"><button class="rb back" aria-label="Back">${ic('back')}</button><p class="pt"></p><span class="pa"><button class="rb ghost" tabindex="-1" aria-hidden="true"></button></span></div><div class="prog" hidden><i></i></div><div class="pscroll" tabindex="0"></div><div class="dock" hidden></div><div class="edge" aria-hidden="true"></div></div>`;
+  host.innerHTML = `<div class="fq" data-id="${id}"><div class="status" aria-hidden="true"><span>9:41</span><span class="sic"><i></i><i></i><i></i><b></b></span></div><div class="base"><div class="bscroll">${def.origin(P)}</div></div>${shell(1)}${shell(2)}<div class="scrim" aria-hidden="true"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="Sheet" hidden></div><div class="toast" aria-live="polite" style="position:absolute;left:50%;top:60px;z-index:40;transform:translate(-50%,-8px);opacity:0;padding:10px 16px;border-radius:22px;background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:var(--gsh);font-weight:650;font-size:13px;white-space:nowrap;transition:opacity .25s,transform .35s var(--spr);pointer-events:none"></div></div>`;
+  const ph = P.ph = host.firstElementChild, $ = (s, r = ph) => r.querySelector(s), $$ = (s, r = ph) => [...r.querySelectorAll(s)];
+  const base = $('.base'), pg1 = $('.pg[data-l="1"]'), pg2 = $('.pg[data-l="2"]'), sheet = $('.sheet'), scrim = $('.scrim');
+  P.pg1 = pg1; P.pg2 = pg2; P.sheetEl = sheet;
+  const K = () => ph.getBoundingClientRect().width / ph.offsetWidth || 1; P.K = K;
+  function paintBehind(el, d, s) {
+    d = clamp(d, -0.04, 1.05); s = clamp(s, 0, 1.05);
+    if (RM) { el.style.opacity = d || s ? String(1 - 0.3 * clamp(d, 0, 1) - 0.15 * s) : ''; return; }
+    el.style.transform = d || s ? `translate3d(${-4 * d}%,${10 * s}px,0) scale(${1 - 0.06 * d - 0.05 * s})` : '';
+    el.style.opacity = d || s ? String(1 - 0.38 * clamp(d, 0, 1) - 0.2 * s) : '';
+    el.style.filter = !RM && d > 0.02 ? `blur(${(1.2 * clamp(d, 0, 1)).toFixed(2)}px)` : '';
+  }
+  P.paintBehind = paintBehind;
+  const topL = () => P.stack[P.stack.length - 1];
+  const topEl = () => topL() ? topL().el : base;
+  function paintPage(L, x) {
+    const el = L.el;
+    if (RM) el.style.opacity = String(clamp(x, 0, 1));
+    else el.style.transform = `translate3d(${Math.max(0, 1 - x) * 100}%,0,0) scale(${0.97 + 0.03 * clamp(x, 0, 1)})`;
+    paintBehind(L.behind, x, L.behind === topEl() || P.stack.length === 1 ? P.sheetP * 0 : 0);
+  }
+  function push(el, instant = false) {
+    if (P.stack.some(L => L.el === el)) return;
+    const L = { el };
+    L.p = spring((x, moving) => { wc(el, moving); wc(L.behind, moving); paintPage(L, x); }, t => { if (t === 0) finishPop(L); });
+    L.behind = topEl(); P.stack.push(L);
+    el.hidden = false; L.behind.inert = true; el.inert = false;
+    const sc = $('.pscroll', el); sc.scrollTop = 0; el.classList.remove('is-scrolled');
+    if (instant) L.p.set(1); else { L.p.set(0); L.p.to(1, { response: 0.42 }); setTimeout(() => $('.back', el).focus({ preventScroll: true }), 90); }
+    P.after && P.after();
+  }
+  function pop(v = 0, flick = false, instant = false) {
+    const L = topL(); if (!L) return;
+    L.behind.inert = false; L.el.inert = true;
+    if (instant) { L.p.set(0); return; }
+    L.p.to(0, { v, damping: flick ? 0.82 : 1, response: 0.42 });
+  }
+  function finishPop(L) {
+    const i = P.stack.indexOf(L); if (i < 0) return; P.stack.splice(i, 1);
+    L.el.hidden = true; L.el.style.transform = L.el.style.opacity = '';
+    paintBehind(L.behind, 0, 0);
+    P.after && P.after();
+  }
+  P.push = push; P.pop = pop;
+  // edge swipe back, tracks the finger
+  $$('.edge').forEach(edge => {
+    let L = null, x0 = 0, p0 = 1, tr;
+    edge.addEventListener('pointerdown', e => { L = P.stack.find(s => s.el.contains(edge)); if (!L || L !== topL()) { L = null; return; } L.p.stop(); p0 = L.p.x; x0 = e.clientX; tr = tracker(); tr.add(e.clientX, e.timeStamp); edge.setPointerCapture(e.pointerId); wc(L.el, true); wc(L.behind, true); });
+    edge.addEventListener('pointermove', e => { if (!L) return; tr.add(e.clientX, e.timeStamp); const w = ph.clientWidth; L.p.x = L.p.t = clamp(p0 - (e.clientX - x0) / K() / w, 0, 1); paintPage(L, L.p.x); });
+    const end = () => { if (!L) return; const w = ph.clientWidth, v = tr.v() / K(), x = (1 - L.p.x) * w, flick = Math.abs(v) > 600; if (x + project(v) > w * 0.5) { const LL = L; L = null; if (!(LL === P.stack[0] && def.back && def.back(P, true))) pop(-v / w, flick); else LL.p.to(1); } else { L.p.to(1, { v: -v / w, damping: flick ? 0.82 : 1 }); L = null; } };
+    edge.addEventListener('pointerup', end); edge.addEventListener('pointercancel', end);
+  });
+  // sheet floats forward, page behind steps back
+  const sh = spring((p, moving) => {
+    P.sheetP = p; wc(sheet, moving);
+    const H = sheet.offsetHeight + 24, behind = topEl();
+    if (RM) sheet.style.opacity = String(clamp(p, 0, 1));
+    else { sheet.style.transform = `translate3d(0,${(1 - p) * H}px,0) scale(${0.92 + 0.08 * clamp(p, 0, 1.06)})`; sheet.style.opacity = String(clamp(p * 2.5, 0, 1)); }
+    scrim.style.opacity = String(clamp(p, 0, 1));
+    wc(behind, moving);
+    if (!RM) { behind.style.transform = p ? `translate3d(0,${10 * p}px,0) scale(${1 - 0.05 * p})` : (behind === base ? '' : 'translate3d(0,0,0)'); behind.style.filter = ''; }
+    if (behind === base) behind.style.opacity = p ? String(1 - 0.2 * p) : '';
+  }, t => { if (t === 0) { sheet.hidden = true; } });
+  function openSheet(html, instant = false) {
+    sheet.innerHTML = `<span class="grab" aria-hidden="true"></span>${html}`; sheet.hidden = false; P.sheetOpen = true; ph.classList.add('sheet-on');
+    topEl().inert = true; sheet.inert = false;
+    if (instant) sh.set(1); else { if (sh.x === 0) sh.set(0); sh.to(1, { response: 0.44 }); const f = $('[data-autofocus]', sheet) || $('button', sheet); setTimeout(() => f && f.focus({ preventScroll: true }), RM ? 0 : 280); }
+    P.after && P.after();
+  }
+  function closeSheet(v = 0, flick = false, instant = false) {
+    if (!P.sheetOpen) return; P.sheetOpen = false; ph.classList.remove('sheet-on'); topEl().inert = false; sheet.inert = true;
+    if (instant) { sh.set(0); } else sh.to(0, { v, damping: flick ? 0.85 : 1, response: 0.4 });
+    P.after && P.after();
+  }
+  P.openSheet = openSheet; P.closeSheet = closeSheet; P.sh = sh;
+  { let y0 = 0, p0 = 1, tr = null;
+    sheet.addEventListener('pointerdown', e => { if (e.target.closest('button,input,.inp')) return; sh.stop(); p0 = sh.x; y0 = e.clientY; tr = tracker(); tr.add(e.clientY, e.timeStamp); sheet.setPointerCapture(e.pointerId); });
+    sheet.addEventListener('pointermove', e => { if (!tr) return; tr.add(e.clientY, e.timeStamp); const H = sheet.offsetHeight + 24; let dy = (e.clientY - y0) / K() + (1 - p0) * H; if (dy < 0) dy = -(-dy * 40) / (40 - dy); sh.x = sh.t = 1 - dy / H; P.sheetP = sh.x; if (!RM) sheet.style.transform = `translate3d(0,${dy}px,0) scale(${0.92 + 0.08 * clamp(sh.x, 0, 1.02)})`; scrim.style.opacity = String(clamp(sh.x, 0, 1)); });
+    const end = () => { if (!tr) return; const H = sheet.offsetHeight + 24, v = tr.v() / K(), dy = (1 - sh.x) * H, flick = Math.abs(v) > 600; tr = null; if (dy + project(v) > H * 0.45) closeSheet(-v / H, flick); else sh.to(1, { v: -v / H, damping: flick ? 0.85 : 1 }); };
+    sheet.addEventListener('pointerup', end); sheet.addEventListener('pointercancel', end);
+  }
+  scrim.addEventListener('click', () => closeSheet());
+  ph.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (P.sheetOpen) closeSheet(); else if (P.stack.length) back(); });
+  // scroll: header glass on scroll, title drifts slower than content (depth)
+  [pg1, pg2].forEach(pg => { const sc = $('.pscroll', pg); let tick = false; sc.addEventListener('scroll', () => { if (tick) return; tick = true; requestAnimationFrame(() => { tick = false; const y = sc.scrollTop; pg.classList.toggle('is-scrolled', y > 8); if (!RM) { const h = $('.h1,.q', sc); if (h) { const k = clamp(y / 90, 0, 1); h.style.transform = k ? `translate3d(0,${(Math.min(y, 90) * 0.28).toFixed(1)}px,0) scale(${1 - 0.04 * k})` : ''; h.style.opacity = k ? String(1 - 0.6 * k) : ''; } $$('[data-depth]', sc).forEach(d => { d.style.transform = `translate3d(0,${(Math.min(y, 240) * +d.dataset.depth).toFixed(1)}px,0)`; }); } }); }, { passive: true }); });
+  function back() {
+    if (P.sheetOpen) return closeSheet();
+    if (P.stack.length === 1 && def.back && def.back(P)) return;
+    pop();
+  }
+  P.back = back;
+  ph.addEventListener('click', e => {
+    const t = e.target.closest('button, [data-push]'); if (!t || !ph.contains(t)) return;
+    if (t.classList.contains('back')) return back();
+    if (t.hasAttribute('data-push') && t.closest('.base')) { push(pg1); return; }
+    if (t.dataset.sheet) { openSheet(def.sheets[t.dataset.sheet](P, t)); return; }
+    if (t.dataset.act === 'close') return closeSheet();
+    if (t.dataset.act === 'geo') return toast(P, 'Opens Geo with this week attached');
+    if (t.dataset.act && def.act && def.act[t.dataset.act]) def.act[t.dataset.act](P, t, e);
+  });
+  // press tilt only while pressed (cards that are buttons)
+  ph.addEventListener('pointerdown', e => { const el = e.target.closest('[data-press]'); if (!el || RM) return; const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; el.style.transition = 'transform .14s cubic-bezier(.23,1,.32,1)'; el.style.transform = `perspective(700px) rotateX(${(-y * 3).toFixed(2)}deg) rotateY(${(x * 3).toFixed(2)}deg) scale(.985)`; const up = () => { el.style.transition = 'transform .5s var(--spr)'; el.style.transform = ''; ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => el.removeEventListener(t, up)); }; ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => el.addEventListener(t, up)); });
+  P.render = (opts = {}) => {
+    const r = def.render(P.state, P);
+    const sc = $('.pscroll', pg1), keep = opts.keepScroll ? sc.scrollTop : 0;
+    $('.pt', pg1).textContent = r.title || ''; $('.pt', pg1).classList.toggle('on', r.titleOn ?? !/class="(h1|q)"/.test(r.body));
+    $('.pa', pg1).innerHTML = r.action || '<button class="rb ghost" tabindex="-1" aria-hidden="true"></button>';
+    pg1.setAttribute('aria-label', r.title || 'Page');
+    const pr = $('.prog', pg1); pr.hidden = r.prog == null; if (r.prog != null) $('i', pr).style.setProperty('--p', r.prog);
+    sc.style.paddingTop = r.prog != null ? '126px' : ''; sc.innerHTML = r.body; sc.scrollTop = keep; if (!keep) pg1.classList.remove('is-scrolled');
+    const dk = $('.dock', pg1); dk.hidden = !r.dock; dk.innerHTML = r.dock || '';
+    sc.style.paddingBottom = r.dock ? (dk.querySelectorAll('.btn').length > 1 || dk.querySelector('.msg') ? '170px' : '112px') : '40px';
+    if (r.sheet) openSheet(r.sheet, !opts.animSheet); else if (P.sheetOpen && !opts.keepSheet) closeSheet(0, false, true);
+    P.after && P.after();
+    if (r.then) r.then();
+  };
+  P.setState = (s, opts = {}) => {
+    P.state = s;
+    if (!opts.soft) {
+      if (P.sheetOpen) closeSheet(0, false, true);
+      while (P.stack.length > 1) pop(0, false, true);
+      if (!P.stack.length) push(pg1, true);
+    }
+    P.render(opts);
+  };
+  P.after = () => updateLive(P);
+  return P;
+}
+function toast(P, text) {
+  const t = P.ph.querySelector('.toast'); t.textContent = text; t.style.opacity = '1'; t.style.transform = 'translate(-50%,0)';
+  clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translate(-50%,-8px)'; }, 1700);
+}
+// live measures: tap targets under 44 and orange actions in the top layer
+function topLayer(P) { if (P.sheetOpen) return [P.sheetEl]; const L = P.stack[P.stack.length - 1]; return L ? [L.el] : [P.ph.querySelector('.base')]; }
+function updateLive(P) {
+  cancelAnimationFrame(P._lv); P._lv = requestAnimationFrame(() => setTimeout(() => {
+    const out = LIVE[P.id]; if (!out) return;
+    const layers = topLayer(P), phr = P.ph.getBoundingClientRect(), k = P.K();
+    let small = 0, total = 0, orange = 0; const smalls = [];
+    layers.forEach(layer => {
+      layer.querySelectorAll('button:not(.ghost), input, [role=switch]').forEach(b => {
+        const r = b.getBoundingClientRect(); if (!r.width || !r.height || b.closest('[hidden]')) return;
+        if (r.bottom < phr.top || r.top > phr.bottom) return;
+        total++; if (r.width / k < 43.5 || r.height / k < 43.5) { small++; smalls.push((b.textContent || b.getAttribute('aria-label') || '').trim().slice(0, 18)); }
+        if (b.classList.contains('or') && !b.disabled) orange++;
+      });
+    });
+    // the page behind an open sheet still shows: count its orange too
+    if (P.sheetOpen) { const L = P.stack[P.stack.length - 1]; if (L) L.el.querySelectorAll('.btn.or:not(:disabled)').forEach(() => orange++); }
+    out.t.textContent = `${small} of ${total}` + (small ? ` (${smalls.join(', ')})` : '');
+    out.o.textContent = String(orange) + (orange > 1 ? ' (over the limit)' : '');
+  }, 30));
+}
+
+// ---------- check-in phones (decision A) ----------
+const CK_VERDICT = "You logged six days and the scale barely moved. That's the second slow week in a row, so I'm trimming calories a little.";
+function ckA1(s, P) {
+  const o = P.data;
+  const title = 'Week 6 check-in';
+  if (s === 'hold') return { title, body: hero('−0.5', "Down 0.5 kg, right on your pace. Nothing changes this week; keep doing what you're doing.") + `<h2 class="sec">Your targets</h2><div class="card">${ledger(KEEP, 'keep')}<div class="band">No change this week. Next check-in Sun 1 Nov.</div></div><div style="margin-top:10px">${why(!!o.why, WHY_HOLD, 'Why nothing changes')}</div>${askGeo()}` + weekBlock(W_ONPACE, '85.1'), dock: btn('ink', 'Keep my targets', 'keep') };
+  if (s === 'floor') return { title, body: hero('−0.1', "Another slow week, but a further cut would take you below what your body burns at rest. I'm holding your targets; a short diet break may work better.") + `<h2 class="sec">Your targets</h2><div class="card">${ledger(KEEP, 'keep')}<div class="band">Held at 2,300 kcal. A lower target would go under your resting burn, about 1,780 kcal.</div></div><div style="margin-top:10px">${why(o.why !== false, WHY_FLOOR, 'Why nothing changes')}</div>${askGeo('Ask Geo about a diet break')}` + weekBlock(), dock: btn('ink', 'Keep my targets', 'keep') };
+  const rows = s === 'big' ? BIG : CHG;
+  const applied = s === 'applied', err = s === 'error';
+  const band = applied ? `<div class="band ok" role="status">Saved. Home, your food diary and Lean cut now use ${n(rows[0][3])} kcal.</div>`
+    : err ? `<div class="band err" role="alert" style="display:flex;gap:8px">${ic('alert')}<span>That didn't save, so your targets are still ${n(rows[0][2])} kcal. Check your connection and try again.</span></div>`
+    : `<div class="band">From today. Home, your food diary and your Lean cut plan use these. Earlier days keep their old targets.</div>`;
+  const h = s === 'big' ? hero('+0.1', "Up 0.1 kg against your 0.25 kg goal, the second slow week. I'm adding calories so you keep building.") : hero('−0.1', CK_VERDICT);
+  const body = h + `<h2 class="sec">${applied ? 'Your new targets' : 'What changes'}</h2><div class="card${applied ? ' applied' : ''}">${ledger(rows, 'change')}${band}</div><div style="margin-top:10px">${why(!!o.why, WHY_CUT)}</div>${askGeo()}` + weekBlock();
+  const dock = s === 'applying' ? busy('or', 'Updating your targets') : applied ? btn('ink', 'Done', 'done') : err ? btn('or', 'Try again', 'apply') : btn('or', 'Apply new targets', 'apply');
+  return { title, body, dock };
+}
+function applyFlow(P, ok = 'applied') { P.setState('applying', { soft: true, keepScroll: true }); setTimeout(() => P.setState(P.data.fail ? 'error' : ok, { soft: true, keepScroll: true }), 1100); }
+const ckAct = {
+  why: P => { P.data.why = !(P.state === 'floor' ? P.data.why !== false : P.data.why); P.render({ keepScroll: true }); },
+  apply: P => applyFlow(P), done: P => P.pop(), keep: P => { toast(P, 'Targets unchanged'); P.pop(); }
+};
+PHONES.a1 = { dec: 'A', name: 'Ledger', rec: true, origin: ORIGIN.home,
+  desc: 'All four targets as old, arrow, new in one card, the place the change lands written under it, the reason one tap away. Apply sits in the glass dock, always in view.',
+  states: [['change', 'Change'], ['hold', 'On pace'], ['floor', 'At the floor'], ['big', 'Big numbers'], ['applying', 'Applying'], ['applied', 'Applied'], ['error', "Didn't save"]],
+  render: ckA1, act: ckAct,
+  trade: '<b>Trade-off:</b> the longest first view of the three (four rows plus a band), but nothing is hidden behind a tap, so the decision and its evidence are read together.',
+  why: 'Recommended: shows exactly what the backend writes (calories, carbs and fat, plus the meal plan) at the same 2 taps as today, and the struck old value fading on Apply is the receipt.',
+  meas: [['Main job', 'Read the change, apply it'], ['Taps from Home, today then this', '3 then 3'], ['Est. time, today then this', '9 s then 11 s'], ['What the user learns', '4 of 4 targets (today 2 of 4)']] };
+PHONES.a2 = { dec: 'A', name: 'Confirm sheet', origin: ORIGIN.home,
+  desc: 'The page leads with one sentence of change; the full ledger and where it applies come up in a sheet that floats forward over the week, with Apply inside it.',
+  states: [['change', 'Change'], ['sheet', 'Review sheet'], ['applying', 'Applying'], ['applied', 'Applied'], ['error', "Didn't save"]],
+  render(s, P) {
+    const title = 'Week 6 check-in';
+    const sheetHtml = (st) => `<p class="sh">What changes</p><div class="card">${ledger(CHG, 'change')}</div><h3 class="sec" style="margin-top:14px">Where it applies</h3><div class="card"><div class="row"><span class="rt"><b>Home ring and food diary</b><span>From today</span></span></div><div class="row"><span class="rt"><b>Lean cut plan targets</b><span>Updated in place</span></span></div><div class="row"><span class="rt"><b>Earlier days</b><span>Keep 2,300 kcal</span></span></div></div>${st === 'error' ? `<p class="note" role="alert" style="margin:10px 6px 0;color:var(--ink)">That didn't save. Your targets are still 2,300 kcal.</p>` : ''}<div style="margin-top:12px;display:grid;gap:4px">${st === 'applying' ? busy('or', 'Updating your targets') : btn('or', st === 'error' ? 'Try again' : 'Apply new targets', 'apply2')}<button class="tbtn" data-act="close">Not now</button></div>`;
+    const applied = s === 'applied';
+    const top = applied ? `<h2 class="sec">Your new targets</h2><div class="card applied">${ledger(CHG, 'change')}<div class="band ok" role="status">Saved. Home, your food diary and Lean cut now use 2,125 kcal.</div></div>`
+      : `<section class="card pad" style="margin-top:10px"><span class="lbl">This week's change</span><p class="fig" style="margin-top:8px">2,125<small> kcal a day</small></p><p class="body mt">Down 175 from 2,300. Protein stays at 165 g; carbs and fat come down with it.</p></section>`;
+    return { title, body: hero('−0.1', CK_VERDICT) + top + askGeo() + weekBlock(), dock: applied ? btn('ink', 'Done', 'done') : `<button class="btn ink" data-sheet="review">Review the change</button>`, sheet: ['sheet', 'applying', 'error'].includes(s) ? sheetHtml(s) : null, _sheet: sheetHtml };
+  },
+  sheets: { review: P => PHONES.a2.render('sheet', P)._sheet('sheet') },
+  act: { apply2: P => { P.state = 'applying'; P.sheetEl.innerHTML = '<span class="grab" aria-hidden="true"></span>' + PHONES.a2.render('sheet', P)._sheet('applying'); updateLive(P); setTimeout(() => { P.closeSheet(); setTimeout(() => P.setState('applied', { soft: true, keepScroll: true }), RM ? 0 : 260); }, 1100); }, done: P => P.pop() },
+  trade: '<b>Trade-off:</b> one more tap and a modal step; the sheet makes the commit feel deliberate, but the first view hides carbs, fat and where it lands.',
+  meas: [['Main job', 'Read the change, apply it'], ['Taps from Home, today then this', '3 then 4'], ['Est. time, today then this', '9 s then 13 s'], ['What the user learns', '4 of 4, after one tap']] };
+PHONES.a3 = { dec: 'A', name: 'Today preview', origin: ORIGIN.home,
+  desc: 'Shows the change as its effect on today: the calorie ring and macro bars switch between current and new targets, so "less" becomes "885 left instead of 1,060".',
+  states: [['now', 'Current'], ['new', 'New targets'], ['applying', 'Applying'], ['applied', 'Applied'], ['error', "Didn't save"]],
+  render(s, P) {
+    const isNew = s !== 'now', pf = P.data.ringFrom ?? (isNew ? 1240 / 2125 : 1240 / 2300), pt = isNew || s === 'applied' ? 1240 / 2125 : 1240 / 2300;
+    P.data.ringFrom = pt;
+    const C = 2 * Math.PI * 44;
+    const bars = [['Protein', 'p', 92, 165, 165], ['Carbs', 'c', 120, 248, 218], ['Fat', 'f', 38, 72, 66]].map(([l, k, e, a, b]) => { const t = isNew ? b : a; return `<div style="margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:650">${l}</span><span class="note" style="font-variant-numeric:tabular-nums"><b style="color:var(--ink)">${e}</b> of ${t} g${a !== b && isNew ? ` <s>${a}</s>` : ''}</span></div><span class="meter" style="height:5px;margin-top:6px"><i style="--v:${(e / t * 0.8).toFixed(3)};background:${HUE[k]};transition:transform .5s var(--spr)"></i></span></div>`; }).join('');
+    const seg = s === 'applied' ? '' : `<div class="seg" role="group" aria-label="Show today with" style="--i:${isNew ? 1 : 0}"><span class="pill" aria-hidden="true"></span><button data-act="seg" data-v="now" aria-pressed="${!isNew}">Current</button><button data-act="seg" data-v="new" aria-pressed="${isNew}">New targets</button></div>`;
+    const card = `<section class="card pad" style="margin-top:10px" aria-label="Today with ${isNew ? 'new' : 'current'} targets">${seg}<div style="display:grid;grid-template-columns:112px 1fr;gap:14px;align-items:center;margin-top:14px"><span style="position:relative;width:112px;height:112px;display:block"><svg viewBox="0 0 104 104" width="112" height="112" style="transform:rotate(-90deg)" aria-hidden="true"><circle cx="52" cy="52" r="44" fill="none" stroke="#111c3512" stroke-width="9"/><circle class="ring" cx="52" cy="52" r="44" fill="none" stroke="#E8622A" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" style="stroke-dashoffset:${C * (1 - pf)};transition:stroke-dashoffset .6s var(--spr)"/></svg><span style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><b class="val">${isNew ? '885' : '1,060'}</b><span class="note">kcal left</span></span></span><div><p class="note">Eaten so far</p><p class="val">1,240<small> kcal</small></p><p class="note" style="margin-top:6px">${isNew ? 'of 2,125, was 2,300' : 'of 2,300'}</p></div></div>${bars}</section>`;
+    const applied = s === 'applied', err = s === 'error';
+    const extra = applied ? `<div class="card" style="margin-top:10px"><div class="band ok" style="border-radius:22px" role="status">Saved. Home, your food diary and Lean cut now use 2,125 kcal.</div></div>` : err ? `<div class="card" style="margin-top:10px"><div class="band err" style="border-radius:22px" role="alert">That didn't save, so your targets are still 2,300 kcal.</div></div>` : `<p class="note" style="margin:10px 6px 0">Calories, carbs and fat come down; protein stays. Lean cut updates too.</p>`;
+    const h = `<section class="card pad" aria-label="Geo's read"><div class="ghd"><span class="gav" aria-hidden="true">G</span><span class="lbl">Geo's read</span><span class="lbl r">−0.1 kg this week</span></div><p class="body mt">${CK_VERDICT}</p></section>`;
+    return { title: 'Week 6 check-in', body: h + card + extra + askGeo() + weekBlock(), dock: s === 'applying' ? busy('or', 'Updating your targets') : applied ? btn('ink', 'Done', 'done') : btn('or', err ? 'Try again' : 'Apply new targets', 'apply'),
+      then: () => requestAnimationFrame(() => requestAnimationFrame(() => { const r = P.pg1.querySelector('.ring'); if (r) r.style.strokeDashoffset = C * (1 - pt); })) };
+  },
+  act: { seg: (P, t) => { P.setState(t.dataset.v, { soft: true, keepScroll: true }); }, apply: P => applyFlow(P), done: P => P.pop() },
+  trade: '<b>Trade-off:</b> the most tangible ("885 left today"), but it leans on today\'s intake, which is near zero in the morning, and the orange ring sits one card above the orange Apply.',
+  meas: [['Main job', 'Read the change, apply it'], ['Taps from Home, today then this', '3 then 3 (4 with the toggle)'], ['Est. time, today then this', '9 s then 12 s'], ['What the user learns', '4 of 4, as today\'s effect']] };
+
+// ---------- check-in other states ----------
+PHONES.ck = { dec: 'CK', name: 'Check-in states', rec: true, origin: ORIGIN.home,
+  desc: 'Mid-week, too few days, loading, load failed and offline. Mid-week assumes the backend counts the current week (see finding 4).',
+  states: [['mid', 'Mid-week'], ['few', 'Too few days'], ['load', 'Loading'], ['fail', 'Load failed'], ['offline', 'Offline']],
+  render(s, P) {
+    if (s === 'mid') return { title: 'This week so far', titleOn: true, body: `<section class="card pad" aria-label="Next check-in"><div class="ghd"><span class="lbl">Next check-in</span><span class="lbl r">Sun 1 Nov</span></div><p class="fig" style="margin-top:12px">3<small> days to go</small></p><div class="segs" role="img" aria-label="4 of 7 days gone">${[1, 1, 1, 1, 0, 0, 0].map(x => `<i class="${x ? 'on' : ''}"></i>`).join('')}</div></section>
+<div class="card row" style="margin-top:10px;min-height:64px"><span class="gav" style="background:var(--te)" aria-hidden="true">${ic('check', 'ic')}</span><span class="rt"><b>3 of 4 days logged</b><span style="white-space:normal">Log 2 more days for a useful check-in</span></span></div>
+<h2 class="sec">Week so far, 26 Oct to 1 Nov</h2><div class="gap">${stats([['Avg calories', '2,140', '', 'of 2,125 kcal', 2140 / 2125], ['Avg protein', '158', 'g', 'of 165 g', 158 / 165], ['Sessions', '2', '', 'of 4 planned', .5], ['Avg sleep', '7.1', 'h', '4 nights tracked', 7.1 / 8]])}${weightCard('84.5', [86.3, 85.8, 85.0, 84.8, 84.7, 84.5], false, 'Apple Health')}</div>
+<h2 class="sec">Current targets</h2><div class="card">${ledger([['Calories', 'cal', 2125, 2125, 'kcal'], ['Protein', 'p', 165, 165, 'g'], ['Carbs', 'c', 218, 218, 'g'], ['Fat', 'f', 66, 66, 'g']], 'keep')}</div>` };
+    if (s === 'few') return { title: 'Week 6 check-in', body: hero(null, "Three days logged isn't enough to tell whether your targets are right, so I'm leaving them alone.") + `<section class="card pad" style="margin-top:10px" aria-label="Days logged"><div class="ghd"><span class="lbl">Days logged</span><span class="lbl r">5 needed</span></div><p class="fig" style="margin-top:12px">3<small> of 7 days</small></p><div class="segs" role="img" aria-label="3 of 7 days logged">${[1, 0, 1, 1, 0, 0, 0].map(x => `<i class="${x ? 'on' : ''}"></i>`).join('')}</div><p class="body mt">Five days next week gives me a real answer.</p></section>
+<h2 class="sec">What I could see</h2><div class="gap">${weightCard('84.8', [85.8, 85.0, 84.8], false)}${stats([['Sessions', '2', '', 'of 4 planned', .5], ['Avg sleep', '6.4', 'h', '3 nights tracked', 6.4 / 8]])}<p class="note" style="margin:0 6px">Food averages are hidden. Three days aren't a week.</p></div>${askGeo()}`, dock: btn('ink', 'Keep current targets', 'keep') };
+    if (s === 'load') return { title: 'Check-in', titleOn: true, body: `<div role="status" aria-busy="true" aria-label="Loading your week">${sk(212, 22, 0)}${sk(20, 6, 22).replace('sk"', 'sk" ').replace('height:20px', 'height:16px;width:120px')}${sk(240)}${sk(176)}</div>` };
+    if (s === 'fail') return { title: 'Check-in', titleOn: true, body: `<section class="card pad" role="alert"><div class="ghd">${ic('alert')}<b style="font-size:16px">I couldn't load your week</b></div><p class="body mt" style="color:var(--mu)">Check your connection and try again. Your targets haven't changed.</p><button class="tbtn ink" data-act="retry" style="margin:8px 0 0 -14px">Try again</button></section>` };
+    return { title: 'Week 6 check-in', body: `<p class="offl">${ic('off')}Offline. Showing your week from 08:12.</p>` + hero('−0.1', CK_VERDICT) + `<h2 class="sec">What changes</h2><div class="card">${ledger(CHG, 'change')}<div class="band">Apply needs a connection; nothing changes until then.</div></div>` + weekBlock(), dock: `<button class="btn soft" disabled>Apply when you're back online</button>` };
+  },
+  act: { keep: P => { toast(P, 'Targets unchanged'); P.pop(); }, retry: P => { P.setState('load', { soft: true }); setTimeout(() => P.setState('mid', { soft: true }), 900); } },
+  trade: '<b>Notes:</b> nothing on these screens is orange, because nothing is being decided. Loading keeps the final layout (flat blocks at real sizes, no shimmer). Load failure stays inside the block and says targets are untouched.',
+  meas: [['Main job', 'See how the week is going'], ['Taps from Home, today then this', '1 then 1'], ['Est. time', '4 s'], ['Mid-week label', 'Needs backend fix 4']] };
+
+// ---------- plans list (decision B) ----------
+const PL = {
+  normal: { meal: { name: 'Lean cut', until: 'until 30 Nov', left: '5 weeks left', kcal: 2125, p: 165, c: 218, f: 66, days: [2125, 2110, 2140, 2125, 2090, 2300, 2050] }, wk: { name: 'Upper/lower, 4 days', per: '4 days a week', next: 'Lower A', when: 'Tue', days: ['Up A', 'Lo A', 'Rest', 'Up B', 'Lo B', 'Rest', 'Rest'], nx: 1 },
+    earlier: [['Summer maintenance', 'Nutrition, 3 Jun to 25 Aug'], ['Push pull legs, 6 days', 'Training, made 12 May'], ['Geo\'s starter plan', 'Nutrition, 1 to 31 May']] },
+  long: { meal: { name: 'Contest prep phase two with refeeds every second Saturday', until: 'until 14 Feb 2027', left: '16 weeks left', kcal: 3450, p: 245, c: 412, f: 96, days: [3450, 3450, 3450, 3450, 3450, 4150, 3450] }, wk: { name: 'Hypertrophy block B, high volume, deload in week five', per: '6 days a week', next: 'Pull, heavy back and rear delts', when: 'Thu', days: ['Push', 'Pull', 'Legs', 'Push', 'Pull', 'Legs', 'Rest'], nx: 3 },
+    earlier: [['Summer maintenance', 'Nutrition, 3 Jun to 25 Aug'], ['Push pull legs, 6 days', 'Training, made 12 May'], ['Geo\'s starter plan', 'Nutrition, 1 to 31 May'], ['Marathon base, 16 weeks with long Sunday runs', 'Training, 1 Jan to 20 Apr'], ['Ramadan timing, two meals and suhoor', 'Nutrition, 11 Mar to 9 Apr']] }
+};
+const WD = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const newPlanBlock = `<h2 class="sec">New plan</h2><div class="card pad" style="padding:8px">${btn('or', 'Ask Geo for a plan', 'geo')}<button class="row" data-act="build" style="margin-top:4px">${ic('food')}<span class="rt"><b>Build a nutrition plan</b><span>By hand, three questions</span></span>${ic('chev', 'ic chev')}</button><button class="row" data-act="build">${ic('train')}<span class="rt"><b>Build a training plan</b><span>By hand, two questions</span></span>${ic('chev', 'ic chev')}</button></div>`;
+const earlierBlock = list => list.length ? `<h2 class="sec">Earlier</h2><div class="card">${list.map(([a, b]) => `<button class="row" data-act="open" data-k="meal"><span class="rt"><b>${a}</b><span>${b}</span></span>${ic('chev', 'ic chev')}</button>`).join('')}</div>` : '';
+const emptySlots = `<button class="empty" data-act="build" style="width:100%;text-align:left"><b>No nutrition plan yet</b><span>Build one, or ask Geo below</span></button><button class="empty" data-act="build" style="width:100%;text-align:left;margin-top:10px"><b>No training plan yet</b><span>Build one, or ask Geo below</span></button>`;
+const plLoad = `<div role="status" aria-busy="true" aria-label="Loading your plans">${sk(16, 6, 6).replace('height:16px', 'height:16px;width:60px')}${sk(150)}${sk(150)}${sk(170, 22, 28)}</div>`;
+const plFail = `<section class="card pad" role="alert"><div class="ghd">${ic('alert')}<b style="font-size:16px">I couldn't load your plans</b></div><p class="body mt" style="color:var(--mu)">Check your connection and try again.</p><button class="tbtn ink" data-act="retry" style="margin:8px 0 0 -14px">Try again</button></section>`;
+function plansPage(s, cards) {
+  const D = PL[s === 'long' ? 'long' : 'normal'];
+  const head = `<h1 class="h1">Plans</h1>`;
+  if (s === 'load') return { title: 'Plans', body: head + plLoad };
+  if (s === 'fail') return { title: 'Plans', body: head + `<div style="margin-top:16px">${plFail}</div>` };
+  if (s === 'none') return { title: 'Plans', body: head + `<h2 class="sec">Active</h2>${emptySlots}${newPlanBlock}` };
+  return { title: 'Plans', body: head + (s === 'offline' ? `<p class="offl" style="margin-top:12px">${ic('off')}Offline. Showing plans from 08:12.</p>` : '') + `<h2 class="sec">Active</h2>${cards(D)}${newPlanBlock}${earlierBlock(D.earlier)}` };
+}
+const B1 = D => `<button class="card pad" data-press data-act="open" data-k="meal" aria-label="${D.meal.name}, nutrition, ${n(D.meal.kcal)} kcal a day"><span style="display:flex;gap:10px;align-items:flex-start"><span style="flex:1;min-width:0"><b class="val" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere">${D.meal.name}</b><span class="note" style="display:block;margin-top:2px">Nutrition, ${D.meal.until}</span></span><span class="pill2">${D.meal.left}</span></span><span style="display:flex;align-items:baseline;gap:6px;margin-top:14px"><b class="fig">${n(D.meal.kcal)}</b><span class="note">kcal a day</span></span><span class="stats c3" style="display:grid;margin:10px -16px -16px;box-shadow:0 -1px 0 var(--rule)">${[['Protein', 'p', D.meal.p], ['Carbs', 'c', D.meal.c], ['Fat', 'f', D.meal.f]].map(([l, k, v]) => `<span style="display:block;padding:10px 16px 12px"><span class="lbl" style="display:flex;align-items:center;gap:6px">${dot(k)}${l}</span><b style="font-size:16px;font-variant-numeric:tabular-nums">${v} g</b></span>`).join('')}</span></button>
+<button class="card pad" data-press data-act="open" data-k="wk" style="margin-top:10px" aria-label="${D.wk.name}, training, next ${D.wk.next}"><b class="val" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere">${D.wk.name}</b><span class="note" style="display:block;margin-top:2px">Training, ${D.wk.per}</span><span style="display:block;margin-top:12px;font-size:16px">Next: <b>${D.wk.next}</b>, ${D.wk.when}</span><span class="wk" aria-hidden="true">${D.wk.days.map((d, i) => `<span>${WD[i]}<i class="${d === 'Rest' ? 'rest' : ''}${i === D.wk.nx ? ' nx' : ''}"></i></span>`).join('')}</span></button>`;
+const B2 = D => { const mx = Math.max(...D.meal.days); return `<button class="card pad" data-press data-act="open" data-k="meal" aria-label="${D.meal.name}, nutrition"><span style="display:flex;gap:10px;justify-content:space-between;align-items:baseline"><b class="val" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${D.meal.name}</b><span class="note" style="flex:none">${D.meal.left}</span></span><span class="note" style="display:block">${n(D.meal.kcal)} kcal a day, ${D.meal.p} g protein</span><span class="bars" aria-hidden="true">${D.meal.days.map((k, i) => `<i class="${i === 0 ? 'today' : ''}" style="--h:${(k / mx).toFixed(3)}"></i>`).join('')}</span><span class="bx" aria-hidden="true">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => `<span>${d[0]}</span>`).join('')}</span></button>
+<button class="card pad" data-press data-act="open" data-k="wk" style="margin-top:10px" aria-label="${D.wk.name}, training"><span style="display:flex;gap:10px;justify-content:space-between;align-items:baseline"><b class="val" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${D.wk.name}</b><span class="note" style="flex:none">${D.wk.per}</span></span><span style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px" aria-hidden="true">${D.wk.days.map((d, i) => `<span style="display:grid;place-items:center;height:48px;border-radius:12px;font-size:13px;font-weight:700;line-height:1.1;text-align:center;${d === 'Rest' ? 'color:var(--mu);box-shadow:inset 0 0 0 1.5px #111c351f' : i === D.wk.nx ? 'background:var(--ink);color:#fff' : 'background:var(--tint)'}">${d === 'Rest' ? '' : d.replace(' ', '<br>')}</span>`).join('')}</span><span class="bx" aria-hidden="true">${WD.map(d => `<span>${d}</span>`).join('')}</span></button>`; };
+const B3 = D => `<div class="card"><button class="row" data-act="open" data-k="meal" style="min-height:72px"><span class="gly">${ic('food')}</span><span class="rt"><b>${D.meal.name}</b><span>${n(D.meal.kcal)} kcal, ${D.meal.p} g protein</span></span>${ic('chev', 'ic chev')}</button><button class="row" data-act="open" data-k="wk" style="min-height:72px"><span class="gly">${ic('train')}</span><span class="rt"><b>${D.wk.name}</b><span>Next: ${D.wk.next}, ${D.wk.when}</span></span>${ic('chev', 'ic chev')}</button></div>`;
+const plAct = { open: (P, t) => { fillView(P, t.dataset.k); P.push(P.pg2); }, build: P => toast(P, 'Opens the builder'), retry: P => { P.setState('load', { soft: true }); setTimeout(() => P.setState('both', { soft: true }), 900); } };
+const PLSTATES = [['both', 'Both active'], ['none', 'Nothing yet'], ['long', 'Long names'], ['load', 'Loading'], ['fail', 'Load failed']];
+PHONES.b1 = { dec: 'B', name: 'Answer card', rec: true, origin: ORIGIN.settings, states: [...PLSTATES, ['offline', 'Offline']],
+  desc: 'Each card answers its plan\'s question on the list: the day\'s calories with the three macros, and the next workout with the week as dots (orange = next).',
+  render: s => plansPage(s, B1), act: plAct,
+  trade: '<b>Trade-off:</b> the tallest cards (about 170 px each), so Earlier sits below the fold; in exchange the two things people open a plan for are on the list.',
+  why: 'Recommended: the next workout and today\'s targets read without opening anything (2 fewer taps for "what\'s next"), and the cards keep one figure each instead of a chart.',
+  meas: [['Main job', 'Know today\'s target and the next workout'], ['Taps from Home, today then this', '4 then 2'], ['Est. time, today then this', '8 s then 4 s'], ['Open a plan', '3 then 3']] };
+PHONES.b2 = { dec: 'B', name: 'Week strip', origin: ORIGIN.settings, states: PLSTATES,
+  desc: 'Each card carries a week strip: planned calories per day as bars, the training split as seven day cells with the next one filled.',
+  render: s => plansPage(s, B2), act: plAct,
+  trade: '<b>Trade-off:</b> the richest preview (the whole week), but day cells shrink to 13 px labels, the strip repeats what the plan view shows, and long split names do not fit a cell.',
+  meas: [['Main job', 'Know today\'s target and the next workout'], ['Taps from Home, today then this', '4 then 2'], ['Est. time, today then this', '8 s then 6 s'], ['Open a plan', '3 then 3']] };
+PHONES.b3 = { dec: 'B', name: 'Rows', origin: ORIGIN.settings, states: PLSTATES,
+  desc: 'Active plans as two rows in one card, like Settings: icon, name, one line of numbers or the next workout, chevron.',
+  render: s => plansPage(s, B3), act: plAct,
+  trade: '<b>Trade-off:</b> the fastest scan and everything on one screen, but long names truncate to one line and the targets shrink to a 13 px subline.',
+  meas: [['Main job', 'Know today\'s target and the next workout'], ['Taps from Home, today then this', '4 then 2'], ['Est. time, today then this', '8 s then 5 s'], ['Open a plan', '3 then 3']] };
+
+// ---------- plan views ----------
+const MEALS = {
+  0: [['Breakfast', 'Greek yoghurt, oats and blueberries', 420, 32, 48, 10], ['Lunch', 'Chicken, rice and roasted vegetables bowl', 640, 52, 70, 15], ['Snack', 'Protein shake with banana', 210, 26, 24, 2], ['Dinner', 'Salmon, sweet potato and greens', 690, 42, 56, 30], ['Snack', 'Rice cakes with peanut butter', 165, 5, 20, 7]],
+  1: [['Breakfast', 'Scrambled eggs on sourdough', 450, 28, 40, 18], ['Lunch', 'Turkey and avocado wrap', 560, 42, 50, 18], ['Snack', 'Cottage cheese and pineapple', 200, 24, 18, 3], ['Dinner', 'Beef stir-fry with jasmine rice', 760, 52, 92, 18], ['Snack', 'Apple with almonds', 140, 4, 16, 8]],
+  long: [['Breakfast', 'Overnight oats with chia, Greek yoghurt, frozen raspberries, honey and a scoop of vanilla whey', 520, 42, 62, 11], ['Lunch', 'Grilled chicken thigh, brown rice, edamame, pickled cucumber and sesame dressing', 690, 55, 72, 19], ['Snack', 'Protein shake with banana', 210, 26, 24, 2], ['Dinner', 'Slow-cooked lamb shoulder with roasted potatoes, carrots and mint yoghurt', 560, 40, 38, 26], ['Snack', 'Rice cakes with peanut butter', 145, 4, 18, 6]]
+};
+const DAYS = ['Mon 26', 'Tue 27', 'Wed 28', 'Thu 29', 'Fri 30', 'Sat 31', 'Sun 1'];
+function mealView(s, P) {
+  const earlier = s === 'earlier', sel = P.data.day ?? 0;
+  const name = earlier ? 'Summer maintenance' : 'Lean cut';
+  const sub = earlier ? 'Ended 25 Aug, made by Geo' : 'Active until 30 Nov, 5 weeks left';
+  const T = earlier ? [2600, 160, 300, 85] : [2125, 165, 218, 66];
+  const targets = s === 'notargets' ? `<button class="empty" data-act="geo" style="width:100%;text-align:left"><b>No targets yet</b><span>Ask Geo to work them out with you</span></button>`
+    : `<section class="card pad" aria-label="Daily targets"><span class="lbl">Daily targets</span><p class="fig" style="margin-top:8px">${n(T[0])}<small> kcal a day</small></p><div class="stats c3" style="margin:14px -16px -16px;box-shadow:0 -1px 0 var(--rule)">${[['Protein', 'p', T[1]], ['Carbs', 'c', T[2]], ['Fat', 'f', T[3]]].map(([l, k, v]) => `<div><span class="lbl" style="display:flex;align-items:center;gap:6px">${dot(k)}${l}</span><p class="val" style="margin-top:2px">${v}<small> g</small></p></div>`).join('')}</div></section>`;
+  const list = s === 'emptyday' && sel === 3 ? null : s === 'long' && sel === 0 ? MEALS.long : MEALS[sel % 2];
+  const meals = list ? `<div class="card">${list.map(([t, f, k, p, c, fa]) => `<div class="row" style="align-items:flex-start"><span class="rt"><span>${t}</span><b class="wrap">${f}</b><span>${p} g protein, ${c} g carbs, ${fa} g fat</span></span><span class="kc">${k}<small> kcal</small></span></div>`).join('')}</div>`
+    : `<div class="empty"><b>Nothing planned for Thu 29</b><span>Edit the plan to add meals, or ask Geo</span></div>`;
+  const hist = `<h2 class="sec">History</h2><div class="card"><div class="row"><span class="rt"><b>Version 3</b><span>Today, after the week 6 check-in</span></span><span class="pill2">Current</span></div><div class="row"><span class="rt"><b>Version 2</b><span>19 Oct, protein up to 165 g</span></span></div><div class="row"><span class="rt"><b>Version 1</b><span>1 Sep, made by Geo</span></span></div></div>`;
+  return { title: 'Nutrition plan', action: `<button class="rb" aria-label="Edit plan" data-act="edit">${ic('pencil')}</button>`,
+    body: `<h1 class="h1">${name}</h1><p class="sub">${sub}</p><div style="margin-top:18px">${targets}</div><h2 class="sec">Meals</h2><div class="chips" role="group" aria-label="Plan days">${DAYS.map((d, i) => `<button class="chip" data-act="day" data-i="${i}" aria-pressed="${i === sel}">${d}</button>`).join('')}</div><div style="margin-top:8px">${meals}</div><h2 class="sec">Notes</h2><p class="card pad body">Refeed on Saturdays: add 50 g of carbs at dinner.</p>${earlier ? '' : hist}`,
+    dock: earlier ? btn('or', 'Make this my plan', 'activate') : null };
+}
+const EX = { 0: [['Bench press', '4 × 6, 80 kg'], ['Barbell row', '4 × 8, 70 kg'], ['Overhead press', '3 × 8, 45 kg'], ['Lat pulldown', '3 × 10, 60 kg'], ['Incline curl', '3 × 12, 12 kg'], ['Rope pushdown', '3 × 12, 25 kg']],
+  1: [['Back squat', '4 × 6, 100 kg'], ['Romanian deadlift', '3 × 8, 80 kg'], ['Leg press', '3 × 12, 180 kg'], ['Walking lunge', '3 × 10, 20 kg'], ['Lying leg curl', '3 × 12, 45 kg'], ['Standing calf raise', '4 × 15, 60 kg']] };
+const WDAYS = [['Mon', 'Upper A', 0], ['Tue', 'Lower A', 1], ['Wed', 'Rest'], ['Thu', 'Upper B', 0], ['Fri', 'Lower B', 1], ['Sat', 'Rest'], ['Sun', 'Rest']];
+function workoutView(s, P) {
+  const open = P.data.open ?? 1;
+  if (s === 'empty') return { title: 'Training plan', action: `<button class="rb" aria-label="Edit plan" data-act="edit">${ic('pencil')}</button>`, body: `<h1 class="h1">Upper/lower, 4 days</h1><p class="sub">Active, no end date</p><div class="empty" style="margin-top:18px"><b>No workout days yet</b><span>Edit the plan to add some, or ask Geo</span></div>` };
+  const rows = WDAYS.map(([d, nm, ex], i) => {
+    if (nm === 'Rest') return `<div class="row" style="min-height:56px"><span class="num">${d}</span><span class="rt"><b style="color:var(--mu)">Rest</b><span>Recovery day</span></span></div>`;
+    const isOpen = open === i;
+    const panel = isOpen ? `<div style="padding:0 16px 14px"><ol class="exl" style="background:var(--tint);border-radius:16px;padding:2px 14px">${EX[ex].map(([a, b]) => `<li>${a}<span>${b}</span></li>`).join('')}</ol><div style="margin-top:10px">${s === 'starting' && isOpen ? busy('or', `Starting ${nm}`) : s === 'failed' && isOpen ? `<p class="note" role="alert" style="margin:0 4px 8px;color:var(--ink)">Couldn't start the workout. Check your connection.</p>${btn('or', 'Try again', 'start')}` : btn('or', `${ic('play')}Start ${nm}`, 'start')}</div></div>` : '';
+    return `<div><button class="row" data-act="exp" data-i="${i}" aria-expanded="${isOpen}" style="min-height:60px"><span class="num">${d}</span><span class="rt"><b>${nm}</b><span>6 exercises</span></span>${i === 1 ? '<span class="pill2">Next</span>' : ''}${ic('chev', 'ic chev')}</button>${panel}</div>`;
+  }).join('');
+  return { title: 'Training plan', action: `<button class="rb" aria-label="Edit plan" data-act="edit">${ic('pencil')}</button>`,
+    body: `<h1 class="h1">Upper/lower, 4 days</h1><p class="sub">Active, no end date</p><div class="card stats c3" style="margin-top:18px">${[['7', 'days'], ['4', 'training'], ['24', 'exercises']].map(([v, l]) => `<div><p class="val">${v}</p><span class="lbl">${l}</span></div>`).join('')}</div><h2 class="sec">Days</h2><div class="card" style="overflow:hidden">${rows.replace(/<div><button/g, '<div class="dwrap"><button')}</div>` };
+}
+function fillView(P, k) {
+  const pg = P.pg2, r = k === 'wk' ? workoutView('active', { data: {} }) : mealView('active', { data: {} });
+  pg.querySelector('.pt').textContent = r.title; pg.querySelector('.pa').innerHTML = r.action;
+  pg.querySelector('.pscroll').innerHTML = r.body; const dk = pg.querySelector('.dock'); dk.hidden = !r.dock; dk.innerHTML = r.dock || '';
+  pg.querySelector('.pscroll').style.paddingBottom = '40px';
+}
+const viewAct = { day: (P, t) => { P.data.day = +t.dataset.i; P.render({ keepScroll: true }); }, edit: P => toast(P, 'Opens the plan in the builder'), activate: P => { P.pg1.querySelector('.dock').innerHTML = busy('or', 'Making it your plan'); setTimeout(() => { toast(P, 'This is your plan now'); P.pg1.querySelector('.dock').hidden = true; }, 1000); },
+  exp: (P, t) => { const i = +t.dataset.i; P.data.open = P.data.open === i ? -1 : i; P.render({ keepScroll: true }); }, start: P => { P.setState('starting', { soft: true, keepScroll: true }); setTimeout(() => toast(P, 'Opens the live session'), 900); } };
+PHONES.v1 = { dec: 'V', name: 'Nutrition plan view', rec: true, origin: () => ORIGIN.plans('meal'),
+  desc: 'Targets lead (one figure), then the day\'s meals behind day chips, then notes and the version history that check-ins write to.',
+  states: [['active', 'Active'], ['earlier', 'Earlier plan'], ['notargets', 'No targets'], ['emptyday', 'Empty day'], ['long', 'Long food names']],
+  render: (s, P) => { if (s === 'emptyday' && P.data._s !== s) P.data.day = 3; if (s !== 'emptyday' && P.data._s === 'emptyday') P.data.day = 0; P.data._s = s; return mealView(s, P); }, act: viewAct,
+  trade: '<b>Notes:</b> food names wrap instead of truncating (they are the content); macros read as words, not "32 P"; the only orange is "Make this my plan" on an earlier plan.',
+  meas: [['Main job', 'Tuesday\'s lunch'], ['Taps from Home, today then this', '4 then 4'], ['Est. time', '7 s then 7 s'], ['Change', 'History shows check-in versions']] };
+PHONES.v2 = { dec: 'V', name: 'Training plan view', rec: true, origin: () => ORIGIN.plans('workout'),
+  desc: 'The plan\'s next day is marked and open on arrival, with its exercises and an orange Start; other days open in place.',
+  states: [['active', 'Next day open'], ['starting', 'Starting'], ['failed', 'Start failed'], ['empty', 'No days']],
+  render: (s, P) => workoutView(s, P), act: viewAct,
+  trade: '<b>Notes:</b> today the view never says which day is next, so people count; opening the next day by default turns "start my workout" into one tap after the view opens.',
+  meas: [['Main job', 'Start the next workout'], ['Taps from Train, today then this', '3 then 2'], ['Est. time', '6 s then 3 s'], ['New data', 'None (current_position exists)']] };
+
+// ---------- builders (decision C) ----------
+const BSTEPS = ['name', 'targets', 'day'];
+const QS = { name: ['What should we call this plan?', 'A name you\'ll recognise later. Dates and notes are optional.'], targets: ['What are your daily targets?', 'Home and your food diary measure each day against these.'], day: ['What does a day of eating look like?', 'Search a food to fill in its numbers. You can change any of them.'] };
+const TDEF = { cal: [2000, 50, 'Calories', 'kcal'], p: [150, 5, 'Protein', 'g'], c: [200, 5, 'Carbs', 'g'], f: [60, 5, 'Fat', 'g'] };
+function tvals(P) { P.data.t = P.data.t || { cal: 2000, p: 150, c: 200, f: 60 }; return P.data.t; }
+const nameBody = (val = 'Lean cut') => `<label class="field"><span>Plan name</span><span class="inp focus">${val}<i class="caret" aria-hidden="true"></i></span></label><div class="two" style="margin-top:14px"><label class="field"><span>Start</span><span class="inp" style="font-size:16px">26 Oct 2026</span></label><label class="field"><span>End</span><span class="inp"><span class="ph">Optional</span></span></label></div><label class="field" style="margin-top:14px"><span>Notes</span><span class="inp" style="min-height:76px;align-items:flex-start;padding-top:14px"><span class="ph">Anything Geo should keep in mind</span></span></label>`;
+function targetsBody(P) { const t = tvals(P), sum = t.p * 4 + t.c * 4 + t.f * 9; return `<div class="gap">${Object.entries(TDEF).map(([k, [, st, l, u]]) => `<div class="step"><button class="sb" data-act="inc" data-k="${k}" data-d="-${st}" aria-label="Less ${l.toLowerCase()}">−</button><span class="sv"><span>${dot(k)} ${l}</span><b>${n(t[k])}<small style="font-size:13px;color:var(--mu)"> ${u}</small></b></span><button class="sb" data-act="inc" data-k="${k}" data-d="${st}" aria-label="More ${l.toLowerCase()}">+</button></div>`).join('')}</div><p class="note" style="margin:12px 6px 0">Protein, carbs and fat add up to ${n(sum)} kcal${Math.abs(sum - t.cal) > 50 ? `, ${n(Math.abs(sum - t.cal))} ${sum < t.cal ? 'under' : 'over'} the calorie target` : ''}.</p>`; }
+function meals(P) { return P.data.meals || (P.data.meals = [['Breakfast', 'Greek yoghurt, plain 2%', '170 g', 120, 17]]); }
+function dayBody(P, opts = {}) {
+  const m = meals(P);
+  return `<section class="card" aria-label="Day 1"><div class="row" style="min-height:56px">${ic('cal')}<span class="rt"><b>Mon 26 Oct</b><span>Day 1 of 1</span></span><button class="rb" style="box-shadow:none;background:none" aria-label="Change date">${ic('chev', 'ic chev')}</button></div>${m.map(([t, f, q, k, p], i) => `<div class="row" style="align-items:flex-start"><span class="rt"><span>${t}</span><b class="wrap">${f}</b><span>${q}, ${p} g protein</span></span><span class="kc">${k}<small> kcal</small></span><button class="rb" style="box-shadow:none;background:none;margin:-6px -10px 0 -4px" data-act="rm" data-i="${i}" aria-label="Remove ${f}">${ic('x')}</button></div>`).join('')}<div style="padding:4px 12px 12px"><button class="add" data-sheet="food">${ic('plus')}Add meal</button></div></section><button class="add" data-act="addday" style="margin-top:10px">${ic('plus')}Add day</button>${opts.noSwitch ? '' : `<div class="card" style="margin-top:14px"><button class="switch" role="switch" aria-checked="true" data-act="sw"><span class="rt"><b>Make it my active plan</b><span>Replaces Lean cut</span></span><span class="tg" aria-hidden="true"></span></button></div>`}`;
+}
+const FOODS = [['Greek yoghurt, plain 2%', 'Chobani, 170 g', 120, 17], ['Greek yoghurt, honey', 'Jalna, 170 g', 180, 15], ['Greek style yoghurt, vanilla', 'Brooklea, 150 g', 142, 8], ['Greek yoghurt and berry bowl', 'Your recent, 1 bowl', 260, 21]];
+const foodSheet = P => `<p class="sh">Add to day 1</p><div class="chips" role="group" aria-label="Meal" style="margin:0 -14px 10px;padding:2px 14px 4px">${['Breakfast', 'Lunch', 'Dinner', 'Snack'].map((t, i) => `<button class="chip" data-act="mtype" data-v="${t}" aria-pressed="${(P.data.mtype || 'Lunch') === t}">${t}</button>`).join('')}</div><label class="field"><span class="vh">Search foods</span><span class="inp focus" data-autofocus tabindex="0">${ic('search')}<span style="margin-left:8px">greek yog</span><i class="caret" aria-hidden="true"></i></span></label><div class="card" style="margin-top:10px;padding:0 10px">${FOODS.map(([a, b, k, p], i) => `<button class="res" data-act="pick" data-i="${i}"><span class="rt"><b class="wrap">${a}</b><span>${b}, ${p} g protein</span></span><span class="kc">${k}<small> kcal</small></span></button>`).join('')}</div>`;
+const builderAct = {
+  next: P => { const i = BSTEPS.indexOf(P.state); if (i < 2) { P.data.dir = 1; P.setState(BSTEPS[i + 1], { soft: true }); } else { P.setState('saving', { soft: true }); setTimeout(() => { if (P.data.fail) P.setState('error', { soft: true }); else { toast(P, 'Nutrition plan saved'); setTimeout(() => P.pop(), 700); } }, 1100); } },
+  inc: (P, t) => { const v = tvals(P); v[t.dataset.k] = Math.max(0, v[t.dataset.k] + +t.dataset.d); P.render({ keepScroll: true, keepSheet: true }); },
+  pick: (P, t) => { const f = FOODS[+t.dataset.i]; meals(P).push([P.data.mtype || 'Lunch', f[0], f[1].split(', ')[1] || f[1], f[2], f[3]]); P.closeSheet(); setTimeout(() => P.render({ keepScroll: true }), RM ? 0 : 200); },
+  mtype: (P, t) => { P.data.mtype = t.dataset.v; t.parentElement.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === t)); },
+  rm: (P, t) => { meals(P).splice(+t.dataset.i, 1); P.render({ keepScroll: true }); },
+  sw: (P, t) => t.setAttribute('aria-checked', t.getAttribute('aria-checked') !== 'true'),
+  addday: P => toast(P, 'Adds Tue 27 Oct'), goto: (P, t) => { P.data.dir = -1; P.setState(t.dataset.v, { soft: true }); }
+};
+function builderBack(P) { const i = BSTEPS.indexOf(P.state === 'saving' || P.state === 'error' ? 'day' : P.state); if (i > 0) { P.data.dir = -1; P.setState(BSTEPS[i - 1], { soft: true }); return true; } return false; }
+const BST = [['name', 'Name'], ['targets', 'Targets'], ['day', 'Day'], ['saving', 'Saving'], ['error', "Didn't save"]];
+function c1(s, P) {
+  const st = s === 'saving' || s === 'error' ? 'day' : s, i = BSTEPS.indexOf(st), last = i === 2;
+  const body = `<div class="slide${P.data.dir < 0 ? ' back' : ''}"><h1 class="q">${QS[st][0]}</h1><p class="qw">${QS[st][1]}</p>${st === 'name' ? nameBody() : st === 'targets' ? targetsBody(P) : dayBody(P)}</div>`;
+  P.data.dir = 0;
+  const dock = s === 'saving' ? busy('or', 'Saving') : s === 'error' ? `<p class="msg" role="alert">That didn't save. Check your connection and try again.</p>${btn('or', 'Try again', 'next')}` : btn('or', last ? 'Save plan' : 'Continue', 'next');
+  return { title: 'New nutrition plan', titleOn: true, prog: (i + 1) / 3, body, dock };
+}
+PHONES.c1 = { dec: 'C', name: 'Focused steps', rec: true, sheetState: 'day', origin: () => ORIGIN.plans('new'), states: BST, render: c1, act: builderAct, back: builderBack, sheets: { food: foodSheet },
+  desc: 'Today\'s pattern, tightened: one question per screen with a progress track under the header, the body, and Continue in the glass dock. Add meal opens a food search sheet that floats forward.',
+  trade: '<b>Trade-off:</b> earlier answers leave the screen (Back to change them), but each screen asks one thing, the same way onboarding does.',
+  why: 'Recommended: it matches the signed onboarding pattern (Q5), so the builders, edit and onboarding teach one way of answering; the search sheet saves a tap and keeps the day in view behind it.',
+  meas: [['Main job', 'Name, targets, one breakfast, save'], ['Taps from Home, today then this', '9 then 8'], ['Est. time, today then this', '22 s then 20 s'], ['Questions per screen', '1']] };
+function c2(s, P) {
+  const st = s === 'saving' || s === 'error' ? 'day' : s, i = BSTEPS.indexOf(st), t = tvals(P);
+  const done = [['name', 'Name', 'Lean cut, from 26 Oct'], ['targets', 'Daily targets', `${n(t.cal)} kcal, ${t.p} g protein`]].slice(0, i);
+  const rest = [['targets', 'Daily targets'], ['day', 'A day of eating']].slice(i);
+  const body = `<h1 class="h1">New nutrition plan</h1>${done.length ? `<div class="card" style="margin-top:16px">${done.map(([k, l, v]) => `<button class="row" data-act="goto" data-v="${k}"><span class="gav" style="background:var(--te)" aria-hidden="true">${ic('check')}</span><span class="rt"><span>${l}</span><b>${v}</b></span><span class="note" style="font-weight:650;color:var(--ink)">Edit</span></button>`).join('')}</div>` : ''}<section class="card pad slide" style="margin-top:12px"><h2 class="val" style="font-size:20px">${QS[st][0]}</h2><p class="note" style="margin:6px 0 16px">${QS[st][1]}</p>${st === 'name' ? nameBody() : st === 'targets' ? targetsBody(P) : dayBody(P, { noSwitch: true })}</section>${rest.length > 1 || (rest.length && rest[0][0] !== st) ? `<div class="card" style="margin-top:12px;opacity:.6">${rest.filter(r => r[0] !== st).map(([, l]) => `<div class="row"><span class="rt"><span>Then</span><b>${l}</b></span></div>`).join('')}</div>` : ''}${st === 'day' ? `<div class="card" style="margin-top:12px"><button class="switch" role="switch" aria-checked="true" data-act="sw"><span class="rt"><b>Make it my active plan</b><span>Replaces Lean cut</span></span><span class="tg" aria-hidden="true"></span></button></div>` : ''}`;
+  const dock = s === 'saving' ? busy('or', 'Saving') : s === 'error' ? `<p class="msg" role="alert">That didn't save. Check your connection and try again.</p>${btn('or', 'Try again', 'next')}` : btn('or', i === 2 ? 'Save plan' : 'Continue', 'next');
+  return { title: 'New nutrition plan', body, dock, then: () => { if (i > 0) { const sc = P.pg1.querySelector('.pscroll'), q = sc.querySelector('section.slide'); if (q) sc.scrollTop = Math.max(0, q.offsetTop - 110); } } };
+}
+PHONES.c2 = { dec: 'C', name: 'Answer stack', sheetState: 'day', origin: () => ORIGIN.plans('new'), states: BST, render: c2, act: builderAct, back: builderBack, sheets: { food: foodSheet },
+  desc: 'One scrolling page: answered questions fold into a ticked list you can tap to edit, the current question is an open card, what comes next is listed dimmed.',
+  trade: '<b>Trade-off:</b> everything answered stays visible and editable in one tap, but the page grows and the current question shares the screen with the record of the others.',
+  meas: [['Main job', 'Name, targets, one breakfast, save'], ['Taps from Home, today then this', '9 then 8'], ['Est. time, today then this', '22 s then 21 s'], ['Questions per screen', '1 open, others folded']] };
+function c3(s, P) {
+  const st = s === 'saving' || s === 'error' ? 'day' : s, i = BSTEPS.indexOf(st), t = tvals(P), m = meals(P);
+  const named = i > 0, tg = i > 1;
+  const body = `<h1 class="h1" style="${named ? '' : 'color:#111c3559'}">${named ? 'Lean cut' : 'Untitled plan'}</h1><p class="sub">${named ? 'From 26 Oct' : 'Your answers fill this in'}</p><div style="margin-top:18px">${tg ? `<section class="card pad"><span class="lbl">Daily targets</span><p class="fig" style="margin-top:8px">${n(t.cal)}<small> kcal a day</small></p><p class="note mt">${t.p} g protein, ${t.c} g carbs, ${t.f} g fat</p></section>` : `<div class="empty"><b style="color:var(--mu)">Daily targets</b><span>Next question</span></div>`}</div><h2 class="sec">Mon 26 Oct</h2>${tg ? `<div class="card">${m.map(([ty, f, q, k]) => `<div class="row"><span class="rt"><span>${ty}</span><b>${f}</b></span><span class="kc">${k}<small> kcal</small></span></div>`).join('')}</div><div class="gap" style="margin-top:10px">${['Lunch', 'Dinner'].map(x => `<button class="add" data-sheet="food" data-mt="${x}">${ic('plus')}Add ${x.toLowerCase()}</button>`).join('')}</div><div class="card" style="margin-top:14px"><button class="switch" role="switch" aria-checked="true" data-act="sw"><span class="rt"><b>Make it my active plan</b><span>Replaces Lean cut</span></span><span class="tg" aria-hidden="true"></span></button></div>` : `<div class="empty"><b style="color:var(--mu)">Meals</b><span>Last question</span></div>`}`;
+  const q = st === 'day' ? null : `<p class="sh">${QS[st][0]}</p><p class="note" style="margin:-4px 4px 14px">${QS[st][1]}</p>${st === 'name' ? nameBody() : targetsBody(P)}<div style="margin-top:14px">${btn('or', 'Continue', 'next')}</div>`;
+  const dock = st !== 'day' ? null : s === 'saving' ? busy('or', 'Saving') : s === 'error' ? `<p class="msg" role="alert">That didn't save. Check your connection and try again.</p>${btn('or', 'Try again', 'next')}` : btn('or', 'Save plan', 'next');
+  return { title: 'New nutrition plan', titleOn: true, prog: (i + 1) / 3, body, dock, sheet: q };
+}
+PHONES.c3 = { dec: 'C', name: 'Live plan and sheets', origin: () => ORIGIN.plans('new'), states: BST, render: c3, act: builderAct, back: builderBack, sheets: { food: foodSheet },
+  desc: 'The plan you are making sits behind, read-only, and fills in as you answer; each question floats forward as a glass sheet. The day step drops the sheet and shows empty meal slots to tap.',
+  trade: '<b>Trade-off:</b> the most "spatial" and you watch the plan form, but questions live in sheets that cover half the screen, and dragging a sheet away loses the question.',
+  meas: [['Main job', 'Name, targets, one breakfast, save'], ['Taps from Home, today then this', '9 then 8'], ['Est. time, today then this', '22 s then 21 s'], ['Questions per screen', '1, in a sheet']] };
+PHONES.c3.act = Object.assign({}, builderAct, { next: (P) => { const i = BSTEPS.indexOf(P.state); if (i < 2) { P.closeSheet(); setTimeout(() => P.setState(BSTEPS[i + 1], { soft: true, animSheet: true }), RM ? 0 : 320); } else builderAct.next(P); } });
+
+// ---------- training builder and edit ----------
+const WSTEPS = ['name', 'days'];
+function wb(s, P) {
+  const st = s === 'name' ? 'name' : 'days';
+  const rest = s === 'rest' || P.data.rest;
+  const ex = P.data.ex || (P.data.ex = [['Bench press', 'Chest, triceps', 4, 6, 80], ['Barbell row', 'Back, biceps', 4, 8, 70]]);
+  const exRow = ([a, b, se, re, kg], i) => `<div style="padding:10px 16px;box-shadow:0 -1px 0 var(--rule)"><div style="display:flex;align-items:center;gap:8px"><span class="rt"><b>${a}</b><span>${b}</span></span><button class="rb" style="box-shadow:none;background:none;margin-right:-10px" data-act="rmx" data-i="${i}" aria-label="Remove ${a}">${ic('x')}</button></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px">${[['Sets', se], ['Reps', re], ['kg', kg]].map(([l, v]) => `<button class="inp" style="min-height:44px;justify-content:space-between;padding:0 12px;font-size:16px;box-shadow:none;background:var(--tint)" aria-label="${l} ${v}"><span class="note">${l}</span><b style="font-variant-numeric:tabular-nums">${v}</b></button>`).join('')}</div></div>`;
+  const day1 = `<section class="card" aria-label="Day 1"><div class="row" style="min-height:60px"><span class="inp" style="flex:1;min-height:44px;box-shadow:none;background:var(--tint)">Upper A</span><button class="chip" data-act="rest" aria-pressed="false" style="box-shadow:none;background:var(--tint)">Rest day</button></div>${ex.map(exRow).join('')}<div style="padding:8px 12px 12px"><button class="add" data-sheet="ex">${ic('plus')}Add exercise</button></div></section>`;
+  const day2 = `<section class="card" aria-label="Day 2" style="margin-top:10px"><div class="row" style="min-height:60px"><span class="inp" style="flex:1;min-height:44px;box-shadow:none;background:var(--tint);${rest ? 'color:var(--mu)' : ''}">${rest ? 'Rest' : 'Lower A'}</span><button class="chip" data-act="rest" aria-pressed="${!!rest}" style="box-shadow:none;${rest ? '' : 'background:var(--tint)'}">Rest day</button></div>${rest ? '<p class="note" style="padding:0 16px 14px">A recovery day. No exercises needed.</p>' : `<div style="padding:4px 12px 12px"><button class="add" data-sheet="ex">${ic('plus')}Add exercise</button></div>`}</section>`;
+  const body = `<div class="slide${P.data.dir < 0 ? ' back' : ''}"><h1 class="q">${st === 'name' ? 'What should we call this program?' : 'Plan your training days'}</h1><p class="qw">${st === 'name' ? 'A name you\'ll recognise later. Dates and notes are optional.' : 'Add exercises to each day, or mark it as a rest day.'}</p>${st === 'name' ? nameBody('Upper/lower') : day1 + day2 + `<button class="add" style="margin-top:10px" data-act="addday">${ic('plus')}Add day</button><div class="card" style="margin-top:14px"><button class="switch" role="switch" aria-checked="true" data-act="sw"><span class="rt"><b>Make it my active plan</b><span>Replaces Upper/lower, 4 days</span></span><span class="tg" aria-hidden="true"></span></button></div>`}</div>`;
+  P.data.dir = 0;
+  const dock = s === 'saving' ? busy('or', 'Saving') : btn('or', st === 'name' ? 'Continue' : 'Save program', 'wnext');
+  return { title: 'New training plan', titleOn: true, prog: st === 'name' ? .5 : 1, body, dock, sheet: s === 'search' ? exSheet() : null };
+}
+const EXS = [['Bench press', 'Chest, triceps, shoulders'], ['Incline dumbbell bench press', 'Upper chest, shoulders'], ['Close-grip bench press', 'Triceps, chest'], ['Dumbbell bench press', 'Chest, triceps']];
+const exSheet = () => `<p class="sh">Add exercise</p><label class="field"><span class="vh">Search exercises</span><span class="inp focus" data-autofocus tabindex="0">${ic('search')}<span style="margin-left:8px">bench</span><i class="caret" aria-hidden="true"></i></span></label><div class="card" style="margin-top:10px;padding:0 10px">${EXS.map(([a, b], i) => `<button class="res" data-act="pickx" data-i="${i}"><span class="rt"><b class="wrap">${a}</b><span>${b}</span></span></button>`).join('')}</div><p class="note" style="margin:10px 6px 0">Starts at 3 sets of 10. Change them on the day.</p>`;
+PHONES.w1 = { dec: 'W', name: 'Training builder', rec: true, sheetState: 'days', origin: () => ORIGIN.plans('new'),
+  desc: 'Two questions, focused steps. Sets, reps and kg are three tappable cells per exercise; exercises come from a search sheet.',
+  states: [['name', 'Name'], ['days', 'Days'], ['search', 'Search sheet'], ['rest', 'Rest day'], ['saving', 'Saving']],
+  render: (s, P) => { if (s === 'rest') P.data.rest = true; else if (s === 'days' || s === 'name') P.data.rest = false; return wb(s, P); },
+  sheets: { ex: () => exSheet() },
+  act: { wnext: P => { if (P.state === 'name') { P.data.dir = 1; P.setState('days', { soft: true }); } else { P.setState('saving', { soft: true, keepScroll: true }); setTimeout(() => { toast(P, 'Training plan saved'); setTimeout(() => P.pop(), 700); }, 1100); } },
+    rest: P => { P.data.rest = !P.data.rest; P.render({ keepScroll: true }); }, pickx: (P, t) => { const e = EXS[+t.dataset.i]; P.data.ex.push([e[0], e[1].split(', ').slice(0, 2).join(', '), 3, 10, '-']); P.closeSheet(); setTimeout(() => P.render({ keepScroll: true }), RM ? 0 : 200); },
+    rmx: (P, t) => { P.data.ex.splice(+t.dataset.i, 1); P.render({ keepScroll: true }); }, sw: builderAct.sw, addday: P => toast(P, 'Adds day 3') },
+  back: P => { if (P.state !== 'name') { P.data.dir = -1; P.setState('name', { soft: true }); return true; } return false; },
+  trade: '<b>Notes:</b> today\'s number fields become labelled cells (44 pt), the day name is a field, Rest day is a chip; one orange action, in the dock.',
+  meas: [['Main job', 'Name, one day, one exercise, save'], ['Taps from Home, today then this', '8 then 7'], ['Est. time, today then this', '19 s then 17 s'], ['Questions per screen', '1']] };
+function ed(s, P) {
+  if (s === 'load') return { title: 'Edit nutrition plan', titleOn: true, prog: 0, body: `<div role="status" aria-busy="true" aria-label="Loading your plan"><span class="skl" style="height:28px;width:80%;margin:8px 4px 0"></span><span class="skl" style="height:16px;width:60%;margin:12px 4px 22px"></span>${sk(52, 16, 0)}${sk(52, 16)}${sk(76, 16)}</div>` };
+  if (s === 'saved') return { title: 'Nutrition plan', titleOn: false, action: `<button class="rb" aria-label="Edit plan">${ic('pencil')}</button>`, body: `<h1 class="h1">Lean cut</h1><p class="sub">Active until 30 Nov, 5 weeks left</p><div class="card" style="margin-top:14px"><div class="band ok" style="border-radius:22px" role="status">Saved as version 4. Version 3 is in History.</div></div><section class="card pad" style="margin-top:10px"><span class="lbl">Daily targets</span><p class="fig" style="margin-top:8px">2,200<small> kcal a day</small></p><p class="note mt">165 g protein, 237 g carbs, 68 g fat</p></section><h2 class="sec">History</h2><div class="card"><div class="row"><span class="rt"><b>Version 4</b><span>Today, edited by you</span></span><span class="pill2">Current</span></div><div class="row"><span class="rt"><b>Version 3</b><span>Today, after the week 6 check-in</span></span></div></div>` };
+  const st = s === 'saving' ? 'targets' : s;
+  if (!P.data.t) P.data.t = { cal: 2125, p: 165, c: 218, f: 66 };
+  const body = `<div class="slide"><h1 class="q">${st === 'name' ? 'Rename it, or keep going' : 'What are your daily targets?'}</h1><p class="qw">${st === 'name' ? 'Saving keeps the old version in History.' : 'Home and your food diary measure each day against these.'}</p>${st === 'name' ? nameBody('Lean cut') : targetsBody(P)}</div>`;
+  const dock = s === 'saving' ? busy('or', 'Saving changes') : `<div style="display:grid;grid-template-columns:1fr 1.3fr;gap:6px">${btn('soft', 'Continue', 'enext')}${btn('or', 'Save changes', 'esave')}</div>`;
+  return { title: 'Edit nutrition plan', titleOn: true, prog: st === 'name' ? 1 / 3 : 2 / 3, body, dock };
+}
+PHONES.e1 = { dec: 'W', name: 'Edit plan', rec: true, origin: () => ORIGIN.plans('meal'),
+  desc: 'The same focused steps, prefilled. In edit mode Save changes sits beside Continue on every step, so a target tweak does not walk the whole plan.',
+  states: [['load', 'Loading'], ['name', 'Name'], ['targets', 'Targets'], ['saving', 'Saving'], ['saved', 'Saved']],
+  render: ed, act: { inc: builderAct.inc, enext: P => P.setState(P.state === 'name' ? 'targets' : 'targets', { soft: true }), esave: P => { P.setState('saving', { soft: true, keepScroll: true }); setTimeout(() => P.setState('saved', { soft: true }), 1100); } },
+  back: P => { if (P.state === 'targets') { P.setState('name', { soft: true }); return true; } return false; },
+  trade: '<b>Notes:</b> Save on every step is a small behaviour change (today Save appears only on the last step); it uses the same update call. Saving writes a new version, so the saved screen says where the old one went.',
+  meas: [['Main job', 'Change the calorie target'], ['Taps from Home, today then this', '8 then 6'], ['Est. time, today then this', '14 s then 10 s'], ['Questions per screen', '1']] };
+
+// ---------- build the option cards ----------
+const FQM = window.FQM || {};
+const order = { A: ['a1', 'a2', 'a3'], CK: ['ck'], B: ['b1', 'b2', 'b3'], V: ['v1', 'v2'], C: ['c1', 'c2', 'c3'], W: ['w1', 'e1'] };
+const DECN = { A: 'Check-in', B: 'Plan card', C: 'Builder' };
+const INST = {};
+document.querySelectorAll('.opts[data-dec]').forEach(box => {
+  (order[box.dataset.dec] || []).forEach(id => {
+    const d = PHONES[id], open = ['A', 'B', 'C'].includes(d.dec);
+    const art = document.createElement('article'); art.className = 'opt'; art.id = 'opt-' + id;
+    const m = FQM[id];
+    const fr = m ? `${m.push} / ${m.scroll} / ${m.sheet}` : 'measuring';
+    art.innerHTML = `<div class="ohd"><h3>${open ? id.toUpperCase() + ' ' : ''}${d.name}${d.rec && open ? ' <span class="badge">Recommended</span>' : ''}${id === 'e1' ? ' <span class="badge ch">challenges Q6</span>' : ''}</h3><p>${d.desc}</p></div>
+<div class="sw" role="group" aria-label="${d.name} states">${d.states.map(([k, l], i) => `<button type="button" data-s="${k}" aria-pressed="${i === 0}">${l}</button>`).join('')}</div>
+<div class="stage"></div>
+<div class="meas" aria-label="Measurements">${d.meas.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}<div><span>Tap targets under 44 pt (this state)</span><b data-live="t">-</b></div><div><span>Orange actions on screen</span><b data-live="o">-</b></div><div><span>Max frame gap, push / scroll / sheet</span><b>${fr}</b></div></div>
+<p class="trade">${d.trade}</p>${d.why ? `<p class="trade"><b>Why recommended:</b> ${d.why.replace(/^Recommended: /, '')}</p>` : ''}${open ? `<button type="button" class="pick" data-dec="${d.dec}" data-id="${id}" aria-pressed="false">Pick ${id.toUpperCase()} ${d.name}</button>` : ''}`;
+    box.appendChild(art);
+    const P = Phone(art.querySelector('.stage'), id, d);
+    LIVE[id] = { t: art.querySelector('[data-live="t"]'), o: art.querySelector('[data-live="o"]') };
+    INST[id] = P;
+    P.push(P.pg1, true); P.render();
+    art.querySelector('.sw').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; art.querySelectorAll('.sw button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); P.data = {}; P.setState(b.dataset.s); });
+  });
+});
+const fit = () => document.querySelectorAll('.stage').forEach(st => { const w = Math.min(300, st.parentElement.clientWidth); const k = w / 390; st.style.width = w + 'px'; st.style.height = (844 * k) + 'px'; const f = st.querySelector('.fq'); if (f) f.style.setProperty('--k', k.toFixed(4)); });
+fit(); addEventListener('resize', fit);
+// ---------- picks tray ----------
+const picks = {}; try { Object.assign(picks, JSON.parse(localStorage.getItem('fiqr-plans-picks') || '{}')); } catch (e) { }
+const out = document.getElementById('tray-out');
+const paint = () => {
+  document.querySelectorAll('.pick').forEach(b => b.setAttribute('aria-pressed', String(picks[b.dataset.dec] === b.dataset.id)));
+  const parts = Object.keys(DECN).filter(k => picks[k]).map(k => `${DECN[k]}: ${picks[k].toUpperCase()} ${PHONES[picks[k]].name}`);
+  out.textContent = parts.length ? parts.join(', ') : 'No picks yet';
+  try { localStorage.setItem('fiqr-plans-picks', JSON.stringify(picks)); } catch (e) { }
+};
+document.addEventListener('click', e => { const b = e.target.closest('.pick'); if (!b) return; picks[b.dataset.dec] = picks[b.dataset.dec] === b.dataset.id ? undefined : b.dataset.id; if (!picks[b.dataset.dec]) delete picks[b.dataset.dec]; paint(); });
+document.getElementById('tray-copy').addEventListener('click', () => { const text = 'FIQR check-in and plans picks: ' + out.textContent; const sel = () => { const r = document.createRange(); r.selectNodeContents(out); getSelection().removeAllRanges(); getSelection().addRange(r); }; try { navigator.clipboard.writeText(text).then(() => { out.textContent = 'Copied: ' + text; }, sel); } catch (e) { sel(); } });
+paint();
+
+// ---------- frame timing probe (used by the Playwright check) ----------
+function rec(ms) { return new Promise(res => { let last = performance.now(), max = 0; const t0 = last; const f = t => { max = Math.max(max, t - last); last = t; if (t - t0 < ms) requestAnimationFrame(f); else res(Math.round(max * 10) / 10); }; requestAnimationFrame(f); }); }
+const wait = ms => new Promise(r => setTimeout(r, ms));
+window.__fqProbe = async id => {
+  const P = INST[id]; const r = {};
+  P.setState(P.def.states[0][0]); await wait(200);
+  P.pop(); await wait(700);
+  const opener = P.ph.querySelector('.base [data-push]'); const pr = rec(750); opener.click(); r.push = await pr; await wait(200);
+  P.setState(P.def.states[0][0]); await wait(150);
+  const sc = P.pg1.querySelector('.pscroll'), max = sc.scrollHeight - sc.clientHeight;
+  const sr = rec(800); const t0 = performance.now(); await new Promise(res => { const f = t => { const k = Math.min(1, (t - t0) / 700); sc.scrollTop = max * (1 - Math.pow(1 - k, 3)); if (k < 1) requestAnimationFrame(f); else res(); }; requestAnimationFrame(f); }); r.scroll = await sr; sc.scrollTop = 0;
+  await wait(150);
+  if (P.def.sheetState) { P.setState(P.def.sheetState); await wait(600); }
+  const trig = P.pg1.querySelector('[data-sheet]');
+  if (trig || id === 'c3') { if (id === 'c3') { P.setState('targets'); P.closeSheet(0, false, true); await wait(600); const s2 = rec(750); P.openSheet(c3('targets', P).sheet); r.sheet = await s2; } else { trig.scrollIntoView({ block: 'center' }); await wait(400); const s2 = rec(750); trig.click(); r.sheet = await s2; } P.closeSheet(0, false, true); }
+  else if (id === 'a2') { const s2 = rec(750); P.pg1.querySelector('[data-sheet]')?.click(); r.sheet = await s2; } else r.sheet = 'n/a';
+  P.setState(P.def.states[0][0]);
+  return r;
+};
+window.__fqIds = Object.keys(INST);
+window.__fqState = (id, s) => { const P = INST[id]; P.data = {}; P.setState(s); const art = document.getElementById('opt-' + id); art.querySelectorAll('.sw button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.s === s))); };
+})();
+
+</script>

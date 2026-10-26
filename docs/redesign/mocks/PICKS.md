@@ -1,0 +1,11 @@
+# Owner picks (26 Oct 2026)
+- Direction: 19 Spatial Depth app-wide (tuned for daily use, smoother); tab bar 01 Minimise to Circle; Aurora for onboarding and login.
+- Today: Hero = Ring first; Tiles = Log first; Coach = Line with action; keep Check-in due card, Water quick log, Weight quick log, Macro detail sheet, Notifications sheet, Health permission sheet, Splash and cold start.
+- Feedback: everything a tad smaller (not drastically); macro detail sheet and weight sheet need a few icons and colour (too plain); compact tab bar and orb.
+- Live workout (26 Oct): one exercise per screen; fill its sets and rest, then move to the next exercise; back to previous allowed; an "All exercises" overview of the whole workout (done/current/next, set counts, tap to jump); progress like "3 of 6".
+- Food (locked): Day summary Ring; Date nav Day strip; Meal rows Photo-led; Row actions Tap for actions; keep Month view sheet, Row actions sheet and confirm, Edit a logged item. Enhance the "Your nutrition plan" link in the same style (no further mock).
+- Train (locked): A3 Muscle hero; B1 Stepper rows + list sheet; C3 Rest screen; D2 Session receipt plus a graph.
+- Ask Geo (locked): A2 Action card; B1 Capsule composer; C1 Floating sheet companion.
+- Check-in and plans (locked): A3 Today preview; B1 Answer card; C1 Focused steps.
+- Settings (locked): Paywall Depth stack; Settings Grouped list; System states Status capsule.
+- Log a meal: page broken, owner could not pick.

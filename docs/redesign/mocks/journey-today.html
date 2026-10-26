@@ -1,0 +1,999 @@
+<title>FIQR Today</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6F4F0;--fg:#14181F;--mu:#5B6170;--surface:#FFFFFF;--line:rgba(20,24,31,.1);--soft:rgba(20,24,31,.05);--acc:#C2481A;--good:#2E6B5F;--warn:#9A3412}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141518;--fg:#ECEBE8;--mu:#A3A6AD;--surface:#1D1F23;--line:rgba(255,255,255,.12);--soft:rgba(255,255,255,.06);--acc:#F08A5D;--good:#7FC3B3;--warn:#F4A27A}}
+:root[data-theme="dark"]{--bg:#141518;--fg:#ECEBE8;--mu:#A3A6AD;--surface:#1D1F23;--line:rgba(255,255,255,.12);--soft:rgba(255,255,255,.06);--acc:#F08A5D;--good:#7FC3B3;--warn:#F4A27A}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font:400 16px/1.55 Archivo,system-ui,sans-serif;padding:32px max(16px,env(safe-area-inset-right,0px)) 120px max(16px,env(safe-area-inset-left,0px));overflow-x:hidden}
+main{max-width:1240px;margin:0 auto}
+h1{font-size:44px;font-weight:850;font-stretch:112%;letter-spacing:-.03em;line-height:1;margin:0 0 14px}
+h2{font-size:28px;font-weight:800;font-stretch:108%;letter-spacing:-.02em;line-height:1.1;margin:0 0 12px}
+h3{font-size:20px;font-weight:750;margin:0 0 8px}
+h4{font-size:18px;font-weight:750;margin:0}
+p{margin:0 0 10px;max-width:72ch}
+code{font-size:.92em;background:var(--soft);padding:1px 5px;border-radius:5px}
+section.blk{margin-top:88px}
+.lead{font-size:18px;max-width:64ch}
+.muted{color:var(--mu)}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0}
+.flow span{background:var(--surface);border-radius:12px;padding:8px 12px;font-weight:650;font-size:14px}
+.flow i{font-style:normal;color:var(--mu)}
+.flow .hub{background:var(--fg);color:var(--bg)}
+.jobs{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin:16px 0;padding:0;list-style:none}
+.jobs li{background:var(--surface);border-radius:16px;padding:16px}
+.jobs b{display:block;font-size:17px}
+.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.sc{background:var(--surface);border-radius:16px;padding:18px;font-size:14.5px}
+.sc h3{font-size:17px}.sc dl{margin:0;display:grid;gap:6px}.sc dt{font-weight:700}.sc dd{margin:0 0 4px;color:var(--mu)}
+.tw{overflow-x:auto;background:var(--surface);border-radius:16px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 12px;vertical-align:top}
+tbody tr+tr th,tbody tr+tr td{border-top:1px solid var(--line)}
+thead th{color:var(--mu);font-weight:600;font-size:13px}
+.sm{min-width:900px}
+.opts{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));margin-top:20px}
+.opt{background:var(--surface);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.opt.rec{box-shadow:inset 0 0 0 2px var(--acc)}
+.oh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.badge{font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--acc);color:#fff}
+.badge.alt{background:var(--soft);color:var(--fg)}
+.what,.trade,.why{font-size:14.5px;margin:0}
+.mt{font-size:13.5px}.mt th{font-weight:600;color:var(--mu);width:46%}.mt td.warn{color:var(--warn);font-weight:700}
+.vs{display:block;color:var(--mu);font-size:12.5px}
+.pick{align-self:flex-start;min-height:44px;padding:0 18px;border-radius:22px;border:0;background:var(--fg);color:var(--bg);font:650 14px Archivo,system-ui,sans-serif;cursor:pointer;margin-top:auto}
+.pick[aria-pressed="true"]{background:var(--acc);color:#fff}
+.pw{display:flex;flex-direction:column;gap:10px;min-width:0}
+.sw{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:320px;margin:0 auto}
+.sw button{min-height:36px;padding:0 12px;border-radius:18px;border:0;background:var(--soft);color:var(--fg);font:600 13px Archivo,system-ui,sans-serif;cursor:pointer}
+.sw button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.surf{display:grid;grid-template-columns:320px minmax(0,1fr);gap:28px;align-items:start;margin-top:28px;background:var(--surface);border-radius:20px;padding:20px}
+.surf ul{margin:0 0 10px;padding-left:18px;font-size:14.5px}
+@media (max-width:760px){.surf{grid-template-columns:1fr}h1{font-size:34px}}
+.decision{margin-top:24px}
+.opts.one{grid-template-columns:minmax(0,520px)}
+.others{margin-top:18px}
+.others summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;font-size:15px}
+.note{background:var(--surface);border-radius:16px;padding:16px 18px;font-size:14.5px}
+.note li{margin-bottom:4px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.tray{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;display:flex;gap:10px;align-items:center;background:var(--surface);border-radius:999px;padding:8px 8px 8px 18px;box-shadow:0 12px 40px -12px rgba(0,0,0,.35);max-width:calc(100% - 32px);font-size:14px}
+.tray output{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tray button{font:650 14px Archivo,system-ui,sans-serif;border-radius:999px;padding:0 16px;min-height:40px;border:0;background:var(--fg);color:var(--bg);cursor:pointer;flex:none}
+.theme{position:absolute;top:16px;right:max(16px,env(safe-area-inset-right,0px));min-height:40px;padding:0 14px;border-radius:20px;border:0;background:var(--surface);color:var(--fg);font:600 13px Archivo,system-ui,sans-serif;cursor:pointer}
+a{color:inherit}
+.tbox{width:calc(390px * var(--k,.769));height:calc(844px * var(--k,.769));margin:0 auto;flex:none}
+/* Phone kit: Spatial Depth (o19, tuned quieter) + Minimise to Circle tab bar (o01). Every selector is scoped to .tdy. */
+.tdy{--ink:#111C35;--cr:#FDF6EC;--or:#E8622A;--te:#3E7C77;--oc:#A07A3C;--mu:rgba(17,28,53,.64);--fa:rgba(17,28,53,.07);--card:#fff;--neg:#B5432A;
+--spr:linear(0,.032,.114,.226,.351,.478,.598,.705,.796,.869,.925,.964,.989,1.003,1.01,1.012,1.011,1.008,1.005,1.003,1.001,1);--sd:.62s;--out:cubic-bezier(.22,1,.36,1);
+position:relative;width:390px;height:844px;margin:0;border-radius:55px;transform:scale(var(--k,.769));transform-origin:0 0;overflow:hidden;background:var(--cr);color:var(--ink);font-family:Archivo,system-ui,sans-serif;isolation:isolate;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;text-align:left;line-height:1.3;box-shadow:0 0 0 1.5px rgba(17,28,53,.12);font-size:17px}
+.tdy *{box-sizing:border-box}
+.tdy .ic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;width:20px;height:20px;flex:none}
+.tdy button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit;touch-action:manipulation}
+.tdy button:focus-visible,.tdy input:focus-visible,.tdy .scroll:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+.tdy .scroll:focus-visible{outline-offset:-3px;border-radius:55px}
+.tdy h2,.tdy h3,.tdy p,.tdy ul{margin:0;padding:0;font-size:inherit}
+.tdy ul{list-style:none}
+.tdy .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.tdy .num{font-variant-numeric:tabular-nums}
+/* type scale, five sizes: 30 lead, 22 values, 15 body, 13 labels, 11 meta */
+.tdy .t30{font-size:34px;font-weight:800;font-stretch:110%;letter-spacing:-.025em;line-height:1}
+.tdy .t22{font-size:28px;font-weight:800;font-stretch:106%;letter-spacing:-.02em;line-height:1.05}
+.tdy .t13{font-size:15px;font-weight:600;color:var(--mu)}
+.tdy .t11{font-size:13px;font-weight:500;color:var(--mu)}
+.tdy .dash{display:inline-block;width:14px;height:3px;border-radius:2px;background:rgba(17,28,53,.3);vertical-align:middle;margin:9px 0}
+
+/* layers */
+.tdy .app{position:absolute;inset:0;z-index:1;transform-origin:50% 40%;transition:transform var(--sd) var(--spr),filter .4s var(--out)}
+.tdy .dim{position:absolute;inset:0;z-index:6;background:#0B1224;opacity:0;pointer-events:none;transition:opacity .4s var(--out)}
+.tdy .scroll{height:100%;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:58px 20px 124px}
+.tdy .scroll::-webkit-scrollbar{display:none}
+.tdy .topfade{position:absolute;top:0;left:0;right:0;height:58px;z-index:5;pointer-events:none;opacity:0;transition:opacity .25s;background:rgba(253,246,236,.72);-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5)}
+.tdy.is-scrolled .topfade{opacity:1}
+.tdy .status{position:absolute;top:0;left:0;right:0;height:54px;z-index:12;display:flex;align-items:center;justify-content:space-between;padding:4px 34px 0 46px;font-weight:650;font-size:17px;pointer-events:none;font-variant-numeric:tabular-nums}
+.tdy .sic{display:flex;align-items:flex-end;gap:2px}.tdy .sic i{width:3px;background:var(--ink);border-radius:1px}.tdy .sic i:nth-child(1){height:5px}.tdy .sic i:nth-child(2){height:7px}.tdy .sic i:nth-child(3){height:9px}
+.tdy .sic b{width:20px;height:10px;border-radius:3px;margin-left:5px;box-shadow:inset 0 0 0 1px rgba(17,28,53,.45);background:linear-gradient(90deg,var(--ink) 70%,transparent 0) 1px/calc(100% - 2px) calc(100% - 2px) no-repeat}
+
+/* header */
+.tdy .hd{display:flex;align-items:flex-start;gap:10px;padding:6px 2px 16px;transform-origin:0 0}
+.tdy .hd>div{flex:1;min-width:0}
+.tdy .hd .date{margin-top:5px}
+.tdy .gbtn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.66);-webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(17,28,53,.12)}
+.tdy .feed{display:flex;flex-direction:column;gap:12px}
+.tdy .card{display:block;width:100%;border-radius:26px;background:var(--card);padding:18px;position:relative;transition:transform .5s var(--spr)}
+.tdy .sec{margin:16px 2px 0;font-size:20px;font-weight:750}
+
+/* hero: ring first */
+.tdy .hero{display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:center}
+.tdy .rw{position:relative;width:132px;height:132px;border-radius:50%;display:block}
+.tdy .ring{width:100%;height:100%;transform:rotate(-90deg);display:block;overflow:visible}
+.tdy .ring circle{fill:none;stroke-width:9}
+.tdy .ring .rt{stroke:var(--fa)}
+.tdy .ring .ra{stroke:var(--or);stroke-linecap:round;stroke-dasharray:100 100;stroke-dashoffset:100;transition:stroke-dashoffset 1.1s var(--out)}
+.tdy .ring .ro{stroke:var(--neg);stroke-linecap:round;stroke-dasharray:100 100}
+.tdy .rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.tdy .macs{display:grid;gap:2px}
+.tdy .mac{display:block;min-height:44px;padding:4px 0;width:100%}
+.tdy .mac .top{display:flex;justify-content:space-between;align-items:baseline;gap:4px;white-space:nowrap}
+.tdy .mac b{font-size:15px;font-weight:700;color:var(--ink)}
+.tdy .dots{display:flex;gap:3px;margin-top:6px}
+.tdy .dots i{flex:1;height:7px;border-radius:4px;background:var(--fa);transition:background .3s}
+.tdy .geo{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding-top:14px;box-shadow:0 -1px 0 var(--fa)}
+.tdy .gmk{flex:none;width:26px;height:26px;display:grid;place-items:center;color:var(--ink)}
+.tdy .gmk svg{width:20px;height:20px}
+.tdy .geo p{font-size:17px;line-height:1.42}
+.tdy .geo{flex-wrap:wrap}.tdy .geo>div{flex:1;min-width:0;display:contents}.tdy .geo>div>p{flex:1;min-width:0}.tdy .geo .acts{flex-basis:100%;margin-top:2px}
+.tdy .geo em{font-style:normal;font-weight:700;text-decoration:underline;text-decoration-color:var(--or);text-decoration-thickness:2px;text-underline-offset:3px}
+.tdy .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tdy .chip{min-height:44px;padding:0 18px;border-radius:22px;display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:700;background:var(--ink);color:#fff;transition:transform .3s var(--spr)}
+.tdy .chip.ghost{background:var(--fa);color:var(--ink)}
+.tdy .chip.txt{background:none;color:var(--ink);padding:0 10px;text-decoration:underline;text-underline-offset:3px}
+.tdy .chip.is-down{transform:scale(.95)}
+/* hero: macros first */
+.tdy .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tdy .mring{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:44px;padding:2px 0}
+.tdy .mring .rw{width:100px;height:100px}
+.tdy .mring .ring circle{stroke-width:8}
+.tdy .kline{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;box-shadow:0 -1px 0 var(--fa);min-height:44px;width:100%}
+/* hero: geo first */
+.tdy .nba .gq{font-size:28px;font-weight:750;font-stretch:104%;letter-spacing:-.015em;line-height:1.15}
+.tdy .nba .who{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.tdy .nba .mini{display:flex;align-items:center;gap:12px;margin-top:14px;padding-top:14px;box-shadow:0 -1px 0 var(--fa);width:100%;min-height:56px}
+.tdy .nba .mini .rw{width:72px;height:72px}
+.tdy .nba .mini .ring circle{stroke-width:7}
+.tdy .mm{flex:1;display:grid;gap:4px}
+.tdy .mm span{display:flex;justify-content:space-between;font-size:15px}
+
+/* coach: glass chip */
+.tdy .gchip{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 16px 0 12px;border-radius:24px;background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(17,28,53,.12);font-size:15px;font-weight:650;width:100%;transition:transform .4s var(--spr)}
+.tdy .gchip span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tdy .gchip.is-down{transform:scale(.97)}
+/* coach: separate card */
+.tdy .ccard p{font-size:17px;line-height:1.45}
+
+/* tiles */
+.tdy .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tdy .tile{position:relative;display:flex;flex-direction:column;gap:4px;min-height:150px;padding:16px;border-radius:24px;background:var(--card);overflow:hidden;width:100%;transition:transform .5s var(--spr)}
+.tdy .tile .tv{margin-top:4px;display:flex;align-items:baseline;gap:3px}
+.tdy .tile .tv small{font-size:15px;font-weight:600;color:var(--mu)}
+.tdy .tile .cap{margin-top:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tdy .prog{display:block;height:6px;border-radius:3px;background:var(--fa);overflow:hidden;margin-top:8px}
+.tdy .prog i{display:block;height:100%;border-radius:3px;background:var(--ink);transform-origin:0 50%;transform:scaleX(0);transition:transform .9s var(--out) .15s}
+.tdy .tile .plus{position:absolute;right:8px;top:8px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--fa);transition:transform .3s var(--spr)}
+.tdy .tile .plus.is-down{transform:scale(.9)}
+.tdy .tile .src{display:inline-flex;align-items:center;gap:4px}
+.tdy .tile .src svg{width:14px;height:14px}
+.tdy .tile.st{padding-right:34px}
+.tdy .meter{position:absolute;right:16px;top:18px;bottom:18px;width:6px;border-radius:3px;background:var(--fa)}
+.tdy .meter i{position:absolute;left:-3px;width:12px;height:12px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 2px #fff;transform:translateY(50%)}
+.tdy .meter b{position:absolute;left:0;right:0;border-radius:3px;background:rgba(62,124,119,.28)}
+.tdy .tcon{margin-top:auto;align-self:flex-start;min-height:44px;padding:0 16px;border-radius:22px;display:inline-flex;align-items:center;background:var(--ink);color:#fff;font-size:15px;font-weight:700}
+.tdy .good{color:var(--te)}.tdy .bad{color:var(--neg)}
+
+/* rows */
+.tdy .rows{border-radius:26px;background:var(--card);overflow:hidden}
+.tdy .row{display:flex;align-items:center;gap:12px;min-height:72px;padding:12px 18px;width:100%}
+.tdy .row+.row{box-shadow:0 -1px 0 var(--fa)}
+.tdy .row .rt2{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tdy .row .rt2 b{font-size:17px;font-weight:700}
+.tdy .row .rt2 span{font-size:15px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tdy .row .rv{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tdy .row .rv small{font-size:13px;font-weight:500;color:var(--mu)}
+.tdy .empty{display:flex;align-items:center;justify-content:center;min-height:72px;border-radius:26px;box-shadow:inset 0 0 0 1.5px rgba(17,28,53,.16);font-size:17px;font-weight:600;color:var(--mu);width:100%;text-align:center;padding:0 16px}
+.tdy .wk{display:flex;align-items:center;gap:14px}
+.tdy .wk>div{flex:1;min-width:0}
+.tdy .wk .wn{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:4px}
+.tdy .play{flex:none;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:#fff}
+.tdy .play svg{width:22px;height:22px;fill:currentColor;stroke:none;margin-left:3px}
+
+/* check-in due */
+.tdy .ci h3{font-size:28px;font-weight:800;font-stretch:106%;letter-spacing:-.02em}
+.tdy .ci p{margin-top:3px}
+.tdy .ci .row2{display:flex;align-items:center;gap:12px}
+.tdy .btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;border-radius:28px;font-size:17px;font-weight:700;background:var(--ink);color:#fff;transition:transform .3s var(--spr),opacity .2s}
+.tdy .btn.or{background:var(--or)}
+.tdy .btn.flat{background:none;color:var(--ink);min-height:44px}
+.tdy .btn.is-down{transform:scale(.97)}
+.tdy .btn[disabled]{opacity:.45;cursor:default}
+.tdy .mt{margin-top:14px}
+
+/* offline band, sync pill, error, loading */
+.tdy .band{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 16px;border-radius:16px;background:var(--ink);color:var(--cr);font-size:15px;font-weight:600}
+.tdy .band i{width:8px;height:8px;border-radius:50%;background:rgba(253,246,236,.6);flex:none}
+.tdy .err{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.tdy .err .rt3{display:flex;gap:8px;align-items:flex-start;font-size:17px;line-height:1.4}
+.tdy .err .rt3 svg{color:var(--neg);margin-top:1px}
+.tdy .txtb{min-height:44px;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px;padding:0 4px}
+.tdy .ph{display:inline-block;border-radius:6px;background:rgba(17,28,53,.08);vertical-align:middle}
+.tdy .is-loading .ring .rt{stroke:rgba(17,28,53,.08)}
+
+/* tab bar: minimise to circle (o01) */
+.tdy .tabs{position:absolute;left:20px;bottom:28px;width:200px;height:56px;border-radius:28px;z-index:7;overflow:hidden;background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(18px) saturate(1.8);backdrop-filter:blur(18px) saturate(1.8);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 0 0 .5px rgba(17,28,53,.12),0 10px 28px -12px rgba(17,28,53,.35);transition:width .5s var(--spr),height .5s var(--spr),transform .5s var(--spr),opacity .3s}
+.tdy .trow{position:absolute;left:4px;top:4px;display:flex;width:192px;transition:transform .5s var(--spr)}
+.tdy .tab{width:48px;height:48px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:10px;font-weight:650;color:rgba(17,28,53,.6);border-radius:24px;transition:opacity .22s,color .2s,background .2s}
+.tdy .tab[aria-current=page]{color:var(--ink);background:var(--fa)}
+.tdy .tab span{transition:opacity .2s}
+.tdy .tabs .hit{position:absolute;inset:0;display:none;border-radius:50%}
+.tdy.is-min .tabs{width:56px;height:56px}
+.tdy.is-min .trow{transform:translate(calc(var(--ai,0)*-48px),0)}
+.tdy.is-min .tab span,.tdy.is-min .tab:not([aria-current=page]){opacity:0}
+.tdy.is-min .tab[aria-current=page]{background:none}
+.tdy.is-min .tabs .hit{display:block}
+.tdy .orb{position:absolute;right:20px;bottom:28px;width:56px;height:56px;border-radius:50%;z-index:7;display:grid;place-items:center;color:#fff;background:var(--ink);box-shadow:0 10px 24px -10px rgba(17,28,53,.55);transition:transform .5s var(--spr),opacity .3s}
+.tdy .orb svg{width:24px;height:24px}
+.tdy .orb.is-down{transform:scale(.92)}
+
+/* pushed page: the screen behind recedes in depth */
+.tdy .detail{position:absolute;inset:0;z-index:8;background:var(--cr);transform:translateX(100%);transition:transform var(--sd) var(--spr);overflow-y:auto;scrollbar-width:none;padding:58px 20px 48px;box-shadow:-18px 0 40px -18px rgba(17,28,53,.4)}
+.tdy .detail::-webkit-scrollbar{display:none}
+.tdy.is-push .detail{transform:none}
+.tdy.is-push .app{transform:scale(.94);filter:blur(1.5px)}
+.tdy.is-push .dim{opacity:.16}
+.tdy.is-push .tabs,.tdy.is-push .orb{transform:translateY(100px);opacity:0}
+.tdy.is-drag .detail,.tdy.is-drag .app,.tdy.is-drag .sheet,.tdy.is-drag .dim{transition:none}
+.tdy .back{position:sticky;top:0;z-index:2}
+.tdy .dh{margin:14px 2px 0}
+.tdy .big{margin:14px 2px 2px;display:flex;align-items:baseline;gap:4px}
+.tdy .big small{font-size:17px;font-weight:600;color:var(--mu)}
+.tdy .bars{display:flex;align-items:flex-end;gap:10px;height:200px;padding:10px 4px 0}
+.tdy .bars span{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.tdy .bars i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:rgba(17,28,53,.18)}
+.tdy .bars span:last-child i{background:var(--ink)}
+.tdy .chart svg{display:block;width:100%;height:auto;overflow:visible}
+.tdy .chart .ln{fill:none;stroke:var(--te);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tdy .chart .ar{fill:rgba(62,124,119,.12)}
+.tdy .ax{display:flex;justify-content:space-between;margin-top:6px}
+
+/* sheet: floats forward while the screen behind steps back */
+.tdy .scrim{position:absolute;inset:0;z-index:9;background:rgba(11,18,36,.16);opacity:0;pointer-events:none;transition:opacity .4s var(--out)}
+.tdy.is-sheet .scrim{opacity:1;pointer-events:auto}
+.tdy.is-sheet .app{transform:scale(.94) translateY(10px)}
+.tdy.is-sheet .tabs,.tdy.is-sheet .orb{transform:translateY(24px) scale(.9);opacity:0}
+.tdy .sheet{position:absolute;left:10px;right:10px;bottom:10px;z-index:10;max-height:760px;display:flex;flex-direction:column;border-radius:46px;padding:10px 20px 24px;transform:translateY(calc(100% + 24px));transform-origin:50% 100%;transition:transform var(--sd) var(--spr);background:rgba(255,255,255,.84);-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(17,28,53,.1),0 40px 80px -30px rgba(17,28,53,.55)}
+.tdy.is-sheet .sheet{transform:translateY(var(--dy,0px))}
+.tdy .grab{display:block;width:36px;height:5px;border-radius:3px;background:rgba(17,28,53,.2);margin:0 auto 12px;flex:none}
+.tdy .sbody{overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:16px;padding:0 2px}
+.tdy .sbody::-webkit-scrollbar{display:none}
+.tdy .shd{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.tdy .stp{display:flex;align-items:center;justify-content:center;gap:26px;padding:6px 0}
+.tdy .stp button{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--fa);transition:transform .3s var(--spr)}
+.tdy .stp button.is-down{transform:scale(.92)}
+.tdy .stp button[disabled]{opacity:.35}
+.tdy .stp .sv{min-width:120px;text-align:center}
+.tdy .glasses{display:flex;gap:5px;justify-content:center}
+.tdy .glasses i{width:18px;height:26px;border-radius:3px 3px 5px 5px;background:var(--fa)}
+.tdy .glasses i.on{background:var(--te)}
+.tdy .glasses i.add{background:rgba(62,124,119,.45)}
+.tdy .fld{display:flex;align-items:center;gap:8px;height:76px;border-radius:22px;padding:0 6px 0 18px;background:#fff;box-shadow:inset 0 0 0 1px rgba(17,28,53,.14)}
+.tdy .fld.bad{box-shadow:inset 0 0 0 2px var(--neg)}
+.tdy .fld input{flex:1;min-width:0;height:100%;border:0;background:none;font:800 34px Archivo,system-ui,sans-serif;font-stretch:110%;color:var(--ink);outline:none;font-variant-numeric:tabular-nums;-webkit-user-select:text;user-select:text;caret-color:var(--or)}
+.tdy .fld .nud{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--fa)}
+.tdy .hint{font-size:15px;color:var(--mu)}
+.tdy .hint.bad{color:var(--neg);font-weight:600}
+.tdy .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;border-radius:24px;background:var(--fa)}
+.tdy .seg button{min-height:44px;border-radius:20px;font-size:15px;font-weight:650;text-align:center;color:var(--mu)}
+.tdy .seg button[aria-selected=true]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(17,28,53,.12)}
+.tdy .brk li{display:flex;align-items:center;gap:12px;min-height:60px;padding:6px 2px}
+.tdy .brk li+li{box-shadow:0 -1px 0 var(--fa)}
+.tdy .brk .bn{flex:1;min-width:0;font-size:17px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tdy .brk .bp{font-size:15px;color:var(--mu);width:46px;text-align:right}
+.tdy .perm li{display:flex;align-items:center;gap:14px;min-height:48px;font-size:17px}
+.tdy .perm li svg{color:var(--mu)}
+.tdy .sbody .lede{font-size:17px;line-height:1.5;color:var(--ink)}
+.tdy .reply{display:flex;align-items:center;height:52px;border-radius:26px;padding:0 18px;background:#fff;box-shadow:inset 0 0 0 1px rgba(17,28,53,.14);font-size:17px;color:var(--mu)}
+
+/* toast */
+.tdy .toast{position:absolute;left:20px;right:20px;bottom:100px;z-index:11;display:flex;align-items:center;gap:10px;min-height:52px;padding:0 6px 0 18px;border-radius:26px;background:rgba(17,28,53,.92);color:var(--cr);font-size:15px;font-weight:600;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .25s,transform .45s var(--spr)}
+.tdy .toast span{flex:1}
+.tdy .toast button{min-height:44px;padding:0 12px;font-weight:700;color:#fff;text-decoration:underline;text-underline-offset:3px}
+.tdy.is-toast .toast{opacity:1;transform:none;pointer-events:auto}
+
+/* splash */
+.tdy .splash{position:absolute;inset:0;z-index:20;background:var(--cr);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .35s var(--out)}
+.tdy .splash b{font-size:40px;font-weight:900;font-stretch:125%;letter-spacing:-.02em;transition:transform .6s var(--spr)}
+.tdy.is-splash .splash{opacity:1}
+.tdy.is-splash .app{transform:scale(1.04)}
+.tdy .splash .sp-off{position:absolute;bottom:60px;left:24px;right:24px;text-align:center}
+
+/* press tilt */
+.tdy [data-press]{will-change:auto}
+.tdy .tile.is-down,.tdy .card.is-down,.tdy .row.is-down{transition:transform .12s linear}
+
+@media (prefers-reduced-motion:reduce){
+.tdy *,.tdy *::before,.tdy *::after{transition-duration:.15s!important;transition-timing-function:ease!important;animation:none!important}
+.tdy .detail,.tdy .sheet,.tdy .app,.tdy .tabs,.tdy .orb,.tdy .is-down,.tdy .toast{transform:none!important;filter:none!important}
+.tdy .detail,.tdy .sheet{opacity:0}.tdy.is-push .detail,.tdy.is-sheet .sheet{opacity:1}
+.tdy.is-sheet .tabs,.tdy.is-sheet .orb,.tdy.is-push .tabs,.tdy.is-push .orb{opacity:0}}
+@media (prefers-reduced-transparency:reduce){
+.tdy .tabs,.tdy .gbtn,.tdy .sheet,.tdy .topfade,.tdy .gchip{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#fff!important}
+.tdy.is-push .app{filter:none}}
+
+.tdy em{font-style:normal}
+.tdy .nba em{text-decoration:underline;text-decoration-color:var(--or);text-decoration-thickness:2px;text-underline-offset:3px}
+.tdy .tile.st{padding-right:28px}.tdy .tile.st .meter{right:12px}.tdy .tile .tv{white-space:nowrap}
+.tdy .sheet:focus,.tdy .dh:focus{outline:none}
+
+/* ---- sizing spec (independent review, 26 Oct): true 390 pt values; overrides the sizes above ---- */
+.tdy{font-size:16px;line-height:1.35}
+.tdy .t30{font-size:30px;font-stretch:102%;letter-spacing:-.02em}
+.tdy .t22{font-size:24px;font-stretch:102%}
+.tdy .t13{font-size:13px}
+.tdy .t11{font-size:12px}
+.tdy .tsm{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.tdy .scroll{padding:56px 16px 112px}
+.tdy .status{padding:4px 30px 0 40px;font-size:16px}
+.tdy .feed{gap:10px}
+.tdy .hd{padding:4px 2px 12px}
+.tdy .card{border-radius:22px;padding:16px}
+.tdy .rows{border-radius:22px}
+.tdy .sec{font-size:18px;margin:14px 2px 0}
+.tdy .ci h3{font-size:18px}
+.tdy .hero{grid-template-columns:112px 1fr;gap:14px}
+.tdy .rw{width:112px;height:112px}
+.tdy .mring .rw{width:84px;height:84px}
+.tdy .nba .mini .rw{width:60px;height:60px}
+.tdy .nba .gq{font-size:22px}
+.tdy .mac b{font-size:13px}
+.tdy .dots i{height:6px}
+.tdy .geo p,.tdy .ccard p{font-size:15px;line-height:1.35}
+.tdy .geo em{text-decoration-thickness:1.5px}
+.tdy .chip{min-height:44px;padding:0 16px;font-size:14px}
+.tdy .gchip{min-height:44px;font-size:14px}
+.tdy .grid{gap:10px}
+.tdy .tile{min-height:128px;padding:14px;border-radius:20px}
+.tdy .tile .tv small{font-size:13px}
+.tdy .tile .plus{right:6px;top:6px}
+.tdy .tcon{min-height:44px;font-size:14px}
+.tdy .row{min-height:58px;padding:9px 16px}
+.tdy .row .rt2 b{font-size:16px}
+.tdy .row .rt2 span{font-size:13px}
+.tdy .row .rv{font-size:16px}
+.tdy .row .rv small{font-size:12px}
+.tdy .empty{min-height:58px;font-size:15px;border-radius:22px}
+.tdy .play{width:50px;height:50px}
+.tdy .btn{min-height:50px;border-radius:25px;font-size:16px}
+.tdy .btn.flat{min-height:44px}
+.tdy .band{min-height:44px;font-size:14px}
+.tdy .err .rt3,.tdy .txtb{font-size:15px}
+.tdy .tabs{left:16px;bottom:26px;width:184px;height:52px;border-radius:26px}
+.tdy .trow{width:176px}
+.tdy .tab{width:44px;height:44px;font-size:11px;border-radius:22px;gap:0}
+.tdy .tab svg{width:19px;height:19px}
+.tdy.is-min .tabs{width:52px;height:52px}
+.tdy.is-min .trow{transform:translate(calc(var(--ai,0)*-44px),0)}
+.tdy .orb{right:16px;bottom:26px;width:52px;height:52px}
+.tdy .orb svg{width:22px;height:22px}
+.tdy .detail{padding:56px 16px 44px}
+.tdy .big small{font-size:15px}
+.tdy .bars{height:170px}
+.tdy .sheet{left:8px;right:8px;bottom:8px;border-radius:38px;padding:8px 16px 20px}
+.tdy .sbody{gap:14px}
+.tdy .stp{gap:24px}
+.tdy .stp button{width:56px;height:56px}
+.tdy .fld{height:60px;border-radius:18px}
+.tdy .fld input{font-size:28px}
+.tdy .hint{font-size:13px}
+.tdy .seg button{font-size:13px}
+.tdy .brk li{min-height:56px}
+.tdy .brk .bn{font-size:15px}
+.tdy .brk .bp{font-size:13px}
+.tdy .perm li{min-height:44px;font-size:15px}
+.tdy .sbody .lede{font-size:15px;line-height:1.4}
+.tdy .reply{height:48px;font-size:15px}
+.tdy .toast{left:16px;right:16px;bottom:92px;min-height:48px;font-size:14px}
+.tdy .splash b{font-size:34px}
+.tdy .glasses i{width:16px;height:22px}
+
+/* colour pass (owner, 26 Oct): macro sheet and weight get icons and brand tints */
+.tdy .seg button{display:flex;align-items:center;justify-content:center;gap:4px}
+.tdy .seg button svg{width:15px;height:15px}
+.tdy .seg button[aria-selected=true]{color:var(--hue)}
+.tdy .msum{display:flex;align-items:center;gap:16px;padding:14px;border-radius:22px;background:var(--tint)}
+.tdy .msum .rw{width:84px;height:84px;flex:none}
+.tdy .msum .ring .ra{stroke:var(--hue)}
+.tdy .msum .ring .rt{stroke:rgba(17,28,53,.08)}
+.tdy .msum .ring circle{stroke-width:9}
+.tdy .msum .rc svg{width:22px;height:22px;color:var(--hue)}
+.tdy .msum .mtxt{display:flex;flex-direction:column;gap:2px}
+.tdy .brk .bd{flex:none;width:10px;height:10px;border-radius:50%;background:var(--hue)}
+.tdy .brk .bw{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.tdy .brk .bs{display:block;height:4px;border-radius:2px;background:var(--tint)}
+.tdy .brk .bs i{display:block;height:100%;border-radius:2px;background:var(--hue)}
+.tdy .wchip{display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:0 10px;border-radius:13px;background:rgba(62,124,119,.14);color:var(--te);font-size:13px;font-weight:700}
+.tdy .wchip.up{background:rgba(181,67,42,.12);color:var(--neg)}
+.tdy .wico{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(62,124,119,.14);color:var(--te)}
+.tdy .wico svg{width:20px;height:20px}
+.tdy .wtrend{padding:10px 12px 8px;border-radius:20px;background:rgba(62,124,119,.07)}
+.tdy .wtrend svg{display:block;width:100%;height:64px;overflow:visible}
+.tdy .wtrend .ln{fill:none;stroke:var(--te);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.tdy .wtrend .ar{fill:rgba(62,124,119,.14)}
+.tdy .wtrend .dot{fill:var(--te)}
+.tdy .whead{display:flex;align-items:center;gap:10px}
+.tdy .whead>div{flex:1;min-width:0}
+
+.tdy .seg button svg{color:var(--hue);stroke-width:2}
+.tdy .seg button[aria-selected=true] svg{fill:currentColor;fill-opacity:.9}
+.tdy .msum .rc svg{width:26px;height:26px;fill:currentColor;fill-opacity:.18;stroke-width:2}
+.tdy .msum .ring .rt{stroke:var(--tint)}
+.tdy .msum{background:var(--tint)}
+.tdy .brk .bs{background:var(--tint)}
+.tdy .wico svg{stroke-width:2}
+
+</style>
+<button type="button" class="theme" id="theme">Theme</button>
+<main>
+<header>
+<h1>FIQR Today</h1>
+<p class="lead">The Home journey in the chosen Spatial Depth system: every surface you meet from opening the app to logging water, with three coded options for each open decision. Every phone is live. Scroll it, tap tiles, rings and actions, swipe from the left edge to go back, drag a sheet down to close it, and switch states under each phone.</p>
+<p class="muted">Data shapes follow the frontend types and the backend (logs summary, Log payloads, check-in status, profile targets). Built 26 Oct 2026, nothing called or written in either repo.</p>
+</header>
+
+<section class="blk" aria-labelledby="sum">
+<h2 id="sum">The journey</h2>
+<p>Home answers one question first: <b>how much can I still eat today, and what is the next useful thing to do?</b> The biggest thing on the screen answers it; everything else is the next question.</p>
+<ul class="jobs"><li><b>Read today</b>Kcal left and protein left in one glance, several times a day.</li><li><b>Log the small things</b>Water and weight in one or two taps without leaving Home.</li><li><b>Act on Geo</b>Turn the coaching line into a log, a plan or a check-in.</li></ul>
+<div class="flow" role="img" aria-label="Flow: splash leads to Home. From Home: macro sheet, water and weight sheets, Health permission sheet, Steps and Sleep week pages, check-in page, Geo sheet, and the notifications sheet on first native launch."><span>Splash</span><i>to</i><span class="hub">Home</span><i>opens</i><span>Macro sheet</span><span>Water sheet</span><span>Weight sheet</span><span>Health permission</span><span>Steps and Sleep weeks</span><span>Check-in page</span><span>Geo sheet</span><span>Notifications (first launch)</span></div>
+<div class="note"><p><b>System rules applied, and where this page departs from the o19 mock.</b></p><ul>
+<li>Glass only on the control layer (tab bar, header buttons, sheets, orb, toast), cards solid white one tone step off cream (signed Q3). The o19 mock's glass cards and drifting blobs are dropped; depth comes from the push, the sheet and the header drifting slower than the feed.</li>
+<li>The + orb is ink, not orange (signed Q4). That leaves one orange action per screen: the check-in card when due, Save in a sheet, Apply on the week page. The calorie ring is orange as data (Q18).</li>
+<li>No macro bars (Q10): macros are ten-dot columns or rings. No sparklines on tiles except in the "Health four" baseline, which is today's app.</li>
+<li>Loading is the final layout with flat placeholders at real size (no shimmer); errors sit inside the block that failed with the last good time and Retry; missing values are a small grey dash, never 0 (Q32).</li>
+<li>Phones are built at a real iPhone's 390 x 844 pt and scaled to fit with a transform, so proportions match a real phone. Sizes follow the review's spec: large title 30, hero number 24, card titles 18, body 15 to 16, captions 13, labels 12, tab labels 11; gutters and card padding 16, tiles 14 at 128 tall; tab capsule and orb 52; buttons 50; rows 58; rings 112, 84 and 60. Tap-target counts are in phone points, before scaling.</li>
+<li>Frame gaps: largest gap between animation frames over 900 ms after each push, scroll and sheet, Playwright in headless Chrome at 4x CPU throttle (a low-end proxy), median of three runs, after a warm-up phone. 17 ms is one frame at 60 Hz; anything over 34 ms (two dropped frames) is flagged. Single spikes vary run to run on identical phones, so a device trace is still owed (rubric item 5).</li>
+<li>Time model for the numbers below: 0.9 s per tap, 0.35 s per typed character, plus reading time where the job is a glance.</li></ul></div>
+</section>
+
+<section class="blk" aria-labelledby="cards"><h2 id="cards">Screen cards</h2>
+<div class="cards"><article class="sc"><h3>Home (/dashboard)</h3><dl><dt>Who and how often</dt><dd>Everyone, several times a day; the default tab after login.</dd><dt>Jobs</dt><dd>How much can I still eat today? What should I do next? Log water or weight fast.</dd><dt>Everything on it today</dt><dd>Header (Today, date, This week, Settings); offline band; check-in card when due; hero ring + 3 macro dot rows + Geo line; Steps, Weight, Water, Sleep tiles; Next up workout (start, see program, ask Geo); Meals rows to Food; Add your height card when targets are missing; Geo suggestion card (Yes, update / Not now); macro sheet; quick-log sheet; Health connect sheet.</dd><dt>Taps today</dt><dd>Glance: 0 taps. Log water: 2. Log weight: 2 + typing. Act on Geo: about 8 s via + sheet.</dd><dt>Data</dt><dd>Six parallel requests: logs summary (day), active plans, profile, 8 days of logs (limit 500), dashboard check-in, check-in status; suggestions after paint.</dd></dl></article><article class="sc"><h3>Health tiles</h3><dl><dt>Who and how often</dt><dd>People with Apple Health or Health Connect; manual users for Water and Weight.</dd><dt>Jobs</dt><dd>See steps and sleep without logging. Log water and weight.</dd><dt>Everything on it today</dt><dd>Steps (Health or connect), Weight (value, sparkline, week delta, log sheet), Water (glasses of 8, sheet), Sleep (hours, 7-night avg or source, sheet).</dd><dt>Taps today</dt><dd>Water 2, Weight 2 + typing, Connect 2 + system.</dd><dt>Data</dt><dd>Steps, weight and sleep from Log payloads (steps, weight_kg, hours); never a fake 0 (Q32).</dd></dl></article><article class="sc"><h3>Check-in due card</h3><dl><dt>Who and how often</dt><dd>Anyone with a due weekly check-in (Sundays, state "due").</dd><dt>Jobs</dt><dd>Open the week review.</dd><dt>Everything on it today</dt><dd>Card with chart badge, "Your week is ready", week label, orange See your week.</dd><dt>Taps today</dt><dd>1 tap.</dd><dt>Data</dt><dd>CheckInStatus.state, week.label, days_logged.</dd></dl></article><article class="sc"><h3>Water quick log</h3><dl><dt>Who and how often</dt><dd>Manual water loggers, up to 8 times a day.</dd><dt>Jobs</dt><dd>Add glasses.</dd><dt>Everything on it today</dt><dd>Stepper 1 to 20, Save (orange).</dd><dt>Taps today</dt><dd>2 taps.</dd><dt>Data</dt><dd>createLog type water, payload.glasses.</dd></dl></article><article class="sc"><h3>Weight quick log</h3><dl><dt>Who and how often</dt><dd>Daily or weekly weighers.</dd><dt>Jobs</dt><dd>Record today’s weight.</dd><dt>Everything on it today</dt><dd>Decimal field, prefilled, autofocus, Save; 20 to 400 kg.</dd><dt>Taps today</dt><dd>2 taps + typing.</dd><dt>Data</dt><dd>createLog type weight, payload.weight_kg.</dd></dl></article><article class="sc"><h3>Macro detail sheet</h3><dl><dt>Who and how often</dt><dd>People checking where protein or calories came from.</dd><dt>Jobs</dt><dd>See which foods drove a number.</dd><dt>Everything on it today</dt><dd>Title, rows sorted desc with value and %; empty text.</dd><dt>Taps today</dt><dd>1 tap; switching macro means close and reopen.</dd><dt>Data</dt><dd>computeMacroContributions over today’s food logs.</dd></dl></article><article class="sc"><h3>Notifications sheet</h3><dl><dt>Who and how often</dt><dd>New native users, once.</dd><dt>Jobs</dt><dd>Decide on push.</dd><dt>Everything on it today</dt><dd>Title, body, Allow notifications, Not now.</dd><dt>Taps today</dt><dd>1 tap.</dd><dt>Data</dt><dd>pushPermissionState, registerPush, kv flag.</dd></dl></article><article class="sc"><h3>Health permission sheet</h3><dl><dt>Who and how often</dt><dd>Native users who tap Connect.</dd><dt>Jobs</dt><dd>Understand and grant Health access.</dd><dt>Everything on it today</dt><dd>Title, body, Continue, failure line, Not now.</dd><dt>Taps today</dt><dd>2 taps + system.</dd><dt>Data</dt><dd>requestHealthPermissions (7 scopes), syncHealth(30).</dd></dl></article><article class="sc"><h3>Splash</h3><dl><dt>Who and how often</dt><dd>Every cold start.</dd><dt>Jobs</dt><dd>Get to Home fast.</dd><dt>Everything on it today</dt><dd>Native splash hidden on first effect; glass mode applied.</dd><dt>Taps today</dt><dd>0 taps.</dd><dt>Data</dt><dd>hideSplash, applyGlassMode.</dd></dl></article></div>
+</section>
+
+<section class="blk" aria-labelledby="matrix"><h2 id="matrix">State matrix</h2>
+<p class="muted">Each cell is designed and reachable from a phone's state switcher below.</p>
+<div class="tw"><table class="sm"><thead><tr><th scope="col">Surface</th><th scope="col">First run</th><th scope="col">Returning</th><th scope="col">Check-in due</th><th scope="col">Loading</th><th scope="col">Error</th><th scope="col">Offline</th><th scope="col">Extreme numbers</th><th scope="col">Long content</th></tr></thead><tbody><tr><th scope="row">Home</th><td>0 of 2,350, connect tile, first-meal line</td><td>Ring, dots, tiles, meals</td><td>Card first, orange action</td><td>Final layout, flat bars</td><td>In-block, last good time, Retry</td><td>Band, cached data, queue</td><td>11,280 over, 128,904 steps</td><td>25-word line, 2-line workout</td></tr><tr><th scope="row">Health tiles</th><td>Connect Apple Health</td><td>Values + source + sync time</td><td>Same</td><td>Flat bars</td><td>Dash, not 0</td><td>Last sync</td><td>312.4 kg, 20 of 8</td><td>Truncated caption</td></tr><tr><th scope="row">Check-in card</th><td>Hidden</td><td>Hidden (header link)</td><td>Shown</td><td>Hidden until status</td><td>Hidden</td><td>Shown from cache</td><td>n/a</td><td>32-char label</td></tr><tr><th scope="row">Water sheet</th><td>0 of 8</td><td>Preview row</td><td>Same</td><td>Saving</td><td>Inline reason, Try again</td><td>Saved on phone</td><td>20 glasses, row grows</td><td>n/a</td></tr><tr><th scope="row">Weight sheet</th><td>First weigh-in, 82.0 from profile</td><td>Prefilled, nudges</td><td>Same</td><td>Saving</td><td>Inline reason</td><td>Queued</td><td>Out of range inline</td><td>n/a</td></tr><tr><th scope="row">Macro sheet</th><td>Empty + Log a meal</td><td>Sorted rows</td><td>Same</td><td>n/a</td><td>n/a</td><td>Cached</td><td>3,120 kcal rows</td><td>2-line wrap</td></tr><tr><th scope="row">Notifications</th><td>Ask</td><td>Not shown</td><td>Not shown</td><td>n/a</td><td>Denied: Settings</td><td>Not shown</td><td>n/a</td><td>n/a</td></tr><tr><th scope="row">Health sheet</th><td>Ask</td><td>Not shown</td><td>n/a</td><td>Waiting on system</td><td>Failed, fix</td><td>Disabled Continue</td><td>n/a</td><td>n/a</td></tr><tr><th scope="row">Splash</th><td>Then onboarding</td><td>Cached Home</td><td>Cached Home</td><td>Skeleton</td><td>Home error block</td><td>Cached + band</td><td>n/a</td><td>n/a</td></tr></tbody></table></div>
+</section>
+
+<section class="blk" aria-labelledby="rec"><h2 id="rec">Recommended Home, every state</h2>
+<p>Ring first, log-first tiles, line with action. Switch through all nine states; the worst case uses 12,480 kcal against 1,200, 128,904 steps, 312.4 kg, six long food names and a 25-word takeaway.</p>
+<div class="surf"><div class="sl"><div class="pw" id="home" data-cfg='{"hero":"ring","tiles":"log","coach":"action","states":["returning","first","due","over","worst","loading","error","offline","nohealth"],"label":"Recommended Home"}'></div></div>
+<div class="sr"><h3>What to try</h3><ul><li>Tap the + on Water: one glass, Undo in the toast.</li><li>Tap Log Greek yoghurt: the ring counts down to the new kcal left; Undo restores it.</li><li>Tap Steps: the week page pushes in and Home recedes; swipe from the left edge to come back.</li><li>Scroll: the header drifts and fades, the tab bar closes into one circle; tap it to open.</li><li>Health off: tap Connect Apple Health, then Continue.</li></ul>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Read kcal left</th><td colspan="3">0 taps, about 1.5 s <span class="vs">today: 0 taps, about 1.5 s</span></td></tr><tr><th scope="row">Log one glass of water</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: 2 taps</span></td></tr><tr><th scope="row">Act on Geo</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: about 8 s</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="home">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="home">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">33 ms</td><td class="">17 ms</td><td class="">17 ms</td></tr></tbody></table></div></section>
+</section>
+
+<section class="blk" aria-labelledby="dA"><h2 id="dA">Hero: ring first</h2>
+<p>Picked. The first thing read every visit. The two options not picked are collapsed below.</p>
+<div class="opts one"><article class="opt rec" data-pick="Hero: Ring first">
+<header class="oh"><h4>Ring first</h4><span class="badge">Picked by owner, 26 Oct</span></header>
+<div class="pw" id="hA1" data-cfg='{"hero":"ring","tiles":"log","coach":"action","states":["returning","first","over","worst","loading"],"label":"Hero, ring first"}'></div>
+<p class="what">The orange ring holds kcal left at the largest size on the screen; protein, carbs and fat sit beside it as ten-dot columns with their targets. Tap the ring or any macro for the breakdown.</p>
+<p class="trade"><b>Trade-off.</b> Calories lead, so someone who only tracks protein reads it second.</p>
+<p class="why"><b>Why recommended.</b> It answers the one question people open Home for (how much can I still eat) with the biggest thing on the screen, keeps the signed layout (Q17, C4) and the colour rule (Q18), and is the fastest five-second read in the set.</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Read kcal left</th><td colspan="3">0 taps, about 1.5 s <span class="vs">today: 0 taps, about 1.5 s</span></td></tr><tr><th scope="row">Read protein left</th><td colspan="3">0 taps, about 2.0 s <span class="vs">today: 0 taps, about 2.0 s</span></td></tr><tr><th scope="row">See what made the calories</th><td colspan="3">1 tap, about 2.4 s <span class="vs">today: 1 tap, old list sheet</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="hA1">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="hA1">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">33 ms</td><td class="">17 ms</td><td class="">17 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Ring first</button>
+</article></div><details class="others"><summary>Other options (2), not picked</summary><div class="opts"><article class="opt" data-pick="Hero: Macros first">
+<header class="oh"><h4>Macros first</h4><span class="badge alt">Challenges Q17</span></header>
+<div class="pw" id="hA2" data-cfg='{"hero":"macro","tiles":"log","coach":"action","states":["returning","first","over","worst","loading"],"label":"Hero, macros first"}'></div>
+<p class="what">Three equal rings give grams left for protein, carbs and fat; calories drop to one line under them.</p>
+<p class="trade"><b>Trade-off.</b> Best for protein-led users, but calories lose the lead and three coloured rings compete for the eye.</p>
+
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Read kcal left</th><td colspan="3">0 taps, about 2.6 s <span class="vs">today: 0 taps, about 1.5 s</span></td></tr><tr><th scope="row">Read protein left</th><td colspan="3">0 taps, about 1.2 s <span class="vs">today: 0 taps, about 2.0 s</span></td></tr><tr><th scope="row">See what made the calories</th><td colspan="3">1 tap, about 2.4 s <span class="vs">today: 1 tap</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="hA2">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="hA2">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="">17 ms</td><td class="">17 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Macros first</button>
+</article><article class="opt" data-pick="Hero: Geo's next move">
+<header class="oh"><h4>Geo's next move</h4><span class="badge alt">Challenges Q17</span></header>
+<div class="pw" id="hA3" data-cfg='{"hero":"geo","tiles":"log","coach":"action","states":["returning","first","over","worst","loading"],"label":"Hero, Geo&#39;s next move"}'></div>
+<p class="what">Geo's sentence leads at 22 pt with its action under it; a small ring and the three macros follow in one row.</p>
+<p class="trade"><b>Trade-off.</b> One tap to act and the most personal, but the numbers read later, and the hero is only as good as the line Geo writes that day.</p>
+
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Read kcal left</th><td colspan="3">0 taps, about 3.4 s <span class="vs">today: 0 taps, about 1.5 s</span></td></tr><tr><th scope="row">Act on the suggestion</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: about 8 s through the + sheet</span></td></tr><tr><th scope="row">See what made the calories</th><td colspan="3">1 tap, about 2.4 s <span class="vs">today: 1 tap</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="hA3">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="hA3">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="">17 ms</td><td class="">17 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Geo's next move</button>
+</article></div></details></section>
+
+<section class="blk" aria-labelledby="dB"><h2 id="dB">Tiles: log first</h2>
+<p>Picked. Which four, in what order, what each shows and what a tap does.</p>
+<div class="opts one"><article class="opt rec" data-pick="Tiles: Log first">
+<header class="oh"><h4>Log first</h4><span class="badge">Picked by owner, 26 Oct</span></header>
+<div class="pw" id="tB2" data-cfg='{"hero":"ring","tiles":"log","coach":"action","states":["returning","nohealth","first","worst"],"label":"Tiles, log first"}'></div>
+<p class="what">The two things you log by hand lead: Water carries a + that adds a glass in one tap with Undo, Weight opens a sheet with 0.1 kg nudges. Steps and Sleep come from Health and push a week view.</p>
+<p class="trade"><b>Trade-off.</b> Order no longer mirrors Apple Health, and the + inside the Water tile is a second target in one tile.</p>
+<p class="why"><b>Why recommended.</b> It halves the most frequent log (water, several times a day) to one tap, removes typing from weight, gives the Health tiles a real tap (the week), and drops the unreadable sparkline.</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Log one glass of water</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: 2 taps, about 1.8 s</span></td></tr><tr><th scope="row">Log weight (0.2 kg change)</th><td colspan="3">4 taps, about 3.6 s <span class="vs">today: 2 taps + 4 typed</span></td></tr><tr><th scope="row">See a week of steps</th><td colspan="3">1 tap, about 2.4 s <span class="vs">today: not possible</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="tB2">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="tB2">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="">17 ms</td><td class="">17 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Log first</button>
+</article></div><details class="others"><summary>Other options (2), not picked</summary><div class="opts"><article class="opt" data-pick="Tiles: Health four">
+<header class="oh"><h4>Health four</h4></header>
+<div class="pw" id="tB1" data-cfg='{"hero":"ring","tiles":"health","coach":"action","states":["returning","nohealth","first","worst"],"label":"Tiles, Health four"}'></div>
+<p class="what">Today's grid kept: Steps, Weight, Water, Sleep, each a value, a line and a caption; tapping Weight, Water or Sleep opens its log sheet, Steps only connects.</p>
+<p class="trade"><b>Trade-off.</b> Familiar and calm, but every log is two taps, connected Steps does nothing on tap, and the weight sparkline is too small to read.</p>
+
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Log one glass of water</th><td colspan="3">2 taps, about 1.8 s <span class="vs">today: 2 taps, about 1.8 s</span></td></tr><tr><th scope="row">Log weight (0.2 kg change)</th><td colspan="3">2 taps + 4 typed, about 3.2 s <span class="vs">today: 2 taps + 4 typed</span></td></tr><tr><th scope="row">See a week of steps</th><td colspan="3">not possible <span class="vs">today: not possible</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="tB1">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="tB1">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="">17 ms</td><td class="">17 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Health four</button>
+</article><article class="opt" data-pick="Tiles: Status words">
+<header class="oh"><h4>Status words</h4></header>
+<div class="pw" id="tB3" data-cfg='{"hero":"ring","tiles":"status","coach":"action","states":["returning","nohealth","first","worst"],"label":"Tiles, status words"}'></div>
+<p class="what">Bevel-style: value, one status word and a vertical range meter. Every tile pushes its own page, and logging lives on that page.</p>
+<p class="trade"><b>Trade-off.</b> Reads like a health report and every tile has a page, but logging water or weight takes an extra step.</p>
+
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Log one glass of water</th><td colspan="3">2 taps, about 1.8 s <span class="vs">today: 2 taps, about 1.8 s</span></td></tr><tr><th scope="row">Log weight (0.2 kg change)</th><td colspan="3">5 taps, about 4.5 s <span class="vs">today: 2 taps + 4 typed</span></td></tr><tr><th scope="row">See a week of steps</th><td colspan="3">1 tap, about 2.4 s <span class="vs">today: not possible</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="tB3">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="tB3">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="warn">50 ms</td><td class="">33 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Status words</button>
+</article></div></details></section>
+
+<section class="blk" aria-labelledby="dC"><h2 id="dC">Coach: line with action</h2>
+<p>Picked. Geo's line stays in the hero card and adds one action when there is something to do.</p>
+<div class="opts one"><article class="opt rec" data-pick="Coach: Line with action">
+<header class="oh"><h4>Line with action</h4><span class="badge">Picked by owner, 26 Oct</span></header>
+<div class="pw" id="cC3" data-cfg='{"hero":"ring","tiles":"log","coach":"action","states":["returning","first","over","worst"],"label":"Coach, line with action"}'></div>
+<p class="what">The same sentence stays in the hero card, and when Geo has something doable it adds one ink chip that does it (Log Greek yoghurt) with Undo, plus Other ideas. With nothing to do, it stays a sentence.</p>
+<p class="trade"><b>Trade-off.</b> The card grows by one row when there is an action, and Geo has to be right often enough that people trust one-tap logging.</p>
+<p class="why"><b>Why recommended.</b> It turns Geo's best line into a one-tap log (from about 8 s to under 1 s), matches how Geo already acts first and offers Undo in chat, and stays inside the signed card (D1).</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Act on the suggestion</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: 2 taps + 18 typed, about 8 s</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="cC3">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="cC3">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="">17 ms</td><td class="">17 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Line with action</button>
+</article></div><details class="others"><summary>Other options (2), not picked</summary><div class="opts"><article class="opt" data-pick="Coach: Inline sentence">
+<header class="oh"><h4>Inline sentence</h4></header>
+<div class="pw" id="cC1" data-cfg='{"hero":"ring","tiles":"log","coach":"inline","states":["returning","first","over","worst"],"label":"Coach, inline sentence"}'></div>
+<p class="what">Today's line: Geo's mark and one sentence in the foot of the hero card, numbers underlined in orange.</p>
+<p class="trade"><b>Trade-off.</b> Quietest, but advice you cannot act on from where you read it.</p>
+
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Act on the suggestion</th><td colspan="3">2 taps + 18 typed, about 8.1 s <span class="vs">today: 2 taps + 18 typed, about 8 s</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="cC1">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="cC1">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">33 ms</td><td class="warn">50 ms</td><td class="">33 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Inline sentence</button>
+</article><article class="opt" data-pick="Coach: Glass chip">
+<header class="oh"><h4>Glass chip</h4><span class="badge alt">Challenges Q3</span></header>
+<div class="pw" id="cC2" data-cfg='{"hero":"ring","tiles":"log","coach":"chip","states":["returning","first","over","worst"],"label":"Coach, glass chip"}'></div>
+<p class="what">One glass line above the hero with the short version; tapping it opens a Geo sheet with the full sentence, the action and a reply field.</p>
+<p class="trade"><b>Trade-off.</b> Keeps the hero clean and scales to long takeaways, but hides the reasoning one tap away and adds glass to the content layer (Q3).</p>
+
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Act on the suggestion</th><td colspan="3">2 taps, about 1.8 s <span class="vs">today: 2 taps + 18 typed, about 8 s</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="cC2">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="cC2">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="">17 ms</td><td class="warn">133 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false">Pick Glass chip</button>
+</article></div></details></section>
+
+<section class="blk" aria-labelledby="other"><h2 id="other">Everything else on the journey</h2>
+<p>One recommended design each.</p>
+<section class="surf" id="s-sDue" aria-labelledby="h-sDue">
+<div class="sl"><div class="pw" id="sDue" data-cfg='{"states":["checkin","checkin-page"],"label":"Check-in due card"}'></div></div>
+<div class="sr"><h3 id="h-sDue">Check-in due card <span class="badge">Kept by owner</span></h3>
+<p>Shown at the top of Home only when <code>/v1/check-in/status</code> returns <code>state: "due"</code>; otherwise the chart button in the header opens This week (D3). The card carries the one orange action on Home that day, so the ring stays the only other orange and the orb stays ink (Q4). Tapping pushes the week page with the screen behind receding; Apply is that page's one orange.</p>
+<ul><li>Copy: "Your week is ready", the week label and days logged, "See your week".</li><li>Edge: label at 32 characters stays one line; days logged 0 to 7.</li></ul>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Open the check-in</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: 1 tap</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="sDue">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="sDue">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="warn">300 ms</td><td class="warn">100 ms</td><td class="">17 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false" data-pickname="Check-in due card">Approve Check-in due card</button></div></section><section class="surf" id="s-sWater" aria-labelledby="h-sWater">
+<div class="sl"><div class="pw" id="sWater" data-cfg='{"states":["water","water-error","water-offline"],"label":"Water sheet"}'></div></div>
+<div class="sr"><h3 id="h-sWater">Water quick log <span class="badge">Kept by owner</span></h3>
+<p>Opened from the Water tile body (the + skips it). The sheet floats forward and Home steps back. The glass row previews today plus what you are adding; the stepper runs 1 to 20 (<code>payload.glasses</code>). The button names the result ("Add 2 glasses"). Failure keeps the sheet open with the reason; offline saves to the queue and says so.</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Log two glasses</th><td colspan="3">3 taps, about 2.7 s <span class="vs">today: 3 taps, about 2.7 s</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="sWater">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="sWater">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="warn">50 ms</td><td class="warn">150 ms</td><td class="">33 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false" data-pickname="Water quick log">Approve Water quick log</button></div></section><section class="surf" id="s-sWeight" aria-labelledby="h-sWeight">
+<div class="sl"><div class="pw" id="sWeight" data-cfg='{"states":["weight","weight-bad"],"label":"Weight sheet"}'></div></div>
+<div class="sr"><h3 id="h-sWeight">Weight quick log <span class="badge">Kept by owner</span></h3>
+<p>Prefilled with the last weigh-in, with 0.1 kg nudges either side so most days need no keyboard. Typing still works (comma or point). The 20 to 400 kg limit shows beside the field, tied with <code>aria-describedby</code>, and Save names the value it will write.</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Log a 0.2 kg change</th><td colspan="3">4 taps, about 3.6 s <span class="vs">today: 2 taps + 4 typed, about 3.2 s</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="sWeight">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="sWeight">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">33 ms</td><td class="">17 ms</td><td class="warn">150 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false" data-pickname="Weight quick log">Approve Weight quick log</button></div></section><section class="surf" id="s-sMacro" aria-labelledby="h-sMacro">
+<div class="sl"><div class="pw" id="sMacro" data-cfg='{"states":["macro","macro-empty","macro-long"],"label":"Macro breakdown sheet"}'></div></div>
+<div class="sr"><h3 id="h-sMacro">Macro detail sheet <span class="badge">Kept by owner</span></h3>
+<p>One sheet for all four: a segmented switch (Calories, Protein, Carbs, Fat) so you can move between them without closing. Total against target first, then each food biggest first with its share. Long names wrap to two lines. Empty shows what will appear and one way to start.</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">See protein sources</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: 1 tap</span></td></tr><tr><th scope="row">Switch to fat</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: close and reopen, 2 taps</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="sMacro">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="sMacro">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="">33 ms</td><td class="warn">50 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false" data-pickname="Macro detail sheet">Approve Macro detail sheet</button></div></section><section class="surf" id="s-sNotif" aria-labelledby="h-sNotif">
+<div class="sl"><div class="pw" id="sNotif" data-cfg='{"states":["notif","notif-off"],"label":"Notifications sheet"}'></div></div>
+<div class="sr"><h3 id="h-sNotif">Notifications sheet <span class="badge">Kept by owner</span></h3>
+<p>Asked once on a native first launch when permission is still "prompt" (<code>fiqr:push-prompted</code>). It names the only two things Geo will send. If permission was denied before, it says how to turn it on instead of asking again.</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Allow</th><td colspan="3">1 tap, about 0.9 s <span class="vs">today: 1 tap, then the system prompt</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="sNotif">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="sNotif">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">33 ms</td><td class="warn">100 ms</td><td class="warn">50 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false" data-pickname="Notifications sheet">Approve Notifications sheet</button></div></section><section class="surf" id="s-sHealth" aria-labelledby="h-sHealth">
+<div class="sl"><div class="pw" id="sHealth" data-cfg='{"states":["health","health-android","health-fail"],"label":"Health permission sheet"}'></div></div>
+<div class="sr"><h3 id="h-sHealth">Health permission sheet <span class="badge">Kept by owner</span></h3>
+<p>Honest pre-permission screen (Q32): what FIQR reads, what it writes back, that nothing is shared, and where to disconnect. Continue hands over to the system sheet; on success the Steps and Sleep tiles fill and a toast confirms 30 days synced. Failure stays on the sheet with the fix.</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">Connect Health</th><td colspan="3">2 taps, about 1.8 s <span class="vs">today: 2 taps, then the system sheet</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="sHealth">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="sHealth">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">33 ms</td><td class="">17 ms</td><td class="">17 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false" data-pickname="Health permission sheet">Approve Health permission sheet</button></div></section><section class="surf" id="s-sSplash" aria-labelledby="h-sSplash">
+<div class="sl"><div class="pw" id="sSplash" data-cfg='{"states":["cold","slow","coldoff"],"replay":true,"label":"Splash"}'></div></div>
+<div class="sr"><h3 id="h-sSplash">Splash and cold start <span class="badge">Kept by owner</span></h3>
+<p>Cream with the FIQR wordmark, held only until the first cached paint (target under 200 ms on low-end Android, Q21). Home then settles forward from 1.04 scale while the ring draws once (Q23). On a slow network the final layout shows flat placeholders at real size, no shimmer, and nothing shifts when data lands. Offline cold start shows the last sync with the band.</p>
+<table class="mt"><caption class="vh">Measurements</caption><tbody>
+<tr><th scope="row">First useful paint</th><td colspan="3">cached Home under splash <span class="vs">today: splash then skeleton</span></td></tr>
+<tr><th scope="row">Tap targets under 44 pt</th><td colspan="3" data-audit="small" data-for="sSplash">counting</td></tr>
+<tr><th scope="row">Orange actions on screen</th><td colspan="3" data-audit="orange" data-for="sSplash">counting</td></tr>
+<tr><th scope="row">Max frame gap at 4x CPU throttle: push, scroll, sheet</th><td class="">17 ms</td><td class="">17 ms</td><td class="">33 ms</td></tr></tbody></table>
+<button type="button" class="pick" aria-pressed="false" data-pickname="Splash and cold start">Approve Splash and cold start</button></div></section>
+</section>
+
+<section class="blk" aria-labelledby="fc"><h2 id="fc">First-click and five-second tests</h2>
+<p class="muted">Run each on the option phones above (or a device build) with people who have not seen the page. Randomise option order.</p>
+<div class="tw"><table><thead><tr><th scope="col">Decision</th><th scope="col">Task</th><th scope="col">Success</th></tr></thead><tbody><tr><th scope="row">Hero</th><td>Five-second test on each hero option, returning state: "How many calories can you still eat today?"</td><td>Answers 1,170 within 5 s; 4 of 5 people for the option to pass.</td></tr><tr><th scope="row">Hero</th><td>First click: "Find out which food gave you the most protein."</td><td>First tap on the Protein row or ring area.</td></tr><tr><th scope="row">Tiles</th><td>First click: "You just drank a glass of water. Record it."</td><td>Option B2: first tap on the Water +. B1 and B3: first tap on the Water tile.</td></tr><tr><th scope="row">Tiles</th><td>First click: "How did you sleep across this week?"</td><td>First tap on Sleep; success if the week view or average is reached in 2 taps.</td></tr><tr><th scope="row">Coach</th><td>Five-second test: "What does Geo want you to do right now?"</td><td>Names Greek yoghurt or protein within 5 s.</td></tr><tr><th scope="row">Coach</th><td>First click: "Do what Geo suggests."</td><td>First tap on the action chip (C3), the chip (C2), or the + orb (C1).</td></tr></tbody></table></div>
+</section>
+
+<section class="blk" aria-labelledby="us"><h2 id="us">Usability script, five people</h2>
+<p>Setup: the recommended Home on a phone, returning state, check-in due on for task 5. Say: "Think aloud. There are no wrong answers; we are testing the app, not you." Record time and taps per task; success counts only without help.</p>
+<div class="tw"><table><thead><tr><th scope="col">Task</th><th scope="col">Success when</th><th scope="col">P1</th><th scope="col">P2</th><th scope="col">P3</th><th scope="col">P4</th><th scope="col">P5</th><th scope="col">Notes</th></tr></thead><tbody><tr><th scope="row">Tell me how much more you can eat today and how you know.</th><td>States kcal left from the ring within 10 s, no taps.</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><th scope="row">You drank two glasses of water. Log them.</th><td>Water shows 7 of 8; under 10 s; no wrong sheet opened.</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><th scope="row">You weighed 78.0 kg this morning. Record it.</th><td>Weight tile shows 78.0 kg; no keyboard error.</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><th scope="row">Geo has a suggestion. Follow it, then change your mind.</th><td>Logs via the action, then uses Undo; Snack row returns to its previous state.</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><th scope="row">Your weekly check-in is ready. Open it and accept the new targets.</th><td>Reaches the week page in 1 tap and applies; returns to Home with the edge swipe or Back.</td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div>
+<p class="muted">Pass bar: every task at 4 of 5 or better. Any task under that goes back to its decision above.</p>
+</section>
+</main>
+<div class="tray" role="region" aria-label="Your picks"><output id="tray-out">No picks yet</output><button type="button" id="tray-copy">Copy picks</button></div>
+<script>
+/* FIQR Today: live phone kit. Each .pw wrapper mounts one phone from its data-cfg. No globals besides TDY. */
+(function(){
+'use strict';
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const I={
+home:'<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/>',
+food:'<path d="M7 3v8m-2.5-8v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17 21V3c-2.2 1.2-3.5 3.8-3.5 7v3H17"/>',
+train:'<path d="M6.5 7.5v9M3.5 10v4m14-6.5v9m3-6.5v4M6.5 12h11"/>',
+geo:'<path d="M12 3.5c.6 3.9 2.4 5.8 6.5 6.5-4.1.7-5.9 2.6-6.5 6.5-.6-3.9-2.4-5.8-6.5-6.5 4.1-.7 5.9-2.6 6.5-6.5zM18.5 16.5c.2 1.4.8 2 2 2.2-1.2.2-1.8.8-2 2.2-.2-1.4-.8-2-2-2.2 1.2-.2 1.8-.8 2-2.2z"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',minus:'<path d="M5 12h14"/>',
+back:'<path d="M14.5 5.5 8 12l6.5 6.5"/>',chev:'<path d="m9.5 6 6 6-6 6"/>',
+chart:'<path d="M5 19V11M10 19V6M15 19v-5M20 19V9"/>',
+person:'<circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.3 3.8-5 7-5s5.8 1.7 7 5"/>',
+play:'<path d="M8 5.5v13l11-6.5z"/>',
+alert:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2v.1"/>',
+heart:'<path d="M12 19.5s-7.5-4.4-7.5-9.7A4.1 4.1 0 0 1 12 7.4a4.1 4.1 0 0 1 7.5 2.4c0 5.3-7.5 9.7-7.5 9.7z"/>',
+steps:'<path d="M8.5 3.5c1.8 0 2.7 2 2.5 4.5-.2 2.2-1 3.5-2.6 3.5S6 10.2 6 8c0-2.6 1-4.5 2.5-4.5zM6.5 14h4.2l-.4 3.3a2 2 0 0 1-3.9-.3zM15.5 7.5c1.5 0 2.5 1.9 2.5 4.5 0 2.2-.8 3.5-2.4 3.5s-2.4-1.3-2.6-3.5c-.2-2.5.7-4.5 2.5-4.5zM13.4 18h4.2l-.3 1.4a2 2 0 0 1-3.9.3z"/>',
+weight:'<path d="M5 5h14l-1.5 15h-11z"/><path d="M9.5 10a2.5 2.5 0 0 1 5 0M12 10l1.2-1.6"/>',
+water:'<path d="M12 3.5s6 6.4 6 10.5a6 6 0 0 1-12 0c0-4.1 6-10.5 6-10.5z"/>',
+sleep:'<path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z"/>',
+energy:'<path d="M13 3 5.5 13.5H12L11 21l7.5-10.5H12z"/>',
+photo:'<path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/>',
+menu:'<path d="M6 3.5h12v17H6zM9 8h6m-6 4h6m-6 4h3.5"/>',
+search:'<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>',
+mood:'<circle cx="12" cy="12" r="8.5"/><path d="M8.5 14c.9 1.3 2.1 2 3.5 2s2.6-.7 3.5-2M9.3 9.8h.01m5.4 0h.01"/>',
+bell:'<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5h4"/>',
+flame:'<path d="M12 3.5c.6 3.2-3.8 5.2-3.8 9.6a3.8 3.8 0 0 0 7.6 0c0-1.7-.8-3-1.7-4 .1 1.7-.6 2.7-1.5 2.9.6-2.9-.2-6.3-.6-8.5z"/>',
+protein:'<path d="M15.5 4.5a4 4 0 0 1 4 4c0 3-3.5 5.5-6.5 5.5L9.2 17.8a1.8 1.8 0 1 1-2.7-.2 1.8 1.8 0 1 1-.2-2.7L10 11c0-3 2.5-6.5 5.5-6.5z"/>',
+carbs:'<path d="M12 21V9M12 9c-1.9-.6-3-2.4-3-4.8 1.9.4 3 1.8 3 3.6 0-1.8 1.1-3.2 3-3.6 0 2.4-1.1 4.2-3 4.8zM12 14c-2-.3-3.5-1.8-3.9-4 2 .2 3.4 1.5 3.9 3.4.5-1.9 1.9-3.2 3.9-3.4-.4 2.2-1.9 3.7-3.9 4zM12 18.5c-2-.3-3.5-1.8-3.9-4 2 .2 3.4 1.5 3.9 3.4.5-1.9 1.9-3.2 3.9-3.4-.4 2.2-1.9 3.7-3.9 4z"/>',
+fat:'<path d="M12 4c3 3.5 5 6.4 5 9a5 5 0 0 1-10 0c0-2.6 2-5.5 5-9z"/><path d="M9.8 14.2a2.3 2.3 0 0 0 2.2 2.3"/>',
+sync:'<path d="M19 12a7 7 0 0 1-12 5M5 12a7 7 0 0 1 12-5M17 3.5V7h-3.5M7 20.5V17h3.5"/>'
+};
+const ic=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
+const f0=n=>Math.round(n).toLocaleString('en-AU');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtSleep=h=>{const t=Math.round(h*60),a=Math.floor(t/60),m=t%60;return m?a+'h '+m+'m':a+'h'};
+
+/* ---------- data (shapes from LogsSummary, Log payloads, CheckInStatus, Profile) ---------- */
+const BASEF=[{n:'Overnight oats with blueberries',meal:'Breakfast',k:402,p:14,c:62,f:11},{n:'Flat white, full cream',meal:'Breakfast',k:110,p:7,c:9,f:6},{n:'Chicken burrito bowl',meal:'Lunch',k:668,p:71,c:47,f:21}];
+const W14=[79.0,78.9,79.1,78.8,78.9,78.7,78.8,78.6,78.7,78.5,78.4,78.5,78.4,78.2];
+const GEO_ACT={text:'Protein is <em>68 g</em> short with <em>1,170 kcal</em> left. A <em>170 g</em> Greek yoghurt closes <em>17 g</em> of it now.',short:'68 g protein short, 1,170 kcal left',act:'Log yoghurt',food:{n:'Greek yoghurt, plain, 170 g',meal:'Snack',k:100,p:17,c:6,f:1}};
+function base(){return{kind:'returning',target:{k:2350,p:160,c:250,f:75},foods:BASEF.map(x=>({...x})),
+steps:{today:8412,yest:10233,week:[9120,6450,11873,7302,4980,10233,8412]},health:'connected',sync:'6:32 pm',
+weight:{kg:78.2,delta:-0.6,last:'78.4 kg on Sun',series:W14.slice()},water:5,sleep:{h:7.2,nights:[6.9,7.4,6.2,7.8,7.0,6.9,7.2]},
+workout:{name:'Upper body A',meta:'6 exercises, 45 min'},geo:{...GEO_ACT},checkin:null,offline:false,loading:false,error:false}}
+const STATES={
+returning:base,
+first:()=>Object.assign(base(),{kind:'first',foods:[],steps:{today:null,yest:null,week:[]},health:'off',weight:{kg:82.0,delta:null,last:null,series:[]},water:0,sleep:{h:null,nights:[]},workout:null,geo:{text:"Log your first meal today and I'll take it from there.",short:'Log your first meal to start',act:'Log a meal',open:'log'}}),
+due:()=>Object.assign(base(),{kind:'due',checkin:{label:'19 to 25 Oct'}}),
+over:()=>Object.assign(base(),{kind:'over',foods:BASEF.concat([{n:'Lamb shawarma plate with garlic sauce',meal:'Dinner',k:1600,p:59,c:144,f:74}]),geo:{text:'Dinner took you <em>430 kcal</em> over. One day does not move your week; tomorrow starts at your normal target.',short:'430 kcal over today',act:null}}),
+worst:()=>Object.assign(base(),{kind:'worst',target:{k:1200,p:90,c:120,f:40},foods:[
+{n:'Grilled chicken thigh with roasted sweet potato, charred broccolini and tahini-lemon dressing (double portion)',meal:'Lunch',k:3120,p:98,c:210,f:160},
+{n:'Margherita pizza, large, extra mozzarella and garlic oil, shared but mostly eaten',meal:'Dinner',k:2860,p:64,c:301,f:120},
+{n:'Bacon and egg roll with hash brown and barbecue sauce',meal:'Breakfast',k:2450,p:88,c:190,f:110},
+{n:'Protein smoothie with peanut butter, banana and oats',meal:'Snack',k:1980,p:74,c:120,f:40},
+{n:'Pad see ew with beef',meal:'Dinner',k:1610,p:52,c:80,f:70},{n:'Iced long black with oat milk',meal:'Snack',k:460,p:36,c:40,f:18}],
+steps:{today:128904,yest:99870,week:[40210,51003,88000,99870,120440,99870,128904]},weight:{kg:312.4,delta:12.6,last:'299.8 kg on Mon 19 Oct',series:[299.8,302,305.1,308.2,310,311.6,312.4]},water:20,sleep:{h:13.75,nights:[12,13,14,11.5,13.2,12.8,13.75]},
+workout:{name:'Lower body hypertrophy with tempo squats and Romanian deadlifts (deload week)',meta:'14 exercises, 105 min'},
+geo:{text:'Focus this week: protein landed under target on five of seven days, so put a palm-sized portion at breakfast and lunch before adding anything else.',short:'Focus this week: protein under target on five of seven days',act:'Plan tomorrow',open:'geo'}}),
+offline:()=>Object.assign(base(),{kind:'offline',offline:true}),
+loading:()=>Object.assign(base(),{kind:'loading',loading:true}),
+error:()=>Object.assign(base(),{kind:'error',error:true}),
+nohealth:()=>Object.assign(base(),{kind:'nohealth',health:'off',steps:{today:null,yest:null,week:[]},sleep:{h:null,nights:[]}})
+};
+const LABEL={returning:'Returning',first:'First run',due:'Check-in due',over:'Over target',worst:'Worst case',offline:'Offline',loading:'Loading',error:'Error',nohealth:'Health off',
+'water':'Water sheet','water-error':'Save failed','water-offline':'Offline save','weight':'Weight sheet','weight-bad':'Invalid entry','macro':'Breakdown','macro-empty':'Nothing logged','macro-long':'Long names',
+'notif':'Ask','notif-off':'Turned off','health':'Apple Health','health-android':'Health Connect','health-fail':'Failed',
+'cold':'Cold start','slow':'Slow network','coldoff':'Offline start','checkin':'Card','checkin-page':'Week page','geo':'Geo sheet'};
+const sum=(fs,k)=>fs.reduce((a,x)=>a+x[k],0);
+const meals=fs=>['Breakfast','Lunch','Dinner','Snack'].map(m=>{const r=fs.filter(x=>x.meal===m);return r.length?{m,k:sum(r,'k'),items:r.map(x=>x.n).join(', ')}:null}).filter(Boolean);
+
+/* ---------- mount ---------- */
+function mount(w){
+const cfg=JSON.parse(w.dataset.cfg);const pid=w.id;
+const hero=cfg.hero||'ring',tiles=cfg.tiles||'log',coach=cfg.coach||'action';
+const keys=cfg.states;let cur=cfg.start||keys[0];let d=STATES.returning();let firstPaint=true;
+w.innerHTML=`<div class="tbox"><div class="tdy" role="group" aria-label="${esc(cfg.label||'Phone')}">
+<div class="app"><div class="scroll" tabindex="0" aria-label="Today"><div class="feed"></div></div></div>
+<div class="dim" aria-hidden="true"></div><div class="topfade" aria-hidden="true"></div>
+<div class="status" aria-hidden="true"><span>6:40</span><span class="sic"><i></i><i></i><i></i><b></b></span></div>
+<nav class="tabs" aria-label="Tabs"><div class="trow">${['Home','Food','Train','Geo'].map((t,i)=>`<button class="tab" ${i?'':'aria-current="page"'} aria-label="${t}">${ic(t.toLowerCase())}<span>${t}</span></button>`).join('')}</div><button class="hit" aria-label="Show tabs"></button></nav>
+<button class="orb" data-press aria-label="Log something" aria-haspopup="dialog">${ic('plus')}</button>
+<section class="detail" aria-label="Detail"></section>
+<div class="scrim" aria-hidden="true"></div>
+<section class="sheet" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="${pid}-sh"><span class="grab" aria-hidden="true"></span><div class="sbody"></div></section>
+<div class="toast" role="status" aria-live="polite"><span></span><button type="button">Undo</button></div>
+<div class="splash" aria-hidden="true"><b>FIQR</b><p class="t13 sp-off"></p></div>
+</div></div>`;
+const fit=()=>{const k=Math.min(300,w.clientWidth||300)/390;w.style.setProperty('--k',k.toFixed(4))};fit();if(window.ResizeObserver)new ResizeObserver(fit).observe(w);const K=()=>parseFloat(w.style.getPropertyValue('--k'))||1;
+const sw=document.createElement('div');sw.className='sw';sw.setAttribute('role','group');sw.setAttribute('aria-label','States');
+sw.innerHTML=keys.map(k=>`<button type="button" data-k="${k}" aria-pressed="${k===cur}">${LABEL[k]||k}</button>`).join('')+(cfg.replay?'<button type="button" data-k="__replay">Replay</button>':'');
+w.appendChild(sw);
+const ph=w.querySelector('.tdy'),$=s=>ph.querySelector(s),$$=s=>[...ph.querySelectorAll(s)];
+const app=$('.app'),sc=$('.scroll'),feed=$('.feed'),det=$('.detail'),sh=$('.sheet'),sb=$('.sbody'),tabs=$('.tabs'),orb=$('.orb'),toastEl=$('.toast');
+const inert=(el,v)=>{el.inert=v;v?el.setAttribute('aria-hidden','true'):el.removeAttribute('aria-hidden')};
+inert(det,true);inert(sh,true);inert(toastEl,true);
+const tot=()=>({k:sum(d.foods,'k'),p:sum(d.foods,'p'),c:sum(d.foods,'c'),f:sum(d.foods,'f')});
+
+/* ---- pieces ---- */
+function ring(frac,over,cls=''){const a=Math.min(1,frac);const o=over>0?Math.min(.999,over):0;
+return `<svg class="ring ${cls}" viewBox="0 0 100 100" aria-hidden="true"><circle class="rt" cx="50" cy="50" r="44" pathLength="100"/><circle class="ra" cx="50" cy="50" r="44" pathLength="100" data-off="${(100-a*100).toFixed(1)}" style="${a>0?'':'opacity:0'}"/>${o?`<circle class="ro" cx="50" cy="50" r="44" pathLength="100" style="stroke-dashoffset:${(100-o*100).toFixed(1)}"/>`:''}</svg>`}
+function kcalCenter(t,big=true){const left=d.target.k-t.k,over=left<0;
+const L=f0(Math.abs(left)).length;return `<span class="rc"><b class="${big&&L<=5?'t22':'tsm'} num${over?' bad':''}" data-count="${Math.abs(left)}">${f0(Math.abs(left))}</b><span class="t11">${over?'kcal over':'kcal left'}</span></span>`}
+function dots(cur,tg,col){const n=tg>0?Math.min(10,Math.round(cur/tg*10)):0;return `<span class="dots" aria-hidden="true">${Array.from({length:10},(_,i)=>`<i style="${i<n?'background:'+col:''}"></i>`).join('')}</span>`}
+const MC={p:['Protein','var(--ink)','protein'],c:['Carbs','var(--te)','carbs'],f:['Fat','var(--oc)','fat']};
+function macroRow(k,t){const [n,col]=MC[k];const cur=t[k],tg=d.target[k],ov=cur>tg*1.1;
+return `<button class="mac" data-macro="${k}" aria-label="${n} ${cur} of ${tg} grams, show breakdown"><span class="top"><span class="t13">${n}</span><span class="t13 num"><b class="${ov?'bad':''}">${f0(cur)}</b> / ${f0(tg)} g</span></span>${dots(cur,tg,col)}</button>`}
+function geoText(){return d.geo.text}
+function coachLine(){if(hero==='geo'||coach==='chip')return '';
+const acts=coach==='action'&&d.geo.act?`<div class="acts"><button class="chip" data-press data-geoact>${esc(d.geo.act)}</button>${d.geo.open?'':'<button class="chip txt" data-geoopen>Other ideas</button>'}</div>`:'';
+return `<div class="geo"><span class="gmk">${ic('geo')}</span><div><p>${geoText()}</p>${acts}</div></div>`}
+function heroHTML(){const t=tot();
+if(d.loading)return `<section class="card hero is-loading" aria-label="Loading today"><span class="rw">${ring(0,0)}<span class="rc"><span class="ph" style="width:70px;height:28px"></span></span></span><span class="macs">${['p','c','f'].map(()=>`<span class="mac"><span class="top"><span class="ph" style="width:44px;height:13px"></span><span class="ph" style="width:56px;height:13px"></span></span>${dots(0,1,'')}</span>`).join('')}</span></section>`;
+if(d.error)return `<section class="card err" aria-label="Today's food"><div class="rt3">${ic('alert')}<p>Couldn't load today's food. Last updated 6:12 pm.</p></div><button class="txtb" data-retry>Retry</button></section>`;
+if(hero==='macro'){const left=d.target.k-t.k;return `<section class="card" aria-label="Today's food"><div class="trio">${['p','c','f'].map(k=>{const [n,col]=MC[k];const cur=t[k],tg=d.target[k],l=tg-cur;return `<button class="mring" data-macro="${k}" data-press aria-label="${n}: ${Math.abs(l)} grams ${l<0?'over':'left'}, show breakdown"><span class="rw">${ring(cur/tg,cur>tg?(cur-tg)/tg:0).replace('class="ra"','class="ra" style="stroke:'+col+'"')}<span class="rc"><b class="t22 num${l<0?' bad':''}">${f0(Math.abs(l))}</b><span class="t11">g ${l<0?'over':'left'}</span></span></span><span class="t13">${n}</span></button>`}).join('')}</div>
+<button class="kline" data-macro="k"><span class="t13">Calories</span><span class="num"><b class="${left<0?'bad':''}" style="font-size:17px;font-weight:800">${f0(Math.abs(left))}</b> <span class="t13">kcal ${left<0?'over':'left'} of ${f0(d.target.k)}</span></span></button>${coachLine()}</section>`}
+if(hero==='geo'){const acts=d.geo.act?`<div class="acts"><button class="chip" data-press data-geoact>${esc(d.geo.act)}</button>${d.geo.open?'':'<button class="chip txt" data-geoopen>Other ideas</button>'}</div>`:'';
+return `<section class="card nba" aria-label="Geo's next step"><p class="who t13">${ic('geo')}Geo</p><p class="gq">${geoText()}</p>${acts}
+<button class="mini" data-macro="k" aria-label="Calories and macros, show breakdown"><span class="rw">${ring(t.k/d.target.k,t.k>d.target.k?(t.k-d.target.k)/d.target.k:0)}<span class="rc"><b class="t13 num" style="color:var(--ink);font-weight:800">${f0(Math.abs(d.target.k-t.k))}</b></span></span><span class="mm">${['p','c','f'].map(k=>`<span><span class="t13">${MC[k][0]}</span><span class="t13 num"><b style="color:var(--ink)">${t[k]}</b> / ${d.target[k]} g</span></span>`).join('')}<span class="t11">${d.target.k-t.k<0?'kcal over':'kcal left'} in the ring</span></span></button></section>`}
+return `<section class="card" aria-label="Today's food" data-press><div class="hero"><button class="rw" data-macro="k" aria-label="${f0(t.k)} of ${f0(d.target.k)} kcal eaten, show breakdown">${ring(t.k/d.target.k,t.k>d.target.k?(t.k-d.target.k)/d.target.k:0)}${kcalCenter(t)}</button><span class="macs">${['p','c','f'].map(k=>macroRow(k,t)).join('')}</span></div>${coachLine()}</section>`}
+function chipHTML(){if(coach!=='chip'||hero==='geo'||d.loading||d.error)return '';return `<button class="gchip" data-press data-geoopen aria-label="Geo: ${esc(d.geo.short)}. Open">${ic('geo')}<span>${esc(d.geo.short)}</span>${ic('chev')}</button>`}
+const prog=f=>`<span class="prog" aria-hidden="true"><i data-f="${Math.min(1,Math.max(0,f)).toFixed(3)}"></i></span>`;
+const src=()=>d.health==='connected'?`<span class="src">${ic('heart')}Synced ${d.sync}</span>`:'';
+function tileSteps(mode){const s=d.steps;
+if(d.loading)return phTile('Steps');
+if(d.health==='off'&&s.today===null)return `<button class="tile" data-press data-act="connect" aria-label="Steps. Connect Apple Health"><span class="t13">Steps</span><span class="tv"><span class="dash"></span></span><span class="tcon">Connect</span><span class="t11">Apple Health</span></button>`;
+const v=s.today===null?'<span class="dash"></span>':`<b class="t22 num" data-count="${s.today}">${f0(s.today)}</b>`;
+if(mode==='status'){const st=s.today>=10000?'Goal met':s.today>=7000?'On pace':'Behind usual';return statusTile('steps','Steps',v,'',st,Math.min(1,s.today/12000),[.55,.85])}
+return `<button class="tile" data-press data-act="${mode==='health'?'none':'steps'}" aria-label="Steps ${s.today??'none yet'}${mode==='health'?'':', open details'}"><span class="t13">Steps</span><span class="tv">${v}</span>${prog((s.today||0)/10000)}<span class="t11 cap">${s.today===null?'Yesterday '+f0(s.yest):src()||'of 10,000'}</span></button>`}
+function tileWeight(mode){const w=d.weight;if(d.loading)return phTile('Weight');
+const dl=w.delta==null?'No trend yet':`<span class="${w.delta<0?'good':w.delta>1?'bad':''}">${w.delta>0?'+':'−'}${Math.abs(w.delta).toFixed(1)} kg</span> this week`;
+const v=w.kg==null?'<span class="dash"></span>':`<b class="t22 num">${w.kg.toFixed(1)}</b><small>kg</small>`;
+if(mode==='status')return statusTile('weight','Weight',v,'',w.delta==null?'No trend yet':w.delta<0?'Down '+Math.abs(w.delta).toFixed(1)+' kg':'Up '+w.delta.toFixed(1)+' kg',.42,[.3,.6]);
+const spark=mode==='health'&&w.series.length>1?sparkSvg(w.series.slice(-8)):'';
+return `<button class="tile" data-press data-act="weight" aria-label="Weight ${w.kg??'not logged'} kg, log weight"><span class="t13">Weight</span><span class="tv">${v}</span>${spark}<span class="t11 cap">${dl}</span></button>`}
+function sparkSvg(s){const lo=Math.min(...s),hi=Math.max(...s),sp=hi-lo||1;return `<svg viewBox="0 0 100 24" preserveAspectRatio="none" style="width:100%;height:28px;margin-top:6px" aria-hidden="true"><polyline points="${s.map((v,i)=>(i/(s.length-1)*100).toFixed(1)+','+(20-(v-lo)/sp*16).toFixed(1)).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`}
+function tileWater(mode){if(d.loading)return phTile('Water');const g=d.water;
+const v=`<b class="t22 num">${g}</b><small>of 8</small>`;
+if(mode==='status')return statusTile('water','Water',v,'',g>=8?'Done for today':g>=5?'On pace':'Behind',Math.min(1,g/10),[.55,.9]);
+if(mode==='log')return `<div class="tile" style="padding:0"><button data-press data-act="water" style="display:flex;flex-direction:column;gap:4px;padding:16px;min-height:150px;width:100%" aria-label="Water ${g} of 8 glasses, open water log"><span class="t13">Water</span><span class="tv">${v}</span>${prog(g/8)}<span class="t11 cap">${g>=8?'Done for today':g?'glasses so far':'None yet today'}</span></button><button class="plus" data-press data-act="water1" aria-label="Add one glass of water">${ic('plus')}</button></div>`;
+return `<button class="tile" data-press data-act="water" aria-label="Water ${g} of 8 glasses, log water"><span class="t13">Water</span><span class="tv">${v}</span>${prog(g/8)}<span class="t11 cap">${g>=8?'Done for today':g?'glasses so far':'Tap to add a glass'}</span></button>`}
+function tileSleep(mode){if(d.loading)return phTile('Sleep');const h=d.sleep.h;
+const v=h==null?'<span class="dash"></span>':`<b class="t22 num">${fmtSleep(h)}</b>`;
+if(mode==='status')return statusTile('sleep','Sleep',v,'',h==null?'Not logged':h>=7?'Usual':'Short night',h?Math.min(1,h/10):0,[.65,.85]);
+const n=d.sleep.nights.filter(x=>x!=null),avg=n.length>=3?fmtSleep(n.reduce((a,b)=>a+b,0)/n.length)+' avg this week':'Last night';
+return `<button class="tile" data-press data-act="${mode==='health'?'sleeplog':'sleep'}" aria-label="Sleep ${h?fmtSleep(h):'not logged'}${mode==='health'?', log sleep':', open details'}"><span class="t13">Sleep</span><span class="tv">${v}</span>${prog((h||0)/8)}<span class="t11 cap">${h==null?(mode==='health'?'Tap to log last night':'Not logged'):d.health==='connected'?src():avg}</span></button>`}
+function statusTile(act,label,v,unit,word,pos,band){return `<button class="tile st" data-press data-act="${act}" aria-label="${label}, ${word}, open details"><span class="t13">${label}</span><span class="tv">${v}</span><span class="t13 cap" style="color:var(--ink);font-weight:700">${word}</span><span class="meter" aria-hidden="true"><b style="bottom:${band[0]*100}%;top:${(1-band[1])*100}%"></b><i style="bottom:${(pos*100).toFixed(0)}%"></i></span></button>`}
+function phTile(l){return `<div class="tile"><span class="t13">${l}</span><span class="tv"><span class="ph" style="width:64px;height:22px"></span></span><span class="prog"></span><span class="ph" style="width:80px;height:11px;margin-top:auto"></span></div>`}
+function tilesHTML(){const m=tiles;
+const order=m==='log'?[tileWater,tileWeight,tileSteps,tileSleep]:m==='status'?[tileSteps,tileSleep,tileWeight,tileWater]:[tileSteps,tileWeight,tileWater,tileSleep];
+return `<div class="grid">${order.map(fn=>fn(m)).join('')}</div>`}
+function workoutHTML(){if(d.loading)return `<div class="card" style="min-height:84px"><span class="ph" style="width:60px;height:13px"></span><br><span class="ph" style="width:150px;height:22px;margin-top:8px"></span></div>`;
+if(!d.workout)return `<section class="card wk"><div><p class="t13">Next up</p><p class="t22 wn">No program yet</p><p class="t13" style="margin-top:4px">Geo can build one from your goals</p></div><button class="chip ghost" data-press data-geoopen>Ask Geo</button></section>`;
+return `<section class="card wk"><div><p class="t13">Next up</p><p class="t22 wn">${esc(d.workout.name)}</p><p class="t13" style="margin-top:4px">${d.workout.meta}</p></div><button class="play" data-press data-act="start" aria-label="Start ${esc(d.workout.name)}">${ic('play')}</button></section>`}
+function mealsHTML(){if(d.loading)return `<div class="rows">${[0,1].map(()=>`<div class="row"><span class="rt2"><span class="ph" style="width:80px;height:15px"></span><span class="ph" style="width:150px;height:13px"></span></span></div>`).join('')}</div>`;
+const r=meals(d.foods);if(!r.length)return `<button class="empty" data-press data-act="log">Nothing logged yet. Tap to add a meal</button>`;
+return `<div class="rows">${r.map(x=>`<button class="row" data-press data-act="meal"><span class="rt2"><b>${x.m}</b><span>${esc(x.items)}</span></span><span class="rv">${f0(x.k)}<small> kcal</small></span>${ic('chev')}</button>`).join('')}</div>`}
+function checkinHTML(){if(!d.checkin)return '';return `<section class="card ci" aria-label="Weekly check-in"><div class="row2"><div style="flex:1"><h3>Your week is ready</h3><p class="t13">${d.checkin.label}, 6 of 7 days logged</p></div></div><button class="btn or mt" data-press data-act="checkin">See your week</button></section>`}
+function render(){
+const head=`<header class="hd"><div><h2 class="t30">Today</h2><p class="t13 date">Mon 26 Oct</p></div>${d.checkin?'':`<button class="gbtn" data-act="week" aria-label="This week">${ic('chart')}</button>`}<button class="gbtn" data-act="settings" aria-label="Settings">${ic('person')}</button></header>`;
+const band=d.offline?`<div class="band" role="status"><i></i>Offline. Showing your last sync.</div>`:'';
+feed.innerHTML=head+band+checkinHTML()+chipHTML()+heroHTML()+tilesHTML()+workoutHTML()+`<h3 class="sec">Meals</h3>`+mealsHTML();
+wire(feed);paint(firstPaint&&!RM);firstPaint=false;}
+function paint(anim){const go=()=>{$$('.ra').forEach(c=>{if(c.dataset.off)c.style.strokeDashoffset=c.dataset.off});$$('.prog i').forEach(i=>i.style.transform=`scaleX(${i.dataset.f})`)};
+if(!anim){$$('.ra,.prog i').forEach(e=>e.style.transition='none');go();requestAnimationFrame(()=>$$('.ra,.prog i').forEach(e=>e.style.transition=''));return}
+requestAnimationFrame(()=>requestAnimationFrame(go));
+$$('[data-count]').forEach(el=>countUp(el,0,+el.dataset.count,900))}
+function countUp(el,a,b,ms){if(RM){el.textContent=f0(b);return}const t0=performance.now();const step=t=>{const p=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-p,3);el.textContent=f0(a+(b-a)*e);if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+
+/* ---- details (pushed pages) ---- */
+function detailHTML(k){const bk=`<button class="gbtn back" aria-label="Back to Today">${ic('back')}</button>`;
+const days=['Tue','Wed','Thu','Fri','Sat','Sun','Mon'];
+if(k==='steps'){const w=d.steps.week,mx=Math.max(...w,10000);return bk+`<h2 class="t30 dh">Steps</h2><p class="big"><b class="t30 num">${f0(d.steps.today)}</b><small>of 10,000 today</small></p><p class="t13" style="margin:0 2px 12px">From Apple Health, synced ${d.sync}</p><div class="card"><div class="bars">${w.map((v,i)=>`<span><i style="height:${(v/mx*100).toFixed(0)}%"></i><span class="t11">${days[i]}</span></span>`).join('')}</div></div><p class="t13" style="margin:12px 2px">7-day average ${f0(w.reduce((a,b)=>a+b,0)/w.length)}</p>`}
+if(k==='sleep'){const n=d.sleep.nights;return bk+`<h2 class="t30 dh">Sleep</h2><p class="big"><b class="t30 num">${d.sleep.h?fmtSleep(d.sleep.h):'—'}</b><small>last night</small></p><p class="t13" style="margin:0 2px 12px">${d.health==='connected'?'From Apple Health, synced '+d.sync:'Logged by you'}</p><div class="card"><div class="bars">${n.map((v,i)=>`<span><i style="height:${((v||0)/12*100).toFixed(0)}%"></i><span class="t11">${days[i]}</span></span>`).join('')}</div></div><button class="btn mt" data-press data-act="sleeplog">Log last night</button>`}
+if(k==='weight')return bk+`<div class="whead dh"><span class="wico">${ic('weight')}</span><div><h2 class="t30">Weight</h2></div></div><p class="big"><b class="t30 num">${d.weight.kg.toFixed(1)}</b><small>kg</small> ${wchip()}</p><div class="mt">${wtrend(d.weight.series,true)}</div><button class="btn mt" data-press data-act="weight">Log weight</button>`;
+if(k==='water')return bk+`<h2 class="t30 dh">Water</h2><p class="big"><b class="t30 num">${d.water}</b><small>of 8 glasses</small></p><div class="card"><div class="glasses">${Array.from({length:8},(_,i)=>`<i class="${i<d.water?'on':''}"></i>`).join('')}</div></div><button class="btn mt" data-press data-act="water1">Add a glass</button><button class="btn flat" data-act="water">Add more than one</button>`;
+if(k==='checkin')return bk+`<h2 class="t30 dh">Your week</h2><p class="t13" style="margin:4px 2px 0">19 to 25 Oct</p><div class="card mt"><p style="font-size:17px;line-height:1.42">${ic('geo')} Steady loss and protein mostly on target. A small trim keeps the pace without hurting training.</p><p class="big"><b class="t30 num">−0.6</b><small>kg this week</small></p></div><h3 class="sec">What changes</h3><div class="rows" style="margin-top:8px"><div class="row"><span class="rt2"><b>Daily calories</b></span><span class="rv"><s class="t13">2,350</s> 2,250<small> kcal</small></span></div><div class="row"><span class="rt2"><b>Daily protein</b></span><span class="rv"><s class="t13">160</s> 165<small> g</small></span></div></div><button class="btn or mt" data-press data-act="apply">Apply new targets</button><button class="btn flat" data-geoopen>Ask Geo about it</button>`;
+if(k==='week')return bk+`<h2 class="t30 dh">This week</h2><p class="t13" style="margin:4px 2px 0">Check-in on Sun 1 Nov, 6 days to go</p><div class="grid mt"><div class="tile"><span class="t13">Avg calories</span><b class="t22 num">2,210</b><span class="t11 cap">of 2,350 kcal</span></div><div class="tile"><span class="t13">Avg protein</span><b class="t22 num">138 g</b><span class="t11 cap">of 160 g</span></div><div class="tile"><span class="t13">Sessions</span><b class="t22 num">2</b><span class="t11 cap">of 4 planned</span></div><div class="tile"><span class="t13">Avg sleep</span><b class="t22 num">7h 4m</b><span class="t11 cap">7 nights tracked</span></div></div>`;
+return bk}
+
+/* ---- sheets ---- */
+let sheetKind=null,wv=1,wkg='78.2',seg='k',failNext=false,offNext=false;
+function wchip(){const w=d.weight;if(w.delta==null)return '';return `<span class="wchip${w.delta>0?' up':''}">${w.delta>0?'+':'−'}${Math.abs(w.delta).toFixed(1)} kg this week</span>`}
+function wtrend(s,tall){if(!s||s.length<2)return `<div class="wtrend"><p class="t13">Your trend draws after two weigh-ins.</p></div>`;const lo=Math.min(...s)-.1,hi=Math.max(...s)+.1,H=tall?120:64;const P=s.map((v,i)=>[(i*268/(s.length-1)).toFixed(1),(6+(hi-v)/(hi-lo)*(H-12)).toFixed(1)]);const ln='M'+P.map(p=>p.join(' ')).join('L');const l=P[P.length-1];
+return `<div class="wtrend"><svg viewBox="0 0 268 ${H}" style="height:${H}px" role="img" aria-label="Weight, last ${s.length} weigh-ins, ${s[0]} to ${s[s.length-1]} kg"><path class="ar" d="${ln}L268 ${H}L0 ${H}Z"/><path class="ln" d="${ln}"/><circle class="dot" cx="${l[0]}" cy="${l[1]}" r="4"/></svg><div class="ax t11"><span>${s.length} weigh-ins ago</span><span>Today</span></div></div>`}
+function sheetHTML(k,variant){const h=t=>`<h2 class="t22" id="${pid}-sh">${t}</h2>`;
+if(k==='water'){const after=d.water+wv;return `<div class="shd">${h('Water')}<span class="t13 num">${d.water} of 8 today</span></div><div class="glasses" aria-hidden="true">${Array.from({length:Math.max(8,after)},(_,i)=>`<i class="${i<d.water?'on':i<after?'add':''}"></i>`).join('')}</div><div class="stp"><button data-press data-wv="-1" aria-label="One glass less" ${wv<=1?'disabled':''}>${ic('minus')}</button><div class="sv"><b class="t30 num" aria-live="polite">${wv}</b><p class="t13">${wv===1?'glass':'glasses'}</p></div><button data-press data-wv="1" aria-label="One glass more" ${wv>=20?'disabled':''}>${ic('plus')}</button></div>${variant==='error'?`<p class="hint bad" role="alert">Couldn't log water. Check your connection and try again.</p>`:''}${variant==='offline'?`<p class="hint">You're offline. This saves on your phone and syncs when you're back.</p>`:''}<button class="btn or" data-press data-save="water">${variant==='error'?'Try again':'Add '+wv+' '+(wv===1?'glass':'glasses')}</button>`}
+if(k==='weight'){const v=Number(wkg.replace(',','.')),ok=isFinite(v)&&v>=20&&v<=400;return `<div class="whead"><span class="wico">${ic('weight')}</span><div>${h('Weight')}<span class="t13">${d.weight.last?'Last '+d.weight.last:'First weigh-in'}</span></div>${wchip()}</div>${wtrend(d.weight.series.slice(-14))}<label class="fld ${ok?'':'bad'}"><span class="vh">Weight in kilograms</span><button type="button" class="nud" data-wk="-0.1" aria-label="Down 0.1 kg">${ic('minus')}</button><input inputmode="decimal" value="${esc(wkg)}" aria-describedby="${pid}-wh" style="text-align:center"><span class="t13">kg</span><button type="button" class="nud" data-wk="0.1" aria-label="Up 0.1 kg">${ic('plus')}</button></label><p class="hint ${ok?'':'bad'}" id="${pid}-wh">${ok?'Weigh at the same time each day for a clean trend.':'Enter a weight between 20 and 400 kg.'}</p><button class="btn or" data-press data-save="weight" ${ok?'':'disabled'}>Save ${ok?v.toFixed(1)+' kg':''}</button>`}
+if(k==='macro'){const fs=variant==='empty'?[]:d.foods;const key=seg;const t=sum(fs,key),tg=d.target[key];const rows=fs.map(x=>({n:x.n,v:x[key]})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);const u=key==='k'?' kcal':' g';
+const H={k:['var(--or)','rgba(232,98,42,.11)','flame','Calories'],p:['var(--ink)','rgba(17,28,53,.10)','protein','Protein'],c:['var(--te)','rgba(62,124,119,.12)','carbs','Carbs'],f:['var(--oc)','rgba(160,122,60,.12)','fat','Fat']};const [hue,tint,icn]=H[key];const left=tg-t;const mx=rows.length?rows[0].v:1;
+return `<div style="--hue:${hue};--tint:${tint};display:contents">${h('Today’s breakdown')}<div class="seg" role="tablist" aria-label="Nutrient">${['k','p','c','f'].map(kk=>`<button role="tab" data-seg="${kk}" aria-selected="${seg===kk}" style="--hue:${H[kk][0]}">${ic(H[kk][2])}${H[kk][3]}</button>`).join('')}</div>
+<div class="msum"><span class="rw">${ring(tg?t/tg:0,t>tg?(t-tg)/tg:0)}<span class="rc">${ic(icn)}</span></span><div class="mtxt"><b class="t22 num" style="color:var(--hue)">${f0(t)}<span class="t13">${u}</span></b><span class="t13 num">of ${f0(tg)}${u}</span><span class="t13 num" style="color:${left<0?'var(--neg)':hue};font-weight:700">${f0(Math.abs(left))}${u} ${left<0?'over':'left'}</span></div></div>
+${rows.length?`<ul class="brk">${rows.map(r=>`<li><span class="bd" aria-hidden="true"></span><span class="bw"><span class="bn">${esc(r.n)}</span><span class="bs" aria-hidden="true"><i style="width:${(r.v/mx*100).toFixed(0)}%"></i></span></span><b class="num" style="font-size:15px;white-space:nowrap">${f0(r.v)}<small class="t11">${u}</small></b><span class="bp num">${Math.round(r.v/t*100)}%</span></li>`).join('')}</ul>`:`<p class="lede">Nothing logged today. What you eat shows here, biggest first.</p><button class="btn" data-press data-act="log">Log a meal</button>`}</div>`}
+if(k==='notif'){if(variant==='off')return `${h('Notifications are off')}<p class="lede">Turn them on in Settings to hear when your weekly check-in is ready.</p><button class="btn" data-press data-close>Open Settings</button><button class="btn flat" data-close>Not now</button>`;
+return `${h('Let Geo nudge you?')}<p class="lede">Geo can tell you when a check-in is ready or when you've gone quiet for a few days. No marketing, ever. You can turn this off in Settings.</p><ul class="perm"><li>${ic('chart')}Your weekly check-in is ready</li><li>${ic('geo')}You've gone quiet for three days</li></ul><button class="btn or" data-press data-close data-ok="Notifications on">Allow notifications</button><button class="btn flat" data-close>Not now</button>`}
+if(k==='health'){const L=variant==='android'?'Health Connect':'Apple Health';return `${h('Connect '+L)}<p class="lede">FIQR reads these so Geo and your weekly check-in can use them. Nothing is shared with anyone else, and you can disconnect in Settings.</p><ul class="perm"><li>${ic('steps')}Steps and active energy</li><li>${ic('weight')}Weight</li><li>${ic('sleep')}Sleep</li><li>${ic('train')}Workouts, and the ones you finish in FIQR are saved back</li></ul>${variant==='fail'?`<p class="hint bad" role="alert">Couldn't connect. Check FIQR's permissions in ${L}.</p>`:''}<button class="btn or" data-press data-save="health">${variant==='fail'?'Try again':'Continue'}</button><button class="btn flat" data-close>Not now</button>`}
+if(k==='sleep')return `${h('Last night')}<div class="stp"><button data-press data-sl="-0.5" aria-label="Half an hour less">${ic('minus')}</button><div class="sv"><b class="t30 num">${fmtSleep(sl)}</b><p class="t13">asleep</p></div><button data-press data-sl="0.5" aria-label="Half an hour more">${ic('plus')}</button></div><button class="btn or" data-press data-save="sleep">Save</button>`;
+if(k==='geo')return `<div class="shd">${h('Geo')}</div><p class="lede">${geoText()}</p><div class="acts">${d.geo.act&&!d.geo.open?`<button class="chip" data-press data-geoact>${esc(d.geo.act)}</button>`:''}<button class="chip ghost" data-press data-close>Suggest dinner instead</button></div><div class="reply">Reply to Geo</div>`;
+if(k==='log')return `${h('Tell Geo, or pick one')}<div class="reply">Had a flat white and a croissant</div><div class="grid" style="grid-template-columns:repeat(3,1fr);gap:8px">${[['photo','Photo'],['menu','Menu'],['search','Search'],['weight','Weight'],['water','Water'],['sleep','Sleep'],['mood','Mood'],['energy','Energy'],['train','Workout']].map(([i,n])=>`<button class="tile" style="min-height:88px;align-items:center;justify-content:center;background:rgba(17,28,53,.05)" data-press data-m="${i}">${ic(i)}<span class="t13" style="color:var(--ink)">${n}</span></button>`).join('')}</div>`;
+return ''}
+let sl=7.5,sheetVar='';
+function drawSheet(){sb.innerHTML=sheetHTML(sheetKind,sheetVar);wire(sb);const r=sb.querySelectorAll('.ra');r.forEach(c=>{c.style.transition='none';c.style.strokeDashoffset='100'});requestAnimationFrame(()=>requestAnimationFrame(()=>r.forEach(c=>{c.style.transition='';c.style.strokeDashoffset=c.dataset.off})))}
+let lastFocus=null;
+function openSheet(k,variant=''){sheetKind=k;sheetVar=variant;if(k==='water')wv=1;if(k==='weight')wkg=variant==='bad'?'7.82':d.weight.kg.toFixed(1);drawSheet();lastFocus=document.activeElement;ph.classList.add('is-sheet');inert(sh,false);[app,tabs,orb,det].forEach(x=>inert(x,true));
+setTimeout(()=>{const f=sb.querySelector('input');(f||sh).focus({preventScroll:true})},RM?0:300)}
+function closeSheet(){if(!ph.classList.contains('is-sheet'))return;ph.classList.remove('is-sheet');sh.style.removeProperty('--dy');inert(sh,true);[app,tabs,orb].forEach(x=>inert(x,false));if(ph.classList.contains('is-push')){inert(det,false);[app,tabs,orb].forEach(x=>inert(x,true))}lastFocus&&lastFocus.isConnected&&lastFocus.focus({preventScroll:true})}
+let tt=0,undoFn=null;
+function toast(msg,undo){toastEl.querySelector('span').textContent=msg;const b=toastEl.querySelector('button');b.hidden=!undo;undoFn=undo||null;ph.classList.add('is-toast');inert(toastEl,false);clearTimeout(tt);tt=setTimeout(()=>{ph.classList.remove('is-toast');inert(toastEl,true)},3200)}
+toastEl.querySelector('button').addEventListener('click',()=>{undoFn&&undoFn();ph.classList.remove('is-toast');inert(toastEl,true)});
+function save(k){const b=sb.querySelector('[data-save]');if(sheetVar==='error'||sheetVar==='fail'){sheetVar=sheetVar==='error'?'':'';}
+b.disabled=true;b.textContent='Saving';setTimeout(()=>{
+if(k==='water'){d.water+=wv;closeSheet();rerender();toast(sheetVar==='offline'?`${wv} ${wv===1?'glass':'glasses'} saved, syncs when online`:`Water logged, ${d.water} of 8`)}
+if(k==='weight'){d.weight.kg=Number(wkg.replace(',','.'));closeSheet();rerender();toast('Weight logged, '+d.weight.kg.toFixed(1)+' kg')}
+if(k==='sleep'){d.sleep.h=sl;closeSheet();rerender();toast('Sleep logged, '+fmtSleep(sl))}
+if(k==='health'){d.health='connected';d.steps={today:8412,yest:10233,week:[9120,6450,11873,7302,4980,10233,8412]};d.sleep={h:7.2,nights:[6.9,7.4,6.2,7.8,7.0,6.9,7.2]};closeSheet();rerender();toast('Apple Health connected, 30 days synced')}
+},RM?0:420)}
+function rerender(){const y=sc.scrollTop;render();sc.scrollTop=y}
+function geoAct(){if(d.geo.open){closeSheet();setTimeout(()=>openSheet(d.geo.open),RM?0:250);return}
+const prev=d.target.k-sum(d.foods,'k');d.foods.push({...d.geo.food});const old={...d.geo};d.geo={text:'Logged. Protein is <em>51 g</em> short now with <em>1,070 kcal</em> left.',short:'51 g protein short, 1,070 kcal left',act:null};closeSheet();rerender();
+const b=feed.querySelector('[data-count]');if(b)countUp(b,prev,+b.dataset.count,600);
+toast('Greek yoghurt logged to Snack',()=>{d.foods.pop();d.geo=old;rerender()})}
+
+/* ---- push ---- */
+function push(k){det.innerHTML=detailHTML(k);wire(det);det.scrollTop=0;ph.classList.add('is-push');inert(det,false);[app,tabs,orb].forEach(x=>inert(x,true));pushFrom=document.activeElement;setTimeout(()=>{const b=det.querySelector('.dh');if(b){b.tabIndex=-1;b.focus({preventScroll:true})}},60)}
+let pushFrom=null;
+function pop(){det.style.transform='';app.style.transform='';$('.dim').style.opacity='';ph.classList.remove('is-push');inert(det,true);[app,tabs,orb].forEach(x=>inert(x,false));pushFrom&&pushFrom.isConnected&&pushFrom.focus({preventScroll:true})}
+let dr=null;
+det.addEventListener('pointerdown',e=>{const r=ph.getBoundingClientRect();if(e.clientX-r.left>28||!ph.classList.contains('is-push'))return;dr={x:e.clientX,dx:0,px:e.clientX,pt:e.timeStamp,v:0};det.setPointerCapture(e.pointerId);ph.classList.add('is-drag')});
+det.addEventListener('pointermove',e=>{if(!dr)return;const w=ph.clientWidth;dr.dx=Math.max(0,(e.clientX-dr.x)/K());const dt=e.timeStamp-dr.pt;if(dt>0)dr.v=(e.clientX-dr.px)/dt;dr.px=e.clientX;dr.pt=e.timeStamp;const p=dr.dx/w;det.style.transform=`translateX(${dr.dx}px)`;app.style.transform=`scale(${.94+.06*p})`;$('.dim').style.opacity=String(.16*(1-p))});
+const endDrag=()=>{if(!dr)return;const w=ph.clientWidth,go=dr.dx>w*.35||(dr.dx>24&&dr.v>.08);ph.classList.remove('is-drag');if(go)pop();else{det.style.transform='';app.style.transform='';$('.dim').style.opacity=''}dr=null};
+det.addEventListener('pointerup',endDrag);det.addEventListener('pointercancel',endDrag);
+let sd=null;
+sh.addEventListener('pointerdown',e=>{if(e.target.closest('button,input'))return;sd={y:e.clientY,dy:0,py:e.clientY,pt:e.timeStamp,v:0};sh.setPointerCapture(e.pointerId);ph.classList.add('is-drag')});
+sh.addEventListener('pointermove',e=>{if(!sd)return;let dy=(e.clientY-sd.y)/K();dy=dy<0?dy/5:dy;sd.dy=dy;const dt=e.timeStamp-sd.pt;if(dt>0)sd.v=(e.clientY-sd.py)/dt;sd.py=e.clientY;sd.pt=e.timeStamp;sh.style.setProperty('--dy',dy+'px');const p=Math.min(1,Math.max(0,dy)/sh.offsetHeight);app.style.transform=`scale(${.94+.06*p}) translateY(${10-10*p}px)`});
+const endS=()=>{if(!sd)return;ph.classList.remove('is-drag');app.style.transform='';if(sd.dy>90||(sd.dy>16&&sd.v>.11))closeSheet();else sh.style.removeProperty('--dy');sd=null};
+sh.addEventListener('pointerup',endS);sh.addEventListener('pointercancel',endS);
+$('.scrim').addEventListener('click',closeSheet);
+ph.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(ph.classList.contains('is-sheet'))closeSheet();else if(ph.classList.contains('is-push'))pop()});
+orb.addEventListener('click',()=>openSheet('log'));
+
+/* ---- wiring ---- */
+function press(el){if(el.dataset.pw)return;el.dataset.pw=1;
+const tilt=e=>{if(RM)return;const r=el.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;const a=el.classList.contains('tile')?5:el.classList.contains('card')?1.5:0;if(a)el.style.transform=`perspective(700px) rotateX(${(-y*a).toFixed(2)}deg) rotateY(${(x*a).toFixed(2)}deg) scale(.985)`};
+el.addEventListener('pointerdown',e=>{if(e.target.closest('[data-press]')!==el)return;el.classList.add('is-down');tilt(e)});
+el.addEventListener('pointermove',e=>{if(el.classList.contains('is-down'))tilt(e)});
+const up=()=>{el.classList.remove('is-down');el.style.transform=''};['pointerup','pointercancel','pointerleave'].forEach(t=>el.addEventListener(t,up))}
+function wire(root){root.querySelectorAll('[data-press]').forEach(press);
+root.querySelectorAll('[data-macro]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();seg=b.dataset.macro;openSheet('macro')}));
+root.querySelectorAll('[data-geoact]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();geoAct()}));
+root.querySelectorAll('[data-geoopen]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openSheet('geo')}));
+root.querySelectorAll('[data-retry]').forEach(b=>b.addEventListener('click',()=>{d.error=false;d.loading=true;render();setTimeout(()=>{d.loading=false;firstPaint=true;render()},700)}));
+root.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{closeSheet();if(b.dataset.ok)toast(b.dataset.ok)}));
+root.querySelectorAll('[data-save]').forEach(b=>b.addEventListener('click',()=>{if(sheetVar==='error'||sheetVar==='fail'){sheetVar='';}save(b.dataset.save)}));
+root.querySelectorAll('[data-wv]').forEach(b=>b.addEventListener('click',()=>{wv=Math.min(20,Math.max(1,wv+ +b.dataset.wv));drawSheet();const n=sb.querySelector(`[data-wv="${b.dataset.wv}"]`);n&&!n.disabled&&n.focus()}));
+root.querySelectorAll('[data-sl]').forEach(b=>b.addEventListener('click',()=>{sl=Math.min(16,Math.max(.5,sl+ +b.dataset.sl));drawSheet()}));
+root.querySelectorAll('[data-wk]').forEach(b=>b.addEventListener('click',()=>{const v=Number(wkg.replace(',','.'));wkg=(isFinite(v)?v+ +b.dataset.wk:78.2).toFixed(1);drawSheet()}));
+root.querySelectorAll('.fld input').forEach(i=>i.addEventListener('input',()=>{wkg=i.value;const pos=i.selectionStart;drawSheet();const n=sb.querySelector('.fld input');n.focus();n.setSelectionRange(pos,pos)}));
+root.querySelectorAll('[data-seg]').forEach(b=>b.addEventListener('click',()=>{seg=b.dataset.seg;drawSheet();sb.querySelector(`[data-seg="${seg}"]`).focus()}));
+root.querySelectorAll('[data-m]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.m;if(m==='water'||m==='weight'||m==='sleep'){closeSheet();setTimeout(()=>openSheet(m),RM?0:260)}else{closeSheet();toast(b.textContent.trim()+' opens in the Food journey')}}));
+root.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const a=b.dataset.act;
+if(a==='water'){if(ph.classList.contains('is-push'))openSheet('water');else if(tiles==='status')push('water');else openSheet('water')}
+else if(a==='water1'){d.water+=1;rerender();if(ph.classList.contains('is-push'))det.innerHTML=detailHTML('water'),wire(det);toast(`Glass added, ${d.water} of 8`,()=>{d.water-=1;rerender();if(ph.classList.contains('is-push')){det.innerHTML=detailHTML('water');wire(det)}})}
+else if(a==='weight'){if(tiles==='status'&&!ph.classList.contains('is-push'))push('weight');else openSheet('weight')}
+else if(a==='steps'||a==='sleep'){if(a==='sleep'&&d.sleep.h==null)openSheet('sleep');else if(a==='steps'&&d.steps.today==null)openSheet('health');else push(a)}
+else if(a==='sleeplog')openSheet('sleep');
+else if(a==='connect')openSheet('health');
+else if(a==='checkin')push('checkin');
+else if(a==='week')push('week');
+else if(a==='apply'){b.textContent='Targets updated';b.classList.remove('or');b.disabled=true;toast('New targets start tomorrow')}
+else if(a==='log'){closeSheet();setTimeout(()=>openSheet('log'),ph.classList.contains('is-sheet')?260:0)}
+else if(a==='start')toast('Starting '+(d.workout?d.workout.name:'')+' (Train journey)');
+else if(a==='meal')toast('Opens the Food diary');
+else if(a==='settings')toast('Opens Settings');
+else if(a==='none')toast('Steps sync from Apple Health');
+}));
+root.querySelectorAll('.back').forEach(b=>b.addEventListener('click',pop));}
+
+/* ---- scroll: header drifts slower, tab bar minimises to a circle ---- */
+let lastY=0,tk=false;
+sc.addEventListener('scroll',()=>{if(tk)return;tk=true;requestAnimationFrame(()=>{tk=false;const y=sc.scrollTop,dd=y-lastY;ph.classList.toggle('is-scrolled',y>6);
+if(y<40||dd<-6){ph.classList.remove('is-min');lastY=y}else if(dd>6){ph.classList.add('is-min');lastY=y}
+if(!RM){const hd=feed.querySelector('.hd');if(hd){const k=Math.min(1,y/110);hd.style.transform=`translate3d(0,${(y*.3).toFixed(1)}px,0) scale(${(1-k*.05).toFixed(3)})`;hd.style.opacity=String(1-k*.85)}}})},{passive:true});
+tabs.querySelector('.hit').addEventListener('click',()=>{ph.classList.remove('is-min');lastY=sc.scrollTop+1000});
+const tabEls=$$('.tab');tabEls.forEach((t,i)=>t.addEventListener('click',()=>{if(i){toast(t.getAttribute('aria-label')+' is another journey');return}sc.scrollTo({top:0,behavior:RM?'auto':'smooth'})}));
+orb.dataset.press=1;press(orb);
+
+/* ---- states ---- */
+function setState(k){cur=k;sw.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k));
+if(ph.classList.contains('is-sheet')){ph.classList.remove('is-sheet');inert(sh,true);[app,tabs,orb].forEach(x=>inert(x,false))}
+if(ph.classList.contains('is-push'))pop();
+ph.classList.remove('is-min','is-scrolled');sc.scrollTop=0;
+const [g,v]=k.split('-');
+if(STATES[k]){d=STATES[k]();firstPaint=true;render();return}
+if(['cold','slow','coldoff'].includes(k)){splash(k);return}
+d=STATES.returning();if(cfg.base&&STATES[cfg.base])d=STATES[cfg.base]();render();
+if(g==='checkin'){d=STATES.due();render();if(v==='page')setTimeout(()=>push('checkin'),RM?0:200);return}
+if(g==='macro'&&v==='long'){d=STATES.worst();render()}
+const map={water:['water',v],weight:['weight',v==='bad'?'bad':''],macro:['macro',v==='empty'?'empty':''],notif:['notif',v==='off'?'off':''],health:['health',v==='android'?'android':v],geo:['geo','']};
+if(g==='health'){d=STATES.nohealth();render()}
+if(map[g])setTimeout(()=>openSheet(map[g][0],map[g][1]==='error'||map[g][1]==='offline'?map[g][1]:map[g][1]),RM?0:250)}
+function splash(k){d=k==='coldoff'?STATES.offline():STATES.returning();d.loading=k==='slow';firstPaint=true;render();ph.classList.add('is-splash');$('.sp-off').textContent='';
+setTimeout(()=>{ph.classList.remove('is-splash');firstPaint=true;render();if(k==='slow')setTimeout(()=>{d.loading=false;firstPaint=true;render()},1500)},RM?300:900)}
+sw.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.k==='__replay'){setState(cur);return}setState(b.dataset.k)});
+w.tdySet=setState;w.tdyPh=ph;w.tdyApi={push,pop,openSheet,closeSheet,sc};
+setState(cur);
+}
+window.TDY={mount};
+document.querySelectorAll('.pw[data-cfg]').forEach(mount);
+})();
+
+(function(){
+'use strict';
+const KEY='fiqr-today-picks';const picks=new Set();
+try{JSON.parse(localStorage.getItem(KEY)||'[]').forEach(p=>picks.add(p))}catch(e){}
+const out=document.getElementById('tray-out');
+const nameOf=b=>b.closest('[data-pick]')?.dataset.pick||b.dataset.pickname;
+function sync(){document.querySelectorAll('.pick').forEach(b=>b.setAttribute('aria-pressed',picks.has(nameOf(b))));out.textContent=picks.size?[...picks].join(', '):'No picks yet';try{localStorage.setItem(KEY,JSON.stringify([...picks]))}catch(e){}}
+document.querySelectorAll('.pick').forEach(b=>b.addEventListener('click',()=>{const n=nameOf(b);const grp=b.closest('.opts');if(grp&&!picks.has(n))grp.querySelectorAll('[data-pick]').forEach(o=>picks.delete(o.dataset.pick));picks.has(n)?picks.delete(n):picks.add(n);sync()}));
+document.getElementById('tray-copy').addEventListener('click',async()=>{const txt='FIQR Today picks: '+([...picks].join('; ')||'none');try{await navigator.clipboard.writeText(txt);out.textContent='Copied'}catch(e){out.textContent=txt}setTimeout(sync,1600)});
+sync();
+document.getElementById('theme').addEventListener('click',()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=dark?'light':'dark'});
+/* live audit: interactive targets under 44 pt and orange actions on the visible layer */
+function audit(){document.querySelectorAll('[data-audit]').forEach(td=>{const w=document.getElementById(td.dataset.for);if(!w||!w.tdyPh)return;const ph=w.tdyPh;const pr=ph.getBoundingClientRect();
+const els=[...ph.querySelectorAll('button,input,[role=tab]')].filter(e=>!e.closest('[inert]')&&e.offsetParent!==null&&getComputedStyle(e).visibility!=='hidden'&&+getComputedStyle(e).opacity!==0).filter(e=>{const r=e.getBoundingClientRect();return r.bottom>pr.top&&r.top<pr.bottom&&r.width>0});
+if(td.dataset.audit==='small'){const s=els.filter(e=>e.offsetWidth<44||e.offsetHeight<44);td.textContent=s.length+(s.length?' ('+s.map(e=>e.getAttribute('aria-label')||e.textContent.trim().slice(0,18)).join(', ')+')':'')+' of '+els.length}
+else{const o=els.filter(e=>getComputedStyle(e).backgroundColor==='rgb(232, 98, 42)');td.textContent=String(o.length)}})}
+setTimeout(audit,1200);document.addEventListener('click',()=>setTimeout(audit,900));document.querySelectorAll('details').forEach(d=>d.addEventListener('toggle',()=>setTimeout(audit,300)));
+})();
+</script>
