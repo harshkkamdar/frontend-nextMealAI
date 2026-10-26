@@ -254,7 +254,8 @@ export function weightDeltaText(weekDelta: number | null): string | null {
 export function WeightTile({ kg, weekDelta, onLog }: { kg: number | null; weekDelta: number | null; onLog: () => void }) {
   const delta = weightDeltaText(weekDelta)
   const caption = kg === null ? 'Tap to log' : delta === null ? 'No trend yet' : (
-    <span><b className={cn('font-semibold', weekDelta !== null && weekDelta < 0 ? 'text-macro-teal' : 'text-ink')}>{delta}</b> this week</span>
+    // Ink, not teal: small teal text drops under 4.5:1 on a glass card over the warm fields (owner 27 Oct).
+    <span><b className="font-semibold text-ink">{delta}</b> this week</span>
   )
   return (
     <TileButton onClick={onLog} label={`Weight ${kg === null ? 'not logged' : `${kg.toFixed(1)} kg`}, log weight`}>

@@ -147,15 +147,7 @@
     "shot": "paywall-monthly",
     "width": 360,
     "url": "/paywall",
-    "axe": [
-      {
-        "id": "color-contrast",
-        "nodes": 1,
-        "targets": [
-          ".h-\\[180px\\].origin-top.p-4:nth-child(2) > .gap-2.w-full.items-center > .min-w-0.text-caption.flex-1"
-        ]
-      }
-    ],
+    "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },
@@ -163,15 +155,7 @@
     "shot": "paywall-monthly",
     "width": 390,
     "url": "/paywall",
-    "axe": [
-      {
-        "id": "color-contrast",
-        "nodes": 1,
-        "targets": [
-          ".h-\\[180px\\].origin-top.p-4:nth-child(2) > .gap-2.w-full.items-center > .min-w-0.text-caption.flex-1"
-        ]
-      }
-    ],
+    "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },

@@ -12,8 +12,9 @@
   /* derived opacities (ink over cream) */
   --color-ink-80: rgba(17,28,53,.8);
   --color-ink-62: rgba(17,28,53,.62);
-  /* lightest ink that passes 4.5:1 for small text on cream, white and ink-08 chips */
-  --color-ink-65: rgba(17,28,53,.65);
+  /* Secondary text. Was .65, the lightest ink passing 4.5:1 on plain cream; raised to .76 so it stays AA over the
+     Spatial atmosphere fields (owner 27 Oct 2026). Name kept for its call sites. */
+  --color-ink-65: rgba(17,28,53,.76);
   --color-ink-60: rgba(17,28,53,.6);
   --color-ink-55: rgba(17,28,53,.55);
   --color-ink-50: rgba(17,28,53,.5);
@@ -35,10 +36,10 @@
   --color-accent-hover: #E8622A;
   --color-accent-light: rgba(232,98,42,.10);
   --color-text-primary: #111C35;
-  --color-text-secondary: rgba(17,28,53,.65);
-  --color-text-tertiary: rgba(17,28,53,.65);
+  --color-text-secondary: rgba(17,28,53,.76);
+  --color-text-tertiary: rgba(17,28,53,.76);
   --color-success: #3E7C77;
-  --color-info: rgba(17,28,53,.65);
+  --color-info: rgba(17,28,53,.76);
   --color-warning: #A07A3C;
   --color-purple: #3E7C77;
   --color-destructive: #E8622A;
@@ -48,7 +49,7 @@
   --color-secondary: rgba(17,28,53,.08);
   --color-secondary-foreground: #111C35;
   --color-muted: rgba(17,28,53,.08);
-  --color-muted-foreground: rgba(17,28,53,.65);
+  --color-muted-foreground: rgba(17,28,53,.76);
   --color-card-foreground: #111C35;
   --color-input: rgba(17,28,53,.12);
   --color-ring: #E8622A;
@@ -212,14 +213,15 @@
 }
 
 /* Spatial Depth atmosphere (ui/fiqr/atmosphere.tsx; differs: Q3, owner 27 Oct 2026). Brand tints only, on cream:
-   far layer peach + teal fields (drift 0.05x), near layer a white glass slab + ochre hint (drift 0.16x). Painted once
-   as SVG; nothing here animates a blur. Peaks are capped (peach .2 plus a .04 warm wash, teal .16; measured in the gutters) so ink-65 text on the bare ground keeps
-   4.5:1 even at a field's centre. */
+   far layer (drift 0.05x) a beige wash over the whole page (ochre into accent, .12-.13), a large peach field behind the
+   content (accent .22), teal mid right (.14, kept low so it never greys the beige) and an ochre hint top left; near
+   layer (drift 0.16x) the white glass slab behind the hero and an ochre slab. Painted once as SVG; nothing animates a
+   blur. Secondary text (ink-65 token) is ink .76 so it keeps >= 5.5:1 on the strongest field (measured per text node). */
 :root {
-  --atmo-far: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMin slice'><defs><radialGradient id='p'><stop offset='0' stop-color='%23E8622A' stop-opacity='.2'/><stop offset='.5' stop-color='%23E8622A' stop-opacity='.16'/><stop offset='1' stop-color='%23E8622A' stop-opacity='0'/></radialGradient><radialGradient id='t'><stop offset='0' stop-color='%233E7C77' stop-opacity='.16'/><stop offset='.5' stop-color='%233E7C77' stop-opacity='.13'/><stop offset='1' stop-color='%233E7C77' stop-opacity='0'/></radialGradient></defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23E8622A' stop-opacity='0'/><stop offset='1' stop-color='%23E8622A' stop-opacity='.04'/></linearGradient><rect width='390' height='844' fill='url(%23g)'/><radialGradient id='c'><stop offset='0' stop-color='%23A07A3C' stop-opacity='.14'/><stop offset='1' stop-color='%23A07A3C' stop-opacity='0'/></radialGradient><circle cx='140' cy='370' r='320' fill='url(%23p)'/><circle cx='390' cy='80' r='220' fill='url(%23p)' fill-opacity='.5'/><circle cx='370' cy='640' r='290' fill='url(%23t)'/><circle cx='20' cy='110' r='150' fill='url(%23c)'/></svg>");
-  --atmo-near: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='w' x1='.65' y1='0' x2='.35' y2='1'><stop offset='0' stop-color='%23FFFFFF' stop-opacity='.8'/><stop offset='1' stop-color='%23FFFFFF' stop-opacity='.08'/></linearGradient><linearGradient id='o' x1='.35' y1='0' x2='.65' y2='1'><stop offset='0' stop-color='%23A07A3C' stop-opacity='.2'/><stop offset='1' stop-color='%23A07A3C' stop-opacity='.02'/></linearGradient><filter id='s' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='16'/></filter></defs><rect x='252' y='96' width='190' height='190' rx='56' transform='rotate(18 347 191)' fill='%23111C35' fill-opacity='.07' filter='url(%23s)'/><rect x='252' y='74' width='190' height='190' rx='56' transform='rotate(18 347 169)' fill='url(%23w)'/><rect x='-70' y='690' width='220' height='220' rx='64' transform='rotate(-14 40 800)' fill='url(%23o)'/></svg>");
-  /* Content cards: white glass, light enough that the fields read through, AA for ink-65 text on top. */
-  --surface-card: rgba(255,255,255,.82);
+  --atmo-far: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23A07A3C' stop-opacity='0.13'/><stop offset='1' stop-color='%23E8622A' stop-opacity='0.12'/></linearGradient><radialGradient id='p'><stop offset='0' stop-color='%23E8622A' stop-opacity='0.22'/><stop offset='.5' stop-color='%23E8622A' stop-opacity='0.165'/><stop offset='1' stop-color='%23E8622A' stop-opacity='0'/></radialGradient><radialGradient id='t'><stop offset='0' stop-color='%233E7C77' stop-opacity='0.14'/><stop offset='.5' stop-color='%233E7C77' stop-opacity='0.105'/><stop offset='1' stop-color='%233E7C77' stop-opacity='0'/></radialGradient><radialGradient id='c'><stop offset='0' stop-color='%23A07A3C' stop-opacity='0.2'/><stop offset='.5' stop-color='%23A07A3C' stop-opacity='0.15'/><stop offset='1' stop-color='%23A07A3C' stop-opacity='0'/></radialGradient></defs><rect width='390' height='844' fill='url(%23g)'/><circle cx='120' cy='400' r='360' fill='url(%23p)'/><circle cx='330' cy='860' r='300' fill='url(%23p)' fill-opacity='.8'/><circle cx='400' cy='520' r='240' fill='url(%23t)'/><circle cx='10' cy='120' r='170' fill='url(%23c)'/></svg>");
+  --atmo-near: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='w' x1='.65' y1='0' x2='.35' y2='1'><stop offset='0' stop-color='%23FFFFFF' stop-opacity='.95'/><stop offset='1' stop-color='%23FFFFFF' stop-opacity='.2'/></linearGradient><linearGradient id='o' x1='.35' y1='0' x2='.65' y2='1'><stop offset='0' stop-color='%23A07A3C' stop-opacity='.22'/><stop offset='1' stop-color='%23A07A3C' stop-opacity='.03'/></linearGradient><filter id='s' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='18'/></filter></defs><rect x='222' y='70' width='230' height='230' rx='64' transform='rotate(18 337 185)' fill='%23111C35' fill-opacity='.06' filter='url(%23s)'/><rect x='222' y='44' width='230' height='230' rx='64' transform='rotate(18 337 159)' fill='url(%23w)'/><rect x='-70' y='700' width='220' height='220' rx='64' transform='rotate(-14 40 810)' fill='url(%23o)'/></svg>");
+  /* Content cards: white glass at 76%, so the warm fields read through; ink and secondary text stay AA on top. */
+  --surface-card: rgba(255,255,255,.76);
   --shadow-card-glass: inset 0 1px 0 #FFFFFF, inset 0 0 0 1px rgba(255,255,255,.7), 0 0 0 .5px rgba(17,28,53,.07), 0 1px 1px rgba(17,28,53,.04), 0 6px 12px -6px rgba(17,28,53,.08), 0 24px 38px -24px rgba(17,28,53,.3);
 }
 .atmo-field { position: absolute; inset: 0; background-position: top center; background-size: cover; background-repeat: no-repeat; }
