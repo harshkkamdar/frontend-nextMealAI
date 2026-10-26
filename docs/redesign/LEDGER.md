@@ -206,7 +206,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 |---|---|---|
 | S1c-01 | Welcome stage: one motion value scrubs all four slides, sequential text and card hand-off, depth and parallax, momentum release, rubber band, one slide per flick | built 076632b, bb0c4f2, 57bc207, bffd781, 5f9d18e |
 | S1c-02 | leaveThen overlaps exit and enter (no cream frame) on welcome, auth and onboarding routes | built 076632b |
-| S1c-R6 | Blind critic (refs Bevel IMG_6856-6859) | pending |
+| S1c-R6 | Blind critic (refs Bevel IMG_6856-6859) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6856-6859): r1 ranks 1/1/1 scores 7/7/7; r2 1/1/1 6.5/7.5/7; r3 1/1/1 7/7.5/7. Remaining critiques: macro hues (Q18), the drawn bowl illustration. Fix commits 8ebaafd, 3b11eab (ring arc now equals 1,240 of 1,950) |
 
 ## Production rows created by the run (F3)
 
