@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { createPortal } from 'react-dom'
 import { Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
@@ -531,8 +532,9 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         )}
       </motion.main>
 
-      {/* Solid cream, not glass: Chrome skips painting a backdrop-filter bar while it animates, so it would pop in. */}
-      {exercises.length > 0 ? (
+      {/* Portalled to body: the route frame's enter transform would otherwise make this fixed bar ride with the page
+          and jump into place when the push ends. Solid cream so it can animate in (a moving glass bar skips paints). */}
+      {exercises.length > 0 ? createPortal(
       <motion.nav initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={spring.sheet} className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-[28px] bg-cream px-4 pt-3 shadow-[0_-8px_24px_rgba(17,28,53,.06)]" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
         {allComplete || currentIndex === exercises.length - 1 ? (
           <PrimaryButton type="button" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
@@ -554,7 +556,8 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
             </button>
           </div>
         )}
-      </motion.nav>
+      </motion.nav>,
+      document.body,
       ) : null}
 
       <BottomSheet open={showMenu} onClose={() => { setShowMenu(false); setRemoveConfirm(false); setDiscardConfirm(false) }} ariaLabel="Workout options">
