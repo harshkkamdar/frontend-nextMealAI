@@ -66,7 +66,7 @@ export function LargeTitleHeader({ title, subtitle, actions, children }: LargeTi
       <TopBar title={title} filled={past} actions={actions} />
       <header className="pt-[calc(8px+var(--safe-top))]">
         {/* The title drifts and fades a little as the page scrolls under the bar (Spatial Depth). */}
-        <div ref={drift}>
+        <div ref={drift} className="origin-top-left">
           <h1 className="font-display pr-28 text-title text-ink">{title}</h1>
           {subtitle ? <p className="mt-1 text-body-sm text-ink-65">{subtitle}</p> : null}
         </div>

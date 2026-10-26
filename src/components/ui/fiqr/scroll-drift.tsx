@@ -26,7 +26,7 @@ function useScrollFrame(el: RefObject<HTMLElement | null>, onFrame: (y: number) 
 /**
  * Large title drift (SPATIAL-BUILD "Press"/drift, spatial mock): as the page scrolls, the title block drifts down at
  * 0.2x, shrinks 3% and fades 55% over the first 110 px. Transform and opacity only, written straight to the element
- * (no React render per frame). Off under reduced motion. Spread the returned ref on the title block.
+ * (no React render per frame). Off under reduced motion. Put the returned ref on the title block (origin top left).
  */
 export function useTitleDrift<T extends HTMLElement>() {
   const ref = useRef<T>(null)
@@ -37,7 +37,6 @@ export function useTitleDrift<T extends HTMLElement>() {
     const d = titleDrift(y)
     el.style.transform = d.y ? `translate3d(0,${d.y.toFixed(2)}px,0) scale(${d.scale.toFixed(4)})` : ''
     el.style.opacity = d.y ? d.opacity.toFixed(3) : ''
-    el.style.transformOrigin = '0 0'
   }, !reduce)
   return ref
 }
