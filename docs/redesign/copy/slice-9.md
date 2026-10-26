@@ -7,10 +7,10 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 | Where | Old | New |
 |---|---|---|
 | Header | Settings (left title, back "Back to dashboard") | Settings (centred, round back "Back to Today") |
-| Profile row subtitle | user email | user email (or "Body, targets and goals" when there is none) |
+| Profile row | avatar, name, email | name and email, no avatar (or "Body, targets and goals" when there is no email) |
 | Section headers | PROFILE, SUBSCRIPTION, LIBRARY ... (caps eyebrows) | Subscription, Apple Health / Health Connect, Notifications, Coaching, Library, Data and AI, About (sentence case) |
-| Plan value, web | In the iOS and Android app | In the phone app |
-| Notifications footer | Geo nudges you when a check-in is ready or you've gone quiet. No marketing. | Geo nudges you when your check-in is ready or you've gone quiet. Never marketing. |
+| Plan value, web | In the iOS and Android app | Manage in the app |
+| Notifications footer | Geo nudges you when a check-in is ready or you've gone quiet. No marketing. | Geo nudges you when your check-in is ready. |
 | Check-in day | Check-in day section with S M T W T F S chips; "Your weekly check-in lands on this day." | "Check-in day" row in Notifications with the weekday name (native picker) |
 | Geo personality | Geo section, chips: Nurturing, Drill Sergeant, Balanced, Data-Driven | Coaching: "Geo's style" row: Nurturing, Drill sergeant, Balanced, Data-driven |
 | Rest timer | Training section, chips: 60s, 90s, 2m, 3m | Coaching: "Rest timer" row: 60 seconds, 90 seconds, 2 minutes, 3 minutes |

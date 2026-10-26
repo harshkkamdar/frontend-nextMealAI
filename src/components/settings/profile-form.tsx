@@ -255,7 +255,7 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
     {header}
     <div className="enter-rows mt-2 flex flex-col gap-7">
       {missingFields.length > 0 ? (
-        <div role="status" className="rounded-[24px] bg-card px-4 py-3.5 shadow-[var(--shadow-card)]">
+        <div role="status" className="rounded-[24px] border border-ink-06 bg-card px-4 py-3.5">
           <p className="text-[16px] font-semibold text-ink">Add your {missingFields.map((f) => f.replace(/_(kg|cm)$/, '').replace(/_/g, ' ')).join(' and ')}</p>
           <p className="mt-0.5 text-[14px] text-ink-65">Geo needs it to work out your daily targets.</p>
         </div>
@@ -371,7 +371,7 @@ function ChipGroup({ label, children }: { label: string; children: ReactNode }) 
   return (
     <section role="group" aria-label={label}>
       <h2 className="mb-2 px-4 text-[13px] font-semibold text-ink-65">{label}</h2>
-      <div className="flex flex-wrap gap-2 rounded-[24px] bg-card p-3 shadow-[var(--shadow-card)]">{children}</div>
+      <div className="flex flex-wrap gap-2 rounded-[24px] border border-ink-06 bg-card p-3">{children}</div>
     </section>
   )
 }

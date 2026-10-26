@@ -15,7 +15,7 @@ export function SettingsSection({ title, footer, children }: { title?: string; f
   return (
     <section aria-label={title}>
       {title ? <h2 className="mb-2 px-4 text-[13px] font-semibold text-ink-65">{title}</h2> : null}
-      <div className="overflow-hidden rounded-[24px] bg-card shadow-[var(--shadow-card)] [&>*+*]:border-t [&>*+*]:border-ink-06">
+      <div className="overflow-hidden rounded-[24px] border border-ink-06 bg-card [&>*+*]:border-t [&>*+*]:border-ink-06">
         {children}
       </div>
       {footer ? <p className="mt-2 px-4 text-[13px] leading-[1.45] text-ink-65">{footer}</p> : null}
@@ -25,6 +25,8 @@ export function SettingsSection({ title, footer, children }: { title?: string; f
 
 const ROW = 'flex min-h-11 w-full items-center gap-3 px-4 py-2.5 text-left text-[16px]'
 const PRESS = 'active:bg-ink-04'
+/** Trailing glyph slot (chevron or picker arrows); values without one reserve the same width, so all values share one right edge. */
+export const GLYPH = 'size-4 shrink-0 text-ink-35'
 
 interface SettingsRowProps {
   label: ReactNode
@@ -46,7 +48,7 @@ export function SettingsRow({ label, value, onClick, href, disabled, children }:
         {children ?? (
           <>
             {value !== undefined ? <span className="min-w-0 truncate text-[15px] text-ink-65">{value}</span> : null}
-            {pressable ? <ChevronRightIcon className="size-4 shrink-0 text-ink-35" /> : null}
+            {pressable ? <ChevronRightIcon className={GLYPH} /> : value !== undefined ? <span aria-hidden="true" className={GLYPH} /> : null}
           </>
         )}
       </span>
@@ -108,7 +110,7 @@ export function SettingsSelect<T extends string | number>({ label, value, option
       <span aria-hidden="true" className="shrink-0 font-medium text-ink">{label}</span>
       <span aria-hidden="true" className="flex min-w-0 flex-1 items-center justify-end gap-1.5">
         <span className="truncate text-[15px] text-ink-65">{current?.label ?? 'Choose'}</span>
-        <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-ink-35" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m8 9 4-4 4 4M8 15l4 4 4-4" /></svg>
+        <svg viewBox="0 0 24 24" className={GLYPH} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m8 9 4-4 4 4M8 15l4 4 4-4" /></svg>
       </span>
       <select
         aria-label={label}
@@ -133,9 +135,9 @@ export function SettingsSkeleton({ groups = [1, 3, 5, 2], label = 'Loading setti
       {groups.map((rows, index) => (
         <div key={index}>
           {index > 0 ? <div className="mb-2 ml-4 h-[13px] w-24 rounded-full bg-ink-06" /> : null}
-          <div className="overflow-hidden rounded-[24px] bg-card shadow-[var(--shadow-card)]">
+          <div className="overflow-hidden rounded-[24px] border border-ink-06 bg-card">
             {Array.from({ length: rows }, (_, row) => (
-              <div key={row} className={cn('flex items-center px-4', index === 0 ? 'h-[76px]' : 'h-11', row > 0 && 'border-t border-ink-06')}>
+              <div key={row} className={cn('flex items-center px-4', index === 0 ? 'h-16' : 'h-11', row > 0 && 'border-t border-ink-06')}>
                 <span className="h-3 w-28 animate-[pulse_1.2s_ease-in-out_infinite] rounded-full bg-ink-06" />
               </div>
             ))}

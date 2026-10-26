@@ -7,7 +7,7 @@ import { PushedHeader } from '@/components/layout/screen-header'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { DeleteAccountSheet } from '@/components/settings/delete-account-sheet'
-import { SettingsRow, SettingsSection, SettingsSelect, SettingsSkeleton, SettingsSwitch } from '@/components/settings/settings-section'
+import { GLYPH, SettingsRow, SettingsSection, SettingsSelect, SettingsSkeleton, SettingsSwitch } from '@/components/settings/settings-section'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
@@ -49,11 +49,6 @@ const WEEKDAYS = [
   { value: 5, label: 'Friday' },
   { value: 6, label: 'Saturday' },
 ] as const
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase() || '?'
-}
 
 export default function SettingsPage() {
   useSetGeoScreen('settings', {})
@@ -224,22 +219,19 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={() => router.push('/settings/profile')}
-            className="flex min-h-[76px] w-full items-center gap-3.5 rounded-[24px] bg-card px-4 py-3 text-left shadow-[var(--shadow-card)] transition-transform duration-100 active:scale-[.98]"
+            className="flex min-h-16 w-full items-center gap-3 rounded-[24px] border border-ink-06 bg-card px-4 py-2.5 text-left active:bg-ink-04"
           >
-            <span aria-hidden="true" className="font-wide grid size-12 shrink-0 place-items-center rounded-full bg-ink text-[17px] font-bold text-cream">
-              {initials(profileName)}
-            </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[17px] font-semibold text-ink">{profileName}</span>
-              <span className="mt-0.5 block truncate text-[14px] text-ink-65">{email || 'Body, targets and goals'}</span>
+              <span className="block truncate text-[14px] text-ink-65">{email || 'Body, targets and goals'}</span>
             </span>
-            <ChevronRightIcon className="size-4 shrink-0 text-ink-35" />
+            <ChevronRightIcon className={GLYPH} />
           </button>
         </section>
 
         <SettingsSection title="Subscription">
           {!native ? (
-            <SettingsRow label="Plan" value="In the phone app" />
+            <SettingsRow label="Plan" value="Manage in the app" />
           ) : subscribed ? (
             <SettingsRow label="Plan" value="FIQR Plus" />
           ) : (
@@ -258,7 +250,7 @@ export default function SettingsPage() {
           </SettingsSection>
         ) : null}
 
-        <SettingsSection title="Notifications" footer="Geo nudges you when your check-in is ready or you've gone quiet. Never marketing.">
+        <SettingsSection title="Notifications" footer="Geo nudges you when your check-in is ready.">
           <SettingsRow label="Push notifications">
             <SettingsSwitch label="Push notifications" checked={settings.notifications_enabled} onChange={handleNotificationChange} />
           </SettingsRow>
@@ -270,6 +262,7 @@ export default function SettingsPage() {
               onChange={(event) => handleReminderChange(event.target.value)}
               className="-my-2.5 h-11 min-w-0 rounded-[10px] bg-transparent text-right text-[15px] text-ink-65 outline-none tabular-nums focus-visible:bg-ink-04 [&::-webkit-calendar-picker-indicator]:hidden"
             />
+            <span aria-hidden="true" className={GLYPH} />
           </SettingsRow>
           <SettingsSelect label="Check-in day" value={settings.check_in_weekday} options={WEEKDAYS} onChange={(day) => void handleUpdate({ check_in_weekday: day })} />
         </SettingsSection>
