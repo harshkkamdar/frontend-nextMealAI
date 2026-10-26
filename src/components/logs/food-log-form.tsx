@@ -92,13 +92,14 @@ export function FoodLogForm() {
   // Bumped when a food fills the editor; the effect below scrolls the card clear of the pinned tray.
   const [reveal, setReveal] = useState(0)
   const searchBarRef = useRef<HTMLDivElement | null>(null)
+  const trayRef = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
     const form = formRef.current
     if (!reveal || !form) return
     // The tray is sticky at the bottom and sits over the card's last row until the page scrolls (grader, 26 Oct 2026).
     // Scroll just enough that the card ends 16 px above it. offsetHeight and the resolved sticky bottom ignore the
     // tray's entrance transform, so the target is where it settles.
-    const tray = document.querySelector<HTMLElement>('[data-testid="food-meal-tray"]')
+    const tray = trayRef.current
     const trayTop = tray ? window.innerHeight - (parseFloat(getComputedStyle(tray).bottom) || 0) - tray.offsetHeight : window.innerHeight
     const card = form.getBoundingClientRect()
     const clear = card.bottom + 16 - trayTop
@@ -701,6 +702,7 @@ export function FoodLogForm() {
         {showTray ? (
           <motion.div
             key="tray"
+            ref={trayRef}
             data-testid="food-meal-tray"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
