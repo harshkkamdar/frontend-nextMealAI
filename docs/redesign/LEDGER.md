@@ -182,7 +182,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S9-R3 | R3 axe 0 / contrast / 44 pt | built 2cd51a0: axe 0, small 0, orange <= 1 on 68 checks |
 | S9-R4 | R4 frame-diff 0 pops | built 2cd51a0: settings-row-push, profile-back, delete-sheet-open, confirm-dialog-in-out, paywall-plan-switch, settings-switch smooth on a production static build |
 | S9-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
-| S9-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
+| S9-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: critic scores of 3 fix rounds printed (refs Bevel IMG_6915-6918) - r1 6.5/7/6.5 (ranks 2/2/2), r2 7/6.5/7 (ranks 2/2/1), r3 7/7/7 (ranks 1/1/2; first r3 attempt lost to API connection drops and rerun). Recurring r3 notes: dark ink-65 switch reads as off, tab capsule plus separate orb (C2, signed), round back button (C3, signed), last row clipped under the tab bar, value column baseline |
 | S9-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-9.md? Picker rows instead of chip rows (36 px chips failed 44 pt), profile Save as a glass pill in the bar, every confirm in ink - taken alone, approve? |
 | S9-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
