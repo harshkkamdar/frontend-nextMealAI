@@ -10,11 +10,14 @@
 // Two steps after hydration, so the bar sees a downward scroll past the threshold.
 const startScrolled = (page) => page.addInitScript(() => addEventListener('load', () => { setTimeout(() => scrollTo(0, 300), 500); setTimeout(() => scrollTo(0, 600), 700) }))
 
+/** `steps` wheel ticks of `dy` px, one per frame, from the middle of the screen. */
+const wheel = async (p, dy, steps) => { await p.mouse.move(195, 400); for (let i = 0; i < steps; i++) { await p.mouse.wheel(0, dy); await p.waitForTimeout(16) } }
+
 const transitions = [
-  { name: 'collapse-scroll-down', url: '/dashboard/', home: 'returning', act: async (p) => { await p.mouse.move(195, 400); for (let i = 0; i < 30; i++) { await p.mouse.wheel(0, 15); await p.waitForTimeout(16) } } },
+  { name: 'collapse-scroll-down', url: '/dashboard/', home: 'returning', act: (p) => wheel(p, 15, 30) },
   // Train: the open tab's icon travels the furthest into the circle.
-  { name: 'collapse-train', url: '/train/', home: 'returning', act: async (p) => { await p.mouse.move(195, 400); for (let i = 0; i < 30; i++) { await p.mouse.wheel(0, 15); await p.waitForTimeout(16) } } },
-  { name: 'expand-scroll-up', url: '/dashboard/', home: 'returning', setup: startScrolled, act: async (p) => { await p.mouse.move(195, 400); for (let i = 0; i < 6; i++) { await p.mouse.wheel(0, -6); await p.waitForTimeout(16) } } },
+  { name: 'collapse-train', url: '/train/', home: 'returning', act: (p) => wheel(p, 15, 30) },
+  { name: 'expand-scroll-up', url: '/dashboard/', home: 'returning', setup: startScrolled, act: (p) => wheel(p, -6, 6) },
   { name: 'expand-tap', url: '/dashboard/', home: 'returning', setup: startScrolled, act: (p) => p.getByRole('button', { name: 'Show tabs, Home' }).click() },
 ]
 
