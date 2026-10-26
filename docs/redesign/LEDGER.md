@@ -31,7 +31,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S2-15 | Splash | blocked: splash is the native launch asset (assets/splash.png, already on brand) plus splash-hider; verifying it needs the Capacitor app on a device, which this goal could not run (Android emulator would not boot) |
 | S2-16 | Notifications prompt | built 30959c3: restyled to the inset sheet (title, copy, 44 pt Not now); native-only, renders only in the Capacitor build, not captured on a device |
 | S2-17 | Health connect sheet | built 30959c3: restyled to the inset sheet; native-only, renders only in the Capacitor build, not captured on a device |
-| S2-18 | T: tab switch | pending |
+| S2-18 | T: tab switch | built ff37fbc: re-recorded on a production static build, 2 runs, host load 22-40; tab-home-to-food and tab-food-to-home smooth in both runs |
 | S2-19 | T: + sheet open/close | built ad99c26: tab switch fades, push enters from the right with the page spring and the outgoing page overlapping; frame-diff smooth on a production build |
 | S2-20 | T: Home load (ring draw, count-up) | built 4b3ffd5 (layered first-paint entrance: hero scale, tiles +12 px 40 ms apart, rows +8 px 30 ms apart; count-ups on motion values; still on revisit) |
 | S2-R1 | R1 core-job metrics | built 30959c3, 0ec6c59: J2 read today = 0 taps, calories and three macros above the fold at 360x800 (home-360.png); J1c tell Geo = 2 taps (orb, type, send arrow; send=1 autosends) vs 3-4 before; seconds and the <200 ms cached-draw target pending the Phase 6 timed test |
@@ -100,7 +100,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S5-R1 | R1 core-job metrics | built 30190d3: no core job owned (J1 entry via meal Add rows and dashed slots: 2 taps to the search screen, same as before) |
 | S5-R2 | R2 states captured (web 390/360, iOS, Android) | built ac909b9: web 390 and 360 for every state (screens/slice-5/*.png); iOS simulator Safari iPhone 16 Pro: slice-5/ios/food.png, month-sheet.png; Android: blocked: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026) and fiqr_lowend died under host load (549d674 notes) |
 | S5-R3 | R3 axe 0 / contrast / 44 pt | built bcd3dfa: axe 0, small 0, orange <= 1 on 36 checks |
-| S5-R4 | R4 frame-diff 0 pops | pending |
+| S5-R4 | R4 frame-diff 0 pops | built ff37fbc: re-recorded on a production static build, 2 runs, host load 22-40; day-change, day-change-back, month-open, row-actions-open, week-swipe smooth (run-1 month-open and row-actions-open flags follow 398 ms and 49.7 ms capture gaps; run 2 smooth) |
 | S5-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S5-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (Fable, critic-prompt.md, refs Bevel IMG_6868/6869/6865/6904): r1 ranks 1/1/1 scores 8/7.5/7.5; r2 1/1/1 7.5/7.5/7.5; r3 1/1/1 7.5/7.5/7.5. Remaining critiques: macro hues (Q18), capsule + orb (C2). Fix commits 1260c0a, 565cfcf |
 | S5-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-5.md? Also: the sticky orange Log food button was removed (Add food rows, dashed slots and the orb cover it) - OK? |
@@ -119,7 +119,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S6-R1 | R1 core-job metrics | built 767f95d: no core job owned (start workout 1 tap from Train and Home, unchanged) |
 | S6-R2 | R2 states captured (web 390/360, iOS, Android) | built ac909b9: web 390 and 360 for every state (screens/slice-6/*.png); iOS simulator Safari iPhone 16 Pro: slice-6/ios/train.png, session-mid.png; Android: blocked: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026) and fiqr_lowend died under host load (549d674 notes) |
 | S6-R3 | R3 axe 0 / contrast / 44 pt | built 4716587: axe 0, small 0, orange <= 1 on 50 checks |
-| S6-R4 | R4 frame-diff 0 pops | pending |
+| S6-R4 | R4 frame-diff 0 pops | built ff37fbc: re-recorded on a production static build, 2 runs, host load 22-40; start-session, set-tick-rest, finish, train-first-load smooth; rest-minimise late change is the elapsed-time clock digit (78 px) after a 50-71 ms capture gap, not a pop |
 | S6-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S6-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: critic scores of 3 fix rounds printed - r1 7.5/7.5/7, r2 7.5/7.5/7.5, r3 7.5/7/7.5 (ranks 1/2/1; top 3 every run, never >= 8). Recurring r3 notes: bottom inset under the tab bar on Program list, one selected-day marker, bar chart scale, title vs body face (signed type decision) |
 | S6-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-6.md? Freestyle log moved to the header +; calendar sheet uses the shared week strip (no tap-Today jump); pager scrolls sideways only (also fixed resume landing on exercise 1). Should Start on Train be orange when Home uses an ink play button? |
@@ -139,7 +139,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S7-R1 | R1 core-job metrics | built 56e322c: no core job owned |
 | S7-R2 | R2 states captured (web 390/360, iOS, Android) | built ac909b9: web 390 and 360 for every state (screens/slice-7/*.png); iOS simulator Safari iPhone 16 Pro: slice-7/ios/plans.png, view-workout.png; Android: blocked: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026) and fiqr_lowend died under host load (549d674 notes) |
 | S7-R3 | R3 axe 0 / contrast / 44 pt | built 56e322c: axe 0, small 0, orange <= 1 on 68 checks |
-| S7-R4 | R4 frame-diff 0 pops | pending |
+| S7-R4 | R4 frame-diff 0 pops | built ff37fbc: re-recorded on a production static build, 2 runs, host load 22-40; open-plan, builder-step, builder-step-back, day-expand, day-collapse, meal-day-switch smooth (run-2 day-expand flag follows a 58 ms gap) |
 | S7-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S7-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6865/6869/6905/6906): r1 ranks 1/3/4 scores 7/6.5/6; r2 1/2/1 7.5/7/7; r3 2/1/1 7/7.5/7. Remaining critiques: round glass back (C3), orange CTA size, card radii vs tab bar. Fix commits be0cd6e, a58d95c |
 | S7-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-7.md? Also: new Earlier plans list is an extra non-blocking getPlans() read (Q6 says no data-flow change) - keep or drop? Cancel removed from builders (Back does it) - OK? |
@@ -156,7 +156,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S8-R1 | R1 core-job metrics | built cf1252b: no core job owned (check-in reached in 1 tap from the Home card or This week) |
 | S8-R2 | R2 states captured (web 390/360, iOS, Android) | built ac909b9: web 390 and 360 for every state (screens/slice-8/*.png); iOS simulator Safari iPhone 16 Pro: slice-8/ios/due.png, mid-week.png; Android: blocked: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026) and fiqr_lowend died under host load (549d674 notes) |
 | S8-R3 | R3 axe 0 / contrast / 44 pt | built cf1252b: axe 0, small 0, orange <= 1 on 38 checks |
-| S8-R4 | R4 frame-diff 0 pops | pending |
+| S8-R4 | R4 frame-diff 0 pops | built ff37fbc: re-recorded on a production static build, 2 runs, host load 22-40; home-card-to-checkin, this-week-to-checkin, control-home-to-settings, apply smooth in both runs |
 | S8-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
 | S8-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6891/6907/6869/6865): r1 1/1/1 7/7.5/7.5; r2 1/1/1 7/7/7.5; r3 1/1/1 7.5/8/7.5. Remaining critique: the orange G in Geo's avatar (client design reference) - needs-owner: make the G cream/ink? Fix commits edda1da, a5d6add |
 | S8-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-8.md? After Apply the screen keeps the applied week until you leave - OK? Settings button dropped from check-in - OK? Health wording "Includes Apple Health weigh-ins" - OK? |
