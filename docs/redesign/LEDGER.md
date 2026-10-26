@@ -32,7 +32,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S2-16 | Notifications prompt | pending |
 | S2-17 | Health connect sheet | pending |
 | S2-18 | T: tab switch | pending |
-| S2-19 | T: + sheet open/close | pending |
+| S2-19 | T: + sheet open/close | built ad99c26: tab switch fades, push enters from the right with the page spring and the outgoing page overlapping; frame-diff smooth on a production build |
 | S2-20 | T: Home load (ring draw, count-up) | built 4b3ffd5 (layered first-paint entrance: hero scale, tiles +12 px 40 ms apart, rows +8 px 30 ms apart; count-ups on motion values; still on revisit) |
 | S2-R1 | R1 core-job metrics | pending |
 | S2-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
@@ -47,26 +47,26 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 
 | ID | Item | Status |
 |---|---|---|
-| S3-01 | Log food search | pending |
-| S3-02 | Log food photo | pending |
-| S3-03 | Food search sheet | pending |
-| S3-04 | Log weight | pending |
-| S3-05 | Log water | pending |
-| S3-06 | Log sleep | pending |
-| S3-07 | Log mood | pending |
-| S3-08 | Log energy | pending |
-| S3-09 | Log workout (manual) | pending |
-| S3-10 | Log chooser /logs | pending |
-| S3-11 | Log list actions | pending |
+| S3-01 | Log food search | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-02 | Log food photo | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-03 | Food search sheet | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-04 | Log weight | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-05 | Log water | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-06 | Log sleep | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-07 | Log mood | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-08 | Log energy | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-09 | Log workout (manual) | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-10 | Log chooser /logs | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
+| S3-11 | Log list actions | built 442e20f; screens/slice-3/ (69 shots x 2 widths, axe 0, small 0, orange <= 1) |
 | S3-12 | Food database /foods | pending |
-| S3-13 | T: log save | pending |
-| S3-R1 | R1 core-job metrics | pending |
+| S3-13 | T: log save | built 442e20f; transitions food-search-results, food-select-tray, photo-tray smooth; water-save and food-log-save popped on the old shared route frame, fixed in ad99c26 (re-record pending) |
+| S3-R1 | R1 core-job metrics | built 442e20f: J1 log by search = 4 taps (orb, Search, result, Log meal); seconds pending the Phase 6 timed test |
 | S3-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
-| S3-R3 | R3 axe 0 / contrast / 44 pt | pending |
+| S3-R3 | R3 axe 0 / contrast / 44 pt | built 442e20f: axe serious/critical 0, small 0, orange <= 1 on 138 checks (screens/slice-3/checks.json) |
 | S3-R4 | R4 frame-diff 0 pops | pending |
 | S3-R5 | R5 60 fps on fiqr_lowend | pending |
 | S3-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
-| S3-R7 | R7 copy list approved | pending |
+| S3-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-3.md? Also: food search sheet moved to the inset sheet (no snap levels); /foods lost the orange Add (round + in header); recent-log right value only for food and workouts |
 | S3-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
 ## S4 Geo tab
@@ -92,18 +92,18 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 
 | ID | Item | Status |
 |---|---|---|
-| S5-01 | Food diary /food | pending |
-| S5-02 | Month view sheet | pending |
-| S5-03 | Copy meal dialog | pending |
-| S5-04 | Name favourite dialog | pending |
-| S5-05 | T: day change on week strip | pending |
+| S5-01 | Food diary /food | built 30190d3, bcd3dfa; screens/slice-5/ (18 shots x 2, axe 0, small 0, orange <= 1) |
+| S5-02 | Month view sheet | built 30190d3, bcd3dfa; screens/slice-5/ (18 shots x 2, axe 0, small 0, orange <= 1) |
+| S5-03 | Copy meal dialog | built 30190d3, bcd3dfa; screens/slice-5/ (18 shots x 2, axe 0, small 0, orange <= 1) |
+| S5-04 | Name favourite dialog | built 30190d3, bcd3dfa; screens/slice-5/ (18 shots x 2, axe 0, small 0, orange <= 1) |
+| S5-05 | T: day change on week strip | built bcd3dfa; day-change, day-change-back, week-swipe, month-open smooth; row-actions-open (shared sheet) popped on the busy dev server, re-check on a production build pending |
 | S5-R1 | R1 core-job metrics | pending |
 | S5-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
-| S5-R3 | R3 axe 0 / contrast / 44 pt | pending |
+| S5-R3 | R3 axe 0 / contrast / 44 pt | built bcd3dfa: axe 0, small 0, orange <= 1 on 36 checks |
 | S5-R4 | R4 frame-diff 0 pops | pending |
 | S5-R5 | R5 60 fps on fiqr_lowend | pending |
 | S5-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
-| S5-R7 | R7 copy list approved | pending |
+| S5-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-5.md? Also: the sticky orange Log food button was removed (Add food rows, dashed slots and the orb cover it) - OK? |
 | S5-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
 ## S6 Train + live session
@@ -129,37 +129,37 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 
 | ID | Item | Status |
 |---|---|---|
-| S7-01 | Plans list | pending |
-| S7-02 | Plan detail workout | pending |
-| S7-03 | Plan detail meal | pending |
-| S7-04 | Meal plan builder | pending |
-| S7-05 | Workout plan builder | pending |
-| S7-06 | Edit program | pending |
-| S7-07 | T: push to detail | pending |
+| S7-01 | Plans list | built 56e322c; screens/slice-7/ (34 shots x 2, axe 0, small 0, orange <= 1) |
+| S7-02 | Plan detail workout | built 56e322c; screens/slice-7/ (34 shots x 2, axe 0, small 0, orange <= 1) |
+| S7-03 | Plan detail meal | built 56e322c; screens/slice-7/ (34 shots x 2, axe 0, small 0, orange <= 1) |
+| S7-04 | Meal plan builder | built 56e322c; screens/slice-7/ (34 shots x 2, axe 0, small 0, orange <= 1) |
+| S7-05 | Workout plan builder | built 56e322c; screens/slice-7/ (34 shots x 2, axe 0, small 0, orange <= 1) |
+| S7-06 | Edit program | built 56e322c; screens/slice-7/ (34 shots x 2, axe 0, small 0, orange <= 1) |
+| S7-07 | T: push to detail | built 56e322c; builder-step, builder-step-back, day-collapse, meal-day-switch smooth; open-plan popped on the old shared route frame (fixed ad99c26), day-expand late text snap: re-check on a production build pending |
 | S7-R1 | R1 core-job metrics | pending |
 | S7-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
-| S7-R3 | R3 axe 0 / contrast / 44 pt | pending |
+| S7-R3 | R3 axe 0 / contrast / 44 pt | built 56e322c: axe 0, small 0, orange <= 1 on 68 checks |
 | S7-R4 | R4 frame-diff 0 pops | pending |
 | S7-R5 | R5 60 fps on fiqr_lowend | pending |
 | S7-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
-| S7-R7 | R7 copy list approved | pending |
+| S7-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-7.md? Also: new Earlier plans list is an extra non-blocking getPlans() read (Q6 says no data-flow change) - keep or drop? Cancel removed from builders (Back does it) - OK? |
 | S7-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
 ## S8 Check-in
 
 | ID | Item | Status |
 |---|---|---|
-| S8-01 | Check-in due | pending |
-| S8-02 | Check-in mid-week | pending |
-| S8-03 | Check-in not enough data | pending |
-| S8-04 | T: check-in load (count-up, trend draw) | pending |
+| S8-01 | Check-in due | built cf1252b, 46b8db8; screens/slice-8/ (19 shots x 2, axe 0, small 0, orange <= 1) |
+| S8-02 | Check-in mid-week | built cf1252b, 46b8db8; screens/slice-8/ (19 shots x 2, axe 0, small 0, orange <= 1) |
+| S8-03 | Check-in not enough data | built cf1252b, 46b8db8; screens/slice-8/ (19 shots x 2, axe 0, small 0, orange <= 1) |
+| S8-04 | T: check-in load (count-up, trend draw) | built cf1252b; apply smooth; the pushes popped on the old shared route frame, fixed ad99c26 (lead re-record of Home to check-in: smooth, screens/slice-2/transitions-lead/push-home-checkin) |
 | S8-R1 | R1 core-job metrics | pending |
 | S8-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
-| S8-R3 | R3 axe 0 / contrast / 44 pt | pending |
+| S8-R3 | R3 axe 0 / contrast / 44 pt | built cf1252b: axe 0, small 0, orange <= 1 on 38 checks |
 | S8-R4 | R4 frame-diff 0 pops | pending |
 | S8-R5 | R5 60 fps on fiqr_lowend | pending |
 | S8-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
-| S8-R7 | R7 copy list approved | pending |
+| S8-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-8.md? After Apply the screen keeps the applied week until you leave - OK? Settings button dropped from check-in - OK? Health wording "Includes Apple Health weigh-ins" - OK? |
 | S8-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
 ## S9 Settings and the rest
