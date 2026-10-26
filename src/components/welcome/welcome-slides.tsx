@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { AnimatePresence, motion, motionValue, useReducedMotion, useTransform, type MotionValue } from 'framer-motion'
 import { useCountUp } from '@/lib/use-count-up'
 import { DRAW_MS } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -10,8 +10,18 @@ import { cn } from '@/lib/utils'
  *  `live` turns true the first time the slide is in view and stays true: values fill once, then hold. */
 type BentoProps = { live: boolean; active: boolean }
 
-function Card({ className, children, style }: { className?: string; children: ReactNode; style?: CSSProperties }) {
-  return <div className={cn('rounded-[var(--radius-bento)] bg-card p-4 shadow-[0_1px_2px_rgba(17,28,53,.05),0_12px_32px_-8px_rgba(17,28,53,.14)] outline outline-1 -outline-offset-1 outline-ink-06', className)} style={style}>{children}</div>
+/** The slide's distance from the stage centre (-1..1, 0 = settled), set by the carousel. Cards parallax off it. */
+export const SlideDepth = createContext<MotionValue<number>>(motionValue(0))
+
+/** Frosted bento card (Q12, Q20): white over the mist, no blur. Card k trails the slide by 20 + 8k px and fades
+ *  sooner the further back it sits, so the layers move at different speeds (motion-feel.md 3a). */
+function Card({ k = 0, className, children }: { k?: number; className?: string; children: ReactNode }) {
+  const d = useContext(SlideDepth)
+  const m = useReducedMotion() ? 0 : 1
+  const x = useTransform(d, (v) => -v * (20 + k * 8) * m)
+  const scale = useTransform(d, (v) => 1 - Math.abs(v) * 0.04 * m)
+  const opacity = useTransform(d, (v) => Math.max(0, 1 - Math.abs(v) * k * 0.3))
+  return <motion.div className={cn('rounded-[var(--radius-bento)] bg-card/80 p-4 shadow-[var(--shadow-card)] outline outline-1 -outline-offset-1 outline-card', className)} style={{ x, scale, opacity }}>{children}</motion.div>
 }
 
 const fill = (live: boolean, delay = 0): CSSProperties => ({ transform: `scaleX(${live ? 1 : 0})`, transition: `transform 900ms cubic-bezier(.22,1,.36,1) ${delay}ms` })
@@ -65,7 +75,7 @@ export function FoodBento({ live }: BentoProps) {
           </div>
         </div>
       </Card>
-      <Card className="flex items-center gap-3">
+      <Card k={1} className="flex items-center gap-3">
         <div className="relative size-[56px] shrink-0">
           <svg viewBox="0 0 56 56" className="size-full -rotate-90">
             <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-ink)" strokeOpacity=".07" strokeWidth="7" />
@@ -77,7 +87,7 @@ export function FoodBento({ live }: BentoProps) {
           <p className="mt-1 text-[12px] font-medium text-ink-65">of 1,950 today</p>
         </div>
       </Card>
-      <Card className="py-3.5">
+      <Card k={2} className="py-3.5">
         <p className="flex justify-between text-[12px] font-semibold text-ink-65"><span>Today</span><span>kcal</span></p>
         <div className="mt-1.5 flex flex-col gap-1.5">
           {([['Oats and berries', 380], ['Rice bowl', 612], ['Greek yogurt', 148]] as const).map(([name, k], i) => (
@@ -134,7 +144,7 @@ export function TrainBento({ live, active }: BentoProps) {
           </div>
         </div>
       </Card>
-      <Card>
+      <Card k={1}>
         <div className="flex items-center gap-2.5">
           <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-ink-06">
             <svg viewBox="0 0 24 24" className="size-5 text-ink" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10" /></svg>
@@ -152,7 +162,7 @@ export function TrainBento({ live, active }: BentoProps) {
           ))}
         </div>
       </Card>
-      <Card className="flex flex-col">
+      <Card k={2} className="flex flex-col">
         <span className="text-[13px] font-semibold text-ink">This week</span>
         <div className="mt-2 flex flex-1 items-end gap-1.5">
           {week.map((v, i) => (
@@ -219,13 +229,13 @@ export function CheckInBento({ live }: BentoProps) {
         </svg>
         <p className="mt-1 text-[12px] font-medium text-ink-65">7-day average, this week</p>
       </Card>
-      <Card>
+      <Card k={1}>
         <span className="text-[13px] font-semibold text-ink">Calories</span>
         <p className="mt-2 text-[12.5px] font-medium tabular-nums text-ink-65 line-through decoration-ink-35">1,950</p>
         <p className="font-wide text-[24px] font-bold leading-tight tabular-nums text-ink">{calories.toLocaleString('en-AU')}</p>
         <p className="text-[12px] font-medium text-ink-65">from next week</p>
       </Card>
-      <Card>
+      <Card k={2}>
         <span className="text-[13px] font-semibold text-ink">Workouts</span>
         <p className="font-wide mt-2 text-[24px] font-bold leading-tight tabular-nums text-ink">4 of 4</p>
         <div className="mt-2.5 grid grid-cols-4 gap-1">
