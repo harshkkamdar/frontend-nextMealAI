@@ -2,22 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
-import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { Chip } from '@/components/ui/fiqr/chip'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
-import { fieldClass } from '@/components/ui/fiqr/field'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { PushedHeader } from '@/components/layout/screen-header'
+import { OfflineBand } from '@/components/shared/offline-band'
+import { SettingsRow, SettingsSection, SettingsSkeleton } from '@/components/settings/settings-section'
 import { toast } from 'sonner'
 import { computeAgeFromDob, computeDailyTargets } from '@/lib/tdee'
 import type { Profile, PrimaryGoal, ActivityLevel, DietaryStyle } from '@/types/profile.types'
 
 const GOAL_OPTIONS: { value: PrimaryGoal; label: string }[] = [
-  { value: 'fat_loss', label: 'Fat Loss' },
-  { value: 'muscle_gain', label: 'Muscle Gain' },
+  { value: 'fat_loss', label: 'Fat loss' },
+  { value: 'muscle_gain', label: 'Muscle gain' },
   { value: 'maintenance', label: 'Maintenance' },
   { value: 'body_recomposition', label: 'Recomposition' },
-  { value: 'improve_health', label: 'Improve Health' },
+  { value: 'improve_health', label: 'Improve health' },
   { value: 'athletic_performance', label: 'Performance' },
 ]
 
@@ -26,7 +25,7 @@ const ACTIVITY_OPTIONS: { value: ActivityLevel; label: string }[] = [
   { value: 'light', label: 'Light' },
   { value: 'moderate', label: 'Moderate' },
   { value: 'active', label: 'Active' },
-  { value: 'very_active', label: 'Very Active' },
+  { value: 'very_active', label: 'Very active' },
 ]
 
 // Backend onboarding uses lightly_active/moderately_active; profile update uses light/moderate/active
@@ -58,7 +57,7 @@ const EQUIPMENT_OPTIONS = [
   'None',
 ]
 
-export function ProfileForm() {
+export function ProfileForm({ onBack }: { onBack: () => void }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -160,9 +159,9 @@ export function ProfileForm() {
       setDailyCarbs(fresh.daily_carbs_g?.toString() ?? '')
       setDailyFat(fresh.daily_fat_g?.toString() ?? '')
       setTouchedTargets({ calories: false, protein: false, carbs: false, fat: false })
-      toast.success('Profile updated')
+      toast.success('Saved')
     } catch {
-      toast.error('Failed to update profile')
+      toast.error("Couldn't save your profile. Try again.")
     } finally {
       setSaving(false)
     }
@@ -183,9 +182,9 @@ export function ProfileForm() {
       setDailyProtein(fresh.daily_protein_g?.toString() ?? '')
       setDailyCarbs(fresh.daily_carbs_g?.toString() ?? '')
       setDailyFat(fresh.daily_fat_g?.toString() ?? '')
-      toast.success('Reset to TDEE baseline')
+      toast.success('Back to the suggested targets')
     } catch {
-      toast.error('Failed to reset targets')
+      toast.error("Couldn't reset your targets. Try again.")
     } finally {
       setResettingTargets(false)
     }
@@ -209,18 +208,27 @@ export function ProfileForm() {
     })
   }, [currentWeight, height, targetWeight, goal, activity, profile?.dob, profile?.sex])
 
-  if (loading) {
-    return (
-      <div className="mt-6 space-y-4">
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-      </div>
-    )
-  }
+  // Save lives in the bar as a glass pill (iOS idiom), so nothing sits over the form and covers its controls.
+  const header = (
+    <>
+      <PushedHeader
+        title="Profile"
+        onBack={onBack}
+        backLabel="Back to settings"
+        actions={profile ? (
+          <button type="button" onClick={handleSave} disabled={saving} className="glass h-11 rounded-full px-4 text-[16px] font-semibold text-ink transition-transform duration-100 enabled:active:scale-[.94] disabled:text-ink-65">
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+        ) : null}
+      />
+      <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
+    </>
+  )
+
+  if (loading) return <>{header}<SettingsSkeleton groups={[3, 4, 2, 2]} label="Loading your profile" /></>
 
   if (!profile) {
-    return <ErrorState onRetry={() => { setLoading(true); load() }}>I couldn&apos;t load your profile. Check your connection and try again.</ErrorState>
+    return <>{header}<ErrorState onRetry={() => { setLoading(true); load() }}>I couldn&apos;t load your profile. Check your connection and try again.</ErrorState></>
   }
 
   // FB-tdee-baseline UX — surface the specific fields the user needs to
@@ -242,62 +250,53 @@ export function ProfileForm() {
   ] as const
 
   return (
-    <div>
-      {missingFields.length > 0 && (
-        <div role="status" className="mt-5 rounded-[16px] border border-ink-16 bg-card px-[14px] py-[13px]">
-          <p className="text-[15.5px] font-semibold text-ink">Add your {missingFields.map((f) => f.replace(/_(kg|cm)$/, '').replace(/_/g, ' ')).join(' and ')}</p>
-          <p className="mt-1 text-[13.5px] text-ink-65">FIQR needs them to work out your daily targets.</p>
+    <>
+    {header}
+    <div className="enter-rows mt-2 flex flex-col gap-7">
+      {missingFields.length > 0 ? (
+        <div role="status" className="rounded-[24px] bg-card px-4 py-3.5 shadow-[var(--shadow-card)]">
+          <p className="text-[16px] font-semibold text-ink">Add your {missingFields.map((f) => f.replace(/_(kg|cm)$/, '').replace(/_/g, ' ')).join(' and ')}</p>
+          <p className="mt-0.5 text-[14px] text-ink-65">Geo needs it to work out your daily targets.</p>
         </div>
-      )}
+      ) : null}
 
-      <section className="mt-6">
-        <SectionLabel>Body</SectionLabel>
-        <div className="mt-[13px] grid grid-cols-2 gap-[10px]">
-          <Field id="weight" label={weightMissing ? 'Weight · needed' : 'Weight'} unit="kg">
-            <input id="weight" type="number" inputMode="decimal" step="0.1" value={currentWeight} onChange={(e) => setCurrentWeight(e.target.value)} placeholder="75" className={`${fieldClass} pr-11 tabular-nums`} />
-          </Field>
-          <Field id="target-weight" label="Goal weight" unit="kg">
-            <input id="target-weight" type="number" inputMode="decimal" step="0.1" value={targetWeight} onChange={(e) => setTargetWeight(e.target.value)} placeholder="70" className={`${fieldClass} pr-11 tabular-nums`} />
-          </Field>
-          <Field id="height" label={heightMissing ? 'Height · needed' : 'Height'} unit="cm">
-            <input id="height" type="number" inputMode="decimal" step="0.1" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="175" className={`${fieldClass} pr-11 tabular-nums`} />
-          </Field>
-        </div>
-      </section>
+      <SettingsSection title="Body">
+        <NumberRow id="weight" label="Weight" needed={weightMissing} unit="kg" step="0.1" value={currentWeight} onChange={setCurrentWeight} placeholder="75" />
+        <NumberRow id="target-weight" label="Goal weight" unit="kg" step="0.1" value={targetWeight} onChange={setTargetWeight} placeholder="70" />
+        <NumberRow id="height" label="Height" needed={heightMissing} unit="cm" step="0.1" value={height} onChange={setHeight} placeholder="175" />
+      </SettingsSection>
 
-      <section className="mt-7">
-        <SectionLabel>Daily targets</SectionLabel>
-        <p className="mt-2 text-[13.5px] leading-[1.45] text-ink-65">
-          {previewTargets
-            ? <>From your body, goal and activity FIQR suggests <b className="font-semibold text-ink tabular-nums">{previewTargets.calories.toLocaleString('en-AU')} kcal</b>. Type a number to set your own.</>
-            : 'Add your weight and height and FIQR works these out for you.'}
-        </p>
-        <div className="mt-[13px] grid grid-cols-2 gap-[10px]">
+      <div>
+        <SettingsSection
+          title="Daily targets"
+          footer={previewTargets
+            ? <>From your body, goal and activity Geo suggests <b className="font-semibold text-ink tabular-nums">{previewTargets.calories.toLocaleString('en-AU')} kcal</b>. Type a number to set your own.</>
+            : 'Add your weight and height and Geo works these out for you.'}
+        >
           {targetFields.map((f) => (
-            <Field key={f.id} id={`target-${f.id}`} label={f.label} unit={f.unit}>
-              <input
-                id={`target-${f.id}`}
-                type="number"
-                inputMode="numeric"
-                value={f.value}
-                onChange={(e) => { f.set(e.target.value); setTouchedTargets((t) => ({ ...t, [f.id]: true })) }}
-                placeholder={f.preview != null ? String(f.preview) : f.saved != null ? String(f.saved) : '—'}
-                className={`${fieldClass} pr-14 tabular-nums`}
-              />
-            </Field>
+            <NumberRow
+              key={f.id}
+              id={`target-${f.id}`}
+              label={f.label}
+              unit={f.unit}
+              numeric
+              value={f.value}
+              onChange={(value) => { f.set(value); setTouchedTargets((t) => ({ ...t, [f.id]: true })) }}
+              placeholder={f.preview != null ? String(f.preview) : f.saved != null ? String(f.saved) : '—'}
+            />
           ))}
-        </div>
-        {hasOverrides && (
+        </SettingsSection>
+        {hasOverrides ? (
           <button
             type="button"
             onClick={handleResetTargetsToBaseline}
             disabled={resettingTargets}
-            className="mt-1 min-h-11 text-[13.5px] font-semibold text-ink underline decoration-ink-35 underline-offset-4 disabled:text-ink-35"
+            className="mt-1 min-h-11 px-4 text-[14px] font-semibold text-ink underline decoration-ink-35 underline-offset-4 disabled:text-ink-65"
           >
             {resettingTargets ? 'Resetting…' : 'Use the suggested targets'}
           </button>
-        )}
-      </section>
+        ) : null}
+      </div>
 
       <ChipGroup label="Goal">
         {GOAL_OPTIONS.map((opt) => (
@@ -323,47 +322,55 @@ export function ProfileForm() {
         ))}
       </ChipGroup>
 
-      <section className="mt-7">
-        <SectionLabel>Injuries</SectionLabel>
-        <div className="mt-[13px] rounded-[16px] border border-ink-12 bg-card px-[14px] py-[13px]">
-          {profile.injuries && profile.injuries.length > 0 ? (
-            <ul className="space-y-1">
-              {profile.injuries.map((injury) => <li key={injury} className="text-[15.5px] font-semibold text-ink">{injury}</li>)}
-            </ul>
-          ) : (
-            <p className="text-[15.5px] font-semibold text-ink">None recorded</p>
-          )}
-          <p className="mt-1 text-[13.5px] text-ink-65">Tell Geo about a new injury and it updates this list.</p>
-        </div>
-      </section>
+      <SettingsSection title="Injuries" footer="Tell Geo about a new injury and it updates this list.">
+        {profile.injuries && profile.injuries.length > 0
+          ? profile.injuries.map((injury) => <SettingsRow key={injury} label={injury} />)
+          : <SettingsRow label={<span className="text-ink-65">None recorded</span>} />}
+      </SettingsSection>
 
-      {/* Cream band runs under the nav's top edge so content never shows between the button and the nav. */}
-      <div className="sticky z-10 mt-7 bg-cream pb-7 pt-3" style={{ bottom: 'calc(68px + var(--safe-bottom))' }}>
-        <PrimaryButton type="button" onClick={handleSave} disabled={saving} className="justify-center">
-          {saving ? 'Saving…' : 'Save changes'}
-        </PrimaryButton>
-      </div>
     </div>
+    </>
   )
 }
 
-function Field({ id, label, unit, children }: { id: string; label: string; unit?: string; children: ReactNode }) {
+/** A 44 pt settings row with the number typed right-aligned, iOS style, and its unit after it. */
+function NumberRow({ id, label, unit, needed, numeric, step, value, onChange, placeholder }: {
+  id: string
+  label: string
+  unit: string
+  needed?: boolean
+  numeric?: boolean
+  step?: string
+  value: string
+  onChange: (value: string) => void
+  placeholder: string
+}) {
   return (
-    <div>
-      <SectionLabel><label htmlFor={id}>{label}</label></SectionLabel>
-      <div className="relative mt-2">
-        {children}
-        {unit ? <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[13.5px] font-medium text-ink-65">{unit}</span> : null}
-      </div>
+    <div className="flex min-h-11 items-center gap-2 pl-4 pr-4 text-[16px] focus-within:bg-ink-04">
+      <label htmlFor={id} className="flex shrink-0 items-center gap-2 py-2.5 font-medium text-ink">
+        {label}
+        {needed ? <span className="rounded-full bg-ink px-2 py-0.5 text-[12px] font-semibold text-cream">Needed</span> : null}
+      </label>
+      <input
+        id={id}
+        type="number"
+        inputMode={numeric ? 'numeric' : 'decimal'}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="h-11 min-w-0 flex-1 bg-transparent text-right text-[16px] font-medium text-ink outline-none tabular-nums placeholder:font-normal placeholder:text-ink-50"
+      />
+      <span aria-hidden="true" className="w-9 shrink-0 text-[15px] text-ink-65">{unit}</span>
     </div>
   )
 }
 
 function ChipGroup({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <section className="mt-7" role="group" aria-label={label}>
-      <SectionLabel>{label}</SectionLabel>
-      <div className="mt-[13px] flex flex-wrap gap-2">{children}</div>
+    <section role="group" aria-label={label}>
+      <h2 className="mb-2 px-4 text-[13px] font-semibold text-ink-65">{label}</h2>
+      <div className="flex flex-wrap gap-2 rounded-[24px] bg-card p-3 shadow-[var(--shadow-card)]">{children}</div>
     </section>
   )
 }

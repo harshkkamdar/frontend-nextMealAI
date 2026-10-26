@@ -1,15 +1,10 @@
 import Link from 'next/link'
+import { StatusScreen, statusActionClass } from '@/components/ui/fiqr/status-screen'
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-[22px] font-semibold text-text-primary">Page not found</h1>
-        <p className="text-sm text-text-secondary mt-2">The page you&apos;re looking for doesn&apos;t exist.</p>
-        <Link href="/dashboard" className="mt-4 inline-block text-sm font-semibold text-ink underline decoration-ink-35 underline-offset-4">
-          Go home
-        </Link>
-      </div>
-    </div>
+    <StatusScreen title="This page isn't here" action={<Link href="/dashboard" className={statusActionClass}>Back to Today</Link>}>
+      The link may be old, or the page has moved. Everything you&apos;ve logged is safe.
+    </StatusScreen>
   )
 }

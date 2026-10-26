@@ -1,0 +1,402 @@
+[
+  {
+    "shot": "crash",
+    "width": 360,
+    "url": "/onboarding/fitness?q=equipment",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "crash",
+    "width": 390,
+    "url": "/onboarding/fitness?q=equipment",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-account-error",
+    "width": 360,
+    "url": "/delete-account",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-account-error",
+    "width": 390,
+    "url": "/delete-account",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-account-sent",
+    "width": 360,
+    "url": "/delete-account",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-account-sent",
+    "width": 390,
+    "url": "/delete-account",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-account",
+    "width": 360,
+    "url": "/delete-account",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-account",
+    "width": 390,
+    "url": "/delete-account",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "not-found",
+    "width": 360,
+    "url": "/no-such-page",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "not-found",
+    "width": 390,
+    "url": "/no-such-page",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall-error",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "paywall-error",
+    "width": 390,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "paywall-loading",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall-loading",
+    "width": 390,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall-monthly",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "paywall-monthly",
+    "width": 390,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "paywall-purchasing",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall-purchasing",
+    "width": 390,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall-subscribed",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall-subscribed",
+    "width": 390,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall-web",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall-web",
+    "width": 390,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "paywall",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "paywall",
+    "width": 390,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "privacy-scrolled",
+    "width": 360,
+    "url": "/privacy",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "privacy-scrolled",
+    "width": 390,
+    "url": "/privacy",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "privacy",
+    "width": 360,
+    "url": "/privacy",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "privacy",
+    "width": 390,
+    "url": "/privacy",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-error",
+    "width": 360,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-error",
+    "width": 390,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-loading",
+    "width": 360,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-loading",
+    "width": 390,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-long",
+    "width": 360,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-long",
+    "width": 390,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-missing",
+    "width": 360,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-missing",
+    "width": 390,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-offline",
+    "width": 360,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-offline",
+    "width": 390,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-scrolled",
+    "width": 360,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile-scrolled",
+    "width": 390,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile",
+    "width": 360,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "profile",
+    "width": 390,
+    "url": "/settings/profile",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-native",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-native",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "support-offline",
+    "width": 360,
+    "url": "/support",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "support-offline",
+    "width": 390,
+    "url": "/support",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "support",
+    "width": 360,
+    "url": "/support",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "support",
+    "width": 390,
+    "url": "/support",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  }
+]

@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { reducedFade, spring } from '@/lib/motion'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -10,9 +12,14 @@ interface ConfirmDialogProps {
   description: string
   confirmLabel?: string
   cancelLabel?: string
+  /** Kept for callers; every confirm is ink (D2 convention), so orange stays the screen's one action. */
   variant?: 'danger' | 'default'
 }
 
+/**
+ * v2 confirm: an inset glass panel that rises from the bottom like the app's sheets, over an ink dim.
+ * The action is ink and stated plainly; Cancel sits under it and takes focus first.
+ */
 export function ConfirmDialog({
   open,
   onClose,
@@ -21,34 +28,24 @@ export function ConfirmDialog({
   description,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
-  variant = 'default',
 }: ConfirmDialogProps) {
   const [loading, setLoading] = useState(false)
+  const reduce = useReducedMotion()
+  const id = useId()
 
-  // Close on Escape key
   useEffect(() => {
     if (!open) return
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !loading) {
-        onClose()
-      }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !loading) onClose()
     }
-
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [open, onClose, loading])
 
-  // Prevent body scroll when open
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
+    if (!open) return
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
   }, [open])
 
   const handleConfirm = useCallback(async () => {
@@ -60,67 +57,49 @@ export function ConfirmDialog({
     }
   }, [onConfirm])
 
-  const handleBackdropClick = useCallback(() => {
-    if (!loading) {
-      onClose()
-    }
-  }, [onClose, loading])
-
-  if (!open) return null
+  const fade = reduce ? reducedFade : { duration: 0.18, ease: 'easeOut' as const }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={handleBackdropClick}
-        aria-hidden="true"
-      />
-
-      {/* Dialog */}
-      <div
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="confirm-dialog-title"
-        aria-describedby="confirm-dialog-description"
-        className="relative z-10 w-[90%] max-w-sm bg-surface border border-border rounded-2xl p-5 shadow-xl animate-in fade-in zoom-in-95 duration-150"
-      >
-        <h2
-          id="confirm-dialog-title"
-          className="text-base font-semibold text-text-primary"
-        >
-          {title}
-        </h2>
-        <p
-          id="confirm-dialog-description"
-          className="text-sm text-text-secondary mt-1.5"
-        >
-          {description}
-        </p>
-
-        <div className="flex items-center justify-end gap-2.5 mt-5">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-text-secondary bg-surface border border-border rounded-xl hover:bg-surface-hover transition-colors disabled:opacity-50"
+    <AnimatePresence>
+      {open ? (
+        <div key="confirm" className="fixed inset-0 z-[100]">
+          <motion.div
+            aria-hidden="true"
+            className="absolute inset-0 bg-ink/30"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: reduce ? reducedFade : { duration: 0.14, ease: 'easeOut' } }}
+            transition={fade}
+            onClick={() => { if (!loading) onClose() }}
+          />
+          <motion.div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby={`${id}-title`}
+            aria-describedby={`${id}-description`}
+            className="glass-cream absolute inset-x-2 bottom-[var(--nav-clearance)] mx-auto max-w-[calc(28rem-16px)] rounded-[38px] px-6 pb-4 pt-7"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduce ? { opacity: 0, transition: reducedFade } : { opacity: 0, y: 12, transition: { duration: 0.14, ease: 'easeOut' } }}
+            transition={reduce ? reducedFade : spring.sheet}
           >
-            {cancelLabel}
-          </button>
-          <button
-            type="button"
-            onClick={handleConfirm}
-            disabled={loading}
-            className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors disabled:opacity-50 ${
-              variant === 'danger'
-                ? 'bg-ink text-cream'
-                : 'bg-accent text-cream'
-            }`}
-          >
-            {loading ? 'Please wait...' : confirmLabel}
-          </button>
+            <h2 id={`${id}-title`} className="font-wide text-[22px] font-bold leading-tight text-ink">{title}</h2>
+            <p id={`${id}-description`} className="mt-2 text-[15.5px] leading-[1.45] text-ink-65">{description}</p>
+            <button
+              type="button"
+              onClick={() => void handleConfirm()}
+              disabled={loading}
+              className="mt-6 h-14 w-full rounded-[18px] bg-ink text-[17px] font-bold text-cream transition-transform duration-100 enabled:active:scale-[.97] disabled:opacity-60"
+            >
+              {loading ? 'One moment…' : confirmLabel}
+            </button>
+            {/* Cancel takes focus first, so Enter on a destructive dialog never deletes by accident. */}
+            <button type="button" autoFocus onClick={onClose} disabled={loading} className="mt-1 h-12 w-full rounded-[18px] text-[16px] font-semibold text-ink disabled:opacity-50">
+              {cancelLabel}
+            </button>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      ) : null}
+    </AnimatePresence>
   )
 }

@@ -1,16 +1,16 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { PageWrapper } from '@/components/layout/page-wrapper'
-import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { PushedHeader } from '@/components/layout/screen-header'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { OfflineBand } from '@/components/shared/offline-band'
 import { DeleteAccountSheet } from '@/components/settings/delete-account-sheet'
-import { SettingsRow, SettingsSection } from '@/components/settings/settings-section'
+import { SettingsRow, SettingsSection, SettingsSelect, SettingsSkeleton, SettingsSwitch } from '@/components/settings/settings-section'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
-import { BottomSheet } from '@/components/ui/bottom-sheet'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { downloadExport } from '@/lib/api/account.api'
 import { logout } from '@/lib/api/auth.api'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
@@ -18,129 +18,41 @@ import { getSettings, updateSettings } from '@/lib/api/settings.api'
 import { isNative } from '@/lib/platform'
 import { disconnectHealth, healthLabel, isHealthConnected, lastHealthSync } from '@/lib/platform/health'
 import { isSubscribed, manageSubscription, restorePurchases } from '@/lib/platform/purchases'
-import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth.store'
 import type { Profile } from '@/types/profile.types'
 import type { GeoPersonality, RestTimerDuration, Settings } from '@/types/settings.types'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
-import { ErrorState } from '@/components/ui/fiqr/error-state'
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev'
 
 const PERSONALITY_OPTIONS: { value: GeoPersonality; label: string }[] = [
   { value: 'nurturing', label: 'Nurturing' },
-  { value: 'drill_sergeant', label: 'Drill Sergeant' },
+  { value: 'drill_sergeant', label: 'Drill sergeant' },
   { value: 'balanced', label: 'Balanced' },
-  { value: 'data_driven', label: 'Data-Driven' },
+  { value: 'data_driven', label: 'Data-driven' },
 ]
 
 const REST_TIMER_OPTIONS: { value: RestTimerDuration; label: string }[] = [
-  { value: 60, label: '60s' },
-  { value: 90, label: '90s' },
-  { value: 120, label: '2m' },
-  { value: 180, label: '3m' },
+  { value: 60, label: '60 seconds' },
+  { value: 90, label: '90 seconds' },
+  { value: 120, label: '2 minutes' },
+  { value: 180, label: '3 minutes' },
 ]
 
 const WEEKDAYS = [
-  { value: 0, short: 'S', label: 'Sunday' },
-  { value: 1, short: 'M', label: 'Monday' },
-  { value: 2, short: 'T', label: 'Tuesday' },
-  { value: 3, short: 'W', label: 'Wednesday' },
-  { value: 4, short: 'T', label: 'Thursday' },
-  { value: 5, short: 'F', label: 'Friday' },
-  { value: 6, short: 'S', label: 'Saturday' },
+  { value: 0, label: 'Sunday' },
+  { value: 1, label: 'Monday' },
+  { value: 2, label: 'Tuesday' },
+  { value: 3, label: 'Wednesday' },
+  { value: 4, label: 'Thursday' },
+  { value: 5, label: 'Friday' },
+  { value: 6, label: 'Saturday' },
 ] as const
 
-function BackHeader({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="mb-6 flex items-center gap-3">
-      <button type="button" onClick={onBack} aria-label="Back to dashboard" className="text-ink">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.75}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-6 w-6"
-        >
-          <path d="m15 18-6-6 6-6" />
-        </svg>
-      </button>
-      <h1 className="text-[22px] font-semibold tracking-[-0.4px]">Settings</h1>
-    </div>
-  )
-}
-
-function RowChevron() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5 shrink-0 text-ink-65"
-    >
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  )
-}
-
-function PersonIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-6 w-6"
-    >
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
-    </svg>
-  )
-}
-
-function SettingsSwitch({
-  label,
-  checked,
-  disabled = false,
-  onChange,
-}: {
-  label: string
-  checked: boolean
-  disabled?: boolean
-  onChange: (checked: boolean) => void
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-label={label}
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        'relative inline-flex h-7 w-12 shrink-0 rounded-full p-0.5 disabled:opacity-50',
-        checked ? 'bg-accent' : 'bg-ink-08',
-      )}
-    >
-      <span
-        className={cn(
-          'block h-6 w-6 rounded-full bg-card transition-transform',
-          checked ? 'translate-x-5' : 'translate-x-0',
-        )}
-      />
-    </button>
-  )
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase() || '?'
 }
 
 export default function SettingsPage() {
@@ -203,7 +115,7 @@ export default function SettingsPage() {
         setSettings(updated)
       } catch {
         setSettings(previous)
-        toast.error('Failed to update settings')
+        toast.error("Couldn't save that. Try again.")
       }
     },
     [settings],
@@ -229,7 +141,7 @@ export default function SettingsPage() {
       setProfile(updated)
       setShowAiConfirm(false)
     } catch {
-      toast.error('Failed to update AI processing')
+      toast.error("Couldn't change AI processing. Try again.")
     } finally {
       setUpdatingAi(false)
     }
@@ -239,9 +151,9 @@ export default function SettingsPage() {
     setExporting(true)
     try {
       await downloadExport()
-      toast.success('Export ready')
+      toast.success('Your data is ready')
     } catch {
-      toast.error('Failed to download data')
+      toast.error("Couldn't download your data. Try again.")
     } finally {
       setExporting(false)
     }
@@ -270,35 +182,31 @@ export default function SettingsPage() {
       await logout()
       router.push('/login')
     } catch {
-      toast.error('Failed to log out')
+      toast.error("Couldn't log out. Try again.")
       setLoggingOut(false)
     }
   }
 
-  if (loading) {
-    return (
-      <PageWrapper>
-        <BackHeader onBack={() => router.push('/dashboard')} />
-        <div className="space-y-4">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      </PageWrapper>
-    )
-  }
+  const header = <PushedHeader title="Settings" onBack={() => router.push('/dashboard')} backLabel="Back to Today" />
 
-  if (!settings || !profile) {
+  if (loading || !settings || !profile) {
     return (
-      <PageWrapper>
-        <BackHeader onBack={() => router.push('/dashboard')} />
-        <ErrorState onRetry={() => { setLoading(true); loadSettings() }}>I couldn&apos;t load your settings. Check your connection and try again.</ErrorState>
-      </PageWrapper>
+      <div className="mx-auto w-full max-w-md px-4">
+        {header}
+        <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
+        <div className="mt-2">
+          {loading ? (
+            <SettingsSkeleton />
+          ) : (
+            <ErrorState onRetry={() => { setLoading(true); loadSettings() }}>I couldn&apos;t load your settings. Check your connection and try again.</ErrorState>
+          )}
+        </div>
+      </div>
     )
   }
 
   const profileName = profile.full_name || user?.email?.split('@')[0] || 'Profile'
-  const email = user?.email ?? '---'
+  const email = user?.email ?? ''
   const aiEnabled = Boolean(profile.ai_consent_at)
   const native = isNative()
   const healthName = healthLabel()
@@ -307,40 +215,68 @@ export default function SettingsPage() {
     : 'Never'
 
   return (
-    <PageWrapper>
-      <BackHeader onBack={() => router.push('/dashboard')} />
+    <div className="mx-auto w-full max-w-md px-4">
+      {header}
+      <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
 
-      <div className="space-y-7">
-        <SettingsSection title="Profile">
+      <div className="enter-rows mt-2 flex flex-col gap-7">
+        <section aria-label="Profile">
           <button
             type="button"
             onClick={() => router.push('/settings/profile')}
-            className="min-h-14 w-full px-[14px] py-2.5 flex items-center gap-3 text-left"
+            className="flex min-h-[76px] w-full items-center gap-3.5 rounded-[24px] bg-card px-4 py-3 text-left shadow-[var(--shadow-card)] transition-transform duration-100 active:scale-[.98]"
           >
-            <span className="w-10 h-10 rounded-full bg-ink-08 border border-ink-16 flex shrink-0 items-center justify-center text-ink">
-              <PersonIcon />
+            <span aria-hidden="true" className="font-wide grid size-12 shrink-0 place-items-center rounded-full bg-ink text-[17px] font-bold text-cream">
+              {initials(profileName)}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[15.5px] font-semibold text-ink">{profileName}</span>
-              <span className="block truncate text-[13.5px] text-ink-65">{email}</span>
+              <span className="block truncate text-[17px] font-semibold text-ink">{profileName}</span>
+              <span className="mt-0.5 block truncate text-[14px] text-ink-65">{email || 'Body, targets and goals'}</span>
             </span>
-            <RowChevron />
+            <ChevronRightIcon className="size-4 shrink-0 text-ink-35" />
           </button>
-        </SettingsSection>
+        </section>
 
         <SettingsSection title="Subscription">
           {!native ? (
-            <SettingsRow label="Plan" value="In the iOS and Android app" />
+            <SettingsRow label="Plan" value="In the phone app" />
           ) : subscribed ? (
             <SettingsRow label="Plan" value="FIQR Plus" />
           ) : (
-            <Link href="/paywall" className="min-h-14 w-full px-[14px] flex items-center justify-between text-left text-[15.5px]">
-              <span className="font-medium text-ink">Plan</span>
-              <span className="flex items-center gap-2"><span className="text-[13.5px] text-ink-65">Free</span><RowChevron /></span>
-            </Link>
+            <SettingsRow label="Plan" value="Free" href="/paywall" />
           )}
           {native ? <SettingsRow label="Restore purchases" onClick={() => void handleRestore()} /> : null}
           {native && subscribed ? <SettingsRow label="Manage subscription" onClick={() => void manageSubscription()} /> : null}
+        </SettingsSection>
+
+        {healthName ? (
+          <SettingsSection title={healthName} footer="Reads steps, active energy, weight, sleep and workouts. Saves the workouts you finish in FIQR.">
+            <SettingsRow label="Sync health data">
+              <SettingsSwitch label="Sync health data" checked={connected} onChange={handleHealthChange} />
+            </SettingsRow>
+            <SettingsRow label="Last synced" value={lastSyncedValue} />
+          </SettingsSection>
+        ) : null}
+
+        <SettingsSection title="Notifications" footer="Geo nudges you when your check-in is ready or you've gone quiet. Never marketing.">
+          <SettingsRow label="Push notifications">
+            <SettingsSwitch label="Push notifications" checked={settings.notifications_enabled} onChange={handleNotificationChange} />
+          </SettingsRow>
+          <SettingsRow label="Reminder time">
+            <input
+              type="time"
+              aria-label="Reminder time"
+              value={settings.notification_time ?? '08:00'}
+              onChange={(event) => handleReminderChange(event.target.value)}
+              className="-my-2.5 h-11 min-w-0 rounded-[10px] bg-transparent text-right text-[15px] text-ink-65 outline-none tabular-nums focus-visible:bg-ink-04 [&::-webkit-calendar-picker-indicator]:hidden"
+            />
+          </SettingsRow>
+          <SettingsSelect label="Check-in day" value={settings.check_in_weekday} options={WEEKDAYS} onChange={(day) => void handleUpdate({ check_in_weekday: day })} />
+        </SettingsSection>
+
+        <SettingsSection title="Coaching">
+          <SettingsSelect label="Geo's style" value={settings.geo_personality} options={PERSONALITY_OPTIONS} onChange={(style) => void handleUpdate({ geo_personality: style })} />
+          <SettingsSelect label="Rest timer" value={settings.rest_timer_seconds} options={REST_TIMER_OPTIONS} onChange={(seconds) => void handleUpdate({ rest_timer_seconds: seconds })} />
         </SettingsSection>
 
         <SettingsSection title="Library">
@@ -351,200 +287,67 @@ export default function SettingsPage() {
           {isAdmin ? <SettingsRow label="Admin dashboard" onClick={() => router.push('/admin')} /> : null}
         </SettingsSection>
 
-        <div>
-          <SettingsSection title="Notifications">
-            <SettingsRow label="Push notifications">
-              <SettingsSwitch
-                label="Push notifications"
-                checked={settings.notifications_enabled}
-                onChange={handleNotificationChange}
-              />
-            </SettingsRow>
-            <SettingsRow label="Reminder time">
-              <input
-                type="time"
-                aria-label="Reminder time"
-                value={settings.notification_time ?? '08:00'}
-                onChange={(event) => handleReminderChange(event.target.value)}
-                className="bg-transparent text-[15.5px] text-ink outline-none"
-              />
-            </SettingsRow>
-          </SettingsSection>
-          <p className="mt-2 px-[14px] text-[13px] text-ink-65">
-            Geo nudges you when a check-in is ready or you&apos;ve gone quiet. No marketing.
-          </p>
-        </div>
-
-        <div>
-          <SettingsSection title="Check-in day">
-            <div className="min-h-14 px-[14px] py-2.5 flex items-center justify-between gap-2">
-              {WEEKDAYS.map((day) => (
-                <button
-                  key={day.value}
-                  type="button"
-                  aria-label={day.label}
-                  aria-pressed={settings.check_in_weekday === day.value}
-                  onClick={() => void handleUpdate({ check_in_weekday: day.value })}
-                  className={cn(
-                    'h-9 w-9 rounded-full text-[13.5px] font-semibold',
-                    settings.check_in_weekday === day.value
-                      ? 'bg-ink text-cream'
-                      : 'bg-ink-08 text-ink',
-                  )}
-                >
-                  {day.short}
-                </button>
-              ))}
-            </div>
-          </SettingsSection>
-          <p className="mt-2 px-[14px] text-[13px] text-ink-65">
-            Your weekly check-in lands on this day.
-          </p>
-        </div>
-
-        {healthName ? (
-          <div>
-            <SettingsSection title={healthName}>
-              <SettingsRow label="Sync health data">
-                <SettingsSwitch label="Sync health data" checked={connected} onChange={handleHealthChange} />
-              </SettingsRow>
-              <SettingsRow label="Last synced" value={lastSyncedValue} />
-            </SettingsSection>
-            <p className="mt-2 px-[14px] text-[13px] text-ink-65">
-              Reads steps, active energy, weight, sleep and workouts. Saves workouts you finish in FIQR.
-            </p>
-          </div>
-        ) : null}
-
-        <SettingsSection title="Geo">
-          <div className="px-[14px] py-3 flex flex-wrap gap-2">
-            {PERSONALITY_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => void handleUpdate({ geo_personality: option.value })}
-                className={cn(
-                  'rounded-full px-4 h-11 text-[14px] font-semibold',
-                  settings.geo_personality === option.value
-                    ? 'bg-ink text-cream'
-                    : 'bg-ink-08 text-ink',
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </SettingsSection>
-
-        <SettingsSection title="Training">
-          <div className="px-[14px] py-3">
-            <p className="mb-2 text-[13px] font-semibold text-ink-65">Rest timer</p>
-            <div className="flex flex-wrap gap-2">
-              {REST_TIMER_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => void handleUpdate({ rest_timer_seconds: option.value })}
-                  className={cn(
-                    'rounded-full px-4 h-11 text-[14px] font-semibold',
-                    settings.rest_timer_seconds === option.value
-                      ? 'bg-ink text-cream'
-                      : 'bg-ink-08 text-ink',
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </SettingsSection>
-
-        <SettingsSection title="Data & AI">
-          <div>
-            <SettingsRow label="AI processing">
-              <SettingsSwitch
-                label="AI processing"
-                checked={aiEnabled}
-                disabled={updatingAi}
-                onChange={(enabled) => {
-                  if (enabled) void handleAiConsent(true)
-                  else setShowAiConfirm(true)
-                }}
-              />
-            </SettingsRow>
-            <p className="px-[14px] pb-4 text-[13px] leading-[1.45] text-ink-65">
-              Your food logs, photos, weight and messages are sent to our model providers to generate coaching. See the privacy policy for who they are.
-            </p>
-          </div>
-          <SettingsRow label="Download my data" onClick={() => void handleDownload()}>
-            {exporting ? (
-              <span
-                aria-label="Downloading"
-                className="h-5 w-5 rounded-full border-2 border-ink-16 border-t-ink animate-spin"
-              />
-            ) : undefined}
+        <SettingsSection
+          title="Data and AI"
+          footer="With AI processing on, your food logs, photos, weight and messages go to our model providers so Geo can coach you. The privacy policy names them."
+        >
+          <SettingsRow label="AI processing">
+            <SettingsSwitch
+              label="AI processing"
+              checked={aiEnabled}
+              disabled={updatingAi}
+              onChange={(enabled) => {
+                if (enabled) void handleAiConsent(true)
+                else setShowAiConfirm(true)
+              }}
+            />
+          </SettingsRow>
+          <SettingsRow label="Download my data" onClick={() => void handleDownload()} disabled={exporting}>
+            {exporting ? <span aria-label="Downloading" role="status" className="size-5 animate-spin rounded-full border-2 border-ink-16 border-t-ink" /> : undefined}
           </SettingsRow>
           <SettingsRow label="Privacy policy" onClick={() => router.push('/privacy')} />
           <SettingsRow label="Support" onClick={() => router.push('/support')} />
         </SettingsSection>
 
-        <SettingsSection title="About">
+        <SettingsSection
+          title="About"
+          footer="FIQR is a wellness and fitness coaching app, not a medical device. Geo doesn't diagnose or treat conditions or advise on medication. Check with a doctor or registered dietitian before making medical decisions."
+        >
           <SettingsRow label="Version" value={APP_VERSION} />
-          <p className="px-[14px] py-4 text-[13px] leading-[1.45] text-ink-65">
-            FIQR is a wellness and fitness coaching app, not a medical device. Geo does not diagnose or treat conditions or advise on medication. Check with a doctor or registered dietitian before making medical decisions.
-          </p>
         </SettingsSection>
 
-        <div>
-          <SecondaryButton type="button" onNavy={false} disabled={loggingOut} onClick={handleLogout}>
-            {loggingOut ? 'Logging out...' : 'Log out'}
-          </SecondaryButton>
+        <div className="flex flex-col gap-3">
+          <SettingsSection>
+            <button
+              type="button"
+              disabled={loggingOut}
+              onClick={handleLogout}
+              className="flex min-h-11 w-full items-center justify-center px-4 py-2.5 text-[16px] font-semibold text-ink active:bg-ink-04 disabled:text-ink-65"
+            >
+              {loggingOut ? 'Logging out…' : 'Log out'}
+            </button>
+          </SettingsSection>
           <button
             type="button"
             onClick={() => setShowDeleteAccount(true)}
-            className="text-[15.5px] font-semibold text-ink-65 underline-offset-4 underline mt-4 mx-auto block"
+            className="mx-auto min-h-11 px-4 text-[15px] font-semibold text-ink-65 underline decoration-ink-35 underline-offset-4"
           >
             Delete account
           </button>
         </div>
       </div>
 
-      <BottomSheet
+      <ConfirmDialog
         open={showAiConfirm}
-        onClose={() => setShowAiConfirm(false)}
-        dismissible={!updatingAi}
-        ariaLabel="Turn off AI processing?"
-      >
-        <div className="px-gutter pb-6 pt-3">
-          <h2 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Turn off AI processing?</h2>
-          <p className="mt-3 text-[15.5px] leading-[1.45] text-ink-65">
-            Geo can&apos;t coach without it. You can turn it back on any time.
-          </p>
-          <div className="mt-5">
-            <SecondaryButton
-              type="button"
-              onNavy={false}
-              disabled={updatingAi}
-              onClick={() => void handleAiConsent(false)}
-            >
-              Turn off
-            </SecondaryButton>
-          </div>
-          <button
-            type="button"
-            disabled={updatingAi}
-            onClick={() => setShowAiConfirm(false)}
-            className="mx-auto mt-4 block text-[15.5px] font-semibold text-ink-65"
-          >
-            Keep on
-          </button>
-        </div>
-      </BottomSheet>
-
-      <DeleteAccountSheet
-        open={showDeleteAccount}
-        onClose={() => setShowDeleteAccount(false)}
+        onClose={() => { if (!updatingAi) setShowAiConfirm(false) }}
+        onConfirm={() => handleAiConsent(false)}
+        title="Turn off AI processing?"
+        description="Geo can't coach without it. You can turn it back on any time."
+        confirmLabel="Turn off"
+        cancelLabel="Keep it on"
+        variant="danger"
       />
+      <DeleteAccountSheet open={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
       <HealthConnectSheet
         open={showHealthConnect}
         onClose={() => setShowHealthConnect(false)}
@@ -553,6 +356,6 @@ export default function SettingsPage() {
           void lastHealthSync().then(setLastSynced)
         }}
       />
-    </PageWrapper>
+    </div>
   )
 }

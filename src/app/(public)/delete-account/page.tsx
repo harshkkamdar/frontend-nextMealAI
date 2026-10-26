@@ -3,16 +3,12 @@
 import Link from 'next/link'
 import { FormEvent, useState } from 'react'
 
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { fieldClass } from '@/components/ui/fiqr/field'
 import { API_BASE } from '@/lib/api/client'
 
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? 'support@fiqr.app'
 
-const headingClass = 'text-[28px] font-bold leading-tight tracking-[-0.6px]'
-const sectionClass = 'mt-8 text-[17px] font-bold'
-const paragraphClass = 'mt-3 text-[15.5px] font-normal leading-[1.5] text-ink-80'
-const labelClass = 'text-[15.5px] font-semibold text-ink'
-const fieldClass = 'h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] w-full text-ink outline-none focus:border-ink'
+const labelClass = 'block text-[15px] font-semibold text-ink'
 
 type SubmissionState = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -40,19 +36,20 @@ export default function DeleteAccountPage() {
 
   return (
     <main>
-      <h1 className={headingClass}>Delete your FIQR account</h1>
-      <p className={paragraphClass}>
-        The fastest way is inside the app: Settings › Delete account. It removes your profile, logs, plans, check-ins, photos and chats immediately and permanently.
+      <h1>Delete your FIQR account</h1>
+      <p>
+        The fastest way is inside the app: Settings, then Delete account. It removes your profile, logs, plans, check-ins, photos and chats straight away, for good.
       </p>
 
-      <h2 className={sectionClass}>Can&apos;t open the app?</h2>
+      <h2>Can&apos;t open the app?</h2>
 
       {submissionState === 'success' ? (
-        <p className={paragraphClass}>
-          Request received. We&apos;ll confirm by email within two business days.
-        </p>
+        <div role="status" className="mt-4 rounded-[24px] bg-card px-5 py-4 shadow-[var(--shadow-card)]">
+          <p className="mt-0! text-ink!">Request received. We&apos;ll confirm by email within two business days.</p>
+        </div>
       ) : (
-        <form className="mt-5 space-y-5" onSubmit={handleSubmit}>
+        <form className="mt-4 space-y-5" onSubmit={handleSubmit}>
+          <p>Send us the email on your account and we&apos;ll delete it for you.</p>
           <div className="space-y-2">
             <label htmlFor="deletion-email" className={labelClass}>Email</label>
             <input
@@ -72,25 +69,31 @@ export default function DeleteAccountPage() {
               id="deletion-note"
               value={note}
               onChange={(event) => setNote(event.target.value)}
-              className={`${fieldClass} min-h-28 py-4`}
+              className={`${fieldClass} h-auto min-h-28 py-4`}
             />
           </div>
 
-          <PrimaryButton type="submit" disabled={submissionState === 'submitting'} className="justify-center">
+          {/* A deletion is destructive, so its action is ink, not orange (D2 convention). */}
+          <button
+            type="submit"
+            disabled={submissionState === 'submitting'}
+            className="flex h-14 w-full items-center justify-center rounded-[18px] bg-ink text-[17px] font-bold text-cream transition-transform duration-100 enabled:active:scale-[.97] disabled:opacity-60"
+          >
             Request deletion
-          </PrimaryButton>
+          </button>
 
           {submissionState === 'error' ? (
-            <p className={paragraphClass}>
+            <p role="alert" className="text-ink!">
               Something went wrong. Email {SUPPORT_EMAIL} instead.
             </p>
           ) : null}
         </form>
       )}
 
-      <p className={paragraphClass}>
-        Deleting your account removes all personal data listed in our{' '}
-        <Link href="/privacy" className="font-semibold text-ink underline decoration-ink-35 underline-offset-4">privacy policy</Link>. Anonymous, aggregated statistics are not personal data and are not affected.
+      <h2>What goes</h2>
+      <p>
+        Deleting your account removes all the personal data listed in our{' '}
+        <Link href="/privacy">privacy policy</Link>. Anonymous, combined statistics aren&apos;t personal data and stay.
       </p>
     </main>
   )

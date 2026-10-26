@@ -1,14 +1,12 @@
 'use client'
 
-import { PageWrapper } from '@/components/layout/page-wrapper'
+import { StatusScreen, statusActionClass } from '@/components/ui/fiqr/status-screen'
 
-export default function ErrorPage({ error, reset }: { error: Error; reset: () => void }) {
+// The raw message (chunk paths, stack text) means nothing to a user; it stays in the console.
+export default function ErrorPage({ reset }: { error: Error; reset: () => void }) {
   return (
-    <PageWrapper>
-      <h1 className="text-[22px] font-semibold tracking-[-0.4px]">Something went wrong</h1>
-      {/* The raw message (chunk paths, stack text) means nothing to a user; it stays in the console. */}
-      <p className="mt-1 text-[15.5px] text-ink-65">This screen didn&apos;t load. Try again, or restart the app if it keeps happening.</p>
-      <button type="button" onClick={reset} className="mt-5 h-14 w-full rounded-[15px] bg-ink text-cream font-bold text-[18px]">Try again</button>
-    </PageWrapper>
+    <StatusScreen title="Something went wrong" action={<button type="button" onClick={reset} className={statusActionClass}>Try again</button>}>
+      This screen didn&apos;t load. Try again, and if it keeps happening, close and reopen the app.
+    </StatusScreen>
   )
 }

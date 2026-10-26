@@ -1,16 +1,13 @@
 'use client'
 
-import { PageWrapper } from '@/components/layout/page-wrapper'
-import { ProfileForm } from '@/components/settings/profile-form'
-import { PageHeader } from '@/components/ui/fiqr/page-header'
 import { useRouter } from 'next/navigation'
+import { ProfileForm } from '@/components/settings/profile-form'
 
 export default function ProfilePage() {
   const router = useRouter()
   return (
-    <PageWrapper>
-      <PageHeader title="Profile" onBack={() => router.push('/settings')} backLabel="Back to settings" />
-      <ProfileForm />
-    </PageWrapper>
+    <div className="mx-auto w-full max-w-md px-4">
+      <ProfileForm onBack={() => router.push('/settings')} />
+    </div>
   )
 }

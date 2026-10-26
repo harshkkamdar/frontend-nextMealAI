@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   subscribed: false,
   getSettings: vi.fn(),
   getProfile: vi.fn(),
+  updateSettings: vi.fn(),
 }))
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
@@ -18,7 +19,7 @@ vi.mock('@/stores/auth.store', () => ({
 }))
 vi.mock('@/lib/api/settings.api', () => ({
   getSettings: (...args: unknown[]) => mocks.getSettings(...args),
-  updateSettings: vi.fn(),
+  updateSettings: (...args: unknown[]) => mocks.updateSettings(...args),
 }))
 vi.mock('@/lib/api/profile.api', () => ({
   getProfile: (...args: unknown[]) => mocks.getProfile(...args),
@@ -80,5 +81,18 @@ describe('Settings health and subscription sections', () => {
 
     expect(await screen.findByText('FIQR Plus')).toBeInTheDocument()
     expect(screen.getByText('Manage subscription')).toBeInTheDocument()
+  })
+})
+
+describe('Settings pickers', () => {
+  it('shows the saved check-in day and saves a new one from the native picker', async () => {
+    mocks.updateSettings.mockImplementation((patch: object) => Promise.resolve({ ...patch }))
+    render(<SettingsPage />)
+
+    const picker = await screen.findByLabelText('Check-in day')
+    expect(picker).toHaveValue('1')
+    expect(screen.getAllByText('Monday')[0]).toBeVisible()
+    fireEvent.change(picker, { target: { value: '4' } })
+    expect(mocks.updateSettings).toHaveBeenCalledWith({ check_in_weekday: 4 })
   })
 })
