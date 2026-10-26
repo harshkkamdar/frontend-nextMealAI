@@ -15,13 +15,15 @@ export type NavKind = 'none' | 'push' | 'pop' | 'tab'
 /**
  * Decides how a route change animates. `stack` holds the routes still mounted, root first, current last.
  * A route already in the stack below the top is a pop to it (back, hardware back, swipe, tapping the current
- * tab again). Browser back/forward to a route outside the stack goes by the history index. Peers at tab roots fade.
+ * tab again). Tab root to tab root is always the tab crossfade, whatever caused it (tab bar, browser or hardware
+ * back). Other browser back/forward outside the stack goes by the history index. Another tab chosen from a pushed page fades.
  */
 export function classifyNav(stack: readonly string[], to: string, popstate: 'back' | 'forward' | null): { kind: NavKind; index: number } {
   const from = stack[stack.length - 1]
   if (from === to) return { kind: 'none', index: stack.length - 1 }
   const index = stack.lastIndexOf(to)
   if (index >= 0) return { kind: 'pop', index }
+  if (TAB_ROOTS.has(from) && TAB_ROOTS.has(to)) return { kind: 'tab', index: -1 }
   if (popstate) return { kind: popstate === 'forward' ? 'push' : 'pop', index: -1 }
   if (TAB_ROOTS.has(to)) return { kind: 'tab', index: -1 }
   return { kind: 'push', index: -1 }

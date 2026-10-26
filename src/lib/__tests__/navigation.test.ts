@@ -28,6 +28,11 @@ describe('classifyNav', () => {
     expect(classifyNav(['/settings'], '/plans/view', 'back').kind).toBe('pop')
   })
 
+  it('crossfades tab root to tab root even on browser or hardware back and forward', () => {
+    expect(classifyNav(['/food'], '/dashboard', 'back').kind).toBe('tab')
+    expect(classifyNav(['/dashboard'], '/train', 'forward').kind).toBe('tab')
+  })
+
   it('does nothing when the route did not change', () => {
     expect(classifyNav(['/food'], '/food', null).kind).toBe('none')
   })
