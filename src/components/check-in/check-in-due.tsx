@@ -20,7 +20,7 @@ export interface TodayContext {
   eaten: { calories: number; protein: number; carbs: number; fat: number }
   carbs: number | null
   fat: number | null
-  /** The active meal plan's name when it pins daily targets (Apply patches those in place). */
+  /** The active nutrition plan's name when it pins daily targets (Apply patches those in place). */
   planName: string | null
 }
 
