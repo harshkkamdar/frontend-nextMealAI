@@ -138,4 +138,10 @@ describe('LogList — FB-09 icons + workout title', () => {
     expect(await screen.findByText('Oatmeal')).toBeInTheDocument()
     expect(screen.getByText('320 kcal')).toBeInTheDocument()
   })
+
+  it('a 0 kcal food row shows 0 kcal, not an empty metric', async () => {
+    await renderWithLogs([makeLog({ id: 'f3', type: 'food', payload: { food_name: 'Black coffee', est_macros: { calories: 0 } } })])
+    expect(await screen.findByText('Black coffee')).toBeInTheDocument()
+    expect(screen.getByText('0 kcal')).toBeInTheDocument()
+  })
 })

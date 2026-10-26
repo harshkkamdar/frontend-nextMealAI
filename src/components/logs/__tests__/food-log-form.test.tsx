@@ -236,6 +236,19 @@ describe('FoodLogForm — R6-12 full-page logging (favourites/recents-first)', (
     expect(screen.getByDisplayValue('Greek Yogurt')).toBeInTheDocument()
   })
 
+  it('a real 0 macro shows as 0 g in its tile and is logged as 0, not left blank', async () => {
+    mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Chicken breast', is_favorite: true, macros_per_serving: { calories: 165, protein: 28, carbs: 0, fat: 0 } })])
+    mocks.createLog.mockResolvedValue({ id: 'log1' })
+    render(<FoodLogForm />)
+    await waitFor(() => expect(screen.getByText('Chicken breast')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Chicken breast'))
+    expect(screen.getByLabelText('Carbs')).toHaveValue(0)
+    expect(screen.getByLabelText('Fat')).toHaveValue(0)
+    fireEvent.click(screen.getByText('Log meal'))
+    await waitFor(() => expect(mocks.createLog).toHaveBeenCalled())
+    expect(mocks.createLog.mock.calls[0][0].payload.est_macros).toEqual({ calories: 165, protein: 28, carbs: 0, fat: 0 })
+  })
+
   it('logs to the meal + date from the URL (not "today")', async () => {
     mocks.searchParamsStr = 'meal=Lunch&date=2026-08-10'
     mocks.getPersonalFoods.mockResolvedValue([userFood({ name: 'Greek Yogurt', is_favorite: true })])

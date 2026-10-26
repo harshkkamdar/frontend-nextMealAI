@@ -210,10 +210,10 @@ export function FoodLogForm() {
     const m = food.macros_per_serving
     setFoodName(food.name)
     setQuantityG(food.serving_size_g || 100)
-    setCalories(m.calories ? Math.round(m.calories) : '')
-    setProtein(m.protein ? Math.round(m.protein) : '')
-    setCarbs(m.carbs ? Math.round(m.carbs) : '')
-    setFat(m.fat ? Math.round(m.fat) : '')
+    setCalories(m.calories != null ? Math.round(m.calories) : '')
+    setProtein(m.protein != null ? Math.round(m.protein) : '')
+    setCarbs(m.carbs != null ? Math.round(m.carbs) : '')
+    setFat(m.fat != null ? Math.round(m.fat) : '')
     // Per-gram basis so editing the quantity rescales the macros (#8).
     const serving = food.serving_size_g || 100
     setMacroBasisPerG({
@@ -401,10 +401,10 @@ export function FoodLogForm() {
             food_name: foodName.trim(),
             quantity_g: quantityG || undefined,
             est_macros: {
-              calories: calories || undefined,
-              protein: protein || undefined,
-              carbs: carbs || undefined,
-              fat: fat || undefined,
+              calories: typeof calories === 'number' ? calories : undefined,
+              protein: typeof protein === 'number' ? protein : undefined,
+              carbs: typeof carbs === 'number' ? carbs : undefined,
+              fat: typeof fat === 'number' ? fat : undefined,
             },
             meal_type: mealType || undefined,
             user_food_id: userFoodId || undefined,
@@ -465,7 +465,8 @@ export function FoodLogForm() {
         />
       ) : null}
 
-      <div className="mt-2">
+      {/* Pinned under the bar so a focused field never scrolls beneath it: iOS draws the caret above fixed layers. */}
+      <div className="sticky top-[calc(60px+var(--safe-top))] z-[30] -mx-4 bg-cream px-4 py-2">
         <SearchField
           label="Search foods"
           value={query}
@@ -477,7 +478,7 @@ export function FoodLogForm() {
         />
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-1 grid grid-cols-2 gap-2">
         <MethodChip
           icon={CameraFill}
           label={estimating ? 'Reading…' : 'Photo'}

@@ -48,9 +48,10 @@ export function BottomSheet({
     >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-[60] bg-ink/30 data-[state=open]:animate-[fiqr-fade-in_280ms_ease-out]" />
+        {/* after:hidden drops vaul's ::after, which extends the glass 200% below the inset sheet as an undimmed strip. */}
         <Drawer.Content
           aria-label={ariaLabel}
-          className={`glass-cream fixed inset-x-2 z-[70] mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[38px] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}
+          className={`glass-cream fixed inset-x-2 z-[70] after:hidden mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[38px] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}
         >
           <Drawer.Handle className="!mx-auto !mt-2.5 !mb-1 !h-[5px] !w-9 shrink-0 !bg-ink-20" />
           {/* Radix/vaul require an accessible title; visually hidden. */}

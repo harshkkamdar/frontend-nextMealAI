@@ -352,6 +352,22 @@
     "orangeActions": 1
   },
   {
+    "shot": "food-selected-scrolled",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-selected-scrolled",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
     "shot": "food-selected",
     "width": 360,
     "url": "/logs/new/food",

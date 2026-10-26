@@ -101,6 +101,8 @@ const shots = [
   { name: 'food-offline', url: '/logs/new/food', api: api(), done, offline: true },
   { name: 'food-long', url: '/logs/new/food', api: api({ '/v1/foods': { foods: LONG_FOODS }, '/v1/foods/search': { results: LONG_RESULTS } }), done, act: (p) => type(p, 'pumpkin') },
   { name: 'food-selected', url: '/logs/new/food', api: api({ '/v1/foods/search': { results: RESULTS } }), done, act: pickFirst },
+  // iOS keeps the search focused after a pick; scrolled, the field must pin under the bar, never slide beneath it.
+  { name: 'food-selected-scrolled', url: '/logs/new/food', api: api({ '/v1/foods/search': { results: RESULTS } }), done, act: async (p) => { await pickFirst(p); await p.getByTestId('food-search-input').focus(); await p.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await wait(p) } },
   { name: 'food-selected-long', url: '/logs/new/food', api: api({ '/v1/foods': { foods: LONG_FOODS } }), done, act: async (p) => { await p.getByTestId('personal-food-row').first().click(); await wait(p) } },
   { name: 'food-tray-two', url: '/logs/new/food', api: api({ '/v1/foods/search': { results: RESULTS } }), done, act: async (p) => { await pickFirst(p); await p.getByRole('button', { name: 'Add to tray' }).click(); await p.getByTestId('personal-food-row').first().click(); await wait(p, 1200) } },
   { name: 'food-saving', url: '/logs/new/food', api: api({ '/v1/foods/search': { results: RESULTS } }), done, hang: ['/v1/logs'], act: async (p) => { await pickFirst(p); await p.getByRole('button', { name: 'Log meal' }).click(); await wait(p, 500) } },

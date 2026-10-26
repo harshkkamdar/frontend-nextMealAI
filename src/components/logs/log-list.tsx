@@ -91,7 +91,7 @@ function getLogMetric(log: Log): string {
   switch (log.type) {
     case 'food': {
       const f = log.payload as FoodPayload
-      return f.est_macros?.calories ? `${formatMacroKcal(f.est_macros.calories)} kcal` : ''
+      return f.est_macros?.calories != null ? `${formatMacroKcal(f.est_macros.calories)} kcal` : ''
     }
     case 'workout': {
       const w = log.payload as WorkoutPayload
