@@ -125,9 +125,10 @@ export function MonthViewSheet({
     }
   }, [isOpen, anchor, tz])
 
+  const today = todayLocalISO(tz)
   const grid = useMemo(
-    () => buildMonthGrid(anchor, breakdown, todayLocalISO(tz)),
-    [anchor, breakdown, tz]
+    () => buildMonthGrid(anchor, breakdown, today),
+    [anchor, breakdown, today]
   )
 
   const handlePrev = useCallback(() => setAnchor((a) => shiftMonth(a, -1)), [])
@@ -166,10 +167,12 @@ export function MonthViewSheet({
         ))}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-5" aria-busy={loading || undefined}>
+      {/* pb-9 lifts the last week clear of the 38 pt sheet corners. */}
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-9" aria-busy={loading || undefined}>
         <div className="grid grid-cols-7 gap-y-1">
           {grid.flat().map((cell) => {
             const isSelected = cell.date === initialDate
+            const isFuture = cell.date > today
             if (!cell.inMonth) return <span key={cell.date} aria-hidden="true" />
             return (
               <button
@@ -180,11 +183,12 @@ export function MonthViewSheet({
                 aria-current={cell.isToday ? 'date' : undefined}
                 aria-label={`${cell.date}${cell.isToday ? ', today' : ''}${cell.calories !== null ? `, ${cell.calories} kcal` : ''}${cell.workouts > 0 ? ', workout logged' : ''}`}
                 className={cn(
-                  'relative flex h-[54px] flex-col items-center justify-center gap-1 rounded-[14px] tabular-nums text-ink transition-transform active:scale-[.94]',
+                  'relative flex h-[54px] flex-col items-center justify-center gap-1 rounded-[14px] tabular-nums transition-transform active:scale-[.94]',
+                  isFuture ? 'text-ink-65' : 'text-ink',
                   isSelected && 'bg-card shadow-[var(--shadow-card)] outline outline-[1.5px] -outline-offset-[1.5px] outline-ink',
                 )}
               >
-                <span className={cn('text-[16px] leading-none', cell.isToday ? 'font-bold' : 'font-semibold')}>{cell.dayNum}</span>
+                <span className={cn('text-[16px] leading-none', cell.isToday ? 'font-bold' : isFuture ? 'font-medium' : 'font-semibold')}>{cell.dayNum}</span>
                 {cell.calories !== null
                   ? <span className="text-[11px] font-medium leading-none text-ink-65">{cell.calories.toLocaleString('en-AU')}</span>
                   : <span className="h-[11px]" />}

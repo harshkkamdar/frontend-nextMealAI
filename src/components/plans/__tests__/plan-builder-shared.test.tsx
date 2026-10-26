@@ -5,6 +5,7 @@ import {
   SearchablePicker,
   PlanNameField,
   PlanDateRangeField,
+  formatDateValue,
 } from '@/components/plans/plan-builder-shared'
 
 describe('NumberField', () => {
@@ -52,6 +53,20 @@ describe('PlanDateRangeField', () => {
     render(<PlanDateRangeField startDate="" endDate="" onChange={onChange} />)
     fireEvent.change(screen.getByLabelText('Start date'), { target: { value: '2025-01-01' } })
     expect(onChange).toHaveBeenCalledWith({ startDate: '2025-01-01', endDate: '' })
+  })
+
+  it('shows the chosen date as app text, and a prompt when empty', () => {
+    render(<PlanDateRangeField startDate="2026-10-26" endDate="" onChange={() => {}} />)
+    expect(screen.getByText('26 Oct 2026')).toBeInTheDocument()
+    expect(screen.getByText('Choose')).toBeInTheDocument()
+  })
+})
+
+describe('formatDateValue', () => {
+  it('reads YYYY-MM-DD as a local date and rejects partial values', () => {
+    expect(formatDateValue('2026-01-01')).toBe('1 Jan 2026')
+    expect(formatDateValue('')).toBe('')
+    expect(formatDateValue('2026-01')).toBe('')
   })
 })
 

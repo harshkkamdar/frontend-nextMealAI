@@ -1,22 +1,50 @@
 'use client'
 
 import * as React from 'react'
-import { Plus, Search, Trash2, X } from 'lucide-react'
+import { Calendar, Plus, Search, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const fieldClass = 'h-14 w-full rounded-[14px] bg-card px-4 text-[17px] text-ink outline outline-1 -outline-offset-1 outline-ink-08 placeholder:text-ink-65 transition-[outline-color] focus:outline-2 focus:outline-ink'
-// Dates use a smaller face so dd/mm/yyyy and the picker icon fit two-up at 360px.
-export const dateClass = 'h-14 w-full rounded-[14px] bg-card px-3 text-[15.5px] text-ink outline outline-1 -outline-offset-1 outline-ink-08 focus:outline-2 focus:outline-ink'
 export const labelClass = 'block text-[15px] font-semibold text-ink'
 
 export function PlanNameField({ value, onChange, placeholder = 'Plan name' }: { value: string; onChange: (value: string) => void; placeholder?: string }) {
   return <div className="space-y-2"><label className={labelClass} htmlFor="plan-name">Plan name</label><input id="plan-name" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={fieldClass} /></div>
 }
 
+/** "26 Oct 2026" for a YYYY-MM-DD value, read as a local date so it never shifts a day. */
+export function formatDateValue(value: string): string {
+  const [y, m, d] = value.split('-').map(Number)
+  if (!y || !m || !d) return ''
+  return new Date(y, m - 1, d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+/**
+ * A date shown as an app row (value text in the house face); the native input sits invisibly on top, so a tap
+ * still opens the platform date picker and the value stays a plain YYYY-MM-DD string.
+ */
+export function DateInput({ id, value, onChange, ariaLabel, placeholder = 'Choose', className }: { id?: string; value: string; onChange: (value: string) => void; ariaLabel?: string; placeholder?: string; className?: string }) {
+  const shown = formatDateValue(value)
+  return (
+    <div className={cn('relative flex items-center rounded-[14px] px-4 focus-within:outline-2 focus-within:outline-ink', className)}>
+      <span aria-hidden="true" className={cn('min-w-0 flex-1 truncate tabular-nums', shown ? 'text-ink' : 'text-ink-65')}>{shown || placeholder}</span>
+      <Calendar aria-hidden="true" className="size-[18px] shrink-0 text-ink-65" strokeWidth={1.75} />
+      <input
+        id={id} type="date" aria-label={ariaLabel} value={value}
+        onChange={(e) => onChange(e.target.value)}
+        // Desktop browsers only open the picker from their own icon; ask for it on any click.
+        onClick={(e) => { try { e.currentTarget.showPicker?.() } catch { /* not allowed here; native focus still works */ } }}
+        className="absolute inset-0 size-full cursor-pointer opacity-0"
+      />
+    </div>
+  )
+}
+
+const dateRowClass = 'h-14 bg-card text-[16px] outline outline-1 -outline-offset-1 outline-ink-08'
+
 export function PlanDateRangeField({ startDate, endDate, onChange }: { startDate: string; endDate: string; onChange: (next: { startDate: string; endDate: string }) => void }) {
   return <div className="grid grid-cols-2 gap-[10px]">
-    <div className="space-y-2"><label className={labelClass} htmlFor="plan-start">Start date</label><input id="plan-start" type="date" value={startDate} onChange={(e) => onChange({ startDate: e.target.value, endDate })} className={dateClass} /></div>
-    <div className="space-y-2"><label className={labelClass} htmlFor="plan-end">End date</label><input id="plan-end" type="date" value={endDate} onChange={(e) => onChange({ startDate, endDate: e.target.value })} className={dateClass} /></div>
+    <div className="space-y-2"><label className={labelClass} htmlFor="plan-start">Start date</label><DateInput id="plan-start" value={startDate} onChange={(v) => onChange({ startDate: v, endDate })} className={dateRowClass} /></div>
+    <div className="space-y-2"><label className={labelClass} htmlFor="plan-end">End date</label><DateInput id="plan-end" value={endDate} onChange={(v) => onChange({ startDate, endDate: v })} className={dateRowClass} /></div>
   </div>
 }
 

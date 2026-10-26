@@ -96,12 +96,12 @@ export function ExerciseVisual({ group, name }: { group: string | null | undefin
   const parts = musclesFor(group, name)
   const caption = muscleCaption(group, name)
   return (
-    <figure className="flex h-[136px] items-center gap-3 rounded-[18px] bg-ink-04 pl-4 pr-3" data-slot="exercise-image">
+    <figure className="flex h-[68px] items-center gap-3 rounded-[16px] bg-ink-04 pl-4 pr-3" data-slot="exercise-image">
       <figcaption className="min-w-0 flex-1">
         <span className="block text-[12px] font-semibold text-ink-65">Works</span>
-        <span className="mt-0.5 line-clamp-3 block text-[15px] font-semibold leading-snug text-ink">{caption || 'Muscles not listed'}</span>
+        <span className="mt-0.5 line-clamp-2 block text-[14px] font-semibold leading-snug text-ink">{caption || 'Muscles not listed'}</span>
       </figcaption>
-      <MuscleMap parts={parts} className="h-[116px] shrink-0" />
+      <MuscleMap parts={parts} className="h-[58px] shrink-0" />
     </figure>
   )
 }

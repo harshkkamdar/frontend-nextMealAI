@@ -136,7 +136,7 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
       key="card"
       role="dialog"
       aria-label="Rest timer"
-      className="fixed bottom-[calc(96px+var(--safe-bottom))] left-4 right-4 z-30 mx-auto max-w-[calc(28rem-32px)] origin-bottom rounded-[24px] bg-ink p-5 text-cream shadow-[var(--shadow-raised)]"
+      className="fixed bottom-[calc(96px+var(--safe-bottom))] left-4 right-4 z-30 mx-auto max-w-[calc(28rem-32px)] origin-bottom rounded-[24px] bg-ink px-4 pb-3 pt-2.5 text-cream shadow-[var(--shadow-raised)]"
       initial={enter?.initial ?? { opacity: 0, y: 24, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }}
       // Minimise shrinks it toward the pill's corner; skip and done let it sink back down.
       // AnimatePresence `custom` carries the live `minimized` to the leaving card (its own props are stale).
@@ -144,26 +144,22 @@ export function RestTimer({ isActive, duration, onSkip, onComplete, resetToken }
       exit="out"
       transition={enter?.transition ?? spring.sheet}
     >
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[13px] font-semibold text-cream-60">Rest</p>
-          <div className="mt-2"><DigitTiles text={tiles} label={clock} tone="dark" size="md" live /></div>
-        </div>
-        <div className="flex gap-1 self-start">
-          <button type="button" onClick={toggleMute} aria-label={muted ? 'Unmute rest timer chime' : 'Mute rest timer chime'} className="grid size-11 place-items-center rounded-full text-cream-60 active:bg-cream-22"><SoundIcon muted={muted} /></button>
-          <button type="button" onClick={() => setMinimized(true)} aria-label="Minimise rest timer" className="grid size-11 place-items-center rounded-full text-cream-60 active:bg-cream-22"><MinimiseIcon /></button>
-        </div>
+      {/* Two compact rows (clock, then controls with the time meter) so the card never covers the set rows above it. */}
+      <div className="flex items-center gap-2">
+        <p className="text-[13px] font-semibold text-cream-60">Rest</p>
+        <DigitTiles text={tiles} label={clock} tone="dark" size="sm" live />
+        <button type="button" onClick={toggleMute} aria-label={muted ? 'Unmute rest timer chime' : 'Mute rest timer chime'} className="ml-auto grid size-11 place-items-center rounded-full text-cream-60 active:bg-cream-22"><SoundIcon muted={muted} /></button>
+        <button type="button" onClick={() => setMinimized(true)} aria-label="Minimise rest timer" className="-mr-1.5 grid size-11 place-items-center rounded-full text-cream-60 active:bg-cream-22"><MinimiseIcon /></button>
       </div>
 
-      <div className="mt-4 h-1 overflow-hidden rounded-full bg-cream-22" aria-hidden="true">
-        {/* A time meter: scaleX at a steady 1 s per tick, so it never re-lays out. */}
-        <div className="h-full w-full origin-left rounded-full bg-cream transition-transform duration-1000 ease-linear" style={{ transform: `scaleX(${progress})` }} />
-      </div>
-
-      <div className="mt-4 flex items-center gap-2">
-        <button type="button" onClick={() => adjust(-15)} aria-label="Subtract 15 seconds" className="h-11 rounded-full bg-cream-22 px-4 text-[14px] font-semibold text-cream tabular-nums transition-transform active:scale-[.95]">−15</button>
-        <button type="button" onClick={() => adjust(15)} aria-label="Add 15 seconds" className="h-11 rounded-full bg-cream-22 px-4 text-[14px] font-semibold text-cream tabular-nums transition-transform active:scale-[.95]">+15</button>
-        <button type="button" onClick={onSkip} aria-label="Skip rest timer" className="ml-auto h-11 rounded-full bg-cream px-5 text-[14px] font-semibold text-ink transition-transform active:scale-[.95]">Skip</button>
+      <div className="mt-2 flex items-center gap-2">
+        <button type="button" onClick={() => adjust(-15)} aria-label="Subtract 15 seconds" className="h-11 shrink-0 rounded-full bg-cream-22 px-3.5 text-[14px] font-semibold text-cream tabular-nums transition-transform active:scale-[.95]">−15</button>
+        <button type="button" onClick={() => adjust(15)} aria-label="Add 15 seconds" className="h-11 shrink-0 rounded-full bg-cream-22 px-3.5 text-[14px] font-semibold text-cream tabular-nums transition-transform active:scale-[.95]">+15</button>
+        <div className="mx-1 h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-cream-22" aria-hidden="true">
+          {/* A time meter: scaleX at a steady 1 s per tick, so it never re-lays out. */}
+          <div className="h-full w-full origin-left rounded-full bg-cream transition-transform duration-1000 ease-linear" style={{ transform: `scaleX(${progress})` }} />
+        </div>
+        <button type="button" onClick={onSkip} aria-label="Skip rest timer" className="h-11 shrink-0 rounded-full bg-cream px-5 text-[14px] font-semibold text-ink transition-transform active:scale-[.95]">Skip</button>
       </div>
     </motion.div>
   )

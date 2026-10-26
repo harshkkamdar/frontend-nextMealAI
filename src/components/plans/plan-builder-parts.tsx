@@ -25,7 +25,7 @@ export function BuilderNotes({ value, onChange, placeholder }: { value: string; 
         onChange={(e) => onChange(e.target.value)}
         rows={3}
         placeholder={placeholder}
-        className="min-h-24 w-full rounded-[14px] bg-card p-4 text-[16px] leading-[1.45] text-ink outline outline-1 -outline-offset-1 outline-ink-08 placeholder:text-ink-65 focus:outline-2 focus:outline-ink"
+        className="min-h-24 w-full resize-none rounded-[14px] bg-card p-4 text-[16px] leading-[1.45] text-ink outline outline-1 -outline-offset-1 outline-ink-08 placeholder:text-ink-65 focus:outline-2 focus:outline-ink"
       />
     </div>
   )

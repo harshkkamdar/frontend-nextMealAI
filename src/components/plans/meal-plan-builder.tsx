@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import {
   PlanNameField,
   PlanDateRangeField,
+  DateInput,
   NumberField,
   SearchablePicker,
   AddRowButton,
@@ -298,12 +299,12 @@ function MealDayCard({
     <DayCardShell
       index={index}
       header={(
-        <input
-          type="date"
-          aria-label={`Day ${index + 1} date`}
+        <DateInput
+          ariaLabel={`Day ${index + 1} date`}
           value={day.date}
-          onChange={(e) => onPatch({ date: e.target.value })}
-          className="h-12 min-w-0 flex-1 rounded-[14px] bg-ink-04 px-3 text-[16px] font-semibold text-ink outline outline-0 -outline-offset-1 outline-ink focus:outline-2"
+          onChange={(date) => onPatch({ date })}
+          placeholder="Pick a date"
+          className="h-12 min-w-0 flex-1 bg-ink-04 text-[16px] font-semibold"
         />
       )}
       onRemove={canRemove ? onRemove : undefined}

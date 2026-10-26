@@ -15,16 +15,16 @@ export function leadIndex(text: string): number {
  * flips in on its tile (rotateX and opacity only); the first paint and reduced motion show it at rest.
  * The visible tiles are hidden from screen readers; `label` carries the readable value.
  */
-export function DigitTiles({ text, label, tone = 'light', size = 'lg', live }: { text: string; label: string; tone?: 'light' | 'dark'; size?: 'lg' | 'md'; live?: boolean }) {
+export function DigitTiles({ text, label, tone = 'light', size = 'lg', live }: { text: string; label: string; tone?: 'light' | 'dark'; size?: 'lg' | 'md' | 'sm'; live?: boolean }) {
   const reduce = useReducedMotion()
   const lead = leadIndex(text)
-  const tile = size === 'lg' ? 'h-[52px] w-[36px] rounded-[12px] text-[30px]' : 'h-[44px] w-[32px] rounded-[10px] text-[26px]'
+  const tile = { lg: 'h-[52px] w-[36px] rounded-[12px] text-[30px]', md: 'h-[44px] w-[32px] rounded-[10px] text-[26px]', sm: 'h-[34px] w-[25px] rounded-[8px] text-[20px]' }[size]
   return (
     <span className="flex items-center">
       <span className="sr-only" aria-live={live ? 'polite' : undefined}>{label}</span>
-      <span aria-hidden="true" className="flex items-center gap-[5px]" style={{ perspective: 240 }}>
+      <span aria-hidden="true" className={cn('flex items-center', size === 'sm' ? 'gap-[3px]' : 'gap-[5px]')} style={{ perspective: 240 }}>
         {[...text].map((char, index) => char === ':' ? (
-          <span key={index} className={cn('px-[1px] text-[22px] font-bold', tone === 'light' ? 'text-ink-50' : 'text-cream-60')}>:</span>
+          <span key={index} className={cn('px-[1px] font-bold', size === 'sm' ? 'text-[16px]' : 'text-[22px]', tone === 'light' ? 'text-ink-50' : 'text-cream-60')}>:</span>
         ) : (
           <span key={index} className={cn('grid place-items-center overflow-hidden', tile, tone === 'light' ? 'bg-ink-04' : 'bg-cream-22')}>
             {/* initial={false}: the first paint shows digits at rest; only later changes flip. */}

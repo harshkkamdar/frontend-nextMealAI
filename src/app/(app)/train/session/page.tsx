@@ -61,6 +61,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const [loading, setLoading] = useState(true)
   const [loadFailed, setLoadFailed] = useState(false)
   const [showRestTimer, setShowRestTimer] = useState(false)
+  const [howToOpen, setHowToOpen] = useState<number | null>(null)
   const [restSeconds, setRestSeconds] = useState(90)
   const [restKey, setRestKey] = useState(0)
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
@@ -442,17 +443,19 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
               {exercises.map((exercise, exerciseIndex) => (
                 <article key={`${exercise.name}-${exerciseIndex}`} data-exercise-index={exerciseIndex} aria-current={exerciseIndex === currentIndex ? 'step' : undefined} className="w-[calc(100vw-44px)] max-w-[388px] shrink-0 snap-center rounded-[24px] bg-card p-5 shadow-[var(--shadow-card)]">
                   <ExerciseVisual group={exercise.muscle_group} name={exercise.name} />
-                  <h2 className="font-wide mt-4 line-clamp-3 break-words text-[26px] font-bold leading-[1.12] tracking-[-0.4px] text-ink">{exercise.name}</h2>
-                  <p className="mt-1.5 text-[14px] text-ink-65 tabular-nums">{exercise.planned_sets} × {exercise.planned_reps}{exercise.rest_seconds ? ` · ${exercise.rest_seconds} s rest` : ''}</p>
+                  <h2 className="font-wide mt-3 line-clamp-3 break-words text-balance text-[22px] font-bold leading-[1.15] tracking-[-0.3px] text-ink">{exercise.name}</h2>
+                  {/* The how-to toggle shares the plan line so the set rows start higher up the screen. */}
+                  <div className="flex min-h-11 items-center justify-between gap-3">
+                    <p className="text-[14px] text-ink-65 tabular-nums">{exercise.planned_sets} × {exercise.planned_reps}{exercise.rest_seconds ? ` · ${exercise.rest_seconds} s rest` : ''}</p>
+                    {exercise.instructions && exercise.instructions.length > 0 ? (
+                      <button type="button" aria-expanded={howToOpen === exerciseIndex} onClick={() => setHowToOpen((open) => (open === exerciseIndex ? null : exerciseIndex))} className="-mr-2 min-h-11 shrink-0 px-2 text-[14px] font-semibold text-ink-65">How to do it</button>
+                    ) : null}
+                  </div>
+                  {howToOpen === exerciseIndex && exercise.instructions?.length ? (
+                    <ol className="mb-2 list-decimal space-y-1 pl-5">{exercise.instructions.map((step, index) => <li key={index} className="text-[14px] text-ink-65">{step}</li>)}</ol>
+                  ) : null}
 
-                  {exercise.instructions && exercise.instructions.length > 0 && (
-                    <details className="mt-2">
-                      <summary className="flex min-h-11 cursor-pointer items-center text-[14px] font-semibold text-ink-65">How to do it</summary>
-                      <ol className="mt-1 list-decimal space-y-1 pl-5">{exercise.instructions.map((step, index) => <li key={index} className="text-[14px] text-ink-65">{step}</li>)}</ol>
-                    </details>
-                  )}
-
-                  <div className="mt-4 grid grid-cols-[32px_1fr_1fr_1fr_44px] items-center gap-1.5 text-[12px] font-semibold text-ink-65">
+                  <div className="mt-1 grid grid-cols-[32px_1fr_1fr_1fr_44px] items-center gap-1.5 text-[12px] font-semibold text-ink-65">
                     <span>Set</span><span>Last</span><span className="text-center">kg</span><span className="text-center">Reps</span><span className="text-center">Done</span>
                   </div>
                   <div className="mt-1">
