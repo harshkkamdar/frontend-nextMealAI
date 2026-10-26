@@ -6,7 +6,7 @@ const DONE = ['personal', 'fitness', 'nutrition']
 
 const ex = (name, sets, reps, rest = 90, weight) => ({ name, sets, reps, rest_seconds: rest, ...(weight ? { weight } : {}) })
 const WORKOUT = {
-  id: 'work-1', user_id: 'capture-user', type: 'workout', status: 'active', version: 3, start_date: '2026-10-05', end_date: '2026-11-29',
+  id: 'work-1', user_id: 'capture-user', type: 'workout', status: 'active', version: 3, start_date: '2026-10-05', end_date: '2026-11-29', current_position: 1,
   content: {
     name: 'Four-day upper lower',
     notes: 'Leave two reps in the tank on the main lifts. Add 2.5 kg once every set hits the top of the range.',
@@ -91,11 +91,15 @@ const shots = [
   s({ name: 'plans-long', url: '/plans', api: LONG_API }),
   // /plans/view
   s({ name: 'view-workout', url: '/plans/view?id=work-1' }),
-  s({ name: 'view-workout-open', url: '/plans/view?id=work-1', act: async (p) => { await p.getByRole('button', { name: 'Upper A day 1' }).click(); await wait(p) } }),
-  s({ name: 'view-workout-history', url: '/plans/view?id=work-1', act: async (p) => { await p.getByRole('button', { name: /^v2/ }).click(); await wait(p); await p.getByRole('button', { name: /^v2/ }).scrollIntoViewIfNeeded() } }),
+  // The plan's next day (current_position 1, Lower A) is open on arrival; this opens another day.
+  s({ name: 'view-workout-open', url: '/plans/view?id=work-1', act: async (p) => { await p.getByRole('button', { name: 'Upper B day 4' }).click(); await wait(p) } }),
+  s({ name: 'view-workout-end', url: '/plans/view?id=work-1', act: async (p) => { await p.mouse.wheel(0, 1600); await wait(p) } }),
+  s({ name: 'view-workout-history', url: '/plans/view?id=work-1', act: async (p) => { await p.getByRole('button', { name: /^Version 2/ }).click(); await wait(p); await p.getByRole('button', { name: /^Version 2/ }).scrollIntoViewIfNeeded() } }),
   s({ name: 'view-workout-long', url: '/plans/view?id=work-1', api: LONG_API, act: async (p) => { await p.getByRole('button', { name: /day 1$/ }).click(); await wait(p) } }),
+  s({ name: 'view-workout-starting', url: '/plans/view?id=work-1', hang: ['/v1/workout-sessions'], act: async (p) => { await p.getByRole('button', { name: /^Start Lower A/ }).click(); await wait(p, 400) } }),
   s({ name: 'view-workout-inactive', url: '/plans/view?id=old-1', api: INACTIVE_API, act: async (p) => { await p.mouse.wheel(0, 1400); await wait(p) } }),
   s({ name: 'view-meal', url: '/plans/view?id=meal-1' }),
+  s({ name: 'view-meal-end', url: '/plans/view?id=meal-1', act: async (p) => { await p.mouse.wheel(0, 1600); await wait(p) } }),
   s({ name: 'view-meal-day', url: '/plans/view?id=meal-1', act: async (p) => { await p.getByRole('button', { name: 'Wed 28' }).click(); await wait(p); await p.mouse.wheel(0, 300); await wait(p) } }),
   s({ name: 'view-meal-long', url: '/plans/view?id=meal-1', api: LONG_API }),
   s({ name: 'view-loading', url: '/plans/view?id=work-1', hang: ['/v1/plans'] }),

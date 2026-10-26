@@ -13,7 +13,7 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { getPlan } from '@/lib/api/plans.api'
-import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { FailCard } from '@/components/plans/spatial-parts'
 import { ApiException } from '@/types/api.types'
 import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 
@@ -50,10 +50,10 @@ function PlanDetailView({ id }: { id: string }) {
         <>
           <PushedHeader title="Plan" onBack={() => goBack(router, '/plans')} backLabel="Back to plans" />
           <div className="-mx-4"><OfflineBand /></div>
-          <div className="mt-2 space-y-3 px-1" role="status" aria-busy="true" aria-label="Loading this plan">
-            <div aria-hidden="true" className="h-[33px] w-3/4 animate-pulse rounded-[10px] bg-ink-06" />
-            <div aria-hidden="true" className="h-[20px] w-1/2 animate-pulse rounded-[8px] bg-ink-06" />
-            <SkeletonCard className="!mt-6 h-[146px]" />
+          <div className="mt-1 flex flex-col gap-2.5 px-1" role="status" aria-busy="true" aria-label="Loading this plan">
+            <div aria-hidden="true" className="h-8 w-3/4 animate-pulse rounded-[10px] bg-ink-06" />
+            <div aria-hidden="true" className="h-5 w-1/2 animate-pulse rounded-[8px] bg-ink-06" />
+            <SkeletonCard className="mt-4 h-[150px]" />
             <SkeletonCard className="h-[260px]" />
           </div>
         </>
@@ -61,10 +61,10 @@ function PlanDetailView({ id }: { id: string }) {
         <>
           <PushedHeader title="Plan" onBack={() => goBack(router, '/plans')} backLabel="Back to plans" />
           <div className="-mx-4"><OfflineBand /></div>
-          <div className="mt-2">
+          <div className="mt-1">
             {error && !(error instanceof ApiException && error.statusCode === 404)
-              ? <ErrorState onRetry={() => void refetch()}>I couldn&apos;t load this plan. Check your connection and try again.</ErrorState>
-              : <ErrorState>This plan is gone. It was probably replaced by a newer version.</ErrorState>}
+              ? <FailCard title="I couldn't load this plan" onRetry={() => void refetch()}>Check your connection and try again.</FailCard>
+              : <FailCard title="This plan is gone">It was probably replaced by a newer version. Your plans list has the current one.</FailCard>}
           </div>
         </>
       ) : (

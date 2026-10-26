@@ -4,17 +4,28 @@ import type { ReactNode } from 'react'
 import { Pencil } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { LayoutGroup, motion, useReducedMotion } from 'framer-motion'
-import { PushedHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { PlanChangelog } from '@/components/plans/plan-changelog'
+import { timeLeft } from '@/components/plans/plan-overview-card'
 import { formatDateRange, statusLabel } from '@/components/plans/plan-format'
+import { Busy, CARD, Dock, DockSpacer, ORANGE_BUTTON, PushedLargeHeader, SectionHeading } from '@/components/plans/spatial-parts'
 import { goBack } from '@/lib/navigation'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { spring } from '@/lib/motion'
 import type { Plan } from '@/types/plans.types'
 
-/** Shared frame of both plan details: pushed header with an edit action, the plan name, history, and "make active". */
+/** "Active until 30 Nov, 5 weeks left", "Active, no end date", "Ended 25 Aug". */
+export function planSubtitle(plan: Plan, today = new Date()): string {
+  const end = plan.end_date ? formatDateRange(undefined, plan.end_date).replace('Until ', '') : null
+  if (plan.status === 'active') {
+    const left = timeLeft(plan.end_date, today)
+    return end ? `Active until ${end}${left ? `, ${left.charAt(0).toLowerCase()}${left.slice(1)}` : ''}` : 'Active, no end date'
+  }
+  if (plan.status === 'draft') return 'Draft'
+  return end ? `Ended ${end}` : statusLabel(plan.status)
+}
+
+/** Shared frame of both plan views: large title with the plan name, an edit action, notes, history, and "make active". */
 export function PlanDetailFrame({ plan, kind, fallbackTitle, activating, onActivate, children }: {
   plan: Plan
   kind: string
@@ -27,39 +38,40 @@ export function PlanDetailFrame({ plan, kind, fallbackTitle, activating, onActiv
   const reduce = useReducedMotion()
   // Everything under the days glides (transform) when a day opens or closes, instead of jumping.
   const glide = reduce ? { duration: 0 } : spring.glide
+  const inactive = plan.status !== 'active'
   return (
-    <div className="pb-6">
-      <PushedHeader
-        title={kind}
+    <div>
+      <PushedLargeHeader
+        title={plan.content.name || fallbackTitle}
+        barTitle={kind}
+        sub={planSubtitle(plan)}
         onBack={() => goBack(router, '/plans')}
+        backLabel="Back to plans"
         actions={<RoundButton aria-label="Edit plan" onClick={() => router.push(`/plans/edit?id=${plan.id}`)}><Pencil strokeWidth={1.75} /></RoundButton>}
       />
-      <div className="-mx-4"><OfflineBand /></div>
-      <header className="px-1 pt-2">
-        <h1 className="font-wide break-words text-[30px] font-bold leading-[1.1] tracking-[-0.5px] text-ink">{plan.content.name || fallbackTitle}</h1>
-        <p className="mt-1.5 text-[15px] text-ink-65">{statusLabel(plan.status)} · {formatDateRange(plan.start_date, plan.end_date)}</p>
-      </header>
+      <div className="-mx-4 mt-3"><OfflineBand /></div>
       <LayoutGroup>
-      <div className="mt-6 flex flex-col gap-3">{children}</div>
-      <motion.div layout="position" transition={glide}>
-      {plan.content.notes ? (
-        <section className="mt-8">
-          <h2 className="mb-2 px-1 text-[13px] font-semibold text-ink-65">Notes</h2>
-          <p className="rounded-[24px] bg-card p-5 text-[15.5px] leading-[1.5] text-ink shadow-[var(--shadow-card)]">{plan.content.notes}</p>
-        </section>
-      ) : null}
-      <div className="mt-8"><PlanChangelog planId={plan.id} /></div>
-      {plan.status !== 'active' ? (
-        <PrimaryButton type="button" className="mt-6 h-[56px] rounded-full py-0" onClick={onActivate} disabled={activating} aria-busy={activating || undefined}>
-          {activating ? 'Making it active…' : 'Make this my plan'}
-        </PrimaryButton>
-      ) : null}
-      </motion.div>
+        <div className="mt-4 flex flex-col">{children}</div>
+        <motion.div layout="position" transition={glide}>
+          {plan.content.notes ? (
+            <section>
+              <SectionHeading>Notes</SectionHeading>
+              <p className={`${CARD} whitespace-pre-line p-4 text-body leading-[1.45] text-ink`}>{plan.content.notes}</p>
+            </section>
+          ) : null}
+          <PlanChangelog planId={plan.id} />
+          {inactive ? <DockSpacer /> : <div aria-hidden="true" className="h-[var(--tabbar-clearance)]" />}
+        </motion.div>
       </LayoutGroup>
+      {inactive ? (
+        <Dock>
+          <button type="button" className={ORANGE_BUTTON} onClick={onActivate} disabled={activating} aria-busy={activating || undefined}>
+            {activating ? <Busy>Making it your plan</Busy> : 'Make this my plan'}
+          </button>
+        </Dock>
+      ) : null}
     </div>
   )
 }
 
-export function SectionTitle({ children }: { children: ReactNode }) {
-  return <h2 className="mt-5 px-1 text-[13px] font-semibold text-ink-65 first:mt-0">{children}</h2>
-}
+export { SectionHeading as SectionTitle }

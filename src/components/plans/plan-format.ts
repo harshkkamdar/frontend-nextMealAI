@@ -47,3 +47,29 @@ export function previousPlans(all: Plan[], active: Plan[]): Plan[] {
   }
   return rows.slice(0, PREVIOUS_LIMIT)
 }
+
+/**
+ * The plan's next training day: from current_position (the cursor the backend advances after each session), skipping
+ * rest days, wrapping round. Null when the plan has no training days.
+ */
+export function nextTrainingDay(days: { is_rest_day?: boolean }[], position = 0): number | null {
+  if (!days.length) return null
+  const start = ((Math.trunc(position) % days.length) + days.length) % days.length
+  for (let step = 0; step < days.length; step += 1) {
+    const index = (start + step) % days.length
+    if (!days[index].is_rest_day) return index
+  }
+  return null
+}
+
+/** A plan day's short label for the week dots: the weekday initial when the day has a date, else its number. */
+export function dayLetter(date: string | undefined, index: number): string {
+  const parsed = date ? parseDate(date) : null
+  return parsed ? 'SMTWTFS'[parsed.getUTCDay()] : String(index + 1)
+}
+
+/** "Tue" for a dated plan day; null without a date. */
+export function dayWeekday(date: string | undefined): string | null {
+  const parsed = date ? parseDate(date) : null
+  return parsed ? parsed.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' }) : null
+}

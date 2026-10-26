@@ -28,7 +28,7 @@ describe('PlanChangelog', () => {
       .mockResolvedValueOnce({ current: { id: 'v3', version: 3, created_at: '2026-09-14T10:00:00Z' }, previous: null, changes: [{ type: 'exercise_added', field: 'days', description: 'Added Bench Press' }] })
     render(<PlanChangelog planId="plan-1" />)
     await screen.findByText('History')
-    fireEvent.click(screen.getByRole('button', { name: /v3 · 14 Sep/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Version 3, 14 Sep/ }))
     expect(await screen.findByText('Added Bench Press')).toBeInTheDocument()
     expect(screen.getByText('+')).toHaveClass('text-ink')
     expect(screen.getByText('Current')).toBeInTheDocument()

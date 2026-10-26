@@ -92,22 +92,20 @@ describe('PlansPage CTAs', () => {
     fireEvent.click(screen.getByText('Ask Geo for a plan'))
     expect(openSheetMock).toHaveBeenCalledWith('geo-companion')
 
-    expect(screen.getByRole('link', { name: 'Build nutrition plan by hand' })).toHaveAttribute('href', '/plans/new/meal')
-    expect(screen.getByRole('link', { name: 'Build training program by hand' })).toHaveAttribute('href', '/plans/new/workout')
-    expect(screen.getByText('Nutrition plan')).toBeInTheDocument()
-    expect(screen.getByText('Training program')).toBeInTheDocument()
-    expect(screen.getByText('No nutrition plan yet')).toBeInTheDocument()
-    expect(screen.getByText('No training program yet')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Build a nutrition plan/ })).toHaveAttribute('href', '/plans/new/meal')
+    expect(screen.getByRole('link', { name: /Build a training plan/ })).toHaveAttribute('href', '/plans/new/workout')
+    expect(screen.getByRole('link', { name: /No nutrition plan yet/ })).toHaveAttribute('href', '/plans/new/meal')
+    expect(screen.getByRole('link', { name: /No training plan yet/ })).toHaveAttribute('href', '/plans/new/workout')
   })
 
-  it('shows an edit button on existing plan cards that routes to the query-based edit page', async () => {
+  it('answers on the cards: the day\'s targets and the next workout, and each card opens its plan', async () => {
     getPlansMock.mockResolvedValue([
       {
         id: 'meal-1',
         user_id: 'u1',
         type: 'meal',
         status: 'active',
-        content: { daily_targets: { calories: 2000, protein: 150, carbs: 200, fat: 60 } },
+        content: { name: 'Lean cut', daily_targets: { calories: 2125, protein: 165, carbs: 218, fat: 66 } },
         created_at: 'n',
         updated_at: 'n',
       },
@@ -116,20 +114,26 @@ describe('PlansPage CTAs', () => {
         user_id: 'u1',
         type: 'workout',
         status: 'active',
-        content: { days: [{ date: '', name: 'Day 1', is_rest_day: false, exercises: [] }] },
+        current_position: 2,
+        content: { name: 'Upper/lower', days: [
+          { date: '', name: 'Upper A', exercises: [] },
+          { date: '', name: 'Lower A', exercises: [] },
+          { date: '', name: 'Rest', is_rest_day: true, exercises: [] },
+          { date: '', name: 'Upper B', exercises: [] },
+        ] },
         created_at: 'n',
         updated_at: 'n',
       },
     ])
     render(<PlansPage />)
 
-    await waitFor(() => screen.getByLabelText('Edit nutrition plan'))
-    expect(screen.getByText('2,000 kcal · 150 g protein')).toBeInTheDocument()
-    expect(screen.getByText('1 training day')).toBeInTheDocument()
-    fireEvent.click(screen.getByLabelText('Edit nutrition plan'))
-    expect(pushMock).toHaveBeenCalledWith('/plans/edit?id=meal-1')
-
-    fireEvent.click(screen.getByLabelText('Edit workout plan'))
-    expect(pushMock).toHaveBeenCalledWith('/plans/edit?id=workout-1')
+    const meal = await screen.findByRole('button', { name: 'Lean cut, nutrition, 2,125 kcal a day' })
+    expect(screen.getByText('218 g')).toBeInTheDocument()
+    // current_position 2 is a rest day, so the next workout is the day after it.
+    const workout = screen.getByRole('button', { name: 'Upper/lower, training, next Upper B' })
+    fireEvent.click(meal)
+    expect(pushMock).toHaveBeenCalledWith('/plans/view?id=meal-1')
+    fireEvent.click(workout)
+    expect(pushMock).toHaveBeenCalledWith('/plans/view?id=workout-1')
   })
 })

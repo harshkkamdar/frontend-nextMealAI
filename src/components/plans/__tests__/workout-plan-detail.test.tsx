@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), back: vi.fn(), refresh: vi.fn() }),
@@ -56,18 +56,21 @@ describe('WorkoutPlanDetail — plan name in header', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Workout Plan')
   })
 
-  it('expands a day to show exercise detail', () => {
+  it('opens the next day on arrival and closes it on tap', async () => {
     const plan = makePlan({
       start_date: '2026-09-15',
       end_date: '2026-10-12',
       content: { name: 'PPL', days: [{ date: '2026-09-15', name: 'Push', is_rest_day: false, exercises: [{ name: 'Bench Press', sets: 3, reps: 10, rest_seconds: 90 }] }] },
     })
     render(<WorkoutPlanDetail plan={plan} />)
-    expect(screen.getByText('Active · 15 Sep – 12 Oct')).toBeInTheDocument()
+    expect(screen.getByText('Active until 12 Oct')).toBeInTheDocument()
     expect(screen.getByText('Days')).toBeInTheDocument()
-    expect(screen.getByText('Push')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /Push/ }))
+    // The plan's next day is open on arrival, marked Next, with its Start.
+    expect(screen.getByText('Next')).toBeInTheDocument()
     expect(screen.getByText('Bench Press').closest('li')).toHaveTextContent('Bench Press3 × 10 · 90 s')
-    expect(screen.getByRole('button', { name: 'Start workout' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Start Push' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Push day 1/ }))
+    expect(screen.getByRole('button', { name: /Push day 1/ })).toHaveAttribute('aria-expanded', 'false')
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Start Push' })).not.toBeInTheDocument())
   })
 })
