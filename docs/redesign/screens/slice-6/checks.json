@@ -1,5 +1,37 @@
 [
   {
+    "shot": "session-active-row",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-active-row",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-all-exercises",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-all-exercises",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "session-error",
     "width": 360,
     "url": "/train/session?id=sess-1",
@@ -57,6 +89,54 @@
   },
   {
     "shot": "session-first-set",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-history-bottom",
+    "width": 360,
+    "url": "/train/session?id=h4",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-history-bottom",
+    "width": 390,
+    "url": "/train/session?id=h4",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-history",
+    "width": 360,
+    "url": "/train/session?id=h4",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-history",
+    "width": 390,
+    "url": "/train/session?id=h4",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-jump",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-jump",
     "width": 390,
     "url": "/train/session?id=sess-1",
     "axe": [],
@@ -137,6 +217,22 @@
   },
   {
     "shot": "session-mid",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-next",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-next",
     "width": 390,
     "url": "/train/session?id=sess-1",
     "axe": [],

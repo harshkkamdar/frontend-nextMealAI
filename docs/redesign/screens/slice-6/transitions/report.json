@@ -1,48 +1,83 @@
 {
+  "all-exercises-jump": {
+    "frames": 120,
+    "chrome_px": 407567,
+    "content_px": 1334716,
+    "max_chrome_share": 0.143,
+    "max_content_share": 0.175,
+    "issues": [
+      "late change frame 14 after 13 still frames (69 px)",
+      "late change frame 64 after 18 still frames (74 px)",
+      "late change frame 118 after 17 still frames (58 px)"
+    ],
+    "verdict": "pop"
+  },
   "finish": {
-    "frames": 84,
-    "chrome_px": 37824,
-    "content_px": 183663,
-    "max_chrome_share": 0.139,
-    "max_content_share": 0.073,
+    "frames": 87,
+    "chrome_px": 68823,
+    "content_px": 336172,
+    "max_chrome_share": 0.081,
+    "max_content_share": 0.048,
     "issues": [],
     "verdict": "smooth"
   },
-  "rest-minimise": {
-    "frames": 146,
-    "chrome_px": 224378,
-    "content_px": 971242,
-    "max_chrome_share": 0.064,
-    "max_content_share": 0.058,
+  "next-exercise": {
+    "frames": 65,
+    "chrome_px": 13126,
+    "content_px": 227600,
+    "max_chrome_share": 0.115,
+    "max_content_share": 0.121,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "previous-exercise": {
+    "frames": 71,
+    "chrome_px": 15273,
+    "content_px": 207371,
+    "max_chrome_share": 0.131,
+    "max_content_share": 0.141,
     "issues": [
-      "late change frame 138 after 16 still frames (78 px)"
+      "chrome jump frame 22: 9% of chrome change",
+      "late change frame 68 after 15 still frames (80 px)"
+    ],
+    "verdict": "pop"
+  },
+  "rest-minimise": {
+    "frames": 138,
+    "chrome_px": 674234,
+    "content_px": 3097705,
+    "max_chrome_share": 0.089,
+    "max_content_share": 0.078,
+    "issues": [
+      "late change frame 86 after 18 still frames (346 px)",
+      "late change frame 137 after 16 still frames (58 px)"
     ],
     "verdict": "pop"
   },
   "set-tick-rest": {
-    "frames": 83,
-    "chrome_px": 109085,
-    "content_px": 605707,
-    "max_chrome_share": 0.135,
-    "max_content_share": 0.092,
+    "frames": 89,
+    "chrome_px": 499822,
+    "content_px": 2112366,
+    "max_chrome_share": 0.116,
+    "max_content_share": 0.114,
     "issues": [],
     "verdict": "smooth"
   },
   "start-session": {
-    "frames": 57,
-    "chrome_px": 132000,
-    "content_px": 348266,
-    "max_chrome_share": 0.111,
-    "max_content_share": 0.096,
+    "frames": 69,
+    "chrome_px": 245290,
+    "content_px": 1068106,
+    "max_chrome_share": 0.091,
+    "max_content_share": 0.056,
     "issues": [],
     "verdict": "smooth"
   },
   "train-first-load": {
-    "frames": 64,
-    "chrome_px": 42769,
-    "content_px": 248903,
-    "max_chrome_share": 0.272,
-    "max_content_share": 0.382,
+    "frames": 70,
+    "chrome_px": 65332,
+    "content_px": 340513,
+    "max_chrome_share": 0.089,
+    "max_content_share": 0.085,
     "issues": [],
     "verdict": "smooth"
   }
