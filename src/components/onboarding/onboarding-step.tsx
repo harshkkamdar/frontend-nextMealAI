@@ -110,7 +110,7 @@ export function OnboardingStep({ stepKey, progress, segments, question, why, onB
             exit="exit"
             transition={settle}
             style={{ '--rise-delay': '60ms', transformOrigin: '50% 30vh' } as CSSProperties}
-            className="flex-1 px-gutter pb-[calc(150px+var(--safe-bottom))] pt-8"
+            className="flex-1 px-gutter pb-[calc(170px+var(--safe-bottom))] pt-8"
           >
             <h1 className="rise font-wide text-balance text-title text-ink">{question}</h1>
             {why ? <p className="rise mt-2.5 text-pretty text-body-sm text-ink-80" style={{ '--i': 1 } as CSSProperties}>{why}</p> : null}
@@ -130,16 +130,18 @@ export function OnboardingStep({ stepKey, progress, segments, question, why, onB
               </motion.span>
             </AnimatePresence>
           </PrimaryButton>
-          <AnimatePresence initial={false}>
-            {secondary ? (
-              // The slot grows from 0, so the CTA above glides up instead of jumping when a secondary action appears.
-              <motion.div key={secondary.label} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 48 }} exit={{ opacity: 0, height: 0 }} transition={reduce ? reducedFade : spring.sheet} className="overflow-hidden">
-                <button type="button" onClick={secondary.onClick} className="mx-auto mt-1 flex h-11 items-center px-4 text-body-sm font-semibold text-ink">
-                  {secondary.label}
-                </button>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+          {/* The slot is always there, so the CTA sits at one height on every screen (mock) and never moves when a link comes or goes. */}
+          <div className="relative h-12">
+            <AnimatePresence initial={false}>
+              {secondary ? (
+                <motion.div key={secondary.label} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={reduce ? reducedFade : { duration: 0.18 }} className="absolute inset-0">
+                  <button type="button" onClick={secondary.onClick} className="mx-auto mt-1 flex h-11 items-center px-4 text-body-sm font-semibold text-ink">
+                    {secondary.label}
+                  </button>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
         </div>
       </form>
     </div>

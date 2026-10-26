@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 /** `carried`: the card was already on screen (the build checklist), so it does not rise in again. */
 export function PlanCard({ label, carried, className, children }: { label?: string; carried?: boolean; className?: string; children: ReactNode }) {
   return (
-    <section aria-label={label} style={{ '--i': 2 } as CSSProperties} className={cn('min-h-[300px] rounded-[28px] p-3.5', !carried && 'rise', auroraSurface, className)}>
+    <section aria-label={label} style={{ '--i': 2 } as CSSProperties} className={cn('min-h-[340px] rounded-[28px] p-3.5', !carried && 'rise', auroraSurface, className)}>
       {children}
     </section>
   )

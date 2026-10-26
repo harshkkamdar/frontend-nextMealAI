@@ -63,7 +63,7 @@ export default function ReviewPage() {
   return (
     <OnboardingStep
       stepKey="reveal"
-      progress={1}
+     
       scene="reveal"
       question={question}
       why={why}

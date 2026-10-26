@@ -24,8 +24,8 @@ const LAST = BEATS.length - 1
 const STEP = 12 // progress dots: 6 px dot + 6 px gap
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 
-/** The shared stage under every beat's visual: below the title block, above the dots and buttons (136 px plus the safe area). */
-const STAGE: CSSProperties = { top: 'calc(var(--safe-top) + 236px)', height: 'min(336px, calc(100dvh - var(--safe-top) - var(--safe-bottom) - 236px - 148px))' }
+/** The shared stage under every beat's visual: below the title block, ending just above the dots (the dots, CTA and link take 200 px plus the safe area). */
+const STAGE: CSSProperties = { top: 'calc(var(--safe-top) + 236px)', height: 'min(420px, calc(100dvh - var(--safe-top) - var(--safe-bottom) - 236px - 200px))' }
 /** The stage leans a little differently on each beat, so it settles like a card being set down. */
 const LEAN = ['none', 'translateY(4px) rotate(-.6deg)', 'translateY(-2px) rotate(.5deg)', 'translateY(2px) rotate(-.3deg)']
 
@@ -168,7 +168,7 @@ function Beat({ p, i, reduce, title, line, current, children }: { p: MotionValue
         <p className={cn('mt-3 max-w-[32ch] text-pretty text-body text-ink-80', i === 0 && 'rise')} style={intro(1)}>{line}</p>
       </motion.div>
       <motion.div style={{ ...STAGE, y: visualY }} className="absolute inset-x-gutter overflow-hidden p-4">
-        <div className={cn(i === 0 && 'rise')} style={intro(3)}>{children}</div>
+        <div className={cn('h-full', i === 0 && 'rise')} style={intro(3)}>{children}</div>
       </motion.div>
     </motion.section>
   )
@@ -181,7 +181,7 @@ function Dots({ p, reduce }: { p: MotionValue<number>; reduce: boolean }) {
   const x = useTransform(c, (v) => v * STEP)
   const scaleX = useTransform(c, (v) => 1 + 1.6 * (1 - Math.abs(2 * (v - Math.floor(v)) - 1)))
   return (
-    <div aria-hidden="true" className="relative mx-auto mb-4 flex w-fit gap-1.5">
+    <div aria-hidden="true" className="relative mx-auto mb-14 flex w-fit gap-1.5">
       {BEATS.map((b, i) => <Dot key={b.title} c={c} i={i} reduce={reduce} />)}
       {!reduce && <motion.span className="absolute left-0 top-0 size-1.5 rounded-full bg-ink" style={{ x, scaleX }} />}
     </div>

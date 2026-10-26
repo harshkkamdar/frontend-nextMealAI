@@ -47,13 +47,13 @@ export default function GeneratingPage() {
   }, [reduce, router])
 
   return (
-    <OnboardingStep stepKey="generating" progress={1} scene="plan" question="Geo is building your plan" why="This takes a few seconds." cta="Start" canContinue={false} onContinue={() => {}} bar={false}>
+    <OnboardingStep stepKey="generating" scene="plan" question="Geo is building your plan" why="This takes a few seconds." cta="Start" canContinue={false} onContinue={() => {}} bar={false}>
       <PlanCard>
         <ul aria-live="polite" className="flex flex-col gap-2">
           {ITEMS.map((item, i) => {
             const isDone = i < done
             return (
-              <li key={item} style={{ '--i': i + 2 } as CSSProperties} className={cn('rise flex h-14 items-center gap-3 rounded-[16px] bg-ink-04 px-4 text-body-sm font-semibold transition-colors duration-300', isDone ? 'text-ink' : 'text-ink-65')}>
+              <li key={item} style={{ '--i': i + 2 } as CSSProperties} className={cn('rise flex h-[60px] items-center gap-3 rounded-[16px] bg-ink-04 px-4 text-body-sm font-semibold transition-colors duration-300', isDone ? 'text-ink' : 'text-ink-65')}>
                 <span className={cn('grid size-6 shrink-0 place-items-center rounded-full transition-colors duration-200', isDone ? 'bg-ink text-cream' : 'outline outline-[1.5px] -outline-offset-[1.5px] outline-ink-20')}>
                   {isDone ? (
                     <motion.svg initial={reduce ? false : { scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={reduce ? reducedFade : spring.tap} viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5l3 3 6-7" /></motion.svg>

@@ -30,9 +30,9 @@
   animation-direction: alternate;
   will-change: transform;
 }
-.f1 { left: -50vw; top: -37vw; background: radial-gradient(closest-side, rgba(232, 98, 42, .3), rgba(232, 98, 42, 0)); animation-name: aurora-a; animation-duration: 29s; }
-.f2 { left: 37vw; top: 63vw; background: radial-gradient(closest-side, rgba(62, 124, 119, .26), rgba(62, 124, 119, 0)); animation-name: aurora-b; animation-duration: 35s; }
-.f3 { left: -43vw; top: 130vw; background: radial-gradient(closest-side, rgba(160, 122, 60, .26), rgba(160, 122, 60, 0)); animation-name: aurora-c; animation-duration: 31s; }
+.f1 { left: -50vw; top: -37vw; background: radial-gradient(closest-side, rgba(232, 98, 42, .38), rgba(232, 98, 42, 0)); animation-name: aurora-a; animation-duration: 29s; }
+.f2 { left: 37vw; top: 63vw; background: radial-gradient(closest-side, rgba(62, 124, 119, .3), rgba(62, 124, 119, 0)); animation-name: aurora-b; animation-duration: 35s; }
+.f3 { left: -43vw; top: 130vw; background: radial-gradient(closest-side, rgba(160, 122, 60, .32), rgba(160, 122, 60, 0)); animation-name: aurora-c; animation-duration: 31s; }
 .f4 { left: 10vw; top: 77vw; width: 87vw; height: 87vw; background: radial-gradient(closest-side, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0)); animation-name: aurora-b; animation-duration: 41s; animation-direction: alternate-reverse; }
 .paused .f { animation-play-state: paused; }
 .still .wrap, .still .slab { transition: none; }

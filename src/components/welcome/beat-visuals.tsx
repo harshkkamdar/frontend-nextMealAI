@@ -38,7 +38,7 @@ export function FoodVisual({ live }: BeatVisualProps) {
     { label: 'Fat', g: 14, v: 0.3, color: 'var(--color-macro-ochre)' },
   ]
   return (
-    <div aria-hidden="true">
+    <div aria-hidden="true" className="flex h-full flex-col justify-between">
       <div className="flex items-center gap-3.5">
         <span className="size-[68px] shrink-0"><Bowl /></span>
         <div className="min-w-0">
@@ -69,16 +69,20 @@ export function FoodVisual({ live }: BeatVisualProps) {
   )
 }
 
+/** The sample rest is 2:22 long and starts at 1:28 left, so the bar opens about 60% full as in the mock. */
+const REST_S = 142
+
 export function TrainVisual({ live, active }: BeatVisualProps) {
   const [left, setLeft] = useState(88)
   useEffect(() => {
     if (!active) return
-    const id = window.setInterval(() => setLeft((s) => (s <= 1 ? 90 : s - 1)), 1000)
+    const id = window.setInterval(() => setLeft((s) => (s <= 1 ? 88 : s - 1)), 1000)
     return () => window.clearInterval(id)
   }, [active])
   const week = [0.5, 0.15, 0.8, 0.15, 0.6, 1, 0.15]
   return (
-    <div aria-hidden="true">
+    <div aria-hidden="true" className="flex h-full flex-col justify-between">
+      <div>
       <div className="flex justify-between text-caption font-semibold">
         <span className="text-ink">Rest</span>
         <span className="text-ink-65">Set 3 of 4 next</span>
@@ -87,8 +91,9 @@ export function TrainVisual({ live, active }: BeatVisualProps) {
         {String(Math.floor(left / 60)).padStart(2, '0')}<span className="text-ink-35">:</span>{String(left % 60).padStart(2, '0')}
       </p>
       <span className="mt-3 block h-1.5 overflow-hidden rounded-full bg-ink-06">
-        <span className="block h-full origin-left rounded-full bg-accent" style={{ transform: `scaleX(${left / 90})`, transition: 'transform 1000ms linear' }} />
+        <span className="block h-full origin-left rounded-full bg-accent" style={{ transform: `scaleX(${left / REST_S})`, transition: 'transform 1000ms linear' }} />
       </span>
+      </div>
       <div className="mt-4 flex items-center gap-3">
         <span className="grid size-11 shrink-0 place-items-center rounded-[14px] bg-ink-06">
           <svg viewBox="0 0 24 24" className="size-5 text-ink" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10" /></svg>
@@ -147,14 +152,17 @@ export function CheckInVisual({ live }: BeatVisualProps) {
   const calories = useCountUp(live ? 1900 : null)
   return (
     <div aria-hidden="true">
+      <div>
       <div className="flex items-baseline justify-between">
         <span className="text-caption font-semibold text-ink">Weight</span>
         <span className="font-wide text-headline font-[800] tabular-nums text-ink">-0.6 kg</span>
       </div>
-      <svg viewBox="0 0 220 44" className="mb-1 mt-2 block h-14 w-full overflow-visible" preserveAspectRatio="none">
-        <motion.path d="M2 12 L40 16 L76 10 L112 20 L150 18 L186 26 L216 30" fill="none" stroke="var(--color-ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: live ? 1 : 0 }} transition={{ duration: reduce ? 0 : (DRAW_MS * 1.3) / 1000, ease: [0.22, 1, 0.36, 1] }} />
+      <svg viewBox="0 0 220 48" className="mb-1 mt-2 block w-full overflow-visible">
+        <motion.path d="M4 12 L40 16 L76 10 L112 20 L150 18 L186 26 L214 30" fill="none" stroke="var(--color-ink)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: live ? 1 : 0 }} transition={{ duration: reduce ? 0 : (DRAW_MS * 1.3) / 1000, ease: [0.22, 1, 0.36, 1] }} />
+        <circle cx="214" cy="30" r="4" fill="var(--color-ink)" style={{ opacity: live ? 1 : 0, transition: `opacity 200ms ${reduce ? 0 : DRAW_MS * 1.2}ms` }} />
       </svg>
       <p className="text-label text-ink-65">7-day average, this week</p>
+      </div>
       <div className="mt-3.5 grid grid-cols-2 gap-2.5">
         <div className="flex flex-col rounded-[16px] bg-ink-04 px-3 py-2.5">
           <span className="text-label text-ink-65">Calories</span>
