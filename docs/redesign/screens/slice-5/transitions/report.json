@@ -1,46 +1,59 @@
 {
   "day-change": {
-    "frames": 37,
-    "chrome_px": 5606,
-    "content_px": 54799,
-    "max_chrome_share": 0.245,
-    "max_content_share": 0.13,
+    "frames": 55,
+    "chrome_px": 3925,
+    "content_px": 64050,
+    "max_chrome_share": 0.451,
+    "max_content_share": 0.169,
     "issues": [],
     "verdict": "smooth"
   },
   "day-change-back": {
-    "frames": 96,
-    "chrome_px": 14167,
-    "content_px": 170384,
-    "max_chrome_share": 0.088,
-    "max_content_share": 0.042,
+    "frames": 103,
+    "chrome_px": 12486,
+    "content_px": 153553,
+    "max_chrome_share": 0.158,
+    "max_content_share": 0.078,
     "issues": [],
     "verdict": "smooth"
   },
   "month-open": {
-    "frames": 34,
-    "chrome_px": 116653,
-    "content_px": 235544,
-    "max_chrome_share": 0.086,
-    "max_content_share": 0.099,
+    "frames": 28,
+    "chrome_px": 192103,
+    "content_px": 634332,
+    "max_chrome_share": 0.33,
+    "max_content_share": 0.385,
+    "issues": [
+      "chrome jump frame 3: 33% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "plan-push": {
+    "frames": 41,
+    "chrome_px": 112760,
+    "content_px": 845135,
+    "max_chrome_share": 0.087,
+    "max_content_share": 0.07,
     "issues": [],
     "verdict": "smooth"
   },
   "row-actions-open": {
-    "frames": 34,
-    "chrome_px": 141435,
-    "content_px": 68113,
-    "max_chrome_share": 0.157,
-    "max_content_share": 0.11,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 33,
+    "chrome_px": 236909,
+    "content_px": 660779,
+    "max_chrome_share": 0.272,
+    "max_content_share": 0.368,
+    "issues": [
+      "chrome jump frame 3: 27% of chrome change"
+    ],
+    "verdict": "pop"
   },
   "week-swipe": {
     "frames": 71,
-    "chrome_px": 4403,
-    "content_px": 113186,
-    "max_chrome_share": 0.342,
-    "max_content_share": 0.106,
+    "chrome_px": 3357,
+    "content_px": 124754,
+    "max_chrome_share": 0.409,
+    "max_content_share": 0.109,
     "issues": [],
     "verdict": "smooth"
   }

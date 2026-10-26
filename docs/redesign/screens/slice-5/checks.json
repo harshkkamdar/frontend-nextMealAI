@@ -16,6 +16,54 @@
     "orangeActions": 1
   },
   {
+    "shot": "edit-item",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-item",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-itemised-field",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-itemised-field",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-itemised",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "edit-itemised",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
     "shot": "food-empty",
     "width": 360,
     "url": "/food",
@@ -160,6 +208,54 @@
     "orangeActions": 0
   },
   {
+    "shot": "food-plan-link-none",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-plan-link-none",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-plan-none",
+    "width": 360,
+    "url": "/food/plan",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-plan-none",
+    "width": 390,
+    "url": "/food/plan",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-plan",
+    "width": 360,
+    "url": "/food/plan",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "food-plan",
+    "width": 390,
+    "url": "/food/plan",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "food-scrolled",
     "width": 360,
     "url": "/food",
@@ -192,7 +288,7 @@
     "orangeActions": 0
   },
   {
-    "shot": "inline-edit",
+    "shot": "meal-actions",
     "width": 360,
     "url": "/food",
     "axe": [],
@@ -200,7 +296,7 @@
     "orangeActions": 0
   },
   {
-    "shot": "inline-edit",
+    "shot": "meal-actions",
     "width": 390,
     "url": "/food",
     "axe": [],
@@ -272,7 +368,7 @@
     "orangeActions": 0
   },
   {
-    "shot": "row-expanded",
+    "shot": "row-copy",
     "width": 360,
     "url": "/food",
     "axe": [],
@@ -280,7 +376,83 @@
     "orangeActions": 0
   },
   {
-    "shot": "row-expanded",
+    "shot": "row-copy",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-delete-confirm",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-delete-confirm",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-delete-long",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-delete-long",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-deleted-undo",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [
+      {
+        "el": "Undo",
+        "w": 36,
+        "h": 24
+      }
+    ],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-deleted-undo",
+    "width": 390,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [
+      {
+        "el": "Undo",
+        "w": 36,
+        "h": 24
+      }
+    ],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-move",
+    "width": 360,
+    "url": "/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "row-move",
     "width": 390,
     "url": "/food",
     "axe": [],
