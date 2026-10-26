@@ -59,7 +59,7 @@ export function CheckInMidWeek({ status, enter, source }: { status: CheckInStatu
       </div>
 
       <section className="mt-3">
-        <SectionTitle>This week so far</SectionTitle>
+        <SectionTitle>This week so far · {status.week.label}</SectionTitle>
         <div className="flex flex-col gap-3">
           <WeightTrendCard currentKg={weight.current_kg} deltaKg={weight.delta_week_kg} points={weight.points} tone="muted" source={source} />
           <StatTiles

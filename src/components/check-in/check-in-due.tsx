@@ -78,15 +78,15 @@ export function CheckInDue({ status, refetch, applied, onApplied, onDone, enter,
 
   return (
     <div className="flex flex-col gap-3">
-      <GeoRead verdict={status.verdict} className={cn(enter && 'enter-hero')}>
+      <GeoRead verdict={status.verdict} week={status.week.label} className={cn(enter && 'enter-hero')}>
         {weight.delta_week_kg === null ? null : (
-          <div className="mt-4">
+          <div className="mb-1 mt-5">
             <span className="sr-only">{formatDelta(weight.delta_week_kg)} kg this week</span>
-            <div aria-hidden="true" className="flex items-baseline gap-1.5">
-              <span className="font-wide text-[40px] font-[750] leading-none tracking-[-1px] text-ink">
+            <div aria-hidden="true" className="flex items-baseline gap-2">
+              <span className="font-wider text-[56px] font-[800] leading-none tracking-[-1.5px] text-ink">
                 <Count value={weight.delta_week_kg} format={formatDelta} />
               </span>
-              <span className="text-[15px] font-semibold text-ink-65">kg this week</span>
+              <span className="text-[16px] font-semibold text-ink-65">kg this week</span>
             </div>
           </div>
         )}

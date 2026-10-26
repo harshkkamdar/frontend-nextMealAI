@@ -25,7 +25,7 @@ export function CheckInInsufficient({ status, enter, source }: { status: CheckIn
 
   return (
     <div className="flex flex-col gap-3">
-      {status.verdict ? <GeoRead verdict={status.verdict} className={cn(enter && 'enter-hero')} /> : null}
+      {status.verdict ? <GeoRead verdict={status.verdict} week={status.week.label} className={cn(enter && 'enter-hero')} /> : null}
 
       <section className={cn(CARD, 'p-5', enter && 'enter-hero')} aria-label="Days logged">
         <div className="flex items-baseline justify-between gap-3">

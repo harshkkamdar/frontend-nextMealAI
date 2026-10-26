@@ -44,15 +44,16 @@ export function SectionTitle({ children }: { children: ReactNode }) {
 }
 
 /** Geo's read of the week: an optional hero number above the verdict. */
-export function GeoRead({ verdict, children, className }: { verdict: string | null; children?: ReactNode; className?: string }) {
+export function GeoRead({ verdict, week, children, className }: { verdict: string | null; week: string; children?: ReactNode; className?: string }) {
   return (
     <section className={cn(CARD, 'p-5', className)} aria-label="Geo's read">
       <div className="flex items-center gap-2.5">
         <GeoAvatar size={28} />
         <span className="text-[13px] font-semibold text-ink-65">Geo&apos;s read</span>
+        <span className="ml-auto text-[13px] font-medium text-ink-65">{week}</span>
       </div>
       {children}
-      {verdict ? <p className="mt-3 text-pretty text-[16px] leading-[1.45] text-ink">{verdict}</p> : null}
+      {verdict ? <p className="mt-4 text-pretty text-[15px] leading-[1.5] text-ink-80">{verdict}</p> : null}
     </section>
   )
 }

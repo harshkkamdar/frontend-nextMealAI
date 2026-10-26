@@ -6,9 +6,10 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 
 | Where | Old | New |
 |---|---|---|
-| Header | Eyebrow "8 – 14 SEP" (caps) over left title "Week 6 check-in", settings button | Centred title "Week 6 check-in" / "Week 7 so far", round back button "Back to Home"; week dates as a centred line under the bar; no settings button (Home has it) |
+| Header | Eyebrow "8 – 14 SEP" (caps) over left title "Week 6 check-in", settings button | Centred title "Week 6 check-in" / "Week 7 so far", round back button "Back to Home"; week dates on the right of the first card's header row ("Geo's read · 20 – 26 Oct"; mid-week: "This week so far · 27 Oct – 2 Nov"); no settings button (Home has it) |
 | Loading / error title | (none) / "Check-in" | Check-in |
 | Loading (screen reader) | (none) | Loading your week |
+| Weight chart (screen reader) | Weight trend chart | Weight trend chart, 79.6 kg 5 weeks ago to 78.2 kg now |
 | Error | I couldn't load your week. Check your connection and try again. | (unchanged) |
 
 ## Due
@@ -18,7 +19,7 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 | Verdict card eyebrow | GEO'S READ | Geo's read |
 | Headline number | (none) | −0.8 kg this week (from the week's weight change; hidden when there is none) |
 | Section | THE WEEK'S DATA | Your week |
-| Weight card | Weight trend · 78.4kg · −0.6 this week | Weight trend, 78.4 kg, −0.6 kg this week, "Last 6 weeks" |
+| Weight card | Weight trend · 78.4kg · −0.6 this week | Weight trend, 78.4 kg, min and max ticks, x-axis "5 wk ago" / "Now"; on due the week's change appears only in the headline, elsewhere "−0.6 kg this week" |
 | Health label (Q32) | (none) | Includes Apple Health weigh-ins / Includes Health Connect weigh-ins |
 | No trend | Log your weight to see a trend | (unchanged) |
 | Stats | Kcal / Protein / Train / Sleep | Avg calories / Avg protein / Sessions / Avg sleep (subs: of 2,200 kcal, of 165 g, of 4 planned, 6 nights tracked) |

@@ -67,7 +67,7 @@ export default function CheckInPage() {
         </div>
       ) : status ? (
         <CheckInEntrance.Provider value={enter}>
-          <p className="mb-3 mt-1 text-center text-[13px] font-semibold text-ink-65">{status.week.label}</p>
+          <div aria-hidden="true" className="h-2" />
           {status.state === 'due' ? (
             <CheckInDue
               status={status}

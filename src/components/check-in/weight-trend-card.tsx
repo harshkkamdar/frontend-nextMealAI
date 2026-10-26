@@ -18,7 +18,7 @@ interface WeightTrendCardProps {
   hideDelta?: boolean
 }
 
-const H = 56
+const H = 72
 
 /** y per point in a 0..100 x 0..H box, 6 px headroom so the end dot never clips. */
 function chartY(points: WeightTrendCardProps['points']): number[] {
@@ -42,7 +42,7 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
         <WeightFill className="size-4" />Weight trend
       </span>
       <div className="mt-2 flex items-baseline gap-1">
-        <span className="font-wide text-[28px] font-bold leading-none tracking-[-0.6px] text-ink tabular-nums">
+        <span className="font-wide text-[32px] font-bold leading-none tracking-[-0.8px] text-ink tabular-nums">
           {currentKg === null ? '—' : currentKg.toFixed(1)}
         </span>
         {currentKg === null ? null : <span className="text-[14px] font-semibold text-ink-65">kg</span>}
@@ -62,7 +62,7 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
           <span className="absolute left-0 -translate-y-1/2" style={{ top: H - 6 }}>{Math.min(...kgs).toFixed(1)}</span>
         </span>
         <span className="relative block min-w-0 flex-1" style={{ height: H }}>
-          <svg aria-label="Weight trend chart" role="img" className="block size-full overflow-visible" preserveAspectRatio="none" viewBox={`0 0 100 ${H}`}>
+          <svg aria-label={`Weight trend chart, ${kgs[0].toFixed(1)} kg ${points.length - 1} weeks ago to ${kgs[kgs.length - 1].toFixed(1)} kg now`} role="img" className="block size-full overflow-visible" preserveAspectRatio="none" viewBox={`0 0 100 ${H}`}>
             <defs>
               <clipPath id={clip}>
                 {/* Draws left to right by scaling the clip, so the line itself is never re-measured (as on Home). */}
@@ -71,6 +71,8 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
             </defs>
             <line x1="0" x2="100" y1="6" y2="6" stroke="var(--color-ink-06)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
             <line x1="0" x2="100" y1={H - 6} y2={H - 6} stroke="var(--color-ink-10)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            {/* Where the period started: the reference the line is read against (the status has no goal weight). */}
+            <line x1="0" x2="100" y1={ys[0]} y2={ys[0]} stroke="var(--color-ink-20)" strokeWidth="1" strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
             <polyline clipPath={`url(#${clip})`} fill="none" points={line} stroke={stroke} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" vectorEffect="non-scaling-stroke" />
           </svg>
           {/* Latest weigh-in: an HTML dot so it stays round under the stretched viewBox. */}
@@ -82,10 +84,14 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
         </span>
         </div>
       )}
-
-      {source || ys.length ? (
-        <p className="mt-3 text-[12px] font-medium text-ink-65">{source ? `Includes ${source} weigh-ins` : `Last ${points.length} weeks`}</p>
+      {ys.length ? (
+        <div aria-hidden="true" className="mt-2 flex justify-between pl-10 text-[11px] font-medium text-ink-65">
+          <span>{points.length - 1} wk ago</span>
+          <span>Now</span>
+        </div>
       ) : null}
+
+      {source ? <p className="mt-3 text-[12px] font-medium text-ink-65">Includes {source} weigh-ins</p> : null}
     </section>
   )
 }
