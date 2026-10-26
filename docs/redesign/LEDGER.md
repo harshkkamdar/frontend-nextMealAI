@@ -14,33 +14,33 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 
 | ID | Item | Status |
 |---|---|---|
-| S2-01 | Tab capsule (Home, Food, Train, Geo) + orb, every app screen | pending |
-| S2-02 | + sheet (Tell Geo + log grid) | pending |
-| S2-03 | Main-tab header (large title, condenses) | pending |
-| S2-04 | Pushed-screen header (centred title, round back) | pending |
-| S2-05 | Home default (returning user) | pending |
-| S2-06 | Home first run (no logs, no plan) | pending |
-| S2-07 | Home loading (skeleton) | pending |
-| S2-08 | Home error | pending |
-| S2-09 | Home offline | pending |
-| S2-10 | Home long text | pending |
+| S2-01 | Tab capsule (Home, Food, Train, Geo) + orb, every app screen | built 30959c3, 0ec6c59 (orb surface morph), 4b3ffd5 (lens spring); captures tabs-food/train/geo-*.png |
+| S2-02 | + sheet (Tell Geo + log grid) | built 30959c3, 0ec6c59 (framer panel grows out of the orb; frames transitions-lead/orb-morph/); plus-sheet*.png axe 0 small 0 |
+| S2-03 | Main-tab header (large title, condenses) | built 30959c3 (LargeTitleHeader; condenses on scroll, home-scrolled-*.png) |
+| S2-04 | Pushed-screen header (centred title, round back) | built 30959c3 (PushedHeader; first used by S3-S9) |
+| S2-05 | Home default (returning user) | built 30959c3, d19f500, de45f9b; home-390/360.png axe 0 small 0 orange 0; live/home-390.png on the real account |
+| S2-06 | Home first run (no logs, no plan) | built 30959c3 (first-meal Geo line de45f9b); home-first-run-*.png |
+| S2-07 | Home loading (skeleton) | built 30959c3; home-loading-*.png (role=status skeleton) |
+| S2-08 | Home error | built 30959c3; home-error-*.png |
+| S2-09 | Home offline | built 30959c3; home-offline-*.png |
+| S2-10 | Home long text | built 30959c3; home-long-*.png (560 kcal over, 4-line Geo line, long meal name) |
 | S2-11 | Home Health tiles: connected / not connected / no data today | pending |
-| S2-12 | Home check-in due card | pending |
-| S2-13 | Home quick-log sheets (water, weight, sleep, mood, energy) | pending |
-| S2-14 | Macro breakdown sheet | pending |
+| S2-12 | Home check-in due card | built 30959c3; home-checkin-due-*.png (one orange: See your week) |
+| S2-13 | Home quick-log sheets (water, weight, sleep, mood, energy) | built 30959c3 (quick-log-sheet.tsx); quicklog-weight/water/sleep-*.png |
+| S2-14 | Macro breakdown sheet | built 30959c3; macro-sheet-*.png |
 | S2-15 | Splash | pending |
 | S2-16 | Notifications prompt | pending |
 | S2-17 | Health connect sheet | pending |
 | S2-18 | T: tab switch | pending |
 | S2-19 | T: + sheet open/close | pending |
-| S2-20 | T: Home load (ring draw, count-up) | pending |
+| S2-20 | T: Home load (ring draw, count-up) | built 4b3ffd5 (layered first-paint entrance: hero scale, tiles +12 px 40 ms apart, rows +8 px 30 ms apart; count-ups on motion values; still on revisit) |
 | S2-R1 | R1 core-job metrics | pending |
 | S2-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S2-R3 | R3 axe 0 / contrast / 44 pt | pending |
 | S2-R4 | R4 frame-diff 0 pops | pending |
-| S2-R5 | R5 60 fps on fiqr_lowend | pending |
-| S2-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
-| S2-R7 | R7 copy list approved | pending |
+| S2-R5 | R5 60 fps on fiqr_lowend | blocked-60fps (F6): no real low-end phone; emulator proxy trace from the S2 device agent (pending its report) |
+| S2-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (Fable, docs/redesign/critic-prompt.md, refs Bevel IMG_6907/6891/6866/6865): r1 ranks 1/1/1 scores 7/7/7; r2 1/1/1 7/7/7; r3 2/1/1 6/7/7. Remaining critiques are signed decisions: macro hues (Q18) and capsule + separate orb (C2). needs-owner: collapse protein/carbs/fat to navy tints (changes Q18)? Keep the orb outside the capsule (C2)? |
+| S2-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-2.md? Also: sleep tile became one line plus weekly average instead of the D1 7-night strip (critic round 2, taken alone, cheap to reverse) - keep? |
 | S2-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
 ## S3 logging
@@ -190,7 +190,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 
 | ID | Item | Status |
 |---|---|---|
-| S10-01 | Admin dashboard token pass | pending |
+| S10-01 | Admin dashboard token pass | built de45f9b, 31bd13f (old aliases to v2 tokens in 8 admin files: card, ink-65, radii, macro tints; card-chrome test updated) |
 | S10-R1 | R1 core-job metrics | pending |
 | S10-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S10-R3 | R3 axe 0 / contrast / 44 pt | pending |
