@@ -117,16 +117,18 @@ export function WelcomeCarousel() {
   )
 }
 
-/** One slide, stacked on the others. d = p - i (d < 0 is arriving from the right, d > 0 has left). Both neighbours show at
- *  30% at mid-drag; the title travels 48 px, the line 36 px and the cards 20-36 px, so the layers part at different speeds. */
+/** One slide, stacked on the others. d = p - i (d < 0 is arriving from the right, d > 0 has left). Text hands off in turn
+ *  instead of overlapping: the outgoing title and line are gone by mid-drag and the incoming ones start after it, so two
+ *  slides' words never sit on top of each other. The title travels 48 px, the line 36 px and the cards 20-36 px. */
 function Slide({ p, i, reduce, title, line, current, children }: { p: MotionValue<number>; i: number; reduce: boolean; title: string; line: string; current: boolean; children: ReactNode }) {
   const d = useTransform(p, (v) => clamp(v - i, -1, 1))
   const m = reduce ? 0 : 1
-  const opacity = useTransform(d, (v) => Math.max(0, 1 - Math.abs(v) * 1.4))
+  const opacity = useTransform(d, (v) => Math.max(0, 1 - Math.abs(v) * 2))
   const scale = useTransform(d, (v) => 1 - Math.abs(v) * 0.06 * m)
   const titleX = useTransform(d, (v) => -v * 48 * m)
   const lineX = useTransform(d, (v) => -v * 36 * m)
   // First paint only, slide 1: title, line and bento start 0 / 40 / 120 ms apart with their own rise, so nothing enters as one block.
+  // The intro sits on wrappers so it never fights the scrubbed opacity on the text itself.
   const intro = (dy: number, delay: number) => (i === 0 ? { initial: { opacity: 0, y: dy * m }, animate: { opacity: 1, y: 0 }, transition: reduce ? reducedFade : { ...spring.glide, delay } } : {})
   return (
     <motion.section
@@ -134,11 +136,11 @@ function Slide({ p, i, reduce, title, line, current, children }: { p: MotionValu
       aria-roledescription="slide"
       aria-label={`${i + 1} of ${SLIDES.length}: ${title}`}
       aria-hidden={!current || undefined}
-      style={{ opacity, scale }}
+      style={{ scale }}
       className={cn('absolute inset-0 flex flex-col px-5 pb-[calc(var(--safe-bottom)+176px)] pt-[6vh] [@media(max-height:740px)]:pb-[calc(var(--safe-bottom)+150px)] [@media(max-height:740px)]:pt-[2vh]', !current && 'pointer-events-none')}
     >
-      <motion.h1 style={{ x: titleX }} {...intro(0, 0)} className="font-wider text-[42px] font-[760] leading-none tracking-[-1.4px] text-ink [@media(max-height:740px)]:text-[38px]">{title}</motion.h1>
-      <motion.p style={{ x: lineX }} {...intro(8, 0.04)} className="mt-3 max-w-[30ch] text-pretty text-[16.5px] leading-[1.45] text-ink-80">{line}</motion.p>
+      <motion.div {...intro(0, 0)}><motion.h1 style={{ x: titleX, opacity }} className="font-wider text-[42px] font-[760] leading-none tracking-[-1.4px] text-ink [@media(max-height:740px)]:text-[38px]">{title}</motion.h1></motion.div>
+      <motion.div {...intro(8, 0.04)} className="mt-3"><motion.p style={{ x: lineX, opacity }} className="max-w-[30ch] text-pretty text-[16.5px] leading-[1.45] text-ink-80">{line}</motion.p></motion.div>
       {/* Titles sit at the same height on every slide; the bento centres in the space left. Critic round 3 (24 Oct 2026): grouping the cards under the title instead opened a worse gap at the top, so this layout stays. */}
       <div className="flex flex-1 items-center py-6 [@media(max-height:740px)]:py-3">
         <motion.div className="w-full" {...intro(12, 0.12)}>

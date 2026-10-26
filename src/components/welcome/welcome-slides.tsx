@@ -14,13 +14,14 @@ type BentoProps = { live: boolean; active: boolean }
 export const SlideDepth = createContext<MotionValue<number>>(motionValue(0))
 
 /** Frosted bento card (Q12, Q20): white over the mist, no blur. Card k trails the slide by 20 + 8k px and fades
- *  sooner the further back it sits, so the layers move at different speeds (motion-feel.md 3a). */
+ *  sooner the further back it sits, so the layers move at different speeds (motion-feel.md 3a). Like the text, a card
+ *  is gone before mid-drag, so the outgoing and incoming slides' numbers never overlap. */
 function Card({ k = 0, className, children }: { k?: number; className?: string; children: ReactNode }) {
   const d = useContext(SlideDepth)
   const m = useReducedMotion() ? 0 : 1
   const x = useTransform(d, (v) => -v * (20 + k * 8) * m)
   const scale = useTransform(d, (v) => 1 - Math.abs(v) * 0.04 * m)
-  const opacity = useTransform(d, (v) => Math.max(0, 1 - Math.abs(v) * k * 0.3))
+  const opacity = useTransform(d, (v) => Math.max(0, 1 - Math.abs(v) * (2 + k * 0.4)))
   return <motion.div className={cn('rounded-[var(--radius-bento)] bg-card/80 p-4 shadow-[var(--shadow-card)] outline outline-1 -outline-offset-1 outline-card', className)} style={{ x, scale, opacity }}>{children}</motion.div>
 }
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { flickTarget, project, rubberband, scrub } from '../stage'
+import { project, rubberband } from '@/lib/motion'
+import { flickTarget, scrub } from '../stage'
 
 const W = 390
 

@@ -1,11 +1,5 @@
-// Welcome stage physics (docs/redesign/motion-feel.md 3a). `project` and `rubberband` belong in src/lib/motion.ts per the
-// spec; they live here until that shared file can take them.
-
-/** Where a flick would come to rest, in px. rate .998 = iOS normal scroll deceleration. */
-export const project = (vPxPerS: number, rate = 0.998) => ((vPxPerS / 1000) * rate) / (1 - rate)
-
-/** iOS rubber band: resistance grows with overshoot. */
-export const rubberband = (over: number, dim: number, c = 0.55) => (over * dim * c) / (dim + c * Math.abs(over))
+// Welcome stage physics (docs/redesign/motion-feel.md 3a).
+import { project, rubberband } from '@/lib/motion'
 
 /** Stage position while the finger is down: 1:1 inside [0, last], rubber band past either end. */
 export function scrub(start: number, dx: number, w: number, last: number): number {

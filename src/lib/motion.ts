@@ -22,3 +22,9 @@ export function easeOutCubic(t: number): number {
   const c = Math.min(1, Math.max(0, t))
   return 1 - (1 - c) ** 3
 }
+
+/** Apple/Emil projection: where a flick would come to rest (px). rate .998 = iOS normal scroll deceleration. */
+export const project = (vPxPerS: number, rate = 0.998) => ((vPxPerS / 1000) * rate) / (1 - rate)
+
+/** iOS rubber band: resistance grows with overshoot; c = .55. */
+export const rubberband = (over: number, dim: number, c = 0.55) => (over * dim * c) / (dim + c * Math.abs(over))
