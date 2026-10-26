@@ -1,60 +1,62 @@
 {
   "chip-tap": {
-    "frames": 78,
-    "chrome_px": 34863,
-    "content_px": 1187889,
-    "max_chrome_share": 0.211,
-    "max_content_share": 0.114,
+    "frames": 64,
+    "chrome_px": 30537,
+    "content_px": 742931,
+    "max_chrome_share": 0.241,
+    "max_content_share": 0.155,
     "issues": [],
     "verdict": "smooth"
   },
   "companion-open": {
-    "frames": 26,
-    "chrome_px": 158733,
-    "content_px": 634907,
-    "max_chrome_share": 0.342,
-    "max_content_share": 0.382,
+    "frames": 20,
+    "chrome_px": 69569,
+    "content_px": 285285,
+    "max_chrome_share": 0.428,
+    "max_content_share": 0.172,
     "issues": [
-      "chrome jump frame 4: 34% of chrome change",
-      "chrome jump frame 6: 16% of chrome change"
+      "chrome jump frame 5: 37% of chrome change",
+      "chrome jump frame 13: 43% of chrome change"
     ],
     "verdict": "pop"
   },
   "companion-resize": {
-    "frames": 61,
-    "chrome_px": 242518,
-    "content_px": 1023449,
-    "max_chrome_share": 0.217,
-    "max_content_share": 0.218,
+    "frames": 57,
+    "chrome_px": 235431,
+    "content_px": 744367,
+    "max_chrome_share": 0.128,
+    "max_content_share": 0.185,
     "issues": [
-      "chrome jump frame 4: 22% of chrome change"
+      "chrome jump frame 9: 11% of chrome change"
     ],
     "verdict": "pop"
   },
   "new-conversation": {
-    "frames": 3,
-    "chrome_px": 0,
-    "content_px": 0,
-    "max_chrome_share": 0,
-    "max_content_share": 0,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 23,
+    "chrome_px": 28630,
+    "content_px": 97129,
+    "max_chrome_share": 0.18,
+    "max_content_share": 0.197,
+    "issues": [
+      "chrome jump frame 4: 18% of chrome change"
+    ],
+    "verdict": "pop"
   },
   "open-conversation": {
-    "frames": 33,
-    "chrome_px": 70007,
-    "content_px": 411777,
-    "max_chrome_share": 0.121,
-    "max_content_share": 0.139,
+    "frames": 20,
+    "chrome_px": 34352,
+    "content_px": 392110,
+    "max_chrome_share": 0.28,
+    "max_content_share": 0.389,
     "issues": [],
     "verdict": "smooth"
   },
   "reply-arrives": {
-    "frames": 38,
-    "chrome_px": 47538,
-    "content_px": 1134472,
-    "max_chrome_share": 0.155,
-    "max_content_share": 0.125,
+    "frames": 37,
+    "chrome_px": 44832,
+    "content_px": 1118656,
+    "max_chrome_share": 0.164,
+    "max_content_share": 0.127,
     "issues": [],
     "verdict": "smooth"
   }
