@@ -31,6 +31,8 @@ export function homeApi(kind) {
     lg('sleep', 0, { hours: 7.2, quality_rating: 7 }, 7),
     ...[1, 2, 3, 4, 5, 6].map((o) => lg('sleep', o, { hours: [6.5, 7.8, 5.9, 7.1, 8.2, 6.8][o - 1] })),
     ...[0, 2, 4, 7].map((o, i) => lg('weight', o, { weight_kg: [78.2, 78.5, 78.6, 79.0][i] }, 9)),
+    // A past snack Geo's chip can log again (same fixture as redesign-capture.mjs RETURNING_LOGS).
+    lg('food', 2, { food_name: 'Greek yoghurt, plain, 170 g', meal_type: 'snack', quantity_g: 170, est_macros: { calories: 100, protein: 17, carbs: 6, fat: 1 } }, 3),
   ]
   const profile = { id: 'capture-user', full_name: 'Sam Rivera', ai_consent_at: '2026-10-24T00:00:00Z', health_disclaimer_ack_at: '2026-10-24T00:00:00Z', current_weight_kg: 78.2, daily_calorie_target: 1950, daily_protein_g: 140, daily_carbs_g: 190, daily_fat_g: 65, daily_targets_missing_fields: [] }
   const status = (state) => ({ state, week: { start: isoDay(6), end: isoDay(0), label: 'Week 3 · 20 to 26 Oct', number: 3 }, days_logged: state === 'insufficient' ? 2 : 6, days_needed: 4, next_check_in_date: isoDay(-3), days_to_go: 3, weight: { current_kg: 78.2, delta_week_kg: -0.8, points: [] }, week_so_far: { avg_calories: 1880, avg_protein_g: 121, sessions_done: 2, sessions_planned: 4, sleep_avg_h: 7.1, sleep_nights: 6 }, targets: { calories: 1950, protein_g: 140 }, verdict: null, proposal: null })

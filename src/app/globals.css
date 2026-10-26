@@ -125,6 +125,9 @@
   html { scrollbar-width: none; }
   html::-webkit-scrollbar { display: none; }
   body { @apply bg-background text-text-primary font-sans antialiased; }
+  /* iOS 18 WebKit's UA sheet gives buttons align-items: flex-start, so a flex-col button shrink-wraps its rows and
+     full-width children (macro dots, tile progress bars) collapse to 0 wide; reset to the initial value Chromium uses. */
+  button { align-items: normal; }
   /* The route frame moves focus to a new page's heading (or the page) after a push or pop, for screen readers and the
      keyboard; that landing spot is not a control, so it draws no ring. */
   [data-route][tabindex="-1"]:focus, [data-route] [tabindex="-1"]:focus { outline: none; }
