@@ -51,22 +51,24 @@ const STEP = {
 const STEP_SPRING = { scale: spring.glide, opacity: { duration: 0.28, ease: 'easeOut' } } as const
 
 /** The card while it leaves stops being the current step and takes no input. */
-function ExerciseCard({ index, count, direction, children }: { index: number; count: number; direction: number; children: ReactNode }) {
+function ExerciseCard({ index, count, direction, then, children }: { index: number; count: number; direction: number; then: string; children: ReactNode }) {
   const present = useIsPresent()
   const reduce = useReducedMotion()
+  // The "Then:" line travels with its card, so nothing below jumps when the leaving card unmounts.
   return (
-    <motion.article
+    <motion.div
       custom={direction}
       variants={reduce ? { enter: { opacity: 0 }, center: { opacity: 1 }, exit: { opacity: 0 } } : STEP}
       initial="enter" animate="center" exit="exit"
       transition={reduce ? reducedFade : STEP_SPRING}
-      aria-current={present ? 'step' : undefined}
-      aria-label={`Exercise ${index + 1} of ${count}`}
       inert={!present}
-      className="origin-[50%_30%] rounded-card bg-card p-3.5 shadow-[var(--shadow-card)] [grid-area:1/1]"
+      className="origin-[50%_30%] [grid-area:1/1]"
     >
-      {children}
-    </motion.article>
+      <article aria-current={present ? 'step' : undefined} aria-label={`Exercise ${index + 1} of ${count}`} className="rounded-card bg-card p-3.5 shadow-[var(--shadow-card)]">
+        {children}
+      </article>
+      <p className="mt-2 truncate px-1 text-label text-ink-65">{then}</p>
+    </motion.div>
   )
 }
 
@@ -450,7 +452,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
             <div className="mt-2.5 grid">
               <AnimatePresence initial={false} custom={direction}>
                 {current ? (
-                  <ExerciseCard key={`${currentIndex}-${current.name}`} index={currentIndex} count={exercises.length} direction={direction}>
+                  <ExerciseCard key={`${currentIndex}-${current.name}`} index={currentIndex} count={exercises.length} direction={direction} then={following ? `Then: ${following.name}` : 'Last exercise'}>
                     <ExerciseVisual group={current.muscle_group} name={current.name} />
                     <h2 className="mt-3 line-clamp-3 break-words text-balance font-display text-[22px] font-extrabold leading-[1.14] tracking-[-0.01em] text-ink">{current.name}</h2>
                     {/* The how-to toggle shares the plan line so the set rows start higher up the screen. */}
@@ -486,7 +488,6 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                 ) : null}
               </AnimatePresence>
             </div>
-            <p className="mt-2 truncate px-1 text-label text-ink-65">{following ? `Then: ${following.name}` : 'Last exercise'}</p>
           </>
         )}
 
