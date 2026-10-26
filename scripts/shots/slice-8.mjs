@@ -97,10 +97,13 @@ const shots = [
 // Transitions run against the fixture API below (`home` names the scenario), so nothing is stubbed in the page.
 const wheel = async (p, px) => { await p.mouse.move(195, 420); for (let i = 0; i < px / 20; i++) { await p.mouse.wheel(0, 20); await p.waitForTimeout(16) } }
 const transitions = [
+  // Control on the same server: a shell-only push (Home to Settings) to tell shell behaviour from this slice's.
+  { name: 'control-home-to-settings', url: '/dashboard', home: 'mid', warm: '/settings', act: (p) => p.getByRole('button', { name: 'Settings', exact: true }).click() },
   // Home's "Your week is ready" card pushes the check-in: page spring from 40 px right, headline counts, trend draws.
-  { name: 'home-card-to-checkin', url: '/dashboard', home: 'due', act: (p) => p.getByRole('button', { name: 'See your week' }).click() },
+  // warm loads the route code first; clearing sessionStorage makes the recorded visit a first paint again.
+  { name: 'home-card-to-checkin', url: '/dashboard', home: 'due', warm: '/check-in', act: async (p) => { await p.evaluate(() => sessionStorage.clear()); await p.getByRole('button', { name: 'See your week' }).click() } },
   // Home's "This week" button when nothing is due: the mid-week screen and its muted trend draw.
-  { name: 'this-week-to-checkin', url: '/dashboard', home: 'mid', act: (p) => p.getByRole('button', { name: 'This week' }).click() },
+  { name: 'this-week-to-checkin', url: '/dashboard', home: 'mid', warm: '/check-in', act: async (p) => { await p.evaluate(() => sessionStorage.clear()); await p.getByRole('button', { name: 'This week', exact: true }).click() } },
   // Apply: saving label, then the old values and arrows fade, the heading and button crossfade in place.
   { name: 'apply', url: '/check-in', home: 'due', act: async (p) => { await wheel(p, 900); await p.waitForTimeout(500); await p.getByRole('button', { name: 'Apply new targets' }).click() } },
 ]
