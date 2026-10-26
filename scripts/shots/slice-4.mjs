@@ -82,6 +82,7 @@ const onSend = (page, handler) => page.route(`${API}/v1/chat`, (route) => (route
 const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' }
 const typeAndSend = async (page, text) => { await page.getByLabel('Type a message').fill(text); await page.getByRole('button', { name: 'Send message' }).click() }
 const openCompanion = async (page) => { await page.getByRole('button', { name: 'Ask Geo' }).click(); await page.waitForTimeout(900) }
+const openReport = async (page) => { await photos(page); await page.getByRole('button', { name: 'Message options' }).last().click(); await page.waitForTimeout(300); await page.getByRole('menuitem', { name: 'Report' }).click(); await page.waitForTimeout(800) }
 
 const SESSION = '/chat/session?id=s-1'
 
@@ -110,7 +111,9 @@ const shots = [
   { name: 'session-long', url: '/chat/session?id=s-long', api: geoApi({ '/v1/chat/sessions': { sessions: LONG_SESSIONS } }) },
   { name: 'session-draft', url: SESSION, api: geoApi(), act: async (p) => { await photos(p); await p.getByLabel('Type a message').fill('Actually it was closer to two cups of rice, and I had a flat white with it as well') } },
   { name: 'session-menu', url: SESSION, api: geoApi(), act: async (p) => { await photos(p); await p.getByRole('button', { name: 'Message options' }).last().click(); await p.waitForTimeout(500) } },
-  { name: 'session-report', url: SESSION, api: geoApi(), act: async (p) => { await photos(p); await p.getByRole('button', { name: 'Message options' }).last().click(); await p.waitForTimeout(300); await p.getByRole('menuitem', { name: 'Report' }).click(); await p.waitForTimeout(800); await p.getByRole('button', { name: 'Wrong or misleading' }).click(); await p.waitForTimeout(300) } },
+  // Report opens with no reason picked and Send disabled; -picked shows the state after one choice.
+  { name: 'session-report', url: SESSION, api: geoApi(), act: openReport },
+  { name: 'session-report-picked', url: SESSION, api: geoApi(), act: async (p) => { await openReport(p); await p.getByRole('button', { name: 'Wrong or misleading' }).click(); await p.waitForTimeout(300) } },
   // Companion sheet, opened from Home's "Ask Geo" (first-run Home has no program, so the card offers it)
   { name: 'companion', url: '/dashboard', api: geoApi(), act: openCompanion },
   { name: 'companion-thread', url: '/dashboard', api: geoApi(), act: async (p) => { await p.evaluate(() => localStorage.setItem('nextmealai:companion:current-session-id', JSON.stringify({ session_id: 'comp-1', ts: Date.now() }))); await openCompanion(p) } },

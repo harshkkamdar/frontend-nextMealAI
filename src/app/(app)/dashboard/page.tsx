@@ -182,7 +182,7 @@ export default function DashboardPage() {
       {/* The skeleton fades out over the arriving cards instead of leaving a bare frame (motion-feel N6). */}
       {data && enter ? <div aria-hidden="true" className="skeleton-out pointer-events-none absolute inset-x-4 top-[calc(108px+var(--safe-top))]"><HomeSkeleton /></div> : null}
       {!data && loading ? null : !data ? (
-        <div className="mt-6"><ErrorState onRetry={refresh}>I couldn&apos;t load today. Check your connection and try again.</ErrorState></div>
+        <div className="mt-5 rounded-[24px] bg-card px-5 pb-5 pt-1 shadow-[var(--shadow-card)]"><ErrorState onRetry={refresh}>I couldn&apos;t load today. Check your connection and try again.</ErrorState></div>
       ) : (
         <HomeEntrance.Provider value={enter}>
         <div className="mt-5 flex flex-col gap-3">

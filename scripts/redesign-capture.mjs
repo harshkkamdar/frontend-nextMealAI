@@ -91,15 +91,13 @@ const SHOTS = {
     { name: 'home-checkin-due', url: '/dashboard', api: homeApi({ '/v1/check-in/status': HOME.status('due') }) },
     { name: 'home-long', url: '/dashboard', api: homeApi({ '/v1/logs': { logs: [...RETURNING_LOGS, lg('food', 0, { food_name: LONG_NAME, meal_type: 'dinner', calories: 1420, est_macros: { calories: 1420 } }, 8)] }, '/v1/logs/summary': { ...HOME.summary, daily_breakdown: [{ date: isoDay(0), calories: 2510, protein: 171, carbs: 260, fat: 98 }] }, '/v1/dashboard/check-in': { check_in: { days: [], takeaway: 'You went 560 kcal over today, mostly from dinner. Keep tomorrow steady and lean on protein at breakfast so the week still lands on target.', generated_at: new Date().toISOString(), v: 2 } } }) },
     { name: 'home-loading', url: '/dashboard', api: homeApi(), hang: ['/v1/logs', '/v1/plans', '/v1/dashboard', '/v1/check-in'] },
-    { name: 'home-error', url: '/dashboard', api: homeApi(), fail: ['/v1/logs/summary', '/v1/plans'], failAfterFirst: ['/v1/profile'] },
+    { name: 'home-error', url: '/dashboard', api: homeApi(), fail: ['/v1/logs/summary', '/v1/plans'], failAfter: { '/v1/profile': 2 } },
     { name: 'home-offline', url: '/dashboard', api: homeApi(), offline: true },
     { name: 'plus-sheet', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: 'Log something' }).click(); await p.waitForTimeout(800) } },
     { name: 'plus-sheet-typed', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: 'Log something' }).click(); await p.waitForTimeout(500); await p.getByLabel('Tell Geo what you ate or did').fill('2 eggs and toast with butter') } },
     { name: 'macro-sheet', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: /^Protein/ }).click(); await p.waitForTimeout(800) } },
     ...['Weight', 'Water', 'Sleep'].map((t) => ({ name: `quicklog-${t.toLowerCase()}`, url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: new RegExp(`^${t}`) }).click(); await p.waitForTimeout(800) } })),
-    { name: 'tabs-food', url: '/food', api: homeApi() },
-    { name: 'tabs-train', url: '/train', api: homeApi() },
-    { name: 'tabs-geo', url: '/chat', api: homeApi() },
+    // The Food, Train and Geo tabs are captured by their own slices (5, 6 and 4).
   ],
   'slice-1b': [
     ...[0, 1, 2, 3].map((i) => ({ name: `welcome-${i + 1}`, url: '/welcome', guest: true, act: (p) => slideTo(p, i) })),
@@ -160,8 +158,8 @@ async function mockApi(page, shot) {
     if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors })
     if (shot.hang && shot.hang.some((h) => p.startsWith(h))) return new Promise(() => {})
     const fails = [].concat(shot.fail ?? [])
-    // failAfterFirst: the auth gate's first read succeeds, the screen's own read fails.
-    for (const f of shot.failAfterFirst ?? []) if (p.startsWith(f) && req.method() === 'GET') { seen[f] = (seen[f] ?? 0) + 1; if (seen[f] > 1) fails.push(f) }
+    // failAfter: { path: n } - the first n GETs of that exact path succeed (the shell's reads), later ones (the screen's own) fail.
+    for (const [f, n] of Object.entries(shot.failAfter ?? {})) if (p === f && req.method() === 'GET') { seen[f] = (seen[f] ?? 0) + 1; if (seen[f] > n) fails.push(f) }
     if (fails.some((f) => p.startsWith(f))) return json(route, shot.failStatus ?? 500, { error: true, code: 'INTERNAL', message: shot.failMessage ?? "We couldn't save that. Check your connection and try again." })
     if (shot.api) {
       const key = Object.keys(shot.api).filter((k) => k.startsWith('/') && (p === k || p.startsWith(k + '/'))).sort((a, b) => b.length - a.length)[0]

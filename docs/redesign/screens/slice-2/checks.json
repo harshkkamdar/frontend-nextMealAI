@@ -18,7 +18,7 @@
   {
     "shot": "home-error",
     "width": 360,
-    "url": "/onboarding/consent?next=%2Fdashboard",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -26,7 +26,7 @@
   {
     "shot": "home-error",
     "width": 390,
-    "url": "/onboarding/consent?next=%2Fdashboard",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -51,15 +51,7 @@
     "shot": "home-loading",
     "width": 360,
     "url": "/dashboard",
-    "axe": [
-      {
-        "id": "aria-prohibited-attr",
-        "nodes": 1,
-        "targets": [
-          ".mt-6"
-        ]
-      }
-    ],
+    "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
@@ -67,15 +59,7 @@
     "shot": "home-loading",
     "width": 390,
     "url": "/dashboard",
-    "axe": [
-      {
-        "id": "aria-prohibited-attr",
-        "nodes": 1,
-        "targets": [
-          ".mt-6"
-        ]
-      }
-    ],
+    "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
@@ -237,78 +221,6 @@
     "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "tabs-food",
-    "width": 360,
-    "url": "/food",
-    "axe": [],
-    "smallTargets": [
-      {
-        "el": "View nutrition plan →",
-        "w": 130,
-        "h": 20
-      }
-    ],
-    "orangeActions": 1
-  },
-  {
-    "shot": "tabs-food",
-    "width": 390,
-    "url": "/food",
-    "axe": [],
-    "smallTargets": [
-      {
-        "el": "View nutrition plan →",
-        "w": 130,
-        "h": 20
-      }
-    ],
-    "orangeActions": 1
-  },
-  {
-    "shot": "tabs-geo",
-    "width": 360,
-    "url": "/chat",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "tabs-geo",
-    "width": 390,
-    "url": "/chat",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "tabs-train",
-    "width": 360,
-    "url": "/train",
-    "axe": [],
-    "smallTargets": [
-      {
-        "el": "View full plan →",
-        "w": 97,
-        "h": 20
-      }
-    ],
-    "orangeActions": 1
-  },
-  {
-    "shot": "tabs-train",
-    "width": 390,
-    "url": "/train",
-    "axe": [],
-    "smallTargets": [
-      {
-        "el": "View full plan →",
-        "w": 97,
-        "h": 20
-      }
-    ],
     "orangeActions": 1
   }
 ]
