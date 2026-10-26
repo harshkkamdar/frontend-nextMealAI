@@ -52,6 +52,7 @@ export function FoodBento({ live }: BentoProps) {
     { label: 'Carbs', g: 71, of: 90, color: 'var(--color-macro-teal)' },
     { label: 'Fat', g: 14, of: 30, color: 'var(--color-macro-ochre)' },
   ]
+  const maxG = Math.max(...macros.map((m) => m.g))
   const r = 22
   const c = 2 * Math.PI * r
   return (
@@ -66,20 +67,23 @@ export function FoodBento({ live }: BentoProps) {
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-bold leading-tight text-ink">Chicken rice bowl</p>
           <p className="font-wide mt-1 text-[30px] font-[760] leading-none tabular-nums text-ink">{kcal}<span className="ml-1 text-[13px] font-semibold text-ink-65" style={{ fontStretch: '100%' }}>kcal</span></p>
-          <div className="mt-3 flex flex-col gap-2">
+          {/* Label and grams on one line, the bar under them from the numeral's left edge; bars scale with the grams shown. */}
+          <div className="mt-2.5 flex flex-col gap-1.5">
             {macros.map((m, i) => (
-              <div key={m.label} className="flex items-center gap-2">
-                <span className="w-[52px] text-[12px] font-semibold text-ink">{m.label}</span>
-                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink-06">
-                  <span className="block h-full origin-left rounded-full" style={{ width: `${(m.g / m.of) * 100}%`, background: m.color, ...fill(live, 900 + i * 90) }} />
+              <div key={m.label}>
+                <div className="flex items-baseline justify-between text-[12px] leading-none">
+                  <span className="font-semibold text-ink">{m.label}</span>
+                  <span className="font-medium tabular-nums text-ink-65">{m.g} g</span>
+                </div>
+                <span className="mt-1 block h-1 overflow-hidden rounded-full bg-ink-06">
+                  <span className="block h-full origin-left rounded-full" style={{ width: `${(m.g / maxG) * 100}%`, background: m.color, ...fill(live, 900 + i * 90) }} />
                 </span>
-                <span className="w-8 text-right text-[12px] font-medium tabular-nums text-ink-65">{m.g} g</span>
               </div>
             ))}
           </div>
         </div>
       </Card>
-      <Card k={1} className="flex items-center gap-3">
+      <Card k={1} className="flex items-center justify-center gap-3">
         <div className="relative size-[56px] shrink-0">
           <svg viewBox="0 0 56 56" className="size-full -rotate-90">
             <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-ink)" strokeOpacity=".07" strokeWidth="7" />
@@ -88,16 +92,17 @@ export function FoodBento({ live }: BentoProps) {
         </div>
         <div className="min-w-0">
           <p className="font-wide text-[19px] font-bold leading-none tabular-nums text-ink">{day.toLocaleString('en-AU')}</p>
-          <p className="mt-1 text-[12px] font-medium text-ink-65">of 1,950 today</p>
+          <p className="mt-1 text-[12px] font-medium tabular-nums text-ink-65">of 1,950</p>
         </div>
       </Card>
       <Card k={2} className="py-3.5">
-        <p className="flex justify-between text-[12px] font-semibold text-ink-65"><span>Today</span><span>kcal</span></p>
+        <p className="text-[12px] font-semibold text-ink-65">Today</p>
+        {/* Names left, kcal in one right-aligned tabular column. */}
         <div className="mt-1.5 flex flex-col gap-1.5">
           {([['Oats and berries', 380], ['Rice bowl', 612], ['Greek yogurt', 148]] as const).map(([name, k], i) => (
             <div key={name} className="flex items-baseline justify-between gap-2" style={{ opacity: live ? 1 : 0, transform: `translateY(${live ? 0 : 6}px)`, transition: `opacity 400ms ${300 + i * 140}ms, transform 500ms cubic-bezier(.22,1,.36,1) ${300 + i * 140}ms` }}>
               <span className="truncate text-[12.5px] font-semibold text-ink">{name}</span>
-              <span className="shrink-0 text-[12px] font-medium tabular-nums text-ink-65">{k}</span>
+              <span className="shrink-0 text-right text-[12px] font-medium tabular-nums text-ink-65">{k}</span>
             </div>
           ))}
         </div>

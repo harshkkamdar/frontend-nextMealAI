@@ -141,23 +141,22 @@ function Slide({ p, i, reduce, title, line, current, children }: { p: MotionValu
     >
       <motion.div {...intro(0, 0)}><motion.h1 style={{ x: titleX, opacity }} className="font-wider text-[42px] font-[760] leading-none tracking-[-1.4px] text-ink [@media(max-height:740px)]:text-[38px]">{title}</motion.h1></motion.div>
       <motion.div {...intro(8, 0.04)} className="mt-3"><motion.p style={{ x: lineX, opacity }} className="max-w-[30ch] text-pretty text-[16.5px] leading-[1.45] text-ink-80">{line}</motion.p></motion.div>
-      {/* Titles sit at the same height on every slide; the bento centres in the space left. Critic round 3 (24 Oct 2026): grouping the cards under the title instead opened a worse gap at the top, so this layout stays. */}
-      <div className="flex flex-1 items-center py-6 [@media(max-height:740px)]:py-3">
-        <motion.div className="w-full" {...intro(12, 0.12)}>
-          <SlideDepth.Provider value={d}>{children}</SlideDepth.Provider>
-        </motion.div>
-      </div>
+      {/* Title, line and bento read as one column with an even rhythm; the space left over sits above the pager.
+          Critic round 2 (26 Oct 2026) replaced the earlier centred bento, whose gaps above and below read as dead zones. */}
+      <motion.div className="mt-7 w-full [@media(max-height:740px)]:mt-5" {...intro(12, 0.12)}>
+        <SlideDepth.Provider value={d}>{children}</SlideDepth.Provider>
+      </motion.div>
     </motion.section>
   )
 }
 
 /** Per-slide mist tints (Q2 alpha tints): Food accent 9%, Train ink 9%, Geo ink 6% + white 60%, Check-in accent 6%.
- *  Each blob has one fixed colour; only its x, y, scale and opacity follow p, so the tint morphs with the finger and the
+ *  The three blobs sit behind the bento as one wash. Each blob has one fixed colour; only its x, y, scale and opacity follow p, so the tint morphs with the finger and the
  *  softness lives in the gradient, not in a blur. Nothing here moves unless p moves (N12). */
 const BLOBS = [
-  { fill: 'rgba(232,98,42,.09)', at: 'left-[-22%] top-[-6%]', x: [0, 70, 20, 80], y: [0, 40, 90, 30], s: [1.1, 0.9, 1, 1.15], o: [1, 0.15, 0.1, 0.67] },
-  { fill: 'rgba(17,28,53,.09)', at: 'right-[-28%] top-[26%]', x: [0, -60, -20, 40], y: [40, -10, 50, 0], s: [0.9, 1.15, 1, 0.95], o: [0.25, 1, 0.67, 0.25] },
-  { fill: 'rgba(255,255,255,.6)', at: 'left-[-14%] bottom-[8%]', x: [-20, 30, 90, 10], y: [0, -40, -90, -30], s: [1, 0.95, 1.15, 0.9], o: [0.3, 0.3, 1, 0.3] },
+  { fill: 'rgba(232,98,42,.09)', at: 'left-[-45vw]', x: [0, 60, 20, 80], y: [0, 40, 70, 20], s: [1.1, 0.9, 1, 1.15], o: [1, 0.15, 0.1, 0.67] },
+  { fill: 'rgba(17,28,53,.09)', at: 'left-[25vw]', x: [0, -60, -20, 40], y: [40, -10, 50, 0], s: [0.9, 1.15, 1, 0.95], o: [0.25, 1, 0.67, 0.25] },
+  { fill: 'rgba(255,255,255,.6)', at: 'left-[-10vw]', x: [-20, 30, 80, 10], y: [60, 20, -20, 40], s: [1, 0.95, 1.15, 0.9], o: [0.3, 0.3, 1, 0.3] },
 ]
 
 function Mist({ p, reduce, dragging }: { p: MotionValue<number>; reduce: boolean; dragging: boolean }) {
@@ -174,7 +173,8 @@ function Blob({ p, blob, reduce, dragging }: { p: MotionValue<number>; blob: (ty
   const y = useTransform(p, [0, 1, 2, 3], still(blob.y))
   const scale = useTransform(p, [0, 1, 2, 3], still(blob.s))
   const opacity = useTransform(p, [0, 1, 2, 3], blob.o)
-  return <motion.div className={cn('absolute aspect-square w-[70vw] rounded-full', blob.at)} style={{ x, y, scale, opacity, background: `radial-gradient(closest-side, ${blob.fill}, transparent)`, willChange: dragging ? 'transform' : 'auto' }} />
+  // Every blob is centred on the bento's band (about 46% down) so the tints read as one wash behind the cards.
+  return <motion.div className={cn('absolute top-[calc(46%-60vw)] aspect-square w-[120vw] rounded-full', blob.at)} style={{ x, y, scale, opacity, background: `radial-gradient(closest-side, ${blob.fill}, ${blob.fill} 35%, transparent)`, willChange: dragging ? 'transform' : 'auto' }} />
 }
 
 /** Liquid progress pill: one ink dot rides the track at p * 12 px and stretches to 2.6x between dots, round again when p lands.
