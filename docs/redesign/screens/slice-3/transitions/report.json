@@ -27,11 +27,11 @@
     "verdict": "smooth"
   },
   "photo-tray": {
-    "frames": 76,
-    "chrome_px": 186039,
-    "content_px": 110661,
-    "max_chrome_share": 0.12,
-    "max_content_share": 0.123,
+    "frames": 77,
+    "chrome_px": 185763,
+    "content_px": 147981,
+    "max_chrome_share": 0.121,
+    "max_content_share": 0.176,
     "issues": [],
     "verdict": "smooth"
   },

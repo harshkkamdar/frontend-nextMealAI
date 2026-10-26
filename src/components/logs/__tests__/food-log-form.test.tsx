@@ -117,6 +117,23 @@ describe('FoodLogForm — FB-R6-13 Photo Estimate', () => {
     expect(screen.getByText(/about 75% sure/i)).toBeInTheDocument()
   })
 
+  it('scrolls the filled editor card clear of the pinned tray', async () => {
+    mocks.estimate.mockResolvedValueOnce(STUB_ESTIMATE)
+    const scrollBy = vi.spyOn(window, 'scrollBy').mockImplementation(() => {})
+    // Card ends at 700 px (the search bar too, so the tray rule decides); the 190 px tray rests 12 px above the 768 px window bottom, so its top is at 566.
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ top: 300, bottom: 700 } as DOMRect)
+    const height = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(190)
+    const style = vi.spyOn(window, 'getComputedStyle').mockReturnValue({ bottom: '12px' } as CSSStyleDeclaration)
+    const { container } = render(<FoodLogForm />)
+    const input = getFileInput(container)
+    Object.defineProperty(input, 'files', { value: [makeImageFile()], configurable: true })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+
+    // 700 + 16 gap - 566 = 150
+    await waitFor(() => expect(scrollBy).toHaveBeenCalledWith({ top: 150, behavior: 'smooth' }))
+    ;[scrollBy, rect, height, style].forEach((spy) => spy.mockRestore())
+  })
+
   it('AC03: Save calls logFromEstimate (not createLog) when an estimate is loaded', async () => {
     mocks.estimate.mockResolvedValueOnce(STUB_ESTIMATE)
     mocks.logFromEstimate.mockResolvedValueOnce({ id: 'log-1' })

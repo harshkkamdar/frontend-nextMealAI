@@ -89,6 +89,28 @@ export function FoodLogForm() {
   // R7-02 — scroll the edit form into view when a food is tapped (it used to sit
   // at the bottom of the page, "cumbersome" to reach).
   const formRef = useRef<HTMLDivElement | null>(null)
+  // Bumped when a food fills the editor; the effect below scrolls the card clear of the pinned tray.
+  const [reveal, setReveal] = useState(0)
+  const searchBarRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    const form = formRef.current
+    if (!reveal || !form) return
+    // The tray is sticky at the bottom and sits over the card's last row until the page scrolls (grader, 26 Oct 2026).
+    // Scroll just enough that the card ends 16 px above it. offsetHeight and the resolved sticky bottom ignore the
+    // tray's entrance transform, so the target is where it settles.
+    const tray = document.querySelector<HTMLElement>('[data-testid="food-meal-tray"]')
+    const trayTop = tray ? window.innerHeight - (parseFloat(getComputedStyle(tray).bottom) || 0) - tray.offsetHeight : window.innerHeight
+    const card = form.getBoundingClientRect()
+    const clear = card.bottom + 16 - trayTop
+    // Once it has to scroll, take the Photo / Menu row fully under the search bar (card 8 px below it) rather than
+    // leaving it half cut, when the page is long enough to get there; otherwise scroll only what the tray needs.
+    const under = searchBarRef.current ? card.top - searchBarRef.current.getBoundingClientRect().bottom - 8 : clear
+    const room = document.documentElement.scrollHeight - window.innerHeight - window.scrollY
+    const by = clear <= 0 ? 0 : under > clear && under <= room ? under : clear
+    // Reduced motion: jump, no smooth travel (impeccable animate: reduce spatial movement, keep the state change).
+    if (by > 0) window.scrollBy({ top: by, behavior: reduce ? 'auto' : 'smooth' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per reveal; reduce only picks the scroll style
+  }, [reveal])
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // FB-R6-13 — Photo estimate flow. When estimateId is set, Save calls
@@ -232,11 +254,7 @@ export function FoodLogForm() {
       setInputMode('grams')
     }
     // R7-02 — bring the editable form into view instead of leaving it at the bottom.
-    requestAnimationFrame(() => {
-      if (typeof formRef.current?.scrollIntoView === 'function') {
-        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
-    })
+    setReveal((n) => n + 1)
     // Link to the personal food DB when this is a saved food (USDA results
     // have no personal id → stays null and logs as free text, as before).
     setUserFoodId(food.source === 'personal' ? food.id ?? null : null)
@@ -287,6 +305,7 @@ export function FoodLogForm() {
     setFat(Math.round(est.totals.fat))
     setEstimateId(est.estimate_id)
     setEstimateConfidence(est.confidence)
+    setReveal((n) => n + 1)
   }
 
   const handlePhotoFile = async (file: File) => {
@@ -466,7 +485,7 @@ export function FoodLogForm() {
       ) : null}
 
       {/* Pinned under the bar so a focused field never scrolls beneath it: iOS draws the caret above fixed layers. */}
-      <div className="sticky top-[calc(60px+var(--safe-top))] z-[30] -mx-4 bg-cream px-4 py-2">
+      <div ref={searchBarRef} className="sticky top-[calc(60px+var(--safe-top))] z-[30] -mx-4 bg-cream px-4 py-2">
         <SearchField
           label="Search foods"
           value={query}
