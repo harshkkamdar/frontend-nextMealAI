@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createLog } from '@/lib/api/logs.api'
-import { ManualLogShell, NotesField, NumericSuffixInput, RatingPills } from './manual-log-shell'
+import { haptic } from '@/lib/platform/app'
+import { FieldLabel, ManualLogShell, NotesField, NumericSuffixInput } from './manual-log-shell'
+import { Scale } from './log-ui'
 
 export function SleepLogForm() {
   const router = useRouter()
@@ -34,6 +36,7 @@ export function SleepLogForm() {
         },
         source: 'manual',
       })
+      void haptic('success')
       toast.success('Sleep logged')
       router.back()
     } catch {
@@ -44,7 +47,7 @@ export function SleepLogForm() {
   }
 
   return (
-    <ManualLogShell title="Log sleep" prompt="How did you sleep?" saving={saving} onSave={() => void handleSave()}>
+    <ManualLogShell title="Sleep" prompt="How did you sleep last night?" saving={saving} onSave={() => void handleSave()}>
       <div className="space-y-7">
         <NumericSuffixInput
           label="Hours slept"
@@ -56,8 +59,11 @@ export function SleepLogForm() {
           min={0}
           max={24}
         />
-        <RatingPills rating={qualityRating} onChange={setQualityRating} label="Sleep quality" />
-        <NotesField value={notes} onChange={setNotes} placeholder="How was your sleep?" />
+        <div>
+          <FieldLabel>How well, 1 to 10</FieldLabel>
+          <Scale value={qualityRating} onChange={setQualityRating} label="Sleep quality from 1 to 10" />
+        </div>
+        <NotesField value={notes} onChange={setNotes} placeholder="Optional" />
       </div>
     </ManualLogShell>
   )

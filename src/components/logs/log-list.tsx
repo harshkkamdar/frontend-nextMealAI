@@ -1,28 +1,18 @@
 'use client'
 
+import type { ComponentType, SVGProps } from 'react'
 import { useEffect, useState } from 'react'
-import {
-  ClipboardList,
-  Check,
-  Utensils,
-  Dumbbell,
-  Droplet,
-  Scale,
-  Smile,
-  Moon,
-  Zap,
-  History,
-  Footprints,
-  type LucideIcon,
-} from 'lucide-react'
+import { Check, History } from 'lucide-react'
 import { toast } from 'sonner'
 import { getLogs, bulkDeleteLogs } from '@/lib/api/logs.api'
-import { EmptyState } from '@/components/shared/empty-state'
-import { CardSkeleton } from '@/components/shared/loading-skeleton'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { formatMacroKcal } from '@/lib/macros'
 import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload, StepsPayload } from '@/types/logs.types'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { EnergyFill, FoodFill, MoodFill, SleepFill, StepsFill, TrainFill, WaterFill, WeightFill } from '@/components/ui/fiqr/icons'
+import { haptic } from '@/lib/platform/app'
+import { cn } from '@/lib/utils'
+import { Chips, EmptySlot, LIST, ROW, RiseList, RowsSkeleton } from './log-ui'
 
 const FILTERS: { label: string; value: LogType | 'all' }[] = [
   { label: 'All', value: 'all' },
@@ -36,17 +26,19 @@ const FILTERS: { label: string; value: LogType | 'all' }[] = [
   { label: 'Steps', value: 'steps' },
 ]
 
-const FALLBACK_ICON = { icon: ClipboardList, label: 'Activity' } as const
+type Icon = ComponentType<SVGProps<SVGSVGElement>>
 
-const TYPE_ICONS: Record<LogType, { icon: LucideIcon; label: string }> = {
-  food: { icon: Utensils, label: 'Food activity' },
-  workout: { icon: Dumbbell, label: 'Workout activity' },
-  water: { icon: Droplet, label: 'Water activity' },
-  weight: { icon: Scale, label: 'Weight activity' },
-  mood: { icon: Smile, label: 'Mood activity' },
-  sleep: { icon: Moon, label: 'Sleep activity' },
-  energy: { icon: Zap, label: 'Energy activity' },
-  steps: { icon: Footprints, label: 'Steps activity' },
+const FALLBACK_ICON = { icon: History as Icon, label: 'Activity' }
+
+const TYPE_ICONS: Record<LogType, { icon: Icon; label: string }> = {
+  food: { icon: FoodFill, label: 'Food activity' },
+  workout: { icon: TrainFill, label: 'Workout activity' },
+  water: { icon: WaterFill, label: 'Water activity' },
+  weight: { icon: WeightFill, label: 'Weight activity' },
+  mood: { icon: MoodFill, label: 'Mood activity' },
+  sleep: { icon: SleepFill, label: 'Sleep activity' },
+  energy: { icon: EnergyFill, label: 'Energy activity' },
+  steps: { icon: StepsFill, label: 'Steps activity' },
   correction: { icon: History, label: 'Correction activity' },
 }
 
@@ -55,7 +47,7 @@ function LogTypeIcon({ type }: { type: LogType }) {
   const Icon = entry.icon
   return (
     <>
-      <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-65" />
+      <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full bg-ink-06 text-ink"><Icon className="size-5" /></span>
       <span className="sr-only">{entry.label}</span>
     </>
   )
@@ -83,11 +75,11 @@ function getLogDescription(log: Log): string {
     case 'weight':
       return `${(log.payload as WeightPayload).weight_kg} kg`
     case 'mood':
-      return `Mood: ${(log.payload as MoodPayload).rating}/10`
+      return `Mood ${(log.payload as MoodPayload).rating} of 10`
     case 'sleep':
-      return `${(log.payload as SleepPayload).hours} hours`
+      return `${(log.payload as SleepPayload).hours} hours asleep`
     case 'energy':
-      return `Energy: ${(log.payload as EnergyPayload).rating}/10`
+      return `Energy ${(log.payload as EnergyPayload).rating} of 10`
     case 'steps':
       return `${(log.payload as StepsPayload).steps} steps`
     default:
@@ -105,20 +97,7 @@ function getLogMetric(log: Log): string {
       const w = log.payload as WorkoutPayload
       return w.duration_min ? `${w.duration_min} min` : ''
     }
-    case 'water': {
-      const w = log.payload as WaterPayload
-      return `${w.glasses ?? 0} glasses`
-    }
-    case 'weight':
-      return `${(log.payload as WeightPayload).weight_kg} kg`
-    case 'mood':
-      return `${(log.payload as MoodPayload).rating}/10`
-    case 'sleep':
-      return `${(log.payload as SleepPayload).hours}h`
-    case 'energy':
-      return `${(log.payload as EnergyPayload).rating}/10`
-    case 'steps':
-      return `${(log.payload as StepsPayload).steps} steps`
+    // The title already carries the number for every other type; repeating it on the right was noise.
     default:
       return ''
   }
@@ -130,7 +109,7 @@ function relativeTime(dateStr: string): string {
   const diffMs = now - date
   const diffMin = Math.floor(diffMs / 60000)
 
-  if (diffMin < 1) return 'just now'
+  if (diffMin < 1) return 'Just now'
   if (diffMin < 60) return `${diffMin}m ago`
   const diffH = Math.floor(diffMin / 60)
   if (diffH < 24) return `${diffH}h ago`
@@ -211,103 +190,77 @@ export function LogList({ filterType }: LogListProps = {}) {
     fetchLogs()
   }, [filter, reload])
 
+  const toggleWithHaptic = (id: string) => { void haptic('selection'); toggleSelect(id) }
+
   return (
     <div>
-      {/* Filter chips scroll edge to edge; Select sits on its own line so it never cuts a chip. */}
-      {logs.length > 0 && !loading && (
-        <div className="-mt-11 mb-2 flex justify-end">
+      <div className="mb-3 flex items-end justify-between px-1">
+        <h2 className="text-[13px] font-semibold text-ink-65">Recent</h2>
+        {logs.length > 0 && !loading ? (
           <button
+            type="button"
             onClick={selectMode ? exitSelectMode : () => setSelectMode(true)}
-            className="h-11 shrink-0 whitespace-nowrap rounded-full px-3 text-[14px] font-semibold text-ink"
+            className="-mb-3 -mr-3 h-11 shrink-0 rounded-full px-3 text-[15px] font-semibold text-ink"
           >
-            {selectMode ? 'Cancel' : 'Select'}
+            {selectMode ? 'Done' : 'Select'}
           </button>
-        </div>
-      )}
-      <div className="scrollbar-hide -mx-gutter mb-4 flex gap-2 overflow-x-auto px-gutter pb-1">
-        {FILTERS.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => setFilter(f.value)}
-            className={`h-11 shrink-0 whitespace-nowrap rounded-full px-4 text-[14px] font-semibold ${
-              filter === f.value ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
+        ) : null}
       </div>
+      <Chips
+        className="scrollbar-hide -mx-4 mb-4 overflow-x-auto px-4 py-1"
+        label="Filter by type"
+        options={FILTERS}
+        value={filter}
+        onChange={(value) => { if (value) setFilter(value) }}
+      />
 
-      {/* Content */}
       {loading ? (
-        <div className="space-y-3">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
+        <RowsSkeleton label="Loading your logs" />
       ) : loadFailed ? (
         <ErrorState onRetry={() => setReload((n) => n + 1)}>I couldn&apos;t load your recent logs. Check your connection and try again.</ErrorState>
       ) : logs.length === 0 ? (
-        <EmptyState
-          icon={ClipboardList}
-          title="No logs yet"
-          description="Start tracking your food, workouts, and more to see them here."
-        />
+        <EmptySlot>{filter === 'all' ? 'Nothing logged yet. Tap + to log your first meal.' : 'Nothing of this kind yet.'}</EmptySlot>
       ) : (
-        <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
-          {logs.map((log) => (
-            <div
-              key={log.id}
-              onClick={selectMode ? () => toggleSelect(log.id) : undefined}
-              className={`flex min-h-14 items-center gap-3 px-[14px] py-2.5 ${
-                selectMode && selectedIds.has(log.id) ? 'bg-ink-08' : ''
-              } ${selectMode ? 'cursor-pointer' : ''}`}
-            >
-              {/* Checkbox in select mode */}
-              {selectMode && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleSelect(log.id) }}
-                  className={`flex size-5 shrink-0 items-center justify-center rounded border ${
-                    selectedIds.has(log.id) ? 'border-ink bg-ink' : 'border-ink-16'
-                  }`}
-                >
-                  {selectedIds.has(log.id) && <Check className="size-3 text-cream" />}
-                </button>
-              )}
-
-              {/* Typed icon — doubles as the legend (FB-09) */}
-              <LogTypeIcon type={log.type} />
-
-              {/* Description */}
-              <div className="flex-1 min-w-0">
-                <p className="truncate text-[15.5px] font-semibold text-ink">
-                  {getLogDescription(log)}
-                </p>
-                <p className="mt-0.5 text-[13px] text-ink-65">
-                  {relativeTime(log.created_at)}
-                </p>
-              </div>
-
-              {/* Metric */}
-              {getLogMetric(log) && (
-                <span className="whitespace-nowrap text-[13.5px] font-medium text-ink-65">
-                  {getLogMetric(log)}
+        <RiseList className={LIST}>
+          {logs.map((log) => {
+            const selected = selectedIds.has(log.id)
+            const metric = getLogMetric(log)
+            const body = (
+              <>
+                {selectMode ? (
+                  <span aria-hidden="true" className={cn('grid size-6 shrink-0 place-items-center rounded-full border-[1.5px] transition-colors', selected ? 'border-ink bg-ink text-cream' : 'border-ink-35')}>
+                    {selected ? <Check className="size-3.5" strokeWidth={3} /> : null}
+                  </span>
+                ) : null}
+                <LogTypeIcon type={log.type} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15.5px] font-semibold text-ink">{getLogDescription(log)}</span>
+                  <span className="mt-0.5 block text-[13px] text-ink-65">{relativeTime(log.created_at)}</span>
                 </span>
-              )}
-            </div>
-          ))}
-        </div>
+                {metric ? <span className="whitespace-nowrap text-[15px] font-semibold text-ink tabular-nums">{metric}</span> : null}
+              </>
+            )
+            return selectMode ? (
+              <button key={log.id} type="button" role="checkbox" aria-checked={selected} onClick={() => toggleWithHaptic(log.id)} className={cn(ROW, selected && 'bg-ink-04')}>
+                {body}
+              </button>
+            ) : (
+              <div key={log.id} className={ROW}>{body}</div>
+            )
+          })}
+        </RiseList>
       )}
 
-      {/* Floating action bar for bulk delete */}
+      {/* Floating glass bar for bulk delete, above the tab bar. */}
       {selectMode && selectedIds.size > 0 && (
-        <div className="fixed bottom-24 left-0 right-0 z-40 flex justify-center">
-          <div className="flex items-center gap-3 rounded-full bg-ink px-4 py-2 text-cream">
-            <span className="text-[13.5px] font-semibold">{selectedIds.size} selected</span>
+        <div className="fixed inset-x-0 z-40 flex justify-center px-4" style={{ bottom: 'calc(96px + var(--safe-bottom))' }}>
+          <div className="glass flex items-center gap-3 rounded-full py-1.5 pl-5 pr-1.5">
+            <span className="text-[15px] font-semibold text-ink tabular-nums">{selectedIds.size} selected</span>
             <button
+              type="button"
               onClick={() => setShowBulkDeleteConfirm(true)}
               disabled={bulkDeleting}
-              className="rounded-full bg-cream-22 px-3 py-1.5 text-[13px] font-semibold text-cream disabled:opacity-50"
+              className="h-11 rounded-full bg-ink px-5 text-[15px] font-semibold text-cream transition-transform active:scale-[.96] disabled:opacity-50"
             >
               {bulkDeleting ? 'Deleting…' : 'Delete'}
             </button>
@@ -315,13 +268,12 @@ export function LogList({ filterType }: LogListProps = {}) {
         </div>
       )}
 
-      {/* Bulk delete confirmation dialog */}
       <ConfirmDialog
         open={showBulkDeleteConfirm}
         onClose={() => setShowBulkDeleteConfirm(false)}
         onConfirm={handleBulkDelete}
         title={`Delete ${selectedIds.size} log${selectedIds.size !== 1 ? 's' : ''}?`}
-        description="This action cannot be undone. The selected logs will be permanently removed."
+        description="They'll be gone for good, and your totals will update."
         confirmLabel="Delete"
         variant="danger"
       />

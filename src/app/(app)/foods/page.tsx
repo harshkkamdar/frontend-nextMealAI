@@ -1,26 +1,30 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { MoreHorizontal, Plus, Search, Star, Utensils, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { MoreHorizontal, Star } from 'lucide-react'
 import { toast } from 'sonner'
-import { PageWrapper } from '@/components/layout/page-wrapper'
+import { PushedHeader } from '@/components/layout/screen-header'
+import { CARD, EmptySlot, FIELD, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
+import { FieldLabel } from '@/components/logs/manual-log-shell'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
-import { ErrorState } from '@/components/ui/fiqr/error-state'
-import { EmptyState } from '@/components/shared/empty-state'
-import { CardSkeleton } from '@/components/shared/loading-skeleton'
+import { OfflineBand } from '@/components/shared/offline-band'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { PlusIcon } from '@/components/ui/fiqr/icons'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { deleteUserFood, getPersonalFoods, saveFood, updateFood } from '@/lib/api/foods.api'
+import { haptic } from '@/lib/platform/app'
+import { cn } from '@/lib/utils'
 import type { UserFood } from '@/types/foods.types'
-import { OfflineBand } from '@/components/shared/offline-band'
 
 const SOURCE_LABELS: Record<string, string> = {
-  manual: 'Manual',
+  manual: 'Added by you',
   usda: 'USDA',
-  geo_estimate: 'Geo',
-  personal: 'Personal',
+  geo_estimate: 'From Geo',
+  personal: 'Yours',
 }
 
 function FoodRow({
@@ -30,32 +34,31 @@ function FoodRow({
 }: {
   food: UserFood
   onToggleFavorite: (id: string, current: boolean) => void
-  onDelete: (id: string) => void
+  onDelete: (id: string) => void | Promise<void>
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const macros = food.macros_per_serving
 
   return (
-    <div className="flex min-h-16 items-start gap-3 px-[14px] py-3">
+    <div className={cn(ROW, 'gap-1 pl-2 pr-2 active:bg-transparent')}>
       <button
         type="button"
-        onClick={() => onToggleFavorite(food.id, food.is_favorite)}
-        aria-label={food.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
-        className={`-my-2.5 -ml-2.5 flex size-11 shrink-0 items-center justify-center ${food.is_favorite ? 'text-accent' : 'text-ink-65'}`}
+        onClick={() => { void haptic('selection'); onToggleFavorite(food.id, food.is_favorite) }}
+        aria-label={food.is_favorite ? `Remove ${food.name} from favourites` : `Add ${food.name} to favourites`}
+        aria-pressed={food.is_favorite}
+        className="grid size-11 shrink-0 place-items-center rounded-full text-ink transition-transform active:scale-[.9]"
       >
-        <Star className={`size-6 ${food.is_favorite ? 'fill-current' : ''}`} />
+        <Star className={cn('size-5', food.is_favorite ? 'fill-current' : 'text-ink-35')} />
       </button>
 
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
-          <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
-            {SOURCE_LABELS[food.source] ?? food.source}
-          </span>
-        </div>
-        <p className="mt-0.5 text-[13px] leading-[1.45] text-ink-65">
-          {food.serving_size_g || 100}g · {macros.calories ?? 0} kcal · {macros.protein ?? 0}P {macros.carbs ?? 0}C {macros.fat ?? 0}F · used {food.use_count ?? 0}×
+      <div className="min-w-0 flex-1 py-0.5">
+        <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
+        <p className="truncate text-[13px] text-ink-65 tabular-nums">
+          {food.serving_size_g || 100} g · {macros.calories ?? 0} kcal · P {macros.protein ?? 0} · C {macros.carbs ?? 0} · F {macros.fat ?? 0}
+        </p>
+        <p className="truncate text-[12px] font-medium text-ink-65">
+          {SOURCE_LABELS[food.source] ?? food.source}{food.brand ? ` · ${food.brand}` : ''} · used {food.use_count ?? 0}×
         </p>
       </div>
 
@@ -63,21 +66,33 @@ function FoodRow({
         type="button"
         onClick={() => setMenuOpen(true)}
         aria-label={`More options for ${food.name}`}
-        className="-my-2.5 -mr-2.5 flex size-11 shrink-0 items-center justify-center text-ink-65"
+        className="grid size-11 shrink-0 place-items-center rounded-full text-ink-65 transition-transform active:scale-[.94]"
       >
-        <MoreHorizontal className="size-6" />
+        <MoreHorizontal className="size-5" />
       </button>
 
       <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} ariaLabel={`${food.name} options`}>
-        <div className="px-gutter pb-6 pt-3">
-          <p className="text-[17px] font-bold text-ink">{food.name}</p>
-          <button
-            type="button"
-            onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true) }}
-            className="mt-4 h-12 w-full rounded-[15px] bg-ink-08 text-[15.5px] font-semibold text-ink"
-          >
-            Delete
-          </button>
+        <div className="px-5 pb-5 pt-3">
+          <p className="font-wide text-[22px] font-bold leading-tight text-ink">{food.name}</p>
+          <p className="mt-1 text-[14px] text-ink-65 tabular-nums">{food.serving_size_g || 100} g · {macros.calories ?? 0} kcal</p>
+          <div className={cn(LIST, 'mt-5')}>
+            <button
+              type="button"
+              onClick={() => { setMenuOpen(false); onToggleFavorite(food.id, food.is_favorite) }}
+              className={ROW}
+            >
+              <Star aria-hidden="true" className={cn('size-5 text-ink', food.is_favorite && 'fill-current')} />
+              <span className="text-[16px] font-semibold text-ink">{food.is_favorite ? 'Remove from favourites' : 'Add to favourites'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true) }}
+              className={ROW}
+            >
+              <span aria-hidden="true" className="size-5" />
+              <span className="text-[16px] font-semibold text-ink">Delete food</span>
+            </button>
+          </div>
         </div>
       </BottomSheet>
 
@@ -88,8 +103,8 @@ function FoodRow({
           await onDelete(food.id)
           setShowDeleteConfirm(false)
         }}
-        title="Delete food?"
-        description={`This will permanently remove "${food.name}" from your saved foods.`}
+        title="Delete this food?"
+        description={`"${food.name}" leaves your saved foods. Meals you already logged stay as they are.`}
         confirmLabel="Delete"
         variant="danger"
       />
@@ -110,7 +125,7 @@ function AddFoodForm({ onSave }: { onSave: (food: UserFood) => void }) {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!name.trim()) {
-      toast.error('Name is required')
+      toast.error('Give the food a name')
       return
     }
     setSaving(true)
@@ -129,39 +144,51 @@ function AddFoodForm({ onSave }: { onSave: (food: UserFood) => void }) {
         is_favorite: false,
       })
       onSave(food)
+      void haptic('success')
       toast.success('Food saved')
     } catch {
-      toast.error('Failed to save food')
+      toast.error("Couldn't save that food. Try again.")
     } finally {
       setSaving(false)
     }
   }
 
-  const inputClass = 'h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-65 focus:border-ink'
+  const input = cn(FIELD, 'h-14 bg-card')
+  const field = (id: string, label: string, value: string, set: (v: string) => void, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
+    <div className="min-w-0">
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <input id={id} value={value} onChange={(event) => set(event.target.value)} className={input} {...props} />
+    </div>
+  )
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 px-gutter pb-6 pt-3">
-      <h2 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Add a food</h2>
-      <input type="text" placeholder="Food name *" value={name} onChange={(event) => setName(event.target.value)} className={inputClass} autoFocus />
-      <input type="text" placeholder="Brand (optional)" value={brand} onChange={(event) => setBrand(event.target.value)} className={inputClass} />
-      <div className="grid grid-cols-2 gap-2">
-        <input type="number" placeholder="Serving (g)" value={servingSize} onChange={(event) => setServingSize(event.target.value)} className={inputClass} />
-        <input type="number" placeholder="Calories" value={calories} onChange={(event) => setCalories(event.target.value)} className={inputClass} />
+    <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 pb-2 pt-3">
+        <h2 className="font-wide text-[22px] font-bold leading-tight text-ink">Add a food</h2>
+        {field('food-name', 'Name', name, setName, { type: 'text', placeholder: 'Overnight oats', autoFocus: true })}
+        {field('food-brand', 'Brand (optional)', brand, setBrand, { type: 'text' })}
+        <div className="grid grid-cols-2 gap-3">
+          {field('food-serving', 'Serving, g', servingSize, setServingSize, { type: 'number', inputMode: 'decimal' })}
+          {field('food-kcal', 'Calories', calories, setCalories, { type: 'number', inputMode: 'numeric' })}
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {field('food-protein', 'Protein, g', protein, setProtein, { type: 'number', inputMode: 'decimal' })}
+          {field('food-carbs', 'Carbs, g', carbs, setCarbs, { type: 'number', inputMode: 'decimal' })}
+          {field('food-fat', 'Fat, g', fat, setFat, { type: 'number', inputMode: 'decimal' })}
+        </div>
       </div>
-      <div className="grid grid-cols-3 gap-2">
-        <input type="number" placeholder="Protein (g)" value={protein} onChange={(event) => setProtein(event.target.value)} className={inputClass} />
-        <input type="number" placeholder="Carbs (g)" value={carbs} onChange={(event) => setCarbs(event.target.value)} className={inputClass} />
-        <input type="number" placeholder="Fat (g)" value={fat} onChange={(event) => setFat(event.target.value)} className={inputClass} />
+      <div className="px-5 pb-5 pt-3">
+        <PrimaryButton type="submit" disabled={saving} aria-busy={saving} className="justify-center">
+          {saving ? 'Saving…' : 'Save food'}
+        </PrimaryButton>
       </div>
-      <PrimaryButton type="submit" disabled={saving} className="justify-center">
-        {saving ? 'Saving…' : 'Save food'}
-      </PrimaryButton>
     </form>
   )
 }
 
 export default function FoodsPage() {
   useSetGeoScreen('food_database', {})
+  const router = useRouter()
 
   const [foods, setFoods] = useState<UserFood[]>([])
   const [loading, setLoading] = useState(true)
@@ -196,7 +223,7 @@ export default function FoodsPage() {
       await updateFood(id, { is_favorite: !currentFavorite })
     } catch {
       setFoods((current) => current.map((food) => food.id === id ? { ...food, is_favorite: currentFavorite } : food))
-      toast.error('Failed to update favorite')
+      toast.error("Couldn't update favourites. Try again.")
     }
   }, [])
 
@@ -208,7 +235,7 @@ export default function FoodsPage() {
       toast.success('Food deleted')
     } catch {
       setFoods(backup)
-      toast.error('Failed to delete food')
+      toast.error("Couldn't delete that food. Try again.")
     }
   }, [foods])
 
@@ -218,73 +245,61 @@ export default function FoodsPage() {
   }, [])
 
   return (
-    <PageWrapper className="pb-32">
-      <h1 className="text-[22px] font-semibold tracking-[-0.4px] text-ink">Foods</h1>
-      <div className="-mx-gutter [&:not(:empty)]:mt-4"><OfflineBand /></div>
+    <div className="mx-auto w-full max-w-md px-4 pb-6">
+      <PushedHeader
+        title="Your foods"
+        onBack={() => router.back()}
+        actions={<RoundButton aria-label="Add a food" onClick={() => setShowAddForm(true)}><PlusIcon /></RoundButton>}
+      />
+      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
 
-      <div className="relative mt-4">
-        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
-        <input
-          type="text"
-          placeholder="Search your foods"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-11 text-[17px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
-        />
-        {search ? (
-          <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-1.5 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center text-ink-65">
-            <X className="size-5" />
-          </button>
-        ) : null}
+      <div className="mt-2">
+        <SearchField label="Search your foods" value={search} onChange={setSearch} placeholder="Search your foods" />
       </div>
-
-      {!showAddForm ? (
-        <PrimaryButton type="button" onClick={() => setShowAddForm(true)} icon={<Plus className="size-5" />} className="mt-3">
-          Add a food
-        </PrimaryButton>
-      ) : null}
 
       <BottomSheet open={showAddForm} onClose={() => setShowAddForm(false)} ariaLabel="Add a food">
         <AddFoodForm onSave={handleFoodAdded} />
       </BottomSheet>
 
-      <div className="mt-8">
+      <div className="mt-6">
         {loading ? (
-          <div className="space-y-3">
-            <CardSkeleton />
-            <CardSkeleton />
-            <CardSkeleton />
-          </div>
+          <RowsSkeleton rows={4} label="Loading your foods" />
         ) : loadFailed && foods.length === 0 ? (
           <ErrorState onRetry={() => { setLoading(true); loadFoods() }}>I couldn&apos;t load your foods. Check your connection and try again.</ErrorState>
         ) : foods.length === 0 ? (
-          <EmptyState icon={Utensils} title="No saved foods yet" description="Foods you log will appear here automatically." />
+          <div className={cn(CARD, 'p-5')}>
+            <p className="font-wide text-[19px] font-bold leading-tight text-ink">Nothing saved yet</p>
+            <p className="mt-1 text-[15px] leading-[1.45] text-ink-65">Foods you log land here, so your usual ones are one tap away. You can also add one by hand.</p>
+            <div className="mt-4"><EmptySlot onClick={() => setShowAddForm(true)}>Add a food</EmptySlot></div>
+          </div>
         ) : filtered.length === 0 ? (
-          <EmptyState icon={Search} title="No matches" description={`No foods match "${search}"`} />
+          <p role="status" className="px-1 text-[15.5px] leading-[1.45] text-ink">
+            None of your foods match &ldquo;{search.trim()}&rdquo;.
+          </p>
         ) : (
-          <div className="space-y-7">
+          <div className="space-y-6">
             {favorites.length > 0 ? (
               <section>
-                <SectionLabel className="mb-2">Favourites</SectionLabel>
-                <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+                <SectionTitle>Favourites</SectionTitle>
+                <RiseList className={LIST}>
                   {favorites.map((food) => (
                     <FoodRow key={`favorite-${food.id}`} food={food} onToggleFavorite={handleToggleFavorite} onDelete={handleDelete} />
                   ))}
-                </div>
+                </RiseList>
               </section>
             ) : null}
 
             <section>
-              <SectionLabel className="mb-2">All foods · {allFoods.length}</SectionLabel>
-              <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+              <SectionTitle>All foods · {allFoods.length}</SectionTitle>
+              <RiseList className={LIST}>
                 {allFoods.map((food) => (
                   <FoodRow key={food.id} food={food} onToggleFavorite={handleToggleFavorite} onDelete={handleDelete} />
                 ))}
-              </div>
+              </RiseList>
             </section>
           </div>
         )}
       </div>
-    </PageWrapper>
+    </div>
   )
 }

@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo, type ComponentType, type SVGProps } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Camera, ChevronLeft, FileText, Search, X } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { ChevronDown, Plus, X } from 'lucide-react'
 import { toast } from 'sonner'
-import { FeatureCard } from '@/components/ui/fiqr/feature-card'
+import { PushedHeader } from '@/components/layout/screen-header'
+import { CameraFill, MenuFill } from '@/components/ui/fiqr/icons'
 import { PrimaryButton as TrayButton } from '@/components/ui/fiqr/primary-button'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
+import { haptic } from '@/lib/platform/app'
+import { reducedFade, spring } from '@/lib/motion'
 import { createLog, createLogs } from '@/lib/api/logs.api'
 import {
   estimateFoodFromPhoto,
@@ -23,6 +25,8 @@ import { isNative } from '@/lib/platform'
 import { pickPhoto } from '@/lib/platform/camera'
 import type { FoodSearchResult, UserFood } from '@/types/foods.types'
 import { OfflineBand } from '@/components/shared/offline-band'
+import { FieldLabel } from './manual-log-shell'
+import { CARD, Chips, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle, Stepper } from './log-ui'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
 
@@ -43,6 +47,7 @@ function capitalizeMeal(v: string | null): string {
 export function FoodLogForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const reduce = useReducedMotion()
   // R6-12 — the diary opens this page as its "Add food" flow, passing the meal
   // slot + the viewed date so the log lands on the right meal AND the right day
   // (not always "today"). Other entry points omit them → sensible defaults.
@@ -335,6 +340,7 @@ export function FoodLogForm() {
       try {
         const { created, failures } = await createLogs(items)
         if (failures.length === 0) {
+          void haptic('success')
           toast.success(items.length === 1 ? 'Food logged' : `Logged ${created.length} items`)
         } else if (created.length > 0) {
           toast.error(`Logged ${created.length} of ${items.length} items — some failed`)
@@ -385,6 +391,7 @@ export function FoodLogForm() {
             fat: numFat,
           },
         })
+        void haptic('success')
         toast.success('Logged from photo')
       } else {
         // Path B: regular manual log.
@@ -406,6 +413,7 @@ export function FoodLogForm() {
           // R6-12 — bucket onto the viewed diary date when opened from a past day.
           ...(logDate ? { local_date: logDate } : {}),
         })
+        void haptic('success')
         toast.success('Food logged')
       }
       router.back()
@@ -422,274 +430,330 @@ export function FoodLogForm() {
     pending.reduce((sum, item) => sum + (item.est_macros.calories ?? 0), 0)
       + (hasCurrent && typeof calories === 'number' ? calories : 0),
   )
+  const trimmed = query.trim()
+  const showYourFoods = trimmed.length < 2 && !estimateId && (favourites.length > 0 || recents.length > 0)
+  const showTray = pending.length > 0 || isFoodDraftFilled(currentDraft())
 
   return (
-    <div className="pb-40">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
+    <div className="mx-auto w-full max-w-md px-4 pb-6">
+      <PushedHeader
+        title="Log food"
+        onBack={() => router.back()}
+        actions={(
           <button
             type="button"
-            onClick={() => router.back()}
-            aria-label="Back"
-            className="-ml-2 flex size-10 items-center justify-center text-ink"
+            onClick={() => { void haptic('selection'); setMealMenuOpen((open) => !open) }}
+            aria-expanded={mealMenuOpen}
+            aria-label={`Meal: ${mealType}`}
+            className="glass flex h-11 shrink-0 items-center gap-1 rounded-full pl-4 pr-3 text-[15px] font-semibold text-ink transition-transform active:scale-[.96]"
           >
-            <ChevronLeft className="size-6" />
+            {mealType}
+            <ChevronDown aria-hidden="true" className={`size-4 transition-transform duration-200 ${mealMenuOpen ? 'rotate-180' : ''}`} />
           </button>
-          <h1 className="truncate text-[22px] font-semibold tracking-[-0.4px] text-ink">Log food</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => setMealMenuOpen((open) => !open)}
-          aria-expanded={mealMenuOpen}
-          className="flex h-11 shrink-0 items-center rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
-        >
-          {mealType} <span aria-hidden="true" className="ml-1">▾</span>
-        </button>
-      </div>
-      <div className="-mx-gutter [&:not(:empty)]:mb-4"><OfflineBand /></div>
+        )}
+      />
+      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
 
       {mealMenuOpen ? (
-        <div className="mb-4 flex gap-2 overflow-x-auto" aria-label="Meal type">
-          {MEAL_TYPES.map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => { setMealType(type); setMealMenuOpen(false) }}
-              className={`h-11 whitespace-nowrap rounded-full px-3 text-[13.5px] font-semibold ${
-                mealType === type ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
-              }`}
-            >
-              {type}
-            </button>
-          ))}
-        </div>
+        <Chips
+          className="scrollbar-hide -mx-4 mb-3 overflow-x-auto px-4 pb-1 pt-1"
+          label="Meal type"
+          options={MEAL_OPTIONS}
+          value={mealType}
+          onChange={(type) => { if (type) setMealType(type); setMealMenuOpen(false) }}
+        />
       ) : null}
 
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
-        <input
-          type="text"
+      <div className="mt-2">
+        <SearchField
+          label="Search foods"
           value={query}
-          onChange={(event) => handleSearch(event.target.value)}
-          placeholder="Search foods, brands, or describe it"
-          className="h-14 w-full rounded-[15px] border border-ink-16 bg-card pl-11 pr-4 text-[17px] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
-          data-testid="food-search-input"
+          onChange={handleSearch}
+          placeholder="Search foods or brands"
+          // J1: arriving from Search in the + sheet, the keyboard is already up (no extra tap).
+          autoFocus={!photoRequested}
+          testId="food-search-input"
         />
       </div>
-      <div className="mt-2 flex gap-2">
-        <button
-          type="button"
+
+      <div className="mt-3 grid grid-cols-2 gap-[10px]">
+        <MethodTile
+          icon={CameraFill}
+          label={estimating ? 'Reading…' : 'Photo'}
+          caption="Snap your plate"
           onClick={() => void handlePhotoButton()}
           disabled={estimating}
-          data-testid="photo-estimate-button"
-          className="flex h-11 items-center gap-2 rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink disabled:text-ink-35"
-        >
-          <Camera className="size-4" />
-          {estimating ? 'Analysing…' : 'Photo'}
-        </button>
-        <button
-          type="button"
+          testId="photo-estimate-button"
+        />
+        <MethodTile
+          icon={MenuFill}
+          label="Menu"
+          caption="Scan a menu"
           onClick={() => router.push(`/chat/session?id=${crypto.randomUUID()}&prefill=` + encodeURIComponent('Scan this menu and suggest what fits my remaining macros'))}
-          className="flex h-11 items-center gap-2 rounded-full bg-ink-08 px-3 text-[13.5px] font-semibold text-ink"
-        >
-          <FileText className="size-4" />
-          Menu
-        </button>
+        />
       </div>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
 
-      {searchFailed && !searching && query.trim().length >= 2 ? (
-        <div role="status" className="mt-4">
-          <p className="text-[15.5px] font-medium text-ink-80">Search isn&apos;t reachable right now. Try again, or use Photo or Menu.</p>
-          <button type="button" onClick={() => handleSearch(query)} className="mt-1 min-h-11 text-[14px] font-semibold text-ink underline decoration-ink-35 underline-offset-4">Try again</button>
+      {searchFailed && !searching && trimmed.length >= 2 ? (
+        <div role="status" className="mt-5 px-1">
+          <p className="text-[15.5px] leading-[1.45] text-ink">I can&apos;t reach search right now. Try again, or snap a photo instead.</p>
+          <button type="button" onClick={() => handleSearch(query)} className="-ml-3 mt-1 min-h-11 rounded-full px-3 text-[15px] font-semibold text-ink underline decoration-ink-35 underline-offset-4">Try again</button>
         </div>
-      ) : !searching && !searchFailed && query.trim().length >= 2 && results.length === 0 && searchedQuery === query.trim() ? (
-        <p role="status" className="mt-4 text-[15.5px] font-medium text-ink-80">No foods match &ldquo;{query.trim()}&rdquo;. Try a shorter name, or use Photo.</p>
+      ) : !searching && !searchFailed && trimmed.length >= 2 && results.length === 0 && searchedQuery === trimmed ? (
+        <p role="status" className="mt-5 px-1 text-[15.5px] leading-[1.45] text-ink">
+          Nothing matches &ldquo;{trimmed}&rdquo;. Try a shorter name, or snap a photo.
+        </p>
       ) : null}
 
-      {(searching || results.length > 0) ? (
-        <div className="mt-4 overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
-          {searching ? (
-            <div className="flex min-h-14 items-center justify-center gap-1.5" role="status" aria-label="Searching">
-              {[0, 1, 2].map((dot) => <span key={dot} className="size-2 animate-pulse rounded-full bg-ink-35" />)}
-            </div>
-          ) : results.map((food, index) => (
-            <button
-              key={food.id ?? `usda-${food.usda_fdc_id ?? index}`}
-              type="button"
-              onClick={() => handleSelectResult(food)}
-              className="flex min-h-14 w-full items-center justify-between gap-3 px-[14px] py-2.5 text-left"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15.5px] font-semibold text-ink">{food.name}</span>
-                {SOURCE_LABELS[String(food.source)] ? (
-                  <span className="mt-0.5 block text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
-                    {SOURCE_LABELS[String(food.source)]}
+      {/* popLayout: results leaving (a food was picked) fade over the editor rising into their place, no one-frame cut. */}
+      <AnimatePresence mode="popLayout" initial={false}>
+      {searching ? (
+        <motion.div key="searching" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }} exit={{ opacity: 0, transition: { duration: 0.12 } }} className="mt-5"><RowsSkeleton label="Searching" /></motion.div>
+      ) : results.length > 0 ? (
+        <motion.section key="results" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.18, ease: 'easeOut' } }} exit={{ opacity: 0, transition: { duration: 0.14 } }} className="mt-5" aria-label="Search results">
+          <RiseList className={LIST}>
+            {results.map((food, index) => (
+              <button
+                key={food.id ?? `usda-${food.usda_fdc_id ?? index}`}
+                type="button"
+                onClick={() => { void haptic('selection'); handleSelectResult(food) }}
+                className={ROW}
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15.5px] font-semibold text-ink">{food.name}</span>
+                  <span className="block truncate text-[13px] text-ink-65">
+                    {food.serving_size_g ? `${food.serving_size_g} g` : '1 serving'} · {formatMacroKcal(food.macros_per_serving.calories)} kcal
+                    {food.brand ? ` · ${food.brand}` : ''}
+                    {SOURCE_LABELS[String(food.source)] ? ` · ${SOURCE_LABELS[String(food.source)]}` : ''}
                   </span>
-                ) : null}
-                <span className="block truncate text-[13px] text-ink-65">
-                  {food.serving_size_g ? `${food.serving_size_g}g` : '1 serving'} · {formatMacroKcal(food.macros_per_serving.calories)} kcal
-                  {food.brand ? ` · ${food.brand}` : ''}
                 </span>
-              </span>
-              <span className="shrink-0 text-[17px] font-semibold text-ink">+</span>
-            </button>
-          ))}
-        </div>
+                <AddMark />
+              </button>
+            ))}
+          </RiseList>
+        </motion.section>
       ) : null}
+      </AnimatePresence>
 
-      {query.trim().length < 2 && !estimateId && (favourites.length > 0 || recents.length > 0) ? (
-        <div className="mt-7 space-y-7" data-testid="your-foods">
-          {recents.length > 0 ? (
-            <div>
-              <SectionLabel className="mb-2">Recent</SectionLabel>
-              <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
-                {recents.map((food) => <PersonalFoodRow key={`recent-${food.id}`} food={food} onSelect={handleSelectPersonalFood} />)}
-              </div>
-            </div>
-          ) : null}
-          {favourites.length > 0 ? (
-            <div>
-              <SectionLabel className="mb-2">Favourites</SectionLabel>
-              <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
-                {favourites.map((food) => <PersonalFoodRow key={`fav-${food.id}`} food={food} onSelect={handleSelectPersonalFood} />)}
-              </div>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {estimateId ? (
-        <div data-testid="estimate-chip" className="mt-6 flex h-8 w-fit items-center gap-2 rounded-full bg-ink-08 px-3 text-[13px] font-medium text-ink">
-          <span>
-            Photo estimate
-            {estimateConfidence != null ? ` · confidence ${Math.round(estimateConfidence * 100)}%` : ''}
-          </span>
-          <button type="button" onClick={clearEstimate} aria-label="Clear photo estimate" className="-my-3 -mr-3 flex size-11 items-center justify-center text-[18px] leading-none">×</button>
-        </div>
+      {estimating ? (
+        <motion.div role="status" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className={`${CARD} mt-5 p-5`}>
+          <p className="text-[15.5px] font-semibold text-ink">Reading your photo</p>
+          <p className="mt-0.5 text-[13px] text-ink-65">A few seconds. I&apos;ll fill in what I can see.</p>
+          <div className="mt-4 space-y-2.5" aria-hidden="true">
+            {[78, 56, 64].map((w) => <span key={w} className="block h-3 animate-pulse rounded-full bg-ink-06 [animation-duration:1.2s]" style={{ width: `${w}%` }} />)}
+          </div>
+        </motion.div>
       ) : null}
 
       {foodName ? (
-        <div ref={formRef} className="mt-7 space-y-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-          {/* Wraps instead of clipping: photo estimates name the whole plate. */}
-          <textarea
-            rows={1}
-            aria-label="Food name"
-            placeholder="e.g. Grilled chicken breast"
-            value={foodName}
-            onChange={(event) => { setFoodName(event.target.value); setUserFoodId(null); setMacroBasisPerG(null) }}
-            className="field-sizing-content min-h-14 w-full resize-none rounded-[15px] border border-ink-16 bg-card px-4 py-[15px] text-[15.5px] font-semibold leading-[1.35] text-ink outline-none placeholder:text-ink-65 focus:border-ink"
-          />
+        <motion.div
+          ref={formRef}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={reduce ? reducedFade : spring.glide}
+          className={`${CARD} mt-5 space-y-5 p-5`}
+        >
+          {estimateId ? (
+            <div data-testid="estimate-chip" className="flex h-9 w-fit items-center gap-1 rounded-full bg-ink-06 pl-3 text-[13px] font-semibold text-ink">
+              <span>
+                From your photo
+                {estimateConfidence != null ? ` · about ${Math.round(estimateConfidence * 100)}% sure` : ''}
+              </span>
+              <button type="button" onClick={clearEstimate} aria-label="Clear photo estimate" className="grid size-11 place-items-center rounded-full -my-1"><X className="size-4" /></button>
+            </div>
+          ) : null}
+
+          <div>
+            <FieldLabel htmlFor="food-name">Food</FieldLabel>
+            {/* Wraps instead of clipping: photo estimates name the whole plate. */}
+            <textarea
+              id="food-name"
+              rows={1}
+              aria-label="Food name"
+              placeholder="e.g. Grilled chicken breast"
+              value={foodName}
+              onChange={(event) => { setFoodName(event.target.value); setUserFoodId(null); setMacroBasisPerG(null) }}
+              className="field-sizing-content min-h-12 w-full resize-none rounded-[14px] bg-ink-04 px-4 py-3 text-[17px] font-semibold leading-[1.35] text-ink outline-none placeholder:text-ink-65 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-ink"
+            />
+          </div>
 
           {servingSizeG && servingSizeG > 0 ? (
-            <div className="space-y-3">
-              {inputMode === 'servings' ? (
-                <div className="flex items-center justify-between gap-3">
-                  <button type="button" aria-label="Fewer servings" onClick={() => handleServingsChange(Math.max(0.25, Math.round((servings - 0.25) * 100) / 100))} className="flex size-11 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">−</button>
-                  <div className="flex flex-1 items-baseline justify-center gap-2 text-center">
-                    <span className="text-[15.5px] font-semibold text-ink">
-                      <span data-testid="servings-value">{servings}</span> serving{servings === 1 ? '' : 's'}
-                    </span>
-                    <span className="text-[13px] text-ink-65">{Math.round(servings * servingSizeG)}g</span>
-                  </div>
-                  <button type="button" aria-label="More servings" onClick={() => handleServingsChange(Math.round((servings + 0.25) * 100) / 100)} className="flex size-11 items-center justify-center rounded-full bg-ink-08 text-[20px] font-semibold text-ink">+</button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <input
-                    aria-label="Grams"
-                    type="number"
-                    value={quantityG}
-                    onChange={(event) => handleQuantityChange(event.target.value ? Number(event.target.value) : '')}
-                    className="h-11 min-w-0 flex-1 rounded-[12px] border-0 bg-ink-08 px-3 text-center text-[15.5px] font-semibold text-ink outline-none"
-                  />
-                  <span className="text-[13px] text-ink-65">g</span>
-                </div>
-              )}
-              <div className="flex gap-2" data-testid="serving-mode-toggle">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (typeof quantityG === 'number' && quantityG > 0) setServings(Math.round((quantityG / servingSizeG) * 100) / 100)
-                    setInputMode('servings')
+            <div className="space-y-4">
+              <div data-testid="serving-mode-toggle">
+                <Chips
+                  label="Amount in"
+                  options={AMOUNT_OPTIONS}
+                  value={inputMode}
+                  onChange={(mode) => {
+                    if (mode === 'servings') {
+                      if (typeof quantityG === 'number' && quantityG > 0) setServings(Math.round((quantityG / servingSizeG) * 100) / 100)
+                      setInputMode('servings')
+                    } else if (mode === 'grams') {
+                      setQuantityG(Math.round(servings * servingSizeG))
+                      setInputMode('grams')
+                    }
                   }}
-                  className={`h-11 rounded-full px-4 text-[14px] font-semibold ${inputMode === 'servings' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
-                >
-                  servings
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setQuantityG(Math.round(servings * servingSizeG)); setInputMode('grams') }}
-                  className={`h-11 rounded-full px-4 text-[14px] font-semibold ${inputMode === 'grams' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
-                >
-                  grams
-                </button>
+                />
               </div>
+              {inputMode === 'servings' ? (
+                <Stepper
+                  value={servings}
+                  unit={`serving${servings === 1 ? '' : 's'} · ${Math.round(servings * servingSizeG)} g`}
+                  onChange={handleServingsChange}
+                  step={0.25}
+                  min={0.25}
+                  max={50}
+                  lessLabel="Fewer servings"
+                  moreLabel="More servings"
+                  valueTestId="servings-value"
+                />
+              ) : (
+                <GramsInput label="Grams" value={quantityG} onChange={handleQuantityChange} />
+              )}
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <input
-                aria-label="Quantity in grams"
-                type="number"
-                placeholder="Quantity"
-                value={quantityG}
-                onChange={(event) => handleQuantityChange(event.target.value ? Number(event.target.value) : '')}
-                className="h-11 min-w-0 flex-1 rounded-[12px] border-0 bg-ink-08 px-3 text-center text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-65"
-              />
-              <span className="text-[13px] text-ink-65">g</span>
-            </div>
+            <GramsInput label="Quantity in grams" placeholder="Quantity" value={quantityG} onChange={handleQuantityChange} />
           )}
 
           <div className="grid grid-cols-4 gap-2">
-            <MacroInput label="KCAL" value={calories} onChange={(value) => { setCalories(value); setMacroBasisPerG(null) }} />
-            <MacroInput label="P" value={protein} onChange={(value) => { setProtein(value); setMacroBasisPerG(null) }} />
-            <MacroInput label="C" value={carbs} onChange={(value) => { setCarbs(value); setMacroBasisPerG(null) }} />
-            <MacroInput label="F" value={fat} onChange={(value) => { setFat(value); setMacroBasisPerG(null) }} />
+            <MacroInput label="Calories" unit="kcal" value={calories} onChange={(value) => { setCalories(value); setMacroBasisPerG(null) }} />
+            <MacroInput label="Protein" unit="g" value={protein} onChange={(value) => { setProtein(value); setMacroBasisPerG(null) }} />
+            <MacroInput label="Carbs" unit="g" value={carbs} onChange={(value) => { setCarbs(value); setMacroBasisPerG(null) }} />
+            <MacroInput label="Fat" unit="g" value={fat} onChange={(value) => { setFat(value); setMacroBasisPerG(null) }} />
           </div>
 
-          <button type="button" onClick={() => router.push('/chat')} className="text-[13.5px] font-semibold text-ink-65">
-            Ask Geo to estimate
-          </button>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => router.push('/chat')} className="-ml-3 min-h-11 rounded-full px-3 text-[15px] font-semibold text-ink-65 transition-transform active:scale-[.97]">
+              Ask Geo to estimate
+            </button>
+            {!estimateId ? (
+              <button
+                type="button"
+                onClick={() => { void haptic('selection'); handleAddAnother() }}
+                disabled={saving || !hasCurrent}
+                className="ml-auto flex h-11 items-center gap-1.5 rounded-full bg-ink-06 px-4 text-[15px] font-semibold text-ink transition-transform active:scale-[.96] disabled:opacity-40"
+              >
+                <Plus aria-hidden="true" className="size-4" />Add to tray
+              </button>
+            ) : null}
+          </div>
+        </motion.div>
+      ) : null}
 
-          {!estimateId ? (
-            <SecondaryButton onNavy={false} type="button" onClick={handleAddAnother} disabled={saving || !hasCurrent}>
-              Add to tray
-            </SecondaryButton>
+      {showYourFoods ? (
+        <div className="mt-7 space-y-6" data-testid="your-foods">
+          {recents.length > 0 ? (
+            <section>
+              <SectionTitle>Recent</SectionTitle>
+              <div className={LIST}>
+                {recents.map((food) => <PersonalFoodRow key={`recent-${food.id}`} food={food} onSelect={handleSelectPersonalFood} />)}
+              </div>
+            </section>
+          ) : null}
+          {favourites.length > 0 ? (
+            <section>
+              <SectionTitle>Favourites</SectionTitle>
+              <div className={LIST}>
+                {favourites.map((food) => <PersonalFoodRow key={`fav-${food.id}`} food={food} onSelect={handleSelectPersonalFood} />)}
+              </div>
+            </section>
           ) : null}
         </div>
       ) : null}
 
-
-      {(pending.length > 0 || isFoodDraftFilled(currentDraft())) ? (
-        <FeatureCard
-          data-testid="food-meal-tray"
-          className="sticky z-30 mt-6"
-          style={{ bottom: 'calc(96px + var(--safe-bottom))' }}
-        >
-          <p className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Tray</p>
-          <p className="mt-1 text-[17px] font-bold text-cream">
-            {totalCount} item{totalCount === 1 ? '' : 's'} · {formatMacroKcal(totalCalories)} kcal
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {pending.map((item, index) => (
-              <span key={`pending-${index}-${item.food_name}`} className="flex h-8 items-center gap-2 rounded-full bg-cream-22 px-3 text-[13px] font-medium text-cream">
-                <span className="max-w-36 truncate">{item.food_name}</span>
-                <button type="button" onClick={() => handleRemovePending(index)} aria-label={`Remove ${item.food_name}`} className="-my-3 -mr-3 flex size-11 items-center justify-center text-[18px] leading-none">×</button>
+      <AnimatePresence>
+        {showTray ? (
+          <motion.div
+            key="tray"
+            data-testid="food-meal-tray"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
+            transition={reduce ? reducedFade : spring.sheet}
+            className="glass sticky z-30 mt-6 rounded-[28px] p-4"
+            style={{ bottom: 'calc(96px + var(--safe-bottom))' }}
+          >
+            <p className="flex items-baseline justify-between gap-3 px-1">
+              <span className="text-[17px] font-bold text-ink tabular-nums">
+                {totalCount} item{totalCount === 1 ? '' : 's'} · {formatMacroKcal(totalCalories)} kcal
               </span>
-            ))}
-            {hasCurrent ? (
-              <span className="flex h-8 items-center gap-2 rounded-full bg-cream-22 px-3 text-[13px] font-medium text-cream">
-                <span className="max-w-36 truncate">{foodName.trim()}</span>
-                <button type="button" onClick={clearForm} aria-label={`Remove ${foodName.trim()}`} className="-my-3 -mr-3 flex size-11 items-center justify-center text-[18px] leading-none">×</button>
-              </span>
-            ) : null}
-          </div>
-          <TrayButton type="button" onClick={handleSave} disabled={saving || totalCount === 0} className="mt-4 justify-center">
-            {saving ? 'Saving…' : totalCount > 1 ? `Log ${totalCount} items` : 'Log meal'}
-          </TrayButton>
-        </FeatureCard>
-      ) : null}
+              <span className="text-[13px] font-semibold text-ink-65">{mealType}</span>
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {pending.map((item, index) => (
+                <TrayChip key={`pending-${index}-${item.food_name}`} name={item.food_name} onRemove={() => handleRemovePending(index)} />
+              ))}
+              {hasCurrent ? <TrayChip name={foodName.trim()} onRemove={clearForm} /> : null}
+            </div>
+            <TrayButton type="button" onClick={handleSave} disabled={saving || totalCount === 0} aria-busy={saving} className="mt-3 justify-center">
+              {saving ? 'Saving…' : totalCount > 1 ? `Log ${totalCount} items` : 'Log meal'}
+            </TrayButton>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
+  )
+}
+
+const MEAL_OPTIONS = MEAL_TYPES.map((value) => ({ value, label: value }))
+const AMOUNT_OPTIONS = [{ value: 'servings', label: 'Servings' }, { value: 'grams', label: 'Grams' }] as const
+
+function AddMark() {
+  return (
+    <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-ink-06 text-ink">
+      <Plus className="size-4" />
+    </span>
+  )
+}
+
+function MethodTile({ icon: Icon, label, caption, onClick, disabled, testId }: {
+  icon: ComponentType<SVGProps<SVGSVGElement>>
+  label: string
+  caption: string
+  onClick: () => void
+  disabled?: boolean
+  testId?: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      data-testid={testId}
+      className="flex min-h-16 items-center gap-3 rounded-[22px] bg-card p-3 text-left shadow-[var(--shadow-card)] transition-transform active:scale-[.97] disabled:opacity-60"
+    >
+      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-ink-06 text-ink"><Icon className="size-5" /></span>
+      <span className="min-w-0">
+        <span className="block text-[15.5px] font-semibold text-ink">{label}</span>
+        <span className="block truncate text-[12.5px] text-ink-65">{caption}</span>
+      </span>
+    </button>
+  )
+}
+
+function TrayChip({ name, onRemove }: { name: string; onRemove: () => void }) {
+  return (
+    <span className="flex h-9 max-w-full items-center rounded-full bg-ink-06 pl-3 text-[13.5px] font-semibold text-ink">
+      <span className="max-w-40 truncate">{name}</span>
+      <button type="button" onClick={onRemove} aria-label={`Remove ${name}`} className="-my-1 grid size-11 shrink-0 place-items-center rounded-full"><X className="size-4" /></button>
+    </span>
+  )
+}
+
+function GramsInput({ label, value, onChange, placeholder }: { label: string; value: number | ''; onChange: (value: number | '') => void; placeholder?: string }) {
+  return (
+    <label className="flex h-14 items-center gap-2 rounded-[14px] bg-ink-04 px-4 focus-within:outline focus-within:outline-[1.5px] focus-within:outline-ink">
+      <input
+        aria-label={label}
+        type="number"
+        inputMode="decimal"
+        placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChange(event.target.value ? Number(event.target.value) : '')}
+        className="h-full min-w-0 flex-1 bg-transparent text-[20px] font-bold text-ink outline-none placeholder:text-ink-65 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+      />
+      <span className="text-[15px] font-semibold text-ink-65">g</span>
+    </label>
   )
 }
 
@@ -698,43 +762,46 @@ function PersonalFoodRow({ food, onSelect }: { food: UserFood; onSelect: (f: Use
   return (
     <button
       type="button"
-      onClick={() => onSelect(food)}
+      onClick={() => { void haptic('selection'); onSelect(food) }}
       data-testid="personal-food-row"
-      className="flex min-h-14 w-full items-center justify-between gap-3 px-[14px] py-2.5 text-left"
+      className={ROW}
     >
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
-        <p className="truncate text-[13px] text-ink-65">
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[15.5px] font-semibold text-ink">{food.name}</span>
+        <span className="block truncate text-[13px] text-ink-65">
           1 serving · {formatMacroKcal(food.macros_per_serving.calories)} kcal
           {food.brand ? ` · ${food.brand}` : ''}
-        </p>
-      </div>
-      <span className="shrink-0 text-[17px] font-semibold text-ink">+</span>
+        </span>
+      </span>
+      <AddMark />
     </button>
   )
 }
 
 function MacroInput({
   label,
+  unit,
   value,
   onChange,
 }: {
   label: string
+  unit: string
   value: number | ''
   onChange: (value: number | '') => void
 }) {
   const id = `food-macro-${label.toLowerCase()}`
   return (
-    <label htmlFor={id} className="min-w-0">
-      <span className="mb-1 block text-center text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">{label}</span>
+    <div className="min-w-0 rounded-[14px] bg-ink-04 px-2 pb-2 pt-2.5 text-center focus-within:outline focus-within:outline-[1.5px] focus-within:outline-ink">
+      <label htmlFor={id} className="block text-[12px] font-semibold text-ink-65">{label}</label>
       <input
         id={id}
-        aria-label={label}
         type="number"
+        inputMode="decimal"
         value={value}
         onChange={(event) => onChange(event.target.value ? Number(event.target.value) : '')}
-        className="h-11 w-full rounded-[12px] border-0 bg-ink-08 px-1 text-center text-[15.5px] font-semibold text-ink outline-none"
+        className="h-11 w-full bg-transparent text-center text-[18px] font-bold text-ink outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
-    </label>
+      <span aria-hidden="true" className="block text-[11.5px] font-medium text-ink-65">{unit}</span>
+    </div>
   )
 }

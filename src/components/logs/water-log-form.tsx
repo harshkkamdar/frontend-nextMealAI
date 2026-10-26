@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createLog } from '@/lib/api/logs.api'
+import { haptic } from '@/lib/platform/app'
 import { ManualLogShell } from './manual-log-shell'
+import { CARD, Stepper } from './log-ui'
 
 export function WaterLogForm() {
   const router = useRouter()
@@ -24,6 +26,7 @@ export function WaterLogForm() {
         payload: { glasses },
         source: 'manual',
       })
+      void haptic('success')
       toast.success('Water logged')
       router.back()
     } catch {
@@ -34,27 +37,16 @@ export function WaterLogForm() {
   }
 
   return (
-    <ManualLogShell title="Log water" prompt="How much water today?" saving={saving} onSave={() => void handleSave()}>
-      <div className="flex items-center justify-center gap-7 py-10">
-        <button
-          type="button"
-          onClick={() => setGlasses(Math.max(0, glasses - 1))}
-          aria-label="Fewer glasses"
-          className="flex size-11 items-center justify-center rounded-full bg-ink-08 text-[24px] font-semibold text-ink"
-        >
-          −
-        </button>
-        <p className="min-w-32 text-center text-[28px] font-bold tracking-[-0.6px] text-ink">
-          {glasses} glass{glasses === 1 ? '' : 'es'}
-        </p>
-        <button
-          type="button"
-          onClick={() => setGlasses(glasses + 1)}
-          aria-label="More glasses"
-          className="flex size-11 items-center justify-center rounded-full bg-ink-08 text-[24px] font-semibold text-ink"
-        >
-          +
-        </button>
+    <ManualLogShell title="Water" prompt="How many glasses so far?" saving={saving} onSave={() => void handleSave()}>
+      <div className={`${CARD} py-8`}>
+        <Stepper
+          value={glasses}
+          unit={glasses === 1 ? 'glass' : 'glasses'}
+          onChange={setGlasses}
+          max={30}
+          lessLabel="Fewer glasses"
+          moreLabel="More glasses"
+        />
       </div>
     </ManualLogShell>
   )

@@ -1,18 +1,21 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { ResizableSheet } from '@/components/ui/resizable-sheet'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { ConfirmDialog } from '@/components/shared/confirm-dialog'
-import { Search, Star, X, Plus, Minus, MessageCircle, Trash2 } from 'lucide-react'
+import { MessageCircle, Plus, Star, X } from 'lucide-react'
 import { toast } from 'sonner'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { RoundButton } from '@/components/ui/fiqr/round-button'
+import { CloseIcon } from '@/components/ui/fiqr/icons'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { CARD, Chips, EmptySlot, FIELD, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
+import { FieldLabel } from '@/components/logs/manual-log-shell'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
 import { getFavourites, logFavourite, deleteFavourite, type Favourite } from '@/lib/api/favourites.api'
 import { createLog, createLogs, updateLog, deleteLog } from '@/lib/api/logs.api'
+import { haptic } from '@/lib/platform/app'
+import { cn } from '@/lib/utils'
 import type { CreateLogInput } from '@/types/logs.types'
 import { formatMacroGrams, formatMacroKcal, quantizeMacros } from '@/lib/macros'
 import type { FoodSearchResult } from '@/types/foods.types'
@@ -23,47 +26,62 @@ function FoodRow({ food, onSelect, onToggleFavorite }: {
   onSelect: (food: FoodSearchResult) => void
   onToggleFavorite: (food: FoodSearchResult) => void
 }) {
+  const canFavourite = food.source === 'personal' && !!food.id
   return (
-    <div
-      role="option"
-      aria-selected={false}
-      tabIndex={0}
-      onClick={() => onSelect(food)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onSelect(food)
-        }
-      }}
-      className="flex min-h-14 w-full cursor-pointer items-center gap-3 px-[14px] py-3 text-left outline-none focus:bg-ink-08"
-    >
-      <div className="flex-1 min-w-0">
-        <p className="truncate text-[15.5px] font-semibold text-ink">{food.name}</p>
-        <p className="text-[13px] text-ink-65">
-          {formatMacroKcal(food.macros_per_serving.calories)} cal
-          {food.serving_size_g ? ` · per ${food.serving_size_g}g` : ''}
-          {food.brand ? ` · ${food.brand}` : ''}
-          {food.source === 'usda' && ' · USDA'}
-        </p>
-      </div>
-
-      {food.source === 'personal' && food.id && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggleFavorite(food) }}
-          className="p-1 shrink-0"
-        >
-          <Star
-            className={`size-4 ${food.is_favorite ? 'fill-ink text-ink' : 'text-ink-65'}`}
-          />
-        </button>
-      )}
-
-      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink-08">
-        <Plus className="size-4 text-ink" />
-      </div>
+    <div className={cn(ROW, 'gap-1 py-0 pr-2')}>
+      <button
+        type="button"
+        onClick={() => { void haptic('selection'); onSelect(food) }}
+        className="flex min-h-16 min-w-0 flex-1 items-center gap-3 py-3 text-left"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[15.5px] font-semibold text-ink">{food.name}</span>
+          <span className="block truncate text-[13px] text-ink-65">
+            {formatMacroKcal(food.macros_per_serving.calories)} kcal
+            {food.serving_size_g ? ` · per ${food.serving_size_g} g` : ''}
+            {food.brand ? ` · ${food.brand}` : ''}
+            {food.source === 'usda' && ' · USDA'}
+          </span>
+        </span>
+        {canFavourite ? null : <AddMark />}
+      </button>
+      {canFavourite ? (
+        <>
+          <button
+            type="button"
+            onClick={() => { void haptic('selection'); onToggleFavorite(food) }}
+            aria-label={food.is_favorite ? `Remove ${food.name} from favourites` : `Add ${food.name} to favourites`}
+            aria-pressed={food.is_favorite}
+            className="grid size-11 shrink-0 place-items-center rounded-full text-ink"
+          >
+            <Star className={cn('size-5', food.is_favorite ? 'fill-current' : 'text-ink-35')} />
+          </button>
+          <span className="pr-3"><AddMark /></span>
+        </>
+      ) : null}
     </div>
   )
 }
+
+function AddMark() {
+  return (
+    <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-ink-06 text-ink">
+      <Plus className="size-4" />
+    </span>
+  )
+}
+
+function MacroTile({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-[14px] bg-card px-2 py-3 text-center shadow-[var(--shadow-card)]">
+      <p className="text-[18px] font-bold text-ink tabular-nums">{value}</p>
+      <p className="text-[12px] font-semibold text-ink-65">{label}</p>
+    </div>
+  )
+}
+
+const TABS = [{ value: 'food', label: 'Foods' }, { value: 'meals', label: 'Saved meals' }] as const
+const AMOUNTS = [{ value: 'servings', label: 'Servings' }, { value: 'grams', label: 'Grams' }] as const
 
 interface FoodSearchSheetProps {
   isOpen: boolean
@@ -228,7 +246,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     setLoggingFav(f.id)
     try {
       const r = await logFavourite(f.id, { target_date: logDate, target_meal_type: mealType.toLowerCase() })
-      toast.success(`Logged ${f.name} — ${r.logged} item${r.logged === 1 ? '' : 's'}`)
+      void haptic('success')
+      toast.success(`Logged ${f.name}, ${r.logged} item${r.logged === 1 ? '' : 's'}`)
       onFoodLogged()
       onClose()
     } catch {
@@ -360,12 +379,14 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
       if (match) {
         const merged = mergeFoodPayloads(match.payload as FoodPayload, payload)
         await updateLog(match.id, merged)
-        toast.success(`${selectedFood.name} — combined into one entry`)
+        void haptic('success')
+        toast.success(`${selectedFood.name} added to the same entry`)
         onFoodLogged()
         return
       }
       // BUG-A — stamp the viewed date so it doesn't land on "today".
       await createLog({ type: 'food', payload, source: 'manual', local_date: logDate })
+      void haptic('success')
       toast.success(`${selectedFood.name} logged`)
       onFoodLogged()
     } catch {
@@ -438,6 +459,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     try {
       const { created, failures } = await createLogs(items)
       if (failures.length === 0) {
+        void haptic('success')
         toast.success(
           items.length === 1
             ? `${(items[0].payload as FoodPayload).food_name} logged`
@@ -537,7 +559,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
         source: 'manual',
         local_date: logDate, // BUG-A — bucket onto the viewed date
       })
-      toast.success(`${customName.trim()} saved & logged`)
+      void haptic('success')
+      toast.success(`${customName.trim()} saved and logged`)
       onFoodLogged()
     } catch {
       toast.error('Failed to save food')
@@ -566,264 +589,235 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     fat: (selectedFood.macros_per_serving.fat ?? 0) * effectiveMultiplier,
   } : null
 
+  const title = mode === 'edit'
+    ? `Edit ${(existingLog?.payload as FoodPayload | undefined)?.food_name ?? 'food'}`
+    : pending.length > 0
+      ? `${mealType} · ${pending.length} in meal`
+      : `Add to ${mealType}`
+  const amountInvalid = inputMode === 'grams' && !grams
+  const stepButton = 'grid size-14 shrink-0 place-items-center rounded-full bg-card text-ink shadow-[var(--shadow-card)] transition-transform active:scale-[.94]'
+  const numberInput = 'font-wide h-16 w-28 rounded-[18px] bg-card px-3 text-center text-[28px] font-bold text-ink shadow-[var(--shadow-card)] outline-none tabular-nums focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-ink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+  const step = (fn: () => void) => () => { void haptic('selection'); fn() }
+
   return (
     <>
-      <ResizableSheet open={isOpen} onClose={onClose} ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'} levels={[0.4, 0.7, 0.94]} defaultLevelIndex={mode === 'edit' ? 0 : 1}>
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 pb-3">
-              <h2 id="food-sheet-title" className="text-[22px] font-semibold tracking-[-0.4px] text-ink">
-                {mode === 'edit'
-                  ? `Edit ${(existingLog?.payload as FoodPayload | undefined)?.food_name ?? 'food'}`
-                  : pending.length > 0
-                    ? `Add to ${mealType} · ${pending.length} in meal`
-                    : `Add to ${mealType}`}
-              </h2>
-              <button onClick={onClose} aria-label="Close" className="rounded-full p-1.5 text-ink-65">
-                <X className="size-5" />
-              </button>
+      <BottomSheet
+        open={isOpen}
+        onClose={onClose}
+        ariaLabel={mode === 'edit' ? 'Edit food' : 'Add food'}
+        // Log mode holds one height so results arriving never resize the sheet (no layout jump).
+        className={mode === 'edit' ? '' : 'h-[calc(92vh-var(--nav-clearance)-var(--safe-top))]'}
+      >
+        <div className="flex items-center justify-between gap-3 px-5 pb-3 pt-1">
+          <h2 id="food-sheet-title" className="font-wide min-w-0 truncate text-[22px] font-bold leading-tight text-ink">{title}</h2>
+          <RoundButton aria-label="Close" onClick={onClose}><CloseIcon /></RoundButton>
+        </div>
+
+        {selectedFood ? (
+          /* Confirmation view */
+          <>
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
+              {mode !== 'edit' && (
+                <button type="button" onClick={() => setSelectedFood(null)} className="-ml-3 mb-1 min-h-11 rounded-full px-3 text-[15px] font-semibold text-ink-65">
+                  Back to search
+                </button>
+              )}
+
+              <div className={cn(CARD, 'p-5')}>
+                <p className="text-[17px] font-bold leading-snug text-ink">{selectedFood.name}</p>
+                {selectedFood.brand && <p className="text-[14px] text-ink-65">{selectedFood.brand}</p>}
+                <p className="mt-1 text-[13px] text-ink-65">Per serving ({selectedFood.serving_size_g} g)</p>
+              </div>
+
+              <Chips
+                className="mt-5"
+                label="Amount in"
+                options={AMOUNTS}
+                value={inputMode}
+                onChange={(next) => {
+                  if (next === 'servings') setInputMode('servings')
+                  if (next === 'grams') {
+                    setInputMode('grams')
+                    setGrams(Math.round((selectedFood?.serving_size_g || 100) * servings))
+                  }
+                }}
+              />
+
+              {inputMode === 'servings' ? (
+                <div className="mt-5 flex items-center justify-center gap-5">
+                  <button type="button" onClick={step(() => setServings(Math.max(0.25, servings - 0.25)))} aria-label="Decrease servings" className={stepButton}>
+                    <span aria-hidden="true" className="text-[22px] font-semibold leading-none">−</span>
+                  </button>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={servings}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      if (val === '') return
+                      const num = Number(val)
+                      if (!isNaN(num) && num > 0) setServings(Math.round(num * 4) / 4)
+                    }}
+                    onBlur={() => { if (!servings || servings < 0.25) setServings(0.25) }}
+                    aria-label="Servings"
+                    className={numberInput}
+                  />
+                  <button type="button" onClick={step(() => setServings(servings + 0.25))} aria-label="Increase servings" className={stepButton}>
+                    <Plus className="size-5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-5 flex items-center justify-center gap-5">
+                  <button type="button" onClick={step(() => setGrams(Math.max(1, (grams || 0) - 10)))} aria-label="Decrease grams" className={stepButton}>
+                    <span aria-hidden="true" className="text-[22px] font-semibold leading-none">−</span>
+                  </button>
+                  <div className="flex items-baseline gap-1.5">
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      value={grams}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        if (val === '') { setGrams(''); return }
+                        const num = Number(val)
+                        if (!isNaN(num)) setGrams(Math.max(0, Math.round(num)))
+                      }}
+                      onBlur={() => { if (grams === '' || grams === 0) setGrams(1) }}
+                      aria-label="Grams"
+                      className={numberInput}
+                    />
+                    <span aria-hidden="true" className="text-[15px] font-semibold text-ink-65">g</span>
+                  </div>
+                  <button type="button" onClick={step(() => setGrams((grams || 0) + 10))} aria-label="Increase grams" className={stepButton}>
+                    <Plus className="size-5" />
+                  </button>
+                </div>
+              )}
+
+              {calculatedMacros && (
+                <div className="mt-6 grid grid-cols-4 gap-2">
+                  <MacroTile value={formatMacroKcal(calculatedMacros.calories)} label="kcal" />
+                  <MacroTile value={formatMacroGrams(calculatedMacros.protein)} label="protein" />
+                  <MacroTile value={formatMacroGrams(calculatedMacros.carbs)} label="carbs" />
+                  <MacroTile value={formatMacroGrams(calculatedMacros.fat)} label="fat" />
+                </div>
+              )}
             </div>
 
-            {selectedFood ? (
-              /* Confirmation view */
-              <>
-              <div className="flex-1 overflow-y-auto px-4 pb-6">
-                {mode !== 'edit' && (
-                  <button
-                    onClick={() => setSelectedFood(null)}
-                    className="mb-3 text-[13.5px] font-semibold text-ink-65"
-                  >
-                    &larr; Back to search
+            <div className="px-5 pb-5 pt-3">
+              {mode === 'edit' ? (
+                <div className="space-y-1">
+                  <PrimaryButton onClick={handleSaveEdit} disabled={saving || !selectedFood} aria-busy={saving} className="justify-center">
+                    {saving ? 'Saving…' : 'Save'}
+                  </PrimaryButton>
+                  <button type="button" onClick={() => setConfirmDeleteEdit(true)} disabled={saving} className="min-h-11 w-full rounded-full text-center text-[15.5px] font-semibold text-ink-65">
+                    Delete entry
                   </button>
-                )}
-
-                <div className="mb-4 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-                  <p className="text-[15.5px] font-semibold text-ink">{selectedFood.name}</p>
-                  {selectedFood.brand && (
-                    <p className="text-[13px] text-ink-65">{selectedFood.brand}</p>
-                  )}
-                  <p className="mt-1 text-[13px] text-ink-65">
-                    Per serving ({selectedFood.serving_size_g}g)
-                  </p>
                 </div>
-
-                {/* Input mode toggle */}
-                <div className="mb-4">
-                  <div className="mb-3 flex gap-2">
-                    <button
-                      onClick={() => setInputMode('servings')}
-                      className={`h-9 flex-1 rounded-full px-3 text-[13.5px] font-semibold ${
-                        inputMode === 'servings'
-                          ? 'bg-ink text-cream'
-                          : 'bg-ink-08 text-ink'
-                      }`}
-                    >
-                      Servings
-                    </button>
-                    <button
-                      onClick={() => {
-                        setInputMode('grams')
-                        setGrams(Math.round((selectedFood?.serving_size_g || 100) * servings))
-                      }}
-                      className={`h-9 flex-1 rounded-full px-3 text-[13.5px] font-semibold ${
-                        inputMode === 'grams'
-                          ? 'bg-ink text-cream'
-                          : 'bg-ink-08 text-ink'
-                      }`}
-                    >
-                      Grams
-                    </button>
-                  </div>
-
-                  {inputMode === 'servings' ? (
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => setServings(Math.max(0.25, servings - 0.25))}
-                        aria-label="Decrease servings"
-                        className="flex size-10 items-center justify-center rounded-full bg-ink-08 text-ink"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <input
-                        type="number"
-                        value={servings}
-                        onChange={(e) => {
-                          const val = e.target.value
-                          if (val === '') return
-                          const num = Number(val)
-                          if (!isNaN(num) && num > 0) setServings(Math.round(num * 4) / 4)
-                        }}
-                        onBlur={() => { if (!servings || servings < 0.25) setServings(0.25) }}
-                        aria-label="Servings"
-                        className="h-14 w-24 rounded-[15px] border border-ink-16 bg-card px-4 text-center text-[17px] font-semibold tabular-nums text-ink outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <button
-                        onClick={() => setServings(servings + 0.25)}
-                        aria-label="Increase servings"
-                        className="flex size-10 items-center justify-center rounded-full bg-ink-08 text-ink"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => setGrams(Math.max(1, (grams || 0) - 10))}
-                        aria-label="Decrease grams"
-                        className="flex size-10 items-center justify-center rounded-full bg-ink-08 text-ink"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <div className="flex items-center gap-1">
-                        <input
-                          type="number"
-                          value={grams}
-                          onChange={(e) => {
-                            const val = e.target.value
-                            if (val === '') { setGrams(''); return }
-                            const num = Number(val)
-                            if (!isNaN(num)) setGrams(Math.max(0, Math.round(num)))
-                          }}
-                          onBlur={() => { if (grams === '' || grams === 0) setGrams(1) }}
-                          aria-label="Grams"
-                          className="h-14 w-24 rounded-[15px] border border-ink-16 bg-card px-4 text-center text-[17px] font-semibold tabular-nums text-ink outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
-                        <span className="text-[13px] text-ink-65">g</span>
-                      </div>
-                      <button
-                        onClick={() => setGrams((grams || 0) + 10)}
-                        aria-label="Increase grams"
-                        className="flex size-10 items-center justify-center rounded-full bg-ink-08 text-ink"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
+              ) : (
+                /* FE-RCA F3 — multi-select footer.
+                   "+ Add to meal" stages the current selection in the pending tray
+                   and returns to search so the user can add another item without
+                   re-opening the sheet. "Log meal (N)" / "Log food" commits via
+                   the batch createLogs() surface. */
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { void haptic('selection'); handleAddToMeal() }}
+                    disabled={saving || amountInvalid}
+                    className="flex h-[60px] flex-1 items-center justify-center gap-1.5 rounded-[18px] bg-ink-06 text-[16px] font-semibold text-ink transition-transform active:scale-[.97] disabled:opacity-40"
+                  >
+                    <Plus aria-hidden="true" className="size-4" />
+                    Add to meal
+                  </button>
+                  <PrimaryButton onClick={handleConfirmLog} disabled={saving || amountInvalid} aria-busy={saving} className="flex-1 justify-center px-3">
+                    {saving
+                      ? 'Logging…'
+                      : pending.length > 0
+                        ? `Log meal (${pending.length + 1})`
+                        : 'Log food'}
+                  </PrimaryButton>
                 </div>
-
-                {/* Macro preview */}
-                {calculatedMacros && (
-                  <div className="grid grid-cols-4 gap-2 mb-6">
-                    <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
-                      <p className="text-[15.5px] font-semibold text-ink">{formatMacroKcal(calculatedMacros.calories)}</p>
-                      <p className="text-[11px] text-ink-65">kcal</p>
-                    </div>
-                    <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
-                      <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.protein)}</p>
-                      <p className="text-[11px] text-ink-65">protein</p>
-                    </div>
-                    <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
-                      <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.carbs)}</p>
-                      <p className="text-[11px] text-ink-65">carbs</p>
-                    </div>
-                    <div className="rounded-[12px] bg-ink-08 p-2.5 text-center">
-                      <p className="text-[15.5px] font-semibold text-ink">{formatMacroGrams(calculatedMacros.fat)}</p>
-                      <p className="text-[11px] text-ink-65">fat</p>
-                    </div>
-                  </div>
-                )}
-
+              )}
+            </div>
+          </>
+        ) : showCustomForm ? (
+          /* Custom food form */
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
+            <button type="button" onClick={() => setShowCustomForm(false)} className="-ml-3 mb-1 min-h-11 rounded-full px-3 text-[15px] font-semibold text-ink-65">
+              Back to search
+            </button>
+            <h3 className="font-wide mb-4 text-[19px] font-bold text-ink">New food</h3>
+            <div className="space-y-4">
+              <div>
+                <FieldLabel htmlFor="custom-name">Name</FieldLabel>
+                <input id="custom-name" type="text" placeholder="Mum's dal and rice" value={customName} onChange={(e) => setCustomName(e.target.value)} autoFocus className={cn(FIELD, 'h-14')} />
               </div>
-              {/* Sticky footer button(s) */}
-              <div className="border-t border-ink-12 px-4 pb-20 pt-3">
-                {mode === 'edit' ? (
-                  <div className="space-y-3">
-                    <PrimaryButton onClick={handleSaveEdit} disabled={saving || !selectedFood} className="justify-center">
-                      Save
-                    </PrimaryButton>
-                    <button type="button" onClick={() => setConfirmDeleteEdit(true)} disabled={saving} className="w-full text-center text-[15.5px] font-semibold text-ink-65">
-                      Delete entry
-                    </button>
-                  </div>
-                ) : (
-                  /* FE-RCA F3 — multi-select footer.
-                     "+ Add to meal" stages the current selection in the pending tray
-                     and returns to search so the user can add another item without
-                     re-opening the sheet. "Log meal (N)" / "Log Food" commits via
-                     the batch createLogs() surface. */
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={handleAddToMeal}
-                      disabled={saving || (inputMode === 'grams' && !grams)}
-                      className="flex-1"
-                    >
-                      <Plus className="w-4 h-4 mr-1" />
-                      Add to meal
-                    </Button>
-                    <PrimaryButton onClick={handleConfirmLog} disabled={saving || (inputMode === 'grams' && !grams)} className="flex-1 justify-center px-3">
-                      {saving
-                        ? 'Logging...'
-                        : pending.length > 0
-                          ? `Log meal (${pending.length + 1})`
-                          : 'Log Food'}
-                    </PrimaryButton>
-                  </div>
-                )}
+              <div>
+                <FieldLabel htmlFor="custom-serving">Serving, g</FieldLabel>
+                <input id="custom-serving" type="number" inputMode="decimal" placeholder="100" value={customServingG} onChange={(e) => setCustomServingG(e.target.value ? Number(e.target.value) : '')} className={cn(FIELD, 'h-14')} />
               </div>
-              </>
-            ) : (
-              /* Search view */
+              <p className="px-1 text-[13px] font-semibold text-ink-65">Per serving</p>
+              <div className="grid grid-cols-2 gap-3">
+                {([
+                  ['custom-kcal', 'Calories', customCalories, setCustomCalories],
+                  ['custom-protein', 'Protein, g', customProtein, setCustomProtein],
+                  ['custom-carbs', 'Carbs, g', customCarbs, setCustomCarbs],
+                  ['custom-fat', 'Fat, g', customFat, setCustomFat],
+                ] as const).map(([id, label, value, set]) => (
+                  <div key={id}>
+                    <FieldLabel htmlFor={id}>{label}</FieldLabel>
+                    <input id={id} type="number" inputMode="decimal" value={value} onChange={(e) => set(e.target.value ? Number(e.target.value) : '')} className={cn(FIELD, 'h-14')} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <PrimaryButton onClick={handleSaveCustomFood} disabled={saving || !customName.trim()} aria-busy={saving} className="mt-6 justify-center">
+              {saving ? 'Saving…' : 'Save and log'}
+            </PrimaryButton>
+            <p className="mt-2 text-center text-[13px] text-ink-65">It&apos;s saved to your foods for next time.</p>
+          </div>
+        ) : (
+          /* Search view */
+          <>
+            {mode !== 'edit' && (
+              <Chips
+                className="px-5 pb-3"
+                label="Add from"
+                options={TABS.map((t) => (t.value === 'meals' && favourites.length > 0 ? { ...t, label: `${t.label} · ${favourites.length}` } : t))}
+                value={activeTab}
+                onChange={(next) => { if (next) setActiveTab(next) }}
+              />
+            )}
+
+            {activeTab === 'meals' && mode !== 'edit' ? (
+              /* Meals tab — your saved meals, one tap to log the whole thing */
               <>
-                {/* Food | Meals tabs (log mode only) */}
-                {mode !== 'edit' && (
-                  <div className="px-4 pb-3">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setActiveTab('food')}
-                        className={`h-9 flex-1 rounded-full px-3 text-[13.5px] font-semibold ${activeTab === 'food' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
-                      >
-                        Food
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('meals')}
-                        className={`flex h-9 flex-1 items-center justify-center gap-1 rounded-full px-3 text-[13.5px] font-semibold ${activeTab === 'meals' ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'}`}
-                      >
-                        Meals{favourites.length > 0 ? ` · ${favourites.length}` : ''}
-                      </button>
-                    </div>
+                {favourites.length > 0 && (
+                  <div className="px-5 pb-3">
+                    <SearchField label="Search saved meals" value={mealQuery} onChange={setMealQuery} placeholder="Search saved meals" />
                   </div>
                 )}
-
-                {activeTab === 'meals' && mode !== 'edit' ? (
-                  /* Meals tab — your saved meals, one tap to log the whole thing */
-                  <>
-                  {favourites.length > 0 && (
-                    <div className="px-4 pb-3">
-                      <div className="relative">
-                        <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
-                        <Input
-                          type="text"
-                          value={mealQuery}
-                          onChange={(e) => setMealQuery(e.target.value)}
-                          placeholder="Search saved meals..."
-                          className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 pl-11 text-[17px] text-ink focus-visible:ring-0"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex-1 overflow-y-auto px-4 pb-6 min-h-0">
-                    {favourites.length === 0 ? (
-                      <div className="text-center py-12 space-y-1.5">
-                        <Star className="mx-auto size-6 text-ink-65" />
-                        <p className="text-[15.5px] text-ink-65">No saved meals yet</p>
-                        <p className="px-6 text-[13px] text-ink-65">Log a meal, then tap &ldquo;Save as meal&rdquo; on it in your diary to reuse it here.</p>
-                      </div>
-                    ) : (() => {
-                      const q = mealQuery.trim().toLowerCase()
-                      const shown = q
-                        ? favourites.filter((f) => f.name.toLowerCase().includes(q) || f.items.some((it) => (it.food_name ?? '').toLowerCase().includes(q)))
-                        : favourites
-                      if (shown.length === 0) {
-                        return <p className="py-10 text-center text-[15.5px] text-ink-65">No saved meals match &ldquo;{mealQuery}&rdquo;</p>
-                      }
-                      return (
-                      <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09" role="listbox" aria-label="Saved meals">
+                <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
+                  {favourites.length === 0 ? (
+                    <EmptySlot>No saved meals yet. In your diary, open a meal&apos;s menu and choose Save as meal.</EmptySlot>
+                  ) : (() => {
+                    const q = mealQuery.trim().toLowerCase()
+                    const shown = q
+                      ? favourites.filter((f) => f.name.toLowerCase().includes(q) || f.items.some((it) => (it.food_name ?? '').toLowerCase().includes(q)))
+                      : favourites
+                    if (shown.length === 0) {
+                      return <p className="px-1 py-4 text-[15.5px] text-ink">No saved meals match &ldquo;{mealQuery}&rdquo;.</p>
+                    }
+                    return (
+                      <div className={LIST} role="list" aria-label="Saved meals">
                         {shown.map((f) => (
-                          <div key={f.id} className="flex min-h-14 items-center gap-2 px-[14px] py-3">
+                          <div key={f.id} role="listitem" className={cn(ROW, 'gap-1 py-0 pr-2')}>
                             <button
+                              type="button"
                               onClick={() => handleLogFavourite(f)}
                               disabled={loggingFav === f.id}
-                              className="flex-1 min-w-0 flex items-center justify-between gap-2 disabled:opacity-50 text-left"
+                              className="flex min-h-16 min-w-0 flex-1 items-center justify-between gap-2 py-3 text-left disabled:opacity-50"
                               aria-label={`Log ${f.name}`}
                             >
                               <span className="min-w-0">
@@ -833,236 +827,120 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                                   {f.items.length > 0 ? ` · ${f.items.map((it) => it.food_name).slice(0, 3).join(', ')}${f.items.length > 3 ? '…' : ''}` : ''}
                                 </span>
                               </span>
-                              <span className="inline-flex shrink-0 items-center gap-1 text-[13.5px] font-semibold text-ink">
-                                <Plus className="w-3.5 h-3.5" />
+                              <span className="inline-flex shrink-0 items-center gap-1 text-[14px] font-semibold text-ink">
+                                <Plus aria-hidden="true" className="size-4" />
                                 {loggingFav === f.id ? 'Logging…' : 'Log'}
                               </span>
                             </button>
                             {confirmDeleteFav === f.id ? (
-                              <button onClick={() => handleDeleteFavourite(f)} className="shrink-0 px-1.5 text-[11px] font-semibold text-ink" aria-label={`Confirm remove ${f.name}`}>Remove?</button>
+                              <button type="button" onClick={() => handleDeleteFavourite(f)} className="h-11 shrink-0 rounded-full px-3 text-[14px] font-semibold text-ink" aria-label={`Confirm remove ${f.name}`}>Remove?</button>
                             ) : (
-                              <button onClick={() => setConfirmDeleteFav(f.id)} aria-label={`Remove ${f.name}`} className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-65">
-                                <X className="w-3.5 h-3.5" />
+                              <button type="button" onClick={() => setConfirmDeleteFav(f.id)} aria-label={`Remove ${f.name}`} className="grid size-11 shrink-0 place-items-center rounded-full text-ink-65">
+                                <X className="size-4" />
                               </button>
                             )}
                           </div>
                         ))}
                       </div>
-                      )
-                    })()}
-                  </div>
-                  </>
-                ) : (
-                <>
-                {/* Search input */}
-                <div className="px-4 pb-3">
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" />
-                    <Input
-                      ref={inputRef}
-                      type="text"
-                      value={query}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      placeholder="Search foods..."
-                      className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 pl-11 text-[17px] text-ink focus-visible:ring-0"
-                    />
-                  </div>
+                    )
+                  })()}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="px-5 pb-3">
+                  <SearchField inputRef={inputRef} label="Search foods" value={query} onChange={handleSearch} placeholder="Search foods" />
                 </div>
 
                 {/* FE-RCA F3 — pending tray summary. Only visible in log mode
                     and only when at least one item has been staged. Lets the
                     user review/remove items before committing the meal. */}
                 {mode !== 'edit' && pending.length > 0 && (
-                  <div className="px-4 pb-3">
-                    <div className="space-y-2 rounded-[16px] border border-ink-12 bg-card p-[14px]">
-                      <p className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">
-                        In this meal · {pending.length}
-                      </p>
-                      <ul className="space-y-1.5">
+                  <div className="px-5 pb-3">
+                    <div className={cn(CARD, 'p-4')}>
+                      <p className="px-1 text-[13px] font-semibold text-ink-65">In this meal · {pending.length}</p>
+                      <ul className="mt-1">
                         {pending.map((item, idx) => (
-                          <li
-                            key={`pending-${idx}-${item.food.id ?? item.food.name}`}
-                            className="flex items-center justify-between gap-2 text-sm"
-                          >
+                          <li key={`pending-${idx}-${item.food.id ?? item.food.name}`} className="flex items-center justify-between gap-2 border-b border-ink-06 py-1 pl-1 last:border-b-0">
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-[15.5px] font-semibold text-ink">{item.food.name}</p>
                               <p className="text-[13px] tabular-nums text-ink-65">
                                 {item.inputMode === 'servings'
-                                  ? `${item.servings} × ${item.food.serving_size_g ?? 100}g`
-                                  : `${item.quantity_g}g`}
+                                  ? `${item.servings} × ${item.food.serving_size_g ?? 100} g`
+                                  : `${item.quantity_g} g`}
                                 {' · '}
-                                {formatMacroKcal(item.est_macros.calories)} cal
+                                {formatMacroKcal(item.est_macros.calories)} kcal
                               </p>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => handleRemovePendingItem(idx)}
-                              aria-label={`Remove ${item.food.name}`}
-                              className="shrink-0 p-1 text-ink-65"
-                            >
-                              <Trash2 className="w-4 h-4" />
+                            <button type="button" onClick={() => handleRemovePendingItem(idx)} aria-label={`Remove ${item.food.name}`} className="grid size-11 shrink-0 place-items-center rounded-full text-ink-65">
+                              <X className="size-4" />
                             </button>
                           </li>
                         ))}
                       </ul>
-                      <PrimaryButton onClick={handleCommitMeal} disabled={saving} className="justify-center">
-                        {saving ? 'Logging...' : `Log meal (${pending.length})`}
+                      <PrimaryButton onClick={handleCommitMeal} disabled={saving} aria-busy={saving} className="mt-3 justify-center">
+                        {saving ? 'Logging…' : `Log meal (${pending.length})`}
                       </PrimaryButton>
                     </div>
                   </div>
                 )}
 
-                {/* Results */}
-                <div className="flex-1 overflow-y-auto px-4 pb-4 min-h-0">
-                  {searching && (
-                    <div className="flex justify-center py-6">
-                      <div className="size-5 animate-spin rounded-full border-2 border-ink border-t-transparent" />
-                    </div>
-                  )}
-
-                  {!searching && results.length > 0 && (
-                    <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09" role="listbox" aria-label="Food search results">
+                <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
+                  {searching ? (
+                    <RowsSkeleton label="Searching" />
+                  ) : results.length > 0 ? (
+                    <RiseList className={LIST} role="list" aria-label="Food search results">
                       {results.map((food, i) => (
-                        <FoodRow
-                          key={food.id ?? `usda-${food.usda_fdc_id ?? i}`}
-                          food={food}
-                          onSelect={handleSelectFood}
-                          onToggleFavorite={handleToggleFavorite}
-                        />
+                        <FoodRow key={food.id ?? `usda-${food.usda_fdc_id ?? i}`} food={food} onSelect={handleSelectFood} onToggleFavorite={handleToggleFavorite} />
                       ))}
-                    </div>
-                  )}
-
-                  {!searching && query.length >= 2 && results.length === 0 && (
-                    <div className="text-center py-8">
-                      <p className="mb-3 text-[15.5px] text-ink-65">No results found</p>
+                    </RiseList>
+                  ) : query.length >= 2 ? (
+                    <div className="px-1 py-4">
+                      <p className="text-[15.5px] text-ink">Nothing matches &ldquo;{query}&rdquo;.</p>
                       <button
+                        type="button"
                         onClick={() => { setShowCustomForm(true); setCustomName(query) }}
-                        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-ink px-3 text-[13.5px] font-semibold text-cream"
+                        className="mt-3 inline-flex h-11 max-w-full items-center gap-1.5 rounded-full bg-ink px-4 text-[15px] font-semibold text-cream"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        Add &ldquo;{query}&rdquo; as custom food
+                        <Plus aria-hidden="true" className="size-4 shrink-0" />
+                        <span className="truncate">Add &ldquo;{query}&rdquo; as a new food</span>
                       </button>
                     </div>
-                  )}
-
-                  {!searching && query.length < 2 && recentFoods.length > 0 ? (
-                    <div>
-                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">Recent</p>
-                      <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09" role="listbox" aria-label="Recent foods">
+                  ) : recentFoods.length > 0 ? (
+                    <section>
+                      <SectionTitle>Recent</SectionTitle>
+                      <div className={LIST} role="list" aria-label="Recent foods">
                         {recentFoods.map((food, i) => (
-                          <FoodRow
-                            key={food.id ?? `recent-${i}`}
-                            food={food}
-                            onSelect={handleSelectFood}
-                            onToggleFavorite={handleToggleFavorite}
-                          />
+                          <FoodRow key={food.id ?? `recent-${i}`} food={food} onSelect={handleSelectFood} onToggleFavorite={handleToggleFavorite} />
                         ))}
                       </div>
-                    </div>
-                  ) : !searching && query.length < 2 ? (
-                    <div className="text-center py-8 space-y-4">
-                      <p className="text-[15.5px] text-ink-65">Type to search foods</p>
-                    </div>
-                  ) : null}
+                    </section>
+                  ) : (
+                    <p className="px-1 py-6 text-center text-[15.5px] text-ink-65">Start typing to find a food.</p>
+                  )}
                 </div>
 
-                {/* Bottom actions */}
-                <div className="flex items-center justify-between border-t border-ink-12 px-4 pb-4 pt-3">
-                  <button
-                    onClick={handleAskGeo}
-                    className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-65"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5" />
+                <div className="flex items-center justify-between border-t border-ink-06 px-3 pb-4 pt-2">
+                  <button type="button" onClick={handleAskGeo} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[15px] font-semibold text-ink-65">
+                    <MessageCircle aria-hidden="true" className="size-4" />
                     Ask Geo to estimate
                   </button>
-                  <button
-                    onClick={() => setShowCustomForm(true)}
-                    className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink-65"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    Add custom food
+                  <button type="button" onClick={() => setShowCustomForm(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[15px] font-semibold text-ink-65">
+                    <Plus aria-hidden="true" className="size-4" />
+                    New food
                   </button>
                 </div>
-                </>
-                )}
               </>
             )}
-
-            {/* Custom food form overlay */}
-            {showCustomForm && !selectedFood && (
-              <div className="flex-1 overflow-y-auto px-4 pb-6">
-                <button
-                  onClick={() => setShowCustomForm(false)}
-                  className="mb-3 text-[13.5px] font-semibold text-ink-65"
-                >
-                  &larr; Back to search
-                </button>
-
-                <h3 className="mb-4 text-[22px] font-semibold tracking-[-0.4px] text-ink">Create Custom Food</h3>
-
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <Label className="text-[13px] text-ink-65">Food Name</Label>
-                    <Input
-                      type="text"
-                      placeholder="e.g. Mom's Dal Rice"
-                      value={customName}
-                      onChange={(e) => setCustomName(e.target.value)}
-                      autoFocus
-                      className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <Label className="text-[13px] text-ink-65">Serving Size (g)</Label>
-                    <Input
-                      type="number"
-                      placeholder="100"
-                      value={customServingG}
-                      onChange={(e) => setCustomServingG(e.target.value ? Number(e.target.value) : '')}
-                      className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0"
-                    />
-                  </div>
-
-                  <p className="mt-2 text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">Macros per serving</p>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <Label className="text-[13px] text-ink-65">Calories</Label>
-                      <Input type="number" placeholder="kcal" value={customCalories} onChange={(e) => setCustomCalories(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[13px] text-ink-65">Protein (g)</Label>
-                      <Input type="number" placeholder="g" value={customProtein} onChange={(e) => setCustomProtein(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[13px] text-ink-65">Carbs (g)</Label>
-                      <Input type="number" placeholder="g" value={customCarbs} onChange={(e) => setCustomCarbs(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[13px] text-ink-65">Fat (g)</Label>
-                      <Input type="number" placeholder="g" value={customFat} onChange={(e) => setCustomFat(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-[15px] border border-ink-16 bg-card px-4 text-[17px] text-ink focus-visible:ring-0" />
-                    </div>
-                  </div>
-                </div>
-
-                <PrimaryButton onClick={handleSaveCustomFood} disabled={saving || !customName.trim()} className="mt-4 justify-center">
-                  {saving ? 'Saving...' : 'Save & Log'}
-                </PrimaryButton>
-
-                <p className="mt-2 text-center text-[11px] text-ink-65">
-                  This food will be saved to your personal database for quick access later
-                </p>
-              </div>
-            )}
-      </ResizableSheet>
+          </>
+        )}
+      </BottomSheet>
       <ConfirmDialog
         open={confirmDeleteEdit}
         onClose={() => setConfirmDeleteEdit(false)}
         onConfirm={handleDeleteEdit}
-        title="Delete entry?"
-        description="This food entry will be removed from your diary."
+        title="Delete this entry?"
+        description="It comes off your diary and your totals update."
         confirmLabel="Delete entry"
         variant="danger"
       />

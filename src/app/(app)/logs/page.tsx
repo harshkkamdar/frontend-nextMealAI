@@ -1,52 +1,54 @@
 'use client'
 
-import { Droplet, Dumbbell, Moon, Scale, Smile, Zap, type LucideIcon } from 'lucide-react'
+import type { ComponentType, SVGProps } from 'react'
 import { useRouter } from 'next/navigation'
-import { PageWrapper } from '@/components/layout/page-wrapper'
+import { PushedHeader } from '@/components/layout/screen-header'
 import { LogList } from '@/components/logs/log-list'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { SectionLabel } from '@/components/ui/fiqr/section-label'
-import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { OfflineBand } from '@/components/shared/offline-band'
+import { EnergyFill, FoodFill, MoodFill, SleepFill, TrainFill, WaterFill, WeightFill } from '@/components/ui/fiqr/icons'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 
-const LOG_TYPES: { type: string; label: string; icon: LucideIcon }[] = [
-  { type: 'workout', label: 'Workout', icon: Dumbbell },
-  { type: 'weight', label: 'Weight', icon: Scale },
-  { type: 'water', label: 'Water', icon: Droplet },
-  { type: 'sleep', label: 'Sleep', icon: Moon },
-  { type: 'mood', label: 'Mood', icon: Smile },
-  { type: 'energy', label: 'Energy', icon: Zap },
+const LOG_TYPES: { type: string; label: string; icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+  { type: 'workout', label: 'Workout', icon: TrainFill },
+  { type: 'weight', label: 'Weight', icon: WeightFill },
+  { type: 'water', label: 'Water', icon: WaterFill },
+  { type: 'sleep', label: 'Sleep', icon: SleepFill },
+  { type: 'mood', label: 'Mood', icon: MoodFill },
+  { type: 'energy', label: 'Energy', icon: EnergyFill },
 ]
 
+/** Log chooser: left the nav for the orb (C2, Q9) but stays reachable; recent logs live here. */
 export default function LogsPage() {
   useSetGeoScreen('logs', {})
   const router = useRouter()
 
   return (
-    <PageWrapper className="pb-32">
-      <h1 className="mb-5 text-[22px] font-semibold tracking-[-0.4px] text-ink">Log</h1>
-      <div className="-mx-gutter [&:not(:empty)]:mb-4"><OfflineBand /></div>
+    <div className="mx-auto w-full max-w-md px-4 pb-6">
+      <PushedHeader title="Log" onBack={() => router.back()} />
+      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
 
-      <PrimaryButton type="button" icon="+" trailing="Scan · Search" onClick={() => router.push('/logs/new/food')}>
+      <PrimaryButton type="button" icon={<FoodFill className="size-5" />} onClick={() => router.push('/logs/new/food')} className="mt-3">
         Log food
       </PrimaryButton>
 
-      <div className="mt-[10px] grid grid-cols-2 gap-[10px]">
+      <div className="mt-3 grid grid-cols-3 gap-[10px]">
         {LOG_TYPES.map(({ type, label, icon: Icon }) => (
           <button
             key={type}
             type="button"
             onClick={() => router.push(`/logs/new/${type}`)}
-            className="flex items-center gap-3 rounded-[16px] border border-ink-12 bg-card p-[14px] text-left"
+            className="flex min-h-[88px] flex-col items-center justify-center gap-2 rounded-[22px] bg-card shadow-[var(--shadow-card)] transition-transform active:scale-[.97]"
           >
-            <Icon className="size-6 shrink-0 text-ink-65" />
-            <span className="text-[15.5px] font-semibold text-ink">{label}</span>
+            <Icon aria-hidden="true" className="size-6 text-ink" />
+            <span className="text-[14px] font-semibold text-ink">{label}</span>
           </button>
         ))}
       </div>
 
-      <SectionLabel className="mb-2 mt-8">Recent</SectionLabel>
-      <LogList />
-    </PageWrapper>
+      <div className="mt-8">
+        <LogList />
+      </div>
+    </div>
   )
 }

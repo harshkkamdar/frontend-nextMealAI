@@ -3,15 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import {
-  NumberField,
-  SearchablePicker,
-  AddRowButton,
-  RemoveRowButton,
-} from '@/components/plans/plan-builder-shared'
+import { Plus, X } from 'lucide-react'
+import { NumberField, SearchablePicker } from '@/components/plans/plan-builder-shared'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
 import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
-import { ManualLogShell } from './manual-log-shell'
+import { FieldLabel, ManualLogShell } from './manual-log-shell'
+import { FIELD, LIST } from './log-ui'
 
 interface DraftExercise {
   key: string
@@ -76,28 +73,29 @@ export function WorkoutLogForm() {
 
   return (
     <ManualLogShell
-      title="Log workout"
-      prompt="Build today's session and I'll time your rests."
+      title="Workout"
+      prompt="What are you training? I'll time your rests."
       saving={starting}
       onSave={() => void handleStart()}
       actionLabel="Start session"
       savingLabel="Starting…"
     >
       <div className="space-y-6">
-        <label className="block">
-          <span className="mb-2 block text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Workout title</span>
+        <div>
+          <FieldLabel htmlFor="workout-title">Name</FieldLabel>
           <input
+            id="workout-title"
             type="text"
-            placeholder="e.g. Push day"
+            placeholder="Push day"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            className="h-14 w-full rounded-[15px] border border-ink-16 bg-card px-4 text-[15.5px] font-semibold text-ink outline-none placeholder:text-ink-65 focus:border-ink"
+            className={`${FIELD} h-14 font-semibold`}
           />
-        </label>
+        </div>
 
-        <div className="space-y-3">
-          <p className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Exercises</p>
-          <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card divide-y divide-ink-09">
+        <div>
+          <FieldLabel>Exercises · optional, add more as you go</FieldLabel>
+          <div className={LIST}>
             {exercises.map((exercise, index) => (
               <ExerciseRow
                 key={exercise.key}
@@ -109,7 +107,9 @@ export function WorkoutLogForm() {
               />
             ))}
           </div>
-          <AddRowButton label="Add exercise" onClick={addExercise} />
+          <button type="button" onClick={addExercise} className="mt-3 flex min-h-11 items-center gap-2 rounded-full px-3 text-[15px] font-semibold text-ink transition-transform active:scale-[.97]">
+            <Plus className="size-5" />Add exercise
+          </button>
         </div>
       </div>
     </ManualLogShell>
@@ -130,7 +130,7 @@ function ExerciseRow({
   onRemove: () => void
 }) {
   return (
-    <div className="space-y-3 p-[14px]">
+    <div className="space-y-3 border-b border-ink-06 px-4 py-4 last:border-b-0">
       <div className="flex items-start gap-2">
         <div className="flex-1">
           <SearchablePicker<ExerciseSearchResult>
@@ -151,7 +151,11 @@ function ExerciseRow({
             onClear={() => onPatch({ name: '', muscle: null })}
           />
         </div>
-        {canRemove ? <RemoveRowButton label={`Remove exercise ${index + 1}`} onClick={onRemove} /> : null}
+        {canRemove ? (
+          <button type="button" onClick={onRemove} aria-label={`Remove exercise ${index + 1}`} className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-ink-65 transition-transform active:scale-[.94]">
+            <X className="size-5" />
+          </button>
+        ) : null}
       </div>
       <div className="grid grid-cols-3 gap-2">
         <NumberField label="Sets" value={exercise.sets} onChange={(v) => onPatch({ sets: v })} min={1} max={20} placeholder="3" />

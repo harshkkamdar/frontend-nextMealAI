@@ -27,12 +27,11 @@ export default function NewLogPage({ type }: { type: string }) {
     return <PageWrapper><p className="text-ink-65">Unknown log type</p></PageWrapper>
   }
 
+  // Each form owns its pushed header and page width (ManualLogShell, FoodLogForm).
   return (
-    <PageWrapper>
-      {/* FoodLogForm reads useSearchParams (meal/date) — needs a Suspense boundary. */}
-      <Suspense fallback={null}>
-        <FormComponent />
-      </Suspense>
-    </PageWrapper>
+    /* FoodLogForm reads useSearchParams (meal/date) — needs a Suspense boundary. */
+    <Suspense fallback={null}>
+      <FormComponent />
+    </Suspense>
   )
 }

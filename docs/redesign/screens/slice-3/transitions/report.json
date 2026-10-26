@@ -1,0 +1,53 @@
+{
+  "food-log-save": {
+    "frames": 111,
+    "chrome_px": 222243,
+    "content_px": 1235935,
+    "max_chrome_share": 0.161,
+    "max_content_share": 0.167,
+    "issues": [
+      "chrome jump frame 38: 16% of chrome change",
+      "chrome jump frame 52: 9% of chrome change",
+      "late change frame 52 after 10 still frames (225809 px)"
+    ],
+    "verdict": "pop"
+  },
+  "food-search-results": {
+    "frames": 48,
+    "chrome_px": 0,
+    "content_px": 75052,
+    "max_chrome_share": 0,
+    "max_content_share": 0.094,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "food-select-tray": {
+    "frames": 63,
+    "chrome_px": 78946,
+    "content_px": 369370,
+    "max_chrome_share": 0.217,
+    "max_content_share": 0.157,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "photo-tray": {
+    "frames": 65,
+    "chrome_px": 69816,
+    "content_px": 247249,
+    "max_chrome_share": 0.128,
+    "max_content_share": 0.203,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "water-save": {
+    "frames": 92,
+    "chrome_px": 197699,
+    "content_px": 1218988,
+    "max_chrome_share": 0.155,
+    "max_content_share": 0.17,
+    "issues": [
+      "late change frame 68 after 16 still frames (222616 px)"
+    ],
+    "verdict": "pop"
+  }
+}

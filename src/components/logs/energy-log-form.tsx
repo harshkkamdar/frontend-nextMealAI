@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createLog } from '@/lib/api/logs.api'
-import { ManualLogShell, NotesField, RatingPills } from './manual-log-shell'
+import { haptic } from '@/lib/platform/app'
+import { FieldLabel, ManualLogShell, NotesField } from './manual-log-shell'
+import { Chips, Scale } from './log-ui'
 
-const TIME_OF_DAY_OPTIONS = ['Morning', 'Afternoon', 'Evening']
+const TIME_OF_DAY_OPTIONS = ['Morning', 'Afternoon', 'Evening'].map((value) => ({ value, label: value }))
 
 export function EnergyLogForm() {
   const router = useRouter()
@@ -32,6 +34,7 @@ export function EnergyLogForm() {
         },
         source: 'manual',
       })
+      void haptic('success')
       toast.success('Energy logged')
       router.back()
     } catch {
@@ -42,28 +45,17 @@ export function EnergyLogForm() {
   }
 
   return (
-    <ManualLogShell title="Log energy" prompt="How's your energy?" saving={saving} onSave={() => void handleSave()}>
+    <ManualLogShell title="Energy" prompt="How much energy do you have?" saving={saving} onSave={() => void handleSave()}>
       <div className="space-y-7">
-        <RatingPills rating={rating} onChange={setRating} label="Energy" />
         <div>
-          <p className="mb-2 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-65">Time of day</p>
-          <div className="flex gap-2">
-            {TIME_OF_DAY_OPTIONS.map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setTimeOfDay(timeOfDay === option ? '' : option)}
-                aria-pressed={timeOfDay === option}
-                className={`h-11 rounded-full px-4 text-[14px] font-semibold ${
-                  timeOfDay === option ? 'bg-ink text-cream' : 'bg-ink-08 text-ink'
-                }`}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
+          <FieldLabel>1 is flat, 10 is flying</FieldLabel>
+          <Scale value={rating} onChange={setRating} label="Energy from 1 to 10" />
         </div>
-        <NotesField value={notes} onChange={setNotes} placeholder="Anything affecting your energy?" />
+        <div>
+          <FieldLabel>Time of day</FieldLabel>
+          <Chips options={TIME_OF_DAY_OPTIONS} value={timeOfDay} onChange={setTimeOfDay} label="Time of day" clearable />
+        </div>
+        <NotesField value={notes} onChange={setNotes} placeholder="Optional" />
       </div>
     </ManualLogShell>
   )

@@ -44,7 +44,8 @@ describe('manual log form guards and FIQR inputs', () => {
 
   it('starts water at three glasses and keeps its positive-value guard', () => {
     render(<WaterLogForm />)
-    expect(screen.getByText('3 glasses')).toBeInTheDocument()
+    expect(screen.getByText('3')).toBeInTheDocument()
+    expect(screen.getByText('glasses')).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('Fewer glasses'))
     fireEvent.click(screen.getByLabelText('Fewer glasses'))
     fireEvent.click(screen.getByLabelText('Fewer glasses'))

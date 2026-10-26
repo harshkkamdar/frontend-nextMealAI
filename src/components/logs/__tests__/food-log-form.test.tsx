@@ -102,8 +102,8 @@ describe('FoodLogForm — FB-R6-13 Photo Estimate', () => {
       expect((screen.getByPlaceholderText(/grilled chicken breast/i) as HTMLInputElement).value)
         .toBe('grilled chicken, rice')
     })
-    expect((screen.getByLabelText('KCAL') as HTMLInputElement).value).toBe('380')
-    expect((screen.getByLabelText('P') as HTMLInputElement).value).toBe('43')
+    expect((screen.getByLabelText('Calories') as HTMLInputElement).value).toBe('380')
+    expect((screen.getByLabelText('Protein') as HTMLInputElement).value).toBe('43')
   })
 
   it('AC02: shows the estimate confidence chip after a successful estimate', async () => {
@@ -114,7 +114,7 @@ describe('FoodLogForm — FB-R6-13 Photo Estimate', () => {
     input.dispatchEvent(new Event('change', { bubbles: true }))
 
     await waitFor(() => expect(screen.getByTestId('estimate-chip')).toBeInTheDocument())
-    expect(screen.getByText(/confidence 75%/i)).toBeInTheDocument()
+    expect(screen.getByText(/about 75% sure/i)).toBeInTheDocument()
   })
 
   it('AC03: Save calls logFromEstimate (not createLog) when an estimate is loaded', async () => {
@@ -290,7 +290,7 @@ describe('FoodLogForm — R7-07 servings selector', () => {
     fireEvent.click(screen.getByText('Bega Cheese Slice'))
     expect(screen.getByTestId('serving-mode-toggle')).toBeInTheDocument()
     expect(screen.getByTestId('servings-value').textContent).toBe('1')
-    expect(screen.getByText('21g')).toBeInTheDocument() // derived grams
+    expect(screen.getByText(/21 g/)).toBeInTheDocument() // derived grams
   })
 
   it('the + stepper increases servings (and derived grams)', async () => {

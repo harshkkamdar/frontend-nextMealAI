@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createLog } from '@/lib/api/logs.api'
+import { haptic } from '@/lib/platform/app'
 import { ManualLogShell, NotesField, NumericSuffixInput } from './manual-log-shell'
 
 export function WeightLogForm() {
@@ -28,6 +29,7 @@ export function WeightLogForm() {
         },
         source: 'manual',
       })
+      void haptic('success')
       toast.success('Weight logged')
       router.back()
     } catch {
@@ -38,7 +40,7 @@ export function WeightLogForm() {
   }
 
   return (
-    <ManualLogShell title="Log weight" prompt="What's the scale saying?" saving={saving} onSave={() => void handleSave()}>
+    <ManualLogShell title="Weight" prompt="What does the scale say today?" saving={saving} onSave={() => void handleSave()}>
       <div className="space-y-6">
         <NumericSuffixInput
           label="Weight"
@@ -48,7 +50,7 @@ export function WeightLogForm() {
           placeholder="0.0"
           step="0.1"
         />
-        <NotesField value={notes} onChange={setNotes} placeholder="Any notes (optional)" />
+        <NotesField value={notes} onChange={setNotes} placeholder="Optional" />
       </div>
     </ManualLogShell>
   )
