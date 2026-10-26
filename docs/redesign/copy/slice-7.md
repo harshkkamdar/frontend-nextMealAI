@@ -12,7 +12,8 @@
 | Empty slot | No nutrition plan yet · Build one → | No nutrition plan yet / Build one, or ask Geo below |
 | Empty slot | No training program yet · Build one → | No training program yet / Build one, or ask Geo below |
 | New-plan heading | (none) | Want a new plan? |
-| New-plan line | (none) | Tell Geo what you're after and it drafts one for you to check. |
+| Card meta, training | 5 days · Upper A/Lower A/Upper B | 4 training days, 1 rest · 5 weeks left |
+| Card meta, nutrition | 1,950 kcal · 140 g protein | 1,950 kcal · 140 g protein · 4 weeks left (time left only when the plan has an end date: "N weeks left", "N days left", "Ends today") |
 | Primary action | Ask Geo for a plan | Ask Geo for a plan |
 | Links header (new) | (none) | Or build it yourself |
 | Link | Build a nutrition plan by hand → | Nutrition plan |

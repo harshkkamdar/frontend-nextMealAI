@@ -20,27 +20,42 @@ export function planMeta(plan: Plan): string {
     return targets ? `${fmt(targets.calories)} kcal · ${fmt(targets.protein)} g protein` : 'Targets not set'
   }
   const days = plan.content.days ?? []
-  const names = days.filter((day) => !day.is_rest_day).slice(0, 3).map((day) => day.name || 'Training').join('/')
-  return `${days.length} ${days.length === 1 ? 'day' : 'days'}${names ? ` · ${names}` : ''}`
+  const training = days.filter((day) => !day.is_rest_day).length
+  return `${training} training ${training === 1 ? 'day' : 'days'}${days.length > training ? `, ${days.length - training} rest` : ''}`
+}
+
+/** How long the plan still runs, from its end date: "5 weeks left", "3 days left", "Ends today"; null without dates. */
+export function timeLeft(endDate: string | undefined, today = new Date()): string | null {
+  if (!endDate) return null
+  const end = Date.UTC(+endDate.slice(0, 4), +endDate.slice(5, 7) - 1, +endDate.slice(8, 10))
+  const now = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+  if (Number.isNaN(end)) return null
+  const days = Math.round((end - now) / 86400000)
+  if (days < 0) return null
+  if (days === 0) return 'Ends today'
+  if (days < 14) return `${days} ${days === 1 ? 'day' : 'days'} left`
+  return `${Math.round(days / 7)} weeks left`
 }
 
 /** Active plan: kind, name, one line of numbers. The card opens the plan; the round pencil edits it. */
 export function PlanOverviewCard({ plan, onClick, onEdit }: { plan: Plan; onClick: () => void; onEdit?: () => void }) {
+  const left = timeLeft(plan.end_date)
   return (
     <div className={cn(CARD, 'relative')}>
       <button type="button" onClick={onClick} className="flex w-full rounded-[24px] p-5 pr-14 text-left transition-transform duration-100 ease-out active:scale-[.98]">
         <span className="min-w-0 flex-1">
           <span className="block text-[13px] font-semibold text-ink-65">{plan.type === 'meal' ? 'Nutrition' : 'Training'}</span>
-          <span className="font-wide mt-1 line-clamp-2 block break-words text-[24px] font-bold leading-[1.12] tracking-[-0.4px] text-ink">{planTitle(plan)}</span>
-          <span className="mt-1.5 line-clamp-2 block text-[14px] text-ink-65 tabular-nums">{planMeta(plan)}</span>
+          <span className="font-wide mt-1 line-clamp-2 block break-words text-[22px] font-bold leading-[1.15] tracking-[-0.3px] text-ink">{planTitle(plan)}</span>
+          <span className="mt-1.5 block truncate text-[14px] text-ink-65 tabular-nums">{planMeta(plan)}{left ? <> · <span className="font-semibold text-ink">{left}</span></> : null}</span>
         </span>
       </button>
       {onEdit ? (
+        // Sits on the title's first line (eyebrow 17 + 4 gap + half of a 25 px line, minus half the 44 px target).
         <button
           type="button"
           aria-label={`Edit ${plan.type === 'meal' ? 'nutrition' : 'workout'} plan`}
           onClick={onEdit}
-          className="absolute right-2 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-ink-65 transition-transform active:scale-[.9]"
+          className="absolute right-2 top-[32px] grid size-11 place-items-center text-ink-65 transition-transform active:scale-[.9]"
         >
           <Pencil className="size-5" strokeWidth={1.75} aria-hidden="true" />
         </button>

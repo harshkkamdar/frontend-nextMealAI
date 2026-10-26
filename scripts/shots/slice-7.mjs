@@ -83,7 +83,7 @@ const s = (shot) => ({ done: DONE, api: plansApi(), ...shot })
 const shots = [
   // /plans
   s({ name: 'plans', url: '/plans' }),
-  s({ name: 'plans-scrolled', url: '/plans', act: async (p) => { await p.mouse.wheel(0, 700); await wait(p) } }),
+  s({ name: 'plans-scrolled', url: '/plans', act: async (p) => { await p.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await wait(p) } }),
   s({ name: 'plans-none', url: '/plans', api: NONE_API }),
   s({ name: 'plans-loading', url: '/plans', hang: ['/v1/plans'] }),
   s({ name: 'plans-error', url: '/plans', fail: ['/v1/plans'] }),

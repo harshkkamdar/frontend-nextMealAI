@@ -64,19 +64,18 @@ export default function PlansPage() {
               : <EmptySlot label="No training program yet" href="/plans/new/workout" />}
           </section>
 
-          <section aria-labelledby="new-plan" className="mt-10">
+          <section aria-labelledby="new-plan" className="mt-8">
             <h2 id="new-plan" className="px-5 text-[17px] font-semibold text-ink">Want a new plan?</h2>
-            <p className="mt-1 px-5 text-[14.5px] leading-[1.45] text-ink-65">Tell Geo what you&apos;re after and it drafts one for you to check.</p>
-            <PrimaryButton type="button" className="mt-4 h-[54px] rounded-full py-0" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a plan</PrimaryButton>
-            <h3 className={cn(SECTION, 'mt-6')}>Or build it yourself</h3>
-            <div className="mt-1">
+            <PrimaryButton type="button" className="mt-3 h-[54px] rounded-full py-0" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a plan</PrimaryButton>
+            <h3 className={cn(SECTION, 'mt-8')}>Or build it yourself</h3>
+            <div>
               <BuildLink href="/plans/new/meal" label="Build nutrition plan by hand">Nutrition plan</BuildLink>
               <BuildLink href="/plans/new/workout" label="Build training program by hand">Training program</BuildLink>
             </div>
           </section>
 
           {earlier.length > 0 ? (
-            <section aria-labelledby="earlier-plans" className="mt-10 flex flex-col gap-3">
+            <section aria-labelledby="earlier-plans" className="mt-8 flex flex-col gap-3">
               <h2 id="earlier-plans" className={SECTION}>Earlier</h2>
               <div className={cn(CARD, 'overflow-hidden')}>
                 {earlier.map((plan) => <PreviousPlanRow key={plan.id} plan={plan} onClick={() => open(plan)} />)}

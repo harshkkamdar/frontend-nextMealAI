@@ -27,6 +27,7 @@ vi.mock('@/contexts/geo-screen-context', () => ({
 
 import PlansPage from '@/app/(app)/plans/page'
 import { previousPlans } from '@/components/plans/plan-format'
+import { timeLeft } from '@/components/plans/plan-overview-card'
 import type { Plan } from '@/types/plans.types'
 
 beforeEach(() => {
@@ -54,6 +55,18 @@ describe('previousPlans', () => {
   it('caps the list at five', () => {
     const all = Array.from({ length: 8 }, (_, i) => plan(`p${i}`, 'meal', 'completed', `Plan ${i}`))
     expect(previousPlans(all, [])).toHaveLength(5)
+  })
+})
+
+describe('timeLeft', () => {
+  const today = new Date(2026, 9, 26)
+  it('counts weeks, then days, then ends today; nothing for past or missing dates', () => {
+    expect(timeLeft('2026-11-29', today)).toBe('5 weeks left')
+    expect(timeLeft('2026-10-29', today)).toBe('3 days left')
+    expect(timeLeft('2026-10-27', today)).toBe('1 day left')
+    expect(timeLeft('2026-10-26', today)).toBe('Ends today')
+    expect(timeLeft('2026-10-01', today)).toBeNull()
+    expect(timeLeft(undefined, today)).toBeNull()
   })
 })
 
@@ -112,7 +125,7 @@ describe('PlansPage CTAs', () => {
 
     await waitFor(() => screen.getByLabelText('Edit nutrition plan'))
     expect(screen.getByText('2,000 kcal · 150 g protein')).toBeInTheDocument()
-    expect(screen.getByText('1 day · Day 1')).toBeInTheDocument()
+    expect(screen.getByText('1 training day')).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('Edit nutrition plan'))
     expect(pushMock).toHaveBeenCalledWith('/plans/edit?id=meal-1')
 
