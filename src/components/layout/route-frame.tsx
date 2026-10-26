@@ -286,9 +286,10 @@ export function RouteFrame({ children }: { children: ReactNode }) {
         setNav((n) => ({ ...n, front: null, moving: true }))
         navHistory.swipeCommitted = true
         window.history.back()
-        // No history to go back to (a cold deep link): put the page back instead of leaving it off screen.
+        // No history to go back to (a cold deep link): put the page back instead of leaving it off screen. A popstate
+        // means the back is under way and only the route commit is slow, so the page stays off and the commit lands as is.
         window.setTimeout(() => {
-          if (!navHistory.swipeCommitted || pair().t !== t) return
+          if (!navHistory.swipeCommitted || navHistory.backPending || pair().t !== t) return
           navHistory.swipeCommitted = false
           setNav((n) => ({ ...n, front: t.key, moving: true }))
           run(() => slide(t, under, 1, 0, 0), () => {})

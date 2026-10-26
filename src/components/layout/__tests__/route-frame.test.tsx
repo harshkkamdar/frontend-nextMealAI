@@ -92,3 +92,37 @@ describe('RouteFrame interrupted slides', () => {
     expect(Math.abs(x('/food') - before)).toBeLessThan(0.05 * W)
   })
 })
+
+/** Drags from the left edge to `toX` and releases. */
+async function swipe(toX: number) {
+  const t0 = performance.now()
+  touch('touchstart', 5, 300, t0)
+  for (let i = 1; i <= 8; i++) { touch('touchmove', 5 + ((toX - 5) * i) / 8, 300, t0 + i * 16); await wait(16) }
+  touch('touchend', toX, 300, t0 + 9 * 16)
+}
+
+describe('RouteFrame swipe-back commit', () => {
+  it('a route commit later than 600 ms lands without sliding the page back and out again', async () => {
+    go('/foods')
+    await wait(700)
+    // Browser back fires popstate quickly, but the route commits late (slow chunk load).
+    vi.spyOn(window.history, 'back').mockImplementation(() => { setTimeout(() => window.dispatchEvent(new PopStateEvent('popstate', { state: null })), 20) })
+    await swipe(0.7 * W)
+    // Release spring (~0.5 s) plus the 600 ms fallback window, and more.
+    await wait(1600)
+    expect(x("/foods")).toBeGreaterThan(0.95 * W)
+    go('/food')
+    await wait(400)
+    expect(layer('/foods')).toBeNull()
+    expect(x('/food')).toBe(0)
+  })
+
+  it('with no history to go back to, puts the page back after 600 ms', async () => {
+    go('/foods')
+    await wait(700)
+    vi.spyOn(window.history, 'back').mockImplementation(() => {})
+    await swipe(0.7 * W)
+    await wait(1800)
+    expect(Math.abs(x("/foods"))).toBeLessThan(2)
+  })
+})
