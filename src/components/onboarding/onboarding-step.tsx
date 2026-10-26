@@ -6,6 +6,7 @@ import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { useAuroraScene, type SceneName } from '@/components/onboarding/aurora'
 import { arrivalDir, BEHIND, clearArrival, FRONT, type DepthDir } from '@/components/onboarding/depth-nav'
+import { useEdgeSwipeBack } from '@/components/onboarding/edge-swipe'
 import { reducedFade, spring } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
@@ -59,6 +60,8 @@ export function OnboardingStep({ stepKey, progress, segments, question, why, onB
   // Cleared after commit, not during render, so React's double render in dev reads the same direction.
   useEffect(() => { goingBack = false }, [stepKey])
   useEffect(() => { clearArrival() }, [])
+  // A left-edge swipe does what the back button does.
+  useEdgeSwipeBack(onBack ? () => { markBack(); onBack() } : undefined)
 
   const bars = segments ?? (progress === undefined ? null : [1, 1, 1])
   const label = busy ? busyLabel : cta
