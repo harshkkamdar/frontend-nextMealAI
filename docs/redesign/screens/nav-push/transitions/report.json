@@ -1,50 +1,46 @@
 {
   "pop-settings-to-home": {
-    "frames": 37,
-    "chrome_px": 131238,
-    "content_px": 874846,
-    "max_chrome_share": 0.089,
-    "max_content_share": 0.091,
-    "issues": [
-      "chrome jump frame 3: 9% of chrome change"
-    ],
-    "verdict": "pop"
+    "frames": 35,
+    "chrome_px": 127991,
+    "content_px": 842939,
+    "max_chrome_share": 0.099,
+    "max_content_share": 0.093,
+    "issues": [],
+    "verdict": "smooth"
   },
   "push-home-to-settings": {
-    "frames": 54,
-    "chrome_px": 102867,
-    "content_px": 593827,
-    "max_chrome_share": 0.108,
-    "max_content_share": 0.141,
-    "issues": [
-      "chrome jump frame 3: 11% of chrome change"
-    ],
-    "verdict": "pop"
+    "frames": 36,
+    "chrome_px": 114795,
+    "content_px": 852362,
+    "max_chrome_share": 0.113,
+    "max_content_share": 0.121,
+    "issues": [],
+    "verdict": "smooth"
   },
   "swipe-back-cancel": {
-    "frames": 52,
-    "chrome_px": 125505,
-    "content_px": 841207,
-    "max_chrome_share": 0.036,
-    "max_content_share": 0.033,
+    "frames": 54,
+    "chrome_px": 126418,
+    "content_px": 847292,
+    "max_chrome_share": 0.04,
+    "max_content_share": 0.036,
     "issues": [],
     "verdict": "smooth"
   },
   "swipe-back-complete": {
-    "frames": 57,
-    "chrome_px": 213634,
-    "content_px": 1314791,
-    "max_chrome_share": 0.037,
-    "max_content_share": 0.039,
+    "frames": 54,
+    "chrome_px": 215023,
+    "content_px": 1324477,
+    "max_chrome_share": 0.036,
+    "max_content_share": 0.037,
     "issues": [],
     "verdict": "smooth"
   },
   "tab-home-to-food": {
-    "frames": 55,
-    "chrome_px": 32602,
-    "content_px": 197185,
-    "max_chrome_share": 0.13,
-    "max_content_share": 0.113,
+    "frames": 43,
+    "chrome_px": 18674,
+    "content_px": 133670,
+    "max_chrome_share": 0.476,
+    "max_content_share": 0.386,
     "issues": [],
     "verdict": "smooth"
   }

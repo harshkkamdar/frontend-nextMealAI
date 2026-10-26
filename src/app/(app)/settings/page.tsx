@@ -24,6 +24,7 @@ import type { Profile } from '@/types/profile.types'
 import type { GeoPersonality, RestTimerDuration, Settings } from '@/types/settings.types'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
+import { goBack } from '@/components/plans/plan-format'
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev'
 
@@ -184,7 +185,7 @@ export default function SettingsPage() {
     }
   }
 
-  const header = <PushedHeader title="Settings" onBack={() => router.push('/dashboard')} backLabel="Back to Today" />
+  const header = <PushedHeader title="Settings" onBack={() => goBack(router, '/dashboard')} backLabel="Back to Today" />
 
   if (loading || !settings || !profile) {
     return (

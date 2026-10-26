@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils'
 import { computeCompleteSetResult, firstIncompleteExerciseIndex, isExerciseComplete, nextIncompleteExerciseIndex, resolveElapsedForSession } from '@/lib/workout-session'
 import { useUIStore } from '@/stores/ui.store'
 import type { SessionExercise, SetData, WorkoutSession } from '@/types/workout-session.types'
+import { goBack } from '@/components/plans/plan-format'
 
 function Chevron({ direction }: { direction: 'left' | 'right' }) {
   return (
@@ -355,7 +356,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   if (loading) {
     return (
       <div className="mx-auto min-h-dvh w-full max-w-md bg-cream px-4">
-        <PushedHeader title="" onBack={() => router.push('/train')} backLabel="Back to training" />
+        <PushedHeader title="" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
         {/* motion-feel 3h: skeletons only after 150 ms without data, so a quick load goes straight to content. */}
         <motion.div className="pt-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.12, delay: 0.15 }}><SessionSkeleton /></motion.div>
       </div>
@@ -364,7 +365,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   if (!session) {
     return (
       <div className="mx-auto min-h-dvh w-full max-w-md bg-cream px-4">
-        <PushedHeader title="Workout" onBack={() => router.push('/train')} backLabel="Back to training" />
+        <PushedHeader title="Workout" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
         <div className="-mx-4"><OfflineBand /></div>
         {loadFailed ? (
           <div className="mt-4">

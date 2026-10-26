@@ -20,6 +20,7 @@ import type { WorkoutProgramContent } from '@/types/plans.types'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { ApiException } from '@/types/api.types'
+import { goBack } from '@/components/plans/plan-format'
 
 // FB-R6-02 — FB-15 (program extraction) still wants a base64 payload. The
 // chat-input no longer keeps base64 around (it has a File + storage_path
@@ -233,7 +234,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
           <PrefillReader onPrefill={setPrefill} />
         </Suspense>
       )}
-      <PushedHeader title={sessionTitle ?? 'Geo'} onBack={() => router.push('/chat')} backLabel="Back to conversations" />
+      <PushedHeader title={sessionTitle ?? 'Geo'} onBack={() => goBack(router, '/chat')} backLabel="Back to conversations" />
       {/* Scroll edge under the header (same idea as the tab bar's): the thread fades into the paper, never sliced. */}
       <div aria-hidden="true" className={`pointer-events-none fixed inset-x-0 top-0 z-[39] h-[calc(var(--safe-top)+88px)] transition-opacity duration-200 ${scrolled ? 'opacity-100' : 'opacity-0'} bg-[linear-gradient(to_bottom,var(--color-cream)_calc(100%-28px),rgba(253,246,236,0))]`} />
       <div className="-mx-5">

@@ -17,6 +17,8 @@ import { useUIStore } from '@/stores/ui.store'
 interface Layer {
   key: string
   scrollY: number
+  /** Arrived by a slide: the slide is its entrance, so the page's own staggered entrance is skipped (globals.css). */
+  slid?: boolean
   x: MotionValue<number>
   dim: MotionValue<number>
   opacity: MotionValue<number>
@@ -76,6 +78,7 @@ function advance(nav: Nav, to: string): Nav {
     return { stack: nav.stack.slice(0, index + 1), exiting: [...exiting, old], step: { kind, top, old, settled: false }, front: old.key, moving: true }
   }
   top.opacity.set(1)
+  if (kind !== 'tab') top.slid = true
   if (kind === 'pop') {
     top.x.set(-PUSH_PARALLAX * window.innerWidth)
     top.dim.set(PUSH_DIM)
@@ -124,6 +127,7 @@ function PageLayer({ layer, live, show, moving, shadow, children }: { layer: Lay
         boxShadow: shadow ? SHADOW : undefined,
       }}
       data-route={layer.key}
+      data-slid={layer.slid || undefined}
       className={cn('min-h-screen w-full bg-background', !live && 'fixed inset-0 overflow-hidden', !hidesTabBar(layer.key) && 'pb-[var(--tabbar-clearance)]')}
     >
       <Freeze live={live}>{children}</Freeze>
