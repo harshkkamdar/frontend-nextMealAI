@@ -8,6 +8,7 @@ import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { DeleteAccountSheet } from '@/components/settings/delete-account-sheet'
 import { GLYPH, SettingsRow, SettingsSection, SettingsSelect, SettingsSkeleton, SettingsSwitch } from '@/components/settings/settings-section'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
@@ -65,6 +66,7 @@ export default function SettingsPage() {
   const [showAiConfirm, setShowAiConfirm] = useState(false)
   const [showDeleteAccount, setShowDeleteAccount] = useState(false)
   const [showHealthConnect, setShowHealthConnect] = useState(false)
+  const [showPlanNote, setShowPlanNote] = useState(false)
   const [connected, setConnected] = useState(false)
   const [lastSynced, setLastSynced] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState(false)
@@ -230,12 +232,11 @@ export default function SettingsPage() {
         </section>
 
         <SettingsSection title="Subscription">
-          {!native ? (
-            <SettingsRow label="Plan" value="Manage in the app" />
-          ) : subscribed ? (
-            <SettingsRow label="Plan" value="FIQR Plus" />
+          {/* Plans are sold only in the phone app; on web the row explains that instead of opening the paywall. */}
+          {native ? (
+            <SettingsRow label="Plan" value={subscribed ? 'FIQR Plus' : 'Free'} href="/paywall" />
           ) : (
-            <SettingsRow label="Plan" value="Free" href="/paywall" />
+            <SettingsRow label="Plan" value="Free" onClick={() => setShowPlanNote(true)} />
           )}
           {native ? <SettingsRow label="Restore purchases" onClick={() => void handleRestore()} /> : null}
           {native && subscribed ? <SettingsRow label="Manage subscription" onClick={() => void manageSubscription()} /> : null}
@@ -250,17 +251,18 @@ export default function SettingsPage() {
           </SettingsSection>
         ) : null}
 
-        <SettingsSection title="Notifications" footer="Geo nudges you when your check-in is ready.">
+        <SettingsSection title="Notifications">
           <SettingsRow label="Push notifications">
             <SettingsSwitch label="Push notifications" checked={settings.notifications_enabled} onChange={handleNotificationChange} />
           </SettingsRow>
           <SettingsRow label="Reminder time">
+            {/* Chrome left-aligns the fields inside the editor box; flex-end puts the time on the shared value edge. */}
             <input
               type="time"
               aria-label="Reminder time"
               value={settings.notification_time ?? '08:00'}
               onChange={(event) => handleReminderChange(event.target.value)}
-              className="-my-2.5 h-11 min-w-0 rounded-[10px] bg-transparent text-right text-[15px] text-ink-65 outline-none tabular-nums focus-visible:bg-ink-04 [&::-webkit-calendar-picker-indicator]:hidden"
+              className="-my-2.5 h-11 min-w-0 rounded-[10px] bg-transparent p-0 text-right text-[15px] text-ink-65 outline-none tabular-nums focus-visible:bg-ink-04 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0 [&::-webkit-datetime-edit]:flex [&::-webkit-datetime-edit]:justify-end [&::-webkit-datetime-edit]:p-0"
             />
             <span aria-hidden="true" className={GLYPH} />
           </SettingsRow>
@@ -268,7 +270,7 @@ export default function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection title="Coaching">
-          <SettingsSelect label="Geo's style" value={settings.geo_personality} options={PERSONALITY_OPTIONS} onChange={(style) => void handleUpdate({ geo_personality: style })} />
+          <SettingsSelect label="Coaching style" value={settings.geo_personality} options={PERSONALITY_OPTIONS} onChange={(style) => void handleUpdate({ geo_personality: style })} />
           <SettingsSelect label="Rest timer" value={settings.rest_timer_seconds} options={REST_TIMER_OPTIONS} onChange={(seconds) => void handleUpdate({ rest_timer_seconds: seconds })} />
         </SettingsSection>
 
@@ -340,6 +342,15 @@ export default function SettingsPage() {
         cancelLabel="Keep it on"
         variant="danger"
       />
+      <BottomSheet open={showPlanNote} onClose={() => setShowPlanNote(false)} ariaLabel="Your plan">
+        <div className="px-6 pb-4 pt-3">
+          <h2 className="font-wide text-[22px] font-bold leading-tight text-ink">Your plan lives in the app</h2>
+          <p className="mt-2 text-[15.5px] leading-[1.45] text-ink-65">FIQR Plus is sold in the FIQR app on iPhone and Android. Open it there to subscribe or change your plan.</p>
+          <button type="button" onClick={() => setShowPlanNote(false)} className="mt-5 h-12 w-full rounded-[18px] bg-card text-[16px] font-semibold text-ink active:bg-ink-04">
+            Got it
+          </button>
+        </div>
+      </BottomSheet>
       <DeleteAccountSheet open={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
       <HealthConnectSheet
         open={showHealthConnect}

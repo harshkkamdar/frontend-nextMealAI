@@ -14,11 +14,11 @@ import { cn } from '@/lib/utils'
 export function SettingsSection({ title, footer, children }: { title?: string; footer?: ReactNode; children: ReactNode }) {
   return (
     <section aria-label={title}>
-      {title ? <h2 className="mb-2 px-4 text-[13px] font-semibold text-ink-65">{title}</h2> : null}
+      {title ? <h2 className="mb-2 px-[17px] text-[13px] font-semibold leading-4 text-ink-65">{title}</h2> : null}
       <div className="overflow-hidden rounded-[24px] border border-ink-06 bg-card [&>*+*]:border-t [&>*+*]:border-ink-06">
         {children}
       </div>
-      {footer ? <p className="mt-2 px-4 text-[13px] leading-[1.45] text-ink-65">{footer}</p> : null}
+      {footer ? <p className="mt-2 px-[17px] text-[13px] leading-[1.45] text-ink-65">{footer}</p> : null}
     </section>
   )
 }
@@ -61,7 +61,7 @@ export function SettingsRow({ label, value, onClick, href, disabled, children }:
   return <div className={ROW}>{content}</div>
 }
 
-/** iOS switch: ink when on (orange stays for the screen's one action). 44 pt tall hit area around a 51 x 31 track. */
+/** iOS switch: ink-65 when on, so a 51 x 31 track reads lighter than the row text (orange stays for the screen's one action). 44 pt tall hit area. */
 export function SettingsSwitch({ label, checked, disabled = false, onChange }: {
   label: string
   checked: boolean
@@ -81,10 +81,10 @@ export function SettingsSwitch({ label, checked, disabled = false, onChange }: {
     >
       <span className="relative block h-[31px] w-[51px] overflow-hidden rounded-full bg-ink-12">
         {/* The on colour is a second layer that fades, so only opacity and transform animate. */}
-        <span aria-hidden="true" className={cn('absolute inset-0 bg-ink transition-opacity duration-200', checked ? 'opacity-100' : 'opacity-0')} />
+        <span aria-hidden="true" className={cn('absolute inset-0 bg-ink-65 transition-opacity duration-200', checked ? 'opacity-100' : 'opacity-0')} />
         <motion.span
           aria-hidden="true"
-          className="absolute left-[2px] top-[2px] block size-[27px] rounded-full bg-card shadow-[0_2px_6px_rgba(17,28,53,.18)]"
+          className="absolute left-[2px] top-[2px] block size-[27px] rounded-full bg-card shadow-[0_1px_3px_rgba(17,28,53,.16)]"
           initial={false}
           animate={{ x: checked ? 20 : 0 }}
           transition={reduce ? reducedFade : spring.tap}
@@ -134,7 +134,7 @@ export function SettingsSkeleton({ groups = [1, 3, 5, 2], label = 'Loading setti
     <div role="status" aria-busy="true" aria-label={label} className="flex flex-col gap-7">
       {groups.map((rows, index) => (
         <div key={index}>
-          {index > 0 ? <div className="mb-2 ml-4 h-[13px] w-24 rounded-full bg-ink-06" /> : null}
+          {index > 0 ? <div className="mb-2 ml-[17px] h-4 w-24 rounded-full bg-ink-06" /> : null}
           <div className="overflow-hidden rounded-[24px] border border-ink-06 bg-card">
             {Array.from({ length: rows }, (_, row) => (
               <div key={row} className={cn('flex items-center px-4', index === 0 ? 'h-16' : 'h-11', row > 0 && 'border-t border-ink-06')}>

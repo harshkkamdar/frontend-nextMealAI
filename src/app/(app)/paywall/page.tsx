@@ -85,7 +85,7 @@ export default function PaywallPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4">
+    <div className="mx-auto w-full max-w-md px-4 pb-[calc(var(--safe-bottom)+16px)]">
       <PushedHeader title="FIQR Plus" onBack={() => router.back()} />
       <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
 
@@ -151,9 +151,10 @@ export default function PaywallPage() {
                         transition={reduce ? reducedFade : spring.lens}
                       />
                     ) : null}
-                    <span className="flex items-center justify-between">
-                      <span className="text-[14px] font-semibold text-ink-65">{o.period === 'yearly' ? 'Yearly' : 'Monthly'}</span>
-                      <span aria-hidden="true" className="relative size-[22px] rounded-full border-[1.5px] border-ink-20">
+                    {/* Explicit widths: WebKit does not stretch this row inside a column-flex button, so the radio would hug the label. */}
+                    <span className="flex w-full items-center gap-2">
+                      <span className="min-w-0 flex-1 text-[14px] font-semibold text-ink-65">{o.period === 'yearly' ? 'Yearly' : 'Monthly'}</span>
+                      <span aria-hidden="true" className="relative ml-auto size-[22px] shrink-0 rounded-full border-[1.5px] border-ink-20">
                         <span className={cn('absolute -inset-[1.5px] grid place-items-center rounded-full bg-ink transition-opacity duration-150', on ? 'opacity-100' : 'opacity-0')}>
                           <span className="size-2 rounded-full bg-cream" />
                         </span>

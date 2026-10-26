@@ -98,6 +98,7 @@ const shots = [
   { name: 'settings-error', url: '/settings', api: api(), fail: ['/v1/settings'] },
   { name: 'settings-offline', url: '/settings', api: api(), offline: true },
   { name: 'settings-long', url: '/settings', api: api({ '/v1/profile': LONG_PROFILE }) },
+  { name: 'settings-plan-note', url: '/settings', api: api(), act: async (p) => { await p.getByRole('button', { name: /Plan/ }).click(); await p.waitForTimeout(900) } },
   { name: 'settings-ai-confirm', url: '/settings', api: api(), act: async (p) => { await p.getByRole('switch', { name: 'AI processing' }).click(); await p.waitForTimeout(700) } },
   { name: 'delete-sheet', url: '/settings', api: api(), act: async (p) => { await p.getByRole('button', { name: 'Delete account' }).click(); await p.waitForTimeout(900) } },
   { name: 'delete-sheet-typed', url: '/settings', api: api(), act: async (p) => { await p.getByRole('button', { name: 'Delete account' }).click(); await p.waitForTimeout(700); await p.getByLabel('Type DELETE to confirm').fill('DELETE'); await p.waitForTimeout(300) } },

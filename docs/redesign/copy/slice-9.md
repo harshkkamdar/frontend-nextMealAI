@@ -9,10 +9,10 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 | Header | Settings (left title, back "Back to dashboard") | Settings (centred, round back "Back to Today") |
 | Profile row | avatar, name, email | name and email, no avatar (or "Body, targets and goals" when there is no email) |
 | Section headers | PROFILE, SUBSCRIPTION, LIBRARY ... (caps eyebrows) | Subscription, Apple Health / Health Connect, Notifications, Coaching, Library, Data and AI, About (sentence case) |
-| Plan value, web | In the iOS and Android app | Manage in the app |
-| Notifications footer | Geo nudges you when a check-in is ready or you've gone quiet. No marketing. | Geo nudges you when your check-in is ready. |
+| Plan value | In the iOS and Android app (web); Free or FIQR Plus (native) | Free or FIQR Plus on every platform, with a chevron. Native opens the paywall; web opens a note: "Your plan lives in the app" / "FIQR Plus is sold in the FIQR app on iPhone and Android. Open it there to subscribe or change your plan." / Got it |
+| Notifications footer | Geo nudges you when a check-in is ready or you've gone quiet. No marketing. | (removed; the rows say it) |
 | Check-in day | Check-in day section with S M T W T F S chips; "Your weekly check-in lands on this day." | "Check-in day" row in Notifications with the weekday name (native picker) |
-| Geo personality | Geo section, chips: Nurturing, Drill Sergeant, Balanced, Data-Driven | Coaching: "Geo's style" row: Nurturing, Drill sergeant, Balanced, Data-driven |
+| Geo personality | Geo section, chips: Nurturing, Drill Sergeant, Balanced, Data-Driven | Coaching: "Coaching style" row (not "Geo's style", so Geo is not named three times on one screen): Nurturing, Drill sergeant, Balanced, Data-driven |
 | Rest timer | Training section, chips: 60s, 90s, 2m, 3m | Coaching: "Rest timer" row: 60 seconds, 90 seconds, 2 minutes, 3 minutes |
 | Health footer | Reads steps, active energy, weight, sleep and workouts. Saves workouts you finish in FIQR. | Reads steps, active energy, weight, sleep and workouts. Saves the workouts you finish in FIQR. |
 | Data and AI section | Data & AI; inline note: Your food logs, photos, weight and messages are sent to our model providers to generate coaching. See the privacy policy for who they are. | Data and AI; footer: With AI processing on, your food logs, photos, weight and messages go to our model providers so Geo can coach you. The privacy policy names them. |

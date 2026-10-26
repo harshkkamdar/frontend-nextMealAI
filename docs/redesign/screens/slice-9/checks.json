@@ -480,6 +480,22 @@
     "orangeActions": 0
   },
   {
+    "shot": "settings-plan-note",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-plan-note",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "settings-scrolled",
     "width": 360,
     "url": "/settings",

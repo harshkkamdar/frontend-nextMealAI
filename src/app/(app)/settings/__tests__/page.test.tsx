@@ -84,6 +84,22 @@ describe('Settings health and subscription sections', () => {
   })
 })
 
+describe('Settings plan row', () => {
+  it('shows Free on web and explains that plans are managed in the phone app', async () => {
+    render(<SettingsPage />)
+
+    fireEvent.click(await screen.findByRole('button', { name: /Plan\s*Free/ }))
+    expect(screen.getByText('Your plan lives in the app')).toBeInTheDocument()
+  })
+
+  it('links the native free plan to the paywall', async () => {
+    mocks.native = true
+    render(<SettingsPage />)
+
+    expect(await screen.findByRole('link', { name: /Plan\s*Free/ })).toHaveAttribute('href', '/paywall')
+  })
+})
+
 describe('Settings pickers', () => {
   it('shows the saved check-in day and saves a new one from the native picker', async () => {
     mocks.updateSettings.mockImplementation((patch: object) => Promise.resolve({ ...patch }))
