@@ -64,13 +64,19 @@ const openStepsFirst = (page) => page.addInitScript(() => {
   setTimeout(go, 600)
 })
 
+/** Before recording starts, open the macro sheet on Protein, so the recording holds only the switch to Fat. */
+const openProteinFirst = (page) => page.addInitScript(() => {
+  const go = () => { const b = [...document.querySelectorAll('button')].find((x) => (x.textContent ?? '').startsWith('Protein')); if (b) b.click(); else setTimeout(go, 100) }
+  setTimeout(go, 600)
+})
+
 const transitions = [
   // First paint of the session: Home settles forward from 1.04 while the ring draws.
   { name: 'home-first-load', url: '/food', home: 'returning', act: (p) => p.getByRole('link', { name: 'Home' }).click() },
   { name: 'push-steps-week', url: '/dashboard', home: 'returning', warm: '/dashboard/steps', act: (p) => p.getByRole('button', { name: /^Steps / }).click() },
   { name: 'pop-steps-week', url: '/dashboard', home: 'returning', setup: openStepsFirst, act: (p) => p.getByRole('button', { name: 'Back to Today' }).click() },
   { name: 'macro-sheet-open', url: '/dashboard', home: 'returning', act: (p) => p.getByRole('button', { name: /^Protein/ }).click() },
-  { name: 'macro-sheet-switch', url: '/dashboard', home: 'returning', act: async (p) => { await p.getByRole('button', { name: /^Protein/ }).click(); await p.waitForTimeout(900); await p.getByRole('button', { name: 'Fat', exact: true }).click() } },
+  { name: 'macro-sheet-switch', url: '/dashboard', home: 'returning', setup: openProteinFirst, act: (p) => p.getByRole('button', { name: 'Fat', exact: true }).click() },
   { name: 'water-sheet-open', url: '/dashboard', home: 'returning', act: (p) => p.getByRole('button', { name: /^Water / }).click() },
   { name: 'water-plus', url: '/dashboard', home: 'returning', act: (p) => p.getByRole('button', { name: 'Add one glass of water' }).click() },
   { name: 'weight-sheet-open', url: '/dashboard', home: 'returning', act: (p) => p.getByRole('button', { name: /^Weight/ }).click() },

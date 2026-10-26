@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, type ComponentType, type SVGProps } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { computeMacroContributions, type MacroKey } from '@/lib/macros'
@@ -57,45 +58,53 @@ export function MacroSheet({ open, macro, foodLogs, targets, onClose, onLogMeal 
             )
           })}
         </div>
-        <div className="flex items-center gap-4 rounded-[20px] p-4" style={{ background: m.tint }}>
-          <ArcRing key={picked} fraction={target > 0 ? total / target : 0} color={m.hue} stroke={9} className="size-ring-md">
-            <Icon className="size-6" style={{ color: m.hue }} />
-          </ArcRing>
-          <div className="min-w-0">
-            <p className="font-display text-hero leading-none text-ink tabular-nums">{fmt(total)}<span className="ml-0.5 text-caption font-semibold">{m.unit}</span></p>
-            {target > 0 ? (
-              <>
-                <p className="mt-1 text-caption text-ink-65 tabular-nums">of {fmt(target)} {m.unit}</p>
-                {/* Hue stays on the ring, icon and bars; text stays ink for contrast on the tint. */}
-                <p className="text-caption font-bold text-ink tabular-nums">{fmt(Math.abs(left))} {m.unit} {left < 0 ? 'over' : 'left'}</p>
-              </>
-            ) : <p className="mt-1 text-caption text-ink-65">No target set yet</p>}
+        {/* Switching macro crossfades old and new bodies stacked in one cell (200 ms), and the body keeps a three-row
+            floor, so neither the content nor the sheet's height hard-cuts. */}
+        <div className="grid min-h-0">
+          <AnimatePresence initial={false}>
+            <motion.div key={picked} className="col-start-1 row-start-1 flex min-h-[300px] flex-col gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
+          <div className="flex items-center gap-4 rounded-[20px] p-4" style={{ background: m.tint }}>
+            <ArcRing key={picked} fraction={target > 0 ? total / target : 0} color={m.hue} stroke={9} className="size-ring-md">
+              <Icon className="size-6" style={{ color: m.hue }} />
+            </ArcRing>
+            <div className="min-w-0">
+              <p className="font-display text-hero leading-none text-ink tabular-nums">{fmt(total)}<span className="ml-0.5 text-caption font-semibold">{m.unit}</span></p>
+              {target > 0 ? (
+                <>
+                  <p className="mt-1 text-caption text-ink-65 tabular-nums">of {fmt(target)} {m.unit}</p>
+                  {/* Hue stays on the ring, icon and bars; text stays ink for contrast on the tint. */}
+                  <p className="text-caption font-bold text-ink tabular-nums">{fmt(Math.abs(left))} {m.unit} {left < 0 ? 'over' : 'left'}</p>
+                </>
+              ) : <p className="mt-1 text-caption text-ink-65">No target set yet</p>}
+            </div>
           </div>
-        </div>
-        {rows.length === 0 ? (
-          <>
-            <p className="text-body-sm text-ink-65">Nothing logged today. What you eat shows here, biggest first.</p>
-            <PrimaryButton type="button" className="bg-ink text-cream text-[16px]" onClick={onLogMeal}>Log a meal</PrimaryButton>
-          </>
-        ) : (
-          <ul className="-mx-1 max-h-[42dvh] overflow-y-auto px-1" aria-label={`${m.label} by food`}>
-            {rows.map((row) => (
-              <li key={row.id} className="flex min-h-row items-center gap-3 border-b border-ink-06 py-2 last:border-b-0">
-                <span className="size-2 shrink-0 rounded-full" style={{ background: m.hue }} aria-hidden="true" />
-                <span className="min-w-0 flex-1">
-                  <span className="line-clamp-2 text-body-sm text-ink">{row.name}</span>
-                  <span className="mt-1.5 block h-1 overflow-hidden rounded-full bg-ink-06" aria-hidden="true">
-                    <span className="block h-full origin-left rounded-full" style={{ background: m.hue, transform: `scaleX(${row.value / top})` }} />
+          {rows.length === 0 ? (
+            <>
+              <p className="text-body-sm text-ink-65">Nothing logged today. What you eat shows here, biggest first.</p>
+              <PrimaryButton type="button" className="bg-ink text-cream text-[16px]" onClick={onLogMeal}>Log a meal</PrimaryButton>
+            </>
+          ) : (
+            <ul className="-mx-1 max-h-[42dvh] overflow-y-auto px-1" aria-label={`${m.label} by food`}>
+              {rows.map((row) => (
+                <li key={row.id} className="flex min-h-row items-center gap-3 border-b border-ink-06 py-2 last:border-b-0">
+                  <span className="size-2 shrink-0 rounded-full" style={{ background: m.hue }} aria-hidden="true" />
+                  <span className="min-w-0 flex-1">
+                    <span className="line-clamp-2 text-body-sm text-ink">{row.name}</span>
+                    <span className="mt-1.5 block h-1 overflow-hidden rounded-full bg-ink-06" aria-hidden="true">
+                      <span className="block h-full origin-left rounded-full" style={{ background: m.hue, transform: `scaleX(${row.value / top})` }} />
+                    </span>
                   </span>
-                </span>
-                <span className="shrink-0 text-right tabular-nums">
-                  <b className="text-body-sm font-bold text-ink">{fmt(row.value)}</b><span className="text-label text-ink-65"> {m.unit}</span>
-                </span>
-                <span className="w-10 shrink-0 text-right text-caption text-ink-65 tabular-nums">{row.pct}%</span>
-              </li>
-            ))}
-          </ul>
-        )}
+                  <span className="shrink-0 text-right tabular-nums">
+                    <b className="text-body-sm font-bold text-ink">{fmt(row.value)}</b><span className="text-label text-ink-65"> {m.unit}</span>
+                  </span>
+                  <span className="w-10 shrink-0 text-right text-caption text-ink-65 tabular-nums">{row.pct}%</span>
+                </li>
+              ))}
+            </ul>
+          )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </BottomSheet>
   )

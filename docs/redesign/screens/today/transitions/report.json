@@ -1,0 +1,78 @@
+{
+  "home-first-load": {
+    "frames": 74,
+    "chrome_px": 50960,
+    "content_px": 282584,
+    "max_chrome_share": 0.087,
+    "max_content_share": 0.062,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "macro-sheet-open": {
+    "frames": 63,
+    "chrome_px": 218496,
+    "content_px": 885833,
+    "max_chrome_share": 0.29,
+    "max_content_share": 0.269,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "macro-sheet-switch": {
+    "frames": 15,
+    "chrome_px": 77293,
+    "content_px": 78033,
+    "max_chrome_share": 0.126,
+    "max_content_share": 0.185,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "pop-steps-week": {
+    "frames": 41,
+    "chrome_px": 87698,
+    "content_px": 580156,
+    "max_chrome_share": 0.1,
+    "max_content_share": 0.125,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "push-steps-week": {
+    "frames": 40,
+    "chrome_px": 86471,
+    "content_px": 574705,
+    "max_chrome_share": 0.113,
+    "max_content_share": 0.176,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "water-plus": {
+    "frames": 32,
+    "chrome_px": 20514,
+    "content_px": 30629,
+    "max_chrome_share": 0.303,
+    "max_content_share": 0.311,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "water-sheet-open": {
+    "frames": 32,
+    "chrome_px": 239714,
+    "content_px": 526165,
+    "max_chrome_share": 0.273,
+    "max_content_share": 0.454,
+    "issues": [
+      "chrome jump frame 3: 27% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "weight-sheet-open": {
+    "frames": 31,
+    "chrome_px": 387576,
+    "content_px": 858841,
+    "max_chrome_share": 0.167,
+    "max_content_share": 0.279,
+    "issues": [
+      "chrome jump frame 3: 17% of chrome change"
+    ],
+    "verdict": "pop"
+  }
+}
