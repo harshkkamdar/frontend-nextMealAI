@@ -47,12 +47,12 @@ export function MacroSheet({ open, macro, foodLogs, targets, onClose, onLogMeal 
     <BottomSheet open={open} onClose={onClose} ariaLabel="Today's breakdown">
       <div className="flex min-h-0 flex-col gap-4 px-5 pb-5 pt-2">
         <h2 className="font-display text-[22px] font-extrabold leading-tight text-ink">Today&apos;s breakdown</h2>
-        <div role="group" aria-label="Nutrient" className="grid grid-cols-4 gap-1 rounded-full bg-ink-06 p-1">
+        <div role="group" aria-label="Nutrient" className="flex gap-1 rounded-full bg-ink-06 p-1">
           {ORDER.map((key) => {
             const { label, hue, icon: TabIcon } = MACROS[key]
             const on = key === picked
             return (
-              <button key={key} type="button" aria-pressed={on} onClick={() => setPicked(key)} className={cn('flex h-11 min-w-0 items-center justify-center gap-1 rounded-full px-1 text-[12px] font-semibold transition-[background-color,color] duration-200', on ? 'bg-card text-ink shadow-[var(--shadow-card)]' : 'text-ink-65')}>
+              <button key={key} type="button" aria-pressed={on} onClick={() => setPicked(key)} className={cn('flex h-11 flex-auto items-center justify-center gap-1 rounded-full px-2 text-[12px] font-semibold transition-[background-color,color] duration-200', on ? 'bg-card text-ink shadow-[var(--shadow-card)]' : 'text-ink-65')}>
                 <TabIcon className="size-3.5 shrink-0" style={{ color: hue }} />{label}
               </button>
             )

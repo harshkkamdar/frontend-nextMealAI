@@ -175,13 +175,14 @@ export default function DashboardPage() {
   if (suggested?.kind === 'log-meal') {
     action = { label: 'Log a meal', onRun: openLogSheet }
   } else if (suggested?.kind === 'relog') {
+    const short = suggested.name.split(',')[0]
     action = {
-      label: `Log ${suggested.name.split(',')[0]}`,
+      label: `Log ${short}`,
       ariaLabel: `Log ${suggested.name} again, ${suggested.protein} g protein`,
       busy: geoBusy,
       onRun: () => {
         setGeoBusy(true)
-        void logWithUndo(suggested.input, `${suggested.name} logged to Snack`, refresh, () => {}).finally(() => setGeoBusy(false))
+        void logWithUndo(suggested.input, `${short} logged to Snack`, refresh, () => {}).finally(() => setGeoBusy(false))
       },
       onMore: openGeo,
     }

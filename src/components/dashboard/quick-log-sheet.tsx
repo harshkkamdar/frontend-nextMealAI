@@ -119,7 +119,7 @@ function WaterSheet({ today, onDone }: { today: number; onDone: () => void }) {
       {/* Today plus what you are adding, one square per glass. */}
       <div className="flex flex-wrap justify-center gap-1.5" aria-hidden="true">
         {Array.from({ length: Math.max(WATER_GOAL_GLASSES, after) }, (_, index) => (
-          <span key={index} className={cn('h-6 w-[18px] rounded-[5px] transition-colors duration-200', index < today ? 'bg-macro-teal' : index < after ? 'bg-macro-teal/45' : 'bg-ink-06')} />
+          <span key={index} className={cn('h-6 w-[18px] rounded-[5px]', index < today ? 'bg-macro-teal' : index < after ? 'bg-macro-teal/45' : 'bg-ink-06')} />
         ))}
       </div>
       <Stepper value={count} unit={count === 1 ? 'glass' : 'glasses'} label={['One glass less', 'One glass more']} min={1} max={20} onChange={setCount} />

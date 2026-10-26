@@ -352,7 +352,14 @@ export function HomeSkeleton() {
     <div className="flex flex-col gap-[10px]" role="status" aria-busy="true" aria-label="Loading today">
       <div className={cn(CARD, 'flex items-center gap-[14px] p-4')}>
         <span className="grid size-ring shrink-0 place-items-center rounded-full border-[11px] border-ink-06"><Ph className="h-6 w-14" /></span>
-        <span className="flex flex-1 flex-col gap-6">{[0, 1, 2].map((i) => <span key={i} className="flex justify-between"><Ph className="h-3 w-11" /><Ph className="h-3 w-14" /></span>)}</span>
+        <span className="flex flex-1 flex-col gap-4">
+          {[0, 1, 2].map((i) => (
+            <span key={i} className="flex flex-col gap-2">
+              <span className="flex justify-between"><Ph className="h-3 w-11" /><Ph className="h-3 w-14" /></span>
+              <span className="flex gap-[3px]">{Array.from({ length: 10 }, (_, d) => <Ph key={d} className="h-[6px] flex-1" />)}</span>
+            </span>
+          ))}
+        </span>
       </div>
       <div className="grid grid-cols-2 gap-[10px]">
         {['Water', 'Weight', 'Steps', 'Sleep'].map((label) => (
@@ -364,6 +371,8 @@ export function HomeSkeleton() {
         ))}
       </div>
       <div className={cn(CARD, 'h-[92px] p-4')}><Ph className="h-3 w-14" /><Ph className="mt-3 h-5 w-36" /></div>
+      <span className="mt-2 px-1 text-caption font-semibold text-ink-65">Meals</span>
+      <div className={cn(CARD, 'h-[116px] p-4')}><Ph className="h-4 w-20" /><Ph className="mt-2 h-3 w-40" /><Ph className="mt-6 h-4 w-16" /></div>
     </div>
   )
 }
