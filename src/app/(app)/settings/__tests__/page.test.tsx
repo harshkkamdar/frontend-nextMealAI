@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
@@ -100,15 +100,23 @@ describe('Settings plan row', () => {
   })
 })
 
-describe('Settings pickers', () => {
-  it('shows the saved check-in day and saves a new one from the native picker', async () => {
+describe('Settings menus', () => {
+  it('shows the saved check-in day and saves a new one from its menu', async () => {
     mocks.updateSettings.mockImplementation((patch: object) => Promise.resolve({ ...patch }))
     render(<SettingsPage />)
 
-    const picker = await screen.findByLabelText('Check-in day')
-    expect(picker).toHaveValue('1')
-    expect(screen.getAllByText('Monday')[0]).toBeVisible()
-    fireEvent.change(picker, { target: { value: '4' } })
+    const row = await screen.findByRole('button', { name: /Check-in day\s*Monday/ })
+    expect(row).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(row)
+    const menu = screen.getByRole('menu', { name: 'Check-in day' })
+    expect(within(menu).getByRole('menuitemradio', { name: 'Monday' })).toHaveAttribute('aria-checked', 'true')
+    fireEvent.click(within(menu).getByRole('menuitemradio', { name: 'Thursday' }))
     expect(mocks.updateSettings).toHaveBeenCalledWith({ check_in_weekday: 4 })
+  })
+
+  it('previews each coaching style in its menu', async () => {
+    render(<SettingsPage />)
+    fireEvent.click(await screen.findByRole('button', { name: /Coaching style/ }))
+    expect(screen.getByRole('menuitemradio', { name: /Drill sergeant/ })).toHaveTextContent('Get it in before 8')
   })
 })

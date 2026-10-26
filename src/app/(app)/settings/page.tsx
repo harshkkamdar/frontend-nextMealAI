@@ -1,17 +1,19 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { DeleteAccountSheet } from '@/components/settings/delete-account-sheet'
-import { GLYPH, SettingsRow, SettingsSection, SettingsSelect, SettingsSkeleton, SettingsSwitch } from '@/components/settings/settings-section'
+import { GLYPH, GROUP_CARD, SettingsMenu, SettingsRow, SettingsSection, SettingsSkeleton, SettingsSwitch, type MenuOption } from '@/components/settings/settings-section'
+import { dayAndDate, formatClock, initials, nextWeekday, profileSummary, syncedLabel } from '@/components/settings/settings-format'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
+import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { downloadExport } from '@/lib/api/account.api'
 import { logout } from '@/lib/api/auth.api'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
@@ -28,36 +30,37 @@ import { goBack } from '@/lib/navigation'
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev'
 
-const PERSONALITY_OPTIONS: { value: GeoPersonality; label: string }[] = [
-  { value: 'nurturing', label: 'Nurturing' },
-  { value: 'drill_sergeant', label: 'Drill sergeant' },
-  { value: 'balanced', label: 'Balanced' },
-  { value: 'data_driven', label: 'Data-driven' },
+// Each style previews how Geo would say the same thing (the menu shows what the choice does, mock "Grouped list").
+const PERSONALITY_OPTIONS: MenuOption<GeoPersonality>[] = [
+  { value: 'balanced', label: 'Balanced', detail: '"Protein is 48 g short. Greek yoghurt closes it."' },
+  { value: 'nurturing', label: 'Nurturing', detail: '"Good day so far. A little more protein at dinner and you are there."' },
+  { value: 'drill_sergeant', label: 'Drill sergeant', detail: '"48 g of protein left. Get it in before 8."' },
+  { value: 'data_driven', label: 'Data-driven', detail: '"Protein 92 of 140 g, 66%. Gap: 48 g."' },
 ]
 
-const REST_TIMER_OPTIONS: { value: RestTimerDuration; label: string }[] = [
+const REST_TIMER_OPTIONS: MenuOption<RestTimerDuration>[] = [
   { value: 60, label: '60 seconds' },
   { value: 90, label: '90 seconds' },
   { value: 120, label: '2 minutes' },
   { value: 180, label: '3 minutes' },
 ]
 
-const WEEKDAYS = [
-  { value: 0, label: 'Sunday' },
-  { value: 1, label: 'Monday' },
-  { value: 2, label: 'Tuesday' },
-  { value: 3, label: 'Wednesday' },
-  { value: 4, label: 'Thursday' },
-  { value: 5, label: 'Friday' },
-  { value: 6, label: 'Saturday' },
-] as const
+const WEEKDAYS: MenuOption<number>[] = [1, 2, 3, 4, 5, 6, 0].map((value) => ({
+  value,
+  label: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][value]!,
+}))
+
+const REMINDER_TIMES = ['06:00', '07:00', '07:30', '08:00', '09:00', '12:00', '18:00', '20:00']
+/** The menu's times, plus a saved time that is not one of them so it still shows as chosen. */
+const reminderOptions = (saved: string): MenuOption<string>[] =>
+  [...new Set([...REMINDER_TIMES, saved])].sort().map((value) => ({ value, label: formatClock(value) }))
 
 export default function SettingsPage() {
   useSetGeoScreen('settings', {})
   const router = useRouter()
   const user = useAuthStore((state) => state.user)
   const isAdmin = useIsAdmin()
-  const reminderTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const tilt = usePressTilt<HTMLButtonElement>()
   const [settings, setSettings] = useState<Settings | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -97,39 +100,28 @@ export default function SettingsPage() {
     return () => { active = false }
   }, [])
 
-  useEffect(() => {
-    return () => {
-      if (reminderTimer.current) clearTimeout(reminderTimer.current)
+  // Every control saves itself: optimistic, reverted on failure with a Retry in the status capsule.
+  async function handleUpdate(patch: Parameters<typeof updateSettings>[0]): Promise<boolean> {
+    if (!settings) return false
+    const previous = settings
+    setSettings({ ...settings, ...patch })
+    try {
+      setSettings(await updateSettings(patch))
+      return true
+    } catch {
+      setSettings(previous)
+      toast.error("Couldn't save that. Try again.", { action: { label: 'Retry', onClick: () => void handleUpdate(patch) } })
+      return false
     }
-  }, [])
-
-  const handleUpdate = useCallback(
-    async (patch: Parameters<typeof updateSettings>[0]) => {
-      if (!settings) return
-      const previous = settings
-      setSettings({ ...settings, ...patch })
-      try {
-        const updated = await updateSettings(patch)
-        setSettings(updated)
-      } catch {
-        setSettings(previous)
-        toast.error("Couldn't save that. Try again.")
-      }
-    },
-    [settings],
-  )
+  }
 
   const handleNotificationChange = (enabled: boolean) => {
     void handleUpdate({ notifications_enabled: enabled })
     window.dispatchEvent(new CustomEvent('fiqr:notifications-changed', { detail: { enabled } }))
   }
 
-  const handleReminderChange = (value: string) => {
-    setSettings((current) => current ? { ...current, notification_time: value } : current)
-    if (reminderTimer.current) clearTimeout(reminderTimer.current)
-    reminderTimer.current = setTimeout(() => {
-      void handleUpdate({ notification_time: value })
-    }, 600)
+  const handleReminderChange = async (value: string) => {
+    if (await handleUpdate({ notification_time: value })) toast(`Geo nudges from ${formatClock(value)}`)
   }
 
   const handleAiConsent = async (enabled: boolean) => {
@@ -160,7 +152,7 @@ export default function SettingsPage() {
   const handleRestore = async () => {
     const restored = await restorePurchases()
     if (restored) setSubscribed(true)
-    toast.success(restored ? 'Subscription restored' : 'No active subscription found')
+    toast(restored ? 'Subscription restored' : 'No active subscription found')
   }
 
   const handleHealthChange = (enabled: boolean) => {
@@ -189,14 +181,16 @@ export default function SettingsPage() {
 
   if (loading || !settings || !profile) {
     return (
-      <div className="mx-auto w-full max-w-md px-4">
+      <div className="mx-auto w-full max-w-md px-gutter pb-[var(--tabbar-clearance)]">
         {header}
-        <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
-        <div className="mt-2">
+        <div className="-mx-gutter mb-2.5 [&:empty]:hidden"><OfflineBand /></div>
+        <div className="mt-1">
           {loading ? (
             <SettingsSkeleton />
           ) : (
-            <ErrorState onRetry={() => { setLoading(true); loadSettings() }}>I couldn&apos;t load your settings. Check your connection and try again.</ErrorState>
+            <div className={`${GROUP_CARD} p-4`}>
+              <ErrorState onRetry={() => { setLoading(true); loadSettings() }}>I couldn&apos;t load your settings. Check your connection and try again.</ErrorState>
+            </div>
           )}
         </div>
       </div>
@@ -204,29 +198,31 @@ export default function SettingsPage() {
   }
 
   const profileName = profile.full_name || user?.email?.split('@')[0] || 'Profile'
-  const email = user?.email ?? ''
+  const summary = profileSummary(profile) || user?.email || 'Body, targets and goals'
   const aiEnabled = Boolean(profile.ai_consent_at)
   const native = isNative()
   const healthName = healthLabel()
-  const lastSyncedValue = lastSynced
-    ? new Intl.DateTimeFormat('en-AU', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }).format(new Date(lastSynced))
-    : 'Never'
+  const lastSyncedValue = lastSynced ? syncedLabel(new Date(lastSynced)) : 'Never'
+  const reminder = (settings.notification_time ?? '08:00').slice(0, 5)
+  const checkInDay = settings.check_in_weekday ?? 0
 
   return (
-    <div className="mx-auto w-full max-w-md px-4">
+    <div className="mx-auto w-full max-w-md px-gutter pb-[var(--tabbar-clearance)]">
       {header}
-      <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
+      <div className="-mx-gutter mb-2.5 [&:empty]:hidden"><OfflineBand /></div>
 
-      <div className="enter-rows mt-2 flex flex-col gap-7">
+      <div className="enter-rows mt-1 flex flex-col gap-[22px]">
         <section aria-label="Profile">
           <button
             type="button"
+            {...tilt}
             onClick={() => router.push('/settings/profile')}
-            className="flex min-h-16 w-full items-center gap-3 rounded-[24px] border border-ink-06 bg-card px-4 py-2.5 text-left active:bg-ink-04"
+            className={`${GROUP_CARD} flex min-h-[72px] w-full items-center gap-3 py-3 pl-3.5 pr-4 text-left`}
           >
+            <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-body-sm font-bold text-ink">{initials(profileName)}</span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[17px] font-semibold text-ink">{profileName}</span>
-              <span className="block truncate text-[14px] text-ink-65">{email || 'Body, targets and goals'}</span>
+              <span className="block truncate text-headline text-ink">{profileName}</span>
+              <span className="mt-0.5 block truncate text-[14px] leading-[1.35] text-ink-65">{summary}</span>
             </span>
             <ChevronRightIcon className={GLYPH} />
           </button>
@@ -239,7 +235,7 @@ export default function SettingsPage() {
           ) : (
             <SettingsRow label="Plan" value="Free" onClick={() => setShowPlanNote(true)} />
           )}
-          {native ? <SettingsRow label="Restore purchases" onClick={() => void handleRestore()} /> : null}
+          {native ? <SettingsRow label="Restore purchases" action onClick={() => void handleRestore()} /> : null}
           {native && subscribed ? <SettingsRow label="Manage subscription" onClick={() => void manageSubscription()} /> : null}
         </SettingsSection>
 
@@ -252,27 +248,31 @@ export default function SettingsPage() {
           </SettingsSection>
         ) : null}
 
-        <SettingsSection title="Notifications">
-          <SettingsRow label="Push notifications">
-            <SettingsSwitch label="Push notifications" checked={settings.notifications_enabled} onChange={handleNotificationChange} />
-          </SettingsRow>
-          <SettingsRow label="Reminder time">
-            {/* Chrome left-aligns the fields inside the editor box; flex-end puts the time on the shared value edge. */}
-            <input
-              type="time"
-              aria-label="Reminder time"
-              value={settings.notification_time ?? '08:00'}
-              onChange={(event) => handleReminderChange(event.target.value)}
-              className="-my-2.5 h-11 min-w-0 rounded-[10px] bg-transparent p-0 text-right text-[15px] text-ink-65 outline-none tabular-nums focus-visible:bg-ink-04 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0 [&::-webkit-datetime-edit]:flex [&::-webkit-datetime-edit]:justify-end [&::-webkit-datetime-edit]:p-0"
-            />
-            <span aria-hidden="true" className={GLYPH} />
-          </SettingsRow>
-          <SettingsSelect label="Check-in day" value={settings.check_in_weekday} options={WEEKDAYS} onChange={(day) => void handleUpdate({ check_in_weekday: day })} />
-        </SettingsSection>
+        <div>
+          <SettingsSection
+            title="Reminders and check-in"
+            footer={`Next check-in: ${dayAndDate(nextWeekday(checkInDay))}. Geo only nudges after your reminder time.`}
+          >
+            <SettingsRow label="Push notifications">
+              <SettingsSwitch label="Push notifications" checked={settings.notifications_enabled} onChange={handleNotificationChange} />
+            </SettingsRow>
+            <SettingsMenu label="Reminder time" value={reminder} options={reminderOptions(reminder)} onChange={(value) => void handleReminderChange(value)} />
+            <SettingsMenu label="Check-in day" value={checkInDay} options={WEEKDAYS} onChange={(day) => void handleUpdate({ check_in_weekday: day })} />
+          </SettingsSection>
+          {settings.notifications_enabled ? (
+            // What the reminder will look like on the lock screen, at the chosen time.
+            <figure aria-label="Example nudge" className="mx-0.5 mt-2.5 grid grid-cols-[32px_1fr_auto] gap-x-2.5 gap-y-0.5 rounded-[18px] bg-card/65 px-3 py-2.5 text-[14px] leading-[1.35] shadow-[0_0_0_.5px_rgba(17,28,53,.1)]">
+              <span aria-hidden="true" className="row-span-2 grid size-8 place-items-center rounded-[8px] bg-ink text-[10px] font-extrabold tracking-[.02em] text-cream">FIQR</span>
+              <b className="font-bold text-ink">Your check-in is ready</b>
+              <time className="text-label font-normal text-ink-65">{formatClock(reminder)}</time>
+              <span className="col-span-2 col-start-2 text-ink-80">Geo has read the week. Open FIQR to see what changes.</span>
+            </figure>
+          ) : null}
+        </div>
 
         <SettingsSection title="Coaching">
-          <SettingsSelect label="Coaching style" value={settings.geo_personality} options={PERSONALITY_OPTIONS} onChange={(style) => void handleUpdate({ geo_personality: style })} />
-          <SettingsSelect label="Rest timer" value={settings.rest_timer_seconds} options={REST_TIMER_OPTIONS} onChange={(seconds) => void handleUpdate({ rest_timer_seconds: seconds })} />
+          <SettingsMenu label="Coaching style" value={settings.geo_personality} options={PERSONALITY_OPTIONS} onChange={(style) => void handleUpdate({ geo_personality: style })} />
+          <SettingsMenu label="Rest timer" value={settings.rest_timer_seconds} options={REST_TIMER_OPTIONS} onChange={(seconds) => void handleUpdate({ rest_timer_seconds: seconds })} />
         </SettingsSection>
 
         <SettingsSection title="Library">
@@ -312,21 +312,16 @@ export default function SettingsPage() {
           <SettingsRow label="Version" value={APP_VERSION} />
         </SettingsSection>
 
-        <div className="flex flex-col gap-3">
-          <SettingsSection>
-            <button
-              type="button"
-              disabled={loggingOut}
-              onClick={handleLogout}
-              className="flex min-h-11 w-full items-center justify-center px-4 py-2.5 text-[16px] font-semibold text-ink active:bg-ink-04 disabled:text-ink-65"
-            >
-              {loggingOut ? 'Logging out…' : 'Log out'}
-            </button>
-          </SettingsSection>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-full">
+            <SettingsSection label="Account">
+              <SettingsRow label={<span className="font-semibold">{loggingOut ? 'Logging out…' : 'Log out'}</span>} action disabled={loggingOut} onClick={() => void handleLogout()} />
+            </SettingsSection>
+          </div>
           <button
             type="button"
             onClick={() => setShowDeleteAccount(true)}
-            className="mx-auto min-h-11 px-4 text-[15px] font-semibold text-ink-65 underline decoration-ink-35 underline-offset-4"
+            className="min-h-11 px-4 text-body font-bold text-ink-65 underline decoration-ink-35 underline-offset-4"
           >
             Delete account
           </button>
@@ -338,21 +333,21 @@ export default function SettingsPage() {
         onClose={() => { if (!updatingAi) setShowAiConfirm(false) }}
         onConfirm={() => handleAiConsent(false)}
         title="Turn off AI processing?"
-        description="Geo can't coach without it. You can turn it back on any time."
+        description="Geo can't coach without it. Your logs stay, and you can turn it back on any time."
         confirmLabel="Turn off"
         cancelLabel="Keep it on"
         variant="danger"
       />
       <BottomSheet open={showPlanNote} onClose={() => setShowPlanNote(false)} ariaLabel="Your plan">
         <div className="px-6 pb-4 pt-3">
-          <h2 className="font-wide text-[22px] font-bold leading-tight text-ink">Your plan lives in the app</h2>
-          <p className="mt-2 text-[15.5px] leading-[1.45] text-ink-65">FIQR Plus is sold in the FIQR app on iPhone and Android. Open it there to subscribe or change your plan.</p>
-          <button type="button" onClick={() => setShowPlanNote(false)} className="mt-5 h-12 w-full rounded-[18px] bg-card text-[16px] font-semibold text-ink active:bg-ink-04">
+          <h2 className="text-hero font-bold text-ink">Your plan lives in the app</h2>
+          <p className="mt-2 text-body leading-[1.45] text-ink-65">FIQR Plus is sold in the FIQR app on iPhone and Android. Open it there to subscribe or change your plan.</p>
+          <button type="button" onClick={() => setShowPlanNote(false)} className="mt-5 h-btn w-full rounded-full bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]">
             Got it
           </button>
         </div>
       </BottomSheet>
-      <DeleteAccountSheet open={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
+      <DeleteAccountSheet open={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} onDownload={() => void handleDownload()} exporting={exporting} />
       <HealthConnectSheet
         open={showHealthConnect}
         onClose={() => setShowHealthConnect(false)}

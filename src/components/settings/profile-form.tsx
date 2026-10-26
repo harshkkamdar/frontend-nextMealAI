@@ -6,7 +6,7 @@ import { Chip } from '@/components/ui/fiqr/chip'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { SettingsRow, SettingsSection, SettingsSkeleton } from '@/components/settings/settings-section'
+import { GROUP_CARD, SettingsRow, SettingsSection, SettingsSkeleton } from '@/components/settings/settings-section'
 import { toast } from 'sonner'
 import { computeAgeFromDob, computeDailyTargets } from '@/lib/tdee'
 import type { Profile, PrimaryGoal, ActivityLevel, DietaryStyle } from '@/types/profile.types'
@@ -217,19 +217,19 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
         backLabel="Back to settings"
         // Always rendered (disabled until the profile loads), so the bar never changes shape mid-transition.
         actions={(
-          <button type="button" onClick={handleSave} disabled={saving || !profile} className="glass h-11 rounded-full px-4 text-[16px] font-semibold text-ink transition-transform duration-100 enabled:active:scale-[.94] disabled:text-ink-65">
+          <button type="button" onClick={handleSave} disabled={saving || !profile} className="glass h-11 rounded-full px-4 text-body font-semibold text-ink transition-transform duration-100 enabled:active:scale-[.94] disabled:text-ink-65">
             {saving ? 'Saving…' : 'Save'}
           </button>
         )}
       />
-      <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
+      <div className="-mx-gutter mb-2.5 [&:empty]:hidden"><OfflineBand /></div>
     </>
   )
 
   if (loading) return <>{header}<SettingsSkeleton groups={[3, 4, 2, 2]} label="Loading your profile" /></>
 
   if (!profile) {
-    return <>{header}<ErrorState onRetry={() => { setLoading(true); load() }}>I couldn&apos;t load your profile. Check your connection and try again.</ErrorState></>
+    return <>{header}<div className={`${GROUP_CARD} p-4`}><ErrorState onRetry={() => { setLoading(true); load() }}>I couldn&apos;t load your profile. Check your connection and try again.</ErrorState></div></>
   }
 
   // FB-tdee-baseline UX — surface the specific fields the user needs to
@@ -253,15 +253,15 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
   return (
     <>
     {header}
-    <div className="enter-rows mt-2 flex flex-col gap-7">
+    <div className="enter-rows mt-1 flex flex-col gap-[22px] pb-10">
       {missingFields.length > 0 ? (
-        <div role="status" className="rounded-[24px] border border-ink-06 bg-card px-4 py-3.5">
-          <p className="text-[16px] font-semibold text-ink">Add your {missingFields.map((f) => f.replace(/_(kg|cm)$/, '').replace(/_/g, ' ')).join(' and ')}</p>
+        <div role="status" className={`${GROUP_CARD} px-4 py-3.5`}>
+          <p className="text-body font-semibold text-ink">Add your {missingFields.map((f) => f.replace(/_(kg|cm)$/, '').replace(/_/g, ' ')).join(' and ')}</p>
           <p className="mt-0.5 text-[14px] text-ink-65">Geo needs it to work out your daily targets.</p>
         </div>
       ) : null}
 
-      <SettingsSection title="Body">
+      <SettingsSection title="Body (kg, cm)">
         <NumberRow id="weight" label="Weight" needed={weightMissing} unit="kg" step="0.1" value={currentWeight} onChange={setCurrentWeight} placeholder="75" />
         <NumberRow id="target-weight" label="Goal weight" unit="kg" step="0.1" value={targetWeight} onChange={setTargetWeight} placeholder="70" />
         <NumberRow id="height" label="Height" needed={heightMissing} unit="cm" step="0.1" value={height} onChange={setHeight} placeholder="175" />
@@ -271,7 +271,7 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
         <SettingsSection
           title="Daily targets"
           footer={previewTargets
-            ? <>From your body, goal and activity Geo suggests <b className="font-semibold text-ink tabular-nums">{previewTargets.calories.toLocaleString('en-AU')} kcal</b>. Type a number to set your own.</>
+            ? <>Geo suggests <b className="font-bold text-ink tabular-nums">{previewTargets.calories.toLocaleString('en-AU')} kcal</b> from your body, goal and activity. {previewTargets.protein} g protein, {previewTargets.carbs} g carbs and {previewTargets.fat} g fat add up to {(previewTargets.protein * 4 + previewTargets.carbs * 4 + previewTargets.fat * 9).toLocaleString('en-AU')} kcal. Type a number to set your own.</>
             : 'Add your weight and height and Geo works these out for you.'}
         >
           {targetFields.map((f) => (
@@ -292,7 +292,7 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
             type="button"
             onClick={handleResetTargetsToBaseline}
             disabled={resettingTargets}
-            className="mt-1 min-h-11 px-4 text-[14px] font-semibold text-ink underline decoration-ink-35 underline-offset-4 disabled:text-ink-65"
+            className="mt-1 min-h-11 px-4 text-[14px] font-bold text-ink underline decoration-ink-35 underline-offset-4 disabled:text-ink-65"
           >
             {resettingTargets ? 'Resetting…' : 'Use the suggested targets'}
           </button>
@@ -334,7 +334,7 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
   )
 }
 
-/** A 44 pt settings row with the number typed right-aligned, iOS style, and its unit after it. */
+/** A 58 pt settings row with the number typed right-aligned, iOS style, and its unit after it. */
 function NumberRow({ id, label, unit, needed, numeric, step, value, onChange, placeholder }: {
   id: string
   label: string
@@ -347,7 +347,7 @@ function NumberRow({ id, label, unit, needed, numeric, step, value, onChange, pl
   placeholder: string
 }) {
   return (
-    <div className="flex min-h-11 items-center gap-2 pl-4 pr-4 text-[16px] focus-within:bg-ink-04">
+    <div className="flex min-h-row items-center gap-2 pl-[18px] pr-4 text-body focus-within:bg-ink-04">
       <label htmlFor={id} className="flex shrink-0 items-center gap-2 py-2.5 font-medium text-ink">
         {label}
         {needed ? <span className="rounded-full bg-ink px-2 py-0.5 text-[12px] font-semibold text-cream">Needed</span> : null}
@@ -360,9 +360,9 @@ function NumberRow({ id, label, unit, needed, numeric, step, value, onChange, pl
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-11 min-w-0 flex-1 bg-transparent text-right text-[16px] font-medium text-ink outline-none tabular-nums placeholder:font-normal placeholder:text-ink-50"
+        className="h-11 min-w-0 flex-1 bg-transparent text-right text-body font-bold text-ink outline-none tabular-nums placeholder:font-normal placeholder:text-ink-50"
       />
-      <span aria-hidden="true" className="w-9 shrink-0 text-[15px] text-ink-65">{unit}</span>
+      <span aria-hidden="true" className="w-9 shrink-0 text-body text-ink-65">{unit}</span>
     </div>
   )
 }
@@ -370,8 +370,8 @@ function NumberRow({ id, label, unit, needed, numeric, step, value, onChange, pl
 function ChipGroup({ label, children }: { label: string; children: ReactNode }) {
   return (
     <section role="group" aria-label={label}>
-      <h2 className="mb-2 px-4 text-[13px] font-semibold text-ink-65">{label}</h2>
-      <div className="flex flex-wrap gap-2 rounded-[24px] border border-ink-06 bg-card p-3">{children}</div>
+      <h2 className="mb-[7px] px-4 text-caption font-semibold text-ink-65">{label}</h2>
+      <div className={`${GROUP_CARD} flex flex-wrap gap-1.5 p-3 [&>button]:text-body`}>{children}</div>
     </section>
   )
 }
