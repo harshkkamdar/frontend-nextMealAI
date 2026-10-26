@@ -460,13 +460,13 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                           type="number" inputMode="decimal" aria-label={`${exercise.name} set ${set.set_number} kilograms`}
                           value={set.actual_weight_kg ?? ''} placeholder={set.planned_weight_kg != null ? String(set.planned_weight_kg) : '—'}
                           onChange={(event) => updateSet(exerciseIndex, setIndex, 'actual_weight_kg', event.target.value ? Number(event.target.value) : null)}
-                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink-65 focus:ring-[1.5px] focus:ring-ink transition-colors duration-200', set.completed ? 'bg-transparent' : 'bg-ink-04')}
+                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink focus:ring-[1.5px] focus:ring-ink transition-colors duration-200', set.completed ? 'bg-transparent' : 'bg-ink-04')}
                         />
                         <input
                           type="number" inputMode="numeric" aria-label={`${exercise.name} set ${set.set_number} reps`}
                           value={set.actual_reps ?? ''} placeholder={String(set.planned_reps)}
                           onChange={(event) => updateSet(exerciseIndex, setIndex, 'actual_reps', event.target.value ? Number(event.target.value) : null)}
-                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink-65 focus:ring-[1.5px] focus:ring-ink transition-colors duration-200', set.completed ? 'bg-transparent' : 'bg-ink-04')}
+                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink focus:ring-[1.5px] focus:ring-ink transition-colors duration-200', set.completed ? 'bg-transparent' : 'bg-ink-04')}
                         />
                         <button
                           type="button" onClick={() => completeSet(exerciseIndex, setIndex)} aria-label={`Complete set ${set.set_number}`}
