@@ -160,7 +160,7 @@ describe('LogList — FB-09 icons + workout title', () => {
     expect(screen.queryByText('Apple')).not.toBeInTheDocument()
     expect(bulkDeleteLogs).not.toHaveBeenCalled()
     // Undo brings it back and nothing is deleted.
-    const undo = vi.mocked(toast.success).mock.calls[0][1] as { action: { onClick: () => void } }
+    const undo = vi.mocked(toast.success).mock.calls[0][1] as unknown as { action: { onClick: () => void } }
     act(() => undo.action.onClick())
     expect(screen.getByText('Apple')).toBeInTheDocument()
     act(() => { vi.advanceTimersByTime(5000) })
