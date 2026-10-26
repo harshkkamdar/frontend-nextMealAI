@@ -2,7 +2,7 @@
   {
     "shot": "energy-empty",
     "width": 360,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -10,7 +10,7 @@
   {
     "shot": "energy-empty",
     "width": 390,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -18,7 +18,7 @@
   {
     "shot": "energy-error",
     "width": 360,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -26,7 +26,7 @@
   {
     "shot": "energy-error",
     "width": 390,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -34,7 +34,7 @@
   {
     "shot": "energy-filled",
     "width": 360,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -42,7 +42,7 @@
   {
     "shot": "energy-filled",
     "width": 390,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -50,7 +50,7 @@
   {
     "shot": "energy-offline",
     "width": 360,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -58,7 +58,7 @@
   {
     "shot": "energy-offline",
     "width": 390,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -66,7 +66,7 @@
   {
     "shot": "energy-saving",
     "width": 360,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -74,7 +74,7 @@
   {
     "shot": "energy-saving",
     "width": 390,
-    "url": "/logs/new/energy/",
+    "url": "/logs/new/energy",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -82,7 +82,7 @@
   {
     "shot": "food-default",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -90,7 +90,7 @@
   {
     "shot": "food-default",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -98,7 +98,7 @@
   {
     "shot": "food-empty",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -106,7 +106,7 @@
   {
     "shot": "food-empty",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -114,7 +114,7 @@
   {
     "shot": "food-error",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -122,7 +122,7 @@
   {
     "shot": "food-error",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -130,7 +130,7 @@
   {
     "shot": "food-from-diary",
     "width": 360,
-    "url": "/logs/new/food/?meal=dinner&date=2026-10-26",
+    "url": "/logs/new/food?meal=dinner&date=2026-10-26",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -138,7 +138,7 @@
   {
     "shot": "food-from-diary",
     "width": 390,
-    "url": "/logs/new/food/?meal=dinner&date=2026-10-26",
+    "url": "/logs/new/food?meal=dinner&date=2026-10-26",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -146,7 +146,7 @@
   {
     "shot": "food-long",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -154,7 +154,7 @@
   {
     "shot": "food-long",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -162,7 +162,7 @@
   {
     "shot": "food-meal-menu",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -170,7 +170,7 @@
   {
     "shot": "food-meal-menu",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -178,7 +178,7 @@
   {
     "shot": "food-menu-to-geo",
     "width": 360,
-    "url": "/chat/session/?id=42a6a686-c3c7-4b65-9e32-7d2c5e034172&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "url": "/chat/session?id=4321e2ca-524c-4b0b-957c-012c8fe030c8&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -186,7 +186,7 @@
   {
     "shot": "food-menu-to-geo",
     "width": 390,
-    "url": "/chat/session/?id=16658368-5189-48c7-ba42-a8df93b4cb3b&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
+    "url": "/chat/session?id=2f80b988-d923-47e8-9258-15d31671de2a&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -194,7 +194,7 @@
   {
     "shot": "food-no-results",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -202,7 +202,7 @@
   {
     "shot": "food-no-results",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -210,7 +210,7 @@
   {
     "shot": "food-offline",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -218,15 +218,47 @@
   {
     "shot": "food-offline",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
   {
+    "shot": "food-photo-down",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-down",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-edited",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-edited",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
     "shot": "food-photo-estimating",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -234,23 +266,71 @@
   {
     "shot": "food-photo-estimating",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
   {
-    "shot": "food-photo-failure",
+    "shot": "food-photo-expired",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-expired",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-low",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-low",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-nofood",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-nofood",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-offline",
+    "width": 360,
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
   {
-    "shot": "food-photo-failure",
+    "shot": "food-photo-offline",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -258,7 +338,7 @@
   {
     "shot": "food-photo-result",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -266,7 +346,87 @@
   {
     "shot": "food-photo-result",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-worst",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-photo-worst",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-plate-one",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-plate-one",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-plate-sheet",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-plate-sheet",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-plate-three",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-plate-three",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-plate-worst",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-plate-worst",
+    "width": 390,
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -274,7 +434,7 @@
   {
     "shot": "food-results",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -282,23 +442,23 @@
   {
     "shot": "food-results",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
   {
-    "shot": "food-save-error",
+    "shot": "food-save-partial",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },
   {
-    "shot": "food-save-error",
+    "shot": "food-save-partial",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -306,7 +466,7 @@
   {
     "shot": "food-saving",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -314,7 +474,7 @@
   {
     "shot": "food-saving",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -322,7 +482,7 @@
   {
     "shot": "food-searching",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -330,15 +490,47 @@
   {
     "shot": "food-searching",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
   {
+    "shot": "food-selected-edit",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-selected-edit",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-selected-grams",
+    "width": 360,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "food-selected-grams",
+    "width": 390,
+    "url": "/logs/new/food",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
     "shot": "food-selected-long",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -346,23 +538,7 @@
   {
     "shot": "food-selected-long",
     "width": 390,
-    "url": "/logs/new/food/",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "food-selected-scrolled",
-    "width": 360,
-    "url": "/logs/new/food/",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "food-selected-scrolled",
-    "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -370,7 +546,7 @@
   {
     "shot": "food-selected",
     "width": 360,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -378,47 +554,15 @@
   {
     "shot": "food-selected",
     "width": 390,
-    "url": "/logs/new/food/",
+    "url": "/logs/new/food",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
-  },
-  {
-    "shot": "food-tray-two",
-    "width": 360,
-    "url": "/logs/new/food/",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "food-tray-two",
-    "width": 390,
-    "url": "/logs/new/food/",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "food-typing",
-    "width": 360,
-    "url": "/logs/new/food/",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 0
-  },
-  {
-    "shot": "food-typing",
-    "width": 390,
-    "url": "/logs/new/food/",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 0
   },
   {
     "shot": "foods-add",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -426,7 +570,7 @@
   {
     "shot": "foods-add",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -434,7 +578,7 @@
   {
     "shot": "foods-default",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -442,15 +586,31 @@
   {
     "shot": "foods-default",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
   {
+    "shot": "foods-edit",
+    "width": 360,
+    "url": "/foods",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "foods-edit",
+    "width": 390,
+    "url": "/foods",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
     "shot": "foods-empty",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -458,7 +618,7 @@
   {
     "shot": "foods-empty",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -466,7 +626,7 @@
   {
     "shot": "foods-error",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -474,7 +634,7 @@
   {
     "shot": "foods-error",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -482,7 +642,7 @@
   {
     "shot": "foods-loading",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -490,7 +650,7 @@
   {
     "shot": "foods-loading",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -498,7 +658,7 @@
   {
     "shot": "foods-long",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -506,7 +666,7 @@
   {
     "shot": "foods-long",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -514,7 +674,7 @@
   {
     "shot": "foods-no-match",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -522,7 +682,7 @@
   {
     "shot": "foods-no-match",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -530,7 +690,7 @@
   {
     "shot": "foods-offline",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -538,7 +698,7 @@
   {
     "shot": "foods-offline",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -546,7 +706,7 @@
   {
     "shot": "foods-options",
     "width": 360,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -554,7 +714,7 @@
   {
     "shot": "foods-options",
     "width": 390,
-    "url": "/foods/",
+    "url": "/foods",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -562,143 +722,143 @@
   {
     "shot": "logs-default",
     "width": 360,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-default",
     "width": 390,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
-    "shot": "logs-delete-confirm",
+    "shot": "logs-deleted",
     "width": 360,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
-    "shot": "logs-delete-confirm",
+    "shot": "logs-deleted",
     "width": 390,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-empty",
     "width": 360,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-empty",
     "width": 390,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-error",
     "width": 360,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-error",
     "width": 390,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-loading",
     "width": 360,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-loading",
     "width": 390,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-long",
     "width": 360,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-long",
     "width": 390,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-offline",
     "width": 360,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-offline",
     "width": 390,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-select",
     "width": 360,
-    "url": "/logs/",
+    "url": "/logs",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "logs-select",
     "width": 390,
-    "url": "/logs/",
+    "url": "/logs",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "mood-empty",
+    "width": 360,
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },
   {
     "shot": "mood-empty",
-    "width": 360,
-    "url": "/logs/new/mood/",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "mood-empty",
     "width": 390,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -706,7 +866,7 @@
   {
     "shot": "mood-error",
     "width": 360,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -714,7 +874,7 @@
   {
     "shot": "mood-error",
     "width": 390,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -722,7 +882,7 @@
   {
     "shot": "mood-filled",
     "width": 360,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -730,7 +890,7 @@
   {
     "shot": "mood-filled",
     "width": 390,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -738,7 +898,7 @@
   {
     "shot": "mood-offline",
     "width": 360,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -746,7 +906,7 @@
   {
     "shot": "mood-offline",
     "width": 390,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -754,7 +914,7 @@
   {
     "shot": "mood-saving",
     "width": 360,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -762,55 +922,103 @@
   {
     "shot": "mood-saving",
     "width": 390,
-    "url": "/logs/new/mood/",
+    "url": "/logs/new/mood",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
   },
   {
-    "shot": "sheet-edit-grams",
+    "shot": "plus-first",
     "width": 360,
-    "url": "/food/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
-    "shot": "sheet-edit-grams",
+    "shot": "plus-first",
     "width": 390,
-    "url": "/food/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
-    "shot": "sheet-edit-servings",
+    "shot": "plus-offline",
     "width": 360,
-    "url": "/food/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
-    "shot": "sheet-edit-servings",
+    "shot": "plus-offline",
     "width": 390,
-    "url": "/food/",
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plus-open",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plus-open",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plus-typing",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plus-typing",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plus-worst",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "plus-worst",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "sleep-empty",
+    "width": 360,
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },
   {
     "shot": "sleep-empty",
-    "width": 360,
-    "url": "/logs/new/sleep/",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 1
-  },
-  {
-    "shot": "sleep-empty",
     "width": 390,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -818,7 +1026,7 @@
   {
     "shot": "sleep-error",
     "width": 360,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -826,7 +1034,7 @@
   {
     "shot": "sleep-error",
     "width": 390,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -834,7 +1042,7 @@
   {
     "shot": "sleep-filled",
     "width": 360,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -842,7 +1050,7 @@
   {
     "shot": "sleep-filled",
     "width": 390,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -850,7 +1058,7 @@
   {
     "shot": "sleep-offline",
     "width": 360,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -858,7 +1066,7 @@
   {
     "shot": "sleep-offline",
     "width": 390,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -866,7 +1074,7 @@
   {
     "shot": "sleep-saving",
     "width": 360,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -874,7 +1082,7 @@
   {
     "shot": "sleep-saving",
     "width": 390,
-    "url": "/logs/new/sleep/",
+    "url": "/logs/new/sleep",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -882,7 +1090,7 @@
   {
     "shot": "water-empty",
     "width": 360,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -890,7 +1098,7 @@
   {
     "shot": "water-empty",
     "width": 390,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -898,7 +1106,7 @@
   {
     "shot": "water-error",
     "width": 360,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -906,7 +1114,7 @@
   {
     "shot": "water-error",
     "width": 390,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -914,7 +1122,7 @@
   {
     "shot": "water-filled",
     "width": 360,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -922,7 +1130,7 @@
   {
     "shot": "water-filled",
     "width": 390,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -930,7 +1138,7 @@
   {
     "shot": "water-offline",
     "width": 360,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -938,7 +1146,7 @@
   {
     "shot": "water-offline",
     "width": 390,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -946,7 +1154,7 @@
   {
     "shot": "water-saving",
     "width": 360,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -954,7 +1162,7 @@
   {
     "shot": "water-saving",
     "width": 390,
-    "url": "/logs/new/water/",
+    "url": "/logs/new/water",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -962,7 +1170,7 @@
   {
     "shot": "weight-empty",
     "width": 360,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -970,7 +1178,7 @@
   {
     "shot": "weight-empty",
     "width": 390,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -978,7 +1186,7 @@
   {
     "shot": "weight-error",
     "width": 360,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -986,7 +1194,7 @@
   {
     "shot": "weight-error",
     "width": 390,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -994,7 +1202,7 @@
   {
     "shot": "weight-filled",
     "width": 360,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1002,7 +1210,7 @@
   {
     "shot": "weight-filled",
     "width": 390,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1010,7 +1218,7 @@
   {
     "shot": "weight-offline",
     "width": 360,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1018,7 +1226,7 @@
   {
     "shot": "weight-offline",
     "width": 390,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1026,7 +1234,7 @@
   {
     "shot": "weight-saving",
     "width": 360,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -1034,7 +1242,7 @@
   {
     "shot": "weight-saving",
     "width": 390,
-    "url": "/logs/new/weight/",
+    "url": "/logs/new/weight",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -1042,7 +1250,7 @@
   {
     "shot": "workout-empty",
     "width": 360,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1050,7 +1258,7 @@
   {
     "shot": "workout-empty",
     "width": 390,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1058,7 +1266,7 @@
   {
     "shot": "workout-error",
     "width": 360,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1066,7 +1274,7 @@
   {
     "shot": "workout-error",
     "width": 390,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1074,7 +1282,7 @@
   {
     "shot": "workout-filled",
     "width": 360,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1082,7 +1290,7 @@
   {
     "shot": "workout-filled",
     "width": 390,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1090,7 +1298,7 @@
   {
     "shot": "workout-offline",
     "width": 360,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1098,7 +1306,7 @@
   {
     "shot": "workout-offline",
     "width": 390,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -1106,7 +1314,7 @@
   {
     "shot": "workout-saving",
     "width": 360,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -1114,7 +1322,7 @@
   {
     "shot": "workout-saving",
     "width": 390,
-    "url": "/logs/new/workout/",
+    "url": "/logs/new/workout",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
