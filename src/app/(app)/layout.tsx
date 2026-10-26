@@ -14,6 +14,7 @@ import { NotificationsPrompt } from '@/components/native/notifications-prompt'
 import { initNativeShell } from '@/lib/platform/app'
 import { syncHealth } from '@/lib/platform/health'
 import { registerPush, unregisterPush } from '@/lib/platform/notifications'
+import { useAuthStore } from '@/stores/auth.store'
 import { useUIStore } from '@/stores/ui.store'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -56,9 +57,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   // FB-12: capture the browser's IANA timezone on first authenticated mount
   // so the backend can bucket logs onto the correct local calendar date.
   // Guarded with a ref so navigations between protected routes don't refire.
+  // Waits for the stored session: on native it loads asynchronously, and an early profile read would 401 and log the user out.
+  const sessionReady = useAuthStore((state) => state.hasHydrated && Boolean(state.accessToken))
   const tzCapturedRef = useRef(false)
   useEffect(() => {
-    if (tzCapturedRef.current) return
+    if (!sessionReady || tzCapturedRef.current) return
     tzCapturedRef.current = true
     ;(async () => {
       try {
@@ -72,7 +75,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         // Non-critical — silently swallow so the app shell still renders.
       }
     })()
-  }, [])
+  }, [sessionReady])
 
   return (
     <AuthGate mode="app">
