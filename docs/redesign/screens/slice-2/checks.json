@@ -2,7 +2,7 @@
   {
     "shot": "home-checkin-due",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -10,7 +10,7 @@
   {
     "shot": "home-checkin-due",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -18,7 +18,7 @@
   {
     "shot": "home-error",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -26,7 +26,7 @@
   {
     "shot": "home-error",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -34,7 +34,7 @@
   {
     "shot": "home-first-run",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -42,7 +42,7 @@
   {
     "shot": "home-first-run",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -50,7 +50,7 @@
   {
     "shot": "home-loading",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -58,7 +58,7 @@
   {
     "shot": "home-loading",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -66,7 +66,7 @@
   {
     "shot": "home-long",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -74,7 +74,7 @@
   {
     "shot": "home-long",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -82,7 +82,7 @@
   {
     "shot": "home-offline",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -90,7 +90,7 @@
   {
     "shot": "home-offline",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -98,7 +98,7 @@
   {
     "shot": "home-scrolled",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -106,7 +106,7 @@
   {
     "shot": "home-scrolled",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -114,7 +114,7 @@
   {
     "shot": "home",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -122,7 +122,7 @@
   {
     "shot": "home",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -130,7 +130,7 @@
   {
     "shot": "macro-sheet",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -138,7 +138,7 @@
   {
     "shot": "macro-sheet",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -146,7 +146,7 @@
   {
     "shot": "plus-sheet-typed",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -154,7 +154,7 @@
   {
     "shot": "plus-sheet-typed",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -162,7 +162,7 @@
   {
     "shot": "plus-sheet",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -170,7 +170,7 @@
   {
     "shot": "plus-sheet",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -178,7 +178,7 @@
   {
     "shot": "quicklog-sleep",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -186,7 +186,7 @@
   {
     "shot": "quicklog-sleep",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -194,7 +194,7 @@
   {
     "shot": "quicklog-water",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -202,7 +202,7 @@
   {
     "shot": "quicklog-water",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -210,7 +210,7 @@
   {
     "shot": "quicklog-weight",
     "width": 360,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -218,7 +218,7 @@
   {
     "shot": "quicklog-weight",
     "width": 390,
-    "url": "/dashboard/",
+    "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1

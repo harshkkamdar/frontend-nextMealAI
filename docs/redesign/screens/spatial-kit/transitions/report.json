@@ -1,0 +1,105 @@
+{
+  "plus-open": {
+    "frames": 55,
+    "chrome_px": 80286,
+    "content_px": 488659,
+    "max_chrome_share": 0.133,
+    "max_content_share": 0.091,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "pop-settings-to-home": {
+    "frames": 41,
+    "chrome_px": 114027,
+    "content_px": 740894,
+    "max_chrome_share": 0.118,
+    "max_content_share": 0.111,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "push-from-scrolled-home": {
+    "frames": 45,
+    "chrome_px": 160812,
+    "content_px": 954473,
+    "max_chrome_share": 0.064,
+    "max_content_share": 0.067,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "push-home-to-settings": {
+    "frames": 43,
+    "chrome_px": 151409,
+    "content_px": 936193,
+    "max_chrome_share": 0.072,
+    "max_content_share": 0.065,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "sheet-close": {
+    "frames": 36,
+    "chrome_px": 189767,
+    "content_px": 344051,
+    "max_chrome_share": 0.151,
+    "max_content_share": 0.113,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "sheet-open": {
+    "frames": 34,
+    "chrome_px": 218710,
+    "content_px": 320718,
+    "max_chrome_share": 0.126,
+    "max_content_share": 0.139,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "swipe-back-cancel": {
+    "frames": 57,
+    "chrome_px": 145908,
+    "content_px": 867053,
+    "max_chrome_share": 0.031,
+    "max_content_share": 0.032,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "swipe-back-complete": {
+    "frames": 57,
+    "chrome_px": 178665,
+    "content_px": 1076689,
+    "max_chrome_share": 0.036,
+    "max_content_share": 0.04,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "swipe-back-flick": {
+    "frames": 54,
+    "chrome_px": 140903,
+    "content_px": 860776,
+    "max_chrome_share": 0.065,
+    "max_content_share": 0.065,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "tab-home-to-food": {
+    "frames": 54,
+    "chrome_px": 79435,
+    "content_px": 366484,
+    "max_chrome_share": 0.089,
+    "max_content_share": 0.083,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "tabbar-collapse": {
+    "frames": 61,
+    "chrome_px": 102732,
+    "content_px": 989482,
+    "max_chrome_share": 0.109,
+    "max_content_share": 0.074,
+    "issues": [
+      "chrome jump frame 2: 9% of chrome change",
+      "chrome jump frame 4: 11% of chrome change",
+      "chrome jump frame 13: 8% of chrome change"
+    ],
+    "verdict": "pop"
+  }
+}
