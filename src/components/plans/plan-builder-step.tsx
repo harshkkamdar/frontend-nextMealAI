@@ -57,7 +57,7 @@ export function PlanBuilderStep({ title, step, steps, stepKey, question, why, on
             animate="center"
             exit="exit"
             transition={reduce ? reducedFade : { ...spring.page, opacity: { duration: 0.2, ease: 'easeOut' } }}
-            className="px-1 pt-5"
+            className="px-1 pt-3"
           >
             <h1 className="font-wide text-balance text-title text-ink">{question}</h1>
             {why ? <p className="mt-2 text-pretty text-body-sm text-ink-65">{why}</p> : null}

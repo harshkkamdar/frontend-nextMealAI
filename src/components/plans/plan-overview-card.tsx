@@ -28,7 +28,7 @@ export function timeLeft(endDate: string | undefined, today = new Date()): strin
   return `${Math.round(days / 7)} weeks left`
 }
 
-const TITLE = 'font-display line-clamp-2 block text-[20px] font-[750] leading-[1.15] tracking-[-0.015em] text-ink [overflow-wrap:anywhere]'
+const TITLE = 'font-display line-clamp-2 text-[20px] font-[750] leading-[1.15] tracking-[-0.015em] text-ink [overflow-wrap:anywhere]'
 
 /** B1 Answer card, nutrition: the day's calories with the three macros, so the list answers "what are my targets". */
 export function MealPlanCard({ plan, onClick }: { plan: MealPlan; onClick: () => void }) {
