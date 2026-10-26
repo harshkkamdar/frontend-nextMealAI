@@ -209,7 +209,8 @@ export default function FoodsPage() {
       />
       <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
 
-      <div className="mt-1">
+      {/* Nothing saved yet: nothing to search. */}
+      <div className={!loading && !loadFailed && shown.length === 0 ? 'hidden' : 'mt-1'}>
         <SearchField label="Search your foods" value={search} onChange={setSearch} placeholder="Search your foods" />
       </div>
 

@@ -112,7 +112,7 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
     <div className="pb-[calc(96px+var(--safe-bottom))]">
       <AnimatePresence mode="popLayout" initial={false}>
         {phase === 'reading' ? (
-          <motion.div key="reading" role="status" {...enter} className="space-y-3 pt-2">
+          <motion.div key="reading" role="status" {...enter} className="space-y-3 pt-4">
             <div className={cn(CARD, 'flex items-center gap-3 p-3')}>
               {thumb('size-16')}
               <div className="min-w-0">
@@ -133,7 +133,7 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
             </div>
           </motion.div>
         ) : phase === 'result' ? (
-          <motion.div key="result" {...enter} className="pt-2" data-testid="photo-result">
+          <motion.div key="result" {...enter} className="pt-4" data-testid="photo-result">
             <div className={cn(CARD, 'flex items-center gap-3 p-3')}>
               {thumb('size-16')}
               <div>
@@ -157,7 +157,7 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
                     <div className="flex items-start gap-3">
                       <div className="min-w-0 flex-1">
                         <p className={`text-body-sm font-semibold leading-snug ${item.removed ? 'text-ink-65 line-through' : 'text-ink'}`}>{item.name}</p>
-                        {item.confidence < UNSURE && !item.removed ? <p className="mt-0.5 flex items-center gap-1.5 text-label text-ink-80"><span aria-hidden="true" className="size-1.5 rounded-full bg-macro-ochre" />Not sure, check this</p> : null}
+                        {item.confidence < UNSURE && !item.removed ? <p className="mt-0.5 flex items-center gap-1.5 text-label font-bold text-ink-80"><span aria-hidden="true" className="size-1.5 rounded-full bg-macro-ochre" />Not sure, check this</p> : null}
                       </div>
                       <p className={`shrink-0 text-body-sm font-bold tabular-nums ${item.removed ? 'text-ink-65' : 'text-ink'}`}>{formatMacroKcal(m.calories)} <span className="text-label font-medium text-ink-65">kcal</span></p>
                     </div>
@@ -186,9 +186,9 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
             </ul>
           </motion.div>
         ) : (
-          <motion.div key={phase} {...enter} className="pt-2">
+          <motion.div key={phase} {...enter} className="pt-4">
             <div role="status" className={cn(CARD, 'p-4')}>
-              {phase === 'nofood' ? thumb('mb-3 size-12') : null}
+              {phase === 'nofood' ? thumb('mb-3 size-16') : null}
               <p className="text-headline text-ink">{TITLES[phase]}</p>
               <p className="mt-1 text-caption leading-[1.4] text-ink-65">{BODIES[phase]}</p>
               <div className="mt-4 space-y-2">
@@ -213,15 +213,25 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
       {phase === 'result' ? (
-        <div className="fixed inset-x-0 bottom-0 z-30 pb-[calc(12px+var(--safe-bottom))] pt-3">
+        // Rises in with the result instead of appearing in one frame.
+        <motion.div
+          key="log"
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={reduce ? reducedFade : spring.sheet}
+          className="fixed inset-x-0 bottom-0 z-30 pb-[calc(12px+var(--safe-bottom))] pt-3"
+        >
           <div className="mx-auto w-full max-w-md px-4">
             <PrimaryButton type="button" onClick={() => void log()} disabled={logging || kept.length === 0} aria-busy={logging} className="shadow-[var(--shadow-action)]">
               {logging ? 'Logging…' : kept.length === 0 ? 'Nothing left to log' : `Log ${kept.length} item${kept.length === 1 ? '' : 's'} to ${meal}`}
             </PrimaryButton>
           </div>
-        </div>
+        </motion.div>
       ) : null}
+      </AnimatePresence>
     </div>
   )
 }

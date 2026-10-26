@@ -193,13 +193,14 @@ export function LogList({ filterType, onBack }: LogListProps = {}) {
         />
       ) : null}
       {onBack ? <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div> : null}
-      <Chips
+      {/* A first-run list has nothing to filter. */}
+      {!loading && !loadFailed && filter === 'all' && visible.length === 0 ? null : <Chips
         className="scrollbar-hide -mx-4 mb-3 overflow-x-auto px-4 py-1"
         label="Filter by type"
         options={FILTERS}
         value={filter}
         onChange={(value) => { if (value && value !== filter) { setLoading(true); setFilter(value) } }}
-      />
+      />}
 
       {loading ? (
         <div className="mt-2">
@@ -259,6 +260,8 @@ export function LogList({ filterType, onBack }: LogListProps = {}) {
         </div>
       )}
 
+      {/* Room for the floating delete capsule, so it never covers the last row. */}
+      {selectMode ? <div aria-hidden="true" className="h-16" /> : null}
       {/* Floating capsule for the delete, above the tab bar. */}
       {selectMode && selectedIds.size > 0 ? (
         <div className="fixed inset-x-0 z-40 flex justify-center px-4" style={{ bottom: 'calc(96px + var(--safe-bottom))' }}>
