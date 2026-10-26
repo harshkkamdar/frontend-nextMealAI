@@ -1,4 +1,12 @@
+import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 import type { FoodMacros, FoodPayload } from '@/types/logs.types'
+
+/** kcal with the app's rounding and a thousands separator: "1,420". */
+export const kcalText = (n: number | null | undefined) => Number(formatMacroKcal(n)).toLocaleString('en-AU')
+
+/** "24 P · 34 C · 8 F" (mock row subtitle: grams without the unit, so the line fits at 360). */
+export const macroLine = (m: FoodMacros | undefined) =>
+  `${formatMacroGrams(m?.protein ?? 0).slice(0, -1)} P · ${formatMacroGrams(m?.carbs ?? 0).slice(0, -1)} C · ${formatMacroGrams(m?.fat ?? 0).slice(0, -1)} F`
 
 export type DayKind = 'today' | 'past' | 'future'
 

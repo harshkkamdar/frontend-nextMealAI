@@ -4,11 +4,10 @@ import { useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowUpDown, Copy, Pencil, Trash2, X } from 'lucide-react'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
-import { formatMacroKcal } from '@/lib/macros'
 import { reducedFade } from '@/lib/motion'
 import type { FoodPayload, Log } from '@/types/logs.types'
 import { ChoiceGrid, GroupLabel } from './choice-grid'
-import { copyDays, mealOf, quantityLabel, shiftISO } from './diary-logic'
+import { copyDays, kcalText, mealOf, quantityLabel, shiftISO } from './diary-logic'
 
 const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
@@ -56,7 +55,7 @@ export function RowActionsSheet({ open, log, date, today, dayLabel, onClose, onE
   if (!log) return null
   const payload = log.payload as FoodPayload
   const meal = mealOf(payload)
-  const kcal = formatMacroKcal(payload.est_macros?.calories ?? 0)
+  const kcal = kcalText(payload.est_macros?.calories)
   const days = copyDays(date, today)
   const pickedDay = copyDay ?? days[0]
   const pickedMeal = copyMeal ?? meal

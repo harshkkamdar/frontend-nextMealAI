@@ -7,10 +7,9 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { ChevronRightIcon, PlusIcon } from '@/components/ui/fiqr/icons'
 import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { reducedFade, spring } from '@/lib/motion'
-import { formatMacroGrams, formatMacroKcal } from '@/lib/macros'
 import { cn } from '@/lib/utils'
 import type { FoodPayload, Log } from '@/types/logs.types'
-import { dominantMacro, logPhoto, mealOf, quantityLabel, type MacroHue } from './diary-logic'
+import { dominantMacro, kcalText, logPhoto, macroLine, mealOf, quantityLabel, type MacroHue } from './diary-logic'
 
 interface MealGroupProps {
   mealType: string
@@ -82,7 +81,7 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
     >
       <div className="mb-1 flex min-h-11 items-center gap-2.5 pl-1">
         <h2 className="font-display min-w-0 flex-1 text-headline font-extrabold tracking-[-0.015em] text-ink">{mealType}</h2>
-        {calories > 0 ? <span className="text-caption font-semibold text-ink-65 tabular-nums">{formatMacroKcal(calories)} kcal</span> : null}
+        {calories > 0 ? <span className="text-caption font-semibold text-ink-65 tabular-nums">{kcalText(calories)} kcal</span> : null}
         <button
           type="button"
           onClick={() => setActionsOpen(true)}
@@ -108,7 +107,7 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
           {shown.map((item, index) => {
             const payload = item.payload as FoodPayload
             const macros = payload.est_macros
-            const kcal = formatMacroKcal(macros?.calories ?? 0)
+            const kcal = kcalText(macros?.calories)
             const quantity = quantityLabel(payload)
             return (
               <motion.button
@@ -126,7 +125,7 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="line-clamp-2 text-body font-semibold leading-[1.3] text-ink [overflow-wrap:anywhere]">{payload.food_name}</span>
                   <span className="truncate text-caption text-ink-65 tabular-nums">
-                    {quantity} · {formatMacroGrams(macros?.protein ?? 0)} P · {formatMacroGrams(macros?.carbs ?? 0)} C · {formatMacroGrams(macros?.fat ?? 0)} F
+                    {quantity} · {macroLine(macros)}
                   </span>
                 </span>
                 <span className="min-w-[58px] shrink-0 text-right text-body font-semibold text-ink tabular-nums">

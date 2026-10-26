@@ -133,24 +133,36 @@ export function DayHero({ calories, macros, kind, logged, dayLabel, animateIn }:
   )
 }
 
-/** Loading: the same boxes as the hero and four meal sections, pulsing only after 600 ms (motion-feel 3h). */
+/** Loading: flat grey shapes at the real sizes inside the real cards, pulsing only after 600 ms (motion-feel 3h). */
 export function DaySkeleton() {
-  const block = (className: string) => (
+  const bar = (className: string) => <span className={cn('block rounded-full bg-ink-06', className)} />
+  return (
     <motion.div
-      className={className}
+      className="mt-5 space-y-4"
+      role="status"
+      aria-busy="true"
+      aria-label="Loading this day"
       animate={{ opacity: [1, 0.6, 1] }}
       transition={{ duration: 1.2, repeat: Infinity, delay: 0.6, ease: 'easeInOut' }}
-    />
-  )
-  return (
-    <div className="mt-5 space-y-6" role="status" aria-busy="true" aria-label="Loading this day">
-      {block(cn(CARD, 'h-[164px]'))}
-      {[0, 1, 2, 3].map((index) => (
+    >
+      <div className={cn(CARD, 'p-4')}>
+        <div className="flex items-center gap-4">
+          <span className="block size-ring shrink-0 rounded-full border-[9px] border-ink-06" />
+          <div className="flex flex-1 flex-col gap-4">
+            {[0, 1, 2].map((i) => <div key={i} className="space-y-2">{bar('h-3 w-3/5')}{bar('h-1.5 w-full')}</div>)}
+          </div>
+        </div>
+        {bar('mt-4 h-3 w-2/5')}
+      </div>
+      {[0, 1, 2].map((index) => (
         <div key={index}>
-          <div className="mb-2 h-11 w-28 rounded-[14px] bg-ink-04" />
-          {block('h-16 rounded-[22px] bg-ink-04')}
+          <div className="mb-1 flex min-h-11 items-center pl-1">{bar('h-4 w-24')}</div>
+          <div className={cn(CARD, 'flex items-center gap-3.5 px-4 py-3')}>
+            <span className="block size-12 shrink-0 rounded-[14px] bg-ink-06" />
+            <div className="flex-1 space-y-2">{bar('h-3.5 w-3/4')}{bar('h-3 w-1/2')}</div>
+          </div>
         </div>
       ))}
-    </div>
+    </motion.div>
   )
 }

@@ -13,10 +13,9 @@ import { NameFavouriteDialog } from '@/components/shared/name-favourite-dialog'
 import { CopyMealDialog } from '@/components/diary/copy-meal-dialog'
 import { RowActionsSheet } from '@/components/diary/row-actions-sheet'
 import { PlanLink } from '@/components/diary/plan-parts'
-import { dayKind, mealOf } from '@/components/diary/diary-logic'
+import { dayKind, kcalText, mealOf } from '@/components/diary/diary-logic'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
-import { formatMacroKcal } from '@/lib/macros'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { WeekStrip, addDays } from '@/components/ui/fiqr/week-strip'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
@@ -465,7 +464,7 @@ export default function DiaryPage() {
         onClose={() => setConfirmDelete(null)}
         onConfirm={() => { if (confirmDelete) void handleDeleteLog(confirmDelete) }}
         title={`Delete ${(confirmDelete?.payload as FoodPayload | undefined)?.food_name ?? 'this entry'}?`}
-        description={`It comes off ${dayLabel(confirmDelete?.local_date ?? selectedDate, today)} and your totals drop by ${formatMacroKcal((confirmDelete?.payload as FoodPayload | undefined)?.est_macros?.calories ?? 0)} kcal.`}
+        description={`It comes off ${dayLabel(confirmDelete?.local_date ?? selectedDate, today)} and your totals drop by ${kcalText((confirmDelete?.payload as FoodPayload | undefined)?.est_macros?.calories)} kcal.`}
         confirmLabel="Delete"
         variant="danger"
       />

@@ -5,7 +5,6 @@ import { MessageCircle, Plus, Star, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { CloseIcon } from '@/components/ui/fiqr/icons'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { CARD, Chips, EmptySlot, FIELD, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
@@ -611,6 +610,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   } : null
 
   const shownMacros = editItems ? sumItems(editItems) : calculatedMacros
+  // Edit mode names the serving under the number ("bowl"), as the mock does.
+  const servingUnit = mode === 'edit' ? ((existingLog?.payload as FoodPayload | undefined)?.serving_label?.trim() || null) : null
 
   const title = mode === 'edit'
     ? `Edit ${(existingLog?.payload as FoodPayload | undefined)?.food_name ?? 'food'}`
@@ -640,7 +641,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
           ) : (
             <h2 id="food-sheet-title" className="font-wide min-w-0 truncate text-[22px] font-bold leading-tight text-ink">{title}</h2>
           )}
-          <RoundButton aria-label="Close" onClick={onClose}><CloseIcon /></RoundButton>
+          <button type="button" aria-label="Close" onClick={onClose} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94] [&_svg]:size-5"><CloseIcon /></button>
         </div>
 
         {selectedFood ? (
@@ -681,7 +682,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   <button type="button" onClick={step(() => setServings(Math.max(0.25, servings - 0.25)))} aria-label="Decrease servings" className={stepButton}>
                     <span aria-hidden="true" className="text-[22px] font-semibold leading-none">−</span>
                   </button>
-                  <input
+                  <span className="flex flex-col items-center gap-1">
+                    <input
                     type="number"
                     inputMode="decimal"
                     value={servings}
@@ -695,6 +697,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                     aria-label="Servings"
                     className={numberInput}
                   />
+                    {servingUnit ? <span className="text-caption font-semibold text-ink-65">{servingUnit}</span> : null}
+                  </span>
                   <button type="button" onClick={step(() => setServings(servings + 0.25))} aria-label="Increase servings" className={stepButton}>
                     <Plus className="size-5" />
                   </button>

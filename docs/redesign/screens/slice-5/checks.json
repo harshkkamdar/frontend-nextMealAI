@@ -420,13 +420,7 @@
     "width": 360,
     "url": "/food",
     "axe": [],
-    "smallTargets": [
-      {
-        "el": "Undo",
-        "w": 36,
-        "h": 24
-      }
-    ],
+    "smallTargets": [],
     "orangeActions": 0
   },
   {
@@ -434,13 +428,7 @@
     "width": 390,
     "url": "/food",
     "axe": [],
-    "smallTargets": [
-      {
-        "el": "Undo",
-        "w": 36,
-        "h": 24
-      }
-    ],
+    "smallTargets": [],
     "orangeActions": 0
   },
   {
