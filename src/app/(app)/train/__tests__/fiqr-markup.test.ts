@@ -18,7 +18,9 @@ describe('FIQR train markup contract', () => {
     expect(trainPage).toContain('<OfflineBand />')
     expect(trainPage).toContain('<BottomSheet open={calendarOpen}')
     expect(trainPage).not.toContain('CalendarStrip')
-    expect(trainPage).toContain('Log a freestyle session')
+    // Freestyle logging stays reachable from the empty history slot (and the orb's + sheet).
+    expect(trainPage).toContain("router.push('/logs/new/workout')")
+    expect(trainPage).not.toContain('PlusIcon')
     // One orange action: whichever hero state renders, exactly one PrimaryButton shows.
     expect(trainPage).not.toContain('SecondaryButton')
   })

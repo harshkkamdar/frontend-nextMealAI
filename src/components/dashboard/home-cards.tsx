@@ -47,6 +47,8 @@ function Ring({ consumed, target }: { consumed: number; target: number }) {
   const r = 54
   const c = 2 * Math.PI * r
   const fraction = target > 0 ? Math.min(1, consumed / target) : 0
+  // Round caps add half the 12 px stroke at each end; shorten the dash by one stroke so the arc equals the fraction.
+  const arcOffset = fraction >= 1 ? 0 : Math.min(c, c * (1 - fraction) + 12)
   return (
     <div className="relative size-[132px] shrink-0">
       <svg viewBox="0 0 132 132" className="size-full -rotate-90" aria-hidden="true">
@@ -54,7 +56,7 @@ function Ring({ consumed, target }: { consumed: number; target: number }) {
         <circle
           cx="66" cy="66" r={r} fill="none" stroke="var(--color-accent)" strokeWidth="12" strokeLinecap="round"
           strokeDasharray={c}
-          strokeDashoffset={drawn ? c * (1 - fraction) : c}
+          strokeDashoffset={drawn ? arcOffset : c}
           style={{ transition: `stroke-dashoffset ${DRAW_MS + 400}ms cubic-bezier(.22,1,.36,1)`, opacity: fraction > 0 ? 1 : 0 }}
         />
       </svg>

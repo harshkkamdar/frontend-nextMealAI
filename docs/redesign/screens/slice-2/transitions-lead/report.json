@@ -1,4 +1,15 @@
 {
+  "home-first-load": {
+    "frames": 97,
+    "chrome_px": 58972,
+    "content_px": 251248,
+    "max_chrome_share": 0.065,
+    "max_content_share": 0.227,
+    "issues": [
+      "late change frame 54 after 25 still frames (57539 px)"
+    ],
+    "verdict": "pop"
+  },
   "orb-morph": {
     "frames": 61,
     "chrome_px": 145659,

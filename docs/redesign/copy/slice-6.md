@@ -8,7 +8,7 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 |---|---|---|
 | Title | Train | Train |
 | Subtitle | none | Program name, or "No program yet" |
-| Header actions (screen reader) | Open workout calendar | Open workout calendar, Log a freestyle session |
+| Header actions (screen reader) | Open workout calendar | Open workout calendar |
 | Week strip day (screen reader) | none | Tue 27 Oct, workout done / Thu 29 Oct, today |
 | Hero eyebrow | NEXT UP | Next up / In progress / Today (rest day) |
 | Hero meta | 5 exercises · 40 min | 5 exercises · about 40 min |
@@ -18,10 +18,11 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 | Start failure toast | Failed to start workout | Couldn't start the workout. Try again. |
 | This week tiles | Sessions / Volume / Last | Volume (kg, counts up) and Sessions "2 of 4", with a bar per day |
 | Program row meta | 5 exercises | 5 exercises · next / Recovery |
+| Program header count | Day 4 of 5 | Day 4 of the cycle |
 | Program link | View full plan → | View full plan |
 | History row | Mon 26 Oct / Upper A · 52 min · 15 sets | Upper A / Mon 26 Oct · 52 min · 15 sets, volume on the right |
 | History empty | No completed workouts yet | No workouts yet. Log a freestyle one |
-| Freestyle button | Log a freestyle session (orange) | moved to the + header button |
+| Freestyle button | Log a freestyle session (orange) | removed; the orb's + sheet has Workout, the same freestyle log |
 | Volume chart, empty week | none | Your sessions this week show up here |
 | Calendar sheet empty | No workouts on this day | No workout on this day |
 

@@ -32,8 +32,14 @@ const msg = (id, role, content, minutes, extra = {}) => ({ id, role, content, ti
 const HISTORY = [
   msg('m-1', 'user', '2 eggs and toast with butter for breakfast', 40),
   msg('m-2', 'assistant', "Logged 2 eggs to breakfast · 156 cal · 13g P · 1g C · 11g F\nLogged sourdough toast with butter to breakfast · 260 cal · 6g P · 30g C · 12g F\n\nThat's 416 kcal for breakfast, leaving 1,534 for the day. Protein's off to a good start.", 39, { metadata: { actions_taken: [{ type: 'log_created', details: { logType: 'food' } }, { type: 'log_created', details: { logType: 'food' } }] } }),
-  msg('m-3', 'user', 'This was lunch, about a cup of rice', 26, { attachments: [{ id: 'a-1', signed_url: `${PHOTO_HOST}/bowl.jpg`, mime_type: 'image/jpeg', width: 480, height: 480 }] }),
-  msg('m-4', 'assistant', 'Salmon, rice, greens and avocado. Which salmon was it?', 25, { metadata: { suggested_replies: ['Grilled fillet, about 150 g', 'Smoked salmon', 'Not sure'] } }),
+  msg('m-3', 'user', 'Lunch was salmon with a cup of rice, greens and half an avocado', 26),
+  msg('m-4', 'assistant', 'Sounds good. Which salmon was it?', 25, { metadata: { suggested_replies: ['Grilled fillet, about 150 g', 'Smoked salmon', 'Not sure'] } }),
+]
+// The user's photo turn gets its own shot, so the main conversation is not judged on a stand-in image.
+const PHOTO_HISTORY = [
+  ...HISTORY.slice(0, 2),
+  msg('p-3', 'user', 'This was lunch, about a cup of rice', 26, { attachments: [{ id: 'a-1', signed_url: `${PHOTO_HOST}/bowl.jpg`, mime_type: 'image/jpeg', width: 480, height: 480 }] }),
+  msg('p-4', 'assistant', 'Salmon, rice, greens and avocado. Which salmon was it?', 25, { metadata: { suggested_replies: ['Grilled fillet, about 150 g', 'Smoked salmon', 'Not sure'] } }),
 ]
 const LONG_HISTORY = [
   msg('l-1', 'user', "I've been training four days a week but my left shoulder gets sore after pressing, especially overhead. I still want to keep upper body strength and I only have 45 minutes on Fridays. Can you rebuild the week so it works around that?", 30),
@@ -53,6 +59,7 @@ const geoApi = (over = {}) => ({
   '/v1/chat/sessions': { sessions: SESSIONS },
   '/v1/chat/sessions/s-1': { messages: HISTORY },
   '/v1/chat/sessions/s-long': { messages: LONG_HISTORY },
+  '/v1/chat/sessions/s-photo': { messages: PHOTO_HISTORY },
   '/v1/chat/sessions/comp-1': { messages: HISTORY.slice(0, 2) },
   '/v1/chat/companion': { session_id: 'comp-1', context_loaded: true },
   '/v1/chat': REPLY,
@@ -92,6 +99,7 @@ const shots = [
   { name: 'list-delete', url: '/chat', api: geoApi(), act: async (p) => { await p.getByRole('button', { name: /^Options for Breakfast/ }).click(); await p.waitForTimeout(700); await p.getByRole('button', { name: 'Delete' }).click(); await p.waitForTimeout(700) } },
   // /chat/session
   { name: 'session', url: SESSION, api: geoApi(), act: photos },
+  { name: 'session-photo', url: '/chat/session?id=s-photo', api: geoApi(), act: photos },
   { name: 'session-new', url: '/chat/session?id=new-1', api: geoApi(), fail: ['/v1/chat/sessions/new-1'], failStatus: 404 },
   { name: 'session-loading', url: SESSION, api: geoApi(), hang: ['/v1/chat/sessions'] },
   { name: 'session-typing', url: SESSION, api: geoApi(), act: async (p) => { await photos(p); await onSend(p, () => new Promise(() => {})); await p.getByRole('button', { name: 'Grilled fillet, about 150 g' }).click(); await p.waitForTimeout(900) } },

@@ -320,6 +320,22 @@
     "orangeActions": 0
   },
   {
+    "shot": "session-photo",
+    "width": 360,
+    "url": "/chat/session?id=s-photo",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-photo",
+    "width": 390,
+    "url": "/chat/session?id=s-photo",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "session-reply",
     "width": 360,
     "url": "/chat/session?id=s-1",

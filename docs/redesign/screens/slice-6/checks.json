@@ -208,6 +208,22 @@
     "orangeActions": 0
   },
   {
+    "shot": "train-bottom",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-bottom",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
     "shot": "train-calendar",
     "width": 360,
     "url": "/train",

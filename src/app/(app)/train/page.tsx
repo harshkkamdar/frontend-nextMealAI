@@ -9,7 +9,7 @@ import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
-import { ChevronRightIcon, PlusIcon } from '@/components/ui/fiqr/icons'
+import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { Enter, HistoryCard, NextUpCard, ProgramCard, SectionTitle, TrainSkeleton, VolumeCard } from '@/components/workout/train-cards'
@@ -146,7 +146,7 @@ export default function ActivityPage() {
       title="No program yet"
       meta="Geo can build one around your goals and kit."
       day={null}
-      action={<PrimaryButton type="button" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a program</PrimaryButton>}
+      action={<PrimaryButton type="button" className="h-[52px] py-0" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a program</PrimaryButton>}
     />
   ) : isRestDay ? (
     <NextUpCard
@@ -155,7 +155,7 @@ export default function ActivityPage() {
       meta={afterRest ? `Recover today. ${afterRest.name || 'Your next session'} is up next.` : 'Recover today.'}
       day={null}
       action={(
-        <button type="button" onClick={() => programRef.current?.scrollIntoView({ behavior: 'smooth' })} className="flex h-12 w-full items-center justify-center gap-1 rounded-[14px] bg-ink-06 text-[15px] font-semibold text-ink transition-transform active:scale-[.97]">
+        <button type="button" onClick={() => programRef.current?.scrollIntoView({ behavior: 'smooth' })} className="flex h-[52px] w-full items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-[15px] font-semibold text-ink transition-transform active:scale-[.97]">
           See program <ChevronRightIcon className="size-4" />
         </button>
       )}
@@ -167,7 +167,7 @@ export default function ActivityPage() {
       meta={`${plural(exerciseCount, 'exercise')} · about ${Math.max(15, Math.round((exerciseCount * 7.5) / 5) * 5)} min`}
       day={nextWorkout}
       action={(
-        <PrimaryButton type="button" disabled={starting} data-testid="activity-start-workout-button" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
+        <PrimaryButton type="button" disabled={starting} data-testid="activity-start-workout-button" className="h-[52px] py-0" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
           {starting ? 'Starting…' : isResume ? 'Resume workout' : 'Start workout'}
         </PrimaryButton>
       )}
@@ -180,10 +180,7 @@ export default function ActivityPage() {
         title="Train"
         subtitle={workoutPlan ? (workoutPlan.content.name || 'Your program') : 'No program yet'}
         actions={(
-          <>
-            <RoundButton aria-label="Open workout calendar" onClick={() => setCalendarOpen(true)}><CalendarDays strokeWidth={1.75} /></RoundButton>
-            <RoundButton aria-label="Log a freestyle session" onClick={() => router.push('/logs/new/workout')}><PlusIcon /></RoundButton>
-          </>
+          <RoundButton aria-label="Open workout calendar" onClick={() => setCalendarOpen(true)}><CalendarDays strokeWidth={1.75} /></RoundButton>
         )}
       >
         <WeekStrip className="mt-4" selected={selectedDate} today={today} onSelect={selectDay} marked={doneDates} markLabel="workout done" weekStartsOn={1} />
@@ -206,7 +203,7 @@ export default function ActivityPage() {
 
           {workoutPlan ? (
             <section ref={programRef} className="mt-3 scroll-mt-24">
-              <SectionTitle trailing={days.length ? `Day ${nextIdx + 1} of ${days.length}` : undefined}>Program</SectionTitle>
+              <SectionTitle trailing={days.length ? `Day ${nextIdx + 1} of the cycle` : undefined}>Program</SectionTitle>
               <ProgramCard days={days} nextIdx={nextIdx} first={first} />
               <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-1 flex min-h-11 items-center gap-1 px-1 text-[14px] font-semibold text-ink-65">
                 View full plan <ChevronRightIcon className="size-4" />

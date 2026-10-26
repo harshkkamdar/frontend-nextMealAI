@@ -52,15 +52,16 @@ export function NextUpCard({ eyebrow, title, meta, day, action }: { eyebrow: str
   const parts = dayMuscles(day)
   return (
     <section className={cn(CARD, 'p-5')} aria-label="Next session" data-testid="activity-next-up-card">
-      <div className="flex items-start gap-4">
+      <p className="text-[13px] font-semibold text-ink-65">{eyebrow}</p>
+      <div className="flex items-end gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-semibold text-ink-65">{eyebrow}</p>
           <h2 className="font-wide mt-1 line-clamp-2 break-words text-[26px] font-bold leading-[1.12] tracking-[-0.4px] text-ink">{title}</h2>
           <p className="mt-1.5 text-[14px] text-ink-65">{meta}</p>
         </div>
-        {parts.length ? <MuscleMap parts={parts} tone="ink" className="h-[92px] shrink-0" /> : null}
+        {/* One level: the figure sits on the meta line's baseline, a step quieter than Start. */}
+        {parts.length ? <MuscleMap parts={parts} tone="ink" className="h-[72px] shrink-0 opacity-60" /> : null}
       </div>
-      <div className="mt-5">{action}</div>
+      <div className="mt-4">{action}</div>
     </section>
   )
 }
@@ -85,17 +86,17 @@ export function VolumeCard({ perDay, labels, todayIndex, sessions, planned, firs
           <p className="mt-1 text-[15px] font-semibold text-ink tabular-nums">{sessions}<span className="font-medium text-ink-65">{planned === null ? '' : ` of ${planned}`}</span></p>
         </div>
       </div>
-      <div className="relative mt-4 grid grid-cols-7 gap-2" aria-hidden="true">
-        {total === 0 ? <span className="absolute inset-x-0 top-6 text-center text-[14px] font-medium text-ink-65">Your sessions this week show up here</span> : null}
+      <div className="relative mt-4 grid grid-cols-7" aria-hidden="true">
+        {total === 0 ? <span className="absolute inset-x-0 top-3 text-center text-[14px] font-medium text-ink-65">Your sessions this week show up here</span> : null}
         {perDay.map((kg, index) => {
           const fraction = kg / max
           return (
             <span key={labels[index] + index} className="flex flex-col items-center gap-1.5">
-              <span className="relative flex h-[72px] w-full max-w-[22px] items-end">
-                <span className="absolute inset-x-0 bottom-0 h-1 rounded-full bg-ink-06" />
+              {/* Every day stands on one continuous baseline; empty days are just the line. */}
+              <span className="flex h-[52px] w-full items-end justify-center border-b-[1.5px] border-ink-10">
                 {kg > 0 ? (
                   <motion.span
-                    className="relative block h-full w-full origin-bottom rounded-[6px] bg-ink"
+                    className="block h-full w-full max-w-[22px] origin-bottom rounded-t-[6px] bg-ink"
                     initial={first && !reduce ? { scaleY: 0 } : false}
                     animate={{ scaleY: Math.max(0.06, fraction) }}
                     transition={reduce ? reducedFade : { ...spring.glide, delay: 0.16 + index * 0.04 }}

@@ -24,7 +24,7 @@ const TABS = [
 /** Routes that own the whole screen (live workout, an open conversation) hide the bar. */
 export function hidesTabBar(pathname: string): boolean {
   // Full-screen task flows (a conversation, a live workout, logging, plan builders) own the whole screen.
-  return ['/chat/session', '/train/session', '/logs/new/', '/plans/new', '/plans/edit'].some((prefix) => pathname.startsWith(prefix))
+  return ['/chat/session', '/train/session', '/logs/new/', '/plans/new', '/plans/edit', '/paywall'].some((prefix) => pathname.startsWith(prefix))
 }
 
 /** Shrinks while the page scrolls down, returns on any scroll up or near the top (Q4). */
