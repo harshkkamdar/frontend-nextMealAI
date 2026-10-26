@@ -8,7 +8,11 @@ export interface SubscriptionOption {
   id: string
   period: 'monthly' | 'yearly'
   title: string
+  /** The store's formatted price, shown as is. */
   price: string
+  /** Numeric price and ISO currency from the store, for maths such as a per-month figure. */
+  amount: number
+  currency: string
   productId: string
   planIdentifier?: string
   offerToken?: string
@@ -29,6 +33,8 @@ export async function getSubscriptionOptions(): Promise<SubscriptionOption[]> {
           period: product.identifier.endsWith('.yearly') ? 'yearly' as const : 'monthly' as const,
           title: product.title,
           price: product.priceString,
+          amount: product.price,
+          currency: product.currencyCode,
           productId: product.identifier,
         }))
         .sort((a, b) => a.period === b.period ? 0 : a.period === 'monthly' ? -1 : 1)
@@ -49,6 +55,8 @@ export async function getSubscriptionOptions(): Promise<SubscriptionOption[]> {
           period: planIdentifier,
           title: product.title,
           price: product.priceString,
+          amount: product.price,
+          currency: product.currencyCode,
           productId: ANDROID_PRODUCT_ID,
           planIdentifier,
           offerToken: product.offerToken,
@@ -88,21 +96,53 @@ export async function restorePurchases(): Promise<boolean> {
   }
 }
 
+/** The current FIQR entitlement from the store, or undefined when there is none. Throws when the store fails. */
+async function activePurchase() {
+  const { NativePurchases, PURCHASE_TYPE } = await import('@capgo/native-purchases')
+  const { purchases } = await NativePurchases.getPurchases({
+    productType: PURCHASE_TYPE.SUBS,
+    onlyCurrentEntitlements: true,
+  })
+  const productIds: readonly string[] = [...IOS_PRODUCT_IDS, ANDROID_PRODUCT_ID]
+  const activeStates = ['subscribed', 'inGracePeriod', 'inBillingRetryPeriod']
+  return purchases.find((purchase) =>
+    productIds.includes(purchase.productIdentifier)
+    && (purchase.isActive === true || (purchase.subscriptionState !== undefined && activeStates.includes(purchase.subscriptionState)))
+  )
+}
+
+export interface ActiveSubscription {
+  productId: string
+  /** From the iOS product id; null on Android, whose transactions name only the product, not the base plan. */
+  period: 'monthly' | 'yearly' | null
+  /** iOS expiration date (ISO); null on Android, where the plugin does not return it. */
+  renewsAt: string | null
+  willCancel: boolean | null
+}
+
+/** The active plan and its renewal date, as far as the store plugin reports them; null when none or unknown. */
+export async function getActiveSubscription(): Promise<ActiveSubscription | null> {
+  if (!isNative()) return null
+  try {
+    const purchase = await activePurchase()
+    if (!purchase) return null
+    const id = purchase.productIdentifier
+    return {
+      productId: id,
+      period: id.endsWith('.yearly') ? 'yearly' : id.endsWith('.monthly') ? 'monthly' : null,
+      renewsAt: purchase.expirationDate ?? null,
+      willCancel: purchase.willCancel ?? null,
+    }
+  } catch {
+    return null
+  }
+}
+
 export async function isSubscribed(): Promise<boolean> {
   if (!isNative()) return false
   let subscribed: boolean
   try {
-    const { NativePurchases, PURCHASE_TYPE } = await import('@capgo/native-purchases')
-    const { purchases } = await NativePurchases.getPurchases({
-      productType: PURCHASE_TYPE.SUBS,
-      onlyCurrentEntitlements: true,
-    })
-    const productIds: readonly string[] = [...IOS_PRODUCT_IDS, ANDROID_PRODUCT_ID]
-    const activeStates = ['subscribed', 'inGracePeriod', 'inBillingRetryPeriod']
-    subscribed = purchases.some((purchase) =>
-      productIds.includes(purchase.productIdentifier)
-      && (purchase.isActive === true || (purchase.subscriptionState !== undefined && activeStates.includes(purchase.subscriptionState)))
-    )
+    subscribed = (await activePurchase()) !== undefined
   } catch {
     try {
       return (await kvGet('fiqr:subscribed')) === '1'

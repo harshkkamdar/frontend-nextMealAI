@@ -26,7 +26,7 @@ vi.mock('@capgo/native-purchases', () => ({
   },
 }))
 
-import { getSubscriptionOptions, isSubscribed } from '@/lib/platform/purchases'
+import { getActiveSubscription, getSubscriptionOptions, isSubscribed } from '@/lib/platform/purchases'
 
 describe('purchase platform adapter', () => {
   beforeEach(() => {
@@ -71,8 +71,8 @@ describe('purchase platform adapter', () => {
     mocks.currentPlatform = 'android'
     mocks.getProducts.mockResolvedValue({
       products: [
-        { identifier: 'yearly', title: 'Yearly', priceString: '$49.99', offerToken: 'year-offer' },
-        { identifier: 'monthly', title: 'Monthly', priceString: '$4.99', offerToken: 'month-offer' },
+        { identifier: 'yearly', title: 'Yearly', price: 49.99, priceString: '$49.99', currencyCode: 'AUD', offerToken: 'year-offer' },
+        { identifier: 'monthly', title: 'Monthly', price: 4.99, priceString: '$4.99', currencyCode: 'AUD', offerToken: 'month-offer' },
       ],
     })
 
@@ -82,6 +82,8 @@ describe('purchase platform adapter', () => {
         period: 'monthly',
         title: 'Monthly',
         price: '$4.99',
+        amount: 4.99,
+        currency: 'AUD',
         productId: 'fiqr_plus',
         planIdentifier: 'monthly',
         offerToken: 'month-offer',
@@ -91,10 +93,41 @@ describe('purchase platform adapter', () => {
         period: 'yearly',
         title: 'Yearly',
         price: '$49.99',
+        amount: 49.99,
+        currency: 'AUD',
         productId: 'fiqr_plus',
         planIdentifier: 'yearly',
         offerToken: 'year-offer',
       },
     ])
+  })
+
+  it('reads the active iOS plan, renewal date and cancel flag from the entitlement', async () => {
+    mocks.native = true
+    mocks.currentPlatform = 'ios'
+    mocks.getPurchases.mockResolvedValue({
+      purchases: [
+        { productIdentifier: 'other.app.product', isActive: true, willCancel: null },
+        { productIdentifier: 'app.fiqr.plus.yearly', isActive: true, expirationDate: '2027-10-27T00:00:00Z', willCancel: false },
+      ],
+    })
+    await expect(getActiveSubscription()).resolves.toEqual({ productId: 'app.fiqr.plus.yearly', period: 'yearly', renewsAt: '2027-10-27T00:00:00Z', willCancel: false })
+  })
+
+  it('has no period or renewal date on Android, where the plugin does not return them', async () => {
+    mocks.native = true
+    mocks.currentPlatform = 'android'
+    mocks.getPurchases.mockResolvedValue({ purchases: [{ productIdentifier: 'fiqr_plus', subscriptionState: 'subscribed', willCancel: true }] })
+    await expect(getActiveSubscription()).resolves.toEqual({ productId: 'fiqr_plus', period: null, renewsAt: null, willCancel: true })
+  })
+
+  it('returns null with no active entitlement, on failure, and on the web', async () => {
+    mocks.native = true
+    mocks.getPurchases.mockResolvedValue({ purchases: [{ productIdentifier: 'app.fiqr.plus.monthly', isActive: false, willCancel: null }] })
+    await expect(getActiveSubscription()).resolves.toBeNull()
+    mocks.getPurchases.mockRejectedValue(new Error('store down'))
+    await expect(getActiveSubscription()).resolves.toBeNull()
+    mocks.native = false
+    await expect(getActiveSubscription()).resolves.toBeNull()
   })
 })
