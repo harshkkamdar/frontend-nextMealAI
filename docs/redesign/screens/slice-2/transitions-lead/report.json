@@ -1,0 +1,20 @@
+{
+  "orb-morph": {
+    "frames": 61,
+    "chrome_px": 145659,
+    "content_px": 708870,
+    "max_chrome_share": 0.222,
+    "max_content_share": 0.205,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "push-home-checkin": {
+    "frames": 69,
+    "chrome_px": 109269,
+    "content_px": 472265,
+    "max_chrome_share": 0.058,
+    "max_content_share": 0.047,
+    "issues": [],
+    "verdict": "smooth"
+  }
+}

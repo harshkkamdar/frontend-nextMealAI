@@ -77,7 +77,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGate mode="app">
       <GeoScreenContextProvider>
-        <div className={`min-h-screen bg-background ${hideBottomPad ? '' : 'pb-[var(--tabbar-clearance)]'}`}>
+        <div className={`min-h-screen overflow-x-clip bg-background ${hideBottomPad ? '' : 'pb-[var(--tabbar-clearance)]'}`}>
           <RouteFrame>{children}</RouteFrame>
           <LayoutGroup>
             <TabBar />
