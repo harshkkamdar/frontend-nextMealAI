@@ -2,30 +2,35 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, useReducedMotion } from 'framer-motion'
 import { toast } from 'sonner'
 import { emphasizeGeoMeasurements, formatDashboardDate, getDashboardGeoLine } from '@/components/dashboard/dashboard-helpers'
 import {
   CheckInCard,
   HeroCard,
   HomeEntrance,
+  HomeErrorCard,
   HomeSkeleton,
   MealsCard,
   SleepTile,
   StepsTile,
+  WATER_GOAL_GLASSES,
   WaterTile,
   WeightTile,
   type HealthSource,
+  type HeroAction,
 } from '@/components/dashboard/home-cards'
-import { mealRows, sleepTile, stepsTile, waterGlassesToday, weightTile } from '@/components/dashboard/home-data'
+import { geoAction, mealRows, sleepTile, stepsTile, waterGlassesToday, weightTile } from '@/components/dashboard/home-data'
+import { useHealthSource } from '@/components/dashboard/health-week'
+import { logWithUndo } from '@/components/dashboard/log-with-undo'
+import { MacroSheet } from '@/components/dashboard/macro-sheet'
 import { QuickLogSheet, type QuickLogType } from '@/components/dashboard/quick-log-sheet'
 import { SuggestionCard } from '@/components/dashboard/suggestion-card'
 import { WorkoutCard } from '@/components/dashboard/workout-card'
 import { LOG_SHEET } from '@/components/layout/tab-bar'
 import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
-import { MacroBreakdownSheet } from '@/components/shared/macro-breakdown-sheet'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { ChartFill, PersonFill } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
@@ -42,7 +47,6 @@ import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { getSuggestions } from '@/lib/api/suggestions.api'
 import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
-import { healthLabel, isHealthConnected, lastHealthSync } from '@/lib/platform/health'
 import type { MacroKey } from '@/lib/macros'
 import { computeNudges } from '@/lib/nudges'
 import { todayLocalISO } from '@/lib/timezone'
@@ -75,25 +79,16 @@ async function withFallback<T>(request: Promise<T>, fallback: T, failures?: unkn
   }
 }
 
-function useHealthSource(): { label: string | null; connected: boolean | null; syncedAt: string | null; recheck: () => void } {
-  const label = healthLabel()
-  const [state, setState] = useState<{ connected: boolean | null; syncedAt: string | null }>({ connected: null, syncedAt: null })
-  const recheck = useCallback(() => {
-    if (!label) return
-    void Promise.all([isHealthConnected(), lastHealthSync()]).then(([connected, syncedAt]) => setState({ connected, syncedAt }))
-  }, [label])
-  useEffect(recheck, [recheck])
-  return { label, ...state, recheck }
-}
-
 export default function DashboardPage() {
   const router = useRouter()
   const tz = useUserTimezone()
   const today = todayLocalISO(tz)
+  const reduce = useReducedMotion()
   const [quickLog, setQuickLog] = useState<QuickLogType>(null)
   const [activeMacro, setActiveMacro] = useState<MacroKey | null>(null)
   const [hiddenSuggestionIds, setHiddenSuggestionIds] = useState<string[]>([])
   const [connectOpen, setConnectOpen] = useState(false)
+  const [geoBusy, setGeoBusy] = useState(false)
   const health = useHealthSource()
   const enter = useFirstPaint('dashboard')
 
@@ -113,10 +108,14 @@ export default function DashboardPage() {
     return { summary, plans, profile, logs, checkIn, status }
   }, [])
 
-  const { data, loading, refetch } = useCachedQuery('dashboard', fetchAll, [today])
+  const { data, loading, savedAt, refetch } = useCachedQuery('dashboard', fetchAll, [today])
   const refresh = useCallback(() => { void refetch() }, [refetch])
   const fetchSuggestions = useCallback(() => getSuggestions({ status: 'pending' }).catch(() => [] as Suggestion[]), [])
   const { data: suggestions } = useCachedQuery('dashboard-suggestions', fetchSuggestions, [today, !!data])
+
+  // Glasses added with the tile's + before the refetch lands; tied to the data they were added on, so fresh data replaces them.
+  const [waterExtra, setWaterExtra] = useState<{ on: DashboardData | null; n: number }>({ on: null, n: 0 })
+  const addWater = (n: number) => setWaterExtra((prev) => ({ on: data, n: (prev.on === data ? prev.n : 0) + n }))
 
   useEffect(() => {
     window.addEventListener('workout:plan-deactivated', refresh)
@@ -133,8 +132,15 @@ export default function DashboardPage() {
   const workoutPlan = (plans.find((plan) => plan.type === 'workout') as WorkoutPlan) ?? null
   const mealPlan = (plans.find((plan) => plan.type === 'meal') as MealPlan) ?? null
   const day = summary?.daily_breakdown?.find((entry) => entry.date === today)
-  const targets = mealPlan?.content.daily_targets
+  const planTargets = mealPlan?.content.daily_targets
+  const targets: Record<MacroKey, number> = {
+    calories: planTargets?.calories ?? profile?.daily_calorie_target ?? 0,
+    protein: planTargets?.protein ?? profile?.daily_protein_g ?? 0,
+    carbs: planTargets?.carbs ?? profile?.daily_carbs_g ?? 0,
+    fat: planTargets?.fat ?? profile?.daily_fat_g ?? 0,
+  }
   const todayLogs = useMemo(() => logs.filter((log) => (log.local_date ?? log.created_at.slice(0, 10)) === today), [logs, today])
+  const todayFood = useMemo(() => todayLogs.filter((log) => log.type === 'food'), [todayLogs])
   const nudges = useMemo(
     () => data ? computeNudges({ todayLogs, summary, mealPlan, workoutPlan, profile }) : [],
     [data, todayLogs, summary, mealPlan, workoutPlan, profile],
@@ -148,7 +154,38 @@ export default function DashboardPage() {
   const steps = stepsTile(logs, today)
   const weight = weightTile(logs, profile?.current_weight_kg, today)
   const sleep = sleepTile(logs, today)
+  const water = waterGlassesToday(logs, today) + (waterExtra.on === data ? waterExtra.n : 0)
   const source: HealthSource | null = health.label && health.connected ? { label: health.label, syncedAt: health.syncedAt } : null
+
+  const openLogSheet = () => useUIStore.getState().openSheet(LOG_SHEET)
+  const openGeo = () => useUIStore.getState().openSheet('geo-companion')
+
+  const addGlass = () => {
+    addWater(1)
+    void logWithUndo(
+      { type: 'water', payload: { glasses: 1 }, source: 'quick_log' },
+      `Glass added, ${water + 1} of ${WATER_GOAL_GLASSES}`,
+      refresh,
+      () => addWater(-1),
+    ).then((ok) => { if (!ok) addWater(-1) })
+  }
+
+  const suggested = data ? geoAction(logs, today, { kcal: targets.calories - (day?.calories ?? 0), protein: targets.protein - (day?.protein ?? 0) }) : null
+  let action: HeroAction | null = null
+  if (suggested?.kind === 'log-meal') {
+    action = { label: 'Log a meal', onRun: openLogSheet }
+  } else if (suggested?.kind === 'relog') {
+    action = {
+      label: `Log ${suggested.name.split(',')[0]}`,
+      ariaLabel: `Log ${suggested.name} again, ${suggested.protein} g protein`,
+      busy: geoBusy,
+      onRun: () => {
+        setGeoBusy(true)
+        void logWithUndo(suggested.input, `${suggested.name} logged to Snack`, refresh, () => {}).finally(() => setGeoBusy(false))
+      },
+      onMore: openGeo,
+    }
+  }
 
   const startWorkout = async (plan: WorkoutPlan, dayIndex: number) => {
     try {
@@ -176,93 +213,97 @@ export default function DashboardPage() {
         <OfflineBand />
       </div>
 
-      {!data && loading ? (
-        <HomeSkeleton />
-      ) : null}
-      {/* The skeleton fades out over the arriving cards instead of leaving a bare frame (motion-feel N6). */}
-      {data && enter ? <div aria-hidden="true" className="skeleton-out pointer-events-none absolute inset-x-4 top-[calc(108px+var(--safe-top))]"><HomeSkeleton /></div> : null}
-      {!data && loading ? null : !data ? (
-        <div className="mt-5 rounded-[24px] bg-card px-5 pb-5 pt-1 shadow-[var(--shadow-card)]"><ErrorState onRetry={refresh}>I couldn&apos;t load today. Check your connection and try again.</ErrorState></div>
-      ) : (
-        <HomeEntrance.Provider value={enter}>
-        <div className="mt-5 flex flex-col gap-3">
-          {checkInDue && data.status ? (
-            <div className={cn(enter && 'enter-hero')}><CheckInCard weekLabel={data.status.week.label} onOpen={() => router.push('/check-in')} /></div>
-          ) : null}
+      <div className="mt-4 pb-4">
+        {!data && loading ? <HomeSkeleton /> : !data ? (
+          <HomeErrorCard savedAt={savedAt} onRetry={refresh} />
+        ) : (
+          <HomeEntrance.Provider value={enter}>
+            {/* Cold start: Home settles forward from 1.04 while the ring draws, once per session (Q23). */}
+            <motion.div
+              className="flex flex-col gap-[10px]"
+              initial={enter && !reduce ? { opacity: 0, scale: 1.04 } : false}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ scale: { type: 'spring', stiffness: 260, damping: 30 }, opacity: { duration: 0.22, ease: 'easeOut' } }}
+            >
+              {checkInDue && data.status ? (
+                <CheckInCard weekLabel={data.status.week.label} daysLogged={data.status.days_logged ?? null} onOpen={() => router.push('/check-in')} />
+              ) : null}
 
-          <div className={cn(enter && 'enter-hero')}>
-            <HeroCard
-              calories={{ current: day?.calories ?? 0, target: targets?.calories ?? profile?.daily_calorie_target ?? 0 }}
-              macros={{
-                protein: [day?.protein ?? 0, targets?.protein ?? profile?.daily_protein_g ?? 0],
-                carbs: [day?.carbs ?? 0, targets?.carbs ?? profile?.daily_carbs_g ?? 0],
-                fat: [day?.fat ?? 0, targets?.fat ?? profile?.daily_fat_g ?? 0],
-              }}
-              geoLine={emphasizeGeoMeasurements(geoLine)}
-              onOpenMacro={setActiveMacro}
+              <HeroCard
+                calories={{ current: day?.calories ?? 0, target: targets.calories }}
+                macros={{
+                  protein: [day?.protein ?? 0, targets.protein],
+                  carbs: [day?.carbs ?? 0, targets.carbs],
+                  fat: [day?.fat ?? 0, targets.fat],
+                }}
+                geoLine={emphasizeGeoMeasurements(geoLine)}
+                action={action}
+                onOpenMacro={setActiveMacro}
+              />
+
+              <div className={cn('grid grid-cols-2 gap-[10px]', enter && 'enter-tiles')}>
+                <WaterTile glasses={water} onOpen={() => setQuickLog('water')} onAdd={addGlass} />
+                <WeightTile kg={weight.kg} weekDelta={weight.weekDelta} onLog={() => setQuickLog('weight')} />
+                <StepsTile
+                  today={steps.today}
+                  yesterday={steps.yesterday}
+                  source={source}
+                  connectLabel={health.connected === false ? health.label : null}
+                  onConnect={() => setConnectOpen(true)}
+                  onOpen={() => router.push('/dashboard/steps')}
+                />
+                <SleepTile hours={sleep.hours} nights={sleep.nights} source={source} onOpen={() => (sleep.hours === null ? setQuickLog('sleep') : router.push('/dashboard/sleep'))} />
+              </div>
+
+              <div className={cn('flex flex-col gap-[10px]', enter && 'enter-rows')}>
+                <WorkoutCard
+                  workoutPlan={workoutPlan}
+                  today={today}
+                  onStart={(plan, dayIndex) => void startWorkout(plan, dayIndex)}
+                  onSeeProgram={() => router.push('/train')}
+                  onAskGeo={openGeo}
+                />
+
+                <section className="mt-2">
+                  <h2 className="mb-2 px-1 text-caption font-semibold text-ink-65">Meals</h2>
+                  <MealsCard rows={mealRows(logs, today)} onOpen={() => router.push('/food')} onLog={openLogSheet} />
+                </section>
+
+                {(profile?.daily_targets_missing_fields?.length ?? 0) > 0 ? (
+                  <button type="button" onClick={() => router.push('/settings/profile')} className="flex min-h-16 items-center rounded-[22px] bg-card px-4 text-left shadow-[var(--shadow-card)] active:scale-[.98]">
+                    <span className="flex-1">
+                      <span className="block text-body font-semibold text-ink">Add your height</span>
+                      <span className="block text-caption text-ink-65">Geo needs it to set your targets</span>
+                    </span>
+                  </button>
+                ) : null}
+
+                {pendingSuggestion ? (
+                  <SuggestionCard suggestion={pendingSuggestion} onAction={() => setHiddenSuggestionIds((ids) => [...ids, pendingSuggestion.id])} />
+                ) : null}
+              </div>
+            </motion.div>
+
+            <MacroSheet
+              open={activeMacro !== null}
+              macro={activeMacro ?? 'calories'}
+              foodLogs={todayFood}
+              targets={targets}
+              onClose={() => setActiveMacro(null)}
+              onLogMeal={() => { setActiveMacro(null); openLogSheet() }}
             />
-          </div>
-
-          <div className={cn('grid grid-cols-2 gap-[10px]', enter && 'enter-tiles')}>
-            <StepsTile
-              today={steps.today}
-              yesterday={steps.yesterday}
-              source={source}
-              connectLabel={health.connected === false ? health.label : null}
-              onConnect={() => setConnectOpen(true)}
-            />
-            <WeightTile {...weight} onLog={() => setQuickLog('weight')} />
-            <WaterTile glasses={waterGlassesToday(logs, today)} onLog={() => setQuickLog('water')} />
-            <SleepTile hours={sleep.hours} nights={sleep.nights} source={source} onLog={() => setQuickLog('sleep')} />
-          </div>
-
-          <div className={cn('contents', enter && 'enter-rows')}>
-          <div>
-            <WorkoutCard
-              workoutPlan={workoutPlan}
-              today={today}
-              onStart={(plan, dayIndex) => void startWorkout(plan, dayIndex)}
-              onSeeProgram={() => router.push('/train')}
-              onAskGeo={() => useUIStore.getState().openSheet('geo-companion')}
-            />
-          </div>
-
-          <section className="mt-3">
-            <h2 className="mb-2 px-1 text-[13px] font-semibold text-ink-65">Meals</h2>
-            <MealsCard rows={mealRows(logs, today)} onOpen={() => router.push('/food')} onLog={() => useUIStore.getState().openSheet(LOG_SHEET)} />
-          </section>
-          </div>
-
-          {(profile?.daily_targets_missing_fields?.length ?? 0) > 0 ? (
-            <button type="button" onClick={() => router.push('/settings/profile')} className="flex min-h-16 items-center rounded-[24px] bg-card px-5 text-left shadow-[var(--shadow-card)] active:scale-[.98]">
-              <span className="flex-1">
-                <span className="block text-[15.5px] font-semibold text-ink">Add your height</span>
-                <span className="block text-[13px] text-ink-65">Geo needs it to set your targets</span>
-              </span>
-            </button>
-          ) : null}
-
-          {pendingSuggestion ? (
-            <SuggestionCard suggestion={pendingSuggestion} onAction={() => setHiddenSuggestionIds((ids) => [...ids, pendingSuggestion.id])} />
-          ) : null}
-
-          <MacroBreakdownSheet
-            open={activeMacro !== null}
-            macro={activeMacro ?? 'calories'}
-            foodLogs={todayLogs.filter((log) => log.type === 'food')}
-            onClose={() => setActiveMacro(null)}
-          />
-        </div>
-        </HomeEntrance.Provider>
-      )}
+          </HomeEntrance.Provider>
+        )}
+      </div>
 
       <QuickLogSheet
         type={quickLog}
         onDone={() => { setQuickLog(null); refresh() }}
         onClose={() => setQuickLog(null)}
-        currentWeight={weight.kg ?? undefined}
+        water={water}
+        weight={{ ...weight, today }}
       />
-      <HealthConnectSheet open={connectOpen} onClose={() => setConnectOpen(false)} onConnected={() => { recheck(); refresh() }} />
+      <HealthConnectSheet open={connectOpen} onClose={() => setConnectOpen(false)} onConnected={() => { recheck(); refresh(); toast.success(`${health.label ?? 'Health'} connected, 30 days synced`) }} />
     </div>
   )
 }

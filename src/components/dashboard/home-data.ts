@@ -1,4 +1,4 @@
-import type { FoodPayload, Log, StepsPayload } from '@/types/logs.types'
+import type { CreateLogInput, FoodPayload, Log, StepsPayload } from '@/types/logs.types'
 
 /** Calendar date of a log in the user's day (backend local_date, else the UTC date of created_at). */
 export function logDate(log: Log): string {
@@ -45,6 +45,8 @@ export interface WeightTile {
   weekDelta: number | null
   /** Oldest to newest, one point per day with a weigh-in, for the sparkline. */
   series: number[]
+  /** Day of the newest weigh-in, null when the weight comes from the profile. */
+  date: string | null
 }
 
 export function weightTile(logs: Log[], fallbackKg: number | null | undefined, today: string): WeightTile {
@@ -64,7 +66,7 @@ export function weightTile(logs: Log[], fallbackKg: number | null | undefined, t
     const older = days.filter((date) => date <= cutoff && date >= shiftDate(today, -14)).pop()
     if (older) weekDelta = Math.round(((byDay.get(latestDay) as number) - (byDay.get(older) as number)) * 10) / 10
   }
-  return { kg, weekDelta, series }
+  return { kg, weekDelta, series, date: latestDay ?? null }
 }
 
 export interface SleepTile {
@@ -121,4 +123,45 @@ export function formatSleep(hours: number): string {
   const h = Math.floor(total / 60)
   const m = total % 60
   return m ? `${h}h ${m}m` : `${h}h`
+}
+
+/** Seven days ending today, oldest first, for the Steps and Sleep week pages; null where nothing was logged. */
+export function weekSeries(logs: Log[], type: 'steps' | 'sleep', today: string): { date: string; value: number | null }[] {
+  const rows = ofType(logs, type)
+  const field = type === 'steps' ? 'steps' : 'hours'
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = shiftDate(today, index - 6)
+    const log = rows.find((entry) => logDate(entry) === date)
+    return { date, value: log ? num((log.payload as Record<string, unknown>)[field]) : null }
+  })
+}
+
+/** What Geo's line can do in one tap (Coach: line with action). */
+export type GeoAction =
+  | { kind: 'log-meal' }
+  | { kind: 'relog'; name: string; protein: number; input: CreateLogInput }
+
+/**
+ * The backend sends Geo's sentence but no action, so the action is derived from the user's own logs:
+ * nothing logged all week opens the log sheet; protein short with calories to spare re-logs the
+ * highest-protein food from the past week that fits what is left. Otherwise the line stays a sentence.
+ */
+export function geoAction(logs: Log[], today: string, left: { kcal: number; protein: number }): GeoAction | null {
+  const food = logs.filter((log) => log.type === 'food')
+  if (food.length === 0) return { kind: 'log-meal' }
+  if (left.protein < 10 || left.kcal <= 0) return null
+  const loggedToday = new Set(food.filter((log) => logDate(log) === today).map((log) => (log.payload as FoodPayload).food_name?.toLowerCase()))
+  let best: { log: Log; protein: number } | null = null
+  for (const log of food.sort(newestFirst)) {
+    const payload = log.payload as FoodPayload
+    const protein = Number(payload.est_macros?.protein) || 0
+    const kcal = Number(payload.est_macros?.calories) || 0
+    if (logDate(log) >= today || !payload.food_name || loggedToday.has(payload.food_name.toLowerCase())) continue
+    if (protein < 10 || kcal <= 0 || kcal > left.kcal) continue
+    if (!best || protein > best.protein) best = { log, protein }
+  }
+  if (!best) return null
+  const { food_name, est_macros, quantity_g, servings, serving_label, serving_size_g, user_food_id } = best.log.payload as FoodPayload
+  const payload = Object.fromEntries(Object.entries({ food_name, est_macros, quantity_g, servings, serving_label, serving_size_g, user_food_id, meal_type: 'snack' }).filter(([, value]) => value !== undefined)) as unknown as FoodPayload
+  return { kind: 'relog', name: food_name, protein: Math.round(best.protein), input: { type: 'food', payload, source: 'quick_log', local_date: today } }
 }
