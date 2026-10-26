@@ -1,112 +1,196 @@
 {
+  "forgot-sent": {
+    "frames": 106,
+    "chrome_px": 59967,
+    "content_px": 111300,
+    "max_chrome_share": 0.159,
+    "max_content_share": 0.116,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "generating-to-reveal": {
+    "frames": 287,
+    "chrome_px": 217761,
+    "content_px": 1016642,
+    "max_chrome_share": 0.098,
+    "max_content_share": 0.068,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "goal-autoadvance": {
+    "frames": 103,
+    "chrome_px": 190072,
+    "content_px": 289477,
+    "max_chrome_share": 0.092,
+    "max_content_share": 0.109,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "login-to-forgot": {
+    "frames": 110,
+    "chrome_px": 262306,
+    "content_px": 106009,
+    "max_chrome_share": 0.127,
+    "max_content_share": 0.111,
+    "issues": [],
+    "verdict": "smooth"
+  },
   "login-to-welcome": {
-    "frames": 57,
-    "chrome_px": 146895,
-    "content_px": 223553,
-    "max_chrome_share": 0.128,
-    "max_content_share": 0.063,
+    "frames": 105,
+    "chrome_px": 163836,
+    "content_px": 205861,
+    "max_chrome_share": 0.11,
+    "max_content_share": 0.059,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "module-back": {
+    "frames": 104,
+    "chrome_px": 4248,
+    "content_px": 224607,
+    "max_chrome_share": 0.06,
+    "max_content_share": 0.156,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "module-forward": {
+    "frames": 105,
+    "chrome_px": 10338,
+    "content_px": 266941,
+    "max_chrome_share": 0.105,
+    "max_content_share": 0.058,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "name-to-sex": {
+    "frames": 108,
+    "chrome_px": 103501,
+    "content_px": 119852,
+    "max_chrome_share": 0.171,
+    "max_content_share": 0.139,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "reveal-to-today": {
+    "frames": 142,
+    "chrome_px": 113345,
+    "content_px": 474099,
+    "max_chrome_share": 0.344,
+    "max_content_share": 0.172,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "signup-to-setup": {
+    "frames": 114,
+    "chrome_px": 141593,
+    "content_px": 157984,
+    "max_chrome_share": 0.126,
+    "max_content_share": 0.101,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "step-back": {
+    "frames": 104,
+    "chrome_px": 87649,
+    "content_px": 343086,
+    "max_chrome_share": 0.199,
+    "max_content_share": 0.143,
+    "issues": [
+      "chrome jump frame 25: 20% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "welcome-back": {
+    "frames": 156,
+    "chrome_px": 1169,
+    "content_px": 400820,
+    "max_chrome_share": 0.18,
+    "max_content_share": 0.047,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-continue": {
-    "frames": 79,
-    "chrome_px": 0,
-    "content_px": 200476,
-    "max_chrome_share": 0,
-    "max_content_share": 0.13,
+    "frames": 108,
+    "chrome_px": 613,
+    "content_px": 189653,
+    "max_chrome_share": 0.135,
+    "max_content_share": 0.099,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-double-continue": {
-    "frames": 91,
-    "chrome_px": 0,
-    "content_px": 382404,
-    "max_chrome_share": 0,
-    "max_content_share": 0.113,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 119,
+    "chrome_px": 1386,
+    "content_px": 425045,
+    "max_chrome_share": 0.061,
+    "max_content_share": 0.045,
+    "issues": [
+      "late change frame 115 after 20 still frames (58 px)"
+    ],
+    "verdict": "pop"
   },
   "welcome-drag-release": {
-    "frames": 128,
-    "chrome_px": 0,
-    "content_px": 368080,
-    "max_chrome_share": 0,
-    "max_content_share": 0.027,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 205,
+    "chrome_px": 1758,
+    "content_px": 228742,
+    "max_chrome_share": 0.86,
+    "max_content_share": 0.059,
+    "issues": [
+      "chrome jump frame 115: 86% of chrome change",
+      "late change frame 170 after 7 still frames (102 px)"
+    ],
+    "verdict": "pop"
   },
   "welcome-drag-scrub": {
-    "frames": 130,
-    "chrome_px": 0,
-    "content_px": 471919,
-    "max_chrome_share": 0,
-    "max_content_share": 0.02,
+    "frames": 301,
+    "chrome_px": 1413,
+    "content_px": 283216,
+    "max_chrome_share": 0.171,
+    "max_content_share": 0.019,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-first-paint": {
-    "frames": 52,
-    "chrome_px": 37923,
-    "content_px": 262985,
-    "max_chrome_share": 0.511,
-    "max_content_share": 0.254,
-    "issues": [],
-    "verdict": "smooth"
-  },
-  "welcome-flick": {
-    "frames": 84,
-    "chrome_px": 0,
-    "content_px": 217292,
-    "max_chrome_share": 0,
-    "max_content_share": 0.091,
-    "issues": [],
-    "verdict": "smooth"
-  },
-  "welcome-hard-flick": {
-    "frames": 84,
-    "chrome_px": 0,
-    "content_px": 199883,
-    "max_chrome_share": 0,
-    "max_content_share": 0.342,
-    "issues": [],
-    "verdict": "smooth"
-  },
-  "welcome-last": {
-    "frames": 214,
-    "chrome_px": 89682,
-    "content_px": 758471,
-    "max_chrome_share": 0.204,
-    "max_content_share": 0.11,
+    "frames": 101,
+    "chrome_px": 198152,
+    "content_px": 296789,
+    "max_chrome_share": 0.148,
+    "max_content_share": 0.345,
     "issues": [
-      "late change frame 146 after 7 still frames (72909 px)"
+      "chrome jump frame 18: 15% of chrome change"
     ],
     "verdict": "pop"
   },
-  "welcome-rubber-band": {
-    "frames": 62,
-    "chrome_px": 0,
-    "content_px": 345329,
-    "max_chrome_share": 0,
-    "max_content_share": 0.032,
-    "issues": [],
-    "verdict": "smooth"
+  "welcome-flick": {
+    "frames": 105,
+    "chrome_px": 623,
+    "content_px": 207845,
+    "max_chrome_share": 0.132,
+    "max_content_share": 0.089,
+    "issues": [
+      "late change frame 87 after 25 still frames (771 px)",
+      "late change frame 95 after 7 still frames (88 px)"
+    ],
+    "verdict": "pop"
   },
   "welcome-to-login": {
-    "frames": 54,
-    "chrome_px": 147242,
-    "content_px": 184667,
-    "max_chrome_share": 0.125,
-    "max_content_share": 0.071,
+    "frames": 105,
+    "chrome_px": 164646,
+    "content_px": 157247,
+    "max_chrome_share": 0.109,
+    "max_content_share": 0.127,
     "issues": [],
     "verdict": "smooth"
   },
   "welcome-to-signup": {
-    "frames": 143,
-    "chrome_px": 132336,
-    "content_px": 625804,
-    "max_chrome_share": 0.138,
-    "max_content_share": 0.044,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 284,
+    "chrome_px": 101201,
+    "content_px": 581815,
+    "max_chrome_share": 0.173,
+    "max_content_share": 0.036,
+    "issues": [
+      "late change frame 200 after 110 still frames (71 px)"
+    ],
+    "verdict": "pop"
   }
 }

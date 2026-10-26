@@ -35,10 +35,15 @@ function freeze(el: HTMLElement, z: number): HTMLElement {
   copy.inert = true
   const live = [el, ...el.querySelectorAll<HTMLElement>('*')]
   ;[copy, ...copy.querySelectorAll<HTMLElement>('*')].forEach((c, i) => {
-    // A clone restarts CSS animations; pin each looping or entering layer where it is now.
-    const t = live[i] && getComputedStyle(live[i]).transform
+    // A clone restarts CSS animations and transitions; pin each layer as it looks now (mid-loop, mid-fade, mid-tint).
     c.style.animation = 'none'
-    if (t && t !== 'none' && c !== copy) c.style.transform = t
+    c.style.transition = 'none'
+    if (!live[i]) return
+    const cs = getComputedStyle(live[i])
+    if (cs.transform !== 'none' && c !== copy) c.style.transform = cs.transform
+    if (c !== copy) c.style.opacity = cs.opacity
+    c.style.backgroundColor = cs.backgroundColor
+    c.style.color = cs.color
   })
   const fields = el.querySelectorAll('input, textarea')
   copy.querySelectorAll<HTMLInputElement>('input, textarea').forEach((f, i) => { f.value = (fields[i] as HTMLInputElement).value })
@@ -80,10 +85,15 @@ export function depthTo(go: () => void, dir: DepthDir = 1, { crossLayout = false
   const under = field ? freeze(field, 0) : null
   // The back button, bars and CTA: the next screen's fade in underneath (page-in, 220 ms) while these hold, then these
   // fade. Controls both screens share never flicker; ones that differ (the welcome's dots, a CTA's fill) crossfade.
-  const chrome = [...document.querySelectorAll<HTMLElement>('[data-chrome]')].map((c) => freeze(c, 11))
+  const liveChrome = [...document.querySelectorAll<HTMLElement>('[data-chrome]')]
+  const chrome = liveChrome.map((c) => freeze(c, 11))
+  // The copies stand in for the originals from here on; both at once would double every edge (text reads bolder).
+  const originals = [el, ...liveChrome]
+  for (const o of originals) o.style.visibility = 'hidden'
   go()
   const scale = dir === 1 ? BEHIND : dir === -1 ? FRONT : 1
   afterSwap(el, '[data-depth]', () => {
+    for (const o of originals) o.style.visibility = '' // still here only if the next route never came
     // The outgoing screen is gone by just over half the step, so two screens' words never sit on top of each other.
     const frames = reduced() ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1, transform: 'none' }, { opacity: 0, offset: 0.55 }, { opacity: 0, transform: `scale(${scale})` }]
     ghost.animate(frames, { duration: reduced() ? 150 : 420, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'forwards' }).finished.then(() => ghost.remove(), () => ghost.remove())
