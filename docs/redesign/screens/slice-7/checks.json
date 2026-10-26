@@ -85,7 +85,7 @@
     "url": "/plans/new/meal",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-meal-days-invalid",
@@ -93,7 +93,7 @@
     "url": "/plans/new/meal",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-meal-empty",
@@ -101,7 +101,7 @@
     "url": "/plans/new/meal",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-meal-empty",
@@ -109,7 +109,7 @@
     "url": "/plans/new/meal",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-meal-error",
@@ -149,7 +149,7 @@
     "url": "/plans/new/meal",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-meal-saving",
@@ -157,7 +157,7 @@
     "url": "/plans/new/meal",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-meal-search",
@@ -165,7 +165,7 @@
     "url": "/plans/new/meal",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-meal-search",
@@ -173,7 +173,7 @@
     "url": "/plans/new/meal",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-meal-targets",
@@ -213,7 +213,7 @@
     "url": "/plans/new/workout",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-workout-days-invalid",
@@ -221,7 +221,7 @@
     "url": "/plans/new/workout",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-workout-empty",
@@ -229,7 +229,7 @@
     "url": "/plans/new/workout",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "new-workout-empty",
@@ -237,7 +237,39 @@
     "url": "/plans/new/workout",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-workout-error",
+    "width": 360,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-workout-error",
+    "width": 390,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-workout-search",
+    "width": 360,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "new-workout-search",
+    "width": 390,
+    "url": "/plans/new/workout",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
   },
   {
     "shot": "plans-error",
@@ -416,6 +448,22 @@
     "orangeActions": 0
   },
   {
+    "shot": "view-meal-end",
+    "width": 360,
+    "url": "/plans/view?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "view-meal-end",
+    "width": 390,
+    "url": "/plans/view?id=meal-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "view-meal-long",
     "width": 360,
     "url": "/plans/view?id=meal-1",
@@ -453,7 +501,7 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "view-offline",
@@ -461,7 +509,23 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
+  },
+  {
+    "shot": "view-workout-end",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "view-workout-end",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
   },
   {
     "shot": "view-workout-history",
@@ -469,7 +533,7 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "view-workout-history",
@@ -477,7 +541,7 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "view-workout-inactive",
@@ -501,7 +565,7 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "view-workout-long",
@@ -509,7 +573,7 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "view-workout-open",
@@ -517,7 +581,7 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "view-workout-open",
@@ -525,7 +589,23 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
+  },
+  {
+    "shot": "view-workout-starting",
+    "width": 360,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "view-workout-starting",
+    "width": 390,
+    "url": "/plans/view?id=work-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
   },
   {
     "shot": "view-workout",
@@ -533,7 +613,7 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   },
   {
     "shot": "view-workout",
@@ -541,6 +621,6 @@
     "url": "/plans/view?id=work-1",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 0
+    "orangeActions": 1
   }
 ]

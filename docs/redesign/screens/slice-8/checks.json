@@ -293,7 +293,7 @@
     "url": "/check-in",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "offline",
@@ -301,6 +301,6 @@
     "url": "/check-in",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   }
 ]
