@@ -114,7 +114,7 @@ describe('WorkoutPlanBuilder component', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     await toDays('Bulk')
     expect(screen.getByRole('status')).toHaveTextContent('Day 1 needs at least one exercise')
-    expect((await screen.findByRole('button', { name: 'Save plan' }))).toBeDisabled()
+    expect((await screen.findByRole('button', { name: 'Save program' }))).toBeDisabled()
   })
 
   it('adds an exercise via search and submits create payload', async () => {
@@ -134,7 +134,8 @@ describe('WorkoutPlanBuilder component', () => {
     await waitFor(() => screen.getByText('Bench Press'))
     fireEvent.click(screen.getByText('Bench Press'))
 
-    const submit = (await screen.findByRole('button', { name: 'Save plan' }))
+    // The sheet's modal layer may still hide the page while it closes in jsdom.
+    const submit = (await screen.findByRole('button', { name: 'Save program', hidden: true }))
     await waitFor(() => expect(submit).not.toBeDisabled())
     fireEvent.click(submit)
 
@@ -149,7 +150,7 @@ describe('WorkoutPlanBuilder component', () => {
     expect(toastSuccess).toHaveBeenCalledWith('Workout plan created')
   })
 
-  it('shows toast on create failure', async () => {
+  it('says in the dock when the save fails, and offers Try again', async () => {
     searchExercisesMock.mockResolvedValue([{ id: 'ex-1', name: 'Squat' }])
     createPlanMock.mockRejectedValue(new Error('boom'))
 
@@ -160,8 +161,9 @@ describe('WorkoutPlanBuilder component', () => {
     await waitFor(() => screen.getByText('Squat'))
     fireEvent.click(screen.getByText('Squat'))
 
-    fireEvent.click((await screen.findByRole('button', { name: 'Save plan' })))
-    await waitFor(() => expect(toastError).toHaveBeenCalledWith('boom'))
+    fireEvent.click((await screen.findByRole('button', { name: 'Save program', hidden: true })))
+    await waitFor(() => expect(screen.getByRole('status', { hidden: true })).toHaveTextContent("That didn't save. Check your connection and try again."))
+    expect(screen.getByRole('button', { name: 'Try again', hidden: true })).toBeEnabled()
   })
 
   it('edit mode pre-fills from initialPlan and calls updatePlan', async () => {
@@ -193,7 +195,7 @@ describe('WorkoutPlanBuilder component', () => {
     expect(screen.getByDisplayValue('Chest')).toBeInTheDocument()
     expect(screen.getByText('Bench Press')).toBeInTheDocument()
 
-    fireEvent.click((await screen.findByRole('button', { name: 'Save plan' })))
+    fireEvent.click((await screen.findByRole('button', { name: 'Save changes' })))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-42')
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-42'))

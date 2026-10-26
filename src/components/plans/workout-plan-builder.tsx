@@ -3,22 +3,16 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import {
-  PlanNameField,
-  PlanDateRangeField,
-  NumberField,
-  SearchablePicker,
-  AddRowButton,
-  RemoveRowButton,
-} from '@/components/plans/plan-builder-shared'
+import { ActiveSwitch, AddButton, NameStep, NumberCell, RemoveButton } from '@/components/plans/builder-fields'
+import { SearchSheet } from '@/components/plans/search-sheet'
+import { CARD } from '@/components/plans/spatial-parts'
 import { createPlan, updatePlan, activatePlan } from '@/lib/api/plans.api'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
 import type { WorkoutPlan, WorkoutPlanDay, WorkoutExercise } from '@/types/plans.types'
 import { PlanBuilderStep } from '@/components/plans/plan-builder-step'
-import { ActiveToggle, BuilderNotes, DayCardShell, stepErrors } from '@/components/plans/plan-builder-parts'
+import { stepErrors } from '@/components/plans/plan-builder-parts'
 import { goBack } from '@/lib/navigation'
 import { haptic } from '@/lib/platform/app'
-import { cn } from '@/lib/utils'
 
 // FB-08 — Workout plan manual builder. Used by both the create route
 // (/plans/new/workout) and the edit route (/plans/edit?id=...). Keeps a
@@ -57,10 +51,10 @@ function emptyDay(index: number): DraftDay {
   }
 }
 
-function emptyExercise(): DraftExercise {
+function emptyExercise(name = ''): DraftExercise {
   return {
     _key: nextKey(),
-    name: '',
+    name,
     sets: 3,
     reps: 10,
     weight: undefined,
@@ -105,7 +99,10 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
   const [days, setDays] = useState<DraftDay[]>(initial.days)
   const [setActive, setSetActive] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
   const [step, setStep] = useState(0)
+  // The day the exercise search sheet adds to.
+  const [sheetDay, setSheetDay] = useState<string | null>(null)
 
   const errors = useMemo(() => validate({ name, days }), [name, days])
   const isValid = errors.length === 0
@@ -122,10 +119,10 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
     setDays((prev) => (prev.length <= 1 ? prev : prev.filter((d) => d._key !== key)))
   }
 
-  function addExercise(dayKey: string) {
+  function addExercise(dayKey: string, name: string) {
     setDays((prev) =>
       prev.map((d) =>
-        d._key === dayKey ? { ...d, exercises: [...d.exercises, emptyExercise()] } : d,
+        d._key === dayKey ? { ...d, exercises: [...d.exercises, emptyExercise(name)] } : d,
       ),
     )
   }
@@ -157,6 +154,7 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
       return
     }
     setSubmitting(true)
+    setSaveFailed(false)
     try {
       const content: WorkoutPlan['content'] = {
         name: name.trim(),
@@ -195,9 +193,9 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
         toast.success('Workout plan updated')
         router.push(`/plans/view?id=${initialPlan.id}`)
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to save plan'
-      toast.error(message)
+    } catch {
+      // Said in the dock above Try again; the answers stay as they were.
+      setSaveFailed(true)
     } finally {
       setSubmitting(false)
     }
@@ -207,33 +205,41 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
   const blocking = stepErrors(current, errors)
   const last = step === STEPS.length - 1
   const copy = {
-    name: { question: mode === 'create' ? 'What should we call this program?' : 'Rename it, or keep going', why: 'A name you will recognise later. Dates and notes are optional.' },
+    name: { question: mode === 'create' ? 'What should we call this program?' : 'Rename it, or keep going', why: mode === 'create' ? 'A name you\'ll recognise later. Dates and notes are optional.' : 'Saving keeps the old version in History.' },
     days: { question: 'Plan your training days', why: 'Add exercises to each day, or mark it as a rest day.' },
   }[current]
+  const sheetIndex = days.findIndex((d) => d._key === sheetDay)
 
   return (
+    <>
     <PlanBuilderStep
-      title={mode === 'create' ? 'New training program' : 'Edit training program'}
+      title={mode === 'create' ? 'New training plan' : 'Edit training plan'}
       step={step}
       steps={STEPS.length}
       stepKey={current}
       question={copy.question}
       why={copy.why}
       onBack={() => (step > 0 ? setStep(step - 1) : goBack(router, '/plans'))}
-      cta={last ? 'Save plan' : 'Continue'}
+      cta={saveFailed && last ? 'Try again' : last ? (mode === 'create' ? 'Save program' : 'Save changes') : 'Continue'}
       canContinue={last ? isValid : blocking.length === 0}
       busy={submitting}
-      notice={current === 'days' ? blocking[0] : undefined}
+      notice={saveFailed && last ? "That didn't save. Check your connection and try again." : current === 'days' ? blocking[0] : undefined}
       onContinue={() => (last ? void handleSubmit() : setStep(step + 1))}
     >
       {current === 'name' ? (
-        <div className="space-y-6">
-          <PlanNameField value={name} onChange={setName} placeholder="e.g. Push Pull Legs" />
-          <PlanDateRangeField startDate={startDate} endDate={endDate} onChange={(next) => { setStartDate(next.startDate); setEndDate(next.endDate) }} />
-          <BuilderNotes value={notes} onChange={setNotes} placeholder="Anything Geo should know about this program" />
-        </div>
+        <NameStep
+          name={name}
+          onName={setName}
+          placeholder="e.g. Push Pull Legs"
+          startDate={startDate}
+          endDate={endDate}
+          onDates={(next) => { setStartDate(next.startDate); setEndDate(next.endDate) }}
+          notes={notes}
+          onNotes={setNotes}
+          notesPlaceholder="Anything Geo should know about this program"
+        />
       ) : (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-2.5">
           {days.map((day, dayIndex) => (
             <DayCard
               key={day._key}
@@ -242,16 +248,35 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
               canRemove={days.length > 1}
               onPatch={(patch) => patchDay(day._key, patch)}
               onRemove={() => removeDay(day._key)}
-              onAddExercise={() => addExercise(day._key)}
+              onAddExercise={() => setSheetDay(day._key)}
               onPatchExercise={(exKey, patch) => patchExercise(day._key, exKey, patch)}
               onRemoveExercise={(exKey) => removeExercise(day._key, exKey)}
             />
           ))}
-          <AddRowButton label="Add day" onClick={addDay} />
-          {mode === 'create' ? <ActiveToggle checked={setActive} onChange={setSetActive} /> : null}
+          <AddButton onClick={addDay}>Add day</AddButton>
+          {mode === 'create' ? <div className="mt-1"><ActiveSwitch checked={setActive} onChange={setSetActive} /></div> : null}
         </div>
       )}
     </PlanBuilderStep>
+    <SearchSheet<ExerciseSearchResult>
+      open={sheetDay !== null}
+      onClose={() => setSheetDay(null)}
+      title={sheetIndex >= 0 ? `Add to day ${sheetIndex + 1}` : 'Add exercise'}
+      label="Search exercises"
+      placeholder="Search exercises"
+      search={searchExercises}
+      getKey={(item) => item.id}
+      renderItem={(item) => (
+        <span className="min-w-0 flex-1">
+          <span className="block text-body font-bold text-ink [overflow-wrap:anywhere]">{item.name}</span>
+          {item.primary_muscles?.length ? <span className="block truncate text-caption text-ink-65">{item.primary_muscles.map((m) => m.charAt(0).toUpperCase() + m.slice(1)).join(', ')}</span> : null}
+        </span>
+      )}
+      onPick={(item) => { if (sheetDay) addExercise(sheetDay, item.name) }}
+      onPickTyped={(text) => { if (sheetDay) addExercise(sheetDay, text) }}
+      footnote="Starts at 3 sets of 10. Change them on the day."
+    />
+    </>
   )
 }
 
@@ -275,103 +300,51 @@ function DayCard({
   onRemoveExercise: (exKey: string) => void
 }) {
   return (
-    <DayCardShell
-      index={index}
-      header={(
+    <section aria-label={`Day ${index + 1}`} className={`${CARD} overflow-hidden`}>
+      <div className="flex min-h-[60px] items-center gap-2 px-3 py-2">
         <input
           aria-label={`Day ${index + 1} name`}
           value={day.name}
           onChange={(e) => onPatch({ name: e.target.value })}
-          className="h-12 min-w-0 flex-1 rounded-[14px] bg-ink-04 px-3 text-[16px] font-semibold text-ink outline outline-0 -outline-offset-1 outline-ink focus:outline-2"
+          className="h-11 min-w-0 flex-1 rounded-[14px] bg-ink-04 px-3.5 text-body font-semibold text-ink outline-none focus:shadow-[inset_0_0_0_2px_var(--color-ink)]"
         />
-      )}
-      onRemove={canRemove ? onRemove : undefined}
-    >
-      <button
-        type="button"
-        aria-pressed={day.is_rest_day}
-        onClick={() => { void haptic('selection'); onPatch({ is_rest_day: !day.is_rest_day }) }}
-        className={cn('min-h-11 rounded-full px-4 text-[14px] font-semibold transition-transform active:scale-[.96]', day.is_rest_day ? 'bg-ink text-cream' : 'bg-ink-06 text-ink')}
-      >
-        Rest day
-      </button>
-      {!day.is_rest_day ? (
+        <button
+          type="button"
+          aria-pressed={day.is_rest_day}
+          onClick={() => { void haptic('selection'); onPatch({ is_rest_day: !day.is_rest_day }) }}
+          className={`min-h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold transition-transform active:scale-[.96] ${day.is_rest_day ? 'bg-ink text-cream' : 'bg-ink-04 text-ink'}`}
+        >
+          Rest day
+        </button>
+        {canRemove ? <RemoveButton label={`Remove day ${index + 1}`} onClick={onRemove} /> : null}
+      </div>
+      {day.is_rest_day ? (
+        <p className="px-4 pb-3.5 text-caption text-ink-65">A recovery day. No exercises needed.</p>
+      ) : (
         <>
           {day.exercises.map((ex, exIndex) => (
-            <ExerciseRow
-              key={ex._key}
-              exercise={ex}
-              index={exIndex}
-              onPatch={(patch) => onPatchExercise(ex._key, patch)}
-              onRemove={() => onRemoveExercise(ex._key)}
-            />
+            <ExerciseRow key={ex._key} exercise={ex} index={exIndex} onPatch={(patch) => onPatchExercise(ex._key, patch)} onRemove={() => onRemoveExercise(ex._key)} />
           ))}
-          <AddRowButton label="Add exercise" onClick={onAddExercise} />
+          <div className="px-3 pb-3 pt-1"><AddButton onClick={onAddExercise}>Add exercise</AddButton></div>
         </>
-      ) : null}
-    </DayCardShell>
+      )}
+    </section>
   )
 }
 
-function ExerciseRow({
-  exercise,
-  index,
-  onPatch,
-  onRemove,
-}: {
-  exercise: DraftExercise
-  index: number
-  onPatch: (patch: Partial<DraftExercise>) => void
-  onRemove: () => void
-}) {
+/** W1: the exercise, then Sets, Reps and kg as three labelled cells. */
+function ExerciseRow({ exercise, index, onPatch, onRemove }: { exercise: DraftExercise; index: number; onPatch: (patch: Partial<DraftExercise>) => void; onRemove: () => void }) {
+  const name = exercise.name || `Exercise ${index + 1}`
   return (
-    <div className="space-y-3 border-b border-ink-06 pb-4">
-      <div className="flex items-start gap-2">
-        <div className="min-w-0 flex-1">
-          <SearchablePicker<ExerciseSearchResult>
-            label={`Exercise ${index + 1}`}
-            placeholder="Search exercises"
-            search={searchExercises}
-            renderItem={(item) => (
-              <div>
-                <div className="text-ink">{item.name}</div>
-                {item.primary_muscles && item.primary_muscles.length > 0 ? (
-                  <div className="text-[13px] text-ink-65">
-                    {item.primary_muscles.join(', ')}
-                  </div>
-                ) : null}
-              </div>
-            )}
-            getItemKey={(item) => item.id}
-            onSelect={(item) => onPatch({ name: item.name })}
-            value={exercise.name || undefined}
-            onClear={() => onPatch({ name: '' })}
-          />
-        </div>
-        <RemoveRowButton label={`Remove exercise ${index + 1}`} onClick={onRemove} />
+    <div className="border-t border-ink-06 px-4 py-2.5">
+      <div className="flex items-center gap-2">
+        <p className="min-w-0 flex-1 text-body font-bold text-ink [overflow-wrap:anywhere]">{name}</p>
+        <RemoveButton label={`Remove ${name}`} onClick={onRemove} />
       </div>
-      <div className="grid grid-cols-3 gap-2">
-        <NumberField
-          label="Sets"
-          value={exercise.sets}
-          onChange={(v) => onPatch({ sets: v })}
-          min={1}
-          max={20}
-        />
-        <NumberField
-          label="Reps"
-          value={exercise.reps}
-          onChange={(v) => onPatch({ reps: v })}
-          min={1}
-          max={200}
-        />
-        <NumberField
-          label="Weight"
-          suffix="kg"
-          value={exercise.weight}
-          onChange={(v) => onPatch({ weight: v })}
-          min={0}
-        />
+      <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+        <NumberCell label="Sets" ariaLabel={`${name} sets`} min={1} value={exercise.sets} onChange={(v) => onPatch({ sets: v })} />
+        <NumberCell label="Reps" ariaLabel={`${name} reps`} min={1} value={exercise.reps} onChange={(v) => onPatch({ reps: v })} />
+        <NumberCell label="kg" ariaLabel={`${name} weight, kg`} value={exercise.weight} onChange={(v) => onPatch({ weight: v })} />
       </div>
     </div>
   )

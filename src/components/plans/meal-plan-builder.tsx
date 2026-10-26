@@ -3,21 +3,16 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import {
-  PlanNameField,
-  PlanDateRangeField,
-  NumberField,
-  SearchablePicker,
-  AddRowButton,
-  RemoveRowButton,
-} from '@/components/plans/plan-builder-shared'
+import { ActiveSwitch, AddButton, NameStep, NumberCell, RemoveButton, TargetStepper } from '@/components/plans/builder-fields'
+import { SearchSheet } from '@/components/plans/search-sheet'
+import { CARD } from '@/components/plans/spatial-parts'
 import { DateInput } from '@/components/ui/fiqr/date-input'
 import { createPlan, updatePlan, activatePlan } from '@/lib/api/plans.api'
 import { searchFoods } from '@/lib/api/foods.api'
 import type { FoodSearchResult } from '@/types/foods.types'
 import type { MealPlan, MealPlanDay, MealPlanMeal } from '@/types/plans.types'
 import { PlanBuilderStep } from '@/components/plans/plan-builder-step'
-import { ActiveToggle, BuilderNotes, DayCardShell, stepErrors } from '@/components/plans/plan-builder-parts'
+import { stepErrors } from '@/components/plans/plan-builder-parts'
 import { goBack } from '@/lib/navigation'
 import { Chip } from '@/components/ui/fiqr/chip'
 import { haptic } from '@/lib/platform/app'
@@ -54,20 +49,13 @@ function todayPlus(days: number): string {
   return d.toISOString().slice(0, 10)
 }
 
-function emptyMeal(type = 'Breakfast'): DraftMeal {
-  return {
-    _key: nextKey(),
-    type,
-    name: '',
-    calories: undefined,
-    protein: undefined,
-    carbs: undefined,
-    fat: undefined,
-  }
+function newMeal(type: string, food: Partial<MealPlanMeal> = {}): DraftMeal {
+  return { _key: nextKey(), type, name: '', calories: undefined, protein: undefined, carbs: undefined, fat: undefined, ...food }
 }
 
+/** A new day starts empty: meals come from the food search sheet (Add meal). */
 function emptyDay(index: number): DraftDay {
-  return { _key: nextKey(), date: todayPlus(index), meals: [emptyMeal('Breakfast')] }
+  return { _key: nextKey(), date: todayPlus(index), meals: [] }
 }
 
 function fromInitial(plan: MealPlan | undefined): {
@@ -123,7 +111,11 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
   const [days, setDays] = useState<DraftDay[]>(initial.days)
   const [setActive, setSetActive] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
   const [step, setStep] = useState(0)
+  // The day the food search sheet adds to, and the meal type it adds as.
+  const [sheetDay, setSheetDay] = useState<string | null>(null)
+  const [mealType, setMealType] = useState('Breakfast')
 
   const errors = useMemo(() => validate({ name, targets, days }), [name, targets, days])
   const isValid = errors.length === 0
@@ -137,10 +129,14 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
   function patchDay(key: string, patch: Partial<DraftDay>) {
     setDays((prev) => prev.map((d) => (d._key === key ? { ...d, ...patch } : d)))
   }
-  function addMeal(dayKey: string) {
+  function addMeal(dayKey: string, meal: DraftMeal) {
     setDays((prev) =>
-      prev.map((d) => (d._key === dayKey ? { ...d, meals: [...d.meals, emptyMeal()] } : d)),
+      prev.map((d) => (d._key === dayKey ? { ...d, meals: [...d.meals, meal] } : d)),
     )
+  }
+  function openSheet(dayKey: string, count: number) {
+    setMealType(MEAL_TYPES[Math.min(count, MEAL_TYPES.length - 1)])
+    setSheetDay(dayKey)
   }
   function removeMeal(dayKey: string, mealKey: string) {
     setDays((prev) =>
@@ -168,6 +164,7 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
       return
     }
     setSubmitting(true)
+    setSaveFailed(false)
     try {
       const content: MealPlan['content'] = {
         // R7 #11 — persist the plan name so a rename in the editor sticks
@@ -207,9 +204,9 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
         toast.success('Nutrition plan updated')
         router.push(`/plans/view?id=${initialPlan.id}`)
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to save plan'
-      toast.error(message)
+    } catch {
+      // Said in the dock above Try again (mock C1 "Didn't save"); the answers stay as they were.
+      setSaveFailed(true)
     } finally {
       setSubmitting(false)
     }
@@ -219,12 +216,16 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
   const blocking = stepErrors(current, errors)
   const last = step === STEPS.length - 1
   const copy = {
-    name: { question: mode === 'create' ? 'What should we call this plan?' : 'Rename it, or keep going', why: 'A name you will recognise later. Dates and notes are optional.' },
-    targets: { question: 'What are your daily targets?', why: 'Home and the food diary measure each day against these.' },
+    name: { question: mode === 'create' ? 'What should we call this plan?' : 'Rename it, or keep going', why: mode === 'create' ? 'A name you\'ll recognise later. Dates and notes are optional.' : 'Saving keeps the old version in History.' },
+    targets: { question: 'What are your daily targets?', why: 'Home and your food diary measure each day against these.' },
     days: { question: 'What does a day of eating look like?', why: 'Search a food to fill in its numbers. You can change any of them.' },
   }[current]
+  const sheetIndex = days.findIndex((d) => d._key === sheetDay)
+  const macroKcal = (targets.protein ?? 0) * 4 + (targets.carbs ?? 0) * 4 + (targets.fat ?? 0) * 9
+  const gap = macroKcal - (targets.calories ?? 0)
 
   return (
+    <>
     <PlanBuilderStep
       title={mode === 'create' ? 'New nutrition plan' : 'Edit nutrition plan'}
       step={step}
@@ -233,52 +234,90 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
       question={copy.question}
       why={copy.why}
       onBack={() => (step > 0 ? setStep(step - 1) : goBack(router, '/plans'))}
-      cta={last ? 'Save plan' : 'Continue'}
+      cta={saveFailed && last ? 'Try again' : last ? (mode === 'create' ? 'Save plan' : 'Save changes') : 'Continue'}
       canContinue={last ? isValid : blocking.length === 0}
       busy={submitting}
-      notice={current !== 'name' ? blocking[0] : undefined}
+      notice={saveFailed && last ? "That didn't save. Check your connection and try again." : current !== 'name' ? blocking[0] : undefined}
       onContinue={() => (last ? void handleSubmit() : setStep(step + 1))}
     >
       {current === 'name' ? (
-        <div className="space-y-6">
-          <PlanNameField value={name} onChange={setName} placeholder="e.g. Cut phase" />
-          <PlanDateRangeField startDate={startDate} endDate={endDate} onChange={(next) => { setStartDate(next.startDate); setEndDate(next.endDate) }} />
-          <BuilderNotes value={notes} onChange={setNotes} placeholder="Anything Geo should keep in mind" />
-        </div>
+        <NameStep
+          name={name}
+          onName={setName}
+          placeholder="e.g. Cut phase"
+          startDate={startDate}
+          endDate={endDate}
+          onDates={(next) => { setStartDate(next.startDate); setEndDate(next.endDate) }}
+          notes={notes}
+          onNotes={setNotes}
+          notesPlaceholder="Anything Geo should keep in mind"
+        />
       ) : current === 'targets' ? (
-        <div className="grid grid-cols-2 gap-[10px]">
-          {([['calories', 'Calories', 'kcal'], ['protein', 'Protein', 'g'], ['carbs', 'Carbs', 'g'], ['fat', 'Fat', 'g']] as const).map(([key, label, suffix]) => (
-            <div key={key} className="rounded-[22px] bg-card p-4 shadow-[var(--shadow-card)]">
-              <NumberField label={label} suffix={suffix} value={targets[key]} onChange={(v) => setTargets((t) => ({ ...t, [key]: v }))} min={0} />
-            </div>
-          ))}
+        <div className="flex flex-col gap-2.5">
+          <TargetStepper label="Calories" macro="calories" unit="kcal" step={50} value={targets.calories} onChange={(v) => setTargets((t) => ({ ...t, calories: v }))} />
+          <TargetStepper label="Protein" macro="protein" unit="g" step={5} value={targets.protein} onChange={(v) => setTargets((t) => ({ ...t, protein: v }))} />
+          <TargetStepper label="Carbs" macro="carbs" unit="g" step={5} value={targets.carbs} onChange={(v) => setTargets((t) => ({ ...t, carbs: v }))} />
+          <TargetStepper label="Fat" macro="fat" unit="g" step={5} value={targets.fat} onChange={(v) => setTargets((t) => ({ ...t, fat: v }))} />
+          <p className="mx-1.5 mt-0.5 text-caption text-ink-65">
+            Protein, carbs and fat add up to {Math.round(macroKcal).toLocaleString('en-AU')} kcal{Math.abs(gap) > 50 ? `, ${Math.round(Math.abs(gap)).toLocaleString('en-AU')} ${gap < 0 ? 'under' : 'over'} the calorie target` : ''}.
+          </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-2.5">
           {days.map((day, dayIndex) => (
             <MealDayCard
               key={day._key}
               day={day}
               index={dayIndex}
+              total={days.length}
               canRemove={days.length > 1}
               onPatch={(patch) => patchDay(day._key, patch)}
               onRemove={() => removeDay(day._key)}
-              onAddMeal={() => addMeal(day._key)}
+              onAddMeal={() => openSheet(day._key, day.meals.length)}
               onRemoveMeal={(mealKey) => removeMeal(day._key, mealKey)}
               onPatchMeal={(mealKey, patch) => patchMeal(day._key, mealKey, patch)}
             />
           ))}
-          <AddRowButton label="Add day" onClick={addDay} />
-          {mode === 'create' ? <ActiveToggle checked={setActive} onChange={setSetActive} /> : null}
+          <AddButton onClick={addDay}>Add day</AddButton>
+          {mode === 'create' ? <div className="mt-1"><ActiveSwitch checked={setActive} onChange={setSetActive} /></div> : null}
         </div>
       )}
     </PlanBuilderStep>
+    <SearchSheet<FoodSearchResult>
+      open={sheetDay !== null}
+      onClose={() => setSheetDay(null)}
+      title={`Add to day ${sheetIndex + 1}`}
+      label="Search foods"
+      placeholder="Search foods"
+      search={searchFoods}
+      getKey={(item) => item.id ?? item.name}
+      chips={(
+        <div role="group" aria-label="Meal" data-no-swipe-back className="scrollbar-hide -mx-3.5 mb-2.5 flex gap-2 overflow-x-auto px-3.5">
+          {MEAL_TYPES.map((type) => (
+            <Chip key={type} selected={mealType === type} onClick={() => { void haptic('selection'); setMealType(type) }} className="shrink-0 transition-transform active:scale-[.96]">{type}</Chip>
+          ))}
+        </div>
+      )}
+      renderItem={(item) => (
+        <>
+          <span className="min-w-0 flex-1">
+            <span className="block text-body font-bold text-ink [overflow-wrap:anywhere]">{item.name}</span>
+            <span className="block truncate text-caption text-ink-65">{[item.brand, `${Math.round(item.serving_size_g)} g`, item.macros_per_serving.protein != null ? `${Math.round(item.macros_per_serving.protein)} g protein` : null].filter(Boolean).join(', ')}</span>
+          </span>
+          <span className="shrink-0 text-body font-bold text-ink tabular-nums">{Math.round(item.macros_per_serving.calories ?? 0)}<span className="text-caption font-semibold text-ink-65"> kcal</span></span>
+        </>
+      )}
+      onPick={(item) => { if (sheetDay) addMeal(sheetDay, newMeal(mealType, { name: item.name, calories: item.macros_per_serving.calories, protein: item.macros_per_serving.protein, carbs: item.macros_per_serving.carbs, fat: item.macros_per_serving.fat })) }}
+      onPickTyped={(text) => { if (sheetDay) addMeal(sheetDay, newMeal(mealType, { name: text })) }}
+    />
+    </>
   )
 }
 
 function MealDayCard({
   day,
   index,
+  total,
   canRemove,
   onPatch,
   onRemove,
@@ -288,6 +327,7 @@ function MealDayCard({
 }: {
   day: DraftDay
   index: number
+  total: number
   canRemove: boolean
   onPatch: (patch: Partial<DraftDay>) => void
   onRemove: () => void
@@ -296,84 +336,39 @@ function MealDayCard({
   onPatchMeal: (mealKey: string, patch: Partial<DraftMeal>) => void
 }) {
   return (
-    <DayCardShell
-      index={index}
-      header={(
-        <DateInput
-          ariaLabel={`Day ${index + 1} date`}
-          value={day.date}
-          onChange={(date) => onPatch({ date })}
-          placeholder="Pick a date"
-          className="h-12 min-w-0 flex-1 bg-ink-04 text-[16px] font-semibold"
-        />
-      )}
-      onRemove={canRemove ? onRemove : undefined}
-    >
+    <section aria-label={`Day ${index + 1}`} className={`${CARD} overflow-hidden`}>
+      <div className="flex min-h-14 items-center gap-1 border-b border-ink-06 pl-1 pr-3">
+        <div className="min-w-0 flex-1">
+          <DateInput ariaLabel={`Day ${index + 1} date`} value={day.date} onChange={(date) => onPatch({ date })} placeholder="Pick a date" className="h-14 text-body font-bold" />
+        </div>
+        <span className="shrink-0 text-caption text-ink-65">Day {index + 1} of {total}</span>
+        {canRemove ? <RemoveButton label={`Remove day ${index + 1}`} onClick={onRemove} /> : null}
+      </div>
       {day.meals.map((meal, mealIndex) => (
-        <MealRow
-          key={meal._key}
-          meal={meal}
-          index={mealIndex}
-          onPatch={(patch) => onPatchMeal(meal._key, patch)}
-          onRemove={() => onRemoveMeal(meal._key)}
-        />
+        <MealRow key={meal._key} meal={meal} index={mealIndex} onPatch={(patch) => onPatchMeal(meal._key, patch)} onRemove={() => onRemoveMeal(meal._key)} />
       ))}
-      <AddRowButton label="Add meal" onClick={onAddMeal} />
-    </DayCardShell>
+      <div className="p-3"><AddButton onClick={onAddMeal}>Add meal</AddButton></div>
+    </section>
   )
 }
 
-function MealRow({
-  meal,
-  index,
-  onPatch,
-  onRemove,
-}: {
-  meal: DraftMeal
-  index: number
-  onPatch: (patch: Partial<DraftMeal>) => void
-  onRemove: () => void
-}) {
+/** A planned food: type, name, its four numbers as typeable cells (the search fills them; any can change). */
+function MealRow({ meal, index, onPatch, onRemove }: { meal: DraftMeal; index: number; onPatch: (patch: Partial<DraftMeal>) => void; onRemove: () => void }) {
+  const name = meal.name || `Meal ${index + 1}`
   return (
-    <div className="space-y-3 border-b border-ink-06 pb-4">
+    <div className="border-b border-ink-06 px-4 py-2.5">
       <div className="flex items-start gap-2">
-        <div className="min-w-0 flex-1 space-y-3">
-          <div role="group" aria-label={`Meal ${index + 1} type`} className="flex flex-wrap gap-2">
-            {MEAL_TYPES.map((type) => (
-              <Chip key={type} selected={meal.type === type} onClick={() => { void haptic('selection'); onPatch({ type }) }} className="transition-transform active:scale-[.96]">{type}</Chip>
-            ))}
-          </div>
-          <SearchablePicker<FoodSearchResult>
-            label={`Meal ${index + 1}`}
-            placeholder="Search foods"
-            search={(q) => searchFoods(q)}
-            renderItem={(item) => (
-              <div>
-                <div className="text-ink">{item.name}</div>
-                {item.brand ? <div className="text-[13px] text-ink-65">{item.brand}</div> : null}
-              </div>
-            )}
-            getItemKey={(item) => item.id ?? item.name}
-            onSelect={(item) => {
-              onPatch({
-                name: item.name,
-                calories: item.macros_per_serving.calories,
-                protein: item.macros_per_serving.protein,
-                carbs: item.macros_per_serving.carbs,
-                fat: item.macros_per_serving.fat,
-              })
-            }}
-            value={meal.name || undefined}
-            onClear={() => onPatch({ name: '' })}
-          />
+        <div className="min-w-0 flex-1">
+          <p className="text-caption text-ink-65">{meal.type}</p>
+          <p className="text-body font-bold text-ink [overflow-wrap:anywhere]">{name}</p>
         </div>
-        <RemoveRowButton label={`Remove meal ${index + 1}`} onClick={onRemove} />
+        <RemoveButton label={`Remove ${name}`} onClick={onRemove} />
       </div>
-      <div className="grid grid-cols-4 gap-2">
-        <NumberField label="Cal" value={meal.calories} onChange={(v) => onPatch({ calories: v })} min={0} />
-        <NumberField label="P" suffix="g" value={meal.protein} onChange={(v) => onPatch({ protein: v })} min={0} />
-        <NumberField label="C" suffix="g" value={meal.carbs} onChange={(v) => onPatch({ carbs: v })} min={0} />
-        <NumberField label="F" suffix="g" value={meal.fat} onChange={(v) => onPatch({ fat: v })} min={0} />
+      <div className="mt-1.5 grid grid-cols-2 gap-1.5 min-[380px]:grid-cols-4">
+        <NumberCell label="kcal" ariaLabel={`${name} calories`} value={meal.calories} onChange={(v) => onPatch({ calories: v })} />
+        <NumberCell label="P" ariaLabel={`${name} protein, grams`} value={meal.protein} onChange={(v) => onPatch({ protein: v })} />
+        <NumberCell label="C" ariaLabel={`${name} carbs, grams`} value={meal.carbs} onChange={(v) => onPatch({ carbs: v })} />
+        <NumberCell label="F" ariaLabel={`${name} fat, grams`} value={meal.fat} onChange={(v) => onPatch({ fat: v })} />
       </div>
     </div>
   )

@@ -72,10 +72,13 @@ const INACTIVE_API = plansApi({ '/v1/plans/old-1': { ...WORKOUT, id: 'old-1', st
 const wait = (p, ms = 700) => p.waitForTimeout(ms)
 const cont = async (p) => { await p.getByRole('button', { name: 'Continue' }).click(); await wait(p) }
 const name = (p, value) => p.getByLabel('Plan name').fill(value)
-async function pick(p, placeholder, query, option) {
+/** Opens the add sheet (Add meal / Add exercise), searches and picks a result; the sheet closes on pick. */
+async function pick(p, placeholder, query, option, opener = placeholder === 'Search foods' ? 'Add meal' : 'Add exercise') {
+  await p.getByRole('button', { name: opener }).first().click()
+  await wait(p, 600)
   await p.getByPlaceholder(placeholder).first().fill(query)
   await p.getByRole('button', { name: option }).first().click()
-  await wait(p, 400)
+  await wait(p, 800)
 }
 
 const s = (shot) => ({ done: DONE, api: plansApi(), ...shot })
@@ -112,12 +115,14 @@ const shots = [
   s({ name: 'new-meal-targets', url: '/plans/new/meal', act: async (p) => { await name(p, 'Cut phase'); await cont(p) } }),
   s({ name: 'new-meal-days-invalid', url: '/plans/new/meal', act: async (p) => { await name(p, 'Cut phase'); await cont(p); await cont(p) } }),
   s({ name: 'new-meal-days-filled', url: '/plans/new/meal', act: async (p) => { await name(p, 'Cut phase'); await cont(p); await cont(p); await pick(p, 'Search foods', 'pumpkin', new RegExp('^Slow-roasted')) } }),
-  s({ name: 'new-meal-search', url: '/plans/new/meal', act: async (p) => { await name(p, 'Cut phase'); await cont(p); await cont(p); await p.getByPlaceholder('Search foods').fill('yog'); await wait(p, 900) } }),
+  s({ name: 'new-meal-search', url: '/plans/new/meal', act: async (p) => { await name(p, 'Cut phase'); await cont(p); await cont(p); await p.getByRole('button', { name: 'Add meal' }).click(); await wait(p, 600); await p.getByPlaceholder('Search foods').fill('yog'); await wait(p, 900) } }),
   s({ name: 'new-meal-saving', url: '/plans/new/meal', hang: ['/v1/plans'], act: async (p) => { await name(p, 'Cut phase'); await cont(p); await cont(p); await pick(p, 'Search foods', 'yog', /^Greek yoghurt/); await p.getByRole('button', { name: 'Save plan' }).click(); await wait(p, 400) } }),
   s({ name: 'new-meal-error', url: '/plans/new/meal', fail: ['/v1/plans'], failMessage: "We couldn't save that. Check your connection and try again.", act: async (p) => { await name(p, 'Cut phase'); await cont(p); await cont(p); await pick(p, 'Search foods', 'yog', /^Greek yoghurt/); await p.getByRole('button', { name: 'Save plan' }).click(); await wait(p, 900) } }),
   s({ name: 'new-workout-empty', url: '/plans/new/workout' }),
   s({ name: 'new-workout-days-invalid', url: '/plans/new/workout', act: async (p) => { await name(p, 'Push Pull Legs'); await cont(p) } }),
-  s({ name: 'new-workout-days-filled', url: '/plans/new/workout', act: async (p) => { await name(p, 'Push Pull Legs'); await cont(p); await p.getByRole('button', { name: 'Add exercise' }).click(); await pick(p, 'Search exercises', 'press', /^Single-arm/); await p.getByRole('button', { name: 'Add day' }).click(); await p.getByRole('button', { name: 'Rest day' }).nth(1).click() } }),
+  s({ name: 'new-workout-days-filled', url: '/plans/new/workout', act: async (p) => { await name(p, 'Push Pull Legs'); await cont(p); await pick(p, 'Search exercises', 'press', /^Single-arm/); await pick(p, 'Search exercises', 'bench', /^Bench press/); await p.getByRole('button', { name: 'Add day' }).click(); await p.getByRole('button', { name: 'Rest day' }).nth(1).click() } }),
+  s({ name: 'new-workout-search', url: '/plans/new/workout', act: async (p) => { await name(p, 'Push Pull Legs'); await cont(p); await p.getByRole('button', { name: 'Add exercise' }).click(); await wait(p, 600); await p.getByPlaceholder('Search exercises').fill('press'); await wait(p, 900) } }),
+  s({ name: 'new-workout-error', url: '/plans/new/workout', fail: ['/v1/plans'], act: async (p) => { await name(p, 'Push Pull Legs'); await cont(p); await pick(p, 'Search exercises', 'bench', /^Bench press/); await p.getByRole('button', { name: 'Save program' }).click(); await wait(p, 900) } }),
   s({ name: 'edit-workout', url: '/plans/edit?id=work-1' }),
   s({ name: 'edit-workout-days', url: '/plans/edit?id=work-1', act: async (p) => { await cont(p) } }),
   s({ name: 'edit-meal-targets', url: '/plans/edit?id=meal-1', act: async (p) => { await cont(p) } }),

@@ -43,7 +43,7 @@ describe('EditPlanPage', () => {
       updated_at: 'n',
     })
     render(<EditPlanView id="p1" />)
-    await waitFor(() => expect(screen.getByText('Edit training program')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Edit training plan')).toBeInTheDocument())
   })
 
   it('routes to MealPlanBuilder for nutrition plans', async () => {

@@ -105,7 +105,7 @@ describe('MealPlanBuilder component', () => {
     render(<MealPlanBuilder mode="create" />)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     await toDays('Cut')
-    expect(screen.getByRole('status')).toHaveTextContent('Day 1 meal 1 needs a name')
+    expect(screen.getByRole('status')).toHaveTextContent('Day 1 needs at least one meal')
     expect((await screen.findByRole('button', { name: 'Save plan' }))).toBeDisabled()
   })
 
@@ -128,11 +128,14 @@ describe('MealPlanBuilder component', () => {
     render(<MealPlanBuilder mode="create" />)
     await toDays('Cut')
 
-    fireEvent.change(screen.getByPlaceholderText('Search foods'), { target: { value: 'oat' } })
+    fireEvent.click(screen.getByText('Add meal'))
+    fireEvent.change(await screen.findByPlaceholderText('Search foods'), { target: { value: 'oat' } })
     await waitFor(() => screen.getByText('Oats'))
     fireEvent.click(screen.getByText('Oats'))
+    expect(await screen.findByLabelText('Oats calories')).toHaveValue(150)
 
-    const submit = (await screen.findByRole('button', { name: 'Save plan' }))
+    // The sheet's modal layer may still hide the page while it closes in jsdom.
+    const submit = (await screen.findByRole('button', { name: 'Save plan', hidden: true }))
     await waitFor(() => expect(submit).not.toBeDisabled())
     fireEvent.click(submit)
 
@@ -148,7 +151,7 @@ describe('MealPlanBuilder component', () => {
     expect(toastSuccess).toHaveBeenCalledWith('Nutrition plan created')
   })
 
-  it('shows toast on create failure', async () => {
+  it('says in the dock when the save fails, and offers Try again', async () => {
     searchFoodsMock.mockResolvedValue([
       {
         id: 'f',
@@ -164,11 +167,13 @@ describe('MealPlanBuilder component', () => {
 
     render(<MealPlanBuilder mode="create" />)
     await toDays('Cut')
-    fireEvent.change(screen.getByPlaceholderText('Search foods'), { target: { value: 'ri' } })
+    fireEvent.click(screen.getByText('Add meal'))
+    fireEvent.change(await screen.findByPlaceholderText('Search foods'), { target: { value: 'ri' } })
     await waitFor(() => screen.getByText('Rice'))
     fireEvent.click(screen.getByText('Rice'))
-    fireEvent.click((await screen.findByRole('button', { name: 'Save plan' })))
-    await waitFor(() => expect(toastError).toHaveBeenCalledWith('nope'))
+    fireEvent.click((await screen.findByRole('button', { name: 'Save plan', hidden: true })))
+    await waitFor(() => expect(screen.getByRole('status', { hidden: true })).toHaveTextContent("That didn't save. Check your connection and try again."))
+    expect(screen.getByRole('button', { name: 'Try again', hidden: true })).toBeEnabled()
   })
 
   it('edit mode pre-fills and calls updatePlan', async () => {
@@ -190,7 +195,7 @@ describe('MealPlanBuilder component', () => {
     await toDays('Recut')
     expect(screen.getByText('Eggs')).toBeInTheDocument()
 
-    fireEvent.click((await screen.findByRole('button', { name: 'Save plan' })))
+    fireEvent.click((await screen.findByRole('button', { name: 'Save changes' })))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-77')
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-77'))
