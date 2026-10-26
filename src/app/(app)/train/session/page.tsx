@@ -515,11 +515,12 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
           and jump into place when the push ends. A solid floating bar so it can animate in (a moving glass bar skips paints). */}
       {exercises.length > 0 && !summaryCovered ? createPortal(
       <motion.nav aria-label="Workout" initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={reduce ? reducedFade : spring.sheet} className="fixed inset-x-2 z-20 mx-auto max-w-[calc(28rem-16px)] rounded-[28px] bg-cream p-2 shadow-[var(--shadow-glass)]" style={{ bottom: 'calc(8px + var(--safe-bottom))' }}>
-        {allComplete || isLast ? (
-          <PrimaryButton type="button" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
-        ) : (
-          <div className="grid grid-cols-[1fr_1.4fr] gap-2">
-            <button type="button" onClick={() => goTo(currentIndex - 1)} disabled={currentIndex <= 0} className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-body font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:text-ink-35"><ChevronLeftIcon className="size-[18px]" /> Previous</button>
+        {/* Previous stays on every exercise; on the last one (or when all are done) Next becomes Finish workout. */}
+        <div className="grid grid-cols-[1fr_1.4fr] gap-2">
+          <button type="button" onClick={() => goTo(currentIndex - 1)} disabled={currentIndex <= 0} className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-body font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:text-ink-35"><ChevronLeftIcon className="size-[18px]" /> Previous</button>
+          {allComplete || isLast ? (
+            <PrimaryButton type="button" className="rounded-[18px] px-3" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
+          ) : (
             <button
               type="button"
               onClick={() => goTo(currentComplete && nextOpen >= 0 ? nextOpen : currentIndex + 1)}
@@ -527,8 +528,8 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
             >
               {currentComplete ? 'Next exercise' : 'Next'} <ChevronRightIcon className="size-[18px]" />
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </motion.nav>,
       document.body,
       ) : null}

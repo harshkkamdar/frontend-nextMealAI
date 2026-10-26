@@ -174,9 +174,9 @@ export default function ActivityPage() {
     <NextUpCard
       eyebrow={isResume ? `In progress · ${liveMinutes} min` : 'Today'}
       title={(isResume ? inProgress?.day_name : nextWorkout?.name) || `Day ${nextIdx + 1}`}
-      meta={isResume ? `${liveSets.filter((set) => set.completed).length} of ${liveSets.length} sets` : `${plural(exerciseCount, 'exercise')} · about ${Math.max(15, Math.round((exerciseCount * 7.5) / 5) * 5)} min`}
+      meta={isResume ? `${liveSets.filter((set) => set.completed).length} of ${liveSets.length} sets` : `${plural(exerciseCount, 'exercise')} · ${Math.max(15, Math.round((exerciseCount * 7.5) / 5) * 5)} min`}
       parts={heroParts}
-      chips={isResume ? undefined : heroChips.length > 4 ? [...heroChips.slice(0, 4), `+${heroChips.length - 4}`] : heroChips}
+      chips={isResume ? undefined : heroChips.length > 4 ? [...heroChips.slice(0, 3), `+${heroChips.length - 3}`] : heroChips}
       action={(
         <PrimaryButton type="button" disabled={starting} data-testid="activity-start-workout-button" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
           {starting ? 'Starting…' : isResume ? 'Resume workout' : 'Start workout'}

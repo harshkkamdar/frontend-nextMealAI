@@ -118,7 +118,7 @@ export function SessionReceipt({ session, tz, title = 'Session done', animate, o
         </ul>
       </motion.section>
 
-      <div className="sticky bottom-0 mt-auto bg-cream pt-4" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
+      <div className="sticky bottom-0 mt-auto bg-linear-to-b from-cream/0 to-cream to-[28px] pt-7" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
         <PrimaryButton type="button" onClick={onDone}>Done</PrimaryButton>
       </div>
     </div>
