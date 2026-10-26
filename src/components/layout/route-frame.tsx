@@ -26,8 +26,11 @@ interface Layer {
 }
 
 interface Step { kind: NavKind; top: Layer; old: Layer; settled: boolean }
-/** `front`: key of the page in front of a running slide (it carries the shadow); `moving`: a slide or fade is running. */
-interface Nav { stack: Layer[]; exiting: Layer[]; step: Step | null; front: string | null; moving: boolean }
+/**
+ * `front`: key of the page in front of a running slide (it carries the shadow); `moving`: a slide or fade is running;
+ * `deep`: a push caught the page under it mid-slide, so the page below that one still shows until it is covered.
+ */
+interface Nav { stack: Layer[]; exiting: Layer[]; step: Step | null; front: string | null; moving: boolean; deep?: boolean }
 
 const makeLayer = (key: string): Layer => ({ key, scrollY: 0, x: motionValue(0), dim: motionValue(0), opacity: motionValue(1) })
 /** Soft left-edge shadow on the page in front of a slide (ink 10%, Q2). */
@@ -66,7 +69,7 @@ function advance(nav: Nav, to: string): Nav {
   top.x.set(0)
   top.dim.set(0)
   if (kind === 'tab') return { stack: [top], exiting: [...exiting, old], step: { kind, top, old, settled: false }, front: null, moving: true }
-  return { stack: [...nav.stack, top], exiting, step: { kind, top, old, settled: false }, front: top.key, moving: true }
+  return { stack: [...nav.stack, top], exiting, step: { kind, top, old, settled: false }, front: top.key, moving: true, deep: old.x.get() > 0 }
 }
 
 /** The router contexts and page content a frozen layer keeps rendering. */
@@ -163,7 +166,7 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     const finish = () => {
       if (finished) return
       finished = true
-      if (active.current === entry) { active.current = null; setNav((n) => ({ ...n, front: null, moving: false })) }
+      if (active.current === entry) { active.current = null; setNav((n) => ({ ...n, front: null, moving: false, deep: false })) }
       done()
     }
     const controls = start()
@@ -172,11 +175,25 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     void Promise.all(controls.map((c) => c.finished)).then(finish, finish)
   }
 
-  /** Springs a push pair from progress `from` to `to` on one spring, so both pages and the dim stay tied. */
+  /**
+   * Springs a push pair from progress `from` to `to` on one spring, so both pages and the dim stay tied. The page
+   * underneath starts where it is: one caught mid-slide (a push over a page still sliding in, a push during a pop)
+   * keeps its offset from the pair geometry, and the offset shrinks to 0 as the spring arrives.
+   */
   const slide = (t: Layer, under: Layer | undefined, from: number, to: number, velocity: number) => {
     const p = motionValue(from)
-    setPair(t, under, from)
-    const unsub = p.on('change', (v) => setPair(t, under, v))
+    const w = window.innerWidth
+    const dx = under ? under.x.get() + PUSH_PARALLAX * w * (1 - from) : 0
+    const dDim = under ? under.dim.get() - PUSH_DIM * (1 - from) : 0
+    const place = (v: number) => {
+      setPair(t, under, v)
+      if (!under || from === to || (dx === 0 && dDim === 0)) return
+      const left = (v - to) / (from - to)
+      under.x.set(under.x.get() + dx * left)
+      under.dim.set(under.dim.get() + dDim * left)
+    }
+    place(from)
+    const unsub = p.on('change', place)
     const c = animate(p, to, { ...spring.push, velocity })
     void c.finished.then(unsub, unsub)
     return [c]
@@ -296,6 +313,7 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     if (layer === top) return 'top'
     if (i >= nav.stack.length) return 'leaving'
     if (i === underIndex) return nav.moving ? 'under' : 'covered'
+    if (i === underIndex - 1 && nav.moving && nav.deep) return 'under'
     return 'buried'
   }
   return (

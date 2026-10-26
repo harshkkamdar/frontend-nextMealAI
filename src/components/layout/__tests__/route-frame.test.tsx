@@ -62,3 +62,33 @@ describe('RouteFrame swipe-back', () => {
     touch('touchend', 30)
   })
 })
+
+describe('RouteFrame interrupted slides', () => {
+  it('a push during a running push starts the half-slid page from where it is, with no jump', async () => {
+    go('/foods')
+    await wait(80)
+    const before = x('/foods')
+    expect(before).toBeGreaterThan(0.1 * W)
+    go('/logs')
+    await wait(16)
+    // The page that was sliding in is now the one being covered: it continues from its live x, not from rest.
+    expect(Math.abs(x('/foods') - before)).toBeLessThan(0.05 * W)
+    // The page under it stays shown until the half-slid page covers it.
+    expect(layer('/food')?.style.display).not.toBe('none')
+    await wait(800)
+    expect(x('/foods')).toBeCloseTo(-0.3 * W, 0)
+    expect(x('/logs')).toBe(0)
+  })
+
+  it('a push during a running pop starts the uncovered page from where it is', async () => {
+    go('/foods')
+    await wait(700)
+    go('/food')
+    await wait(80)
+    const before = x('/food')
+    expect(before).toBeLessThan(-0.02 * W)
+    go('/logs')
+    await wait(16)
+    expect(Math.abs(x('/food') - before)).toBeLessThan(0.05 * W)
+  })
+})
