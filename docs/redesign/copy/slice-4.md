@@ -37,6 +37,8 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 | Send failed toast | Failed to send message. Please try again. | That didn't send. Check your connection and try again. |
 | Plan saved toast | Plan saved! / Your plan is ready to view. / View Plans | Plan saved / It's ready in Plans. / View |
 | Logged foods | inside Geo's text | rows: name, P C F, kcal, meal |
+| Logged foods, one meal | none | caption under the card: Logged to {meal} (rows then drop their meal) |
+| Geo anchor | none | Geo, once at the start of each run of Geo turns |
 | Action failure | Heads up: couldn't save that log — looks like a duplicate from the last minute | Heads up. I couldn't save that log: it looks like a duplicate from the last minute. (all tool messages now in Geo's first person) |
 | Message menu | Copy / Report | unchanged |
 
