@@ -31,7 +31,7 @@ import { cn } from '@/lib/utils'
 import { computeCompleteSetResult, firstIncompleteExerciseIndex, isExerciseComplete, nextIncompleteExerciseIndex, resolveElapsedForSession } from '@/lib/workout-session'
 import { useUIStore } from '@/stores/ui.store'
 import type { SessionExercise, SetData, WorkoutSession } from '@/types/workout-session.types'
-import { goBack } from '@/components/plans/plan-format'
+import { goBack } from '@/lib/navigation'
 
 function Chevron({ direction }: { direction: 'left' | 'right' }) {
   return (

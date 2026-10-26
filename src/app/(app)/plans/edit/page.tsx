@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { PushedHeader } from '@/components/layout/screen-header'
-import { goBack } from '@/components/plans/plan-format'
+import { goBack } from '@/lib/navigation'
 import { EditPlanView } from '@/components/plans/edit-plan-view'
 
 export default function EditPlanPage() {

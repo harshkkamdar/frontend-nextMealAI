@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { classifyNav, shouldCompleteSwipe, spring } from '@/lib/motion'
+import { shouldCompleteSwipe, spring } from '@/lib/motion'
+import { classifyNav } from '@/lib/navigation'
 
 describe('classifyNav', () => {
   it('pushes a deeper screen over the current one', () => {

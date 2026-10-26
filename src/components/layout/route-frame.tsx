@@ -9,7 +9,8 @@ import { PathParamsContext, PathnameContext, SearchParamsContext } from 'next/di
 import { animate, motion, motionValue, useReducedMotion, type AnimationPlaybackControls, type MotionValue } from 'framer-motion'
 import { hidesTabBar } from '@/components/layout/tab-bar'
 import { isNative } from '@/lib/platform'
-import { PUSH_DIM, PUSH_PARALLAX, SWIPE_EDGE_PX, TAB_ROOTS, classifyNav, reducedFade, shouldCompleteSwipe, spring, type NavKind } from '@/lib/motion'
+import { PUSH_DIM, PUSH_PARALLAX, SWIPE_EDGE_PX, reducedFade, shouldCompleteSwipe, spring } from '@/lib/motion'
+import { TAB_ROOTS, classifyNav, navHistory, stampHistory, type NavKind } from '@/lib/navigation'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui.store'
 
@@ -32,28 +33,6 @@ const makeLayer = (key: string): Layer => ({ key, scrollY: 0, x: motionValue(0),
 /** Soft left-edge shadow on the page in front of a slide (ink 10%, Q2). */
 const SHADOW = '-12px 0 32px rgba(17,28,53,0.10)'
 
-/**
- * Browser and hardware back/forward set this until the next route commits, so back plays the pop and forward the push.
- * Each history entry is stamped with its index; an entry without a stamp (lost to a replace) counts as back.
- */
-let backPending: 'back' | 'forward' | null = null
-let historyIndex = 0
-/** A swipe-back already slid the page off; the route change it causes must not animate again. */
-let swipeCommitted = false
-if (typeof window !== 'undefined') {
-  window.addEventListener('popstate', (e) => {
-    const index = (e.state as { fiqrIndex?: unknown } | null)?.fiqrIndex
-    backPending = typeof index === 'number' && index > historyIndex ? 'forward' : 'back'
-  })
-}
-
-/** Stamps the current history entry (new entries get the next index), so a later popstate knows its direction. */
-function stampHistory() {
-  const state = (window.history.state ?? {}) as { fiqrIndex?: unknown }
-  if (typeof state.fiqrIndex === 'number') historyIndex = state.fiqrIndex
-  else window.history.replaceState({ ...state, fiqrIndex: ++historyIndex }, '')
-}
-
 /** Places a push pair at progress p: 0 = top page covers the screen, 1 = top page gone and the page under it at rest. */
 function setPair(top: Layer, under: Layer | undefined, p: number) {
   const w = window.innerWidth
@@ -68,13 +47,13 @@ function setPair(top: Layer, under: Layer | undefined, p: number) {
 function advance(nav: Nav, to: string): Nav {
   const keys = nav.stack.map((l) => l.key)
   const old = nav.stack[nav.stack.length - 1]
-  const { kind, index } = classifyNav(keys, to, backPending)
+  const { kind, index } = classifyNav(keys, to, navHistory.backPending)
   const exiting = nav.exiting.filter((l) => l.key !== to)
   // A page still fading or sliding out is reused, so a quick return keeps its state.
   const top = index >= 0 ? nav.stack[index] : nav.exiting.find((l) => l.key === to) ?? makeLayer(to)
   if (kind === 'pop' && index >= 0) {
     // After a completed swipe-back the leaving page is already off screen: drop it, nothing left to animate.
-    if (swipeCommitted && index === keys.length - 2) return { stack: nav.stack.slice(0, index + 1), exiting, step: { kind, top, old, settled: true }, front: null, moving: false }
+    if (navHistory.swipeCommitted && index === keys.length - 2) return { stack: nav.stack.slice(0, index + 1), exiting, step: { kind, top, old, settled: true }, front: null, moving: false }
     return { stack: nav.stack.slice(0, index + 1), exiting: [...exiting, old], step: { kind, top, old, settled: false }, front: old.key, moving: true }
   }
   top.opacity.set(1)
@@ -90,14 +69,15 @@ function advance(nav: Nav, to: string): Nav {
   return { stack: [...nav.stack, top], exiting, step: { kind, top, old, settled: false }, front: top.key, moving: true }
 }
 
-type Kept = readonly [unknown, unknown, unknown, unknown, ReactNode]
+/** The router contexts and page content a frozen layer keeps rendering. */
+interface Kept { layout: unknown; pathname: unknown; search: unknown; params: unknown; content: ReactNode }
 
 /** Keeps a page on the route and query it had when it stopped being the top page, so it can sit underneath or finish leaving. */
 function Freeze({ live, children }: { live: boolean; children: ReactNode }) {
-  const current: Kept = [useContext(LayoutRouterContext), useContext(PathnameContext), useContext(SearchParamsContext), useContext(PathParamsContext), children]
+  const current: Kept = { layout: useContext(LayoutRouterContext), pathname: useContext(PathnameContext), search: useContext(SearchParamsContext), params: useContext(PathParamsContext), content: children }
   const [kept, setKept] = useState(current)
-  if (live && current.some((v, i) => v !== kept[i])) setKept(current)
-  const [layout, pathname, search, params, content] = live ? current : kept
+  if (live && (Object.keys(current) as (keyof Kept)[]).some((k) => current[k] !== kept[k])) setKept(current)
+  const { layout, pathname, search, params, content } = live ? current : kept
   return (
     <LayoutRouterContext.Provider value={layout as never}>
       <PathnameContext.Provider value={pathname as never}>
@@ -109,7 +89,17 @@ function Freeze({ live, children }: { live: boolean; children: ReactNode }) {
   )
 }
 
-function PageLayer({ layer, live, show, moving, shadow, children }: { layer: Layer; live: boolean; show: 'visible' | 'hidden' | 'none'; moving: boolean; shadow: boolean; children: ReactNode }) {
+/**
+ * A layer's part in the current frame: `top` is the live page; `leaving` is fading or sliding out; `under` is the page a
+ * running slide uncovers or covers; `covered` sits under the top page at rest (kept painted-ready, invisible); `buried` is
+ * two or more levels down (display none).
+ */
+type Role = 'top' | 'leaving' | 'under' | 'covered' | 'buried'
+
+function PageLayer({ layer, role, navMoving, front, children }: { layer: Layer; role: Role; navMoving: boolean; front: boolean; children: ReactNode }) {
+  const live = role === 'top'
+  const show = role === 'buried' ? 'none' : role === 'covered' ? 'hidden' : 'visible'
+  const moving = navMoving && show === 'visible'
   const ref = useRef<HTMLDivElement>(null)
   // A fixed layer shows the page where its user left it; display:none drops scrollTop, so reapply on show.
   useLayoutEffect(() => { if (!live && show !== 'none' && ref.current) ref.current.scrollTop = layer.scrollY }, [live, show, layer])
@@ -124,7 +114,7 @@ function PageLayer({ layer, live, show, moving, shadow, children }: { layer: Lay
         display: show === 'none' ? 'none' : undefined,
         visibility: show === 'hidden' ? 'hidden' : undefined,
         willChange: moving ? 'transform, opacity' : undefined,
-        boxShadow: shadow ? SHADOW : undefined,
+        boxShadow: front ? SHADOW : undefined,
       }}
       data-route={layer.key}
       data-slid={layer.slid || undefined}
@@ -196,8 +186,8 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     const step = nav.step
     stampHistory()
     if (!step) return
-    backPending = null
-    swipeCommitted = false
+    navHistory.backPending = null
+    navHistory.swipeCommitted = false
     window.scrollTo(0, step.top.scrollY)
     if (step.settled) return
     const { kind, top: t, old } = step
@@ -275,12 +265,12 @@ export function RouteFrame({ children }: { children: ReactNode }) {
         if (!complete) return
         // Keep the page underneath shown until the route commits, or the screen would flash empty.
         setNav((n) => ({ ...n, front: null, moving: true }))
-        swipeCommitted = true
+        navHistory.swipeCommitted = true
         window.history.back()
         // No history to go back to (a cold deep link): put the page back instead of leaving it off screen.
         window.setTimeout(() => {
-          if (!swipeCommitted || pair().t !== t) return
-          swipeCommitted = false
+          if (!navHistory.swipeCommitted || pair().t !== t) return
+          navHistory.swipeCommitted = false
           setNav((n) => ({ ...n, front: t.key, moving: true }))
           run(() => slide(t, under, 1, 0, 0), () => {})
         }, 600)
@@ -300,15 +290,17 @@ export function RouteFrame({ children }: { children: ReactNode }) {
   }, [])
 
   const underIndex = nav.stack.length - 2
+  const roleOf = (layer: Layer, i: number): Role => {
+    if (layer === top) return 'top'
+    if (i >= nav.stack.length) return 'leaving'
+    if (i === underIndex) return nav.moving ? 'under' : 'covered'
+    return 'buried'
+  }
   return (
     <>
       {[...nav.stack, ...nav.exiting].map((layer, i) => {
-        const live = layer === top
-        const leaving = i >= nav.stack.length
-        const moving = nav.moving && (live || leaving || i === underIndex)
-        const show = live || leaving ? 'visible' : i === underIndex ? (nav.moving ? 'visible' : 'hidden') : 'none'
         return (
-          <PageLayer key={layer.key} layer={layer} live={live} show={show} moving={moving} shadow={nav.front === layer.key}>
+          <PageLayer key={layer.key} layer={layer} role={roleOf(layer, i)} navMoving={nav.moving} front={nav.front === layer.key}>
             {children}
           </PageLayer>
         )

@@ -20,7 +20,7 @@ import type { WorkoutProgramContent } from '@/types/plans.types'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { ApiException } from '@/types/api.types'
-import { goBack } from '@/components/plans/plan-format'
+import { goBack } from '@/lib/navigation'
 
 // FB-R6-02 — FB-15 (program extraction) still wants a base64 payload. The
 // chat-input no longer keeps base64 around (it has a File + storage_path

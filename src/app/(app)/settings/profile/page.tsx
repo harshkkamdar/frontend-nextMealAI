@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { ProfileForm } from '@/components/settings/profile-form'
-import { goBack } from '@/components/plans/plan-format'
+import { goBack } from '@/lib/navigation'
 
 export default function ProfilePage() {
   const router = useRouter()

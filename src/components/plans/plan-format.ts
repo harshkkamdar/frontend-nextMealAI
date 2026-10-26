@@ -29,12 +29,6 @@ export function statusLabel(status: PlanStatus): string {
   return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
-/** Back to where the user came from; a screen opened directly (deep link, reload) goes to `fallback` instead. */
-export function goBack(router: { back: () => void; push: (href: string) => void }, fallback: string): void {
-  if (typeof window !== 'undefined' && window.history.length > 1) router.back()
-  else router.push(fallback)
-}
-
 const PREVIOUS_LIMIT = 5
 
 /**

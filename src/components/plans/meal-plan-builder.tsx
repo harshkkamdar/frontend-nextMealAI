@@ -18,7 +18,7 @@ import type { FoodSearchResult } from '@/types/foods.types'
 import type { MealPlan, MealPlanDay, MealPlanMeal } from '@/types/plans.types'
 import { PlanBuilderStep } from '@/components/plans/plan-builder-step'
 import { ActiveToggle, BuilderNotes, DayCardShell, stepErrors } from '@/components/plans/plan-builder-parts'
-import { goBack } from '@/components/plans/plan-format'
+import { goBack } from '@/lib/navigation'
 import { Chip } from '@/components/ui/fiqr/chip'
 import { haptic } from '@/lib/platform/app'
 

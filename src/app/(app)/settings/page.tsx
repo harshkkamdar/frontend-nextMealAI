@@ -24,7 +24,7 @@ import type { Profile } from '@/types/profile.types'
 import type { GeoPersonality, RestTimerDuration, Settings } from '@/types/settings.types'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
-import { goBack } from '@/components/plans/plan-format'
+import { goBack } from '@/lib/navigation'
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev'
 

@@ -16,7 +16,7 @@ import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.
 import type { WorkoutPlan, WorkoutPlanDay, WorkoutExercise } from '@/types/plans.types'
 import { PlanBuilderStep } from '@/components/plans/plan-builder-step'
 import { ActiveToggle, BuilderNotes, DayCardShell, stepErrors } from '@/components/plans/plan-builder-parts'
-import { goBack } from '@/components/plans/plan-format'
+import { goBack } from '@/lib/navigation'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 

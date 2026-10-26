@@ -9,18 +9,15 @@ import { cn } from '@/lib/utils'
 import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
 import { initialMinimise, minimiseStep } from '@/lib/tab-bar-minimise'
+import { TAB_ROUTES } from '@/lib/navigation'
 import { useUIStore } from '@/stores/ui.store'
 
 export const LOG_SHEET = 'log-sheet'
 /** Shared by the orb's surface and the + sheet panel (log-sheet.tsx), so the orb grows into the sheet (motion-feel 3i). */
 export const ORB_SURFACE = 'orb-surface'
 
-const TABS = [
-  { label: 'Home', href: '/dashboard', icon: HomeFill },
-  { label: 'Food', href: '/food', icon: FoodFill },
-  { label: 'Train', href: '/train', icon: TrainFill },
-  { label: 'Geo', href: '/chat', icon: GeoFill },
-] as const
+const ICONS = { '/dashboard': HomeFill, '/food': FoodFill, '/train': TrainFill, '/chat': GeoFill }
+const TABS = TAB_ROUTES.map((tab) => ({ ...tab, icon: ICONS[tab.href] }))
 
 /** Routes that own the whole screen (live workout, an open conversation) hide the bar. */
 export function hidesTabBar(pathname: string): boolean {
