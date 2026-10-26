@@ -72,8 +72,8 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
                 >
                   <span className="w-9 shrink-0 text-caption font-semibold text-ink-65 tabular-nums">{tag}</span>
                   <span className="min-w-0 flex-1">
-                    <span className={`block truncate text-body font-bold ${day.is_rest_day ? 'text-ink-65' : 'text-ink'}`}>{title}</span>
-                    <span className="block text-caption text-ink-65">{day.is_rest_day ? 'Recovery day' : `${count} ${count === 1 ? 'exercise' : 'exercises'}`}</span>
+                    <span className={`block truncate text-body font-bold leading-[22px] ${day.is_rest_day ? 'text-ink-65' : 'text-ink'}`}>{title}</span>
+                    <span className="block text-caption leading-[18px] text-ink-65">{day.is_rest_day ? 'Recovery day' : `${count} ${count === 1 ? 'exercise' : 'exercises'}`}</span>
                   </span>
                   {index === next ? <span className="shrink-0 rounded-full bg-ink-06 px-2.5 py-1 text-label text-ink">Next</span> : null}
                   {day.is_rest_day ? null : <ChevronRightIcon aria-hidden="true" className={cn('size-4 shrink-0 text-ink-35 transition-transform duration-200 ease-out', isOpen && 'rotate-90')} />}

@@ -26,7 +26,7 @@ export const SOFT_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 
 /** Section heading: 18 / 750, a little wide, 28 above and 10 below (the mock's `.sec`). */
 export function SectionHeading({ children, id, className }: { children: ReactNode; id?: string; className?: string }) {
   // Plain strings, not cn(): tailwind-merge reads the custom size tokens (text-headline) as colours and drops one.
-  return <h2 id={id} className={`font-display mx-1 mb-2.5 mt-7 text-headline font-[750] tracking-[-0.01em] text-ink ${className ?? ''}`}>{children}</h2>
+  return <h2 id={id} className={`font-display mx-1 mb-2.5 mt-7 text-headline leading-[22px] font-[750] tracking-[-0.01em] text-ink ${className ?? ''}`}>{children}</h2>
 }
 
 /** Macro hue dot: calories orange, protein ink, carbs teal, fat ochre. */
