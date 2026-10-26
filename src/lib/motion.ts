@@ -36,6 +36,8 @@ export const PUSH_PARALLAX = 0.3
 export const PUSH_DIM = 0.08
 /** Swipe-back: touches must start within this many px of the left edge. */
 export const SWIPE_EDGE_PX = 20
+/** Swipe-back: the finger must travel this far rightward (and more sideways than down) before the swipe is claimed. */
+export const SWIPE_SLOP_PX = 8
 
 /** Swipe-back release: a clear flick decides by direction, otherwise the page must be past 35% of the width. */
 export function shouldCompleteSwipe(dx: number, width: number, velocityPxPerS: number): boolean {

@@ -9,7 +9,7 @@ import { PathParamsContext, PathnameContext, SearchParamsContext } from 'next/di
 import { animate, motion, motionValue, useReducedMotion, type AnimationPlaybackControls, type MotionValue } from 'framer-motion'
 import { hidesTabBar } from '@/components/layout/tab-bar'
 import { isNative } from '@/lib/platform'
-import { PUSH_DIM, PUSH_PARALLAX, SWIPE_EDGE_PX, reducedFade, shouldCompleteSwipe, spring } from '@/lib/motion'
+import { PUSH_DIM, PUSH_PARALLAX, SWIPE_EDGE_PX, reducedFade, shouldCompleteSwipe, spring, SWIPE_SLOP_PX } from '@/lib/motion'
 import { TAB_ROOTS, classifyNav, navHistory, stampHistory, type NavKind } from '@/lib/navigation'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui.store'
@@ -233,11 +233,11 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       const touch = e.touches[0]
       const dx = touch.clientX - track.x0
       const dy = touch.clientY - track.y0
-      // Vertical first: it is a scroll, let it go. Horizontal: claim it before the page or a carousel starts panning.
-      if (!track.dragging && Math.abs(dy) > Math.abs(dx)) { track = null; return }
-      if (e.cancelable) e.preventDefault()
       if (!track.dragging) {
-        if (dx < 8) return
+        // Vertical first is a scroll and leftward is not a back swipe: let both go. Until the finger is past the slop the
+        // gesture is undecided, and cancelling an early touchmove would kill the scroll for the whole gesture on iOS.
+        if (Math.abs(dy) > Math.abs(dx) || dx < -SWIPE_SLOP_PX) { track = null; return }
+        if (dx < SWIPE_SLOP_PX || dx <= Math.abs(dy)) return
         track.dragging = true
         const caught = active.current
         active.current = null
@@ -246,6 +246,8 @@ export function RouteFrame({ children }: { children: ReactNode }) {
         const key = pair().t.key
         setNav((n) => ({ ...n, front: key, moving: true }))
       }
+      // Committed as a rightward swipe: claim it before the page or a carousel starts panning.
+      if (e.cancelable) e.preventDefault()
       const dt = e.timeStamp - track.t
       if (dt > 0) track.v = 0.8 * (((touch.clientX - track.x) / dt) * 1000) + 0.2 * track.v
       track.x = touch.clientX
