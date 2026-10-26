@@ -151,7 +151,12 @@ if (process.argv[1]?.endsWith('redesign-transitions.mjs')) {
     browser.newContext = async (...options) => {
       const context = await newContext(...options)
       const t = transitions[contexts++] ?? {}
-      if (t.native) await context.addInitScript(fakeNative, t.native)
+      if (t.native) {
+        await context.addInitScript(fakeNative, t.native)
+        // The first native load can read the profile before the session hydrates (see native() above) and send the
+        // page to /login; a 204 cancels that navigation, so the page stays and the hydrated session takes over.
+        await context.route(/\/login\/?$/, (route) => route.fulfill({ status: 204 }))
+      }
       // Pre-scroll before recording so the act is the only motion in the capture.
       if (t.scroll) await context.addInitScript(() => { addEventListener('load', () => setTimeout(() => scrollTo(0, document.body.scrollHeight), 900)) })
       await context.route(`${API}/**`, (route) => {

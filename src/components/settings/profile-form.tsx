@@ -215,11 +215,12 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
         title="Profile"
         onBack={onBack}
         backLabel="Back to settings"
-        actions={profile ? (
-          <button type="button" onClick={handleSave} disabled={saving} className="glass h-11 rounded-full px-4 text-[16px] font-semibold text-ink transition-transform duration-100 enabled:active:scale-[.94] disabled:text-ink-65">
+        // Always rendered (disabled until the profile loads), so the bar never changes shape mid-transition.
+        actions={(
+          <button type="button" onClick={handleSave} disabled={saving || !profile} className="glass h-11 rounded-full px-4 text-[16px] font-semibold text-ink transition-transform duration-100 enabled:active:scale-[.94] disabled:text-ink-65">
             {saving ? 'Saving…' : 'Save'}
           </button>
-        ) : null}
+        )}
       />
       <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
     </>
