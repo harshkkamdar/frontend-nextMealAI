@@ -106,7 +106,7 @@ export function TabBar() {
       transition={reducedFade}
       className={cn('absolute left-0 top-0 grid size-16 place-items-center rounded-full text-ink transition-transform active:scale-[.94]', !logOpen && 'pointer-events-auto')}
     >
-      <motion.span layoutId={reduce ? undefined : 'tab-icon'} transition={spring.glide}><activeTab.icon className="size-[24px]" /></motion.span>
+      <motion.span layoutId={reduce ? undefined : `tab-icon-${activeTab.href}`} transition={spring.glide}><activeTab.icon className="size-[24px]" /></motion.span>
     </motion.button>
   ) : null
 
@@ -167,11 +167,16 @@ export function TabBar() {
                     className="absolute inset-0 rounded-full bg-ink-06"
                   />
                 ) : null}
+                {/* Each role has its own key: a motion element reused across roles keeps stale shared-layout or animation
+                    state and can stay at opacity 0 after the open tab changes (seen on iOS, 26 Oct 2026). */}
                 {active && !reduce ? (
-                  // The open tab's icon travels into the collapsed circle (shared layoutId with the circle's icon).
-                  collapsed ? <span className="size-[22px]" /> : <motion.span layoutId="tab-icon" transition={spring.glide} className="relative"><Icon className="size-[22px]" /></motion.span>
+                  // The open tab's icon travels into the collapsed circle (shared layoutId with the circle's icon), one id per
+                  // tab so switching tabs never flies an icon across the bar.
+                  collapsed ? <span key="gap" className="size-[22px]" /> : <motion.span key="travel" layoutId={`tab-icon-${href}`} transition={spring.glide} className="relative"><Icon className="size-[22px]" /></motion.span>
+                ) : active ? (
+                  <motion.span key="open" initial={false} animate={{ opacity: collapsed ? 0 : 1 }} transition={itemTransition} className="relative"><Icon className="size-[22px]" /></motion.span>
                 ) : (
-                  <motion.span initial={false} animate={active ? { opacity: collapsed ? 0 : 1 } : item} transition={itemTransition} className="relative will-change-transform"><Icon className="size-[22px]" /></motion.span>
+                  <motion.span key="still" initial={false} animate={item} transition={itemTransition} className="relative will-change-transform"><Icon className="size-[22px]" /></motion.span>
                 )}
                 {/* will-change keeps the labels on their own layer, so they do not re-rasterise (a 1 px text shift) when the scale hands back from the compositor. */}
                 <motion.span initial={false} animate={item} transition={itemTransition} className={cn('relative text-[11px] leading-none will-change-transform', active ? 'font-semibold' : 'font-medium')}>{label}</motion.span>
