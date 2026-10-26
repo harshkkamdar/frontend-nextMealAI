@@ -25,3 +25,11 @@ export function beatDepth(d: number, reduce = false): { opacity: number; scale: 
   if (reduce) return { opacity, scale: 1, y: 0 }
   return d >= 0 ? { opacity, scale: 1 - 0.07 * d, y: d ? -7 * d : 0 } : { opacity, scale: 1 + 0.05 * a, y: 13 * a }
 }
+
+/** The tallest beat visual's natural height (Food, measured at 375 x 667): below it a visual would clip. */
+export const VISUAL_MIN_H = 284
+
+/** Scale for a visual on a stage with `avail` px of content height: 1 where it fits, smaller on short phones. */
+export function fitScale(avail: number, natural = VISUAL_MIN_H): number {
+  return avail > 0 && avail < natural ? avail / natural : 1
+}

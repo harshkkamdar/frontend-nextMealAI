@@ -12,7 +12,7 @@ import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import { CheckInVisual, FoodVisual, GeoVisual, TrainVisual, type BeatVisualProps } from './beat-visuals'
-import { beatDepth, flickTarget, scrub } from './stage'
+import { beatDepth, fitScale, flickTarget, scrub, VISUAL_MIN_H } from './stage'
 
 const BEATS: { title: string; line: string; Visual: ComponentType<BeatVisualProps> }[] = [
   { title: 'Food', line: 'Snap a meal or describe it. Geo counts the calories and macros for you.', Visual: FoodVisual },
@@ -24,8 +24,10 @@ const LAST = BEATS.length - 1
 const STEP = 12 // progress dots: 6 px dot + 6 px gap
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 
+/** Stage top below the title block: 236 px on tall phones, closing up to 188 px (just under a two-line line) on short ones (iPhone SE). */
+const STAGE_TOP = 'min(236px, max(188px, 100dvh - 520px))'
 /** The shared stage under every beat's visual: below the title block, ending just above the dots (the dots, CTA and link take 200 px plus the safe area). */
-const STAGE: CSSProperties = { top: 'calc(var(--safe-top) + 236px)', height: 'min(420px, calc(100dvh - var(--safe-top) - var(--safe-bottom) - 236px - 200px))' }
+const STAGE: CSSProperties = { top: `calc(var(--safe-top) + ${STAGE_TOP})`, height: `min(420px, calc(100dvh - var(--safe-top) - var(--safe-bottom) - ${STAGE_TOP} - 200px))` }
 /** The stage leans a little differently on each beat, so it settles like a card being set down. */
 const LEAN = ['none', 'translateY(4px) rotate(-.6deg)', 'translateY(-2px) rotate(.5deg)', 'translateY(2px) rotate(-.3deg)']
 
@@ -49,6 +51,16 @@ export function WelcomeBeats() {
   const [seen, setSeen] = useState(1) // beats [0, seen) have played their fill
   const [arrival] = useState<DepthDir | null>(() => arrivalDir())
   useEffect(() => { clearArrival() }, [])
+  // On a short phone the stage is shorter than the visuals: they scale down to fit instead of clipping.
+  const stage = useRef<HTMLDivElement>(null)
+  const [fit, setFit] = useState(1)
+  useEffect(() => {
+    const el = stage.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() => setFit(fitScale(el.clientHeight - 32))) // the stage's p-4
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
   useAuroraScene(`w${index}` as SceneName)
   const last = index === LAST
 
@@ -89,7 +101,7 @@ export function WelcomeBeats() {
         animate={{ opacity: 1, scale: 1 }}
         transition={reduce ? reducedFade : { scale: spring.page, opacity: { duration: 0.3, delay: 0.08 } }}
       >
-        <div aria-hidden="true" className={cn('absolute inset-x-gutter rounded-[30px] transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)]', auroraSurface)} style={{ ...STAGE, transform: reduce ? 'none' : LEAN[index] }} />
+        <div ref={stage} aria-hidden="true" className={cn('absolute inset-x-gutter rounded-[30px] transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)]', auroraSurface)} style={{ ...STAGE, transform: reduce ? 'none' : LEAN[index] }} />
         <motion.div
           ref={region}
           tabIndex={0}
@@ -115,7 +127,7 @@ export function WelcomeBeats() {
           className="absolute inset-0 touch-pan-y select-none outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ink"
         >
           {BEATS.map(({ title, line, Visual }, i) => (
-            <Beat key={title} p={p} i={i} reduce={reduce} title={title} line={line} current={i === index}>
+            <Beat key={title} p={p} i={i} reduce={reduce} title={title} line={line} current={i === index} fit={fit}>
               <Visual live={i < seen} active={i === index} />
             </Beat>
           ))}
@@ -147,7 +159,7 @@ export function WelcomeBeats() {
  * arriving from in front (larger, drifting down into place). Opacity clears by about 0.6 of the way, so two beats'
  * words never sit on top of each other. The visual travels 2.2x the title, so the layers separate in depth.
  */
-function Beat({ p, i, reduce, title, line, current, children }: { p: MotionValue<number>; i: number; reduce: boolean; title: string; line: string; current: boolean; children: ReactNode }) {
+function Beat({ p, i, reduce, title, line, current, fit, children }: { p: MotionValue<number>; i: number; reduce: boolean; title: string; line: string; current: boolean; fit: number; children: ReactNode }) {
   const d = useTransform(p, (v) => clamp(v - i, -1, 1))
   const opacity = useTransform(d, (v) => beatDepth(v, reduce).opacity)
   const scale = useTransform(d, (v) => beatDepth(v, reduce).scale)
@@ -168,7 +180,8 @@ function Beat({ p, i, reduce, title, line, current, children }: { p: MotionValue
         <p className={cn('mt-3 max-w-[32ch] text-pretty text-body text-ink-80', i === 0 && 'rise')} style={intro(1)}>{line}</p>
       </motion.div>
       <motion.div style={{ ...STAGE, y: visualY }} className="absolute inset-x-gutter overflow-hidden p-4">
-        <div className={cn('h-full', i === 0 && 'rise')} style={intro(3)}>{children}</div>
+        {/* fit < 1: laid out at its natural height and width / fit, then scaled into the stage from the top left. */}
+        <div className={cn('h-full', i === 0 && 'rise')} style={fit < 1 ? { ...intro(3), height: VISUAL_MIN_H, width: `${100 / fit}%`, transform: `scale(${fit})`, transformOrigin: '0 0' } : intro(3)}>{children}</div>
       </motion.div>
     </motion.section>
   )

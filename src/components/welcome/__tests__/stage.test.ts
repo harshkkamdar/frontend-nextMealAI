@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { project, rubberband } from '@/lib/motion'
-import { beatDepth, flickTarget, scrub } from '../stage'
+import { beatDepth, fitScale, flickTarget, scrub, VISUAL_MIN_H } from '../stage'
 
 const W = 390
 
@@ -60,5 +60,14 @@ describe('welcome stage physics', () => {
 
   it('reduced motion keeps the crossfade and drops the travel', () => {
     expect(beatDepth(0.5, true)).toEqual({ opacity: 0.5, scale: 1, y: 0 })
+  })
+})
+
+describe('fitScale', () => {
+  it('keeps visuals at full size where the stage holds them, and shrinks them to fit a short phone', () => {
+    expect(fitScale(376)).toBe(1)
+    expect(fitScale(VISUAL_MIN_H)).toBe(1)
+    expect(fitScale(VISUAL_MIN_H * 0.8)).toBeCloseTo(0.8)
+    expect(fitScale(0)).toBe(1) // not measured yet
   })
 })
