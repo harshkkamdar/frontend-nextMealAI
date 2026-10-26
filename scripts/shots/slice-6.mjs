@@ -107,7 +107,7 @@ const transitions = [
   { name: 'rest-minimise', url: S, api: sessionApi(live(MID)), act: async (p) => { await current(p).getByRole('button', { name: 'Complete set 3' }).click(); await p.waitForTimeout(1500); await p.getByRole('button', { name: 'Minimise rest timer' }).click() } },
   { name: 'finish', url: S, api: sessionApi(live(UPPER_B([3, 3, 3, 3, 3]))), act: (p) => p.getByRole('button', { name: 'Finish workout' }).click() },
   // Warmed so the route is compiled; the painted flag is then cleared so the first-paint entrance plays.
-  { name: 'train-first-load', url: '/dashboard', warm: T, api: trainApi(), act: async (p) => { await p.evaluate(() => sessionStorage.removeItem('fiqr:painted:train')); await p.getByRole('link', { name: 'Train' }).click(); await p.waitForURL(/\/train$/, { timeout: 10000 }) } },
+  { name: 'train-first-load', url: '/dashboard', warm: T, api: trainApi(), act: async (p) => { await p.evaluate(() => sessionStorage.removeItem('fiqr:painted:train')); await p.getByRole('link', { name: 'Train' }).click(); await p.waitForURL(/\/train\/?$/, { timeout: 10000 }) } },
 ]
 
 function fixtureHandler(api) {

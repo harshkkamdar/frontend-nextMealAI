@@ -423,7 +423,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       <div className="px-4"><PushedHeader title={session.day_name} onBack={handleBack} backLabel="Go back" actions={optionsButton} /></div>
       <OfflineBand />
 
-      {/* Content and nav fade in on their own (an opacity ancestor would hide the nav's backdrop filter). */}
+      {/* Content fades in on its own; an opacity ancestor would also hide the nav's backdrop filter. */}
       <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className="pt-3" style={{ paddingBottom: `calc(${showRestTimer ? 300 : 120}px + var(--safe-bottom))` }}>
         {exercises.length === 0 ? (
           <div className="px-4">
@@ -460,25 +460,27 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                           type="number" inputMode="decimal" aria-label={`${exercise.name} set ${set.set_number} kilograms`}
                           value={set.actual_weight_kg ?? ''} placeholder={set.planned_weight_kg != null ? String(set.planned_weight_kg) : '—'}
                           onChange={(event) => updateSet(exerciseIndex, setIndex, 'actual_weight_kg', event.target.value ? Number(event.target.value) : null)}
-                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink-65 focus:ring-[1.5px] focus:ring-ink', set.completed ? 'bg-transparent' : 'bg-ink-04')}
+                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink-65 focus:ring-[1.5px] focus:ring-ink transition-colors duration-200', set.completed ? 'bg-transparent' : 'bg-ink-04')}
                         />
                         <input
                           type="number" inputMode="numeric" aria-label={`${exercise.name} set ${set.set_number} reps`}
                           value={set.actual_reps ?? ''} placeholder={String(set.planned_reps)}
                           onChange={(event) => updateSet(exerciseIndex, setIndex, 'actual_reps', event.target.value ? Number(event.target.value) : null)}
-                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink-65 focus:ring-[1.5px] focus:ring-ink', set.completed ? 'bg-transparent' : 'bg-ink-04')}
+                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink-65 focus:ring-[1.5px] focus:ring-ink transition-colors duration-200', set.completed ? 'bg-transparent' : 'bg-ink-04')}
                         />
                         <button
                           type="button" onClick={() => completeSet(exerciseIndex, setIndex)} aria-label={`Complete set ${set.set_number}`}
                           aria-pressed={set.completed}
                           className="mx-auto grid size-11 place-items-center transition-transform active:scale-[.9]"
                         >
-                          <span className={cn('relative grid size-10 place-items-center rounded-full', set.completed ? 'bg-ink text-cream' : 'border-[1.5px] border-ink-20')}>
+                          <span className="relative grid size-10 place-items-center rounded-full border-[1.5px] border-ink-20">
                             {set.completed ? (
+                              // The ink disc grows in and the tick pops after it (transform and opacity only).
                               <motion.span
                                 key={set.completed_at ?? 'done'}
-                                initial={reduce ? { opacity: 0 } : { scale: 0.4, opacity: 0 }}
-                                animate={{ scale: celebrate && exerciseIndex === currentIndex ? 1.12 : 1, opacity: 1 }}
+                                className="absolute -inset-[1.5px] grid place-items-center rounded-full bg-ink text-cream"
+                                initial={reduce ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
+                                animate={{ scale: celebrate && exerciseIndex === currentIndex ? 1.08 : 1, opacity: 1 }}
                                 transition={reduce ? reducedFade : spring.tap}
                               >
                                 <TickIcon />
@@ -529,8 +531,9 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         )}
       </motion.main>
 
+      {/* Rises in on transform only: a backdrop-filter bar under fading opacity does not paint until it is opaque. */}
       {exercises.length > 0 ? (
-      <motion.nav initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className="glass-cream fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-[28px] px-4 pt-3" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
+      <motion.nav initial={reduce ? false : { y: 96 }} animate={{ y: 0 }} transition={spring.sheet} className="glass-cream fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-[28px] px-4 pt-3" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
         {allComplete || currentIndex === exercises.length - 1 ? (
           <PrimaryButton type="button" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
         ) : (
