@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { ChatInput } from '@/components/chat/chat-input'
+import { mergeHistory } from '@/components/chat/merge-history'
 import { sessionTitles } from '@/components/chat/session-titles'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
@@ -100,7 +101,8 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
         const history = sessionData.messages ?? []
         if (history.length > 0) setHistoryFailed(false)
         setFreshFrom((current) => (current === Infinity ? history.length : current))
-        setMessages(history)
+        // The refetch 4 s after open must not drop a message that failed to send (or is still sending).
+        setMessages((prev) => mergeHistory(history, prev, new Set(unsent.current.keys())))
         const match = sessions.find((s) => s.session_id === sessionId || s.id === sessionId)
         if (match?.title) setSessionTitle(match.title)
       })
