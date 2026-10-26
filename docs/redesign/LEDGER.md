@@ -102,7 +102,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S5-R3 | R3 axe 0 / contrast / 44 pt | built bcd3dfa: axe 0, small 0, orange <= 1 on 36 checks |
 | S5-R4 | R4 frame-diff 0 pops | pending |
 | S5-R5 | R5 60 fps on fiqr_lowend | pending |
-| S5-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
+| S5-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (Fable, critic-prompt.md, refs Bevel IMG_6868/6869/6865/6904): r1 ranks 1/1/1 scores 8/7.5/7.5; r2 1/1/1 7.5/7.5/7.5; r3 1/1/1 7.5/7.5/7.5. Remaining critiques: macro hues (Q18), capsule + orb (C2). Fix commits 1260c0a, 565cfcf |
 | S5-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-5.md? Also: the sticky orange Log food button was removed (Add food rows, dashed slots and the orb cover it) - OK? |
 | S5-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
@@ -158,7 +158,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S8-R3 | R3 axe 0 / contrast / 44 pt | built cf1252b: axe 0, small 0, orange <= 1 on 38 checks |
 | S8-R4 | R4 frame-diff 0 pops | pending |
 | S8-R5 | R5 60 fps on fiqr_lowend | pending |
-| S8-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
+| S8-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6891/6907/6869/6865): r1 1/1/1 7/7.5/7.5; r2 1/1/1 7/7/7.5; r3 1/1/1 7.5/8/7.5. Remaining critique: the orange G in Geo's avatar (client design reference) - needs-owner: make the G cream/ink? Fix commits edda1da, a5d6add |
 | S8-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-8.md? After Apply the screen keeps the applied week until you leave - OK? Settings button dropped from check-in - OK? Health wording "Includes Apple Health weigh-ins" - OK? |
 | S8-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
