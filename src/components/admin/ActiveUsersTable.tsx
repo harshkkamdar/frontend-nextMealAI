@@ -63,7 +63,7 @@ export function ActiveUsersTable({
       <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-65 block mb-3">
         Active Users (30d)
       </span>
-      <div className="overflow-x-auto">
+      <div data-no-swipe-back className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs font-semibold text-ink-65 border-b border-ink-08">

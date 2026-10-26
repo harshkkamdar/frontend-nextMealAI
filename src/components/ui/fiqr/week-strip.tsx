@@ -60,7 +60,7 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
 
   return (
     // Clip sideways so a drag past the edge never widens the page (mobile browsers zoom out to fit it).
-    <div className={cn('-mx-4 select-none overflow-x-clip px-4', className)}>
+    <div data-no-swipe-back className={cn('-mx-4 select-none overflow-x-clip px-4', className)}>
       <motion.div
         drag={reduce ? false : 'x'}
         dragConstraints={{ left: 0, right: 0 }}

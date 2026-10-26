@@ -136,6 +136,7 @@ export function RulerInput({ label, value, onChange, min, max, start, units }: R
           ref={ruler}
           onScroll={onScroll}
           aria-hidden="true"
+          data-no-swipe-back
           className="scrollbar-hide h-full overflow-x-auto overscroll-x-contain"
           style={{ maskImage: 'linear-gradient(90deg, transparent, #111C35 22%, #111C35 78%, transparent)', WebkitMaskImage: 'linear-gradient(90deg, transparent, #111C35 22%, #111C35 78%, transparent)' }}
         >

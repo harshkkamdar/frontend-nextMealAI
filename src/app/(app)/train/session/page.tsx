@@ -439,7 +439,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         ) : (
           <>
             <div className="px-4"><SessionTimerCard elapsedSeconds={elapsedSeconds} exercises={exercises} currentIndex={currentIndex} /></div>
-            <div ref={pagerRef} className="scrollbar-hide -mb-2 mt-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 pt-2">
+            <div ref={pagerRef} data-no-swipe-back className="scrollbar-hide -mb-2 mt-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 pt-2">
               {exercises.map((exercise, exerciseIndex) => (
                 <article key={`${exercise.name}-${exerciseIndex}`} data-exercise-index={exerciseIndex} aria-current={exerciseIndex === currentIndex ? 'step' : undefined} className="w-[calc(100vw-44px)] max-w-[388px] shrink-0 snap-center rounded-[24px] bg-card p-5 shadow-[var(--shadow-card)]">
                   <ExerciseVisual group={exercise.muscle_group} name={exercise.name} />

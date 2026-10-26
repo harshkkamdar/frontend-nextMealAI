@@ -122,7 +122,8 @@ export function Chips<T extends string>({ options, value, onChange, label, clear
   className?: string
 }) {
   return (
-    <div role="group" aria-label={label} className={cn('flex gap-2', className)}>
+    // A chip rail scrolls sideways from the screen edge, so it opts out of the route frame's swipe-back.
+    <div role="group" aria-label={label} data-no-swipe-back className={cn('flex gap-2', className)}>
       {options.map((option) => {
         const on = option.value === value
         return (

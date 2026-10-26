@@ -80,6 +80,7 @@ export const CalendarStrip = memo(function CalendarStrip({
       )}
     <div
       ref={scrollRef}
+      data-no-swipe-back
       className="flex gap-2 overflow-x-auto scrollbar-hide -mx-gutter px-gutter"
     >
       {days.map((day) => {

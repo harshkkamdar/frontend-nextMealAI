@@ -61,7 +61,7 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
       {day ? (
         <>
           <SectionTitle>Meals</SectionTitle>
-          <div role="group" aria-label="Plan days" className="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+          <div role="group" aria-label="Plan days" data-no-swipe-back className="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
             {days.map((item, index) => (
               <Chip
                 key={`${item.date}-${index}`}
