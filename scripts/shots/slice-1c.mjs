@@ -45,8 +45,8 @@ const slice = {
   ],
   transitions: [
     { name: 'welcome-first-paint', url: '/signup', guest: true, act: (p) => p.goto(new URL('/welcome', p.url()).href) },
-    // Slow scrub: finger to mid-stage, drift back past halfway, release with almost no velocity (settles back on slide 1).
-    { name: 'welcome-drag-scrub', url: '/welcome', guest: true, act: (p) => drag(p, 330, 135, 40, 16, { back: 260 }) },
+    // Slow scrub: finger past mid-stage (about 0.6), drift back past halfway, release with almost no velocity (settles back on slide 1).
+    { name: 'welcome-drag-scrub', url: '/welcome', guest: true, act: (p) => drag(p, 330, 100, 40, 16, { back: 260 }) },
     // Scrub forward past halfway and release slowly: settles on slide 2 with the drag velocity handed to the spring.
     { name: 'welcome-drag-release', url: '/welcome', guest: true, act: (p) => drag(p, 340, 110, 36, 16) },
     // Short fast flick (80 px in 3 moves, about 1,600 px/s): exactly one slide. Slower input (under 500 px/s) settles back, by design.
