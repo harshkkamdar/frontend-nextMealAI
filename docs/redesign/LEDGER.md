@@ -110,19 +110,19 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 
 | ID | Item | Status |
 |---|---|---|
-| S6-01 | Train /train | pending |
-| S6-02 | Live session | pending |
-| S6-03 | Rest timer (pinned, minimised) | pending |
-| S6-04 | Target-muscle map (C7) | pending |
-| S6-05 | T: set tick | pending |
-| S6-06 | T: start session | pending |
+| S6-01 | Train /train | built 767f95d..4716587; screens/slice-6/ (25 shots x 2, axe 0, small 0, orange <= 1) |
+| S6-02 | Live session | built 767f95d..4716587; screens/slice-6/ (25 shots x 2, axe 0, small 0, orange <= 1) |
+| S6-03 | Rest timer (pinned, minimised) | built 767f95d..4716587; screens/slice-6/ (25 shots x 2, axe 0, small 0, orange <= 1) |
+| S6-04 | Target-muscle map (C7) | built 767f95d: target-muscle diagram from body-highlighter 3.0.2 polygons (MIT, (c) 2020 GV79, notice in src/components/workout/muscle-map-data.ts), bundled, 136 px ExerciseVisual slot for a licensed image set later (C7) |
+| S6-05 | T: set tick | built 5f0240a: set tick grows an ink disc; static-build frame diff smooth in 3 of 5 runs, single first-frame flag otherwise (host load 60-170) |
+| S6-06 | T: start session | built 82519d2: start-session, finish and train-first-load smooth on the static build |
 | S6-R1 | R1 core-job metrics | pending |
 | S6-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
-| S6-R3 | R3 axe 0 / contrast / 44 pt | pending |
+| S6-R3 | R3 axe 0 / contrast / 44 pt | built 4716587: axe 0, small 0, orange <= 1 on 50 checks |
 | S6-R4 | R4 frame-diff 0 pops | pending |
 | S6-R5 | R5 60 fps on fiqr_lowend | pending |
 | S6-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
-| S6-R7 | R7 copy list approved | pending |
+| S6-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-6.md? Freestyle log moved to the header +; calendar sheet uses the shared week strip (no tap-Today jump); pager scrolls sideways only (also fixed resume landing on exercise 1). Should Start on Train be orange when Home uses an ink play button? |
 | S6-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
 ## S7 Plans
@@ -166,24 +166,24 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 
 | ID | Item | Status |
 |---|---|---|
-| S9-01 | Settings | pending |
-| S9-02 | Profile | pending |
-| S9-03 | Account deletion sheet | pending |
-| S9-04 | Paywall | pending |
-| S9-05 | Privacy | pending |
-| S9-06 | Support | pending |
-| S9-07 | Delete account (public) | pending |
-| S9-08 | 404 | pending |
-| S9-09 | Crash boundary | pending |
-| S9-10 | Confirm dialog | pending |
-| S9-11 | Offline band | pending |
+| S9-01 | Settings | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-02 | Profile | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-03 | Account deletion sheet | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-04 | Paywall | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-05 | Privacy | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-06 | Support | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-07 | Delete account (public) | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-08 | 404 | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-09 | Crash boundary | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-10 | Confirm dialog | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
+| S9-11 | Offline band | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
 | S9-R1 | R1 core-job metrics | pending |
 | S9-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
-| S9-R3 | R3 axe 0 / contrast / 44 pt | pending |
-| S9-R4 | R4 frame-diff 0 pops | pending |
+| S9-R3 | R3 axe 0 / contrast / 44 pt | built 2cd51a0: axe 0, small 0, orange <= 1 on 68 checks |
+| S9-R4 | R4 frame-diff 0 pops | built 2cd51a0: settings-row-push, profile-back, delete-sheet-open, confirm-dialog-in-out, paywall-plan-switch, settings-switch smooth on a production static build |
 | S9-R5 | R5 60 fps on fiqr_lowend | pending |
 | S9-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
-| S9-R7 | R7 copy list approved | pending |
+| S9-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-9.md? Picker rows instead of chip rows (36 px chips failed 44 pt), profile Save as a glass pill in the bar, every confirm in ink - taken alone, approve? |
 | S9-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
 ## S10 admin
@@ -199,6 +199,14 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S10-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
 | S10-R7 | R7 copy list approved | pending |
 | S10-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
+
+## S1c welcome rebuild (owner request 26 Oct 2026: "static, PowerPoint slides, not liquid glass, AI slop")
+
+| ID | Item | Status |
+|---|---|---|
+| S1c-01 | Welcome stage: one motion value scrubs all four slides, sequential text and card hand-off, depth and parallax, momentum release, rubber band, one slide per flick | built 076632b, bb0c4f2, 57bc207, bffd781, 5f9d18e |
+| S1c-02 | leaveThen overlaps exit and enter (no cream frame) on welcome, auth and onboarding routes | built 076632b |
+| S1c-R6 | Blind critic (refs Bevel IMG_6856-6859) | pending |
 
 ## Production rows created by the run (F3)
 
