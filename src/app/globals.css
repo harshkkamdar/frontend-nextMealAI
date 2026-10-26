@@ -80,6 +80,8 @@
 
   --shadow-action: 0 8px 20px rgba(232,98,42,.26);
   --shadow-raised: 0 6px 16px rgba(17,28,53,.28);
+  /* Left-edge shadow on the page in front of a push or pop slide (motion-feel 3c-native). */
+  --shadow-push: -12px 0 32px rgba(17,28,53,.10);
 
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 }

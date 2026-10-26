@@ -33,8 +33,6 @@ interface Step { kind: NavKind; top: Layer; old: Layer; settled: boolean }
 interface Nav { stack: Layer[]; exiting: Layer[]; step: Step | null; front: string | null; moving: boolean; deep?: boolean }
 
 const makeLayer = (key: string): Layer => ({ key, scrollY: 0, x: motionValue(0), dim: motionValue(0), opacity: motionValue(1) })
-/** Soft left-edge shadow on the page in front of a slide (ink 10%, Q2). */
-const SHADOW = '-12px 0 32px rgba(17,28,53,0.10)'
 
 /** Places a push pair at progress p: 0 = top page covers the screen, 1 = top page gone and the page under it at rest. */
 function setPair(top: Layer, under: Layer | undefined, p: number) {
@@ -131,7 +129,7 @@ function PageLayer({ layer, role, navMoving, front, children }: { layer: Layer; 
         display: show === 'none' ? 'none' : undefined,
         visibility: show === 'hidden' ? 'hidden' : undefined,
         willChange: moving ? 'transform, opacity' : undefined,
-        boxShadow: front ? SHADOW : undefined,
+        boxShadow: front ? 'var(--shadow-push)' : undefined,
       }}
       data-route={layer.key}
       data-slid={layer.slid || undefined}
