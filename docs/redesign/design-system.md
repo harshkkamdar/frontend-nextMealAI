@@ -36,8 +36,9 @@ Archivo is loaded with its `wdth` axis. Wide (`font-stretch: 112-118%`) is reser
 
 - 4 pt grid. Page gutter 16 pt for bento grids, 20 pt for text. Tile gap 10 pt. Section gap 24 pt.
 - Radii (concentric): card 24, tile 22, row 16, control 14, capsule and round buttons full. Sheets 38 with an 8 pt inset.
-- Shadow: one token, `0 1px 2px ink/4%, 0 8px 24px ink/6%`. No borders on cards; selection is a 1.5 pt ink outline, never a fill.
-- Bottom clearance: content ends 120 pt + safe area above the bottom, so the tab bar never covers content at rest (critic fix 7).
+- Shadow: one card token, `--shadow-card` `0 1px 2px ink/4%, 0 8px 24px ink/6%`. No borders on cards; selection is a 1.5 pt ink outline, never a fill. Motion-only: `--shadow-push` `-12px 0 32px ink/10%`, the left-edge shadow on the page in front of a push or pop slide (motion-feel 3c-native).
+- Bottom clearance: content ends 106 pt + safe area above the bottom (`--tabbar-clearance`: 10 pt offset + 52 pt bar + 44 pt), so the tab bar never covers content at rest (critic fix 7).
+- Tab bar (compact, iOS 26, owner ask 26 Oct 2026): capsule 52 pt tall with 4 pt glass padding, so the active pill and each tab link are 44 pt tall; orb and collapsed circle 52 pt; tab icons 20 pt, labels 11 pt; the bar sits 10 pt above the safe area. Every target stays 44 pt or more.
 
 ## Glass material (C1, Q3, Q14)
 
@@ -74,9 +75,12 @@ Decision from the data: low-end Android ships with glass off, which the auto-det
 |---|---|---|
 | `tap` | 500 / 35 | press feedback, chips, steppers |
 | `sheet` | 320 / 32 | sheets, the + sheet, tab pill |
-| `page` | 260 / 30 | push and pop between screens |
+| `page` | 260 / 30 | in-page step changes (onboarding steps, plan builder steps) |
+| `push` | 320 / 36 / 1, critically damped (zeta 1.0) | native push and pop between screens and the swipe-back release (owner approved the native push, 26 Oct 2026; motion-feel 3c-native) |
 | `countUp` | 900 ms, ease-out cubic | hero and tile numbers, once per visit |
 | `draw` | 700 ms, ease-out | ring and chart draw-in, once per visit |
+
+Opacity-only fades use ease-out, never ease-in: the tab crossfade is new 180 ms ease-out over old 120 ms ease-out.
 
 Reduced motion: every preset becomes a 150 ms opacity fade; count-ups jump to the final value.
 
