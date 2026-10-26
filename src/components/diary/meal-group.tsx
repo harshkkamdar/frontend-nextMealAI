@@ -79,9 +79,7 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
       <div className="mb-1 flex items-center gap-2 pl-1">
         <h2 className="min-w-0 flex-1 text-[17px] font-semibold text-ink">{mealType}</h2>
         {calories > 0 ? (
-          <span className="text-[15px] font-semibold text-ink tabular-nums">
-            {formatMacroKcal(calories)}<span className="text-[13px] font-medium text-ink-65"> kcal</span>
-          </span>
+          <span className="text-[14px] font-medium text-ink-65 tabular-nums">{formatMacroKcal(calories)} kcal</span>
         ) : null}
         <button type="button" onClick={() => setActionsOpen(true)} aria-label={`${mealType} actions`} className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-ink-65 transition-transform active:scale-[.94]">
           <MoreHorizontal className="size-5" strokeWidth={1.75} aria-hidden="true" />

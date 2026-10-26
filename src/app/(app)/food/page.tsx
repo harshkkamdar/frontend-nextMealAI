@@ -320,10 +320,10 @@ export default function DiaryPage() {
                 <button
                   type="button"
                   onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
-                  className="-mx-5 -mb-5 mt-4 flex min-h-12 w-[calc(100%+40px)] items-center gap-2 border-t border-ink-06 px-5 text-left text-[14px] font-semibold text-ink-65 active:bg-ink-04"
+                  className="-mb-3 mt-2 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-ink-65 transition-transform active:scale-[.97]"
                 >
-                  <span className="min-w-0 flex-1">See your nutrition plan</span>
-                  <ChevronRightIcon className="size-4 text-ink-35" />
+                  Your nutrition plan
+                  <ChevronRightIcon className="size-4" />
                 </button>
               ) : null}
             />
