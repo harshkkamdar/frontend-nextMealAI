@@ -47,6 +47,9 @@ const makeLayer = (key: string): Layer => ({ key, scrollY: 0, height: 0, x: moti
  */
 const travel = () => window.innerWidth + 44
 
+/** A completed swipe ends off screen, where sub-pixel precision is invisible: rest sooner so the route commits sooner. */
+const SETTLE_OFFSCREEN = { restDelta: 0.003, restSpeed: 0.15 }
+
 /**
  * Places a push pair at progress p (Spatial Depth, motion.ts depthPair): 0 = top page covers the screen, 1 = top page
  * gone and the page under it at rest. `flat` (reduced motion): the top page only follows the finger, no depth.
@@ -396,7 +399,7 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       }
       // Reduced motion completes with the short crossfade (motion-feel 3c-native) instead of the spring slide.
       // The release hands the finger's velocity to the spring; a flick (over 600 px/s) earns a slight overshoot.
-      const release = reduced ? () => [animate(t.opacity, 0, reducedFade)] : () => slide(t, under, Math.max(0, done.base + done.x - done.x0) / travel(), complete ? 1 : 0, v / travel(), Math.abs(v) > 600 ? spring.pushFlick : spring.push)
+      const release = reduced ? () => [animate(t.opacity, 0, reducedFade)] : () => slide(t, under, Math.max(0, done.base + done.x - done.x0) / travel(), complete ? 1 : 0, v / travel(), { ...(Math.abs(v) > 600 ? spring.pushFlick : spring.push), ...(complete ? SETTLE_OFFSCREEN : null) })
       run(release, () => {
         if (!complete) return
         // Keep the page underneath shown until the route commits, or the screen would flash empty.

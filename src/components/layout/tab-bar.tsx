@@ -161,7 +161,8 @@ export function TabBar() {
                 aria-current={active ? 'page' : undefined}
                 onClick={() => { if (!active) void haptic('light') }}
                 className={cn(
-                  'relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full transition-transform active:scale-[.94]',
+                  // The open tab's ink fades in with its pill (200 ms) rather than cutting in after a pop.
+                  'relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full transition-[transform,color] duration-200 active:scale-[.94] active:duration-150',
                   active ? 'text-ink' : 'text-ink-65',
                 )}
               >
