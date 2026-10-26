@@ -124,13 +124,14 @@ export function WelcomeBeats() {
 
       <div className="absolute inset-x-0 bottom-0 z-10 px-gutter pb-[calc(var(--safe-bottom)+16px)] pt-6">
         <Dots p={p} reduce={reduce} />
-        <PrimaryButton type="button" onClick={onContinue} className={cn('relative text-cream', !last && 'bg-transparent')}>
-          {/* Ink base with the orange layer fading over it: the fill changes by opacity, never background-color. */}
+        <PrimaryButton type="button" onClick={onContinue} className={cn('relative', !last && 'bg-transparent')}>
+          {/* Ink base with the orange layer fading over it: the fill changes by opacity, never background-color. Label colours match
+              how PrimaryButton renders on orange today (ink; its class merge drops text-cream), cream on the ink base. */}
           <span aria-hidden="true" className="absolute inset-0 rounded-full bg-ink" />
           <span aria-hidden="true" className={cn('absolute inset-0 rounded-full bg-accent shadow-[var(--shadow-action)] transition-opacity duration-150 ease-out', last ? 'opacity-100' : 'opacity-0')} />
           <span className="relative grid">
-            <span aria-hidden={last || undefined} className={cn('col-start-1 row-start-1 transition-opacity duration-150 ease-out', last && 'opacity-0')}>Continue</span>
-            <span aria-hidden={!last || undefined} className={cn('col-start-1 row-start-1 transition-opacity duration-150 ease-out', !last && 'opacity-0')}>Get started</span>
+            <span aria-hidden={last || undefined} className={cn('col-start-1 row-start-1 text-cream transition-opacity duration-150 ease-out', last && 'opacity-0')}>Continue</span>
+            <span aria-hidden={!last || undefined} className={cn('col-start-1 row-start-1 text-ink transition-opacity duration-150 ease-out', !last && 'opacity-0')}>Get started</span>
           </span>
         </PrimaryButton>
         <button type="button" onClick={() => depthTo(() => router.push('/login'))} className="mx-auto mt-1 flex h-11 items-center px-4 text-body-sm font-semibold text-ink">

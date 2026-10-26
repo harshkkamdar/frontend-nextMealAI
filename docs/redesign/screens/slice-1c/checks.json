@@ -1,5 +1,885 @@
 [
   {
+    "shot": "consent",
+    "width": 360,
+    "url": "/onboarding/consent",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "consent",
+    "width": 390,
+    "url": "/onboarding/consent",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "forgot-empty",
+    "width": 360,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "forgot-empty",
+    "width": 390,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "forgot-sent",
+    "width": 360,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "forgot-sent",
+    "width": 390,
+    "url": "/forgot-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "generating",
+    "width": 360,
+    "url": "/onboarding/generating",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "generating",
+    "width": 390,
+    "url": "/onboarding/generating",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "login-empty",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-empty",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-error",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-error",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-filled",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-filled",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-invalid",
+    "width": 360,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "login-invalid",
+    "width": 390,
+    "url": "/login",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-activity-empty",
+    "width": 360,
+    "url": "/onboarding/fitness?q=activity",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-activity-empty",
+    "width": 390,
+    "url": "/onboarding/fitness?q=activity",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-activity-filled",
+    "width": 360,
+    "url": "/onboarding/fitness?q=activity",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-activity-filled",
+    "width": 390,
+    "url": "/onboarding/fitness?q=activity",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-allergies-empty",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=allergies",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-allergies-empty",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=allergies",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-allergies-filled",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=allergies",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-allergies-filled",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=allergies",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-cuisines-empty",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=cuisines",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-cuisines-empty",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=cuisines",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-cuisines-filled",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=cuisines",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-cuisines-filled",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=cuisines",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-diet-empty",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=diet",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-diet-empty",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=diet",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-diet-filled",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=diet",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-diet-filled",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=diet",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-dislikes-empty",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=dislikes",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-dislikes-empty",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=dislikes",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-dislikes-filled",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=dislikes",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-dislikes-filled",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=dislikes",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-dob-empty",
+    "width": 360,
+    "url": "/onboarding/personal?q=dob",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-dob-empty",
+    "width": 390,
+    "url": "/onboarding/personal?q=dob",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-dob-filled",
+    "width": 360,
+    "url": "/onboarding/personal?q=dob",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-dob-filled",
+    "width": 390,
+    "url": "/onboarding/personal?q=dob",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-equipment-empty",
+    "width": 360,
+    "url": "/onboarding/fitness?q=equipment",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-equipment-empty",
+    "width": 390,
+    "url": "/onboarding/fitness?q=equipment",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-equipment-filled",
+    "width": 360,
+    "url": "/onboarding/fitness?q=equipment",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-equipment-filled",
+    "width": 390,
+    "url": "/onboarding/fitness?q=equipment",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-experience-empty",
+    "width": 360,
+    "url": "/onboarding/fitness?q=experience",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-experience-empty",
+    "width": 390,
+    "url": "/onboarding/fitness?q=experience",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-experience-filled",
+    "width": 360,
+    "url": "/onboarding/fitness?q=experience",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-experience-filled",
+    "width": 390,
+    "url": "/onboarding/fitness?q=experience",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-frequency-empty",
+    "width": 360,
+    "url": "/onboarding/fitness?q=frequency",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-frequency-empty",
+    "width": 390,
+    "url": "/onboarding/fitness?q=frequency",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-frequency-filled",
+    "width": 360,
+    "url": "/onboarding/fitness?q=frequency",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-frequency-filled",
+    "width": 390,
+    "url": "/onboarding/fitness?q=frequency",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-goal-empty",
+    "width": 360,
+    "url": "/onboarding/fitness?q=goal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-goal-empty",
+    "width": 390,
+    "url": "/onboarding/fitness?q=goal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-goal-filled",
+    "width": 360,
+    "url": "/onboarding/fitness?q=goal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-goal-filled",
+    "width": 390,
+    "url": "/onboarding/fitness?q=goal",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-height-empty",
+    "width": 360,
+    "url": "/onboarding/personal?q=height",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-height-empty",
+    "width": 390,
+    "url": "/onboarding/personal?q=height",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-height-error",
+    "width": 360,
+    "url": "/onboarding/personal?q=height",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-height-error",
+    "width": 390,
+    "url": "/onboarding/personal?q=height",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-height-filled",
+    "width": 360,
+    "url": "/onboarding/personal?q=height",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-height-filled",
+    "width": 390,
+    "url": "/onboarding/personal?q=height",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-injuries-empty",
+    "width": 360,
+    "url": "/onboarding/fitness?q=injuries",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-injuries-empty",
+    "width": 390,
+    "url": "/onboarding/fitness?q=injuries",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-injuries-filled",
+    "width": 360,
+    "url": "/onboarding/fitness?q=injuries",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-injuries-filled",
+    "width": 390,
+    "url": "/onboarding/fitness?q=injuries",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-meals-empty",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=meals",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-meals-empty",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=meals",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-meals-filled",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=meals",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-meals-filled",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=meals",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-name-empty",
+    "width": 360,
+    "url": "/onboarding/personal?q=name",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-name-empty",
+    "width": 390,
+    "url": "/onboarding/personal?q=name",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-name-filled",
+    "width": 360,
+    "url": "/onboarding/personal?q=name",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-name-filled",
+    "width": 390,
+    "url": "/onboarding/personal?q=name",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-reflection-empty",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=reflection",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-reflection-empty",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=reflection",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-reflection-filled",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=reflection",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-reflection-filled",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=reflection",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-sex-empty",
+    "width": 360,
+    "url": "/onboarding/personal?q=sex",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-sex-empty",
+    "width": 390,
+    "url": "/onboarding/personal?q=sex",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-sex-filled",
+    "width": 360,
+    "url": "/onboarding/personal?q=sex",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-sex-filled",
+    "width": 390,
+    "url": "/onboarding/personal?q=sex",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-target-empty",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=target",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-target-empty",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=target",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-target-filled",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=target",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-target-filled",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=target",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-weight-empty",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=weight",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-weight-empty",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=weight",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "ob-weight-filled",
+    "width": 360,
+    "url": "/onboarding/nutrition?q=weight",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "ob-weight-filled",
+    "width": 390,
+    "url": "/onboarding/nutrition?q=weight",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-expired",
+    "width": 360,
+    "url": "/reset-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-expired",
+    "width": 390,
+    "url": "/reset-password",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-valid",
+    "width": 360,
+    "url": "/reset-password#access_token=capture&type=recovery",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reset-valid",
+    "width": 390,
+    "url": "/reset-password#access_token=capture&type=recovery",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reveal-error",
+    "width": 360,
+    "url": "/onboarding/review",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reveal-error",
+    "width": 390,
+    "url": "/onboarding/review",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reveal-long-days",
+    "width": 360,
+    "url": "/onboarding/review",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reveal-long-days",
+    "width": 390,
+    "url": "/onboarding/review",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reveal-no-plan",
+    "width": 360,
+    "url": "/onboarding/review",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reveal-no-plan",
+    "width": 390,
+    "url": "/onboarding/review",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reveal",
+    "width": 360,
+    "url": "/onboarding/review",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "reveal",
+    "width": 390,
+    "url": "/onboarding/review",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-empty",
+    "width": 360,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-empty",
+    "width": 390,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-error",
+    "width": 360,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-error",
+    "width": 390,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-filled",
+    "width": 360,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-filled",
+    "width": 390,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-invalid",
+    "width": 360,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "signup-invalid",
+    "width": 390,
+    "url": "/signup",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
     "shot": "welcome-1",
     "width": 360,
     "url": "/welcome",
@@ -62,22 +942,6 @@
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
-  },
-  {
-    "shot": "welcome-mid-drag",
-    "width": 360,
-    "url": "/welcome",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 0
-  },
-  {
-    "shot": "welcome-mid-drag",
-    "width": 390,
-    "url": "/welcome",
-    "axe": [],
-    "smallTargets": [],
-    "orangeActions": 0
   },
   {
     "shot": "welcome-offline",
