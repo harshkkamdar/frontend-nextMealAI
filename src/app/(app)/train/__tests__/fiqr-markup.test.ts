@@ -17,6 +17,7 @@ describe('FIQR train markup contract', () => {
     expect(trainPage).toContain('<WeekStrip')
     expect(trainPage).toContain('<OfflineBand />')
     expect(trainPage).toContain('<BottomSheet open={calendarOpen}')
+    expect(trainPage).not.toContain('CalendarStrip')
     expect(trainPage).toContain('Log a freestyle session')
     // One orange action: whichever hero state renders, exactly one PrimaryButton shows.
     expect(trainPage).not.toContain('SecondaryButton')

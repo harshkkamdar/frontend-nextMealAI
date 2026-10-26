@@ -65,6 +65,8 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [completing, setCompleting] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
+  // Once the summary is opaque the live controls under it are removed (one orange action, nothing tabbable behind).
+  const [summaryCovered, setSummaryCovered] = useState(false)
   const [showExitSheet, setShowExitSheet] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   const [removeConfirm, setRemoveConfirm] = useState(false)
@@ -385,7 +387,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       transition: reduce ? reducedFade : { ...spring.glide, delay: 0.12 + index * 0.04 },
     })
     summary = (
-      <motion.div key="summary" role="dialog" aria-label="Session done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="fixed inset-0 z-[80] mx-auto flex w-full max-w-md flex-col overflow-y-auto bg-cream px-4" style={{ paddingTop: 'var(--safe-top)', paddingBottom: 'calc(16px + var(--safe-bottom))' }}>
+      <motion.div key="summary" role="dialog" aria-label="Session done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onAnimationComplete={() => setSummaryCovered(true)} transition={{ duration: 0.2, ease: 'easeOut' }} className="fixed inset-0 z-[80] mx-auto flex w-full max-w-md flex-col overflow-y-auto bg-cream px-4" style={{ paddingTop: 'var(--safe-top)', paddingBottom: 'calc(16px + var(--safe-bottom))' }}>
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           <motion.div initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={reduce ? reducedFade : spring.lens}>
             <GeoAvatar variant="face" state="coach" size={64} />
@@ -534,7 +536,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
       {/* Portalled to body: the route frame's enter transform would otherwise make this fixed bar ride with the page
           and jump into place when the push ends. Solid cream so it can animate in (a moving glass bar skips paints). */}
-      {exercises.length > 0 ? createPortal(
+      {exercises.length > 0 && !summaryCovered ? createPortal(
       <motion.nav initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={spring.sheet} className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-[28px] bg-cream px-4 pt-3 shadow-[0_-8px_24px_rgba(17,28,53,.06)]" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
         {allComplete || currentIndex === exercises.length - 1 ? (
           <PrimaryButton type="button" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>

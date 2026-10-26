@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { CalendarDays } from 'lucide-react'
 
 import { LargeTitleHeader } from '@/components/layout/screen-header'
-import { CalendarStrip } from '@/components/shared/calendar-strip'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
@@ -104,7 +103,6 @@ export default function ActivityPage() {
     for (const session of history) if (session.completed_at) set.add(todayLocalISO(tz, new Date(session.completed_at)))
     return set
   }, [history, tz])
-  const indicators = useMemo(() => new Map([...doneDates].map((date) => [date, { workout: true }])), [doneDates])
 
   const selectedDateHistory = useMemo(() => history.filter((session) => (
     Boolean(session.completed_at) && todayLocalISO(tz, new Date(session.completed_at!)) === selectedDate
@@ -225,7 +223,7 @@ export default function ActivityPage() {
 
       <BottomSheet open={calendarOpen} onClose={() => setCalendarOpen(false)} ariaLabel="Workout history calendar">
         <div className="px-4 pb-6 pt-3">
-          <CalendarStrip selectedDate={selectedDate} onSelectDate={setSelectedDate} indicators={indicators} label="Today" onLabelClick={() => setSelectedDate(todayLocalISO(tz))} tz={tz} />
+          <WeekStrip selected={selectedDate} today={today} onSelect={setSelectedDate} marked={doneDates} markLabel="workout done" weekStartsOn={1} />
           <div className="mt-4 overflow-hidden rounded-[22px] bg-card shadow-[var(--shadow-card)]">
             {selectedDateHistory.length === 0 ? <p className="px-5 py-5 text-[14px] text-ink-65">No workout on this day</p> : selectedDateHistory.map((session) => (
               <button key={session.id} type="button" onClick={() => router.push(`/train/session?id=${session.id}`)} className="flex min-h-16 w-full items-center gap-3 border-b border-ink-06 px-5 py-3 text-left last:border-b-0 active:bg-ink-04">
