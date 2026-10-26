@@ -1,0 +1,112 @@
+{
+  "login-to-welcome": {
+    "frames": 39,
+    "chrome_px": 146909,
+    "content_px": 192758,
+    "max_chrome_share": 0.128,
+    "max_content_share": 0.119,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-continue": {
+    "frames": 46,
+    "chrome_px": 0,
+    "content_px": 182186,
+    "max_chrome_share": 0,
+    "max_content_share": 0.238,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-double-continue": {
+    "frames": 69,
+    "chrome_px": 3156,
+    "content_px": 349797,
+    "max_chrome_share": 0.46,
+    "max_content_share": 0.092,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-drag-release": {
+    "frames": 111,
+    "chrome_px": 0,
+    "content_px": 420838,
+    "max_chrome_share": 0,
+    "max_content_share": 0.03,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-drag-scrub": {
+    "frames": 135,
+    "chrome_px": 0,
+    "content_px": 590222,
+    "max_chrome_share": 0,
+    "max_content_share": 0.018,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-first-paint": {
+    "frames": 31,
+    "chrome_px": 44615,
+    "content_px": 199969,
+    "max_chrome_share": 0.557,
+    "max_content_share": 0.334,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-flick": {
+    "frames": 67,
+    "chrome_px": 0,
+    "content_px": 233634,
+    "max_chrome_share": 0,
+    "max_content_share": 0.091,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-hard-flick": {
+    "frames": 30,
+    "chrome_px": 0,
+    "content_px": 232451,
+    "max_chrome_share": 0,
+    "max_content_share": 0.176,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-last": {
+    "frames": 124,
+    "chrome_px": 41274,
+    "content_px": 482638,
+    "max_chrome_share": 0.51,
+    "max_content_share": 0.093,
+    "issues": [
+      "late change frame 68 after 25 still frames (64 px)"
+    ],
+    "verdict": "pop"
+  },
+  "welcome-rubber-band": {
+    "frames": 60,
+    "chrome_px": 0,
+    "content_px": 346299,
+    "max_chrome_share": 0,
+    "max_content_share": 0.032,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-to-login": {
+    "frames": 49,
+    "chrome_px": 147358,
+    "content_px": 169892,
+    "max_chrome_share": 0.125,
+    "max_content_share": 0.078,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "welcome-to-signup": {
+    "frames": 98,
+    "chrome_px": 83745,
+    "content_px": 516945,
+    "max_chrome_share": 0.271,
+    "max_content_share": 0.051,
+    "issues": [],
+    "verdict": "smooth"
+  }
+}

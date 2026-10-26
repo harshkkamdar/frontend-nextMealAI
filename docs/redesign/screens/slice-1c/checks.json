@@ -1,0 +1,114 @@
+[
+  {
+    "shot": "welcome-1",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-1",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-2",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-2",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-3",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-3",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-4",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "welcome-4",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "welcome-mid-drag",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [
+      {
+        "id": "color-contrast",
+        "nodes": 1,
+        "targets": [
+          ".gap-2\\.5 > .min-w-0 > .font-medium.text-\\[12px\\].text-ink-65"
+        ]
+      }
+    ],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-mid-drag",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [
+      {
+        "id": "color-contrast",
+        "nodes": 1,
+        "targets": [
+          ".gap-2\\.5 > .min-w-0 > .font-medium.text-\\[12px\\].text-ink-65"
+        ]
+      }
+    ],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-offline",
+    "width": 360,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "welcome-offline",
+    "width": 390,
+    "url": "/welcome",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  }
+]
