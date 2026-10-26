@@ -121,7 +121,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S6-R3 | R3 axe 0 / contrast / 44 pt | built 4716587: axe 0, small 0, orange <= 1 on 50 checks |
 | S6-R4 | R4 frame-diff 0 pops | pending |
 | S6-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
-| S6-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
+| S6-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: critic scores of 3 fix rounds printed - r1 7.5/7.5/7, r2 7.5/7.5/7.5, r3 7.5/7/7.5 (ranks 1/2/1; top 3 every run, never >= 8). Recurring r3 notes: bottom inset under the tab bar on Program list, one selected-day marker, bar chart scale, title vs body face (signed type decision) |
 | S6-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-6.md? Freestyle log moved to the header +; calendar sheet uses the shared week strip (no tap-Today jump); pager scrolls sideways only (also fixed resume landing on exercise 1). Should Start on Train be orange when Home uses an ink play button? |
 | S6-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
