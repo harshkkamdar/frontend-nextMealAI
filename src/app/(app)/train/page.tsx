@@ -46,6 +46,8 @@ export default function ActivityPage() {
   const [selectedDate, setSelectedDate] = useState(() => todayLocalISO(tz))
   const [starting, setStarting] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
+  // Read once per visit: the in-progress card's minutes need not tick.
+  const [mountedAt] = useState(() => Date.now())
   const programRef = useRef<HTMLElement>(null)
 
   const todayAtMountRef = useRef<string | null>(null)
@@ -147,7 +149,7 @@ export default function ActivityPage() {
   const heroParts = liveExercise ? musclesFor(liveExercise.muscle_group, liveExercise.name) : dayParts
   const heroChips = muscleNames(dayParts)
   const liveSets = inProgress ? inProgress.exercises.flatMap((exercise) => exercise.sets) : []
-  const liveMinutes = inProgress?.started_at ? Math.max(0, Math.floor((Date.now() - new Date(inProgress.started_at).getTime()) / 60000)) : 0
+  const liveMinutes = inProgress?.started_at ? Math.max(0, Math.floor((mountedAt - new Date(inProgress.started_at).getTime()) / 60000)) : 0
   const afterRest = isRestDay ? days.slice(nextIdx + 1).concat(days.slice(0, nextIdx)).find((day) => !day.is_rest_day) : undefined
 
   const hero = !workoutPlan ? (

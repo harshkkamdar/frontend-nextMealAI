@@ -28,8 +28,8 @@ function VolumeCompareChart({ compares, animate }: { compares: ExerciseCompare[]
   )
   return (
     <section className={cn(CARD, 'p-4')} aria-label="Volume by exercise">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-headline text-ink">Volume by exercise</h2>
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <h2 className="whitespace-nowrap text-headline text-ink">Volume by exercise</h2>
         <p className="flex shrink-0 items-center gap-3 text-label text-ink-65" aria-hidden="true">
           <span className="flex items-center gap-1.5"><i className="size-2.5 rounded-full bg-ink" />Today</span>
           <span className="flex items-center gap-1.5"><i className="size-2.5 rounded-full bg-ink-20" />Last time</span>
