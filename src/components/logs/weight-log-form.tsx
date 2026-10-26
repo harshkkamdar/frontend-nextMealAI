@@ -57,7 +57,7 @@ export function WeightLogForm() {
               value={weightKg}
               placeholder="0.0"
               onChange={(event) => setWeightKg(event.target.value ? Number(event.target.value) : '')}
-              className="font-display w-[5ch] bg-transparent text-right text-[40px] font-extrabold leading-none tracking-[-0.02em] text-ink outline-none placeholder:text-ink-35 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+              className="font-display h-14 w-[5ch] bg-transparent text-right text-[40px] font-extrabold leading-none tracking-[-0.02em] text-ink outline-none placeholder:text-ink-35 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
             />
             <span className="text-body font-semibold text-ink-65">kg</span>
           </label>

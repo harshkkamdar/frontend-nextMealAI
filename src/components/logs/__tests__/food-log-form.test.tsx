@@ -57,8 +57,6 @@ const ESTIMATE = {
   confidence: 0.75,
 }
 
-URL.createObjectURL = vi.fn(() => 'blob:photo')
-URL.revokeObjectURL = vi.fn()
 
 function pickPhoto(container: HTMLElement) {
   const input = container.querySelector('input[type="file"]') as HTMLInputElement

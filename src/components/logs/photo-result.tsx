@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Minus, Plus, RotateCcw, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -39,8 +39,14 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
 }) {
   const reduce = useReducedMotion()
   const online = useOnline()
-  const url = useMemo(() => URL.createObjectURL(file), [file])
-  useEffect(() => () => URL.revokeObjectURL(url), [url])
+  // A data URL, not an object URL: nothing to revoke, so a remount (StrictMode) can't leave a dead thumbnail.
+  const [url, setUrl] = useState<string>()
+  useEffect(() => {
+    const reader = new FileReader()
+    reader.onload = () => setUrl(String(reader.result))
+    reader.readAsDataURL(file)
+    return () => reader.abort()
+  }, [file])
   const [phase, setPhase] = useState<Phase>(online ? 'reading' : 'offline')
   const [estimate, setEstimate] = useState<FoodEstimate | null>(null)
   const [items, setItems] = useState<PhotoItem[]>([])
@@ -98,7 +104,9 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: reducedFade }
     : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, transition: { duration: 0.12 } }, transition: spring.glide }
 
-  const thumb = (size: string) => <img src={url} alt="Your photo" className={cn('shrink-0 rounded-[14px] object-cover', size)} />
+  const thumb = (size: string) => (url
+    ? <img src={url} alt="Your photo" className={cn('shrink-0 rounded-[14px] object-cover', size)} />
+    : <span aria-hidden="true" className={cn('shrink-0 rounded-[14px] bg-ink-06', size)} />)
 
   return (
     <div className="pb-[calc(96px+var(--safe-bottom))]">
@@ -148,10 +156,10 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
                   <li key={`${item.name}-${index}`} className="border-b border-ink-06 px-4 pb-2 pt-3 last:border-b-0">
                     <div className="flex items-start gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className={`text-body-sm font-semibold leading-snug ${item.removed ? 'text-ink-35 line-through' : 'text-ink'}`}>{item.name}</p>
+                        <p className={`text-body-sm font-semibold leading-snug ${item.removed ? 'text-ink-65 line-through' : 'text-ink'}`}>{item.name}</p>
                         {item.confidence < UNSURE && !item.removed ? <p className="mt-0.5 flex items-center gap-1.5 text-label text-ink-80"><span aria-hidden="true" className="size-1.5 rounded-full bg-macro-ochre" />Not sure, check this</p> : null}
                       </div>
-                      <p className={`shrink-0 text-body-sm font-bold tabular-nums ${item.removed ? 'text-ink-35' : 'text-ink'}`}>{formatMacroKcal(m.calories)} <span className="text-label font-medium text-ink-65">kcal</span></p>
+                      <p className={`shrink-0 text-body-sm font-bold tabular-nums ${item.removed ? 'text-ink-65' : 'text-ink'}`}>{formatMacroKcal(m.calories)} <span className="text-label font-medium text-ink-65">kcal</span></p>
                     </div>
                     <div className="mt-1 flex items-center">
                       {item.removed ? (

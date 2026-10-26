@@ -23,7 +23,7 @@ export function WaterLogForm() {
     let alive = true
     getLogs({ type: 'water', days: 1 }).then((logs: Log[]) => {
       if (!alive) return
-      const day = todayLocalISO()
+      const day = todayLocalISO(Intl.DateTimeFormat().resolvedOptions().timeZone)
       const last = logs.filter((l) => l.type === 'water').sort((a, b) => b.created_at.localeCompare(a.created_at))[0]
       setToday({ count: waterGlassesToday(logs, day), last: last && (last.local_date ?? day) === day ? clockTime(last.created_at) : null })
     }, () => {})

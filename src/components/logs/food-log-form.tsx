@@ -278,7 +278,8 @@ export function FoodLogForm() {
         onAdd={(item) => { addToPlate(item); setPicked(null) }}
         onLogNow={(item) => { const next = [...plate, item]; setPlate(next); setPicked(null); void savePlate(next) }}
       />
-      <PlatePill items={plate} saving={saving} onOpen={() => setPlateOpen(true)} onLog={() => void savePlate(plate)} />
+      {/* The pill steps aside while a sheet is up, so the screen keeps one orange action. */}
+      <PlatePill items={picked || plateOpen ? [] : plate} saving={saving} onOpen={() => setPlateOpen(true)} onLog={() => void savePlate(plate)} />
       <PlateSheet
         open={plateOpen}
         items={plate}

@@ -131,15 +131,15 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
         {editing ? (
           <div className="mt-4 grid grid-cols-4 gap-2">
             {(['calories', 'protein', 'carbs', 'fat'] as const).map((key) => (
-              <label key={key} className="rounded-[14px] bg-ink-04 px-2 pb-1.5 pt-2 text-center focus-within:outline focus-within:outline-[1.5px] focus-within:outline-ink">
-                <span className="block text-label capitalize text-ink-65">{key === 'calories' ? 'kcal' : `${key}, g`}</span>
+              <label key={key} className="rounded-[14px] bg-ink-04 px-2 pb-0.5 pt-2 text-center focus-within:outline focus-within:outline-[1.5px] focus-within:outline-ink">
+                <span className="block text-label text-ink-65">{key === 'calories' ? 'kcal' : `${key.charAt(0).toUpperCase()}${key.slice(1)}, g`}</span>
                 <input
                   type="number"
                   inputMode="decimal"
                   aria-label={key === 'calories' ? 'Calories' : key.charAt(0).toUpperCase() + key.slice(1)}
                   value={macros[key]}
                   onChange={(event) => setOverride({ ...macros, [key]: Number(event.target.value) || 0 })}
-                  className="h-9 w-full bg-transparent text-center text-body font-bold text-ink outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                  className="h-11 w-full bg-transparent text-center text-body font-bold text-ink outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </label>
             ))}
