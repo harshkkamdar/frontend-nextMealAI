@@ -57,11 +57,11 @@ export function SessionTimerCard({ elapsedSeconds, exercises, currentIndex }: { 
     <section className={cn(CARD, 'px-4 pb-3.5 pt-4')} aria-label="Session">
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-[12px] font-semibold leading-none text-ink-65">Time</p>
+          <p className="text-[13px] font-semibold leading-none text-ink-65">Time</p>
           <div className="mt-1.5"><DigitTiles text={hms} label={`${minutes} min ${elapsedSeconds % 60} s`} size="sm" /></div>
         </div>
         <p className="text-right">
-          <span className="block text-[12px] font-semibold leading-none text-ink-65">Volume</span>
+          <span className="block text-[13px] font-semibold leading-none text-ink-65">Volume</span>
           <span className="mt-1.5 flex h-[34px] items-center justify-end text-[17px] font-bold text-ink tabular-nums"><CountUp value={sessionVolumeKg(exercises)} delay={0} /><span className="text-[13px] font-semibold text-ink-65">&nbsp;kg</span></span>
         </p>
       </div>

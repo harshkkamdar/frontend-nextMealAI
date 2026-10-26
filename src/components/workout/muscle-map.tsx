@@ -98,8 +98,8 @@ export function ExerciseVisual({ group, name }: { group: string | null | undefin
   return (
     <figure className="flex h-[68px] items-center gap-3 rounded-[16px] bg-ink-04 pl-4 pr-3" data-slot="exercise-image">
       <figcaption className="min-w-0 flex-1">
-        <span className="block text-[12px] font-semibold text-ink-65">Works</span>
-        <span className="mt-0.5 line-clamp-2 block text-[14px] font-semibold leading-snug text-ink">{caption || 'Muscles not listed'}</span>
+        <span className="block text-[12px] font-medium leading-[1.3] text-ink-65">Works</span>
+        <span className="mt-0.5 line-clamp-2 block text-[13px] font-semibold leading-[1.3] text-ink">{caption || 'Muscles not listed'}</span>
       </figcaption>
       <MuscleMap parts={parts} className="h-[58px] shrink-0" />
     </figure>
