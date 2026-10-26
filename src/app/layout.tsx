@@ -21,7 +21,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           position="top-center"
           // Below the 60px header row (PushedHeader and LargeTitleHeader) so a toast never covers the back button.
           offset={{ top: 'calc(64px + var(--safe-top))' }}
-          mobileOffset={{ top: 'calc(64px + var(--safe-top))' }}
+          // left/right 0: sonner's phone layout is 100% wide from its side offset, which pushed a long capsule (and Undo) 16 px off screen.
+          mobileOffset={{ top: 'calc(64px + var(--safe-top))', left: 0, right: 0 }}
           // The status capsule (mock "Status capsule"): toasts share the offline band's glass capsule and ink dot (a ring
           // for errors), so every message lives in one place under the header. Our dot replaces sonner's type icons.
           icons={{ success: null, error: null, info: null, warning: null }}
