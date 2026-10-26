@@ -25,7 +25,7 @@ Rebuild the app's screens to match the locked mocks: Spatial Depth (option 19) a
 | P Check-in and plans | A3 Today preview check-in; B1 Answer card; C1 Focused builder steps |
 | S Settings and system | Paywall Depth stack; Settings Grouped list; system states Status capsule (one capsule under the header for all messages; crash/404 float a card over the last screen) |
 | O Onboarding and login | Aurora fields + depth steps per `mocks/aurora-onboarding.html` |
-| L Log a meal | waiting for owner picks |
+| L Log a meal | A2 Tell Geo + Log again in the + sheet; B2 item sheet with portion chips; C2 photo result as item rows with steppers (uses the per-item estimate and confidence the backend returns, edits via the existing log-from-estimate edits field); D2 plate pill tray that opens a sheet; camera, estimating hand-off and menu scan to Geo; manual logs (water, weight, sleep, mood, energy, workout; water adds 1 glass per log, owner to confirm); /logs; /foods with Add a food |
 
 ## Done criteria per slice
 1. Screens match the locked mock in a side-by-side screenshot at 390 and 360 (read by the builder and by a fresh reviewer on a different model).

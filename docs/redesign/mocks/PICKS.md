@@ -9,3 +9,4 @@
 - Check-in and plans (locked): A3 Today preview; B1 Answer card; C1 Focused steps.
 - Settings (locked): Paywall Depth stack; Settings Grouped list; System states Status capsule.
 - Log a meal: page broken, owner could not pick.
+- Log a meal (locked): A2 Tell Geo + Log again; B2 Item sheet with portion chips; C2 Photo result item rows with steppers; D2 Plate pill tray that opens a sheet; keep K camera, estimating hand-off and menu scan to Geo; M manual logs (water, weight, sleep, mood, energy, workout); L /logs recent logs; F /foods your foods and Add a food.
