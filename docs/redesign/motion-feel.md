@@ -129,6 +129,16 @@ html[data-nav="back"]::view-transition-new(root) { animation-name: vt-enter-back
 
 Fallback path (framer): the incoming page root uses `initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={spring.page}`, and back navigation uses `x: -24`. The shared-element morph is only possible inside one React tree (card to sheet, row to expanded row) with `layoutId` plus `AnimatePresence`. It does not work across routes. Do not fake a cross-route morph with fixed-position clones.
 
+### 3c-native. Native push, pop and swipe-back (owner choice, 26 Oct 2026)
+
+Supersedes the 40 px fade-in fallback above. Built in `src/components/layout/route-frame.tsx`; values in `src/lib/motion.ts`.
+- Stack: every page stays mounted under the page that covers it (frozen router contexts), so back keeps its state and scroll. Only the top page is live and in the document flow; pages underneath are `fixed inset-0 overflow-hidden` at their own `scrollTop`, `inert`, `visibility: hidden` at rest, and `display: none` two or more levels down.
+- Push: the new page enters from x 100% to 0 over the old one and carries a `-12px 0 32px` ink 10% shadow; the old page moves to x -30% under an ink dim from 0 to 0.08. One spring drives progress 0..1 for both pages and the dim: `spring.push` 320 / 36 / 1 (zeta 1.0, no overshoot, within 2 px of 390 by about 0.42 s, at rest by about 0.5 s). Pop is the exact reverse and starts from the live position if it interrupts a push.
+- Swipe-back: a touch that starts within 20 px of the left edge and moves sideways first follows the finger 1:1 (parallax and dim tied to progress). Release completes past 35% of the width or at more than 300 px/s rightward; a leftward flick faster than 300 px/s cancels. A push still sliding in can be caught. Vertical-first touches are left to scroll; `[data-no-swipe-back]` and vaul drawers opt out; off on tab roots, with nothing underneath, and in iOS Safari outside the app (Safari owns that edge). WKWebView's own back-forward swipe stays off (Capacitor never sets `allowsBackForwardNavigationGestures`).
+- Direction (`classifyNav`): a route still in the stack is a pop to it (back button, hardware back, swipe, or a pushed page's link to its root). Browser back or forward outside the stack reads the history index stamped on each entry. Tab root to tab root, or another tab chosen from a pushed page, is the 3b crossfade (new 0.18 s ease-out over old 0.12 s ease-in), and the stack starts over.
+- Reduced motion: every route change is a 0.15 s crossfade, and pages underneath stay at x 0.
+- Tab bar: outside the stack, so it never slides with a push; it only leaves with its own slide on `hidesTabBar` routes. Each page layer carries its own tab bar clearance.
+
 ### 3d. Sheets
 
 The inset `BottomSheet` stays on vaul 1.1.2. Its behaviour is fixed by its source and is accepted: 1:1 drag; release on a 500 ms `cubic-bezier(.32,.72,0,1)` transition; close when the drag passes 25% of the height (`CLOSE_THRESHOLD`) or the velocity exceeds 0.4 px/ms (`VELOCITY_THRESHOLD`); upward overdrag damped by `8 * (ln(v + 1) - 2)`. The repo README now says "This repo is unmaintained": pin 1.1.2 and do not upgrade blind.

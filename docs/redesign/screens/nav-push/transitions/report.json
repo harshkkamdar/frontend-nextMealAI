@@ -1,0 +1,51 @@
+{
+  "pop-settings-to-home": {
+    "frames": 37,
+    "chrome_px": 131238,
+    "content_px": 874846,
+    "max_chrome_share": 0.089,
+    "max_content_share": 0.091,
+    "issues": [
+      "chrome jump frame 3: 9% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "push-home-to-settings": {
+    "frames": 54,
+    "chrome_px": 102867,
+    "content_px": 593827,
+    "max_chrome_share": 0.108,
+    "max_content_share": 0.141,
+    "issues": [
+      "chrome jump frame 3: 11% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "swipe-back-cancel": {
+    "frames": 52,
+    "chrome_px": 125505,
+    "content_px": 841207,
+    "max_chrome_share": 0.036,
+    "max_content_share": 0.033,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "swipe-back-complete": {
+    "frames": 57,
+    "chrome_px": 213634,
+    "content_px": 1314791,
+    "max_chrome_share": 0.037,
+    "max_content_share": 0.039,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "tab-home-to-food": {
+    "frames": 55,
+    "chrome_px": 32602,
+    "content_px": 197185,
+    "max_chrome_share": 0.13,
+    "max_content_share": 0.113,
+    "issues": [],
+    "verdict": "smooth"
+  }
+}

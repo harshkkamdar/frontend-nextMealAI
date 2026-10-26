@@ -9,6 +9,8 @@ export const spring = {
   glide: { type: 'spring', stiffness: 300, damping: 35, mass: 1 },
   /** Small earned overshoot (~0.15 bounce): tab lens, orb morph. */
   lens: { type: 'spring', stiffness: 380, damping: 33, mass: 1 },
+  /** iOS navigation push and pop: critically damped (zeta 1.0), no overshoot, ~0.42 s to within 2 px. Animates progress 0..1. */
+  push: { type: 'spring', stiffness: 320, damping: 36, mass: 1, restDelta: 0.001, restSpeed: 0.01 },
 } as const satisfies Record<string, Transition>
 
 /** Reduced motion: every preset becomes a short fade. */
@@ -28,3 +30,35 @@ export const project = (vPxPerS: number, rate = 0.998) => ((vPxPerS / 1000) * ra
 
 /** iOS rubber band: resistance grows with overshoot; c = .55. */
 export const rubberband = (over: number, dim: number, c = 0.55) => (over * dim * c) / (dim + c * Math.abs(over))
+
+/** Native push geometry (motion-feel 3c): the covered page parallaxes to -30% and dims to ink 8%. */
+export const PUSH_PARALLAX = 0.3
+export const PUSH_DIM = 0.08
+/** Swipe-back: touches must start within this many px of the left edge. */
+export const SWIPE_EDGE_PX = 20
+
+export const TAB_ROOTS = new Set(['/dashboard', '/food', '/train', '/chat'])
+
+export type NavKind = 'none' | 'push' | 'pop' | 'tab'
+
+/**
+ * Decides how a route change animates. `stack` holds the routes still mounted, root first, current last.
+ * A route already in the stack below the top is a pop to it (back, hardware back, swipe, tapping the current
+ * tab again). Browser back/forward to a route outside the stack goes by the history index. Peers at tab roots fade.
+ */
+export function classifyNav(stack: readonly string[], to: string, popstate: 'back' | 'forward' | null): { kind: NavKind; index: number } {
+  const from = stack[stack.length - 1]
+  if (from === to) return { kind: 'none', index: stack.length - 1 }
+  const index = stack.lastIndexOf(to)
+  if (index >= 0) return { kind: 'pop', index }
+  if (popstate) return { kind: popstate === 'forward' ? 'push' : 'pop', index: -1 }
+  if (TAB_ROOTS.has(to)) return { kind: 'tab', index: -1 }
+  return { kind: 'push', index: -1 }
+}
+
+/** Swipe-back release: a clear flick decides by direction, otherwise the page must be past 35% of the width. */
+export function shouldCompleteSwipe(dx: number, width: number, velocityPxPerS: number): boolean {
+  if (velocityPxPerS > 300) return true
+  if (velocityPxPerS < -300) return false
+  return dx / width > 0.35
+}

@@ -1,0 +1,63 @@
+import { describe, expect, it } from 'vitest'
+import { classifyNav, shouldCompleteSwipe, spring } from '@/lib/motion'
+
+describe('classifyNav', () => {
+  it('pushes a deeper screen over the current one', () => {
+    expect(classifyNav(['/food'], '/foods', null)).toEqual({ kind: 'push', index: -1 })
+    expect(classifyNav(['/plans'], '/plans/view', null)).toEqual({ kind: 'push', index: -1 })
+  })
+
+  it('pops to a screen still in the stack (back button, hardware back, swipe)', () => {
+    expect(classifyNav(['/food', '/foods'], '/food', 'back')).toEqual({ kind: 'pop', index: 0 })
+    expect(classifyNav(['/dashboard', '/plans', '/plans/view'], '/plans', 'back')).toEqual({ kind: 'pop', index: 1 })
+  })
+
+  it('pops to the root when the current tab is tapped again from a pushed screen', () => {
+    expect(classifyNav(['/food', '/foods', '/logs'], '/food', null)).toEqual({ kind: 'pop', index: 0 })
+  })
+
+  it('fades between tab roots and when another tab is chosen from a pushed screen', () => {
+    expect(classifyNav(['/dashboard'], '/food', null).kind).toBe('tab')
+    expect(classifyNav(['/food', '/foods'], '/train', null).kind).toBe('tab')
+  })
+
+  it('reads browser back/forward outside the stack by history direction, not route depth', () => {
+    expect(classifyNav(['/plans/view'], '/plans', 'back').kind).toBe('pop')
+    expect(classifyNav(['/dashboard'], '/settings', 'forward').kind).toBe('push')
+    expect(classifyNav(['/settings'], '/plans/view', 'back').kind).toBe('pop')
+  })
+
+  it('does nothing when the route did not change', () => {
+    expect(classifyNav(['/food'], '/food', null).kind).toBe('none')
+  })
+})
+
+describe('shouldCompleteSwipe', () => {
+  const w = 390
+  it('completes past 35% of the width and snaps back short of it', () => {
+    expect(shouldCompleteSwipe(0.36 * w, w, 0)).toBe(true)
+    expect(shouldCompleteSwipe(0.34 * w, w, 0)).toBe(false)
+  })
+  it('lets a rightward flick complete early and a leftward flick cancel late', () => {
+    expect(shouldCompleteSwipe(40, w, 600)).toBe(true)
+    expect(shouldCompleteSwipe(0.8 * w, w, -600)).toBe(false)
+  })
+})
+
+describe('spring.push', () => {
+  // Integrates the spring 0 -> 1 at 1 ms steps: it must never overshoot and must be within 2 px (of 390) by ~0.5 s.
+  it('settles without overshoot in about half a second', () => {
+    const { stiffness: k, damping: c, mass: m } = spring.push
+    let x = 0, v = 0, peak = 0, settledAt = -1
+    for (let t = 1; t <= 1000; t++) {
+      const a = (-k * (x - 1) - c * v) / m
+      v += a / 1000
+      x += v / 1000
+      peak = Math.max(peak, x)
+      if (settledAt < 0 && Math.abs(1 - x) * 390 < 2) settledAt = t
+    }
+    expect(peak).toBeLessThanOrEqual(1.0005)
+    expect(settledAt).toBeGreaterThan(300)
+    expect(settledAt).toBeLessThan(550)
+  })
+})

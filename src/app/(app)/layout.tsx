@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import { TabBar, hidesTabBar } from '@/components/layout/tab-bar'
+import { useRouter } from 'next/navigation'
+import { TabBar } from '@/components/layout/tab-bar'
 import { LogSheet } from '@/components/layout/log-sheet'
 import { RouteFrame } from '@/components/layout/route-frame'
 import { LayoutGroup } from 'framer-motion'
@@ -18,9 +18,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useUIStore } from '@/stores/ui.store'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
   const router = useRouter()
-  const hideBottomPad = hidesTabBar(pathname)
 
   useEffect(() => {
     const cleanupNativeShell = initNativeShell({
@@ -80,7 +78,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGate mode="app">
       <GeoScreenContextProvider>
-        <div className={`min-h-screen overflow-x-clip bg-background ${hideBottomPad ? '' : 'pb-[var(--tabbar-clearance)]'}`}>
+        {/* Each page layer carries its own tab bar clearance (route-frame.tsx), so a page kept under another keeps its height. */}
+        <div className="min-h-screen overflow-x-clip bg-background">
           <RouteFrame>{children}</RouteFrame>
           <LayoutGroup>
             <TabBar />
