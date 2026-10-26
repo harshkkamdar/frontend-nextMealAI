@@ -1,5 +1,8 @@
 import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
+
+// The Spatial type scale (globals.css --text-*) must count as font sizes, or a following text colour drops them.
+const twMerge = extendTailwindMerge({ extend: { theme: { text: ['title', 'hero', 'headline', 'body', 'body-sm', 'caption', 'label', 'tab'] } } })
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
