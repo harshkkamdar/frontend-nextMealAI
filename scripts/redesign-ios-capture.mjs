@@ -7,10 +7,13 @@
  *   ios_webkit_debug_proxy -s unix:<webinspectord_sim socket> -c null:9300,:9301-9310
  * Usage: node scripts/redesign-ios-capture.mjs slice-1
  * Writes docs/redesign/screens/<slice>/ios/<shot>.png
+ * Device set of any slice against a static export (see redesign-device-mock.mjs; the mock injects auth, so no
+ * localStorage step): DEVICE_MOCK=http://localhost:4019 APP_URL=http://localhost:3040 node scripts/redesign-ios-capture.mjs slice-5
  */
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
+import { DEVICE_SHOTS } from './redesign-device-mock.mjs'
 
 const SLICE = process.argv[2] || 'slice-1'
 const OUT = path.join('docs/redesign/screens', SLICE, 'ios')
@@ -88,6 +91,20 @@ async function page() {
 
 ;(async () => {
   fs.mkdirSync(OUT, { recursive: true })
+  if (process.env.DEVICE_MOCK) {
+    for (const shot of DEVICE_SHOTS[SLICE]) {
+      const { url } = await fetch(process.env.DEVICE_MOCK + '/__shot', { method: 'POST', body: JSON.stringify({ slice: SLICE, name: shot.name }) }).then((r) => r.json())
+      const p = await page()
+      await p.evaluate(`location.href = ${JSON.stringify(APP + url)}; 1`)
+      p.close()
+      await sleep(5000)
+      if (shot.js) { const q = await page(); await q.evaluate(shot.js); q.close(); await sleep(2500) }
+      const file = path.join(OUT, `${shot.name}.png`)
+      execFileSync('xcrun', ['simctl', 'io', 'booted', 'screenshot', file], { stdio: 'ignore' })
+      console.log(file)
+    }
+    return
+  }
   for (const shot of SHOTS[SLICE]) {
     await fetch(MOCK + '/__scenario', { method: 'POST', body: JSON.stringify({ fail: null, ...shot.scenario }) })
     const p = await page()

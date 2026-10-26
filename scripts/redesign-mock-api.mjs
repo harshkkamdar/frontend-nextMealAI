@@ -7,6 +7,7 @@
  * Slice 2 Home: -d '{"home":"returning"}' (or "first-run", "due"); fixtures copied from redesign-capture.mjs.
  */
 import http from 'node:http'
+import { pathToFileURL } from 'node:url'
 
 const port = Number(process.argv[2] || 4011)
 let scenario = { done: [], consent: true, plans: 'full', fail: null }
@@ -20,7 +21,7 @@ const PLANS = [
 const DAY_MS = 86400000
 const isoDay = (offset) => new Date(Date.now() - offset * DAY_MS).toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' })
 const lg = (type, offset, payload, hour = 8) => ({ id: `${type}-${offset}-${hour}`, user_id: 'capture-user', type, payload, source: 'manual', local_date: isoDay(offset), created_at: `${isoDay(offset)}T0${hour % 10}:00:00.000Z`, updated_at: `${isoDay(offset)}T0${hour % 10}:00:00.000Z` })
-function homeApi(kind) {
+export function homeApi(kind) {
   const logs = [
     lg('food', 0, { food_name: 'Greek yoghurt and berries', meal_type: 'breakfast', calories: 310, est_macros: { calories: 310, protein: 24 } }, 1),
     lg('food', 0, { food_name: 'Oat flat white', meal_type: 'breakfast', calories: 140, est_macros: { calories: 140 } }, 2),
@@ -63,7 +64,8 @@ function send(res, status, body, origin) {
   res.end(JSON.stringify(body))
 }
 
-http.createServer((req, res) => {
+// Imported by redesign-device-mock.mjs for homeApi; only listen when run directly.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) http.createServer((req, res) => {
   const origin = req.headers.origin
   const p = new URL(req.url, 'http://x').pathname
   if (req.method === 'OPTIONS') return send(res, 204, {}, origin)
