@@ -25,12 +25,13 @@ function useScrolledPast<T extends Element>() {
 
 /**
  * Fixed top bar: actions float as round glass buttons; once the page title scrolls away the bar fills with
- * cream glass and shows the title inline (17/600). Opacity and transform only.
+ * cream glass (blur and saturation, fading out at its lower edge, as in the Spatial mock) and shows the title inline
+ * (17/600). Only the opacity animates; the blur itself never does.
  */
 function TopBar({ title, filled, titleVisible = filled, leading, actions }: { title: ReactNode; filled: boolean; titleVisible?: boolean; leading?: ReactNode; actions?: ReactNode }) {
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[40]" style={{ paddingTop: 'var(--safe-top)' }}>
-      <div aria-hidden="true" className={cn('glass-cream absolute inset-0 rounded-none shadow-none transition-opacity duration-200', filled ? 'opacity-100' : 'opacity-0')} />
+      <div aria-hidden="true" className={cn('glass-bar absolute inset-x-0 top-0 -bottom-4 transition-opacity duration-200', filled ? 'opacity-100' : 'opacity-0')} />
       <div className="relative mx-auto flex h-[60px] max-w-md items-center gap-2 px-4">
         <div className="pointer-events-auto flex min-w-11 items-center">{leading}</div>
         <p

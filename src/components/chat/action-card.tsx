@@ -75,7 +75,7 @@ export function ActionCard({ card, body, onAction }: { card: ActionCardModel; bo
   const done = (kind === 'logged' && !undone) || kind === 'saved' || accepted
 
   return (
-    <section aria-label={label} className="overflow-hidden rounded-card bg-card shadow-[var(--shadow-card)]">
+    <section aria-label={label} className="overflow-hidden rounded-card card-glass">
       <div className="flex min-h-11 items-center gap-1.5 px-4 pt-1">
         {done ? <Check aria-hidden="true" className="size-4 text-ink" strokeWidth={2.25} /> : null}
         <p className="min-w-0 flex-1 text-caption font-semibold text-ink-65">{label}</p>

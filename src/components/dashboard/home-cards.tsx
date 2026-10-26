@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 import { formatSleep, type MealRow } from './home-data'
 import { AlertIcon, HeartIcon, PlusLine, SparkleIcon } from './home-icons'
 
-export const CARD = 'rounded-[22px] bg-card shadow-[var(--shadow-card)]'
+export const CARD = 'rounded-[22px] card-glass'
 
 /** False on a revisit in the same session: charts and numbers paint at rest instead of drawing again (motion-feel 7). */
 export const HomeEntrance = createContext(true)
@@ -182,7 +182,7 @@ export function HomeErrorCard({ savedAt, onRetry }: { savedAt: string | null; on
 
 // ── Tiles, log first: Water, Weight, Steps, Sleep (Q32) ──
 
-const TILE = 'flex min-h-tile flex-col rounded-[20px] bg-card p-[14px] text-left shadow-[var(--shadow-card)]'
+const TILE = 'flex min-h-tile flex-col rounded-[20px] card-glass p-[14px] text-left'
 
 function TileBody({ label, value, unit, caption, children }: { label: string; value: ReactNode; unit?: string; caption?: ReactNode; children?: ReactNode }) {
   return (

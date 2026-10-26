@@ -20,7 +20,7 @@ import { todayLocalISO } from '@/lib/timezone'
 import { useUIStore } from '@/stores/ui.store'
 import type { MealPlan } from '@/types/plans.types'
 
-const CARD = 'rounded-card bg-card shadow-[var(--shadow-card)]'
+const CARD = 'rounded-card card-glass'
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
 const shortDate = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00`).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
 

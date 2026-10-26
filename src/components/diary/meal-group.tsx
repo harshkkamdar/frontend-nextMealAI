@@ -103,7 +103,7 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
           {addLabel(mealType)}
         </button>
       ) : (
-        <div {...tilt} className="overflow-hidden rounded-card bg-card shadow-[var(--shadow-card)]">
+        <div {...tilt} className="overflow-hidden rounded-card card-glass">
           {shown.map((item, index) => {
             const payload = item.payload as FoodPayload
             const macros = payload.est_macros
@@ -152,7 +152,7 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
       <BottomSheet open={actionsOpen} onClose={() => setActionsOpen(false)} ariaLabel={`${mealType} actions`}>
         <div className="px-4 pb-5 pt-1">
           <h2 className="font-display mb-3 px-1 text-headline font-extrabold text-ink">{mealType}</h2>
-          <div className="overflow-hidden rounded-card bg-card shadow-[var(--shadow-card)]">
+          <div className="overflow-hidden rounded-card card-glass">
             <ActionRow label={addLabel(mealType)} onClick={() => runAction(onAddFood)} />
             {!isToday && onCopyToToday ? <ActionRow label="Copy to today" onClick={() => runAction(onCopyToToday)} /> : null}
             {onSaveFavourite ? <ActionRow label="Save as meal" onClick={() => runAction(onSaveFavourite)} /> : null}

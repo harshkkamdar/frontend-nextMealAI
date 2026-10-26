@@ -69,7 +69,19 @@ Archivo is loaded with its `wdth` axis. Wide (`font-stretch: 112-118%`) is reser
 
 ## Glass material (C1, Q3, Q14)
 
-Glass only on the controls layer: tab capsule, orb, floating header buttons, sheets.
+Glass on the controls layer: tab capsule, orb, floating header buttons, sheets, and the condensed top bar.
+
+### Spatial atmosphere and card glass (differs: Q3, owner 27 Oct 2026)
+
+The owner asked to see the tint and liquid glass of mock 19 (`mocks/spatial-app.html`) in the app, so Q3 (solid content cards) is relaxed:
+
+- Atmosphere (`src/components/ui/fiqr/atmosphere.tsx`, mounted once in `src/app/(app)/layout.tsx`): soft brand fields on the cream ground behind every tab and pushed page. Far layer (drift 0.05x): a large peach field behind the content (accent at peak 20%), teal (peak 16%) mid right and an ochre hint top left, over a faint warm wash (accent 4% at the bottom). Near layer (drift 0.16x): a white glass slab and an ochre hint. Each layer also breathes on a slow transform-only loop (29-38 s), paused while the app is hidden. Painted once as SVG (`--atmo-far`, `--atmo-near`); nothing animates a blur. Peaks are capped so ink-65 text on the bare ground keeps 4.5:1 at a field's centre.
+- Pages: while the atmosphere is mounted (`html[data-atmosphere]`) the live page layer is transparent; a lifted layer (under a push, behind a sheet, in a tab fade) paints the same fields at its own scroll (`--lift-y`), so it keeps its tint as it steps back.
+- Content cards: `card-glass` (`--surface-card` white 82%, `--shadow-card-glass`: 1 px white inner rim and top highlight, soft deep shadow). No backdrop blur on cards (cheap; the fields behind are already soft). Use `card-glass` instead of `bg-card shadow-[var(--shadow-card)]` for content cards on the page; inputs, sheet contents, menus and stacked cards (paywall) stay solid.
+- Top bar: `glass-bar` (cream 72%, blur 16 saturate 1.7 when glass is on, fading out at its lower edge) appears once content scrolls under the large title.
+- Reduced transparency (`data-transparency="reduced"` or the media query): no atmosphere, plain cream ground, solid white cards. Reduced motion: no drift, no ambient loop.
+- Round header buttons: `glass-btn` (white 60%, blur 14 saturate 1.8, white top rim, soft drop) when glass is on; solid white otherwise.
+- One orange action per screen and the ink orb are unchanged.
 
 ```
 glass on:  background white/72%; backdrop-filter blur(20px) saturate(1.6);

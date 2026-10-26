@@ -259,15 +259,7 @@
     "shot": "quicklog-water",
     "width": 360,
     "url": "/dashboard",
-    "axe": [
-      {
-        "id": "color-contrast",
-        "nodes": 1,
-        "targets": [
-          ".min-h-btn"
-        ]
-      }
-    ],
+    "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },
@@ -275,15 +267,7 @@
     "shot": "quicklog-water",
     "width": 390,
     "url": "/dashboard",
-    "axe": [
-      {
-        "id": "color-contrast",
-        "nodes": 1,
-        "targets": [
-          ".min-h-btn"
-        ]
-      }
-    ],
+    "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },
@@ -323,15 +307,7 @@
     "shot": "quicklog-weight",
     "width": 360,
     "url": "/dashboard",
-    "axe": [
-      {
-        "id": "color-contrast",
-        "nodes": 1,
-        "targets": [
-          ".min-h-btn"
-        ]
-      }
-    ],
+    "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },
@@ -339,15 +315,7 @@
     "shot": "quicklog-weight",
     "width": 390,
     "url": "/dashboard",
-    "axe": [
-      {
-        "id": "color-contrast",
-        "nodes": 1,
-        "targets": [
-          ".min-h-btn"
-        ]
-      }
-    ],
+    "axe": [],
     "smallTargets": [],
     "orangeActions": 1
   },

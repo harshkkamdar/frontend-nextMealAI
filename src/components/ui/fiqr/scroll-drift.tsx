@@ -43,7 +43,7 @@ export function useTitleDrift<T extends HTMLElement>() {
 
 /**
  * Optional background depth layer: a fixed, non-interactive layer behind the content that drifts up at `speed` of the
- * scroll (0.05 for the far layer, 0.16 for the near one), smoothed by a short critically damped spring (response 0.3 s).
+ * scroll (0.05 for the far layer, 0.16 for the near one), smoothed by a short critically damped spring (response 0.3 s), promoted (will-change) only while it moves.
  * Decoration only: give it Q2 tints, keep it behind the content (the page's content sits on a higher z).
  */
 export function DriftLayer({ speed, className, children }: { speed: 0.05 | 0.16; className?: string; children?: ReactNode }) {
@@ -52,5 +52,11 @@ export function DriftLayer({ speed, className, children }: { speed: 0.05 | 0.16;
   const target = useMotionValue(0)
   const y = useSpring(target, { stiffness: 438, damping: 42 })
   useScrollFrame(ref, (scroll) => target.set(-scroll * speed), !reduce)
+  // Promote the layer only while the spring moves it; at rest it stays a plain painted layer.
+  useEffect(() => {
+    const promote = (on: boolean) => () => { if (ref.current) ref.current.style.willChange = on ? 'transform' : '' }
+    const offs = [y.on('animationStart', promote(true)), y.on('animationComplete', promote(false)), y.on('animationCancel', promote(false))]
+    return () => offs.forEach((off) => off())
+  }, [y])
   return <motion.div ref={ref} aria-hidden="true" style={{ y }} className={cn('pointer-events-none fixed inset-0', className)}>{children}</motion.div>
 }

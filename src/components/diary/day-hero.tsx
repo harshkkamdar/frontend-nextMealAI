@@ -7,7 +7,7 @@ import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { cn } from '@/lib/utils'
 import { summaryCopy, type DayKind } from './diary-logic'
 
-const CARD = 'rounded-card bg-card shadow-[var(--shadow-card)]'
+const CARD = 'rounded-card card-glass'
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
 
 /** Rolls from the last shown value to `value` through a motion value (no re-render per frame, motion-feel 3f). */

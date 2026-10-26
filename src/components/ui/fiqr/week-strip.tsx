@@ -113,7 +113,7 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
                     <motion.span
                       layoutId={capsule}
                       transition={reduce ? reducedFade : spring.glide}
-                      className="absolute inset-x-[3px] inset-y-0 rounded-[18px] bg-card shadow-[var(--shadow-card)]"
+                      className="absolute inset-x-[3px] inset-y-0 rounded-[18px] card-glass"
                     />
                   ) : null}
                   <span className="relative text-[12px] font-semibold text-ink-65">

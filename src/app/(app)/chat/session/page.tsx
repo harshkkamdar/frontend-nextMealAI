@@ -265,7 +265,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
             {historyFailed && messages.length === 0 ? (
               // Same frame as the list's error: a white card, the line, and Try again.
-              <div role="alert" className="mb-6 rounded-card bg-card px-4 py-3 shadow-[var(--shadow-card)]">
+              <div role="alert" className="mb-6 rounded-card card-glass px-4 py-3">
                 <p className="py-1 text-body-sm leading-[1.4] text-ink">I couldn&apos;t load this conversation. You can still send a message.</p>
                 <button type="button" onClick={() => { setLoading(true); setHistoryTry((n) => n + 1) }} className="-ml-2 h-11 px-2 text-body-sm font-semibold text-ink underline underline-offset-4">Try again</button>
               </div>

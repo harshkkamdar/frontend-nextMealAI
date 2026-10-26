@@ -25,7 +25,7 @@ export function SuggestionCard({
   }
 
   return (
-    <div className="rounded-[24px] bg-card p-5 shadow-[var(--shadow-card)]">
+    <div className="rounded-[24px] card-glass p-5">
       <div className="flex gap-[11px]">
         <GeoAvatar variant="face" state="suggest" size={24} />
         <div className="min-w-0 flex-1">

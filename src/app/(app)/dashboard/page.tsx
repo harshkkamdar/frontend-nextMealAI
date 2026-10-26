@@ -271,7 +271,7 @@ export default function DashboardPage() {
                 </section>
 
                 {(profile?.daily_targets_missing_fields?.length ?? 0) > 0 ? (
-                  <button type="button" onClick={() => router.push('/settings/profile')} className="flex min-h-16 items-center rounded-[22px] bg-card px-4 text-left shadow-[var(--shadow-card)] active:scale-[.98]">
+                  <button type="button" onClick={() => router.push('/settings/profile')} className="flex min-h-16 items-center rounded-[22px] card-glass px-4 text-left active:scale-[.98]">
                     <span className="flex-1">
                       <span className="block text-body font-semibold text-ink">Add your height</span>
                       <span className="block text-caption text-ink-65">Geo needs it to set your targets</span>

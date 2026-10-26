@@ -34,7 +34,7 @@ function ListSkeleton() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.12, delay: 0.15 }}
-      className="overflow-hidden rounded-card bg-card shadow-[var(--shadow-card)]"
+      className="overflow-hidden rounded-card card-glass"
     >
       {[0, 1, 2, 3, 4].map((index) => (
         <div key={index} className="flex min-h-row flex-col justify-center gap-2 border-b border-ink-06 px-4 last:border-b-0">
@@ -116,7 +116,7 @@ export default function ChatListPage() {
 
       {/* Two taps to talk (J3): the Geo tab, then this field. */}
       <form
-        className="mt-3 flex h-field items-center gap-1.5 rounded-full bg-card pl-5 pr-2 shadow-[var(--shadow-card)]"
+        className="mt-3 flex h-field items-center gap-1.5 rounded-full card-glass pl-5 pr-2"
         onSubmit={(event) => { event.preventDefault(); ask() }}
       >
         <input
@@ -144,12 +144,12 @@ export default function ChatListPage() {
           <ListSkeleton />
         ) : !data && error ? (
           // The error sits in the list's own frame, so the page keeps its shape.
-          <div role="alert" className="rounded-card bg-card px-4 py-3 shadow-[var(--shadow-card)]">
+          <div role="alert" className="rounded-card card-glass px-4 py-3">
             <p className="py-1 text-body-sm leading-[1.4] text-ink">I couldn&apos;t load your conversations. Check your connection and try again.</p>
             <button type="button" onClick={() => void refetch()} className="-ml-2 h-11 px-2 text-body-sm font-semibold text-ink underline underline-offset-4">Try again</button>
           </div>
         ) : sessions.length === 0 ? (
-          <div className="rounded-card bg-card p-4 shadow-[var(--shadow-card)]">
+          <div className="rounded-card card-glass p-4">
             <GeoAvatar variant="face" state="happy" size={32} />
             <p className="mt-3 text-body-sm leading-[1.4] text-ink">Our conversations land here. Tell me what you ate, or try one of these.</p>
             <div className="mt-3 flex flex-col gap-2">

@@ -114,7 +114,7 @@ export function SessionList({
 
   return (
     <>
-      <ul aria-label="Conversations" className="overflow-hidden rounded-card bg-card shadow-[var(--shadow-card)]">
+      <ul aria-label="Conversations" className="overflow-hidden rounded-card card-glass">
         {sessions.map((session, index) => {
           const sessionId = session.session_id ?? session.id
           const title = titleOf(session)
@@ -155,7 +155,7 @@ export function SessionList({
         {target && mode === 'menu' ? (
           <div className="px-4 pb-4 pt-2">
             <p className="truncate px-1 text-body-sm font-semibold text-ink-65">{titleOf(target)}</p>
-            <div className="mt-3 overflow-hidden rounded-[16px] bg-card shadow-[var(--shadow-card)]">
+            <div className="mt-3 overflow-hidden rounded-[16px] card-glass">
               <button type="button" onClick={startRename} className="flex min-h-row w-full items-center gap-3 border-b border-ink-06 px-4 text-left text-body font-medium text-ink active:bg-ink-04">
                 <Pencil className="size-[18px] text-ink-65" strokeWidth={1.75} />
                 Rename

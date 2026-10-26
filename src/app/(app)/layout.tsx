@@ -8,6 +8,7 @@ import { RouteFrame } from '@/components/layout/route-frame'
 import { LayoutGroup } from 'framer-motion'
 import { GeoCompanionSheet } from '@/components/geo/geo-companion-sheet'
 import { AuthGate } from '@/components/auth/auth-gate'
+import { Atmosphere } from '@/components/ui/fiqr/atmosphere'
 import { GeoScreenContextProvider } from '@/contexts/geo-screen-context'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
 import { NotificationsPrompt } from '@/components/native/notifications-prompt'
@@ -79,7 +80,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <AuthGate mode="app">
       <GeoScreenContextProvider>
         {/* Each page layer carries its own tab bar clearance (route-frame.tsx), so a page kept under another keeps its height. */}
-        <div className="min-h-screen overflow-x-clip bg-background">
+        {/* The Spatial Depth colour fields sit behind every page (atmosphere.tsx); the cream ground is the html background. */}
+        <div className="min-h-screen overflow-x-clip">
+          <Atmosphere />
           <RouteFrame>{children}</RouteFrame>
           <LayoutGroup>
             <TabBar />

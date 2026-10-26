@@ -47,7 +47,7 @@ export function WorkoutCard({
   const starts = action === 'Start Workout'
 
   return (
-    <section className="flex items-center gap-4 rounded-[24px] bg-card p-5 shadow-[var(--shadow-card)]">
+    <section className="flex items-center gap-4 rounded-[24px] card-glass p-5">
       <div className="min-w-0 flex-1">
         <p className="text-[13px] font-semibold text-ink-65">Next up</p>
         <p className="font-wide mt-1 line-clamp-2 text-[22px] font-bold leading-[1.15] tracking-[-0.3px] text-ink">{name}</p>

@@ -9,7 +9,7 @@ import { reducedFade, spring } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 /** White content card of the grouped list (Spatial: radius 22, no border, soft shadow; Q3 content stays solid). */
-export const GROUP_CARD = 'overflow-hidden rounded-card bg-card shadow-[0_1px_2px_rgba(17,28,53,.04),0_10px_24px_-18px_rgba(17,28,53,.25)]'
+export const GROUP_CARD = 'overflow-hidden rounded-card card-glass'
 /** Hairline between rows, inset to the label edge like iOS. */
 const HAIRLINES = "[&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:inset-x-0 [&>*+*]:before:left-[18px] [&>*+*]:before:top-0 [&>*+*]:before:h-px [&>*+*]:before:bg-ink-08 [&>*+*]:before:content-['']"
 
