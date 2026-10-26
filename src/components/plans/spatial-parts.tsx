@@ -131,8 +131,9 @@ export function PushedLargeHeader({ title, barTitle = title, sub, onBack, backLa
       </div>
       <div aria-hidden="true" className="h-[calc(60px+var(--safe-top))]" />
       <div ref={drift} className="origin-top-left px-1 pt-1">
-        <h1 className="font-display break-words text-title text-ink [overflow-wrap:anywhere]">{title}</h1>
-        {sub ? <p className="mt-1.5 text-body-sm text-ink-65 tabular-nums">{sub}</p> : null}
+        {/* Whole-pixel line heights keep everything below on whole pixels, so layout glides settle without a 1 px text snap. */}
+        <h1 className="font-display break-words text-title leading-8 text-ink [overflow-wrap:anywhere]">{title}</h1>
+        {sub ? <p className="mt-1.5 text-body-sm leading-5 text-ink-65 tabular-nums">{sub}</p> : null}
       </div>
       <div ref={marker} aria-hidden="true" />
     </>

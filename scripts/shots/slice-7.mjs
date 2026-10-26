@@ -138,7 +138,7 @@ const shots = [
 //   BASE_URL=http://localhost:3027 API_URL=http://localhost:4017 node scripts/redesign-transitions.mjs slice-7 ──
 const day1 = (p) => p.getByRole('button', { name: 'Upper A day 1' })
 const transitions = [
-  { name: 'open-plan', url: '/plans', home: 'plans', warm: '/plans/view?id=work-1', act: (p) => p.getByRole('button', { name: /^Training/ }).click() },
+  { name: 'open-plan', url: '/plans', home: 'plans', warm: '/plans/view?id=work-1', act: (p) => p.getByRole('button', { name: /, training, next / }).click() },
   { name: 'day-expand', url: '/plans/view?id=work-1', home: 'plans', act: (p) => day1(p).click() },
   { name: 'day-collapse', url: '/plans/view?id=work-1', home: 'plans', act: async (p) => { await day1(p).click(); await wait(p, 1200); await day1(p).click() } },
   // The edit route starts with the name filled, so the recording holds only the step change (no CTA enabling).
@@ -152,7 +152,8 @@ export default slice7
 
 /** Fixture API for transitions: `node scripts/shots/slice-7.mjs [port]` (POST /__scenario is accepted and ignored). */
 function serve(port) {
-  const table = plansApi()
+  // The app shell needs a consented profile, or it routes away before the plans screen draws.
+  const table = { ...plansApi(), '/v1/profile': { id: 'capture-user', full_name: 'Sam Rivera', ai_consent_at: '2026-10-24T00:00:00Z', health_disclaimer_ack_at: '2026-10-24T00:00:00Z' } }
   http.createServer((req, res) => {
     const send = (status, body) => { res.writeHead(status, { 'access-control-allow-origin': req.headers.origin || '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*', 'content-type': 'application/json' }); res.end(JSON.stringify(body)) }
     const p = new URL(req.url, 'http://x').pathname
