@@ -1,49 +1,49 @@
 {
   "day-change": {
     "frames": 53,
-    "chrome_px": 6025,
-    "content_px": 59098,
-    "max_chrome_share": 0.356,
-    "max_content_share": 0.145,
+    "chrome_px": 3756,
+    "content_px": 71406,
+    "max_chrome_share": 0.309,
+    "max_content_share": 0.113,
     "issues": [],
     "verdict": "smooth"
   },
   "day-change-back": {
-    "frames": 104,
-    "chrome_px": 18122,
-    "content_px": 163562,
-    "max_chrome_share": 0.092,
-    "max_content_share": 0.047,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 58,
+    "chrome_px": 10612,
+    "content_px": 183828,
+    "max_chrome_share": 0.412,
+    "max_content_share": 0.319,
+    "issues": [
+      "chrome jump frame 6: 41% of chrome change",
+      "chrome jump frame 34: 14% of chrome change"
+    ],
+    "verdict": "pop"
   },
   "month-open": {
-    "frames": 24,
-    "chrome_px": 114931,
-    "content_px": 208453,
-    "max_chrome_share": 0.199,
-    "max_content_share": 0.117,
+    "frames": 32,
+    "chrome_px": 117746,
+    "content_px": 232226,
+    "max_chrome_share": 0.073,
+    "max_content_share": 0.106,
     "issues": [],
     "verdict": "smooth"
   },
   "row-actions-open": {
-    "frames": 27,
-    "chrome_px": 185890,
-    "content_px": 548703,
-    "max_chrome_share": 0.332,
-    "max_content_share": 0.452,
-    "issues": [
-      "chrome jump frame 3: 33% of chrome change",
-      "chrome jump frame 5: 28% of chrome change"
-    ],
-    "verdict": "pop"
+    "frames": 34,
+    "chrome_px": 140501,
+    "content_px": 69108,
+    "max_chrome_share": 0.163,
+    "max_content_share": 0.113,
+    "issues": [],
+    "verdict": "smooth"
   },
   "week-swipe": {
-    "frames": 71,
-    "chrome_px": 5772,
-    "content_px": 154612,
-    "max_chrome_share": 0.25,
-    "max_content_share": 0.118,
+    "frames": 66,
+    "chrome_px": 3733,
+    "content_px": 138235,
+    "max_chrome_share": 0.39,
+    "max_content_share": 0.112,
     "issues": [],
     "verdict": "smooth"
   }
