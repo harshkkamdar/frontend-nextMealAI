@@ -108,14 +108,17 @@ const shots = [
 // page.route call it makes for the API is swapped for this file's fixtures (by transition order). The clock is
 // left real here: a Playwright fake clock also drives performance.now and turns framer springs into jumps. The capture script is untouched by this.
 const API = process.env.API_URL || 'http://localhost:4010'
+// Recordings run on the real clock, so a live session must start in the real past or its clock sits at 0.
+const realMinsAgo = (m) => new Date(Date.now() - m * 60000).toISOString()
+const liveRec = (exercises, extra = {}) => live(exercises, { started_at: realMinsAgo(23), created_at: realMinsAgo(23), ...extra })
 const transitions = [
-  { name: 'start-session', url: T, warm: S, api: { ...trainApi(), ...sessionApi(live(UPPER_B([0, 0, 0, 0, 0]), { started_at: NOW })) }, act: async (p) => { await p.getByTestId('activity-start-workout-button').click(); await p.waitForURL(/train\/session/, { timeout: 10000 }) } },
-  { name: 'set-tick-rest', url: S, api: sessionApi(live(MID)), act: (p) => current(p).getByRole('button', { name: 'Complete set 3' }).click() },
-  { name: 'rest-minimise', url: S, api: sessionApi(live(MID)), act: async (p) => { await current(p).getByRole('button', { name: 'Complete set 3' }).click(); await p.waitForTimeout(1500); await p.getByRole('button', { name: 'Minimise rest timer' }).click() } },
-  { name: 'next-exercise', url: S, api: sessionApi(live(MID)), act: (p) => p.getByRole('navigation', { name: 'Workout' }).getByRole('button', { name: /^Next/ }).click() },
-  { name: 'previous-exercise', url: S, api: sessionApi(live(MID)), act: (p) => p.getByRole('navigation', { name: 'Workout' }).getByRole('button', { name: /^Previous/ }).click() },
-  { name: 'all-exercises-jump', url: S, api: sessionApi(live(MID)), act: async (p) => { await p.getByRole('button', { name: /^Exercise 2 of 5/ }).click(); await p.waitForTimeout(900); await p.getByRole('button', { name: /^Exercise 4: Lateral raise/ }).click() } },
-  { name: 'finish', url: S, api: sessionApi(live(UPPER_B([3, 3, 3, 3, 3]))), act: (p) => p.getByRole('button', { name: 'Finish workout' }).click() },
+  { name: 'start-session', url: T, warm: S, api: { ...trainApi(), ...sessionApi(liveRec(UPPER_B([0, 0, 0, 0, 0]), { started_at: realMinsAgo(0) })) }, act: async (p) => { await p.getByTestId('activity-start-workout-button').click(); await p.waitForURL(/train\/session/, { timeout: 10000 }) } },
+  { name: 'set-tick-rest', url: S, api: sessionApi(liveRec(MID)), act: (p) => current(p).getByRole('button', { name: 'Complete set 3' }).click() },
+  { name: 'rest-minimise', url: S, api: sessionApi(liveRec(MID)), act: async (p) => { await current(p).getByRole('button', { name: 'Complete set 3' }).click(); await p.waitForTimeout(1500); await p.getByRole('button', { name: 'Minimise rest timer' }).click() } },
+  { name: 'next-exercise', url: S, api: sessionApi(liveRec(MID)), act: (p) => p.getByRole('navigation', { name: 'Workout' }).getByRole('button', { name: /^Next/ }).click() },
+  { name: 'previous-exercise', url: S, api: sessionApi(liveRec(MID)), act: (p) => p.getByRole('navigation', { name: 'Workout' }).getByRole('button', { name: /^Previous/ }).click() },
+  { name: 'all-exercises-jump', url: S, api: sessionApi(liveRec(MID)), act: async (p) => { await p.getByRole('button', { name: /^Exercise 2 of 5/ }).click(); await p.waitForTimeout(900); await p.getByRole('button', { name: /^Exercise 4: Lateral raise/ }).click() } },
+  { name: 'finish', url: S, api: sessionApi(liveRec(UPPER_B([3, 3, 3, 3, 3]))), act: (p) => p.getByRole('button', { name: 'Finish workout' }).click() },
   // Warmed so the route is compiled; the painted flag is then cleared so the first-paint entrance plays.
   { name: 'train-first-load', url: '/dashboard', warm: T, api: trainApi(), act: async (p) => { await p.evaluate(() => sessionStorage.removeItem('fiqr:painted:train')); await p.getByRole('link', { name: 'Train' }).click(); await p.waitForURL(/\/train\/?$/, { timeout: 10000 }) } },
 ]
