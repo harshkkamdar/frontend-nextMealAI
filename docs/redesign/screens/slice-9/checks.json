@@ -147,7 +147,15 @@
     "shot": "paywall-monthly",
     "width": 360,
     "url": "/paywall",
-    "axe": [],
+    "axe": [
+      {
+        "id": "color-contrast",
+        "nodes": 1,
+        "targets": [
+          ".h-\\[180px\\].origin-top.p-4:nth-child(2) > .gap-2.w-full.items-center > .min-w-0.text-caption.flex-1"
+        ]
+      }
+    ],
     "smallTargets": [],
     "orangeActions": 1
   },
@@ -155,6 +163,30 @@
     "shot": "paywall-monthly",
     "width": 390,
     "url": "/paywall",
+    "axe": [
+      {
+        "id": "color-contrast",
+        "nodes": 1,
+        "targets": [
+          ".h-\\[180px\\].origin-top.p-4:nth-child(2) > .gap-2.w-full.items-center > .min-w-0.text-caption.flex-1"
+        ]
+      }
+    ],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "paywall-offline",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "paywall-offline",
+    "width": 390,
+    "url": "/paywall",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
@@ -174,6 +206,22 @@
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
+  },
+  {
+    "shot": "paywall-restore-none",
+    "width": 360,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "paywall-restore-none",
+    "width": 390,
+    "url": "/paywall",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
   },
   {
     "shot": "paywall-subscribed",
@@ -432,6 +480,38 @@
     "orangeActions": 0
   },
   {
+    "shot": "settings-menu-day",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-menu-day",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-menu-style",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-menu-style",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "settings-native-plus",
     "width": 360,
     "url": "/settings",
@@ -489,6 +569,54 @@
   },
   {
     "shot": "settings-plan-note",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-queued",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-queued",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-reminder-toast",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-reminder-toast",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-save-failed",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-save-failed",
     "width": 390,
     "url": "/settings",
     "axe": [],

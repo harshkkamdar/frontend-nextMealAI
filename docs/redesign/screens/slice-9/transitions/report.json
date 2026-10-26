@@ -1,55 +1,68 @@
 {
   "confirm-dialog-in-out": {
-    "frames": 42,
-    "chrome_px": 352744,
-    "content_px": 144436,
-    "max_chrome_share": 0.056,
-    "max_content_share": 0.067,
+    "frames": 41,
+    "chrome_px": 393541,
+    "content_px": 167711,
+    "max_chrome_share": 0.05,
+    "max_content_share": 0.066,
     "issues": [],
     "verdict": "smooth"
   },
   "delete-sheet-open": {
-    "frames": 31,
-    "chrome_px": 279082,
-    "content_px": 534673,
-    "max_chrome_share": 0.127,
-    "max_content_share": 0.095,
-    "issues": [],
-    "verdict": "smooth"
+    "frames": 26,
+    "chrome_px": 325481,
+    "content_px": 963224,
+    "max_chrome_share": 0.19,
+    "max_content_share": 0.257,
+    "issues": [
+      "chrome jump frame 3: 19% of chrome change"
+    ],
+    "verdict": "pop"
   },
   "paywall-plan-switch": {
-    "frames": 34,
+    "frames": 22,
     "chrome_px": 0,
-    "content_px": 18626,
+    "content_px": 164508,
     "max_chrome_share": 0,
-    "max_content_share": 0.07,
+    "max_content_share": 0.201,
     "issues": [],
     "verdict": "smooth"
   },
   "profile-back": {
-    "frames": 54,
-    "chrome_px": 21794,
-    "content_px": 171717,
-    "max_chrome_share": 0.063,
-    "max_content_share": 0.069,
+    "frames": 39,
+    "chrome_px": 124650,
+    "content_px": 1001633,
+    "max_chrome_share": 0.124,
+    "max_content_share": 0.122,
+    "issues": [
+      "chrome jump frame 3: 11% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "settings-menu-open": {
+    "frames": 23,
+    "chrome_px": 60244,
+    "content_px": 103715,
+    "max_chrome_share": 0.167,
+    "max_content_share": 0.119,
     "issues": [],
     "verdict": "smooth"
   },
   "settings-row-push": {
-    "frames": 53,
-    "chrome_px": 21465,
-    "content_px": 188959,
-    "max_chrome_share": 0.07,
-    "max_content_share": 0.079,
+    "frames": 41,
+    "chrome_px": 149222,
+    "content_px": 856961,
+    "max_chrome_share": 0.102,
+    "max_content_share": 0.122,
     "issues": [],
     "verdict": "smooth"
   },
   "settings-switch": {
-    "frames": 19,
+    "frames": 21,
     "chrome_px": 0,
-    "content_px": 384,
+    "content_px": 764,
     "max_chrome_share": 0,
-    "max_content_share": 0.216,
+    "max_content_share": 0.131,
     "issues": [],
     "verdict": "smooth"
   }

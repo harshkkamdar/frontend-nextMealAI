@@ -88,6 +88,22 @@ const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-creden
 const wait = (ms) => (p) => p.waitForTimeout(ms)
 const scrollToBottom = async (p) => { await p.mouse.wheel(0, 4000); await p.waitForTimeout(800) }
 
+/** Opens a settings menu row by name (scrolled into view first). */
+const openMenu = (name) => async (p) => { const row = p.getByRole('button', { name }); await row.scrollIntoViewIfNeeded(); await p.waitForTimeout(300); await row.click(); await p.waitForTimeout(700) }
+/** The settings write fails while the read stays fine, then a switch is flipped: the save-failed capsule with Retry. */
+const saveFails = async (p) => {
+  await p.route(`${API}/v1/settings`, (r) => (r.request().method() === 'GET' || r.request().method() === 'OPTIONS' ? r.fallback() : r.fulfill({ status: 500, headers: { ...cors, 'content-type': 'application/json' }, body: '{"error":true}' })))
+  await p.getByRole('switch', { name: 'Push notifications' }).click(); await p.waitForTimeout(900)
+}
+/** Three changes waiting in the offline queue (as left by a log made offline), then the page reloads to read them. */
+const queued = async (p) => {
+  await p.evaluate(() => localStorage.setItem('fiqr-offline-queue', JSON.stringify({ state: { items: [1, 2, 3].map((i) => ({ id: `q${i}`, method: 'POST', path: '/v1/logs', body: {}, createdAt: new Date().toISOString(), attempts: 1 })), dead: [] }, version: 0 })))
+  await p.route(`${API}/v1/logs`, (r) => (r.request().method() === 'OPTIONS' ? r.fallback() : new Promise(() => {})))
+  await p.reload({ waitUntil: 'networkidle' }).catch(() => {}); await p.waitForTimeout(1200)
+}
+/** The peeking plan sits behind the front one; its visible strip is the top 60 pt, so tap there. */
+const tapMonthly = (p) => p.getByRole('radio', { name: /Monthly/ }).click({ position: { x: 60, y: 24 } })
+
 const shots = [
   // Settings
   { name: 'settings', url: '/settings', api: api() },
@@ -100,6 +116,11 @@ const shots = [
   { name: 'settings-long', url: '/settings', api: api({ '/v1/profile': LONG_PROFILE }) },
   { name: 'settings-plan-note', url: '/settings', api: api(), act: async (p) => { await p.getByRole('button', { name: /Plan/ }).click(); await p.waitForTimeout(900) } },
   { name: 'settings-ai-confirm', url: '/settings', api: api(), act: async (p) => { await p.getByRole('switch', { name: 'AI processing' }).click(); await p.waitForTimeout(700) } },
+  { name: 'settings-menu-style', url: '/settings', api: api(), act: openMenu(/Coaching style/) },
+  { name: 'settings-menu-day', url: '/settings', api: api(), act: openMenu(/Check-in day/) },
+  { name: 'settings-reminder-toast', url: '/settings', api: api(), act: async (p) => { await openMenu(/Reminder time/)(p); await p.getByRole('menuitemradio', { name: '8:00 am' }).click(); await p.waitForTimeout(900) } },
+  { name: 'settings-save-failed', url: '/settings', api: api(), act: saveFails },
+  { name: 'settings-queued', url: '/settings', api: api(), act: queued },
   { name: 'delete-sheet', url: '/settings', api: api(), act: async (p) => { await p.getByRole('button', { name: 'Delete account' }).click(); await p.waitForTimeout(900) } },
   { name: 'delete-sheet-typed', url: '/settings', api: api(), act: async (p) => { await p.getByRole('button', { name: 'Delete account' }).click(); await p.waitForTimeout(700); await p.getByLabel('Type DELETE to confirm').fill('DELETE'); await p.waitForTimeout(300) } },
   // Profile
@@ -114,7 +135,9 @@ const shots = [
   // Paywall
   { name: 'paywall-web', url: '/paywall', api: api() },
   { name: 'paywall', url: '/paywall', api: api(), act: native({ products: PRODUCTS }) },
-  { name: 'paywall-monthly', url: '/paywall', api: api(), act: native({ products: PRODUCTS }, async (p) => { await p.getByRole('radio', { name: /Monthly/ }).click(); await p.waitForTimeout(500) }) },
+  { name: 'paywall-monthly', url: '/paywall', api: api(), act: native({ products: PRODUCTS }, async (p) => { await tapMonthly(p); await p.waitForTimeout(900) }) },
+  { name: 'paywall-restore-none', url: '/paywall', api: api(), act: native({ products: PRODUCTS }, async (p) => { await scrollToBottom(p); await p.getByRole('button', { name: 'Restore purchases' }).click(); await p.mouse.wheel(0, -4000); await p.waitForTimeout(900) }) },
+  { name: 'paywall-offline', url: '/paywall', api: api(), act: native({ products: PRODUCTS }), offline: true },
   { name: 'paywall-loading', url: '/paywall', api: api(), act: native({ hangProducts: true }) },
   { name: 'paywall-purchasing', url: '/paywall', api: api(), act: native({ products: PRODUCTS, purchase: 'hang' }, async (p) => { await scrollToBottom(p); await p.getByRole('button', { name: 'Start FIQR Plus' }).click(); await p.waitForTimeout(400) }) },
   { name: 'paywall-error', url: '/paywall', api: api(), act: native({ products: PRODUCTS, purchase: 'fail' }, async (p) => { await scrollToBottom(p); await p.getByRole('button', { name: 'Start FIQR Plus' }).click(); await p.waitForTimeout(600) }) },
@@ -181,7 +204,8 @@ const transitions = [
   { name: 'profile-back', url: '/settings/profile', warm: '/settings', act: (p) => p.getByRole('button', { name: 'Back to settings' }).click() },
   { name: 'delete-sheet-open', url: '/settings', scroll: true, act: (p) => p.getByRole('button', { name: 'Delete account' }).click() },
   { name: 'confirm-dialog-in-out', url: '/settings', scroll: true, act: async (p) => { await p.getByRole('switch', { name: 'AI processing' }).click(); await p.waitForTimeout(800); await p.getByRole('button', { name: 'Keep it on' }).click() } },
-  { name: 'paywall-plan-switch', url: '/paywall', native: { products: PRODUCTS }, act: (p) => p.getByRole('radio', { name: /Monthly/ }).click() },
+  { name: 'paywall-plan-switch', url: '/paywall', native: { products: PRODUCTS }, act: tapMonthly },
+  { name: 'settings-menu-open', url: '/settings', act: (p) => p.getByRole('button', { name: /Check-in day/ }).click() },
   { name: 'settings-switch', url: '/settings', act: (p) => p.getByRole('switch', { name: 'Push notifications' }).click() },
 ]
 
