@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 
 import { parseLoggedFoods, type LoggedFood } from '@/components/chat/logged-foods'
 import { ReportSheet } from '@/components/chat/report-sheet'
+import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { reducedFade, spring } from '@/lib/motion'
 import { cn, safeImageUrl } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat.types'
@@ -84,37 +85,43 @@ function MacroValue({ value, letter, color }: { value: number | null; letter: st
   )
 }
 
-/** Foods Geo logged in this reply, as white rows with their numbers (Q25). */
+/** Foods Geo logged in this reply: flat white rows on a hairline, like the pills (Q25). */
 function LoggedFoods({ foods }: { foods: LoggedFood[] }) {
+  // One meal for the whole reply is said once, under the card; mixed meals stay on their rows.
+  const sharedMeal = foods.every((food) => food.meal === foods[0].meal) ? foods[0].meal : null
   return (
-    <ul aria-label="Logged" className="overflow-hidden rounded-[16px] bg-card shadow-[var(--shadow-card)]">
-      {foods.map((food, index) => {
-        const hasMacros = food.protein !== null || food.carbs !== null || food.fat !== null
-        return (
-          // Two rows on two shared baselines: name with kcal, macros with meal.
-          <li key={index} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-1 border-b border-ink-06 px-4 py-3 last:border-b-0">
-            <span className="min-w-0 text-[15px] font-semibold leading-snug text-ink">{food.name}</span>
-            <span className="text-right text-[15px] font-semibold text-ink tabular-nums">
-              {food.estimated ? '~' : ''}{fmt(food.kcal)}<span className="text-[13px] font-medium text-ink-65"> kcal</span>
-            </span>
-            {hasMacros || food.meal ? (
-              <>
-                <span className="flex min-w-0 flex-wrap gap-x-3 text-[13px] font-medium text-ink-65 tabular-nums">
-                  {hasMacros ? (
-                    <>
-                      <MacroValue value={food.protein} letter="P" color="var(--color-ink)" />
-                      <MacroValue value={food.carbs} letter="C" color="var(--color-macro-teal)" />
-                      <MacroValue value={food.fat} letter="F" color="var(--color-macro-ochre)" />
-                    </>
-                  ) : food.meal}
-                </span>
-                <span className="text-right text-[13px] font-medium text-ink-65">{hasMacros ? food.meal : null}</span>
-              </>
-            ) : null}
-          </li>
-        )
-      })}
-    </ul>
+    <div className="flex flex-col gap-1.5">
+      <ul aria-label="Logged" className="overflow-hidden rounded-[16px] border border-ink-06 bg-card">
+        {foods.map((food, index) => {
+          const hasMacros = food.protein !== null || food.carbs !== null || food.fat !== null
+          const rowMeal = sharedMeal ? null : food.meal
+          return (
+            // Name and kcal share a baseline; macros (or the row's own meal) sit under the name.
+            <li key={index} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-1 border-b border-ink-06 px-4 py-3 last:border-b-0">
+              <span className="min-w-0 text-[15px] font-semibold leading-snug text-ink">{food.name}</span>
+              <span className="text-right text-[15px] font-semibold text-ink tabular-nums">
+                {food.estimated ? '~' : ''}{fmt(food.kcal)}<span className="text-[13px] font-medium text-ink-65"> kcal</span>
+              </span>
+              {hasMacros || rowMeal ? (
+                <>
+                  <span className="flex min-w-0 flex-wrap gap-x-3 text-[13px] font-medium text-ink-65 tabular-nums">
+                    {hasMacros ? (
+                      <>
+                        <MacroValue value={food.protein} letter="P" color="var(--color-ink)" />
+                        <MacroValue value={food.carbs} letter="C" color="var(--color-macro-teal)" />
+                        <MacroValue value={food.fat} letter="F" color="var(--color-macro-ochre)" />
+                      </>
+                    ) : rowMeal}
+                  </span>
+                  <span className="text-right text-[13px] font-medium text-ink-65">{hasMacros ? rowMeal : null}</span>
+                </>
+              ) : null}
+            </li>
+          )
+        })}
+      </ul>
+      {sharedMeal ? <p className="px-4 text-[13px] font-medium text-ink-65">Logged to {sharedMeal.toLowerCase()}</p> : null}
+    </div>
   )
 }
 
@@ -141,6 +148,16 @@ function describeFailure(a: { tool: string; error?: string }) {
   return friendly ? `${base}: ${friendly}` : base
 }
 
+/** Opens a run of Geo's turns, so its plain text reads as a reply, not an unsent draft. Shared with the typing dots. */
+export function GeoAnchor() {
+  return (
+    <div className="flex h-5 items-center gap-2">
+      <GeoAvatar variant="face" size={20} />
+      <span aria-hidden="true" className="text-[13px] font-semibold text-ink">Geo</span>
+    </div>
+  )
+}
+
 interface ChatBubbleProps {
   message: ChatMessage
   sessionId?: string
@@ -148,10 +165,14 @@ interface ChatBubbleProps {
   fresh?: boolean
   /** Shared-element id: a tapped option chip glides into this pill. */
   layoutId?: string
+  /** First of a run of Geo's turns: carries the Geo anchor. */
+  clusterStart?: boolean
+  /** Last of a run of Geo's turns: carries the timestamp. */
+  showTime?: boolean
 }
 
 /** One turn of the running conversation: the user's ink-tint pill, or Geo's plain text with logged-food rows. */
-export function ChatBubble({ message, sessionId, fresh = false, layoutId }: ChatBubbleProps) {
+export function ChatBubble({ message, sessionId, fresh = false, layoutId, clusterStart = false, showTime = true }: ChatBubbleProps) {
   const reduce = useReducedMotion()
   const isUser = message.role === 'user'
   const [menuOpen, setMenuOpen] = useState(false)
@@ -168,7 +189,7 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId }: Chat
     return () => document.removeEventListener('pointerdown', closeMenu)
   }, [menuOpen])
 
-  const formattedTime = message.timestamp
+  const formattedTime = showTime && message.timestamp
     ? new Date(message.timestamp).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })
     : null
 
@@ -253,6 +274,7 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId }: Chat
         className="flex select-none flex-col gap-3 [-webkit-touch-callout:none]"
         {...longPress}
       >
+        {clusterStart ? <GeoAnchor /> : null}
         {/* What was logged leads; Geo's line about it follows. */}
         {foods.length > 0 ? <LoggedFoods foods={foods} /> : null}
         {text ? <GeoText content={text} /> : null}
@@ -262,11 +284,12 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId }: Chat
             {failures.map((a) => describeFailure(a)).join('. ')}.
           </p>
         ) : null}
-        <div ref={menuRef} className="relative -my-2 -ml-3 flex items-center">
+        {/* The time sits 4 pt under the reply; its 44 pt target hangs into the gap before the next turn. */}
+        <div ref={menuRef} className={cn('relative -ml-3 flex', formattedTime ? '-mb-5 -mt-2' : '-my-2')}>
           <button
             type="button"
             onClick={() => setMenuOpen((current) => !current)}
-            className={formattedTime ? 'flex h-11 items-center rounded-full px-3 text-[12px] font-medium text-ink-65 transition-transform active:scale-[.96]' : 'sr-only focus:not-sr-only'}
+            className={formattedTime ? 'flex h-11 items-start rounded-full px-3 leading-4 text-[12px] font-medium text-ink-65 transition-transform active:scale-[.96]' : 'sr-only focus:not-sr-only'}
             aria-label="Message options"
             aria-haspopup="menu"
             aria-expanded={menuOpen}

@@ -317,7 +317,7 @@ export function ChatInput({
           type="button"
           onClick={handleSend}
           disabled={sendDisabled}
-          className="group relative grid size-11 shrink-0 place-items-center rounded-full bg-ink-08 text-ink-35 transition-transform enabled:active:scale-[.94]"
+          className="group relative grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink-35 transition-transform enabled:active:scale-[.94]"
           aria-label="Send message"
         >
           {/* Orange crossfades in over the grey (opacity, not background-color), so ready and sent never snap. */}

@@ -60,11 +60,13 @@ export function ChatThread({
           key={message.id ?? index}
           message={message}
           sessionId={sessionId}
+          clusterStart={messages[index - 1]?.role !== 'assistant'}
+          showTime={messages[index + 1]?.role !== 'assistant'}
           fresh={index >= freshFrom}
           layoutId={chipSent && index === lastUser && index >= freshFrom && message.content === chipSent ? replyLayoutId(chipSent) : undefined}
         />
       ))}
-      {isTyping ? <TypingIndicator /> : null}
+      {isTyping ? <TypingIndicator anchor={last?.role !== 'assistant'} /> : null}
       {/* Untapped chips fade out as the turn moves on; a tapped one glides into its pill (layoutId). */}
       <AnimatePresence>
         {chips.length > 0 && onReply ? (
