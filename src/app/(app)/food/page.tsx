@@ -11,15 +11,19 @@ import { FoodSearchSheet } from '@/components/diary/food-search-sheet'
 import { MonthViewSheet } from '@/components/diary/month-view-sheet'
 import { NameFavouriteDialog } from '@/components/shared/name-favourite-dialog'
 import { CopyMealDialog } from '@/components/diary/copy-meal-dialog'
+import { RowActionsSheet } from '@/components/diary/row-actions-sheet'
+import { PlanLink } from '@/components/diary/plan-parts'
+import { dayKind, mealOf } from '@/components/diary/diary-logic'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { formatMacroKcal } from '@/lib/macros'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { WeekStrip, addDays } from '@/components/ui/fiqr/week-strip'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { toast } from 'sonner'
-import { getLogs } from '@/lib/api/logs.api'
+import { createLog, createLogWithStatus, deleteLog, getLogs, updateLog } from '@/lib/api/logs.api'
 import { copyMeal } from '@/lib/api/meals.api'
 import { createFavourite } from '@/lib/api/favourites.api'
 import { getPlans } from '@/lib/api/plans.api'
@@ -44,6 +48,11 @@ function daySubtitle(iso: string, today: string): string {
   const label = date.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', ...(sameYear ? {} : { year: 'numeric' }) }).replace(',', '')
   const relative = iso === today ? 'Today' : iso === addDays(today, -1) ? 'Yesterday' : iso === addDays(today, 1) ? 'Tomorrow' : null
   return relative ? `${relative}, ${label}` : label
+}
+
+/** "Mon 26 Oct" (year added outside the current one). */
+function dayLabel(iso: string, today: string): string {
+  return daySubtitle(iso, today).replace(/^(Today|Yesterday|Tomorrow), /, '')
 }
 
 /** True once `flag` has held for `ms`, so a fast load never flashes a skeleton (motion-feel 3h). */
@@ -83,6 +92,10 @@ export default function DiaryPage() {
   const [selectedMealType, setSelectedMealType] = useState<string>('Breakfast')
   const [monthOpen, setMonthOpen] = useState(false)
   const [editingLog, setEditingLog] = useState<Log | null>(null)
+  // The row actions sheet keeps its log after closing, so it leaves with its content.
+  const [actionsLog, setActionsLog] = useState<Log | null>(null)
+  const [actionsOpen, setActionsOpen] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState<Log | null>(null)
 
   const router = useRouter()
   useSetGeoScreen('food_diary', { selectedDate })
@@ -249,7 +262,71 @@ export default function DiaryPage() {
     setSearchOpen(false)
   }
 
+  const openLogActions = (log: Log) => {
+    setActionsLog(log)
+    setActionsOpen(true)
+  }
+
+  // Row actions (journey-food D1): each change refetches, and its toast offers Undo for 4 s.
+  const undoToast = (message: string, undo: () => Promise<unknown>) => {
+    toast(message, {
+      duration: 4000,
+      action: { label: 'Undo', onClick: () => { void undo().then(() => refetch(), () => toast.error("Couldn't undo that. Try again.")) } },
+    })
+  }
+
+  const handleMoveLog = async (log: Log, meal: string) => {
+    setActionsOpen(false)
+    const was = (log.payload as FoodPayload).meal_type ?? mealOf(log.payload as FoodPayload).toLowerCase()
+    try {
+      await updateLog(log.id, { meal_type: meal.toLowerCase() })
+      void haptic('success')
+      refetch()
+      undoToast(`Moved to ${meal.toLowerCase()}.`, () => updateLog(log.id, { meal_type: was }))
+    } catch {
+      toast.error("Couldn't move. Try again.")
+    }
+  }
+
+  const handleCopyLog = async (log: Log, date: string, meal: string) => {
+    setActionsOpen(false)
+    const payload = { ...(log.payload as FoodPayload), meal_type: meal.toLowerCase() }
+    const where = `${date === today ? "today's" : date === addDays(today, 1) ? "tomorrow's" : `${dayLabel(date, today)}'s`} ${meal.toLowerCase()}`
+    try {
+      const result = await createLogWithStatus({ type: 'food', payload, source: 'manual', local_date: date })
+      void haptic('success')
+      refetch()
+      if (result.queued) toast.success(`Copied to ${where}. Syncs when you're online.`)
+      else undoToast(`Copied to ${where}.`, () => deleteLog(result.data.id))
+    } catch {
+      toast.error("Couldn't copy. Try again.")
+    }
+  }
+
+  // Delete closes whichever sheet asked, then confirms; the confirm can't sit over a modal sheet.
+  const requestDelete = (log: Log) => {
+    setActionsOpen(false)
+    setSearchOpen(false)
+    setEditingLog(null)
+    setConfirmDelete(log)
+  }
+
+  const handleDeleteLog = async (log: Log) => {
+    setConfirmDelete(null)
+    const payload = log.payload as FoodPayload
+    try {
+      await deleteLog(log.id)
+      void haptic('success')
+      refetch()
+      const name = payload.food_name.length > 22 ? `${payload.food_name.slice(0, 20)}…` : payload.food_name
+      undoToast(`Deleted ${name}.`, () => createLog({ type: 'food', payload, source: log.source, local_date: log.local_date ?? selectedDate }))
+    } catch {
+      toast.error("Couldn't delete. Try again.")
+    }
+  }
+
   const handleEditLog = (log: Log) => {
+    setActionsOpen(false)
     setEditingLog(log)
     const mealType = (log.payload as FoodPayload).meal_type
     setSelectedMealType(
@@ -315,28 +392,22 @@ export default function DiaryPage() {
             <DayHero
               calories={{ current: dayTotals.calories, target: targets.calories }}
               macros={{ protein: [dayTotals.protein, targets.protein], carbs: [dayTotals.carbs, targets.carbs], fat: [dayTotals.fat, targets.fat] }}
+              kind={dayKind(selectedDate, today)}
+              logged={dayLogs.length > 0}
+              dayLabel={dayLabel(selectedDate, today)}
               animateIn={animateIn}
             />
           </motion.div>
-          {mealPlan ? (
-            <button
-              type="button"
-              onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
-              className="mt-1 flex min-h-11 w-full items-center gap-1 px-1 text-left text-[14px] font-semibold text-ink-65 transition-transform active:scale-[.98]"
-            >
-              Your nutrition plan
-              <ChevronRightIcon className="size-4" />
-            </button>
-          ) : null}
+          <PlanLink planName={mealPlan ? mealPlan.content?.name ?? '' : null} targets={targets} onOpen={() => router.push('/food/plan')} />
 
           {/* Day change: the old day fades out over 120 ms while the new one fades in over 180 ms, stacked in one cell. */}
           <LayoutGroup>
-            <div className="mt-4 grid">
+            <div className="mt-4 grid grid-cols-1">
               <AnimatePresence initial={false}>
                 <motion.div
                   key={selectedDate}
                   style={{ gridArea: '1 / 1' }}
-                  className="flex flex-col gap-5"
+                  className="flex flex-col gap-4"
                   initial={isFirstBlock ? false : { opacity: 0 }}
                   animate={{ opacity: 1, transition: { duration: reduce ? 0.15 : 0.18, ease: 'easeOut' } }}
                   exit={{ opacity: 0, transition: { duration: 0.12, ease: 'easeOut' } }}
@@ -347,7 +418,7 @@ export default function DiaryPage() {
                       mealType={mealType}
                       items={groupedMeals[mealType] || []}
                       onAddFood={() => handleAddFood(mealType)}
-                      onEditLog={handleEditLog}
+                      onOpenLog={openLogActions}
                       isToday={selectedDate === today}
                       onCopyToToday={() => handleCopyToToday(mealType)}
                       onSaveFavourite={() => handleSaveFavourite(mealType)}
@@ -372,6 +443,31 @@ export default function DiaryPage() {
         onFoodLogged={handleFoodLogged}
         onLogUpdated={handleLogUpdated}
         onLogDeleted={handleLogDeleted}
+        onRequestDelete={requestDelete}
+        editSubtitle={editingLog ? `${mealOf(editingLog.payload as FoodPayload)}, ${dayLabel(selectedDate, today)}` : undefined}
+      />
+
+      <RowActionsSheet
+        open={actionsOpen}
+        log={actionsLog}
+        date={selectedDate}
+        today={today}
+        dayLabel={(iso) => dayLabel(iso, today)}
+        onClose={() => setActionsOpen(false)}
+        onEdit={handleEditLog}
+        onMove={handleMoveLog}
+        onCopy={handleCopyLog}
+        onDelete={requestDelete}
+      />
+
+      <ConfirmDialog
+        open={confirmDelete !== null}
+        onClose={() => setConfirmDelete(null)}
+        onConfirm={() => { if (confirmDelete) void handleDeleteLog(confirmDelete) }}
+        title={`Delete ${(confirmDelete?.payload as FoodPayload | undefined)?.food_name ?? 'this entry'}?`}
+        description={`It comes off ${dayLabel(confirmDelete?.local_date ?? selectedDate, today)} and your totals drop by ${formatMacroKcal((confirmDelete?.payload as FoodPayload | undefined)?.est_macros?.calories ?? 0)} kcal.`}
+        confirmLabel="Delete"
+        variant="danger"
       />
 
       <MonthViewSheet

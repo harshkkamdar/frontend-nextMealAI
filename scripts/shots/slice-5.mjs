@@ -13,7 +13,14 @@ const food = (offset, meal_type, food_name, [calories, protein, carbs, fat], ext
 }
 
 const PROFILE = { id: 'capture-user', full_name: 'Sam Rivera', ai_consent_at: '2026-10-24T00:00:00Z', health_disclaimer_ack_at: '2026-10-24T00:00:00Z', current_weight_kg: 78.2, daily_calorie_target: 1950, daily_protein_g: 140, daily_carbs_g: 190, daily_fat_g: 65, daily_targets_missing_fields: [] }
-const PLANS = [{ id: 'meal-1', type: 'meal', is_active: true, name: 'Lean and steady', content: { daily_targets: { calories: 1950, protein: 140, carbs: 190, fat: 65 }, days: [] } }]
+const PLANS = [{
+  id: 'meal-1', type: 'meal', status: 'active', is_active: true, start_date: isoDay(14), created_at: `${isoDay(14)}T00:00:00Z`,
+  content: {
+    name: 'Lean and steady', notes: 'Training days add 200 kcal from carbs. Rest days hold at 1,750.',
+    daily_targets: { calories: 1950, protein: 140, carbs: 190, fat: 65 },
+    days: [{ date: isoDay(0), meals: [{ type: 'breakfast', name: 'Greek yoghurt, berries and oats', calories: 420 }, { type: 'lunch', name: 'Chicken burrito bowl', calories: 640 }, { type: 'dinner', name: 'Salmon, greens and potatoes', calories: 620 }], snacks: [{ name: 'Apple and peanut butter', calories: 260 }] }],
+  },
+}]
 
 const BOWL_ITEMS = [
   { name: 'Brown rice', quantity_g: 150, est_macros: { calories: 165, protein: 4, carbs: 35, fat: 1 } },
@@ -54,6 +61,11 @@ async function neighbour(p) {
   const today = new Date(`${isoDay(0)}T12:00:00`).getDay()
   return dayButton(p, today === 0 ? -1 : 1)
 }
+/** Opens a diary row's actions sheet by the food's name. */
+async function openRow(p, name) {
+  await p.getByRole('button', { name: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).first().click()
+  await wait(p)
+}
 async function pickDay(p, offset) {
   const btn = dayButton(p, offset)
   if (await btn.count()) await btn.click()
@@ -75,19 +87,30 @@ const slice5 = {
     { name: 'food-error', url: '/food', api: DEFAULT, fail: ['/v1/logs'] },
     { name: 'food-offline', url: '/food', api: DEFAULT, offline: true },
     { name: 'month-sheet', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Open month view' }).click(); await wait(p) } },
-    { name: 'row-actions', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Breakfast actions' }).click(); await wait(p) } },
-    { name: 'row-actions-past', url: '/food', api: DEFAULT, act: async (p) => { await pickDay(p, 1); await p.getByRole('button', { name: 'Lunch actions' }).click(); await wait(p) } },
+    { name: 'meal-actions', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Breakfast actions' }).click(); await wait(p) } },
     { name: 'copy-meal', url: '/food', api: DEFAULT, act: async (p) => { await pickDay(p, 1); await p.getByRole('button', { name: 'Lunch actions' }).click(); await wait(p, 600); await p.getByRole('button', { name: 'Copy to today' }).click(); await wait(p) } },
     { name: 'name-favourite', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Breakfast actions' }).click(); await wait(p, 600); await p.getByRole('button', { name: 'Save as meal' }).click(); await wait(p); await p.getByLabel('Meal name').fill('Usual breakfast') } },
-    { name: 'row-expanded', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Expand items' }).click(); await p.mouse.wheel(0, 300); await wait(p) } },
-    { name: 'inline-edit', url: '/food', api: DEFAULT, act: async (p) => { await p.getByRole('button', { name: 'Expand items' }).click(); await wait(p, 300); await p.getByRole('button', { name: 'Edit item' }).nth(1).click(); await p.mouse.wheel(0, 500); await wait(p) } },
+    { name: 'row-actions', url: '/food', api: DEFAULT, act: (p) => openRow(p, 'Greek yoghurt and berries') },
+    { name: 'row-actions-past', url: '/food', api: DEFAULT, act: async (p) => { await pickDay(p, 1); await openRow(p, 'Tuna salad wrap') } },
+    { name: 'row-move', url: '/food', api: DEFAULT, act: async (p) => { await openRow(p, 'Greek yoghurt and berries'); await p.getByRole('button', { name: /^Change meal/ }).click(); await wait(p) } },
+    { name: 'row-copy', url: '/food', api: DEFAULT, act: async (p) => { await openRow(p, 'Greek yoghurt and berries'); await p.getByRole('button', { name: 'Copy to another day' }).click(); await wait(p) } },
+    { name: 'row-delete-confirm', url: '/food', api: DEFAULT, act: async (p) => { await openRow(p, 'Greek yoghurt and berries'); await p.getByRole('button', { name: 'Delete' }).click(); await wait(p) } },
+    { name: 'row-delete-long', url: '/food', api: api([...TODAY, food(0, 'dinner', LONG, [1420, 48, 120, 82]), ...HISTORY]), act: async (p) => { await p.mouse.wheel(0, 700); await wait(p, 400); await openRow(p, LONG.slice(0, 20)); await p.getByRole('button', { name: 'Delete' }).click(); await wait(p) } },
+    { name: 'row-deleted-undo', url: '/food', api: DEFAULT, act: async (p) => { await openRow(p, 'Oat flat white'); await p.getByRole('button', { name: 'Delete' }).click(); await wait(p, 600); await p.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click(); await wait(p, 900) } },
+    { name: 'edit-item', url: '/food', api: DEFAULT, act: async (p) => { await openRow(p, 'Greek yoghurt and berries'); await p.getByRole('button', { name: 'Edit amount' }).click(); await wait(p, 1000) } },
+    { name: 'edit-itemised', url: '/food', api: DEFAULT, act: async (p) => { await openRow(p, 'Chicken burrito bowl'); await p.getByRole('button', { name: 'Edit amount' }).click(); await wait(p, 1000) } },
+    { name: 'edit-itemised-field', url: '/food', api: DEFAULT, act: async (p) => { await openRow(p, 'Chicken burrito bowl'); await p.getByRole('button', { name: 'Edit amount' }).click(); await wait(p, 1000); await p.getByRole('button', { name: 'Edit Grilled chicken thigh' }).click(); await wait(p) } },
+    { name: 'food-plan', url: '/food/plan', api: DEFAULT },
+    { name: 'food-plan-none', url: '/food/plan', api: api([...TODAY, ...HISTORY], { plans: [] }) },
+    { name: 'food-plan-link-none', url: '/food', api: api([...TODAY, ...HISTORY], { plans: [] }) },
   ],
   transitions: [
     // Day change: content crossfades with overlap, the capsule glides, nothing slides.
     { name: 'day-change', url: '/food', home: 'returning', act: async (p) => (await neighbour(p)).click() },
     { name: 'day-change-back', url: '/food', home: 'returning', act: async (p) => { await (await neighbour(p)).click(); await p.waitForTimeout(1200); await dayButton(p, 0).click() } },
     { name: 'month-open', url: '/food', home: 'returning', act: (p) => p.getByRole('button', { name: 'Open month view' }).click() },
-    { name: 'row-actions-open', url: '/food', home: 'returning', act: (p) => p.getByRole('button', { name: 'Breakfast actions' }).click() },
+    { name: 'row-actions-open', url: '/food', home: 'returning', act: (p) => p.getByRole('button', { name: /^Greek yoghurt and berries,/ }).click() },
+    { name: 'plan-push', url: '/food', home: 'returning', act: (p) => p.getByRole('button', { name: /^Your nutrition plan/ }).click() },
     { name: 'week-swipe', url: '/food', home: 'returning', act: async (p) => { const b = await dayButton(p, 0).boundingBox(); const y = b.y + b.height / 2; await p.mouse.move(300, y); await p.mouse.down(); for (let i = 1; i <= 12; i++) { await p.mouse.move(300 + i * 14, y); await p.waitForTimeout(16) } await p.mouse.up() } },
   ],
 }

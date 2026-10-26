@@ -21,6 +21,7 @@ import {
   type DailyBreakdownRow,
 } from '@/lib/month-grid'
 import { todayLocalISO } from '@/lib/timezone'
+import { shiftISO } from './diary-logic'
 import { cn } from '@/lib/utils'
 import type { Log, FoodPayload } from '@/types/logs.types'
 
@@ -131,6 +132,12 @@ export function MonthViewSheet({
     [anchor, breakdown, today]
   )
 
+  // Footer: days with food logged in the shown month, and their average (journey-food month sheet).
+  const monthDays = breakdown.filter((r) => r.date.startsWith(anchor.slice(0, 7)) && r.calories > 0)
+  const average = monthDays.length ? Math.round(monthDays.reduce((t, r) => t + r.calories, 0) / monthDays.length) : 0
+  // The backend accepts logs up to 7 days ahead, so later days have nothing to open.
+  const lastOpenDay = shiftISO(today, 7)
+
   const handlePrev = useCallback(() => setAnchor((a) => shiftMonth(a, -1)), [])
   const handleNext = useCallback(() => setAnchor((a) => shiftMonth(a, 1)), [])
 
@@ -167,31 +174,32 @@ export function MonthViewSheet({
         ))}
       </div>
 
-      {/* pb-9 lifts the last week clear of the 38 pt sheet corners. */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-9" aria-busy={loading || undefined}>
+      <div className="min-h-0 flex-1 overflow-y-auto px-3" aria-busy={loading || undefined}>
         <div className="grid grid-cols-7 gap-y-1">
           {grid.flat().map((cell) => {
             const isSelected = cell.date === initialDate
             const isFuture = cell.date > today
+            const beyond = cell.date > lastOpenDay
             if (!cell.inMonth) return <span key={cell.date} aria-hidden="true" />
             return (
               <button
                 key={cell.date}
                 type="button"
                 onClick={() => handleDayTap(cell.date)}
+                disabled={beyond}
                 aria-pressed={isSelected}
                 aria-current={cell.isToday ? 'date' : undefined}
                 aria-label={`${cell.date}${cell.isToday ? ', today' : ''}${cell.calories !== null ? `, ${cell.calories} kcal` : ''}${cell.workouts > 0 ? ', workout logged' : ''}`}
                 className={cn(
-                  'relative flex h-[54px] flex-col items-center justify-center gap-1 rounded-[14px] tabular-nums transition-transform active:scale-[.94]',
+                  'relative flex h-[54px] flex-col items-center justify-center gap-1 rounded-[14px] tabular-nums transition-transform enabled:active:scale-[.94] disabled:opacity-40',
                   isFuture ? 'text-ink-65' : 'text-ink',
                   isSelected && 'bg-card shadow-[var(--shadow-card)] outline outline-[1.5px] -outline-offset-[1.5px] outline-ink',
                 )}
               >
                 <span className={cn('text-[16px] leading-none', cell.isToday ? 'font-bold' : isFuture ? 'font-medium' : 'font-semibold')}>{cell.dayNum}</span>
                 {cell.calories !== null
-                  ? <span className="text-[11px] font-medium leading-none text-ink-65">{cell.calories.toLocaleString('en-AU')}</span>
-                  : <span className="h-[11px]" />}
+                  ? <span className="text-[11px] font-semibold leading-none text-ink-65">{cell.calories.toLocaleString('en-AU')}</span>
+                  : loading && !isFuture ? <span aria-hidden="true" className="h-[9px] w-7 rounded-full bg-ink-06" /> : <span className="h-[11px]" />}
                 {cell.isToday ? (
                   <svg viewBox="0 0 10 7" className="absolute top-0.5 h-[5px] w-[7px] text-accent" aria-hidden="true"><path d="M0 0h10L5 7Z" fill="currentColor" /></svg>
                 ) : null}
@@ -201,6 +209,11 @@ export function MonthViewSheet({
           })}
         </div>
       </div>
+      {/* pb-7 lifts the footer clear of the 38 pt sheet corners. */}
+      <p className="flex justify-between px-5 pb-7 pt-3 text-caption text-ink-65 tabular-nums">
+        {loading ? <span>Loading this month</span> : <span>{monthDays.length ? `${monthDays.length} day${monthDays.length === 1 ? '' : 's'} logged` : 'No logs this month'}</span>}
+        {!loading && monthDays.length ? <span>Average {average.toLocaleString('en-AU')} kcal</span> : null}
+      </p>
     </BottomSheet>
   )
 }

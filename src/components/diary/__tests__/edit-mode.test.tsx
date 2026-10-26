@@ -114,4 +114,46 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
     expect(callArg.servings).toBe(2)
     expect(callArg.quantity_g).toBe(700)  // 350g/serving * 2 = 700
   })
+
+  it('changing the meal saves meal_type with the amount', async () => {
+    const updateLogMock = vi.mocked(updateLog)
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={baseLog} editSubtitle="Breakfast, Mon 26 Oct"
+        mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    expect(screen.getByText('Breakfast, Mon 26 Oct')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Lunch' }))
+    fireEvent.click(screen.getByRole('button', { name: /save/i }))
+    await waitFor(() => expect(updateLogMock).toHaveBeenCalled())
+    expect((updateLogMock.mock.calls[0][1] as Partial<FoodPayload>).meal_type).toBe('lunch')
+  })
+
+  it('an itemised log edits one component and saves the items with summed totals', async () => {
+    const updateLogMock = vi.mocked(updateLog)
+    const itemised: Log = {
+      ...baseLog,
+      payload: {
+        food_name: 'Burrito bowl', meal_type: 'lunch',
+        est_macros: { calories: 300, protein: 20, carbs: 30, fat: 10 },
+        items: [
+          { name: 'Rice', est_macros: { calories: 200, protein: 4, carbs: 30, fat: 1 } },
+          { name: 'Chicken', est_macros: { calories: 100, protein: 16, carbs: 0, fat: 9 } },
+        ],
+      } as FoodPayload,
+    }
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={itemised}
+        mealType="Lunch" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    expect(screen.getByText('2 items from your photo')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Rice' }))
+    fireEvent.change(screen.getByLabelText('Calories'), { target: { value: '150' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+    fireEvent.click(screen.getByRole('button', { name: /save/i }))
+    await waitFor(() => expect(updateLogMock).toHaveBeenCalled())
+    const arg = updateLogMock.mock.calls[0][1] as Partial<FoodPayload>
+    expect(arg.items?.[0].est_macros.calories).toBe(150)
+    expect(arg.est_macros?.calories).toBe(250)
+    expect(arg.meal_type).toBe('lunch')
+  })
 })

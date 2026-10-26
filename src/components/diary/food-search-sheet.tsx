@@ -19,7 +19,12 @@ import { cn } from '@/lib/utils'
 import type { CreateLogInput } from '@/types/logs.types'
 import { formatMacroGrams, formatMacroKcal, quantizeMacros } from '@/lib/macros'
 import type { FoodSearchResult } from '@/types/foods.types'
-import type { Log, FoodPayload } from '@/types/logs.types'
+import type { Log, FoodPayload, FoodLogItem } from '@/types/logs.types'
+import { ChoiceGrid, GroupLabel } from './choice-grid'
+import { mealOf } from './diary-logic'
+import { ItemListEditor } from './item-list-editor'
+
+const MEAL_CHOICES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'].map((m) => ({ value: m, label: m }))
 
 function FoodRow({ food, onSelect, onToggleFavorite }: {
   food: FoodSearchResult
@@ -80,6 +85,14 @@ function MacroTile({ value, label }: { value: string; label: string }) {
   )
 }
 
+/** Totals of an itemised log's components. */
+function sumItems(items: FoodLogItem[]) {
+  return items.reduce(
+    (t, i) => ({ calories: t.calories + (i.est_macros.calories ?? 0), protein: t.protein + (i.est_macros.protein ?? 0), carbs: t.carbs + (i.est_macros.carbs ?? 0), fat: t.fat + (i.est_macros.fat ?? 0) }),
+    { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  )
+}
+
 const TABS = [{ value: 'food', label: 'Foods' }, { value: 'meals', label: 'Saved meals' }] as const
 const AMOUNTS = [{ value: 'servings', label: 'Servings' }, { value: 'grams', label: 'Grams' }] as const
 
@@ -99,9 +112,13 @@ interface FoodSearchSheetProps {
   existingLog?: Log
   onLogUpdated?: (logId: string, payload: FoodPayload) => void
   onLogDeleted?: (logId: string) => void
+  /** Edit mode: the line under the title, e.g. "Breakfast, Mon 26 Oct". */
+  editSubtitle?: string
+  /** Edit mode: Delete entry hands the log to the caller, which closes this sheet and confirms (a confirm over a modal sheet can't take focus). */
+  onRequestDelete?: (log: Log) => void
 }
 
-export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDate, existingMealLogs, mode, existingLog, onLogUpdated, onLogDeleted }: FoodSearchSheetProps) {
+export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDate, existingMealLogs, mode, existingLog, onLogUpdated, onLogDeleted, editSubtitle, onRequestDelete }: FoodSearchSheetProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<FoodSearchResult[]>([])
   const [searching, setSearching] = useState(false)
@@ -125,6 +142,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   const [loggingFav, setLoggingFav] = useState<string | null>(null)
   const [confirmDeleteFav, setConfirmDeleteFav] = useState<string | null>(null)
   const [confirmDeleteEdit, setConfirmDeleteEdit] = useState(false)
+  // Edit mode: the meal the entry files under, and an itemised (photo) log's components, both saved on Save.
+  const [editMeal, setEditMeal] = useState('Snack')
+  const [editItems, setEditItems] = useState<FoodLogItem[] | null>(null)
   // Add-food sheet has two tabs: search individual Foods, or log a saved Meal.
   const [activeTab, setActiveTab] = useState<'food' | 'meals'>('food')
   const [mealQuery, setMealQuery] = useState('')
@@ -147,6 +167,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     if (!isOpen) return
     if (mode === 'edit' && existingLog) {
       const payload = existingLog.payload as FoodPayload
+      setEditMeal(mealOf(payload))
+      setEditItems(payload.items?.length ? payload.items : null)
       const servingSize = payload.servings && payload.quantity_g
         ? Math.round(payload.quantity_g / payload.servings)
         : null
@@ -492,18 +514,17 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     const macros = quantizeMacros(
       calculatedMacros ?? (existingLog.payload as FoodPayload).est_macros ?? null
     )
-    const updated: Partial<FoodPayload> = {
-      quantity_g: quantity,
-      servings: inputMode === 'servings' ? servings : undefined,
-      est_macros: macros,
-    }
+    // An itemised log saves its components (the backend re-sums the parent); a single food saves its amount.
+    const updated: Partial<FoodPayload> = editItems
+      ? { items: editItems, est_macros: quantizeMacros(sumItems(editItems)), meal_type: editMeal.toLowerCase() }
+      : { quantity_g: quantity, servings: inputMode === 'servings' ? servings : undefined, est_macros: macros, meal_type: editMeal.toLowerCase() }
     try {
       await updateLog(existingLog.id, updated)
       onLogUpdated?.(existingLog.id, { ...(existingLog.payload as FoodPayload), ...updated })
       toast.success('Updated')
       onClose()
     } catch {
-      toast.error('Failed to update')
+      toast.error("Couldn't save. Your change is still here.")
     } finally {
       setSaving(false)
     }
@@ -589,6 +610,8 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     fat: (selectedFood.macros_per_serving.fat ?? 0) * effectiveMultiplier,
   } : null
 
+  const shownMacros = editItems ? sumItems(editItems) : calculatedMacros
+
   const title = mode === 'edit'
     ? `Edit ${(existingLog?.payload as FoodPayload | undefined)?.food_name ?? 'food'}`
     : pending.length > 0
@@ -608,8 +631,15 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
         // Log mode holds one height so results arriving never resize the sheet (no layout jump).
         className={mode === 'edit' ? '' : 'h-[calc(92vh-var(--nav-clearance)-var(--safe-top))]'}
       >
-        <div className="flex items-center justify-between gap-3 px-5 pb-3 pt-1">
-          <h2 id="food-sheet-title" className="font-wide min-w-0 truncate text-[22px] font-bold leading-tight text-ink">{title}</h2>
+        <div className={cn('flex justify-between gap-3 px-5 pb-3 pt-1', mode === 'edit' ? 'items-start' : 'items-center')}>
+          {mode === 'edit' ? (
+            <div className="min-w-0 flex-1">
+              <h2 id="food-sheet-title" className="font-display line-clamp-2 text-headline font-extrabold leading-tight text-ink [overflow-wrap:anywhere]">{title}</h2>
+              {editSubtitle ? <p className="mt-0.5 text-caption text-ink-65">{editSubtitle}</p> : null}
+            </div>
+          ) : (
+            <h2 id="food-sheet-title" className="font-wide min-w-0 truncate text-[22px] font-bold leading-tight text-ink">{title}</h2>
+          )}
           <RoundButton aria-label="Close" onClick={onClose}><CloseIcon /></RoundButton>
         </div>
 
@@ -623,18 +653,21 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 </button>
               )}
 
-              <div className={cn(CARD, 'p-5')}>
-                <p className="text-[17px] font-bold leading-snug text-ink">{selectedFood.name}</p>
-                {selectedFood.brand && <p className="text-[14px] text-ink-65">{selectedFood.brand}</p>}
-                <p className="mt-1 text-[13px] text-ink-65">Per serving ({selectedFood.serving_size_g} g)</p>
-              </div>
+              {editItems ? <ItemListEditor items={editItems} onChange={setEditItems} /> : (<>
+              {/* Edit mode names the food in the title, so the card only shows when logging. */}
+              {mode !== 'edit' && (
+                <div className={cn(CARD, 'mb-5 p-5')}>
+                  <p className="text-[17px] font-bold leading-snug text-ink">{selectedFood.name}</p>
+                  {selectedFood.brand && <p className="text-[14px] text-ink-65">{selectedFood.brand}</p>}
+                  <p className="mt-1 text-[13px] text-ink-65">Per serving ({selectedFood.serving_size_g} g)</p>
+                </div>
+              )}
 
-              <Chips
-                className="mt-5"
+              <ChoiceGrid
                 label="Amount in"
-                options={AMOUNTS}
+                choices={AMOUNTS}
                 value={inputMode}
-                onChange={(next) => {
+                onPick={(next) => {
                   if (next === 'servings') setInputMode('servings')
                   if (next === 'grams') {
                     setInputMode('grams')
@@ -694,14 +727,23 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                 </div>
               )}
 
-              {calculatedMacros && (
-                <div className="mt-6 grid grid-cols-4 gap-2">
-                  <MacroTile value={formatMacroKcal(calculatedMacros.calories)} label="kcal" />
-                  <MacroTile value={formatMacroGrams(calculatedMacros.protein)} label="protein" />
-                  <MacroTile value={formatMacroGrams(calculatedMacros.carbs)} label="carbs" />
-                  <MacroTile value={formatMacroGrams(calculatedMacros.fat)} label="fat" />
+              </>)}
+
+              {shownMacros && (
+                <div className={cn('grid grid-cols-4 gap-2', editItems ? 'mt-3' : 'mt-6')}>
+                  <MacroTile value={formatMacroKcal(shownMacros.calories)} label="kcal" />
+                  <MacroTile value={formatMacroGrams(shownMacros.protein)} label="protein" />
+                  <MacroTile value={formatMacroGrams(shownMacros.carbs)} label="carbs" />
+                  <MacroTile value={formatMacroGrams(shownMacros.fat)} label="fat" />
                 </div>
               )}
+
+              {mode === 'edit' ? (
+                <>
+                  <GroupLabel>Meal</GroupLabel>
+                  <ChoiceGrid label="Meal" choices={MEAL_CHOICES} value={editMeal} onPick={setEditMeal} />
+                </>
+              ) : null}
             </div>
 
             <div className="px-5 pb-5 pt-3">
@@ -710,7 +752,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   <PrimaryButton onClick={handleSaveEdit} disabled={saving || !selectedFood} aria-busy={saving} className="justify-center">
                     {saving ? 'Saving…' : 'Save'}
                   </PrimaryButton>
-                  <button type="button" onClick={() => setConfirmDeleteEdit(true)} disabled={saving} className="min-h-11 w-full rounded-full text-center text-[15.5px] font-semibold text-ink-65">
+                  <button type="button" onClick={() => (onRequestDelete && existingLog ? onRequestDelete(existingLog) : setConfirmDeleteEdit(true))} disabled={saving} className="min-h-11 w-full rounded-full text-center text-[15.5px] font-semibold text-ink-65">
                     Delete entry
                   </button>
                 </div>

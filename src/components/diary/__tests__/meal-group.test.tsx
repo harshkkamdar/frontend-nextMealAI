@@ -1,14 +1,10 @@
 /**
- * FB-10 — Expandable itemised food row inside MealGroup.
- *
- * A food log that carries a non-empty `items` array should render a
- * disclosure control (aria-expanded chevron button) which, when toggled,
- * shows each child component name + per-child macros. Children have an
- * edit flow that calls updateLog with the edited items array.
+ * MealGroup rows: photo-led media, a tap opens the row's actions, itemised logs read as their item count (their
+ * components are edited in the edit sheet now), long meals fold.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import type { Log } from '@/types/logs.types'
 
 vi.mock('@/lib/api/logs.api', () => ({
@@ -17,10 +13,7 @@ vi.mock('@/lib/api/logs.api', () => ({
 }))
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 
-import { updateLog } from '@/lib/api/logs.api'
 import { MealGroup } from '../meal-group'
-
-const mockedUpdateLog = vi.mocked(updateLog)
 
 function makeFoodLog(overrides: Partial<Log> = {}): Log {
   return {
@@ -51,38 +44,41 @@ const itemisedLog: Log = makeFoodLog({
   },
 })
 
-describe('FB-10: MealGroup expandable itemised rows', () => {
+describe('MealGroup photo-led rows (journey-food C3, D1)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('does not render a chevron when items is undefined', () => {
+  it('tapping a row opens its actions with that log', () => {
     const log = makeFoodLog({ id: 'plain' })
-    render(
-      <MealGroup
-        mealType="Breakfast"
-        items={[log]}
-        onAddFood={() => {}}
-      />
-    )
+    const onOpenLog = vi.fn()
+    render(<MealGroup mealType="Breakfast" items={[log]} onAddFood={() => {}} onOpenLog={onOpenLog} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /^breakfast bowl, 1 serving, 681 kcal$/i }))
+
+    expect(onOpenLog).toHaveBeenCalledWith(log)
+  })
+
+  it('an itemised (photo) log reads as its item count, with no expand control', () => {
+    render(<MealGroup mealType="Breakfast" items={[itemisedLog]} onAddFood={() => {}} />)
+    expect(screen.getByText(/3 items, from your photo/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /expand items/i })).toBeNull()
   })
 
-  it('tapping a simple food row calls onEditLog', () => {
-    const log = makeFoodLog({ id: 'plain' })
-    const onEditLog = vi.fn()
-    render(
-      <MealGroup
-        mealType="Breakfast"
-        items={[log]}
-        onAddFood={() => {}}
-        onEditLog={onEditLog}
-      />
-    )
+  it('a row without a photo shows a glyph, and an https photo_url shows the photo', () => {
+    const { container, rerender } = render(<MealGroup mealType="Lunch" items={[makeFoodLog()]} onAddFood={() => {}} />)
+    expect(container.querySelector('img')).toBeNull()
+    const withPhoto = makeFoodLog({ payload: { food_name: 'Bowl', est_macros: { calories: 10 }, photo_url: 'https://cdn.example.com/p.jpg' } as never })
+    rerender(<MealGroup mealType="Lunch" items={[withPhoto]} onAddFood={() => {}} />)
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('https://cdn.example.com/p.jpg')
+  })
 
-    fireEvent.click(screen.getByRole('button', { name: /edit breakfast bowl/i }))
-
-    expect(onEditLog).toHaveBeenCalledWith(log)
+  it('a meal with more than 7 rows shows 6 and a Show more row', () => {
+    const many = Array.from({ length: 9 }, (_, i) => makeFoodLog({ id: `m${i}`, payload: { food_name: `Food ${i}`, est_macros: { calories: 10 } } }))
+    render(<MealGroup mealType="Snack" items={many} onAddFood={() => {}} />)
+    expect(screen.queryByText('Food 6')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Show 3 more' }))
+    expect(screen.getByText('Food 8')).toBeInTheDocument()
   })
 
   it('the empty meal row calls onAddFood', () => {
@@ -94,7 +90,7 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
     expect(onAddFood).toHaveBeenCalledOnce()
   })
 
-  it('hides Copy to today from the overflow sheet when viewing today', () => {
+  it('hides Copy to today from the meal actions sheet when viewing today', () => {
     render(
       <MealGroup
         mealType="Breakfast"
@@ -110,102 +106,6 @@ describe('FB-10: MealGroup expandable itemised rows', () => {
 
     expect(screen.queryByRole('button', { name: /copy to today/i })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /save as meal/i })).toBeInTheDocument()
-  })
-
-  it('does not render a chevron when items is an empty array', () => {
-    const log = makeFoodLog({
-      id: 'empty',
-      payload: {
-        food_name: 'Apple',
-        est_macros: { calories: 95, protein: 0, carbs: 25, fat: 0 },
-        items: [],
-      },
-    })
-    render(
-      <MealGroup
-        mealType="Snack"
-        items={[log]}
-        onAddFood={() => {}}
-      />
-    )
-    expect(screen.queryByRole('button', { name: /expand items/i })).toBeNull()
-  })
-
-  it('renders a chevron button when items has 3 entries', () => {
-    render(
-      <MealGroup
-        mealType="Breakfast"
-        items={[itemisedLog]}
-        onAddFood={() => {}}
-      />
-    )
-    const btn = screen.getByRole('button', { name: /expand items/i })
-    expect(btn).toHaveAttribute('aria-expanded', 'false')
-  })
-
-  it('clicking the chevron expands and reveals all 3 child names', async () => {
-    render(
-      <MealGroup
-        mealType="Breakfast"
-        items={[itemisedLog]}
-        onAddFood={() => {}}
-      />
-    )
-    const btn = screen.getByRole('button', { name: /expand items/i })
-    fireEvent.click(btn)
-    expect(btn).toHaveAttribute('aria-expanded', 'true')
-    expect(await screen.findByText('Scrambled eggs')).toBeInTheDocument()
-    expect(screen.getByText('Avocado')).toBeInTheDocument()
-    expect(screen.getByText('Toast')).toBeInTheDocument()
-    // Quantity labels surface too
-    expect(screen.getByText(/3 whole eggs/)).toBeInTheDocument()
-  })
-
-  it('clicking the chevron twice collapses the children again', () => {
-    render(
-      <MealGroup
-        mealType="Breakfast"
-        items={[itemisedLog]}
-        onAddFood={() => {}}
-      />
-    )
-    const btn = screen.getByRole('button', { name: /expand items/i })
-    fireEvent.click(btn)
-    fireEvent.click(btn)
-    expect(btn).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.queryByText('Scrambled eggs')).toBeNull()
-  })
-
-  it('editing a child macro calls updateLog with the new items[] array', async () => {
-    mockedUpdateLog.mockResolvedValueOnce({ ...itemisedLog })
-    render(
-      <MealGroup
-        mealType="Breakfast"
-        items={[itemisedLog]}
-        onAddFood={() => {}}
-      />
-    )
-    // Expand
-    fireEvent.click(screen.getByRole('button', { name: /expand items/i }))
-    // Open the edit form for the first child
-    const editBtn = screen.getAllByRole('button', { name: /edit item/i })[0]
-    fireEvent.click(editBtn)
-    // Change calories
-    const input = screen.getByLabelText(/calories/i) as HTMLInputElement
-    fireEvent.change(input, { target: { value: '180' } })
-    // Save
-    fireEvent.click(screen.getByRole('button', { name: /save/i }))
-
-    await waitFor(() => {
-      expect(mockedUpdateLog).toHaveBeenCalledTimes(1)
-    })
-    const [id, payload] = mockedUpdateLog.mock.calls[0]
-    expect(id).toBe('log-iti')
-    const items = (payload as { items?: Array<{ est_macros: { calories?: number } }> }).items!
-    expect(items).toHaveLength(3)
-    expect(items[0].est_macros.calories).toBe(180)
-    expect(items[1].est_macros.calories).toBe(240)
-    expect(items[2].est_macros.calories).toBe(231)
   })
 })
 
