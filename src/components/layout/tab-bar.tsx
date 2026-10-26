@@ -55,7 +55,8 @@ export function TabBar() {
   const minimised = useMinimised()
   const logOpen = useUIStore((state) => state.activeSheet === LOG_SHEET)
 
-  if (hidesTabBar(pathname)) return null
+  // Full-screen routes slide the bar away instead of unmounting it, so entering and leaving them never pops.
+  const hidden = hidesTabBar(pathname)
 
   const toggleLog = () => {
     void haptic('light')
@@ -67,9 +68,11 @@ export function TabBar() {
   return (
     <>
     {/* Scroll edge (Liquid Glass "scroll edge effect"): content fades into the page under the bar instead of colliding with it. */}
-    <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] h-[calc(104px+var(--safe-bottom))] bg-[linear-gradient(to_top,var(--color-cream)_calc(100%-24px),rgba(253,246,236,0))]" />
+    <div aria-hidden="true" className={cn('pointer-events-none fixed inset-x-0 bottom-0 z-[45] h-[calc(104px+var(--safe-bottom))] bg-[linear-gradient(to_top,var(--color-cream)_calc(100%-24px),rgba(253,246,236,0))] transition-opacity duration-200', hidden && 'opacity-0')} />
     <div
-      className={cn('pointer-events-none fixed inset-x-0 mx-auto flex max-w-md items-end gap-3 px-4', logOpen ? 'z-[80]' : 'z-[50]')}
+      aria-hidden={hidden || undefined}
+      inert={hidden || undefined}
+      className={cn('pointer-events-none fixed inset-x-0 mx-auto flex max-w-md items-end gap-3 px-4 transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]', logOpen ? 'z-[80]' : 'z-[50]', hidden && 'translate-y-[calc(100%+24px)] opacity-0')}
       style={{ bottom: 'calc(12px + var(--safe-bottom))' }}
     >
       <nav

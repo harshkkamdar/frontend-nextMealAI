@@ -41,8 +41,8 @@ const TRANSITIONS = {
     { name: 'tab-home-to-food', url: '/dashboard', home: 'returning', warm: '/food', act: (p) => p.getByRole('link', { name: 'Food' }).click() },
     { name: 'tab-food-to-home', url: '/food', home: 'returning', warm: '/dashboard', act: async (p) => { await p.getByRole('link', { name: 'Home' }).click() } },
     { name: 'plus-open-close', url: '/dashboard', home: 'returning', act: async (p) => { const orb = p.getByRole('button', { name: 'Log something' }); const b = await orb.boundingBox(); await orb.click(); await p.waitForTimeout(1000); await p.mouse.click(b.x + b.width / 2, b.y + b.height / 2) } },
-    // First load: a full navigation to Home (ring draw, count-up, staggered rise) with the route already compiled.
-    { name: 'home-first-load', url: '/food', home: 'returning', warm: '/dashboard', act: (p) => p.goto(BASE + '/dashboard') },
+    // First load: Home's first paint in the session (ring draw, count-up, staggered rise); revisits paint at rest (useFirstPaint), so no warm visit. Run against a production build so nothing compiles mid-recording.
+    { name: 'home-first-load', url: '/food', home: 'returning', act: (p) => p.getByRole('link', { name: 'Home' }).click() },
     { name: 'header-condense-scroll', url: '/dashboard', home: 'returning', act: async (p) => { await p.mouse.move(195, 400); for (let i = 0; i < 40; i++) { await p.mouse.wheel(0, 10); await p.waitForTimeout(16) } } },
     { name: 'quicklog-open', url: '/dashboard', home: 'returning', act: (p) => p.getByRole('button', { name: /^Weight/ }).click() },
   ],
@@ -78,6 +78,8 @@ const cors = { 'access-control-allow-origin': BASE, 'access-control-allow-creden
       const body = p === '/v1/profile/onboarding' ? { personal: { complete: false }, fitness: { complete: false }, nutrition: { complete: false } } : {}
       return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(body) })
     })
+    // Per-transition setup (e.g. its own API fixtures) runs after the default stubs, so its routes win.
+    if (t.setup) await t.setup(page, context)
     await page.goto(BASE + t.url, { waitUntil: 'networkidle' })
     await page.waitForTimeout(1200)
     if (t.warm) { await page.goto(BASE + t.warm, { waitUntil: 'networkidle' }); await page.goto(BASE + t.url, { waitUntil: 'networkidle' }); await page.waitForTimeout(1200) }
