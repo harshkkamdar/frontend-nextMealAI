@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 // shortcut: Next exposes no public API to keep a page rendered after its route is left; these internal contexts
 // are the known way (frozen router). Re-check them on every Next major upgrade.
@@ -19,6 +19,8 @@ import { useUIStore } from '@/stores/ui.store'
 interface Layer {
   key: string
   scrollY: number
+  /** Its height in the document flow, kept by a ResizeObserver while it is in the flow (the spacer stands in when lifted). */
+  height: number
   /** Arrived by a slide: the slide is its entrance, so the page's own staggered entrance is skipped (globals.css). */
   slid?: boolean
   x: MotionValue<number>
@@ -37,7 +39,7 @@ interface Step { kind: NavKind; top: Layer; old: Layer; settled: boolean }
  */
 interface Nav { stack: Layer[]; exiting: Layer[]; step: Step | null; front: string | null; moving: boolean; deep?: boolean }
 
-const makeLayer = (key: string): Layer => ({ key, scrollY: 0, x: motionValue(0), scale: motionValue(1), dim: motionValue(0), opacity: motionValue(1), sheet: motionValue(0) })
+const makeLayer = (key: string): Layer => ({ key, scrollY: 0, height: 0, x: motionValue(0), scale: motionValue(1), dim: motionValue(0), opacity: motionValue(1), sheet: motionValue(0) })
 
 /**
  * Places a push pair at progress p (Spatial Depth, motion.ts depthPair): 0 = top page covers the screen, 1 = top page
@@ -134,10 +136,10 @@ type Role = 'top' | 'leaving' | 'under' | 'covered' | 'buried'
  * A layer is lifted (fixed to the screen, scrolled inside itself) whenever it can move: under or leaving, while a slide
  * or fade runs on it, and while it sits behind a sheet. Scaling an in-flow page would scale about the middle of the
  * whole document and drag its fixed bars along; lifted, it scales about the screen's middle. Its fixed bars then ride
- * with its inner scroll, so `--lift-y` moves them back (globals.css). While the live page is lifted, `spacer` keeps the
+ * with its inner scroll, so `--lift-y` moves them back (globals.css). While the live page is lifted, the frame's spacer keeps the
  * document its height, so the window scroll (and the tab bar's minimise) never sees a jump.
  */
-function PageLayer({ layer, role, navMoving, front, sheet, spacer, children }: { layer: Layer; role: Role; navMoving: boolean; front: boolean; sheet: boolean; spacer: (px: number) => void; children: ReactNode }) {
+function PageLayer({ layer, role, navMoving, front, sheet, children }: { layer: Layer; role: Role; navMoving: boolean; front: boolean; sheet: boolean; children: ReactNode }) {
   const live = role === 'top'
   const show = role === 'buried' ? 'none' : role === 'covered' ? 'hidden' : 'visible'
   const moving = navMoving && show === 'visible'
@@ -152,12 +154,17 @@ function PageLayer({ layer, role, navMoving, front, sheet, spacer, children }: {
     if (!el) return
     // A lifted layer shows the page where its user left it; display:none drops scrollTop, so reapply on show.
     if (lifted && show !== 'none') el.scrollTop = layer.scrollY
-    if (live) {
-      spacer(lifted ? Math.max(el.scrollHeight, window.innerHeight) : 0)
-      if (!lifted && wasLifted.current) window.scrollTo(0, layer.scrollY)
-    }
+    if (live && !lifted && wasLifted.current) window.scrollTo(0, layer.scrollY)
     wasLifted.current = lifted
-  }, [live, lifted, show, layer, spacer])
+  }, [live, lifted, show, layer])
+  // The flow height, measured without forcing layout; a lifted layer is screen-sized, so it is not measured then.
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(([entry]) => { if (!el.hasAttribute('data-lifted')) layer.height = entry.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [layer])
   return (
     <motion.div
       ref={ref}
@@ -205,8 +212,6 @@ export function RouteFrame({ children }: { children: ReactNode }) {
   const [nav, setNav] = useState<Nav>(() => ({ stack: [makeLayer(pathname)], exiting: [], step: null, front: null, moving: false }))
   const navRef = useRef(nav)
   const active = useRef<{ stop: () => void } | null>(null)
-  const spacer = useRef<HTMLDivElement>(null)
-  const setSpacer = useCallback((px: number) => { if (spacer.current) spacer.current.style.height = `${px}px` }, [])
 
   const top = nav.stack[nav.stack.length - 1]
   if (top.key !== pathname) setNav(advance(nav, pathname))
@@ -429,12 +434,13 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     <>
       {[...nav.stack, ...nav.exiting].map((layer, i) => {
         return (
-          <PageLayer key={layer.key} layer={layer} role={roleOf(layer, i)} navMoving={nav.moving} front={nav.front === layer.key} sheet={sheetKey === layer.key} spacer={setSpacer}>
+          <PageLayer key={layer.key} layer={layer} role={roleOf(layer, i)} navMoving={nav.moving} front={nav.front === layer.key} sheet={sheetKey === layer.key}>
             {children}
           </PageLayer>
         )
       })}
-      <div ref={spacer} aria-hidden="true" />
+      {/* Rendered in the same commit that lifts the live page, so the document never shrinks and the scroll never clamps. */}
+      <div aria-hidden="true" style={{ height: nav.moving || sheetKey === top.key ? Math.max(top.height, window.innerHeight) : 0 }} />
     </>
   )
 }
