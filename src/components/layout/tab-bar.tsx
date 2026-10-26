@@ -11,6 +11,8 @@ import { haptic } from '@/lib/platform/app'
 import { useUIStore } from '@/stores/ui.store'
 
 export const LOG_SHEET = 'log-sheet'
+/** Shared by the orb's surface and the + sheet panel (log-sheet.tsx), so the orb grows into the sheet (motion-feel 3i). */
+export const ORB_SURFACE = 'orb-surface'
 
 const TABS = [
   { label: 'Home', href: '/dashboard', icon: HomeFill },
@@ -74,7 +76,7 @@ export function TabBar() {
         className={cn(
           'glass pointer-events-auto flex h-16 flex-1 origin-bottom-left items-stretch rounded-full p-1.5 transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]',
           minimised && !reduce && 'translate-y-1 scale-[.9]',
-          logOpen && 'pointer-events-none opacity-0',
+          logOpen && 'pointer-events-none scale-[.96] opacity-0',
         )}
         aria-hidden={logOpen || undefined}
       >
@@ -109,11 +111,15 @@ export function TabBar() {
         aria-label={logOpen ? 'Close' : 'Log something'}
         aria-expanded={logOpen}
         onClick={toggleLog}
-        className={cn(
-          'glass pointer-events-auto grid size-16 shrink-0 place-items-center rounded-full text-ink transition-transform duration-300 active:scale-[.94]',
-        )}
+        className="pointer-events-auto relative grid size-16 shrink-0 place-items-center rounded-full text-ink transition-transform duration-300 active:scale-[.94]"
       >
-        <PlusIcon className={cn('size-7 transition-transform duration-300 ease-[cubic-bezier(.22,1,.36,1)]', logOpen && 'rotate-45')} />
+        {/* The orb's surface: while closed it lives here; opening hands it to the sheet panel, which grows out of it. */}
+        {logOpen ? (
+          <span aria-hidden="true" className="absolute inset-0 rounded-full bg-card shadow-[var(--shadow-card)]" />
+        ) : (
+          <motion.span aria-hidden="true" layoutId={reduce ? undefined : ORB_SURFACE} transition={spring.sheet} style={{ borderRadius: 32 }} className="glass absolute inset-0" />
+        )}
+        <PlusIcon className={cn('relative size-7 transition-transform duration-300 ease-[cubic-bezier(.22,1,.36,1)]', logOpen && 'rotate-45')} />
       </button>
     </div>
     </>
