@@ -68,7 +68,7 @@ export function ConfirmDialog({
             className="absolute inset-0 bg-ink/30"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: reduce ? reducedFade : { duration: 0.14, ease: 'easeOut' } }}
+            exit={{ opacity: 0, transition: reduce ? reducedFade : { duration: 0.22, ease: 'linear' } }}
             transition={fade}
             onClick={() => { if (!loading) onClose() }}
           />
@@ -80,7 +80,7 @@ export function ConfirmDialog({
             className="glass-cream absolute inset-x-2 bottom-[var(--nav-clearance)] mx-auto max-w-[calc(28rem-16px)] rounded-[38px] px-6 pb-4 pt-7"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduce ? { opacity: 0, transition: reducedFade } : { opacity: 0, y: 12, transition: { duration: 0.14, ease: 'easeOut' } }}
+            exit={reduce ? { opacity: 0, transition: reducedFade } : { opacity: 0, y: 16, transition: { duration: 0.2, ease: 'easeOut' } }}
             transition={reduce ? reducedFade : spring.sheet}
           >
             <h2 id={`${id}-title`} className="font-wide text-[22px] font-bold leading-tight text-ink">{title}</h2>
