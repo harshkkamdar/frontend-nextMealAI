@@ -42,13 +42,19 @@ interface Nav { stack: Layer[]; exiting: Layer[]; step: Step | null; front: stri
 const makeLayer = (key: string): Layer => ({ key, scrollY: 0, height: 0, x: motionValue(0), scale: motionValue(1), dim: motionValue(0), opacity: motionValue(1), sheet: motionValue(0) })
 
 /**
+ * How far the front page travels from covering the screen to gone: the width plus its left-edge shadow
+ * (--shadow-push, -12 px offset and 32 px blur), so no shadow strip is left at the edge to vanish when the page drops.
+ */
+const travel = () => window.innerWidth + 44
+
+/**
  * Places a push pair at progress p (Spatial Depth, motion.ts depthPair): 0 = top page covers the screen, 1 = top page
  * gone and the page under it at rest. `flat` (reduced motion): the top page only follows the finger, no depth.
  */
 function setPair(top: Layer, under: Layer | undefined, p: number, flat = false) {
   const w = window.innerWidth
   const { front, behind } = depthPair(p)
-  top.x.set(front.x * w)
+  top.x.set(front.x * travel())
   top.scale.set(flat ? 1 : front.scale)
   if (under) {
     under.x.set(behind.x * w)
@@ -322,8 +328,7 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     }
     if (kind === 'push') { run(() => slide(t, old, 1, 0, 0), land); return }
     // Pop: start from wherever the leaving page is and with its velocity (an interrupted push reverses without a brick wall).
-    const w = window.innerWidth
-    run(() => slide(old, t, Math.max(0, old.x.get() / w), 1, old.x.getVelocity() / w), drop)
+    run(() => slide(old, t, Math.max(0, old.x.get() / travel()), 1, old.x.getVelocity() / travel()), drop)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per route change; run and slide are plain helpers
   }, [nav.step])
 
@@ -372,7 +377,7 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       const { t, under } = pair()
       // Reduced motion: the page still follows the finger (direct manipulation), but nothing scales and the page under it stays at rest.
       const reduced = !!reduceRef.current
-      setPair(t, reduced ? undefined : under, Math.max(0, track.base + dx) / window.innerWidth, reduced)
+      setPair(t, reduced ? undefined : under, Math.max(0, track.base + dx) / travel(), reduced)
     }
     const onEnd = (e: TouchEvent) => {
       const done = track
@@ -391,7 +396,7 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       }
       // Reduced motion completes with the short crossfade (motion-feel 3c-native) instead of the spring slide.
       // The release hands the finger's velocity to the spring; a flick (over 600 px/s) earns a slight overshoot.
-      const release = reduced ? () => [animate(t.opacity, 0, reducedFade)] : () => slide(t, under, Math.max(0, done.base + done.x - done.x0) / w, complete ? 1 : 0, v / w, Math.abs(v) > 600 ? spring.pushFlick : spring.push)
+      const release = reduced ? () => [animate(t.opacity, 0, reducedFade)] : () => slide(t, under, Math.max(0, done.base + done.x - done.x0) / travel(), complete ? 1 : 0, v / travel(), Math.abs(v) > 600 ? spring.pushFlick : spring.push)
       run(release, () => {
         if (!complete) return
         // Keep the page underneath shown until the route commits, or the screen would flash empty.
