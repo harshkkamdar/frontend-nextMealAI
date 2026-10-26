@@ -75,7 +75,7 @@ export function OnboardingStep({ stepKey, progress, segments, question, why, onB
   return (
     // overflow-x-clip: the content must never widen the page, or mobile browsers rescale the viewport and the fixed CTA jumps.
     <div data-page className="flex min-h-dvh flex-col overflow-x-clip pt-[calc(var(--safe-top)+8px)]">
-      <div className="relative z-10 flex h-11 items-center gap-4 px-gutter">
+      <div data-chrome className={cn('relative z-10 flex h-11 items-center gap-4 px-gutter', 'page-in')}>
         {onBack ? (
           <RoundButton aria-label="Back" onClick={() => { markBack(); onBack() }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
@@ -118,7 +118,7 @@ export function OnboardingStep({ stepKey, progress, segments, question, why, onB
           </motion.div>
         </AnimatePresence>
 
-        <div className={cn('fixed inset-x-0 bottom-0 z-10 px-gutter pb-[calc(var(--safe-bottom)+16px)] pt-6 transition-[opacity,translate] duration-300 ease-out', !bar && 'pointer-events-none translate-y-4 opacity-0')} inert={!bar || undefined}>
+        <div data-chrome className={cn('fixed inset-x-0 bottom-0 z-10 px-gutter pb-[calc(var(--safe-bottom)+16px)] pt-6 transition-[opacity,translate] duration-300 ease-out', 'page-in', !bar && 'pointer-events-none translate-y-4 opacity-0')} inert={!bar || undefined}>
           {/* A short cream wash under the buttons so scrolled content fades out instead of running under them. */}
           <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-cream from-45% to-transparent" />
           {notice}

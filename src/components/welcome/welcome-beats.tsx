@@ -74,7 +74,7 @@ export function WelcomeBeats() {
 
   return (
     <div data-page className="relative h-dvh overflow-hidden">
-      <div className="relative z-10 flex h-11 items-center px-gutter" style={{ marginTop: 'calc(var(--safe-top) + 8px)' }}>
+      <div data-chrome className={cn('relative z-10 flex h-11 items-center px-gutter', 'page-in')} style={{ marginTop: 'calc(var(--safe-top) + 8px)' }}>
         <RoundButton aria-label="Back" onClick={() => go(target.current - 1)} inert={index === 0 || undefined} className={cn('transition-[opacity,scale,visibility] duration-300 ease-out', index === 0 && 'invisible scale-75 opacity-0')}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
         </RoundButton>
@@ -122,7 +122,7 @@ export function WelcomeBeats() {
         </motion.div>
       </motion.div>
 
-      <div className="absolute inset-x-0 bottom-0 z-10 px-gutter pb-[calc(var(--safe-bottom)+16px)] pt-6">
+      <div data-chrome className={cn('absolute inset-x-0 bottom-0 z-10 px-gutter pb-[calc(var(--safe-bottom)+16px)] pt-6', 'page-in')}>
         <Dots p={p} reduce={reduce} />
         <PrimaryButton type="button" onClick={onContinue} className={cn('relative', !last && 'bg-transparent')}>
           {/* Ink base with the orange layer fading over it: the fill changes by opacity, never background-color. Label colours match

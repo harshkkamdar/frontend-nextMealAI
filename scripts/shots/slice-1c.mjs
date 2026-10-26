@@ -107,7 +107,7 @@ const slice = {
     { name: 'step-back', url: '/onboarding/fitness?q=activity', draft: { ...EMPTY, goal: 'fat_loss' }, act: (p) => p.getByRole('button', { name: 'Back' }).click() },
     { name: 'module-forward', url: '/onboarding/personal?q=height', draft: FULL, warm: '/onboarding/fitness?q=goal', act: (p) => p.getByRole('button', { name: 'Continue' }).click() },
     { name: 'module-back', url: '/onboarding/fitness?q=goal', draft: FULL, warm: '/onboarding/personal?q=height', act: (p) => p.getByRole('button', { name: 'Back' }).click() },
-    { name: 'generating-to-reveal', url: '/onboarding/consent', draft: FULL, warm: '/onboarding/review', setup: planRoutes, act: async (p) => { await p.getByRole('checkbox', { name: 'I understand and agree' }).check({ force: true }); await p.getByRole('checkbox', { name: 'I understand', exact: true }).check({ force: true }); await p.getByRole('button', { name: 'I agree' }).click(); await p.waitForTimeout(1800) } },
+    { name: 'generating-to-reveal', url: '/onboarding/consent', draft: FULL, warm: '/onboarding/review', setup: planRoutes, act: async (p) => { await p.getByText('I understand and agree', { exact: true }).click(); await p.getByText('I understand', { exact: true }).click(); await p.getByRole('button', { name: 'I agree' }).click(); await p.waitForTimeout(1800) } },
     { name: 'reveal-to-today', url: '/onboarding/review', warm: '/dashboard', setup: planRoutes, act: async (p) => { await p.waitForTimeout(600); await p.getByRole('button', { name: 'Start' }).click() } },
   ],
 }
