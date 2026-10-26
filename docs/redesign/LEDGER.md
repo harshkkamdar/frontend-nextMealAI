@@ -34,7 +34,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S2-18 | T: tab switch | pending |
 | S2-19 | T: + sheet open/close | built ad99c26: tab switch fades, push enters from the right with the page spring and the outgoing page overlapping; frame-diff smooth on a production build |
 | S2-20 | T: Home load (ring draw, count-up) | built 4b3ffd5 (layered first-paint entrance: hero scale, tiles +12 px 40 ms apart, rows +8 px 30 ms apart; count-ups on motion values; still on revisit) |
-| S2-R1 | R1 core-job metrics | pending |
+| S2-R1 | R1 core-job metrics | built 30959c3, 0ec6c59: J2 read today = 0 taps, calories and three macros above the fold at 360x800 (home-360.png); J1c tell Geo = 2 taps (orb, type, send arrow; send=1 autosends) vs 3-4 before; seconds and the <200 ms cached-draw target pending the Phase 6 timed test |
 | S2-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S2-R3 | R3 axe 0 / contrast / 44 pt | pending |
 | S2-R4 | R4 frame-diff 0 pops | pending |
@@ -97,7 +97,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S5-03 | Copy meal dialog | built 30190d3, bcd3dfa; screens/slice-5/ (18 shots x 2, axe 0, small 0, orange <= 1) |
 | S5-04 | Name favourite dialog | built 30190d3, bcd3dfa; screens/slice-5/ (18 shots x 2, axe 0, small 0, orange <= 1) |
 | S5-05 | T: day change on week strip | built bcd3dfa; day-change, day-change-back, week-swipe, month-open smooth; row-actions-open (shared sheet) popped on the busy dev server, re-check on a production build pending |
-| S5-R1 | R1 core-job metrics | pending |
+| S5-R1 | R1 core-job metrics | built 30190d3: no core job owned (J1 entry via meal Add rows and dashed slots: 2 taps to the search screen, same as before) |
 | S5-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S5-R3 | R3 axe 0 / contrast / 44 pt | built bcd3dfa: axe 0, small 0, orange <= 1 on 36 checks |
 | S5-R4 | R4 frame-diff 0 pops | pending |
@@ -116,7 +116,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S6-04 | Target-muscle map (C7) | built 767f95d: target-muscle diagram from body-highlighter 3.0.2 polygons (MIT, (c) 2020 GV79, notice in src/components/workout/muscle-map-data.ts), bundled, 136 px ExerciseVisual slot for a licensed image set later (C7) |
 | S6-05 | T: set tick | built 5f0240a: set tick grows an ink disc; static-build frame diff smooth in 3 of 5 runs, single first-frame flag otherwise (host load 60-170) |
 | S6-06 | T: start session | built 82519d2: start-session, finish and train-first-load smooth on the static build |
-| S6-R1 | R1 core-job metrics | pending |
+| S6-R1 | R1 core-job metrics | built 767f95d: no core job owned (start workout 1 tap from Train and Home, unchanged) |
 | S6-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S6-R3 | R3 axe 0 / contrast / 44 pt | built 4716587: axe 0, small 0, orange <= 1 on 50 checks |
 | S6-R4 | R4 frame-diff 0 pops | pending |
@@ -136,7 +136,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S7-05 | Workout plan builder | built 56e322c; screens/slice-7/ (34 shots x 2, axe 0, small 0, orange <= 1) |
 | S7-06 | Edit program | built 56e322c; screens/slice-7/ (34 shots x 2, axe 0, small 0, orange <= 1) |
 | S7-07 | T: push to detail | built 56e322c; builder-step, builder-step-back, day-collapse, meal-day-switch smooth; open-plan popped on the old shared route frame (fixed ad99c26), day-expand late text snap: re-check on a production build pending |
-| S7-R1 | R1 core-job metrics | pending |
+| S7-R1 | R1 core-job metrics | built 56e322c: no core job owned |
 | S7-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S7-R3 | R3 axe 0 / contrast / 44 pt | built 56e322c: axe 0, small 0, orange <= 1 on 68 checks |
 | S7-R4 | R4 frame-diff 0 pops | pending |
@@ -153,7 +153,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S8-02 | Check-in mid-week | built cf1252b, 46b8db8; screens/slice-8/ (19 shots x 2, axe 0, small 0, orange <= 1) |
 | S8-03 | Check-in not enough data | built cf1252b, 46b8db8; screens/slice-8/ (19 shots x 2, axe 0, small 0, orange <= 1) |
 | S8-04 | T: check-in load (count-up, trend draw) | built cf1252b; apply smooth; the pushes popped on the old shared route frame, fixed ad99c26 (lead re-record of Home to check-in: smooth, screens/slice-2/transitions-lead/push-home-checkin) |
-| S8-R1 | R1 core-job metrics | pending |
+| S8-R1 | R1 core-job metrics | built cf1252b: no core job owned (check-in reached in 1 tap from the Home card or This week) |
 | S8-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S8-R3 | R3 axe 0 / contrast / 44 pt | built cf1252b: axe 0, small 0, orange <= 1 on 38 checks |
 | S8-R4 | R4 frame-diff 0 pops | pending |
@@ -177,7 +177,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S9-09 | Crash boundary | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
 | S9-10 | Confirm dialog | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
 | S9-11 | Offline band | built a5c15d7, 6d05ab5, 578134d, 2cd51a0; screens/slice-9/ (34 shots x 2, axe 0, small 0, orange <= 1); in-app crash boundary reuses it (a21cbc3) |
-| S9-R1 | R1 core-job metrics | pending |
+| S9-R1 | R1 core-job metrics | built a5c15d7: no core job owned |
 | S9-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S9-R3 | R3 axe 0 / contrast / 44 pt | built 2cd51a0: axe 0, small 0, orange <= 1 on 68 checks |
 | S9-R4 | R4 frame-diff 0 pops | built 2cd51a0: settings-row-push, profile-back, delete-sheet-open, confirm-dialog-in-out, paywall-plan-switch, settings-switch smooth on a production static build |
@@ -191,7 +191,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | ID | Item | Status |
 |---|---|---|
 | S10-01 | Admin dashboard token pass | built de45f9b, 31bd13f (old aliases to v2 tokens in 8 admin files: card, ink-65, radii, macro tints; card-chrome test updated) |
-| S10-R1 | R1 core-job metrics | pending |
+| S10-R1 | R1 core-job metrics | built de45f9b: no core job owned (admin, web only) |
 | S10-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
 | S10-R3 | R3 axe 0 / contrast / 44 pt | pending |
 | S10-R4 | R4 frame-diff 0 pops | pending |
