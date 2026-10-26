@@ -40,7 +40,7 @@ export function useHealthSource(): string | null {
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
-  return <h2 className="mb-2 px-1 text-[13px] font-semibold text-ink-65">{children}</h2>
+  return <h2 className="mb-2 text-[13px] font-semibold text-ink-65">{children}</h2>
 }
 
 /** Geo's read of the week: an optional hero number above the verdict. */
@@ -52,7 +52,7 @@ export function GeoRead({ verdict, children, className }: { verdict: string | nu
         <span className="text-[13px] font-semibold text-ink-65">Geo&apos;s read</span>
       </div>
       {children}
-      {verdict ? <p className="mt-3 text-pretty text-[18px] font-semibold leading-[1.4] text-ink">{verdict}</p> : null}
+      {verdict ? <p className="mt-3 text-pretty text-[16px] leading-[1.45] text-ink">{verdict}</p> : null}
     </section>
   )
 }

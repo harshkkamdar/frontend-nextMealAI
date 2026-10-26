@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 import { formatMetric, numberWord } from './format'
 import { AskGeo, CARD, Count, GeoRead, INK_BUTTON, SectionTitle } from './parts'
 import { SegmentsBar } from './segments-bar'
-import { StatTiles } from './stat-tiles'
+import { ratio, StatTiles } from './stat-tiles'
 import { WeightTrendCard } from './weight-trend-card'
 
 const capitalise = (word: string) => word.charAt(0).toUpperCase() + word.slice(1)
@@ -52,8 +52,8 @@ export function CheckInInsufficient({ status, enter, source }: { status: CheckIn
           <StatTiles
             enter={enter}
             items={[
-              { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned` },
-              { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked` },
+              { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned`, fraction: ratio(week.sessions_done, week.sessions_planned) },
+              { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked`, fraction: ratio(week.sleep_avg_h, 8) },
             ]}
           />
           <p className="px-1 text-[13px] text-ink-65">

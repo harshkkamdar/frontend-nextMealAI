@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { formatMetric } from './format'
 import { CARD, Count, SectionTitle } from './parts'
 import { SegmentsBar } from './segments-bar'
-import { StatTiles } from './stat-tiles'
+import { ratio, StatTiles } from './stat-tiles'
 import { WeightTrendCard } from './weight-trend-card'
 
 function formatCheckInDate(date: string): string {
@@ -65,10 +65,10 @@ export function CheckInMidWeek({ status, enter, source }: { status: CheckInStatu
           <StatTiles
             enter={enter}
             items={[
-              { label: 'Avg calories', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)} kcal` },
-              { label: 'Avg protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)} g` },
-              { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned` },
-              { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked` },
+              { label: 'Avg calories', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)} kcal`, fraction: ratio(week.avg_calories, targets.calories) },
+              { label: 'Avg protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)} g`, fraction: ratio(week.avg_protein_g, targets.protein_g) },
+              { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned`, fraction: ratio(week.sessions_done, week.sessions_planned) },
+              { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked`, fraction: ratio(week.sleep_avg_h, 8) },
             ]}
           />
         </div>

@@ -14,6 +14,8 @@ interface WeightTrendCardProps {
   tone: 'strong' | 'muted'
   /** Set when the phone's Health app feeds the weigh-ins (Q32). */
   source?: string | null
+  /** The due screen already leads with the week's change, so the card leaves it out. */
+  hideDelta?: boolean
 }
 
 const H = 56
@@ -26,11 +28,12 @@ function chartY(points: WeightTrendCardProps['points']): number[] {
   return values.map((kg) => 6 + ((max - kg) / span) * (H - 12))
 }
 
-export function WeightTrendCard({ points, currentKg, deltaKg, tone, source }: WeightTrendCardProps) {
+export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hideDelta }: WeightTrendCardProps) {
   const drawn = useDrawn()
   const clip = useId()
   const stroke = tone === 'strong' ? 'var(--color-ink)' : 'var(--color-ink-35)'
   const ys = points.length >= 2 ? chartY(points) : []
+  const kgs = points.map((point) => point.kg)
   const line = ys.map((y, index) => `${(index / (ys.length - 1)) * 100},${y.toFixed(2)}`).join(' ')
 
   return (
@@ -43,7 +46,7 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source }: We
           {currentKg === null ? '—' : currentKg.toFixed(1)}
         </span>
         {currentKg === null ? null : <span className="text-[14px] font-semibold text-ink-65">kg</span>}
-        {deltaKg === null ? null : <span className="ml-auto text-[13px] font-semibold text-ink-65 tabular-nums">{formatDelta(deltaKg)} kg this week</span>}
+        {deltaKg === null || hideDelta ? null : <span className="ml-auto text-[13px] font-semibold text-ink-65 tabular-nums">{formatDelta(deltaKg)} kg this week</span>}
       </div>
 
       {ys.length === 0 ? (
@@ -52,7 +55,13 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source }: We
           <p className="mt-3 text-[13px] text-ink-65">Log your weight to see a trend</p>
         </div>
       ) : (
-        <span className="relative mt-4 block" style={{ height: H }}>
+        <div className="mt-4 flex gap-2">
+        {/* Min and max ticks, level with the gridlines they label. */}
+        <span aria-hidden="true" className="relative w-8 shrink-0 text-[11px] font-medium text-ink-65 tabular-nums" style={{ height: H }}>
+          <span className="absolute left-0 top-[6px] -translate-y-1/2">{Math.max(...kgs).toFixed(1)}</span>
+          <span className="absolute left-0 -translate-y-1/2" style={{ top: H - 6 }}>{Math.min(...kgs).toFixed(1)}</span>
+        </span>
+        <span className="relative block min-w-0 flex-1" style={{ height: H }}>
           <svg aria-label="Weight trend chart" role="img" className="block size-full overflow-visible" preserveAspectRatio="none" viewBox={`0 0 100 ${H}`}>
             <defs>
               <clipPath id={clip}>
@@ -60,7 +69,8 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source }: We
                 <rect x="0" y="-8" width="100" height={H + 16} style={{ transformOrigin: '0 0', transform: `scaleX(${drawn ? 1 : 0})`, transition: `transform ${DRAW_MS}ms ease-out 200ms` }} />
               </clipPath>
             </defs>
-            <line x1="0" x2="100" y1={H - 0.5} y2={H - 0.5} stroke="var(--color-ink-10)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            <line x1="0" x2="100" y1="6" y2="6" stroke="var(--color-ink-06)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            <line x1="0" x2="100" y1={H - 6} y2={H - 6} stroke="var(--color-ink-10)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
             <polyline clipPath={`url(#${clip})`} fill="none" points={line} stroke={stroke} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" vectorEffect="non-scaling-stroke" />
           </svg>
           {/* Latest weigh-in: an HTML dot so it stays round under the stretched viewBox. */}
@@ -70,6 +80,7 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source }: We
             style={{ top: `${(ys[ys.length - 1] / H) * 100}%`, background: stroke, opacity: drawn ? 1 : 0, transitionDelay: `${DRAW_MS + 200}ms` }}
           />
         </span>
+        </div>
       )}
 
       {source || ys.length ? (

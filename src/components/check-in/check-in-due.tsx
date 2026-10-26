@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 
 import { formatDelta, formatMetric } from './format'
 import { AskGeo, CARD, Count, GeoRead, INK_BUTTON, SectionTitle } from './parts'
-import { StatTiles } from './stat-tiles'
+import { ratio, StatTiles } from './stat-tiles'
 import { WeightTrendCard } from './weight-trend-card'
 
 interface CheckInDueProps {
@@ -95,14 +95,14 @@ export function CheckInDue({ status, refetch, applied, onApplied, onDone, enter,
       <section className="mt-3">
         <SectionTitle>Your week</SectionTitle>
         <div className="flex flex-col gap-3">
-          <WeightTrendCard currentKg={weight.current_kg} deltaKg={weight.delta_week_kg} points={weight.points} tone="strong" source={source} />
+          <WeightTrendCard currentKg={weight.current_kg} deltaKg={weight.delta_week_kg} points={weight.points} tone="strong" source={source} hideDelta={weight.delta_week_kg !== null} />
           <StatTiles
             enter={enter}
             items={[
-              { label: 'Avg calories', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)} kcal` },
-              { label: 'Avg protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)} g` },
-              { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned` },
-              { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked` },
+              { label: 'Avg calories', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)} kcal`, fraction: ratio(week.avg_calories, targets.calories) },
+              { label: 'Avg protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)} g`, fraction: ratio(week.avg_protein_g, targets.protein_g) },
+              { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned`, fraction: ratio(week.sessions_done, week.sessions_planned) },
+              { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked`, fraction: ratio(week.sleep_avg_h, 8) },
             ]}
           />
         </div>
