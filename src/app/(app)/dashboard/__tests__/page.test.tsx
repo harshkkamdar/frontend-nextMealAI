@@ -13,7 +13,7 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 vi.mock('@/hooks/use-cached-query', () => ({
   useCachedQuery: (key: string) => ({ data: key === 'dashboard' ? mocks.data : [], loading: false, error: null, stale: false, savedAt: null, refetch: vi.fn() }),
 }))
-vi.mock('@/lib/use-count-up', () => ({ useCountUp: (target: number | null) => target ?? 0 }))
+vi.mock('@/components/ui/fiqr/count-up', () => ({ CountUp: ({ value }: { value: number }) => value.toLocaleString('en-AU') }))
 vi.mock('@/hooks/use-sync-refetch', () => ({ useSyncRefetch: () => {} }))
 vi.mock('@/hooks/useUserTimezone', () => ({ useUserTimezone: () => 'UTC' }))
 vi.mock('@/contexts/geo-screen-context', () => ({ useSetGeoScreen: () => {} }))

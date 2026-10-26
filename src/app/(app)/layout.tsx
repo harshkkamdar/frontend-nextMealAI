@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { TabBar, hidesTabBar } from '@/components/layout/tab-bar'
 import { LogSheet } from '@/components/layout/log-sheet'
+import { RouteFrame } from '@/components/layout/route-frame'
 import { GeoCompanionSheet } from '@/components/geo/geo-companion-sheet'
 import { AuthGate } from '@/components/auth/auth-gate'
 import { GeoScreenContextProvider } from '@/contexts/geo-screen-context'
@@ -76,7 +77,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <AuthGate mode="app">
       <GeoScreenContextProvider>
         <div className={`min-h-screen bg-background ${hideBottomPad ? '' : 'pb-[var(--tabbar-clearance)]'}`}>
-          {children}
+          <RouteFrame>{children}</RouteFrame>
           <TabBar />
           <LogSheet />
           <GeoCompanionSheet />

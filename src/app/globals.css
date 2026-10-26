@@ -131,6 +131,19 @@
   .shimmer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(253,246,236,.75), transparent); transform: translateX(-100%); animation: fiqr-sweep 1.4s ease-in-out infinite; }
 }
 
+/* Home-style entrance choreography (motion-feel 3e), first paint per session only: hero scales in, tiles rise 12 px
+   from 160 ms at 40 ms apart, rows rise 8 px from 240 ms at 30 ms apart (rows past 6 come with row 6). */
+.enter-hero { animation: fiqr-hero 460ms cubic-bezier(.22,1,.36,1) backwards; }
+.enter-tiles > * { animation: fiqr-rise-12 480ms cubic-bezier(.22,1,.36,1) backwards; }
+.enter-tiles > :nth-child(1) { animation-delay: 160ms; } .enter-tiles > :nth-child(2) { animation-delay: 200ms; }
+.enter-tiles > :nth-child(3) { animation-delay: 240ms; } .enter-tiles > :nth-child(4) { animation-delay: 280ms; }
+.enter-rows > * { animation: fiqr-rise-8 420ms cubic-bezier(.22,1,.36,1) backwards; animation-delay: 390ms; }
+.enter-rows > :nth-child(1) { animation-delay: 240ms; } .enter-rows > :nth-child(2) { animation-delay: 270ms; }
+.enter-rows > :nth-child(3) { animation-delay: 300ms; } .enter-rows > :nth-child(4) { animation-delay: 330ms; }
+.enter-rows > :nth-child(5) { animation-delay: 360ms; }
+@keyframes fiqr-hero { from { opacity: 0; transform: scale(.98); } }
+@keyframes fiqr-rise-12 { from { opacity: 0; transform: translateY(12px); } }
+@keyframes fiqr-rise-8 { from { opacity: 0; transform: translateY(8px); } }
 @keyframes fiqr-rise { from { opacity: 0; transform: translateY(14px); } }
 @keyframes fiqr-grow { from { transform: scaleX(0); } }
 @keyframes fiqr-sweep { to { transform: translateX(100%); } }

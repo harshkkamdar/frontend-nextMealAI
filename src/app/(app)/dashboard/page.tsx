@@ -7,6 +7,7 @@ import { emphasizeGeoMeasurements, formatDashboardDate, getDashboardGeoLine } fr
 import {
   CheckInCard,
   HeroCard,
+  HomeEntrance,
   HomeSkeleton,
   MealsCard,
   SleepTile,
@@ -29,6 +30,8 @@ import { ChartFill, PersonFill } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
+import { useFirstPaint } from '@/lib/use-first-paint'
+import { cn } from '@/lib/utils'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { OfflineError } from '@/lib/api/client'
@@ -92,6 +95,7 @@ export default function DashboardPage() {
   const [hiddenSuggestionIds, setHiddenSuggestionIds] = useState<string[]>([])
   const [connectOpen, setConnectOpen] = useState(false)
   const health = useHealthSource()
+  const enter = useFirstPaint('dashboard')
 
   // Six requests in parallel at most (Q24); suggestions follow once the screen is drawn.
   const fetchAll = useCallback(async (): Promise<DashboardData> => {
@@ -177,12 +181,13 @@ export default function DashboardPage() {
       ) : !data ? (
         <div className="mt-6"><ErrorState onRetry={refresh}>I couldn&apos;t load today. Check your connection and try again.</ErrorState></div>
       ) : (
+        <HomeEntrance.Provider value={enter}>
         <div className="mt-5 flex flex-col gap-3">
           {checkInDue && data.status ? (
-            <div className="rise"><CheckInCard weekLabel={data.status.week.label} onOpen={() => router.push('/check-in')} /></div>
+            <div className={cn(enter && 'enter-hero')}><CheckInCard weekLabel={data.status.week.label} onOpen={() => router.push('/check-in')} /></div>
           ) : null}
 
-          <div className="rise" style={{ ['--i' as string]: 1 }}>
+          <div className={cn(enter && 'enter-hero')}>
             <HeroCard
               calories={{ current: day?.calories ?? 0, target: targets?.calories ?? profile?.daily_calorie_target ?? 0 }}
               macros={{
@@ -195,7 +200,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="rise grid grid-cols-2 gap-[10px]" style={{ ['--i' as string]: 2 }}>
+          <div className={cn('grid grid-cols-2 gap-[10px]', enter && 'enter-tiles')}>
             <StepsTile
               today={steps.today}
               yesterday={steps.yesterday}
@@ -208,7 +213,8 @@ export default function DashboardPage() {
             <SleepTile hours={sleep.hours} nights={sleep.nights} source={source} onLog={() => setQuickLog('sleep')} />
           </div>
 
-          <div className="rise" style={{ ['--i' as string]: 3 }}>
+          <div className={cn('contents', enter && 'enter-rows')}>
+          <div>
             <WorkoutCard
               workoutPlan={workoutPlan}
               today={today}
@@ -218,10 +224,11 @@ export default function DashboardPage() {
             />
           </div>
 
-          <section className="rise mt-3" style={{ ['--i' as string]: 4 }}>
+          <section className="mt-3">
             <h2 className="mb-2 px-1 text-[13px] font-semibold text-ink-65">Meals</h2>
             <MealsCard rows={mealRows(logs, today)} onOpen={() => router.push('/food')} onLog={() => useUIStore.getState().openSheet(LOG_SHEET)} />
           </section>
+          </div>
 
           {(profile?.daily_targets_missing_fields?.length ?? 0) > 0 ? (
             <button type="button" onClick={() => router.push('/settings/profile')} className="flex min-h-16 items-center rounded-[24px] bg-card px-5 text-left shadow-[var(--shadow-card)] active:scale-[.98]">
@@ -243,6 +250,7 @@ export default function DashboardPage() {
             onClose={() => setActiveMacro(null)}
           />
         </div>
+        </HomeEntrance.Provider>
       )}
 
       <QuickLogSheet

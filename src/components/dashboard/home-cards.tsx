@@ -1,22 +1,31 @@
 'use client'
 
 import type { ComponentType, ReactNode, SVGProps } from 'react'
-import { useEffect, useId, useState } from 'react'
+import { createContext, useContext, useEffect, useId, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { ChartFill, ChevronRightIcon, SleepFill, StepsFill, WaterFill, WeightFill } from '@/components/ui/fiqr/icons'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import type { MacroKey } from '@/lib/macros'
 import { DRAW_MS } from '@/lib/motion'
-import { useCountUp } from '@/lib/use-count-up'
+import { CountUp } from '@/components/ui/fiqr/count-up'
 import { cn } from '@/lib/utils'
 import { formatSleep, type MealRow } from './home-data'
 
 const CARD = 'rounded-[24px] bg-card shadow-[var(--shadow-card)]'
 
-/** Flips true one frame after mount so CSS transitions draw from empty (once per visit, Q23). */
+/** False on a revisit in the same session: charts and numbers paint at rest instead of drawing again (motion-feel 7). */
+export const HomeEntrance = createContext(true)
+
+function Count(props: { value: number; delay?: number }) {
+  return <CountUp {...props} still={!useContext(HomeEntrance)} />
+}
+
+/** Flips true one frame after mount so CSS transitions draw from empty (first paint per session, Q23). */
 function useDrawn(): boolean {
-  const reduce = useReducedMotion()
+  const reduced = useReducedMotion()
+  const entering = useContext(HomeEntrance)
+  const reduce = reduced || !entering
   const [drawn, setDrawn] = useState(false)
   useEffect(() => {
     const frame = requestAnimationFrame(() => setDrawn(true))
@@ -35,7 +44,6 @@ function Ring({ consumed, target }: { consumed: number; target: number }) {
   const drawn = useDrawn()
   const over = target > 0 && consumed > target
   const remaining = target > 0 ? Math.abs(target - consumed) : consumed
-  const shown = useCountUp(remaining)
   const r = 54
   const c = 2 * Math.PI * r
   const fraction = target > 0 ? Math.min(1, consumed / target) : 0
@@ -51,7 +59,7 @@ function Ring({ consumed, target }: { consumed: number; target: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-wide text-[40px] font-[750] leading-none tracking-[-1px] text-ink tabular-nums">{fmt(shown)}</span>
+        <span className="font-wide text-[40px] font-[750] leading-none tracking-[-1px] text-ink tabular-nums"><Count value={remaining} /></span>
         <span className="mt-1 text-[13px] font-semibold text-ink-65">{target > 0 ? (over ? 'kcal over' : 'kcal left') : 'kcal today'}</span>
       </div>
     </div>
@@ -214,7 +222,6 @@ export function StepsTile({ today, yesterday, source, connectLabel, onConnect }:
   connectLabel?: string | null
   onConnect?: () => void
 }) {
-  const shown = useCountUp(today)
   if (connectLabel && today === null) {
     return (
       <Tile icon={StepsFill} label="Steps" value="—" caption={`Connect ${connectLabel}`} onClick={onConnect} actionLabel={`connect ${connectLabel}`}>
@@ -226,7 +233,7 @@ export function StepsTile({ today, yesterday, source, connectLabel, onConnect }:
     <Tile
       icon={StepsFill}
       label="Steps"
-      value={today === null ? '—' : fmt(shown)}
+      value={today === null ? '—' : <Count value={today} delay={0.2} />}
       caption={today === null ? (yesterday ? `Yesterday ${fmt(yesterday)}` : sourceCaption(source, 'Syncs from your phone')) : sourceCaption(source, 'of 10,000')}
     >
       <Progress fraction={(today ?? 0) / 10000} />
@@ -246,9 +253,8 @@ export function WeightTile({ kg, weekDelta, series, onLog }: { kg: number | null
 export const WATER_GOAL_GLASSES = 8
 
 export function WaterTile({ glasses, onLog }: { glasses: number; onLog: () => void }) {
-  const shown = useCountUp(glasses)
   return (
-    <Tile icon={WaterFill} label="Water" value={fmt(shown)} unit={`of ${WATER_GOAL_GLASSES}`} caption={glasses >= WATER_GOAL_GLASSES ? 'Done for today' : glasses ? 'glasses so far' : 'Tap to add a glass'} onClick={onLog} actionLabel="log water">
+    <Tile icon={WaterFill} label="Water" value={<Count value={glasses} delay={0.24} />} unit={`of ${WATER_GOAL_GLASSES}`} caption={glasses >= WATER_GOAL_GLASSES ? 'Done for today' : glasses ? 'glasses so far' : 'Tap to add a glass'} onClick={onLog} actionLabel="log water">
       <Progress fraction={glasses / WATER_GOAL_GLASSES} />
     </Tile>
   )
