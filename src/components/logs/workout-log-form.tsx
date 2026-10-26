@@ -74,7 +74,8 @@ export function WorkoutLogForm() {
   return (
     <ManualLogShell
       title="Workout"
-      prompt="What are you training? I'll time your rests."
+      prompt="What are you training?"
+      sub="I'll time your rests."
       saving={starting}
       onSave={() => void handleStart()}
       actionLabel="Start session"

@@ -19,7 +19,8 @@ vi.mock('sonner', () => ({
 }))
 
 vi.mock('@/lib/api/logs.api', () => ({
-  createLog: (...args: unknown[]) => mocks.createLog(...args),
+  createLogWithStatus: (...args: unknown[]) => mocks.createLog(...args),
+  getLogs: vi.fn(async () => []),
 }))
 
 vi.mock('@/lib/api/exercises.api', () => ({
@@ -42,16 +43,30 @@ describe('manual log form guards and FIQR inputs', () => {
     vi.clearAllMocks()
   })
 
-  it('starts water at three glasses and keeps its positive-value guard', () => {
+  it('water adds one glass per log and keeps its positive-value guard', async () => {
+    mocks.createLog.mockResolvedValueOnce({ queued: false, data: {} })
     render(<WaterLogForm />)
-    expect(screen.getByText('3')).toBeInTheDocument()
-    expect(screen.getByText('glasses')).toBeInTheDocument()
-    fireEvent.click(screen.getByLabelText('Fewer glasses'))
-    fireEvent.click(screen.getByLabelText('Fewer glasses'))
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.getByText('glass · 250 ml')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(mocks.createLog).toHaveBeenCalledWith({ type: 'water', payload: { glasses: 1 }, source: 'manual' }))
+    await waitFor(() => expect(mocks.back).toHaveBeenCalled())
+
+    mocks.createLog.mockClear()
     fireEvent.click(screen.getByLabelText('Fewer glasses'))
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     expect(mocks.toastError).toHaveBeenCalledWith('Add at least 1 glass')
     expect(mocks.createLog).not.toHaveBeenCalled()
+  })
+
+  it('a failed save shows why and turns Save into Try again', async () => {
+    mocks.createLog.mockRejectedValueOnce(new Error('500'))
+    render(<MoodLogForm />)
+    fireEvent.click(screen.getByRole('radio', { name: '7 of 10' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save")
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
+    expect(mocks.back).not.toHaveBeenCalled()
   })
 
   it('does not save weight when the numeric input is empty', () => {
@@ -73,12 +88,11 @@ describe('manual log form guards and FIQR inputs', () => {
     expect(mocks.createLog).not.toHaveBeenCalled()
   })
 
-  it('keeps both sleep validation guards', () => {
+  it('sleep steps by 15 minutes and still needs a quality rating', () => {
     render(<SleepLogForm />)
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-    expect(mocks.toastError).toHaveBeenCalledWith('Hours slept is required')
-
-    fireEvent.change(screen.getByLabelText('Hours slept'), { target: { value: '7.5' } })
+    expect(screen.getByLabelText('7h 30m slept')).toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('15 minutes more'))
+    expect(screen.getByLabelText('7h 45m slept')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     expect(mocks.toastError).toHaveBeenCalledWith('Select a quality rating')
     expect(mocks.createLog).not.toHaveBeenCalled()

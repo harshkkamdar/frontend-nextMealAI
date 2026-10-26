@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react'
 import type { Log } from '@/types/logs.types'
 
 // Mock the logs API — must be hoisted before the component import
@@ -10,8 +10,10 @@ vi.mock('@/lib/api/logs.api', () => ({
 
 // Mock sonner to avoid pulling in actual toaster
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+vi.mock('next/navigation', () => ({ useRouter: () => ({ back: vi.fn(), push: vi.fn() }) }))
 
-import { getLogs } from '@/lib/api/logs.api'
+import { bulkDeleteLogs, getLogs } from '@/lib/api/logs.api'
+import { toast } from 'sonner'
 import { LogList } from '../log-list'
 
 const mockedGetLogs = vi.mocked(getLogs)
@@ -76,7 +78,7 @@ describe('LogList — FB-09 icons + workout title', () => {
     expect(screen.getByText('Sleep activity')).toBeInTheDocument()
     expect(screen.getByText('Energy activity')).toBeInTheDocument()
     expect(screen.getByText('Steps activity')).toBeInTheDocument()
-    expect((await screen.findAllByText('8412 steps')).length).toBeGreaterThanOrEqual(1)
+    expect((await screen.findAllByText('8,412 steps')).length).toBeGreaterThanOrEqual(1)
   })
 
   // AC02 — workout title fallback
@@ -120,7 +122,7 @@ describe('LogList — FB-09 icons + workout title', () => {
     ])
     // Wait for load, then inspect every workout row's title paragraph
     await screen.findByText('Workout completed')
-    const titles = document.querySelectorAll('p.text-\\[15\\.5px\\].font-semibold.truncate')
+    const titles = document.querySelectorAll('span.text-body-sm.font-semibold.truncate')
     titles.forEach((el) => {
       expect(el.textContent?.trim()).not.toBe('')
     })
@@ -143,5 +145,32 @@ describe('LogList — FB-09 icons + workout title', () => {
     await renderWithLogs([makeLog({ id: 'f3', type: 'food', payload: { food_name: 'Black coffee', est_macros: { calories: 0 } } })])
     expect(await screen.findByText('Black coffee')).toBeInTheDocument()
     expect(screen.getByText('0 kcal')).toBeInTheDocument()
+  })
+
+  it('groups by day and deletes selected logs only after the Undo window', async () => {
+    vi.mocked(bulkDeleteLogs).mockResolvedValue({ deleted: 1 })
+    mockedGetLogs.mockResolvedValueOnce([makeLog({ id: 'a', payload: { food_name: 'Apple' } as Log['payload'] }), makeLog({ id: 'b', payload: { food_name: 'Pear' } as Log['payload'] })])
+    render(<LogList onBack={() => {}} />)
+    await screen.findByText('Apple')
+    expect(screen.getByRole('region', { name: 'Today' })).toBeInTheDocument()
+    vi.useFakeTimers()
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /Apple/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+    expect(screen.queryByText('Apple')).not.toBeInTheDocument()
+    expect(bulkDeleteLogs).not.toHaveBeenCalled()
+    // Undo brings it back and nothing is deleted.
+    const undo = vi.mocked(toast.success).mock.calls[0][1] as { action: { onClick: () => void } }
+    act(() => undo.action.onClick())
+    expect(screen.getByText('Apple')).toBeInTheDocument()
+    act(() => { vi.advanceTimersByTime(5000) })
+    expect(bulkDeleteLogs).not.toHaveBeenCalled()
+    // Without Undo the delete goes out after the window.
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /Pear/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+    act(() => { vi.advanceTimersByTime(4100) })
+    expect(bulkDeleteLogs).toHaveBeenCalledWith(['b'])
+    vi.useRealTimers()
   })
 })

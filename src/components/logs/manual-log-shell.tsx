@@ -2,20 +2,28 @@
 
 import type { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { Minus, Plus } from 'lucide-react'
+import { toast } from 'sonner'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { OfflineBand } from '@/components/shared/offline-band'
+import { createLogWithStatus } from '@/lib/api/logs.api'
+import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
-import { FIELD } from './log-ui'
+import type { CreateLogInput } from '@/types/logs.types'
+import { CARD, FIELD } from './log-ui'
 
 /**
- * Pushed log screen: centred title with a round glass back (Q19), Geo's question as the hero line,
- * the inputs, and the one orange Save under them. Save stays in the flow so the tab bar never covers it.
+ * Pushed log screen (journey-log M): centred title with a round glass back (Q19), Geo's question as the large title
+ * with a context line under it, the inputs, and the one orange Save pinned at the bottom (the tab bar is hidden on
+ * /logs/new/*). A failed save shows the reason above the inputs' end and Save becomes Try again.
  */
 export function ManualLogShell({
   title,
   prompt,
+  sub,
   saving,
+  failed = false,
   onSave,
   actionLabel = 'Save',
   savingLabel = 'Saving…',
@@ -23,7 +31,9 @@ export function ManualLogShell({
 }: {
   title: string
   prompt: string
+  sub?: ReactNode
   saving: boolean
+  failed?: boolean
   onSave: () => void
   actionLabel?: string
   savingLabel?: string
@@ -35,18 +45,71 @@ export function ManualLogShell({
     <div className="mx-auto w-full max-w-md px-4 pb-[calc(112px+var(--safe-bottom))]">
       <PushedHeader title={title} onBack={() => router.back()} />
       <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
-      <p className="font-wide mt-3 px-1 text-[28px] font-bold leading-[1.15] tracking-[-0.5px] text-ink">{prompt}</p>
-      <div className="mt-6">{children}</div>
-      {/* The tab bar is hidden on /logs/new/*, so Save owns the bottom edge on a solid cream band. */}
+      <h1 className="font-display mt-2 px-0.5 text-title text-ink">{prompt}</h1>
+      {sub ? <p className="mt-1.5 px-0.5 text-caption text-ink-65 tabular-nums">{sub}</p> : null}
+      <div className="mt-5">{children}</div>
+      {failed ? (
+        <p role="alert" className="mt-4 rounded-[16px] bg-macro-ochre/15 px-4 py-3 text-body-sm text-ink">Couldn&apos;t save. Check your connection and try again.</p>
+      ) : null}
       <div className="fixed inset-x-0 bottom-0 z-30 bg-cream pb-[calc(16px+var(--safe-bottom))] pt-3">
         <div className="mx-auto w-full max-w-md px-4">
-          <PrimaryButton type="button" onClick={onSave} disabled={saving} aria-busy={saving} className="justify-center">
-            {saving ? savingLabel : actionLabel}
+          <PrimaryButton type="button" onClick={onSave} disabled={saving} aria-busy={saving}>
+            {saving ? savingLabel : failed ? 'Try again' : actionLabel}
           </PrimaryButton>
         </div>
       </div>
     </div>
   )
+}
+
+/**
+ * Saves one manual log. Offline it queues on the phone and says so; a server error returns false so the screen can
+ * show its failed state. Success leaves the screen.
+ */
+export async function saveManualLog(input: CreateLogInput, done: string, leave: () => void): Promise<boolean> {
+  try {
+    const result = await createLogWithStatus(input)
+    void haptic('success')
+    toast.success(result.queued ? `${done}. Saved on your phone, sends when you are back online` : done)
+    leave()
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** One card: − value + on 56 pt round buttons (water glasses, sleep hours). */
+export function InlineStepper({ value, unit, onLess, onMore, lessLabel, moreLabel, lessDisabled, moreDisabled, children }: {
+  value: ReactNode
+  unit: string
+  onLess: () => void
+  onMore: () => void
+  lessLabel: string
+  moreLabel: string
+  lessDisabled?: boolean
+  moreDisabled?: boolean
+  children?: ReactNode
+}) {
+  const button = 'grid size-14 shrink-0 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.92] disabled:opacity-40'
+  const step = (fn: () => void) => () => { void haptic('selection'); fn() }
+  return (
+    <div className={cn(CARD, 'px-4 py-4')}>
+      <div className="flex items-center gap-3">
+        <button type="button" aria-label={lessLabel} disabled={lessDisabled} onClick={step(onLess)} className={button}><Minus className="size-5" /></button>
+        <div className="min-w-0 flex-1 text-center" aria-live="polite">
+          <p className="font-display text-hero text-ink tabular-nums">{value}</p>
+          <p className="mt-0.5 text-label font-medium text-ink-65">{unit}</p>
+        </div>
+        <button type="button" aria-label={moreLabel} disabled={moreDisabled} onClick={step(onMore)} className={button}><Plus className="size-5" /></button>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+/** The words under the two ends of a 1 to 10 scale. */
+export function ScaleEnds({ low, high }: { low: string; high: string }) {
+  return <p className="mt-1.5 flex justify-between px-0.5 text-caption text-ink-65"><span>{low}</span><span>{high}</span></p>
 }
 
 export function FieldLabel({ children, htmlFor }: { children: ReactNode; htmlFor?: string }) {

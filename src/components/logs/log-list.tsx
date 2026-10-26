@@ -5,14 +5,15 @@ import { useEffect, useState } from 'react'
 import { Check, History } from 'lucide-react'
 import { toast } from 'sonner'
 import { getLogs, bulkDeleteLogs } from '@/lib/api/logs.api'
-import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { PushedHeader } from '@/components/layout/screen-header'
+import { OfflineBand } from '@/components/shared/offline-band'
 import { formatMacroKcal } from '@/lib/macros'
 import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload, StepsPayload } from '@/types/logs.types'
-import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { EnergyFill, FoodFill, MoodFill, SleepFill, StepsFill, TrainFill, WaterFill, WeightFill } from '@/components/ui/fiqr/icons'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
-import { Chips, EmptySlot, LIST, ROW, RiseList, RowsSkeleton } from './log-ui'
+import { CARD, Chips, LIST, RowsSkeleton } from './log-ui'
+import { clockTime, groupLogsByDay } from './log-math'
 
 const FILTERS: { label: string; value: LogType | 'all' }[] = [
   { label: 'All', value: 'all' },
@@ -47,7 +48,7 @@ function LogTypeIcon({ type }: { type: LogType }) {
   const Icon = entry.icon
   return (
     <>
-      <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full bg-ink-06 text-ink"><Icon className="size-5" /></span>
+      <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-80" />
       <span className="sr-only">{entry.label}</span>
     </>
   )
@@ -81,7 +82,7 @@ function getLogDescription(log: Log): string {
     case 'energy':
       return `Energy ${(log.payload as EnergyPayload).rating} of 10`
     case 'steps':
-      return `${(log.payload as StepsPayload).steps} steps`
+      return `${Number((log.payload as StepsPayload).steps ?? 0).toLocaleString('en-AU')} steps`
     default:
       return log.type
   }
@@ -103,26 +104,17 @@ function getLogMetric(log: Log): string {
   }
 }
 
-function relativeTime(dateStr: string): string {
-  const now = Date.now()
-  const date = new Date(dateStr).getTime()
-  const diffMs = now - date
-  const diffMin = Math.floor(diffMs / 60000)
-
-  if (diffMin < 1) return 'Just now'
-  if (diffMin < 60) return `${diffMin}m ago`
-  const diffH = Math.floor(diffMin / 60)
-  if (diffH < 24) return `${diffH}h ago`
-  const diffD = Math.floor(diffH / 24)
-  if (diffD < 7) return `${diffD}d ago`
-  return new Date(dateStr).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' })
-}
-
 interface LogListProps {
   filterType?: LogType | 'all'
+  /** On /logs: renders the pushed header with Select in it. */
+  onBack?: () => void
 }
 
-export function LogList({ filterType }: LogListProps = {}) {
+/** Holds a delete back this long so Undo can cancel it before anything reaches the server. */
+const UNDO_MS = 4000
+
+/** Recent logs (journey-log L): filter chips, day groups, Select to delete several with Undo. */
+export function LogList({ filterType, onBack }: LogListProps = {}) {
   const [logs, setLogs] = useState<Log[]>([])
   const [loading, setLoading] = useState(true)
   const [loadFailed, setLoadFailed] = useState(false)
@@ -130,18 +122,15 @@ export function LogList({ filterType }: LogListProps = {}) {
   const [filter, setFilter] = useState<LogType | 'all'>('all')
   const [selectMode, setSelectMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [bulkDeleting, setBulkDeleting] = useState(false)
-  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false)
+  const [hidden, setHidden] = useState<Set<string>>(new Set())
 
-  // Sync external filterType prop when it changes
   useEffect(() => {
-    if (filterType !== undefined) {
-      setFilter(filterType)
-    }
+    if (filterType !== undefined) setFilter(filterType)
   }, [filterType])
 
   const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
+    void haptic('selection')
+    setSelectedIds((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
@@ -149,134 +138,138 @@ export function LogList({ filterType }: LogListProps = {}) {
     })
   }
 
-  const handleBulkDelete = async () => {
-    if (selectedIds.size === 0) return
-    setBulkDeleting(true)
-    try {
-      await bulkDeleteLogs(Array.from(selectedIds))
-      setLogs(prev => prev.filter(l => !selectedIds.has(l.id)))
-      toast.success(`${selectedIds.size} logs deleted`)
-      setSelectedIds(new Set())
-      setSelectMode(false)
-    } catch {
-      toast.error('Failed to delete logs')
-    } finally {
-      setBulkDeleting(false)
-      setShowBulkDeleteConfirm(false)
-    }
-  }
-
   const exitSelectMode = () => {
     setSelectMode(false)
     setSelectedIds(new Set())
   }
 
+  // Rows leave at once; the server delete waits out the Undo window, and a failed delete brings them back.
+  const handleBulkDelete = () => {
+    const ids = [...selectedIds]
+    if (ids.length === 0) return
+    const show = (on: boolean) => setHidden((prev) => { const next = new Set(prev); ids.forEach((id) => (on ? next.delete(id) : next.add(id))); return next })
+    show(false)
+    exitSelectMode()
+    void haptic('success')
+    let undone = false
+    const timer = setTimeout(() => {
+      if (undone) return
+      bulkDeleteLogs(ids).then(
+        () => setLogs((prev) => prev.filter((l) => !ids.includes(l.id))),
+        () => { show(true); toast.error("Couldn't delete those logs. Try again.") },
+      )
+    }, UNDO_MS)
+    toast.success(`${ids.length} log${ids.length === 1 ? '' : 's'} deleted`, {
+      duration: UNDO_MS,
+      action: { label: 'Undo', onClick: () => { undone = true; clearTimeout(timer); show(true) } },
+    })
+  }
+
   useEffect(() => {
-    const fetchLogs = async () => {
-      setLoading(true)
-      try {
-        const params: { limit: number; type?: string } = { limit: 50 }
-        if (filter !== 'all') params.type = filter
-        const data = await getLogs(params)
-        setLogs(data)
-        setLoadFailed(false)
-      } catch {
-        setLogs([])
-        setLoadFailed(true)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchLogs()
+    let alive = true
+    const params: { limit: number; type?: string } = { limit: 50 }
+    if (filter !== 'all') params.type = filter
+    getLogs(params).then(
+      (data) => { if (!alive) return; setLogs(data); setLoadFailed(false) },
+      () => { if (!alive) return; setLogs([]); setLoadFailed(true) },
+    ).finally(() => { if (alive) setLoading(false) })
+    return () => { alive = false }
   }, [filter, reload])
 
-  const toggleWithHaptic = (id: string) => { void haptic('selection'); toggleSelect(id) }
+  const visible = logs.filter((log) => !hidden.has(log.id))
+  const groups = groupLogsByDay(visible)
 
   return (
     <div>
-      <div className="mb-3 flex items-end justify-between px-1">
-        <h2 className="text-[13px] font-semibold text-ink-65">Recent</h2>
-        {logs.length > 0 && !loading ? (
-          <button
-            type="button"
-            onClick={selectMode ? exitSelectMode : () => setSelectMode(true)}
-            className="-mb-3 -mr-3 h-11 shrink-0 rounded-full px-3 text-[15px] font-semibold text-ink"
-          >
-            {selectMode ? 'Done' : 'Select'}
-          </button>
-        ) : null}
-      </div>
+      {onBack ? (
+        <PushedHeader
+          title="Log"
+          onBack={onBack}
+          actions={visible.length > 0 && !loading ? (
+            <button type="button" onClick={selectMode ? exitSelectMode : () => setSelectMode(true)} className="glass h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]">
+              {selectMode ? 'Done' : 'Select'}
+            </button>
+          ) : undefined}
+        />
+      ) : null}
+      {onBack ? <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div> : null}
       <Chips
-        className="scrollbar-hide -mx-4 mb-4 overflow-x-auto px-4 py-1"
+        className="scrollbar-hide -mx-4 mb-3 overflow-x-auto px-4 py-1"
         label="Filter by type"
         options={FILTERS}
         value={filter}
-        onChange={(value) => { if (value) setFilter(value) }}
+        onChange={(value) => { if (value && value !== filter) { setLoading(true); setFilter(value) } }}
       />
 
       {loading ? (
-        <RowsSkeleton label="Loading your logs" />
+        <div className="mt-2">
+          <p className="mb-2 px-1 text-label text-ink-65">Today</p>
+          <RowsSkeleton rows={5} label="Loading your logs" />
+        </div>
       ) : loadFailed ? (
-        <ErrorState onRetry={() => setReload((n) => n + 1)}>I couldn&apos;t load your recent logs. Check your connection and try again.</ErrorState>
-      ) : logs.length === 0 ? (
-        <EmptySlot>{filter === 'all' ? 'Nothing logged yet. Tap + to log your first meal.' : 'Nothing of this kind yet.'}</EmptySlot>
+        <div role="alert" className={`${CARD} p-4`}>
+          <p className="text-body-sm text-ink">I couldn&apos;t load your logs.</p>
+          <button type="button" onClick={() => { setLoading(true); setReload((n) => n + 1) }} className="-ml-1 mt-1 min-h-11 px-1 text-body-sm font-semibold text-ink underline decoration-ink-35 underline-offset-4">Try again</button>
+        </div>
+      ) : visible.length === 0 ? (
+        <div className={`${CARD} p-4`}>
+          <p className="text-headline text-ink">{filter === 'all' ? 'Nothing logged yet' : 'Nothing of this kind yet'}</p>
+          <p className="mt-1 text-caption leading-[1.4] text-ink-65">Tap + to log your first meal. Everything you log lands here, newest first.</p>
+        </div>
       ) : (
-        <RiseList className={LIST}>
-          {logs.map((log) => {
-            const selected = selectedIds.has(log.id)
-            const metric = getLogMetric(log)
-            const body = (
-              <>
-                {selectMode ? (
-                  <span aria-hidden="true" className={cn('grid size-6 shrink-0 place-items-center rounded-full border-[1.5px] transition-colors', selected ? 'border-ink bg-ink text-cream' : 'border-ink-35')}>
-                    {selected ? <Check className="size-3.5" strokeWidth={3} /> : null}
-                  </span>
-                ) : null}
-                <LogTypeIcon type={log.type} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[15.5px] font-semibold text-ink">{getLogDescription(log)}</span>
-                  <span className="mt-0.5 block text-[13px] text-ink-65">{relativeTime(log.created_at)}</span>
-                </span>
-                {metric ? <span className="whitespace-nowrap text-[15px] font-semibold text-ink tabular-nums">{metric}</span> : null}
-              </>
-            )
-            return selectMode ? (
-              <button key={log.id} type="button" role="checkbox" aria-checked={selected} onClick={() => toggleWithHaptic(log.id)} className={cn(ROW, selected && 'bg-ink-04')}>
-                {body}
-              </button>
-            ) : (
-              <div key={log.id} className={ROW}>{body}</div>
-            )
-          })}
-        </RiseList>
-      )}
-
-      {/* Floating glass bar for bulk delete, above the tab bar. */}
-      {selectMode && selectedIds.size > 0 && (
-        <div className="fixed inset-x-0 z-40 flex justify-center px-4" style={{ bottom: 'calc(96px + var(--safe-bottom))' }}>
-          <div className="glass flex items-center gap-3 rounded-full py-1.5 pl-5 pr-1.5">
-            <span className="text-[15px] font-semibold text-ink tabular-nums">{selectedIds.size} selected</span>
-            <button
-              type="button"
-              onClick={() => setShowBulkDeleteConfirm(true)}
-              disabled={bulkDeleting}
-              className="h-11 rounded-full bg-ink px-5 text-[15px] font-semibold text-cream transition-transform active:scale-[.96] disabled:opacity-50"
-            >
-              {bulkDeleting ? 'Deleting…' : 'Delete'}
-            </button>
-          </div>
+        <div className="space-y-5">
+          {groups.map((group) => (
+            <section key={group.label} aria-label={group.label}>
+              <h2 className="mb-2 px-1 text-label text-ink-65">{group.label}</h2>
+              <ul className={LIST}>
+                {group.logs.map((log) => {
+                  const selected = selectedIds.has(log.id)
+                  const metric = getLogMetric(log)
+                  const body = (
+                    <>
+                      {selectMode ? (
+                        <span aria-hidden="true" className={cn('grid size-6 shrink-0 place-items-center rounded-full border-[1.5px] transition-colors', selected ? 'border-ink bg-ink text-cream' : 'border-ink-35')}>
+                          {selected ? <Check className="size-3.5" strokeWidth={3} /> : null}
+                        </span>
+                      ) : null}
+                      <LogTypeIcon type={log.type} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-body-sm font-semibold text-ink">{getLogDescription(log)}</span>
+                        <span className="block text-caption text-ink-65 tabular-nums">{clockTime(log.created_at)}</span>
+                      </span>
+                      {metric ? <span className="shrink-0 whitespace-nowrap text-body-sm font-bold text-ink tabular-nums">{metric}</span> : null}
+                    </>
+                  )
+                  const row = 'flex min-h-row w-full items-center gap-3 px-4 py-2 text-left'
+                  return (
+                    <li key={log.id} className="border-b border-ink-06 last:border-b-0">
+                      {selectMode ? (
+                        <button type="button" role="checkbox" aria-checked={selected} onClick={() => toggleSelect(log.id)} className={`${row} transition-colors ${selected ? 'bg-ink-04' : 'active:bg-ink-04'}`}>
+                          {body}
+                        </button>
+                      ) : (
+                        <div className={row}>{body}</div>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </section>
+          ))}
         </div>
       )}
 
-      <ConfirmDialog
-        open={showBulkDeleteConfirm}
-        onClose={() => setShowBulkDeleteConfirm(false)}
-        onConfirm={handleBulkDelete}
-        title={`Delete ${selectedIds.size} log${selectedIds.size !== 1 ? 's' : ''}?`}
-        description="They'll be gone for good, and your totals will update."
-        confirmLabel="Delete"
-        variant="danger"
-      />
+      {/* Floating capsule for the delete, above the tab bar. */}
+      {selectMode && selectedIds.size > 0 ? (
+        <div className="fixed inset-x-0 z-40 flex justify-center px-4" style={{ bottom: 'calc(96px + var(--safe-bottom))' }}>
+          <div className="glass flex items-center gap-3 rounded-full py-1.5 pl-5 pr-1.5">
+            <span className="text-body-sm font-semibold text-ink tabular-nums">{selectedIds.size} selected</span>
+            <button type="button" onClick={handleBulkDelete} className="h-11 rounded-full bg-ink px-5 text-body-sm font-semibold text-cream transition-transform active:scale-[.96]">
+              Delete
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
