@@ -40,6 +40,9 @@ const RETURNING_LOGS = [
   lg('sleep', 0, { hours: 7.2, quality_rating: 7 }, 7),
   ...[1, 2, 3, 4, 5, 6].map((o) => lg('sleep', o, { hours: [6.5, 7.8, 5.9, 7.1, 8.2, 6.8][o - 1] })),
   ...[0, 2, 4, 7].map((o, i) => lg('weight', o, { weight_kg: [78.2, 78.5, 78.6, 79.0][i] }, 9)),
+  // A past snack Geo's chip can log again (Coach: line with action).
+  lg('food', 2, { food_name: 'Greek yoghurt, plain, 170 g', meal_type: 'snack', quantity_g: 170, est_macros: { calories: 100, protein: 17, carbs: 6, fat: 1 } }, 3),
+  ...[1, 2, 3, 4, 5, 6].map((o) => lg('steps', o, { steps: [10233, 4980, 7302, 11873, 6450, 9120][o - 1] }, 6)),
 ]
 const LONG_NAME = 'Slow-roasted pumpkin, feta and toasted pepita salad with a lemon tahini dressing'
 const HOME = {
@@ -96,7 +99,18 @@ const SHOTS = {
     { name: 'plus-sheet', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: 'Log something' }).click(); await p.waitForTimeout(800) } },
     { name: 'plus-sheet-typed', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: 'Log something' }).click(); await p.waitForTimeout(500); await p.getByLabel('Tell Geo what you ate or did').fill('2 eggs and toast with butter') } },
     { name: 'macro-sheet', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: /^Protein/ }).click(); await p.waitForTimeout(800) } },
-    ...['Weight', 'Water', 'Sleep'].map((t) => ({ name: `quicklog-${t.toLowerCase()}`, url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: new RegExp(`^${t}`) }).click(); await p.waitForTimeout(800) } })),
+    { name: 'macro-sheet-calories', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: /kcal eaten, show breakdown/ }).click(); await p.waitForTimeout(800) } },
+    { name: 'macro-sheet-fat', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: /^Carbs/ }).click(); await p.waitForTimeout(600); await p.getByRole('button', { name: 'Fat', exact: true }).click(); await p.waitForTimeout(500) } },
+    { name: 'macro-sheet-empty', url: '/dashboard', api: FIRST_RUN_API, act: async (p) => { await p.getByRole('button', { name: /kcal eaten, show breakdown/ }).click(); await p.waitForTimeout(800) } },
+    ...['Weight', 'Water'].map((t) => ({ name: `quicklog-${t.toLowerCase()}`, url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: new RegExp(`^${t}`) }).click(); await p.waitForTimeout(800) } })),
+    { name: 'quicklog-weight-bad', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: /^Weight/ }).click(); await p.waitForTimeout(700); await p.getByLabel('Weight in kilograms').fill('7.82'); await p.waitForTimeout(200) } },
+    { name: 'quicklog-weight-first', url: '/dashboard', api: FIRST_RUN_API, act: async (p) => { await p.getByRole('button', { name: /^Weight/ }).click(); await p.waitForTimeout(800) } },
+    { name: 'quicklog-sleep', url: '/dashboard', api: FIRST_RUN_API, act: async (p) => { await p.getByRole('button', { name: /^Sleep/ }).click(); await p.waitForTimeout(800) } },
+    { name: 'water-plus', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: 'Add one glass of water' }).click(); await p.waitForTimeout(900) } },
+    { name: 'geo-action', url: '/dashboard', api: homeApi(), act: async (p) => { await p.getByRole('button', { name: /^Log Greek yoghurt/ }).click(); await p.waitForTimeout(900) } },
+    { name: 'steps-week', url: '/dashboard/steps', api: homeApi() },
+    { name: 'sleep-week', url: '/dashboard/sleep', api: homeApi() },
+    { name: 'sleep-week-empty', url: '/dashboard/sleep', api: FIRST_RUN_API },
     // The Food, Train and Geo tabs are captured by their own slices (5, 6 and 4).
   ],
   'slice-1b': [

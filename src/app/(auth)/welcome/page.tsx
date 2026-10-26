@@ -1,6 +1,6 @@
 import { GuestOnly } from '@/components/auth/guest-only'
-import { WelcomeCarousel } from '@/components/welcome/welcome-carousel'
+import { WelcomeBeats } from '@/components/welcome/welcome-beats'
 
 export default function WelcomePage() {
-  return <GuestOnly><WelcomeCarousel /></GuestOnly>
+  return <GuestOnly><WelcomeBeats /></GuestOnly>
 }

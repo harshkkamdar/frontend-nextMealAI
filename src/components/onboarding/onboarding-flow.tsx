@@ -9,8 +9,9 @@ import { OptionList, type Option } from '@/components/ui/fiqr/option-list'
 import { CM, FT_IN, KG, LB, RulerInput } from '@/components/ui/fiqr/ruler-input'
 import { WheelBand, WheelPicker } from '@/components/ui/fiqr/wheel-picker'
 import { WeightPath } from '@/components/onboarding/weight-path'
+import { questionScene } from '@/components/onboarding/aurora'
+import { depthTo } from '@/components/onboarding/depth-nav'
 import { submitFitnessOnboarding, submitNutritionOnboarding, submitPersonalOnboarding } from '@/lib/api/profile.api'
-import { leaveThen } from '@/lib/page-transition'
 import { haptic } from '@/lib/platform/app'
 import { ageOn, nextInModule, previousRoute, progressOf, routeOf, STEPS, stepsFor, visibleSteps, type OnboardingModule, type StepId } from '@/lib/onboarding-steps'
 import { useOnboardingDraft, type OnboardingDraft } from '@/stores/onboarding-draft.store'
@@ -79,6 +80,27 @@ function NumberCells({ label, values, value, onChange }: { label: string; values
   )
 }
 
+/** Single choice as wrapping chips (mocks/aurora-onboarding.html, How do you eat?). Selected = ink fill, never orange. */
+function ChoiceChips<T extends string>({ label, options, value, onChange }: { label: string; options: Option<T>[]; value: T | null; onChange: (v: T) => void }) {
+  return (
+    <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
+      {options.map((o, i) => (
+        <button
+          key={o.value}
+          type="button"
+          role="radio"
+          aria-checked={value === o.value}
+          onClick={() => { void haptic('light'); onChange(o.value) }}
+          style={{ '--i': i + 2 } as CSSProperties}
+          className={cn('rise h-chip rounded-full px-[18px] text-body-sm font-semibold transition-[background-color,color,transform] duration-200 active:scale-[.96] active:duration-75', value === o.value ? 'bg-ink text-cream' : 'glass text-ink')}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 const pad = (n: number) => String(n).padStart(2, '0')
 
@@ -95,6 +117,19 @@ function DateWheels({ value, onChange, minYear, maxYear }: { value: string; onCh
       <WheelPicker label="Year" items={Array.from({ length: maxYear - minYear + 1 }, (_, i) => ({ value: minYear + i, label: String(minYear + i) }))} value={y} onChange={(year) => emit(year, m, d)} />
     </div>
   )
+}
+
+const MODULES: OnboardingModule[] = ['personal', 'fitness', 'nutrition']
+
+/** Fill of the three section bars on step `id`: sections before it full, its own section up to and including it, later ones empty. */
+export function segmentsOf(id: StepId, goal: PrimaryGoal | null): number[] {
+  const current = STEPS.find((s) => s.id === id)!.module
+  return MODULES.map((m, k) => {
+    const at = MODULES.indexOf(current)
+    if (k !== at) return k < at ? 1 : 0
+    const steps = stepsFor(m, goal)
+    return (steps.findIndex((s) => s.id === id) + 1) / steps.length
+  })
 }
 
 function weeksAt(deltaKg: number, perWeek: number) {
@@ -151,10 +186,10 @@ export function OnboardingFlow({ module }: { module: OnboardingModule }) {
       void haptic('success')
       if (module === 'nutrition') {
         draft.reset()
-        leaveThen(() => router.push('/onboarding/consent'))
+        depthTo(() => router.push('/onboarding/consent'))
       } else {
         const firstOfNext = visibleSteps(draft.goal).find((s) => s.module === (module === 'personal' ? 'fitness' : 'nutrition'))!
-        leaveThen(() => router.push(routeOf(firstOfNext.id)))
+        depthTo(() => router.push(routeOf(firstOfNext.id)))
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "That didn't save. Check your connection and try again.")
@@ -166,8 +201,10 @@ export function OnboardingFlow({ module }: { module: OnboardingModule }) {
   const common = {
     stepKey: id,
     progress: progressOf(id, draft.goal),
-    // Crossing into another module is a route change: fade through it. Within a module only the question animates.
-    onBack: back ? () => (back.startsWith(`/onboarding/${module}?`) ? router.push(back) : leaveThen(() => router.push(back))) : undefined,
+    segments: segmentsOf(id, draft.goal),
+    scene: questionScene(visibleSteps(draft.goal).findIndex((s) => s.id === id)),
+    // Crossing into another module is a route change: step back through it in depth. Within a module only the question moves.
+    onBack: back ? () => (back.startsWith(`/onboarding/${module}?`) ? router.push(back) : depthTo(() => router.push(back), -1)) : undefined,
     busy,
     onContinue: next,
   }
@@ -303,7 +340,7 @@ export function OnboardingFlow({ module }: { module: OnboardingModule }) {
     case 'diet':
       return (
         <OnboardingStep {...common} question="How do you eat?" canContinue={draft.diet !== null} secondary={{ label: 'Skip', onClick: () => { set({ diet: null }); void next() } }}>
-          <OptionList label="Eating style" options={DIETS} value={draft.diet} onChange={(diet) => pick({ diet })} />
+          <ChoiceChips label="Eating style" options={DIETS} value={draft.diet} onChange={(diet) => pick({ diet })} />
         </OnboardingStep>
       )
     case 'dislikes':

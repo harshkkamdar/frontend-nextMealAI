@@ -1,0 +1,75 @@
+/* Aurora (mocks/aurora-onboarding.html): four large soft colour fields and two glass slabs behind sign-in and setup.
+   Cheap by construction: each field is one radial gradient (no blur filter), its inner layer loops a compositor-only
+   transform, and the outer layer moves only when the scene changes. Loops pause while the page is hidden. */
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--color-cream);
+  animation: aurora-in 420ms ease-out backwards;
+}
+
+.wrap {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transition: transform 2.4s cubic-bezier(.65, 0, .35, 1), opacity 1.6s cubic-bezier(.65, 0, .35, 1);
+}
+
+.f {
+  position: absolute;
+  display: block;
+  width: 127vw;
+  height: 127vw;
+  border-radius: 50%;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  will-change: transform;
+}
+.f1 { left: -50vw; top: -37vw; background: radial-gradient(closest-side, rgba(232, 98, 42, .3), rgba(232, 98, 42, 0)); animation-name: aurora-a; animation-duration: 29s; }
+.f2 { left: 37vw; top: 63vw; background: radial-gradient(closest-side, rgba(62, 124, 119, .26), rgba(62, 124, 119, 0)); animation-name: aurora-b; animation-duration: 35s; }
+.f3 { left: -43vw; top: 130vw; background: radial-gradient(closest-side, rgba(160, 122, 60, .26), rgba(160, 122, 60, 0)); animation-name: aurora-c; animation-duration: 31s; }
+.f4 { left: 10vw; top: 77vw; width: 87vw; height: 87vw; background: radial-gradient(closest-side, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0)); animation-name: aurora-b; animation-duration: 41s; animation-direction: alternate-reverse; }
+.paused .f { animation-play-state: paused; }
+.still .wrap, .still .slab { transition: none; }
+.carried { animation: none; }
+
+@keyframes aurora-a { to { transform: translate(20vw, 27vw) scale(1.1); } }
+@keyframes aurora-b { to { transform: translate(-17vw, -30vw) scale(.92); } }
+@keyframes aurora-c { to { transform: translate(27vw, -13vw) scale(1.12); } }
+@keyframes aurora-in { from { opacity: 0; } }
+
+/* Depth layer: two glass slabs, slower than the content, faster than the fields. */
+.slab {
+  position: absolute;
+  display: block;
+  border-radius: 15vw;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .66), rgba(255, 255, 255, .06));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 0 0 1px rgba(255, 255, 255, .35), 0 30px 50px -30px rgba(17, 28, 53, .2);
+  transition: transform 1s cubic-bezier(.22, 1, .36, 1);
+}
+.s1 { right: -19vw; top: 25vw; width: 50vw; height: 50vw; }
+.s2 { left: -23vw; top: 173vw; width: 57vw; height: 57vw; background: linear-gradient(200deg, rgba(160, 122, 60, .16), rgba(255, 255, 255, .04)); }
+
+/* Translucent surface over the fields. No backdrop blur: the fields are already soft, so a blurred backdrop looks the
+   same and would re-blur every frame of the loop. */
+.surface {
+  background: rgba(255, 255, 255, .64);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), inset 0 0 0 1px rgba(255, 255, 255, .5), 0 1px 1px rgba(17, 28, 53, .04), 0 10px 24px -16px rgba(17, 28, 53, .3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .f { animation: none; }
+  .wrap, .slab { transition-property: opacity; transition-duration: .3s; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .slab { opacity: .35; }
+  .surface { background: var(--color-card); box-shadow: 0 0 0 1px rgba(17, 28, 53, .09); }
+}
+:global(html[data-transparency="reduced"]) .slab { opacity: .35; }
+:global(html[data-transparency="reduced"]) .surface { background: var(--color-card); box-shadow: 0 0 0 1px rgba(17, 28, 53, .09); }

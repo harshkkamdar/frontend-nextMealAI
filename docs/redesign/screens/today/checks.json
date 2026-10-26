@@ -1,0 +1,98 @@
+[
+  {
+    "shot": "native-health-fail",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "native-health-fail",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "native-health-off",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "native-health-off",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "native-health-on",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "native-health-on",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "native-health-sheet",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "native-health-sheet",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "native-notifications-off",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "native-notifications-off",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "native-notifications",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "native-notifications",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  }
+]

@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { TextField } from '@/components/ui/fiqr/text-field'
 import { forgotPassword } from '@/lib/api/auth.api'
-import { leaveThen } from '@/lib/page-transition'
+import { depthTo } from '@/components/onboarding/depth-nav'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Enter an email like name@example.com'),
@@ -52,12 +52,12 @@ export default function ForgotPasswordPage() {
       stepKey={sentTo ? 'forgot-sent' : 'forgot'}
       question={sentTo ? 'Check your email' : 'Reset your password'}
       why={sentTo ? `If an account uses ${sentTo}, a reset link is on its way. It can take a minute to arrive.` : "Enter your email and we'll send you a reset link."}
-      onBack={sentTo ? () => setSentTo(null) : () => leaveThen(() => router.push('/login'))}
+      onBack={sentTo ? () => setSentTo(null) : () => depthTo(() => router.push('/login'), -1)}
       cta={sentTo ? 'Back to sign in' : 'Send reset link'}
       busyLabel="Sending…"
       canContinue
       busy={isLoading}
-      onContinue={sentTo ? () => leaveThen(() => router.push('/login')) : handleSubmit(onSubmit)}
+      onContinue={sentTo ? () => depthTo(() => router.push('/login'), -1) : handleSubmit(onSubmit)}
       secondary={sentTo ? { label: 'Send it again', onClick: () => void onSubmit({ email: getValues('email') }) } : undefined}
     >
       {sentTo ? (

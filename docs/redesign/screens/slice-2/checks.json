@@ -1,5 +1,21 @@
 [
   {
+    "shot": "geo-action",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "geo-action",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "home-checkin-due",
     "width": 360,
     "url": "/dashboard",
@@ -128,6 +144,54 @@
     "orangeActions": 0
   },
   {
+    "shot": "macro-sheet-calories",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "macro-sheet-calories",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "macro-sheet-empty",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "macro-sheet-empty",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "macro-sheet-fat",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "macro-sheet-fat",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "macro-sheet",
     "width": 360,
     "url": "/dashboard",
@@ -149,7 +213,7 @@
     "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "plus-sheet-typed",
@@ -157,7 +221,7 @@
     "url": "/dashboard",
     "axe": [],
     "smallTargets": [],
-    "orangeActions": 1
+    "orangeActions": 0
   },
   {
     "shot": "plus-sheet",
@@ -208,6 +272,38 @@
     "orangeActions": 1
   },
   {
+    "shot": "quicklog-weight-bad",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "quicklog-weight-bad",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "quicklog-weight-first",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "quicklog-weight-first",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "quicklog-weight",
     "width": 360,
     "url": "/dashboard",
@@ -222,5 +318,69 @@
     "axe": [],
     "smallTargets": [],
     "orangeActions": 1
+  },
+  {
+    "shot": "sleep-week-empty",
+    "width": 360,
+    "url": "/dashboard/sleep",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "sleep-week-empty",
+    "width": 390,
+    "url": "/dashboard/sleep",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "sleep-week",
+    "width": 360,
+    "url": "/dashboard/sleep",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "sleep-week",
+    "width": 390,
+    "url": "/dashboard/sleep",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "steps-week",
+    "width": 360,
+    "url": "/dashboard/steps",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "steps-week",
+    "width": 390,
+    "url": "/dashboard/steps",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "water-plus",
+    "width": 360,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "water-plus",
+    "width": 390,
+    "url": "/dashboard",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
   }
 ]

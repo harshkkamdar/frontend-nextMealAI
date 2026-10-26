@@ -10,7 +10,7 @@ import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { FormNotice } from '@/components/auth/form-notice'
 import { TextField } from '@/components/ui/fiqr/text-field'
 import { updatePassword } from '@/lib/api/auth.api'
-import { leaveThen } from '@/lib/page-transition'
+import { depthTo } from '@/components/onboarding/depth-nav'
 
 const resetPasswordSchema = z
   .object({
@@ -77,7 +77,7 @@ function ResetPasswordForm() {
     try {
       await updatePassword(data.password, linkState.accessToken)
       toast.success('Password updated. Sign in with your new password.')
-      leaveThen(() => router.push('/login'))
+      depthTo(() => router.push('/login'))
     } catch (error) {
       setFailure((f) => ({ message: error instanceof Error ? error.message : "That didn't work. Check your connection and try again.", attempt: (f?.attempt ?? 0) + 1 }))
     } finally {
@@ -93,10 +93,10 @@ function ResetPasswordForm() {
         stepKey="reset-invalid"
         question="This reset link has expired"
         why="Reset links work once and expire. Ask for a new one and use the latest email."
-        onBack={() => leaveThen(() => router.push('/login'))}
+        onBack={() => depthTo(() => router.push('/login'), -1)}
         cta="Send a new link"
         canContinue
-        onContinue={() => leaveThen(() => router.push('/forgot-password'))}
+        onContinue={() => depthTo(() => router.push('/forgot-password'))}
       >
         {null}
       </OnboardingStep>
@@ -108,7 +108,7 @@ function ResetPasswordForm() {
       stepKey="reset"
       question="Choose a new password"
       why="Use at least 8 characters, one you haven't used here before."
-      onBack={() => leaveThen(() => router.push('/login'))}
+      onBack={() => depthTo(() => router.push('/login'), -1)}
       cta="Update password"
       busyLabel="Updating…"
       canContinue

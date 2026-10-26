@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { leaveThen } from '@/lib/page-transition'
+import { depthTo, leaveAurora } from '@/components/onboarding/depth-nav'
 import { toast } from 'sonner'
 import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { updateProfile } from '@/lib/api/profile.api'
@@ -43,7 +43,8 @@ export default function ConsentPage() {
       useOnboardingStore.getState().setConsent(true)
       // Existing users sent here by AuthGate already have plans; return them to the app.
       const next = new URLSearchParams(window.location.search).get('next')
-      leaveThen(() => router.push(next?.startsWith('/') && !next.startsWith('//') ? next : '/onboarding/generating'))
+      if (next?.startsWith('/') && !next.startsWith('//')) leaveAurora(() => router.push(next))
+      else depthTo(() => router.push('/onboarding/generating'))
     } catch {
       toast.error("That didn't save. Check your connection and try again.")
     } finally {

@@ -1,4 +1,4 @@
-// Welcome stage physics (docs/redesign/motion-feel.md 3a).
+// Welcome beat physics (docs/redesign/motion-feel.md 3a; depth per mocks/aurora-onboarding.html).
 import { project, rubberband } from '@/lib/motion'
 
 /** Stage position while the finger is down: 1:1 inside [0, last], rubber band past either end. */
@@ -16,7 +16,12 @@ export function flickTarget(p: number, start: number, vx: number, w: number, las
   return Math.max(0, from - 1, Math.min(last, from + 1, landing))
 }
 
-/** Opacity of a layer at slide distance d: gone once a slide has moved `gone` of the way out (d > 0), visible again once
- *  the next one is within `arrive` (d < 0). With gone + arrive = 1 two slides never show the same layer at once. Quadratic,
- *  so a layer stays solid until near its hand-off instead of the whole stage dimming to a fog mid-drag. */
-export const handoff = (d: number, gone: number, arrive: number) => Math.max(0, 1 - (Math.abs(d) / (d > 0 ? gone : arrive)) ** 2)
+/** A beat at depth distance d (p - i): d > 0 has stepped back (smaller, drifting up), d < 0 is arriving from in front
+ *  (larger, drifting down into place), as in mocks/aurora-onboarding.html. Opacity clears by about 0.6 of the way, so
+ *  the outgoing beat is nearly gone before the incoming one fills. Reduced motion: opacity only. */
+export function beatDepth(d: number, reduce = false): { opacity: number; scale: number; y: number } {
+  const a = Math.abs(d)
+  const opacity = Math.max(0, 1 - a * (reduce ? 1 : 1.7))
+  if (reduce) return { opacity, scale: 1, y: 0 }
+  return d >= 0 ? { opacity, scale: 1 - 0.07 * d, y: d ? -7 * d : 0 } : { opacity, scale: 1 + 0.05 * a, y: 13 * a }
+}

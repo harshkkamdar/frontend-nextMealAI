@@ -9,7 +9,7 @@ import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { FormNotice } from '@/components/auth/form-notice'
 import { TextField } from '@/components/ui/fiqr/text-field'
 import { signup } from '@/lib/api/auth.api'
-import { leaveThen } from '@/lib/page-transition'
+import { depthTo } from '@/components/onboarding/depth-nav'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 
@@ -63,7 +63,7 @@ export function SignupForm() {
     try {
       await signup(data.email, data.password)
       void haptic('success')
-      leaveThen(() => router.push('/onboarding/personal'))
+      depthTo(() => router.push('/onboarding/personal'), 1, { crossLayout: true })
     } catch (error) {
       void haptic('warning')
       setFailure((f) => ({ message: error instanceof Error ? error.message : "That didn't work. Check your connection and try again.", attempt: (f?.attempt ?? 0) + 1 }))
@@ -79,14 +79,14 @@ export function SignupForm() {
       stepKey="signup"
       question="Create your account"
       why="Geo saves your plan and your logs to it."
-      onBack={() => leaveThen(() => router.push('/welcome'))}
+      onBack={() => depthTo(() => router.push('/welcome'), -1)}
       cta="Create account"
       busyLabel="Creating account…"
       canContinue
       busy={isLoading}
       onContinue={handleSubmit(onSubmit)}
       notice={failure ? <FormNotice key={failure.attempt}>{failure.message}</FormNotice> : null}
-      secondary={{ label: 'I have an account', onClick: () => leaveThen(() => router.push('/login')) }}
+      secondary={{ label: 'I have an account', onClick: () => depthTo(() => router.push('/login')) }}
     >
       <div className="flex flex-col gap-5">
         <TextField id="email" label="Email" type="email" placeholder="you@example.com" autoComplete="email" inputMode="email" error={errors.email?.message} i={2} {...register('email')} />

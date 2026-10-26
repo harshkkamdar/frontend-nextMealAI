@@ -9,7 +9,7 @@ import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { FormNotice } from '@/components/auth/form-notice'
 import { TextField } from '@/components/ui/fiqr/text-field'
 import { login } from '@/lib/api/auth.api'
-import { leaveThen } from '@/lib/page-transition'
+import { depthTo, leaveAurora } from '@/components/onboarding/depth-nav'
 import { haptic } from '@/lib/platform/app'
 
 const loginSchema = z.object({
@@ -42,7 +42,7 @@ export function LoginForm() {
     try {
       await login(data.email, data.password)
       void haptic('success')
-      leaveThen(() => router.push('/dashboard'))
+      leaveAurora(() => router.push('/dashboard'))
     } catch (error) {
       void haptic('warning')
       setFailure((f) => ({ message: error instanceof Error ? error.message : "That didn't work. Check your connection and try again.", attempt: (f?.attempt ?? 0) + 1 }))
@@ -56,21 +56,21 @@ export function LoginForm() {
       stepKey="login"
       question="Welcome back"
       why="Sign in to pick up where you left off."
-      onBack={() => leaveThen(() => router.push('/welcome'))}
+      onBack={() => depthTo(() => router.push('/welcome'), -1)}
       cta="Sign in"
       busyLabel="Signing in…"
       canContinue
       busy={isLoading}
       onContinue={handleSubmit(onSubmit)}
       notice={failure ? <FormNotice key={failure.attempt}>{failure.message}</FormNotice> : null}
-      secondary={{ label: 'New here? Create an account', onClick: () => leaveThen(() => router.push('/signup')) }}
+      secondary={{ label: 'New here? Create an account', onClick: () => depthTo(() => router.push('/signup')) }}
     >
       <div className="flex flex-col gap-5">
         <TextField id="email" label="Email" type="email" placeholder="you@example.com" autoComplete="email" inputMode="email" error={errors.email?.message} i={2} {...register('email')} />
         <div>
           <TextField id="password" label="Password" type="password" placeholder="Your password" autoComplete="current-password" error={errors.password?.message} i={3} {...register('password')} />
           <div className="rise flex justify-end" style={{ '--i': 4 } as React.CSSProperties}>
-            <button type="button" onClick={() => leaveThen(() => router.push('/forgot-password'))} className="-mr-2 mt-1 flex h-11 items-center px-2 text-[15px] font-semibold text-ink-65">
+            <button type="button" onClick={() => depthTo(() => router.push('/forgot-password'))} className="-mr-2 mt-1 flex h-11 items-center px-2 text-body-sm font-semibold text-ink">
               Forgot password?
             </button>
           </div>
