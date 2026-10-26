@@ -128,3 +128,20 @@ describe('RouteFrame swipe-back commit', () => {
     expect(Math.abs(x("/foods"))).toBeLessThan(2)
   })
 })
+
+describe('RouteFrame swipe-back under reduced motion', () => {
+  it('follows the finger without parallax and completes with the short crossfade, not the spring slide', async () => {
+    route.reduce = true
+    go('/foods')
+    await wait(300)
+    vi.spyOn(window.history, 'back').mockImplementation(() => { setTimeout(() => window.dispatchEvent(new PopStateEvent('popstate', { state: null })), 20) })
+    await swipe(0.7 * W)
+    const released = x('/foods')
+    expect(x('/food')).toBe(0)
+    await wait(60)
+    expect(Math.abs(x('/foods') - released)).toBeLessThan(2)
+    await wait(300)
+    expect(layer('/foods')?.style.opacity).toBe('0')
+    expect(x('/food')).toBe(0)
+  })
+})

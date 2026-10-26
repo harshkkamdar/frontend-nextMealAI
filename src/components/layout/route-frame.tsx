@@ -140,6 +140,9 @@ export function RouteFrame({ children }: { children: ReactNode }) {
   // The static export (trailingSlash) reports '/food/'; keys and TAB_ROOTS use '/food'.
   const pathname = usePathname().replace(/(.)\/$/, '$1')
   const reduce = useReducedMotion()
+  // The touch handlers are bound once; they read the live preference from here.
+  const reduceRef = useRef(reduce)
+  useLayoutEffect(() => { reduceRef.current = reduce }, [reduce])
   const [nav, setNav] = useState<Nav>(() => ({ stack: [makeLayer(pathname)], exiting: [], step: null, front: null, moving: false }))
   const navRef = useRef(nav)
   const active = useRef<{ stop: () => void } | null>(null)
@@ -270,7 +273,8 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       track.x = touch.clientX
       track.t = e.timeStamp
       const { t, under } = pair()
-      setPair(t, under, Math.max(0, track.base + dx) / window.innerWidth)
+      // Reduced motion: the page still follows the finger (direct manipulation), but the page under it stays at rest.
+      setPair(t, reduceRef.current ? undefined : under, Math.max(0, track.base + dx) / window.innerWidth)
     }
     const onEnd = (e: TouchEvent) => {
       const done = track
@@ -280,7 +284,16 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       const w = window.innerWidth
       const v = e.timeStamp - done.t > 100 ? 0 : done.v
       const complete = shouldCompleteSwipe(done.base + done.x - done.x0, w, v)
-      run(() => slide(t, under, Math.max(0, done.base + done.x - done.x0) / w, complete ? 1 : 0, v / w), () => {
+      const reduced = reduceRef.current
+      if (reduced && !complete) {
+        // Reduced motion: no slide back; the page returns to rest at once.
+        t.x.set(0)
+        setNav((n) => ({ ...n, front: null, moving: false }))
+        return
+      }
+      // Reduced motion completes with the short crossfade (motion-feel 3c-native) instead of the spring slide.
+      const release = reduced ? () => [animate(t.opacity, 0, reducedFade)] : () => slide(t, under, Math.max(0, done.base + done.x - done.x0) / w, complete ? 1 : 0, v / w)
+      run(release, () => {
         if (!complete) return
         // Keep the page underneath shown until the route commits, or the screen would flash empty.
         setNav((n) => ({ ...n, front: null, moving: true }))
@@ -292,7 +305,8 @@ export function RouteFrame({ children }: { children: ReactNode }) {
           if (!navHistory.swipeCommitted || navHistory.backPending || pair().t !== t) return
           navHistory.swipeCommitted = false
           setNav((n) => ({ ...n, front: t.key, moving: true }))
-          run(() => slide(t, under, 1, 0, 0), () => {})
+          if (reduced) { t.x.set(0); run(() => [animate(t.opacity, 1, reducedFade)], () => {}) }
+          else run(() => slide(t, under, 1, 0, 0), () => {})
         }, 600)
       })
     }
