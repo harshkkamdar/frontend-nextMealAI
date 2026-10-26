@@ -18,15 +18,13 @@
     "verdict": "smooth"
   },
   "plus-open-close": {
-    "frames": 73,
-    "chrome_px": 154650,
-    "content_px": 737672,
-    "max_chrome_share": 0.262,
-    "max_content_share": 0.236,
-    "issues": [
-      "chrome jump frame 7: 26% of chrome change"
-    ],
-    "verdict": "pop"
+    "frames": 92,
+    "chrome_px": 149360,
+    "content_px": 627334,
+    "max_chrome_share": 0.256,
+    "max_content_share": 0.272,
+    "issues": [],
+    "verdict": "smooth"
   },
   "quicklog-open": {
     "frames": 33,
