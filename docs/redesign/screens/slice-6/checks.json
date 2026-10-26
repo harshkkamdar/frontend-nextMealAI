@@ -1,0 +1,402 @@
+[
+  {
+    "shot": "session-error",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-error",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-exit-confirm",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-exit-confirm",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-finished",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-finished",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-first-set",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-first-set",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-last-exercise",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-last-exercise",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "session-loading",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-loading",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-long",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-long",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-mid-scrolled",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-mid-scrolled",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-mid",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-mid",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-offline",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-offline",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-options",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-options",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-rest-minimised",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-rest-minimised",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-rest",
+    "width": 360,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "session-rest",
+    "width": 390,
+    "url": "/train/session?id=sess-1",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "train-calendar",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-calendar",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-day-open",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-day-open",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-error",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "train-error",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "train-first-run",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-first-run",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-loading",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "train-loading",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "train-long",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-long",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-no-program",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-no-program",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-offline",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-offline",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-rest-day",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "train-rest-day",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "train-resume",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-resume",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-scrolled",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train-scrolled",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train",
+    "width": 360,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  },
+  {
+    "shot": "train",
+    "width": 390,
+    "url": "/train",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 1
+  }
+]
