@@ -86,7 +86,8 @@ export function depthTo(go: () => void, dir: DepthDir = 1, { crossLayout = false
   // The back button, bars and CTA: the next screen's fade in underneath (page-in, 220 ms) while these hold, then these
   // fade. Controls both screens share never flicker; ones that differ (the welcome's dots, a CTA's fill) crossfade.
   const liveChrome = [...document.querySelectorAll<HTMLElement>('[data-chrome]')]
-  const chrome = liveChrome.map((c) => freeze(c, 11))
+  // Each copy fades from the opacity its original had (a hidden CTA bar stays hidden, it does not flash in to fade out).
+  const chrome = liveChrome.map((c) => ({ copy: freeze(c, 11), from: getComputedStyle(c).opacity }))
   // The copies stand in for the originals from here on; both at once would double every edge (text reads bolder).
   const originals = [el, ...liveChrome]
   for (const o of originals) o.style.visibility = 'hidden'
@@ -97,7 +98,7 @@ export function depthTo(go: () => void, dir: DepthDir = 1, { crossLayout = false
     // The outgoing screen is gone by just over half the step, so two screens' words never sit on top of each other.
     const frames = reduced() ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1, transform: 'none' }, { opacity: 0, offset: 0.55 }, { opacity: 0, transform: `scale(${scale})` }]
     ghost.animate(frames, { duration: reduced() ? 150 : 420, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'forwards' }).finished.then(() => ghost.remove(), () => ghost.remove())
-    for (const c of chrome) c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: reduced() ? 0 : 180, easing: 'ease-out', fill: 'both' }).finished.then(() => c.remove(), () => c.remove())
+    for (const { copy: c, from } of chrome) c.animate([{ opacity: from }, { opacity: 0 }], { duration: 200, delay: reduced() ? 0 : 180, easing: 'ease-out', fill: 'both' }).finished.then(() => c.remove(), () => c.remove())
     // The new Aurora is already showing the same scene (carried over), so the still copy can go at once; fading it
     // would hide the new screen's buttons under it for a moment.
     under?.remove()
