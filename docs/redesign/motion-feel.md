@@ -193,6 +193,24 @@ The + sheet becomes a framer component (vaul cannot morph from a source element)
 3. 80 ms: the Geo field fades in with y 8 px. From 110 ms, the 9 grid items scale 0.92 to 1 with opacity, 25 ms apart, in row order. Everything is in place by about 400 ms.
 4. Close (orb tap, dim tap, or a drag down past 25% or faster than 0.4 px/ms with `drag="y"`, `dragElastic={{ top: 0.08, bottom: 0.6 }}`): the content fades out over 100 ms all at once, the blur layer drops to 0 at once, and the surface shrinks back into the orb with `spring.sheet`, carrying the drag velocity. If the user re-taps mid-close, the morph reverses from its live position (N11).
 
+### 3j. Tab bar minimises on scroll (iOS 26)
+
+Owner ask (26 Oct 2026): "the menu bar should collapse into just one home icon on scroll". What Apple ships, checked 26 Oct 2026:
+- iOS 26 tab bars can minimise on scroll: SwiftUI `tabBarMinimizeBehavior(.onScrollDown)`, UIKit `tabBarController.tabBarMinimizeBehavior = .onScrollDown`. "The tab bar minimizes when scrolling down, and expands when scrolling back up" ([UIKit MinimizeBehavior.onScrollDown](https://developer.apple.com/documentation/uikit/uitabbarcontroller/minimizebehavior/onscrolldown); [WWDC25 284](https://developer.apple.com/videos/play/wwdc2025/284/) and [WWDC25 323](https://developer.apple.com/videos/play/wwdc2025/323/): "The tab bar re-expands when scrolling in the opposite direction"). iPhone only.
+- The minimised bar is the currently open tab, not always Home: the HIG art shows "the tab bar ... minimized into the currently open tab at the leading bottom corner of the screen, with the MiniPlayer at the bottom center, and the search tab in the trailing corner" ([HIG Tab bars, iOS](https://developer.apple.com/design/human-interface-guidelines/tab-bars#iOS)). So on Home it shows the Home icon (what the owner described); on Food it shows Food. We follow Apple.
+- Exit: "A person can exit the minimized state by tapping a tab or scrolling to the top of the view" (same HIG section), plus any scroll up.
+- A separate control stays separate: the search tab keeps its own circle at the trailing corner, and a bottom accessory "animates down to display inline with the tab bar" ([WWDC25 284](https://developer.apple.com/videos/play/wwdc2025/284/); Music: [9to5Mac](https://9to5mac.com/?p=1020858)). Our + orb is that trailing control and does not move.
+- Motion: Apple publishes no curve for this. Liquid Glass controls "morph" and "shape shift" between states and "materialize in and out" rather than fade ([WWDC25 219](https://developer.apple.com/videos/play/wwdc2025/219/)), so the capsule's glass shrinks into the circle rather than swapping.
+
+Build (`src/components/layout/tab-bar.tsx`, state in `src/lib/tab-bar-minimise.ts`):
+1. Thresholds with hysteresis: collapse after 24 px of travel down from the lowest point since the bar last expanded, and only past y 96. Expand after 12 px up from the deepest point, at y 48 or less, on a tap on the circle, and on every route change. One state step per frame (passive `scroll` on `window`, rAF), and `scrollY` is clamped to the real range so iOS's bottom rubber band never reads as a scroll up.
+2. Collapse (`spring.glide`, 300/35/1, critically damped: the morph follows a scroll, not a flick release, so it earns no overshoot): one glass surface shrinks from the capsule to the 64 pt circle at the leading edge through framer layout projection (transforms only, `borderRadius` in `style` so the corners stay round). The three other tabs and the labels fade out in 120 ms while scaling to 0.8 (a `transform` string, so the scale stays on the compositor while the page scrolls). The open tab's icon flies into the circle (shared `layoutId="tab-icon"`) and grows from 22 to 24 px.
+3. Expand is the reverse on the same spring. Items fade back over 180 ms after a 120 ms delay, so they arrive behind the growing glass, not ahead of it.
+4. The circle is a `button` inside the `nav` landmark, named "Show tabs, Home" (or the open tab), 64 x 64 pt. Tapping it expands and never navigates; a keyboard or screen reader activation hands focus to the open tab, because the circle unmounts. While collapsed, the links are `inert`. Pages outside the four tabs never collapse, because there is no open tab to show.
+5. Interruptible: a scroll back up mid-collapse reverses the glass from its live width (measured: 282 to 147 px, then back to 282 with no snap).
+6. Reduced motion: no projection. Two still surfaces (capsule and circle) crossfade with `reducedFade`, and the circle button fades in and out.
+7. The + orb, the `orb-surface` morph into the + sheet, and the slide-away on full-screen routes are unchanged.
+
 ## 4. HOW NOT: implementation traps
 
 1. `scroll-snap` pagers for narrative slides. The browser owns the physics, there is no progress value to scrub layers with, and the result is N1. Use `scroll-snap` only for real lists and pickers (`wheel-picker.tsx` is fine).

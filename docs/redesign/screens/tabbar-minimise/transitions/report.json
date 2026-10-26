@@ -1,0 +1,42 @@
+{
+  "collapse-scroll-down": {
+    "frames": 59,
+    "chrome_px": 89676,
+    "content_px": 1177440,
+    "max_chrome_share": 0.114,
+    "max_content_share": 0.062,
+    "issues": [
+      "chrome jump frame 7: 11% of chrome change"
+    ],
+    "verdict": "pop"
+  },
+  "collapse-train": {
+    "frames": 62,
+    "chrome_px": 97147,
+    "content_px": 1338861,
+    "max_chrome_share": 0.082,
+    "max_content_share": 0.044,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "expand-scroll-up": {
+    "frames": 47,
+    "chrome_px": 32862,
+    "content_px": 264050,
+    "max_chrome_share": 0.132,
+    "max_content_share": 0.171,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "expand-tap": {
+    "frames": 44,
+    "chrome_px": 17092,
+    "content_px": 0,
+    "max_chrome_share": 0.113,
+    "max_content_share": 0,
+    "issues": [
+      "chrome jump frame 3: 11% of chrome change"
+    ],
+    "verdict": "pop"
+  }
+}

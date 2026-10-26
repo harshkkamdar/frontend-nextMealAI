@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { FoodFill, GeoFill, HomeFill, PlusIcon, TrainFill } from '@/components/ui/fiqr/icons'
 import { cn } from '@/lib/utils'
 import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
+import { initialMinimise, minimiseStep } from '@/lib/tab-bar-minimise'
 import { useUIStore } from '@/stores/ui.store'
 
 export const LOG_SHEET = 'log-sheet'
@@ -27,22 +28,41 @@ export function hidesTabBar(pathname: string): boolean {
   return ['/chat/session', '/train/session', '/logs/new/', '/plans/new', '/plans/edit', '/paywall'].some((prefix) => pathname.startsWith(prefix))
 }
 
-/** Shrinks while the page scrolls down, returns on any scroll up or near the top (Q4). */
-function useMinimised(): boolean {
+/**
+ * iOS 26 tab bar minimise (motion-feel 3j): collapses on scroll down, expands on scroll up, near the top, on tap,
+ * and on every route change. Passive listener, at most one state step per frame.
+ */
+function useMinimised(): [boolean, () => void] {
+  const pathname = usePathname()
+  // The anchor moves every frame while scrolling; only the boolean is state, so the bar re-renders (and framer re-measures) only on a flip.
+  const step = useRef(initialMinimise)
   const [minimised, setMinimised] = useState(false)
+  const [path, setPath] = useState(pathname)
+  if (path !== pathname) {
+    setPath(pathname)
+    setMinimised(false)
+  }
   useEffect(() => {
-    let last = window.scrollY
-    const onScroll = () => {
-      const y = window.scrollY
-      if (y < 40) setMinimised(false)
-      else if (y > last + 6) setMinimised(true)
-      else if (y < last - 6) setMinimised(false)
-      last = y
+    step.current = initialMinimise
+  }, [pathname])
+  useEffect(() => {
+    let frame = 0
+    const read = () => {
+      frame = 0
+      // Clamp to the real scroll range so iOS's bottom rubber band (scrollY past the end, then back) never reads as a scroll up.
+      const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      step.current = minimiseStep(step.current, { type: 'scroll', y: Math.min(window.scrollY, max) })
+      setMinimised(step.current.minimised)
     }
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(read) }
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(frame) }
   }, [])
-  return minimised
+  const expand = useCallback(() => {
+    step.current = minimiseStep(step.current, { type: 'tap', y: window.scrollY })
+    setMinimised(false)
+  }, [])
+  return [minimised, expand]
 }
 
 /**
@@ -52,11 +72,43 @@ function useMinimised(): boolean {
 export function TabBar() {
   const pathname = usePathname()
   const reduce = useReducedMotion()
-  const minimised = useMinimised()
+  const [minimised, expand] = useMinimised()
+  const navRef = useRef<HTMLElement>(null)
   const logOpen = useUIStore((state) => state.activeSheet === LOG_SHEET)
 
   // Full-screen routes slide the bar away instead of unmounting it, so entering and leaving them never pops.
   const hidden = hidesTabBar(pathname)
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
+  const activeTab = TABS.find((tab) => isActive(tab.href))
+  // Like iOS, the bar minimises into the open tab, so a screen outside the four tabs keeps the full bar.
+  const collapsed = minimised && activeTab !== undefined
+  // Collapse: items leave fast while the glass shrinks. Expand: items arrive just behind the growing glass.
+  const fade = collapsed ? { duration: 0.12 } : { duration: 0.18, delay: 0.12 }
+  // The morph is scroll-driven, not a flick release, so it settles critically damped (glide) rather than with the lens overshoot.
+  const itemTransition = reduce ? reducedFade : { ...spring.glide, opacity: fade }
+  // Transform string, not the scale shorthand, so the scale runs on the compositor while the page scrolls.
+  const item = { opacity: collapsed ? 0 : 1, transform: collapsed && !reduce ? 'scale(0.8)' : 'scale(1)' }
+  // Collapsed, the bar is one button that shows the open tab and expands the bar rather than navigating (iOS 26).
+  const restore = collapsed && activeTab ? (
+    <motion.button
+      key="show-tabs"
+      type="button"
+      aria-label={`Show tabs, ${activeTab.label}`}
+      onClick={(event) => {
+        void haptic('light')
+        expand()
+        // Keyboard or screen reader activation (detail 0): the button is about to unmount, so hand focus to the open tab.
+        if (event.detail === 0) requestAnimationFrame(() => navRef.current?.querySelector<HTMLElement>('a[aria-current="page"]')?.focus())
+      }}
+      initial={reduce ? { opacity: 0 } : false}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={reducedFade}
+      className={cn('absolute left-0 top-0 grid size-16 place-items-center rounded-full text-ink transition-transform active:scale-[.94]', !logOpen && 'pointer-events-auto')}
+    >
+      <motion.span layoutId={reduce ? undefined : 'tab-icon'} transition={spring.glide}><activeTab.icon className="size-[24px]" /></motion.span>
+    </motion.button>
+  ) : null
 
   const toggleLog = () => {
     void haptic('light')
@@ -76,39 +128,59 @@ export function TabBar() {
       style={{ bottom: 'calc(12px + var(--safe-bottom))' }}
     >
       <nav
+        ref={navRef}
         aria-label="Main"
         className={cn(
-          'glass pointer-events-auto flex h-16 flex-1 origin-bottom-left items-stretch rounded-full p-1.5 transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]',
-          minimised && !reduce && 'translate-y-1 scale-[.9]',
-          logOpen && 'pointer-events-none scale-[.96] opacity-0',
+          'pointer-events-none relative h-16 flex-1 origin-bottom-left transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]',
+          logOpen && 'scale-[.96] opacity-0',
         )}
         aria-hidden={logOpen || undefined}
       >
-        {TABS.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + '/')
-          return (
-            <Link
-              key={href}
-              href={href}
-              aria-current={active ? 'page' : undefined}
-              onClick={() => { if (!active) void haptic('light') }}
-              className={cn(
-                'relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full transition-transform active:scale-[.94]',
-                active ? 'text-ink' : 'text-ink-65',
-              )}
-            >
-              {active ? (
-                <motion.span
-                  layoutId="tab-pill"
-                  transition={reduce ? reducedFade : spring.lens}
-                  className="absolute inset-0 rounded-full bg-ink-06"
-                />
-              ) : null}
-              <Icon className="relative size-[22px]" />
-              <span className={cn('relative text-[11px] leading-none', active ? 'font-semibold' : 'font-medium')}>{label}</span>
-            </Link>
-          )
-        })}
+        {/* The glass surface: one element that shrinks from the capsule into the circle (framer layout projection, transforms only). Reduced motion crossfades two still surfaces instead. */}
+        {reduce ? (
+          <>
+            <motion.span aria-hidden="true" animate={{ opacity: collapsed ? 0 : 1 }} transition={reducedFade} className="glass absolute inset-0 rounded-full" />
+            <motion.span aria-hidden="true" initial={false} animate={{ opacity: collapsed ? 1 : 0 }} transition={reducedFade} className="glass absolute inset-y-0 left-0 w-16 rounded-full" />
+          </>
+        ) : (
+          <motion.span aria-hidden="true" layout transition={spring.glide} style={{ borderRadius: 32 }} className={cn('glass absolute inset-y-0 left-0', collapsed ? 'w-16' : 'w-full')} />
+        )}
+        <div inert={collapsed || undefined} className={cn('relative flex h-full items-stretch p-1.5', !collapsed && !logOpen && 'pointer-events-auto')}>
+          {TABS.map(({ label, href, icon: Icon }) => {
+            const active = isActive(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? 'page' : undefined}
+                onClick={() => { if (!active) void haptic('light') }}
+                className={cn(
+                  'relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full transition-transform active:scale-[.94]',
+                  active ? 'text-ink' : 'text-ink-65',
+                )}
+              >
+                {active ? (
+                  <motion.span
+                    layoutId="tab-pill"
+                    animate={{ opacity: collapsed ? 0 : 1 }}
+                    transition={reduce ? reducedFade : { ...spring.lens, opacity: fade }}
+                    className="absolute inset-0 rounded-full bg-ink-06"
+                  />
+                ) : null}
+                {active && !reduce ? (
+                  // The open tab's icon travels into the collapsed circle (shared layoutId with the circle's icon).
+                  collapsed ? <span className="size-[22px]" /> : <motion.span layoutId="tab-icon" transition={spring.glide} className="relative"><Icon className="size-[22px]" /></motion.span>
+                ) : (
+                  <motion.span initial={false} animate={active ? { opacity: collapsed ? 0 : 1 } : item} transition={itemTransition} className="relative will-change-transform"><Icon className="size-[22px]" /></motion.span>
+                )}
+                {/* will-change keeps the labels on their own layer, so they do not re-rasterise (a 1 px text shift) when the scale hands back from the compositor. */}
+                <motion.span initial={false} animate={item} transition={itemTransition} className={cn('relative text-[11px] leading-none will-change-transform', active ? 'font-semibold' : 'font-medium')}>{label}</motion.span>
+              </Link>
+            )
+          })}
+        </div>
+        {/* Reduced motion fades the circle out; otherwise it hands its icon straight back to the open tab (layoutId), so it must leave at once. */}
+        {reduce ? <AnimatePresence initial={false}>{restore}</AnimatePresence> : restore}
       </nav>
       <button
         type="button"
