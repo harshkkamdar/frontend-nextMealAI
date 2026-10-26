@@ -63,8 +63,8 @@ export function WheelPicker<T extends string | number>({ label, items, value, on
       style={{
         height: WHEEL_ROW * VISIBLE,
         paddingBlock: WHEEL_ROW * 2,
-        maskImage: 'linear-gradient(transparent, #000 30%, #000 70%, transparent)',
-        WebkitMaskImage: 'linear-gradient(transparent, #000 30%, #000 70%, transparent)',
+        maskImage: 'linear-gradient(transparent, #111C35 30%, #111C35 70%, transparent)',
+        WebkitMaskImage: 'linear-gradient(transparent, #111C35 30%, #111C35 70%, transparent)',
       }}
     >
       {items.map((item, i) => (

@@ -137,7 +137,7 @@ export function RulerInput({ label, value, onChange, min, max, start, units }: R
           onScroll={onScroll}
           aria-hidden="true"
           className="scrollbar-hide h-full overflow-x-auto overscroll-x-contain"
-          style={{ maskImage: 'linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent)', WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent)' }}
+          style={{ maskImage: 'linear-gradient(90deg, transparent, #111C35 22%, #111C35 78%, transparent)', WebkitMaskImage: 'linear-gradient(90deg, transparent, #111C35 22%, #111C35 78%, transparent)' }}
         >
           <div className="relative h-full" style={{ width: half * 2 + ticks * GAP }}>
             <div
