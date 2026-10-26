@@ -2,7 +2,7 @@
  * FB-R6-S2-v2 · AdminMetricsCards
  *
  * 4 KPI tiles fed directly from response.summary. Visual contract matches
- * the dashboard cards (bg-surface border border-border rounded-2xl, uppercase
+ * the dashboard cards (v2: bg-card rounded-[24px] with the card shadow, uppercase
  * section labels, tabular-nums KPI numbers).
  */
 
@@ -30,16 +30,16 @@ describe('AdminMetricsCards — FB-R6-S2-v2 AC01', () => {
     expect(screen.getByText(/new signups/i)).toBeInTheDocument()
   })
 
-  it('uses dashboard card chrome — bg-surface, border-border, rounded-2xl, p-4 (AC17 visual contract)', () => {
+  it('uses the v2 card chrome: bg-card, card shadow, rounded-[24px], p-4 (AC17 visual contract)', () => {
     const { container } = render(<AdminMetricsCards summary={ADMIN_METRICS_STUB.summary} />)
     // Each tile is a Card with the shared dashboard chrome
     const tiles = container.querySelectorAll('[data-testid="admin-kpi-tile"]')
     expect(tiles.length).toBe(4)
     tiles.forEach((tile) => {
       const el = tile as HTMLElement
-      expect(el.className).toContain('bg-surface')
-      expect(el.className).toContain('border-border')
-      expect(el.className).toContain('rounded-2xl')
+      expect(el.className).toContain('bg-card')
+      expect(el.className).toContain('shadow-[var(--shadow-card)]')
+      expect(el.className).toContain('rounded-[24px]')
     })
   })
 
