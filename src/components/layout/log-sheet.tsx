@@ -38,18 +38,17 @@ const METHODS: Method[] = [
 
 /**
  * The orb's sheet (Q9, D4): tell Geo in words, or pick one of the existing log methods.
- * The panel morphs out of the orb on the lens spring while solid; the glass blur fades in only after it settles,
- * so blur never animates. Drag down past a quarter of its height, or flick, to close.
+ * The panel morphs out of the orb on the lens spring and stays solid (a glass layer let Home's numbers show through
+ * between the tiles). Drag down past a quarter of its height, or flick, to close.
  */
 export function LogSheet() {
   const router = useRouter()
   const reduce = useReducedMotion()
   const open = useUIStore((state) => state.activeSheet === LOG_SHEET)
   const [text, setText] = useState('')
-  const [settled, setSettled] = useState(false)
   const panel = useRef<HTMLDivElement>(null)
 
-  const close = () => { setSettled(false); useUIStore.getState().closeSheet() }
+  const close = () => useUIStore.getState().closeSheet()
   const go = (href: string) => {
     close()
     router.push(href)
@@ -104,7 +103,6 @@ export function LogSheet() {
             tabIndex={-1}
             layoutId={reduce ? undefined : ORB_SURFACE}
             transition={spring.lens}
-            onLayoutAnimationComplete={() => setSettled(true)}
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0.08, bottom: 0.6 }}
@@ -112,8 +110,6 @@ export function LogSheet() {
             style={{ borderRadius: 38 }}
             className="fixed inset-x-2 z-[70] mx-auto max-w-[calc(28rem-16px)] overflow-hidden bg-[rgba(253,246,236,.98)] shadow-[var(--shadow-glass)] outline-none bottom-[var(--nav-clearance)]"
           >
-            {/* Glass arrives once the surface has settled (never an animated blur; absent when glass is off). */}
-            <span aria-hidden="true" className={`glass-cream pointer-events-none absolute inset-0 shadow-none transition-opacity duration-150 ${settled ? 'opacity-100' : 'opacity-0'}`} />
             <div className="relative px-5 pb-[88px] pt-3">
               <span aria-hidden="true" className="mx-auto mb-3 block h-[5px] w-9 rounded-full bg-ink-20" />
               <motion.div {...item(0.08)} className="origin-top">

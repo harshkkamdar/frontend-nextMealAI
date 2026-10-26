@@ -160,7 +160,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4">
+    <div className="relative mx-auto w-full max-w-md px-4">
       <LargeTitleHeader
         title="Today"
         subtitle={formatDashboardDate(today)}
@@ -178,7 +178,10 @@ export default function DashboardPage() {
 
       {!data && loading ? (
         <HomeSkeleton />
-      ) : !data ? (
+      ) : null}
+      {/* The skeleton fades out over the arriving cards instead of leaving a bare frame (motion-feel N6). */}
+      {data && enter ? <div aria-hidden="true" className="skeleton-out pointer-events-none absolute inset-x-4 top-[calc(108px+var(--safe-top))]"><HomeSkeleton /></div> : null}
+      {!data && loading ? null : !data ? (
         <div className="mt-6"><ErrorState onRetry={refresh}>I couldn&apos;t load today. Check your connection and try again.</ErrorState></div>
       ) : (
         <HomeEntrance.Provider value={enter}>

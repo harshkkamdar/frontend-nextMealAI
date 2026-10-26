@@ -103,11 +103,12 @@ export function mealRows(logs: Log[], today: string): MealRow[] {
   const rows = new Map<MealRow['meal'], MealRow>()
   for (const log of logs) {
     if (log.type !== 'food' || logDate(log) !== today) continue
+    // Food logs carry calories in est_macros; a bare `calories` is only a legacy fallback.
     const payload = log.payload as FoodPayload & { calories?: number }
     const raw = (payload.meal_type ?? 'Snack').toLowerCase()
     const meal = MEAL_ORDER.find((name) => raw.startsWith(name.toLowerCase())) ?? 'Snack'
     const row = rows.get(meal) ?? { meal, kcal: 0, items: [] }
-    row.kcal += Math.round(Number(payload.calories) || 0)
+    row.kcal += Math.round(Number(payload.est_macros?.calories ?? payload.calories) || 0)
     if (payload.food_name) row.items.push(payload.food_name)
     rows.set(meal, row)
   }

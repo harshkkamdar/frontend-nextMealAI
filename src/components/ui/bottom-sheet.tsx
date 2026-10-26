@@ -47,7 +47,7 @@ export function BottomSheet({
       modal
     >
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-[60] bg-ink/30" />
+        <Drawer.Overlay className="fixed inset-0 z-[60] bg-ink/30 data-[state=open]:animate-[fiqr-fade-in_280ms_ease-out]" />
         <Drawer.Content
           aria-label={ariaLabel}
           className={`glass-cream fixed inset-x-2 z-[70] mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[38px] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}

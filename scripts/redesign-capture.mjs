@@ -32,9 +32,9 @@ const DAY_MS = 86400000
 const isoDay = (offset) => new Date(Date.now() - offset * DAY_MS).toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' })
 const lg = (type, offset, payload, hour = 8) => ({ id: `${type}-${offset}-${hour}`, user_id: 'capture-user', type, payload, source: 'manual', local_date: isoDay(offset), created_at: `${isoDay(offset)}T0${hour % 10}:00:00.000Z`, updated_at: `${isoDay(offset)}T0${hour % 10}:00:00.000Z` })
 const RETURNING_LOGS = [
-  lg('food', 0, { food_name: 'Greek yoghurt and berries', meal_type: 'breakfast', calories: 310, protein_g: 24 }, 1),
-  lg('food', 0, { food_name: 'Oat flat white', meal_type: 'breakfast', calories: 140 }, 2),
-  lg('food', 0, { food_name: 'Chicken burrito bowl', meal_type: 'lunch', calories: 640 }, 3),
+  lg('food', 0, { food_name: 'Greek yoghurt and berries', meal_type: 'breakfast', calories: 310, est_macros: { calories: 310, protein: 24 } }, 1),
+  lg('food', 0, { food_name: 'Oat flat white', meal_type: 'breakfast', calories: 140, est_macros: { calories: 140 } }, 2),
+  lg('food', 0, { food_name: 'Chicken burrito bowl', meal_type: 'lunch', calories: 640, est_macros: { calories: 640 } }, 3),
   lg('water', 0, { glasses: 3 }, 4), lg('water', 0, { glasses: 2 }, 5),
   lg('steps', 0, { steps: 8214 }, 6),
   lg('sleep', 0, { hours: 7.2, quality_rating: 7 }, 7),
@@ -89,7 +89,7 @@ const SHOTS = {
     { name: 'home-scrolled', url: '/dashboard', api: homeApi(), act: async (p) => { await p.mouse.wheel(0, 900); await p.waitForTimeout(700) } },
     { name: 'home-first-run', url: '/dashboard', api: FIRST_RUN_API },
     { name: 'home-checkin-due', url: '/dashboard', api: homeApi({ '/v1/check-in/status': HOME.status('due') }) },
-    { name: 'home-long', url: '/dashboard', api: homeApi({ '/v1/logs': { logs: [...RETURNING_LOGS, lg('food', 0, { food_name: LONG_NAME, meal_type: 'dinner', calories: 1420 }, 8)] }, '/v1/logs/summary': { ...HOME.summary, daily_breakdown: [{ date: isoDay(0), calories: 2510, protein: 171, carbs: 260, fat: 98 }] }, '/v1/dashboard/check-in': { check_in: { days: [], takeaway: 'You went 560 kcal over today, mostly from dinner. Keep tomorrow steady and lean on protein at breakfast so the week still lands on target.', generated_at: new Date().toISOString(), v: 2 } } }) },
+    { name: 'home-long', url: '/dashboard', api: homeApi({ '/v1/logs': { logs: [...RETURNING_LOGS, lg('food', 0, { food_name: LONG_NAME, meal_type: 'dinner', calories: 1420, est_macros: { calories: 1420 } }, 8)] }, '/v1/logs/summary': { ...HOME.summary, daily_breakdown: [{ date: isoDay(0), calories: 2510, protein: 171, carbs: 260, fat: 98 }] }, '/v1/dashboard/check-in': { check_in: { days: [], takeaway: 'You went 560 kcal over today, mostly from dinner. Keep tomorrow steady and lean on protein at breakfast so the week still lands on target.', generated_at: new Date().toISOString(), v: 2 } } }) },
     { name: 'home-loading', url: '/dashboard', api: homeApi(), hang: ['/v1/logs', '/v1/plans', '/v1/dashboard', '/v1/check-in'] },
     { name: 'home-error', url: '/dashboard', api: homeApi(), fail: ['/v1/logs/summary', '/v1/plans'], failAfterFirst: ['/v1/profile'] },
     { name: 'home-offline', url: '/dashboard', api: homeApi(), offline: true },

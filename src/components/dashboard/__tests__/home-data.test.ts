@@ -52,8 +52,8 @@ describe('home-data', () => {
 
   it('groups today’s food by meal in day order', () => {
     const rows = mealRows([
-      log('food', TODAY, { food_name: 'Chicken wrap', meal_type: 'lunch', calories: 540.4 }),
-      log('food', TODAY, { food_name: 'Oats', meal_type: 'Breakfast', calories: 310 }),
+      log('food', TODAY, { food_name: 'Chicken wrap', meal_type: 'lunch', est_macros: { calories: 540.4, protein: 38 } }),
+      log('food', TODAY, { food_name: 'Oats', meal_type: 'Breakfast', est_macros: { calories: 310 } }),
       log('food', TODAY, { food_name: 'Banana', meal_type: 'breakfast', calories: 105 }),
       log('food', '2026-10-25', { food_name: 'Pizza', meal_type: 'dinner', calories: 900 }),
     ], TODAY)
