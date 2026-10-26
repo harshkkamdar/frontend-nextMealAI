@@ -1,5 +1,6 @@
 import { todayLocalISO } from '@/lib/timezone'
-import type { WorkoutExercise } from '@/types/plans.types'
+import { addDays } from '@/components/ui/fiqr/week-strip'
+import type { WorkoutExercise, WorkoutPlanDay } from '@/types/plans.types'
 import type { SessionExercise, WorkoutSession } from '@/types/workout-session.types'
 
 /** "3 × 10 · 90s rest" for a plan exercise; empty when it has neither sets nor reps. */
@@ -21,6 +22,20 @@ export function completedSessions(history: WorkoutSession[]): WorkoutSession[] {
   return history
     .filter((session) => session.status === 'completed' && session.completed_at)
     .sort((a, b) => new Date(b.completed_at!).getTime() - new Date(a.completed_at!).getTime())
+}
+
+/**
+ * Future dates with a training day on them, walking the cycle one plan day per calendar day from the next workout.
+ * The next workout lands today unless today is already done, then tomorrow. Rest days get no date.
+ */
+export function plannedDates(days: WorkoutPlanDay[], nextIdx: number, today: string, doneToday: boolean, ahead = 13): Set<string> {
+  const out = new Set<string>()
+  if (!days.length || nextIdx < 0) return out
+  for (let k = 1; k <= ahead; k += 1) {
+    const day = days[(nextIdx + k - (doneToday ? 1 : 0)) % days.length]
+    if (!day.is_rest_day) out.add(addDays(today, k))
+  }
+  return out
 }
 
 /** Kilograms lifted per day, Monday to Sunday, from completed sessions in the given week. */

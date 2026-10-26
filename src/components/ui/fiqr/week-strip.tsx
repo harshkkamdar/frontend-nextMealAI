@@ -29,6 +29,8 @@ interface WeekStripProps {
   marked?: ReadonlySet<string>
   /** Read out after a marked day, e.g. "food logged". */
   markLabel?: string
+  /** Optional: future days with something scheduled get a muted dot. Unset, the strip looks as before. */
+  planned?: ReadonlySet<string>
   weekStartsOn?: 0 | 1
   className?: string
 }
@@ -38,7 +40,7 @@ interface WeekStripProps {
  * The selected day sits in a lifted white capsule that glides between days. Swipe the days to change week;
  * the month sheet is the non-drag way to reach other weeks.
  */
-export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logged', weekStartsOn = 0, className }: WeekStripProps) {
+export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logged', planned, weekStartsOn = 0, className }: WeekStripProps) {
   const reduce = useReducedMotion()
   const capsule = useId()
   const days = weekDays(selected, weekStartsOn)
@@ -95,7 +97,8 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
               const isSelected = iso === selected
               const isMarked = marked?.has(iso) ?? false
               const future = iso > today
-              const label = `${date.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long' })}${iso === today ? ', today' : ''}${isMarked ? `, ${markLabel}` : ''}`
+              const isPlanned = !isMarked && future && (planned?.has(iso) ?? false)
+              const label = `${date.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long' })}${iso === today ? ', today' : ''}${isMarked ? `, ${markLabel}` : ''}${isPlanned ? ', planned' : ''}`
               return (
                 <button
                   key={iso}
@@ -119,8 +122,8 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
                   <span className={cn('relative text-[17px] leading-none tabular-nums', future ? 'text-ink-65' : 'text-ink', iso === today ? 'font-bold' : 'font-semibold')}>
                     {date.getDate()}
                   </span>
-                  {/* Logged days get one small ink dot; nothing else marks a day. */}
-                  <span className={cn('relative mt-1 size-[5px] rounded-full', isMarked ? 'bg-ink' : 'bg-transparent')} aria-hidden="true" />
+                  {/* Logged days get one small ink dot; planned future days (when passed) a muted one. */}
+                  <span className={cn('relative mt-1 size-[5px] rounded-full', isMarked ? 'bg-ink' : isPlanned ? 'bg-ink-35' : 'bg-transparent')} aria-hidden="true" />
                 </button>
               )
             })}

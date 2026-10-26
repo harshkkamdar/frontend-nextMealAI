@@ -9,7 +9,6 @@ import { reducedFade, spring } from '@/lib/motion'
 import { cn, plural } from '@/lib/utils'
 import type { WorkoutPlanDay } from '@/types/plans.types'
 import type { WorkoutSession } from '@/types/workout-session.types'
-import { MuscleMap, musclesFor } from './muscle-map'
 import { formatExDetail, formatHistoryDate } from './train-data'
 
 export const CARD = 'rounded-[24px] bg-card shadow-[var(--shadow-card)]'
@@ -36,31 +35,20 @@ export function Enter({ first, layer, index = 0, className, children }: { first:
 
 export function SectionTitle({ children, trailing }: { children: ReactNode; trailing?: ReactNode }) {
   return (
-    <div className="mb-2 flex items-baseline justify-between gap-3 px-1">
+    <div className="mb-2 flex items-baseline justify-between gap-3 px-5">
       <h2 className="text-[13px] font-semibold text-ink-65">{children}</h2>
-      {trailing ? <span className="min-w-0 truncate text-[13px] font-medium text-ink-65">{trailing}</span> : null}
+      {trailing ? <span className="min-w-0 truncate text-[13px] text-ink-65">{trailing}</span> : null}
     </div>
   )
 }
 
-/** The muscles a plan day works, from its exercise names (plan exercises carry no muscle group). */
-export function dayMuscles(day: WorkoutPlanDay | null) {
-  return [...new Set((day?.exercises ?? []).flatMap((exercise) => musclesFor(null, exercise.name)))]
-}
-
-export function NextUpCard({ eyebrow, title, meta, day, action }: { eyebrow: string; title: string; meta: string; day: WorkoutPlanDay | null; action: ReactNode }) {
-  const parts = dayMuscles(day)
+export function NextUpCard({ eyebrow, title, meta, action }: { eyebrow: string; title: string; meta: string; action: ReactNode }) {
+  // No muscle figure here: the card has one job (Start); the diagram lives on each exercise in the session (C7).
   return (
     <section className={cn(CARD, 'p-5')} aria-label="Next session" data-testid="activity-next-up-card">
       <p className="text-[13px] font-semibold text-ink-65">{eyebrow}</p>
-      <div className="flex items-end gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="font-wide mt-1 line-clamp-2 break-words text-[26px] font-bold leading-[1.12] tracking-[-0.4px] text-ink">{title}</h2>
-          <p className="mt-1.5 text-[14px] text-ink-65">{meta}</p>
-        </div>
-        {/* One level: the figure sits on the meta line's baseline, a step quieter than Start. */}
-        {parts.length ? <MuscleMap parts={parts} tone="ink" className="h-[72px] shrink-0 opacity-60" /> : null}
-      </div>
+      <h2 className="font-wide mt-1 line-clamp-2 break-words text-[26px] font-bold leading-[1.12] tracking-[-0.4px] text-ink">{title}</h2>
+      <p className="mt-1.5 text-[14px] text-ink-65">{meta}</p>
       <div className="mt-4">{action}</div>
     </section>
   )
@@ -101,7 +89,7 @@ export function VolumeCard({ perDay, labels, todayIndex, sessions, planned, firs
                     animate={{ scaleY: Math.max(0.06, fraction) }}
                     transition={reduce ? reducedFade : { ...spring.glide, delay: 0.16 + index * 0.04 }}
                   />
-                ) : null}
+                ) : index === todayIndex ? <span className="block h-1 w-full max-w-[22px] rounded-t-[3px] bg-ink-20" /> : null}
               </span>
               <span className={cn('text-[12px] text-ink-65', index === todayIndex ? 'font-bold text-ink' : 'font-medium')}>{labels[index]}</span>
             </span>

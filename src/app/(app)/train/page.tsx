@@ -13,7 +13,7 @@ import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { Enter, HistoryCard, NextUpCard, ProgramCard, SectionTitle, TrainSkeleton, VolumeCard } from '@/components/workout/train-cards'
-import { completedSessions, weekVolume } from '@/components/workout/train-data'
+import { completedSessions, plannedDates, weekVolume } from '@/components/workout/train-data'
 import { WeekStrip, weekDays } from '@/components/ui/fiqr/week-strip'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
@@ -104,6 +104,8 @@ export default function ActivityPage() {
     return set
   }, [history, tz])
 
+  const planned = useMemo(() => plannedDates(workoutPlan?.content?.days ?? [], nextIdx, today, doneDates.has(today)), [workoutPlan, nextIdx, today, doneDates])
+
   const selectedDateHistory = useMemo(() => history.filter((session) => (
     Boolean(session.completed_at) && todayLocalISO(tz, new Date(session.completed_at!)) === selectedDate
   )), [history, selectedDate, tz])
@@ -145,17 +147,15 @@ export default function ActivityPage() {
       eyebrow="Next up"
       title="No program yet"
       meta="Geo can build one around your goals and kit."
-      day={null}
-      action={<PrimaryButton type="button" className="h-[52px] py-0" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a program</PrimaryButton>}
+      action={<PrimaryButton type="button" className="h-12 rounded-[14px] py-0" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a program</PrimaryButton>}
     />
   ) : isRestDay ? (
     <NextUpCard
       eyebrow="Today"
       title="Rest day"
       meta={afterRest ? `Recover today. ${afterRest.name || 'Your next session'} is up next.` : 'Recover today.'}
-      day={null}
       action={(
-        <button type="button" onClick={() => programRef.current?.scrollIntoView({ behavior: 'smooth' })} className="flex h-[52px] w-full items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-[15px] font-semibold text-ink transition-transform active:scale-[.97]">
+        <button type="button" onClick={() => programRef.current?.scrollIntoView({ behavior: 'smooth' })} className="flex h-12 w-full items-center justify-center gap-1 rounded-[14px] bg-ink-06 text-[15px] font-semibold text-ink transition-transform active:scale-[.97]">
           See program <ChevronRightIcon className="size-4" />
         </button>
       )}
@@ -165,9 +165,8 @@ export default function ActivityPage() {
       eyebrow={isResume ? 'In progress' : 'Next up'}
       title={nextWorkout?.name || `Day ${nextIdx + 1}`}
       meta={`${plural(exerciseCount, 'exercise')} · about ${Math.max(15, Math.round((exerciseCount * 7.5) / 5) * 5)} min`}
-      day={nextWorkout}
       action={(
-        <PrimaryButton type="button" disabled={starting} data-testid="activity-start-workout-button" className="h-[52px] py-0" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
+        <PrimaryButton type="button" disabled={starting} data-testid="activity-start-workout-button" className="h-12 rounded-[14px] py-0" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
           {starting ? 'Starting…' : isResume ? 'Resume workout' : 'Start workout'}
         </PrimaryButton>
       )}
@@ -183,7 +182,7 @@ export default function ActivityPage() {
           <RoundButton aria-label="Open workout calendar" onClick={() => setCalendarOpen(true)}><CalendarDays strokeWidth={1.75} /></RoundButton>
         )}
       >
-        <WeekStrip className="mt-4" selected={selectedDate} today={today} onSelect={selectDay} marked={doneDates} markLabel="workout done" weekStartsOn={1} />
+        <WeekStrip className="mt-4" selected={selectedDate} today={today} onSelect={selectDay} marked={doneDates} markLabel="workout done" planned={planned} weekStartsOn={1} />
       </LargeTitleHeader>
 
       <div className="-mx-4 mt-3"><OfflineBand /></div>
@@ -205,7 +204,7 @@ export default function ActivityPage() {
             <section ref={programRef} className="mt-3 scroll-mt-24">
               <SectionTitle trailing={days.length ? `Day ${nextIdx + 1} of the cycle` : undefined}>Program</SectionTitle>
               <ProgramCard days={days} nextIdx={nextIdx} first={first} />
-              <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-1 flex min-h-11 items-center gap-1 px-1 text-[14px] font-semibold text-ink-65">
+              <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-1 flex min-h-11 items-center gap-1 px-5 text-[14px] font-semibold text-ink-65">
                 View full plan <ChevronRightIcon className="size-4" />
               </button>
             </section>
@@ -220,7 +219,7 @@ export default function ActivityPage() {
 
       <BottomSheet open={calendarOpen} onClose={() => setCalendarOpen(false)} ariaLabel="Workout history calendar">
         <div className="px-4 pb-6 pt-3">
-          <WeekStrip selected={selectedDate} today={today} onSelect={setSelectedDate} marked={doneDates} markLabel="workout done" weekStartsOn={1} />
+          <WeekStrip selected={selectedDate} today={today} onSelect={setSelectedDate} marked={doneDates} markLabel="workout done" planned={planned} weekStartsOn={1} />
           <div className="mt-4 overflow-hidden rounded-[22px] bg-card shadow-[var(--shadow-card)]">
             {selectedDateHistory.length === 0 ? <p className="px-5 py-5 text-[14px] text-ink-65">No workout on this day</p> : selectedDateHistory.map((session) => (
               <button key={session.id} type="button" onClick={() => router.push(`/train/session?id=${session.id}`)} className="flex min-h-16 w-full items-center gap-3 border-b border-ink-06 px-5 py-3 text-left last:border-b-0 active:bg-ink-04">

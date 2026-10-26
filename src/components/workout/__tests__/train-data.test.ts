@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { clockHMS, completedSessions, formatExDetail, sessionVolumeKg, weekVolume } from '../train-data'
+import { clockHMS, completedSessions, formatExDetail, plannedDates, sessionVolumeKg, weekVolume } from '../train-data'
+import type { WorkoutPlanDay } from '@/types/plans.types'
 import { weekDays } from '@/components/ui/fiqr/week-strip'
 import { leadIndex } from '../digit-tiles'
 import { muscleCaption, musclesFor } from '../muscle-map'
@@ -9,6 +10,15 @@ const set = (completed: boolean, kg: number | null, reps: number | null) => ({ s
 const session = (id: string, completedAt: string | null, kg: number, status: WorkoutSession['status'] = 'completed') => ({ id, completed_at: completedAt, total_volume_kg: kg, status } as WorkoutSession)
 
 describe('train data helpers', () => {
+  it('plannedDates walks the cycle from the next workout and skips rest days', () => {
+    const cycle = [{ name: 'A' }, { name: 'B' }, { name: 'Rest', is_rest_day: true }, { name: 'C' }] as WorkoutPlanDay[]
+    // Next is C (index 3) today: tomorrow A, then B, then rest.
+    expect([...plannedDates(cycle, 3, '2026-10-29', false, 4)]).toEqual(['2026-10-30', '2026-10-31', '2026-11-02'])
+    // Today already done: C moves to tomorrow.
+    expect([...plannedDates(cycle, 3, '2026-10-29', true, 2)]).toEqual(['2026-10-30', '2026-10-31'])
+    expect(plannedDates([], 0, '2026-10-29', false).size).toBe(0)
+  })
+
   it('weekVolume buckets completed sessions by local day and ignores other weeks', () => {
     const days = weekDays('2026-10-28', 1)
     // 19:00 UTC on Monday is Tuesday in Sydney.
