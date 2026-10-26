@@ -17,5 +17,6 @@ export function flickTarget(p: number, start: number, vx: number, w: number, las
 }
 
 /** Opacity of a layer at slide distance d: gone once a slide has moved `gone` of the way out (d > 0), visible again once
- *  the next one is within `arrive` (d < 0). With gone + arrive = 1 two slides never show the same layer at once. */
-export const handoff = (d: number, gone: number, arrive: number) => Math.max(0, 1 - Math.abs(d) / (d > 0 ? gone : arrive))
+ *  the next one is within `arrive` (d < 0). With gone + arrive = 1 two slides never show the same layer at once. Quadratic,
+ *  so a layer stays solid until near its hand-off instead of the whole stage dimming to a fog mid-drag. */
+export const handoff = (d: number, gone: number, arrive: number) => Math.max(0, 1 - (Math.abs(d) / (d > 0 ? gone : arrive)) ** 2)
