@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { motion, useReducedMotion } from 'framer-motion'
-import { ChevronDown, MoreHorizontal, Pencil } from 'lucide-react'
+import { ChevronDown, Pencil } from 'lucide-react'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { ChevronRightIcon, PlusIcon } from '@/components/ui/fiqr/icons'
 import { reducedFade, spring } from '@/lib/motion'
@@ -76,15 +76,20 @@ export function MealGroup({ mealType, items, onAddFood, onEditLog, isToday = tru
       transition={{ ...glide, delay: enterDelay ?? 0, layout: glide }}
       aria-label={mealType}
     >
-      <div className="mb-1 flex items-center gap-2 pl-1">
-        <h2 className="min-w-0 flex-1 text-[17px] font-semibold text-ink">{mealType}</h2>
-        {calories > 0 ? (
-          <span className="text-[14px] font-medium text-ink-65 tabular-nums">{formatMacroKcal(calories)} kcal</span>
-        ) : null}
-        <button type="button" onClick={() => setActionsOpen(true)} aria-label={`${mealType} actions`} className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-ink-65 transition-transform active:scale-[.94]">
-          <MoreHorizontal className="size-5" strokeWidth={1.75} aria-hidden="true" />
+      {/* The whole header opens the meal's actions. */}
+      <h2 className="mb-1">
+        <button
+          type="button"
+          onClick={() => setActionsOpen(true)}
+          aria-label={`${mealType} actions${calories > 0 ? `, ${formatMacroKcal(calories)} kcal` : ''}`}
+          aria-haspopup="dialog"
+          className="flex min-h-11 w-full items-center gap-2 pl-1 text-left transition-transform active:scale-[.98]"
+        >
+          <span className="min-w-0 flex-1 text-[17px] font-semibold text-ink">{mealType}</span>
+          {calories > 0 ? <span className="text-[14px] font-medium text-ink-65 tabular-nums">{formatMacroKcal(calories)} kcal</span> : null}
+          <ChevronDown className="size-4 shrink-0 text-ink-35" strokeWidth={2} aria-hidden="true" />
         </button>
-      </div>
+      </h2>
 
       {items.length === 0 ? (
         <button
@@ -197,11 +202,11 @@ function FoodRowCopy({ payload }: { payload: FoodPayload }) {
     <>
       <div className="min-w-0 flex-1">
         <p className="line-clamp-2 break-words text-[15.5px] font-semibold leading-snug text-ink">{payload.food_name}</p>
-        <p aria-hidden="true" className="mt-0.5 truncate text-[13px] text-ink-65">
+        <p aria-hidden="true" className="mt-0.5 truncate text-[13px] text-ink-65 tabular-nums">
           {formatQuantity(payload)} · {formatMacroGrams(macros?.protein ?? 0)} P · {formatMacroGrams(macros?.carbs ?? 0)} C · {formatMacroGrams(macros?.fat ?? 0)} F
         </p>
       </div>
-      <span className="shrink-0 text-[15px] font-semibold text-ink tabular-nums">
+      <span className="min-w-[72px] shrink-0 text-right text-[15px] font-semibold text-ink tabular-nums">
         {formatMacroKcal(macros?.calories ?? 0)}<span className="text-[13px] font-medium text-ink-65"> kcal</span>
       </span>
     </>

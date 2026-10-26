@@ -316,22 +316,22 @@ export default function DiaryPage() {
               calories={{ current: dayTotals.calories, target: targets.calories }}
               macros={{ protein: [dayTotals.protein, targets.protein], carbs: [dayTotals.carbs, targets.carbs], fat: [dayTotals.fat, targets.fat] }}
               animateIn={animateIn}
-              footer={mealPlan ? (
-                <button
-                  type="button"
-                  onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
-                  className="-mb-3 mt-2 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-ink-65 transition-transform active:scale-[.97]"
-                >
-                  Your nutrition plan
-                  <ChevronRightIcon className="size-4" />
-                </button>
-              ) : null}
             />
           </motion.div>
+          {mealPlan ? (
+            <button
+              type="button"
+              onClick={() => router.push(`/plans/view?id=${mealPlan.id}`)}
+              className="mt-1 flex min-h-11 w-full items-center gap-1 px-1 text-left text-[14px] font-semibold text-ink-65 transition-transform active:scale-[.98]"
+            >
+              Your nutrition plan
+              <ChevronRightIcon className="size-4" />
+            </button>
+          ) : null}
 
           {/* Day change: the old day fades out over 120 ms while the new one fades in over 180 ms, stacked in one cell. */}
           <LayoutGroup>
-            <div className="mt-6 grid">
+            <div className="mt-4 grid">
               <AnimatePresence initial={false}>
                 <motion.div
                   key={selectedDate}

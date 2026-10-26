@@ -6,11 +6,12 @@
 |---|---|---|
 | Header title | "OCTOBER 2026" eyebrow + "Monday 26" | "Food" |
 | Header subtitle | - | "Today, Mon 26 Oct" / "Yesterday, Sun 25 Oct" / "Tomorrow, Tue 27 Oct" / "Thu 22 Oct" (year added outside the current year) |
+| Meal actions (screen reader) | "Breakfast actions" (visible "...") | "Breakfast actions, 450 kcal" on the whole header, quiet chevron |
 | Week strip day (screen reader) | "2026-10-26, today" | "Monday 26 October, today, food logged" |
 | Day section label | "THIS DAY" | removed (the hero card is the day total) |
-| Hero caption | "0 / 1950 · 1950 left" (calories bar) | beside the ring: "860 left" over "of 1,950" / "120 over" over "of 1,950"; no target: "No daily target set" under the number |
+| Hero caption | "0 / 1950 · 1950 left" (calories bar) | under the orange progress line: "860 left of 1,950" / "120 over 1,950"; no target: "No daily target set" |
 | Hero macros | "Protein 0 / 140g · 140g left" bars | "Protein 73 / 140 g" with dots (no target: "73 g") |
-| Plan link | "View nutrition plan →" | "Your nutrition plan" (chevron link) |
+| Plan link | "View nutrition plan →" | "Your nutrition plan" (quiet chevron row under the day card) |
 | Meal heading | "BREAKFAST · 450 kcal" | "Breakfast" with "450 kcal" on the right |
 | Empty meal | "Nothing logged" + "+ Add" | "Add breakfast" / "Add lunch" / "Add dinner" / "Add a snack" (dashed slot) |
 | Add to a meal with items | (only in the overflow sheet) | "Add food" row at the end of the card |

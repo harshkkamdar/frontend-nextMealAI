@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, type ReactNode } from 'react'
+import { useEffect } from 'react'
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import { DRAW_MS } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -39,18 +39,18 @@ export function FadeText({ text }: { text: string }) {
   )
 }
 
-function Ring({ fraction, animateIn }: { fraction: number; animateIn: boolean }) {
+/** One thin orange line under the number carries calories (critic round 3: a ring beside the number competed with it). */
+function CalorieLine({ fraction, animateIn }: { fraction: number; animateIn: boolean }) {
   const reduce = useReducedMotion()
   return (
-    <svg viewBox="0 0 64 64" className="size-10 shrink-0 -rotate-90" aria-hidden="true">
-      <circle cx="32" cy="32" r="26" fill="none" stroke="var(--color-ink-06)" strokeWidth="11" />
-      <motion.circle
-        cx="32" cy="32" r="26" fill="none" stroke="var(--color-accent)" strokeWidth="11" strokeLinecap="round"
-        initial={animateIn && !reduce ? { pathLength: 0, opacity: 0 } : false}
-        animate={{ pathLength: fraction, opacity: fraction > 0 ? 1 : 0 }}
-        transition={{ pathLength: { duration: reduce ? 0 : DRAW_MS / 1000, ease: [0.22, 1, 0.36, 1], delay: animateIn ? 0.12 : 0 }, opacity: { duration: 0.15 } }}
+    <span className="mt-3 block h-[6px] overflow-hidden rounded-full bg-ink-06" aria-hidden="true">
+      <motion.span
+        className="block h-full w-full origin-left rounded-full bg-accent"
+        initial={animateIn && !reduce ? { scaleX: 0 } : false}
+        animate={{ scaleX: fraction }}
+        transition={{ duration: reduce ? 0 : DRAW_MS / 1000, ease: [0.22, 1, 0.36, 1], delay: animateIn ? 0.12 : 0 }}
       />
-    </svg>
+    </span>
   )
 }
 
@@ -84,11 +84,10 @@ interface DayHeroProps {
   macros: { protein: [number, number]; carbs: [number, number]; fat: [number, number] }
   /** First paint of the session: count from 0 and draw the ring (Q23). Later the numbers roll from the last value. */
   animateIn: boolean
-  footer?: ReactNode
 }
 
-/** The day's total: kcal count-up, a small orange ring, and the three macros with targets (Q18, Q26). */
-export function DayHero({ calories, macros, animateIn, footer }: DayHeroProps) {
+/** The day's total: kcal count-up over a thin orange progress line, and the three macros with targets (Q18, Q26). */
+export function DayHero({ calories, macros, animateIn }: DayHeroProps) {
   const { current, target } = calories
   const left = target - current
   const list: MacroValue[] = [
@@ -98,31 +97,23 @@ export function DayHero({ calories, macros, animateIn, footer }: DayHeroProps) {
   ]
   return (
     <section className={cn(CARD, 'p-5')} aria-label="Day total">
-      <div className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="flex items-baseline gap-1">
-            <span className="font-wide text-[40px] font-[750] leading-none tracking-[-1.6px] text-ink tabular-nums">
-              <CountUp value={current} from={animateIn ? 0 : current} />
-            </span>
-            <span className="text-[15px] font-semibold leading-none text-ink-65">kcal</span>
+      <p className="flex items-baseline gap-1">
+        <span className="font-wide text-[40px] font-[750] leading-none tracking-[-1.6px] text-ink tabular-nums">
+          <CountUp value={current} from={animateIn ? 0 : current} />
+        </span>
+        <span className="text-[15px] font-semibold leading-none text-ink-65">kcal</span>
+      </p>
+      {target > 0 ? (
+        <>
+          <CalorieLine fraction={Math.min(1, current / target)} animateIn={animateIn} />
+          <p className="mt-2 text-[14px] text-ink-65 tabular-nums">
+            <FadeText text={left >= 0 ? `${fmt(left)} left of ${fmt(target)}` : `${fmt(-left)} over ${fmt(target)}`} />
           </p>
-          {target > 0 ? null : <p className="mt-1.5 text-[14px] text-ink-65">No daily target set</p>}
-        </div>
-        {target > 0 ? (
-          // The ring and its words sit on the number's row, so it reads as the calorie ring.
-          <div className="flex shrink-0 items-center gap-2.5">
-            <Ring fraction={Math.min(1, current / target)} animateIn={animateIn} />
-            <p className="leading-tight tabular-nums">
-              <span className="block text-[15px] font-semibold text-ink"><FadeText text={left >= 0 ? `${fmt(left)} left` : `${fmt(-left)} over`} /></span>
-              <span className="block text-[13px] text-ink-65">of {fmt(target)}</span>
-            </p>
-          </div>
-        ) : null}
-      </div>
+        </>
+      ) : <p className="mt-2 text-[14px] text-ink-65">No daily target set</p>}
       <div className="mt-5 grid grid-cols-3 gap-4">
         {list.map((macro) => <Macro key={macro.label} macro={macro} />)}
       </div>
-      {footer}
     </section>
   )
 }

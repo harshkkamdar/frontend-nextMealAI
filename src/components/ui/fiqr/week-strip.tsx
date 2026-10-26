@@ -25,7 +25,7 @@ interface WeekStripProps {
   selected: string
   today: string
   onSelect: (iso: string) => void
-  /** Days with something logged: ink check badge. */
+  /** Days with something logged: a small ink dot under the date. */
   marked?: ReadonlySet<string>
   /** Read out after a marked day, e.g. "food logged". */
   markLabel?: string
@@ -104,7 +104,7 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
                   aria-pressed={isSelected}
                   aria-current={iso === today ? 'date' : undefined}
                   onClick={() => { if (!dragged.current) { setDir(0); onSelect(iso) } }}
-                  className="relative flex min-h-[84px] flex-col items-center justify-center gap-1 rounded-[18px] transition-transform active:scale-[.96]"
+                  className="relative flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-[18px] transition-transform active:scale-[.96]"
                 >
                   {isSelected ? (
                     <motion.span
@@ -119,15 +119,8 @@ export function WeekStrip({ selected, today, onSelect, marked, markLabel = 'logg
                   <span className={cn('relative text-[17px] leading-none tabular-nums', future ? 'text-ink-65' : 'text-ink', iso === today ? 'font-bold' : 'font-semibold')}>
                     {date.getDate()}
                   </span>
-                  <span className="relative mt-1 grid size-[18px] place-items-center" aria-hidden="true">
-                    {isMarked ? (
-                      <span className={cn('grid size-[18px] place-items-center rounded-full', isSelected ? 'bg-ink text-cream' : 'bg-ink-12 text-ink-65')}>
-                        <svg viewBox="0 0 12 12" className="size-[10px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5" /></svg>
-                      </span>
-                    ) : (
-                      <span className={cn('size-[16px] rounded-full border-[1.5px]', future ? 'border-dashed border-ink-16' : 'border-ink-20')} />
-                    )}
-                  </span>
+                  {/* Logged days get one small ink dot; nothing else marks a day. */}
+                  <span className={cn('relative mt-1 size-[5px] rounded-full', isMarked ? 'bg-ink' : 'bg-transparent')} aria-hidden="true" />
                 </button>
               )
             })}
