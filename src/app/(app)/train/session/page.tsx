@@ -3,46 +3,71 @@
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createPortal } from 'react-dom'
-import { Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
 import { NumberField, SearchablePicker } from '@/components/plans/plan-builder-shared'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'framer-motion'
 import { PushedHeader } from '@/components/layout/screen-header'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
-import { CountUp } from '@/components/ui/fiqr/count-up'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '@/components/ui/fiqr/icons'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
-import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
 import { ExerciseVisual } from '@/components/workout/muscle-map'
 import { RestTimer } from '@/components/workout/rest-timer'
-import { SessionSkeleton, SessionTimerCard } from '@/components/workout/session-cards'
+import { AllExercisesList, ExerciseNav, SessionSkeleton, SessionTimerCard, SetTable } from '@/components/workout/session-cards'
+import { SessionReceipt } from '@/components/workout/session-receipt'
+import { setReps, setWeight, stepReps, stepWeight, upNextText } from '@/components/workout/train-data'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
+import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { unlockAudio } from '@/lib/audio'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
 import { abandonWorkoutSession, completeWorkoutSession, getWorkoutSession, updateWorkoutSession } from '@/lib/api/workout-sessions.api'
 import { haptic } from '@/lib/platform/app'
 import { writeWorkoutToHealth } from '@/lib/platform/health'
 import { reducedFade, spring } from '@/lib/motion'
-import { cn } from '@/lib/utils'
 import { computeCompleteSetResult, firstIncompleteExerciseIndex, isExerciseComplete, nextIncompleteExerciseIndex, resolveElapsedForSession } from '@/lib/workout-session'
 import { useUIStore } from '@/stores/ui.store'
 import type { SessionExercise, SetData, WorkoutSession } from '@/types/workout-session.types'
 import { goBack } from '@/lib/navigation'
 
-function Chevron({ direction }: { direction: 'left' | 'right' }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d={direction === 'left' ? 'm15 5-7 7 7 7' : 'm9 5 7 7-7 7'} />
-    </svg>
-  )
+/** "2 min", "90 s" or "1 min 30 s" for the plan line. */
+function restText(seconds: number): string {
+  if (seconds < 60 || seconds === 90) return `${seconds} s`
+  return seconds % 60 ? `${Math.floor(seconds / 60)} min ${seconds % 60} s` : `${seconds / 60} min`
 }
 
-function TickIcon() {
-  return <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 4 4 10-10" /></svg>
+/**
+ * One exercise per screen, changed by a depth step: Next sends the current card back (smaller, fading) while the next
+ * comes forward from just in front; Previous plays it in reverse. Scale and opacity only, critically damped.
+ */
+const STEP = {
+  enter: (dir: number) => ({ opacity: 0, scale: dir > 0 ? 1.05 : 0.92 }),
+  center: { opacity: 1, scale: 1 },
+  exit: (dir: number) => ({ opacity: 0, scale: dir > 0 ? 0.92 : 1.05 }),
+}
+const STEP_SPRING = { scale: spring.glide, opacity: { duration: 0.28, ease: 'easeOut' } } as const
+
+/** The card while it leaves stops being the current step and takes no input. */
+function ExerciseCard({ index, count, direction, children }: { index: number; count: number; direction: number; children: ReactNode }) {
+  const present = useIsPresent()
+  const reduce = useReducedMotion()
+  return (
+    <motion.article
+      custom={direction}
+      variants={reduce ? { enter: { opacity: 0 }, center: { opacity: 1 }, exit: { opacity: 0 } } : STEP}
+      initial="enter" animate="center" exit="exit"
+      transition={reduce ? reducedFade : STEP_SPRING}
+      aria-current={present ? 'step' : undefined}
+      aria-label={`Exercise ${index + 1} of ${count}`}
+      inert={!present}
+      className="origin-[50%_30%] rounded-card bg-card p-3.5 shadow-[var(--shadow-card)] [grid-area:1/1]"
+    >
+      {children}
+    </motion.article>
+  )
 }
 
 export default function WorkoutFollowPage() {
@@ -57,11 +82,14 @@ function WorkoutFollowRoute() {
 
 function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const router = useRouter()
+  const tz = useUserTimezone()
   const [session, setSession] = useState<WorkoutSession | null>(null)
+  const sessionRef = useRef<WorkoutSession | null>(null)
+  useLayoutEffect(() => { sessionRef.current = session }, [session])
   const [loading, setLoading] = useState(true)
   const [loadFailed, setLoadFailed] = useState(false)
   const [showRestTimer, setShowRestTimer] = useState(false)
-  const [howToOpen, setHowToOpen] = useState<number | null>(null)
+  const [howToOpen, setHowToOpen] = useState(false)
   const [restSeconds, setRestSeconds] = useState(90)
   const [restKey, setRestKey] = useState(0)
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
@@ -71,9 +99,13 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const [summaryCovered, setSummaryCovered] = useState(false)
   const [showExitSheet, setShowExitSheet] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
+  const [showAll, setShowAll] = useState(false)
   const [removeConfirm, setRemoveConfirm] = useState(false)
   const [discardConfirm, setDiscardConfirm] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [direction, setDirection] = useState(1)
+  // The set the lifter tapped to edit; null means the first set still to do.
+  const [focusSet, setFocusSet] = useState<number | null>(null)
   const initedRef = useRef(false)
   const [celebrate, setCelebrate] = useState(false)
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -83,8 +115,6 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const [addReps, setAddReps] = useState<number | undefined>(10)
   const [addRest, setAddRest] = useState<number | undefined>(90)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pagerRef = useRef<HTMLDivElement>(null)
-  const programmaticScrollRef = useRef(false)
   const reduce = useReducedMotion()
 
   const exercises = session?.exercises ?? []
@@ -165,41 +195,6 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [session?.started_at, session?.status])
 
-  useEffect(() => {
-    const pager = pagerRef.current
-    const card = pager?.querySelector<HTMLElement>(`[data-exercise-index="${currentIndex}"]`)
-    // Horizontal only: the page itself scrolls now, so scrollIntoView would also move it vertically.
-    if (!pager || !card) return
-    const left = card.offsetLeft - pager.offsetLeft - (pager.clientWidth - card.clientWidth) / 2
-    if (Math.abs(pager.scrollLeft - left) < 2) return
-    // A scroll we started must not be read back as a swipe: an interrupted one ends on the old card.
-    programmaticScrollRef.current = true
-    pager.scrollTo?.({ left, behavior: 'smooth' })
-  }, [currentIndex, exercises.length])
-
-  useEffect(() => {
-    const pager = pagerRef.current
-    if (!pager) return
-    const onScrollEnd = () => {
-      if (programmaticScrollRef.current) { programmaticScrollRef.current = false; return }
-      const center = pager.getBoundingClientRect().left + pager.clientWidth / 2
-      const cards = Array.from(pager.querySelectorAll<HTMLElement>('[data-exercise-index]'))
-      let nearest = currentIndex
-      let distance = Number.POSITIVE_INFINITY
-      for (const card of cards) {
-        const rect = card.getBoundingClientRect()
-        const nextDistance = Math.abs(rect.left + rect.width / 2 - center)
-        if (nextDistance < distance) {
-          distance = nextDistance
-          nearest = Number(card.dataset.exerciseIndex)
-        }
-      }
-      if (Number.isFinite(nearest)) setCurrentIndex(nearest)
-    }
-    pager.addEventListener('scrollend', onScrollEnd)
-    return () => pager.removeEventListener('scrollend', onScrollEnd)
-  }, [currentIndex, exercises.length])
-
   const saveExercises = useCallback((nextExercises: SessionExercise[]) => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
     saveTimeoutRef.current = setTimeout(() => {
@@ -207,24 +202,51 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     }, 500)
   }, [sessionId])
 
-  const updateSet = (exerciseIndex: number, setIndex: number, field: string, value: any) => {
-    if (!session) return
-    const updated = [...session.exercises]
-    const sets = [...updated[exerciseIndex].sets]
-    sets[setIndex] = { ...sets[setIndex], [field]: value }
-    updated[exerciseIndex] = { ...updated[exerciseIndex], sets }
-    setSession({ ...session, exercises: updated })
-    saveExercises(updated)
+  /** Writes new exercises through a ref, so a held stepper's repeats each build on the last one. */
+  const commit = useCallback((nextExercises: SessionExercise[]) => {
+    const base = sessionRef.current
+    if (!base) return
+    const next = { ...base, exercises: nextExercises }
+    sessionRef.current = next
+    setSession(next)
+    saveExercises(nextExercises)
+  }, [saveExercises])
+
+  const indexRef = useRef(0)
+  useLayoutEffect(() => { indexRef.current = currentIndex }, [currentIndex])
+  const goTo = useCallback((index: number) => {
+    const from = indexRef.current
+    if (index === from || index < 0 || index >= (sessionRef.current?.exercises.length ?? 0)) return
+    setDirection(index > from ? 1 : -1)
+    setCurrentIndex(index)
+    setFocusSet(null)
+    setHowToOpen(false)
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+  }, [reduce])
+
+  const stepSet = (setIndex: number, field: 'kg' | 'reps', dir: 1 | -1) => {
+    const base = sessionRef.current
+    if (!base) return
+    const updated = [...base.exercises]
+    const exercise = updated[currentIndex]
+    const sets = [...exercise.sets]
+    const set = sets[setIndex]
+    sets[setIndex] = field === 'kg'
+      ? { ...set, actual_weight_kg: stepWeight(setWeight(set), dir) }
+      : { ...set, actual_reps: stepReps(setReps(set), dir) }
+    updated[currentIndex] = { ...exercise, sets }
+    commit(updated)
   }
 
   const completeSet = (exerciseIndex: number, setIndex: number) => {
-    if (!session) return
+    const base = sessionRef.current
+    if (!base) return
     unlockAudio()
     // Q28: success on a new tick, nothing on an untick.
-    if (!session.exercises[exerciseIndex]?.sets[setIndex]?.completed) void haptic('success')
-    const result = computeCompleteSetResult(session.exercises, exerciseIndex, setIndex, new Date().toISOString())
-    setSession({ ...session, exercises: result.exercises })
-    saveExercises(result.exercises)
+    if (!base.exercises[exerciseIndex]?.sets[setIndex]?.completed) void haptic('success')
+    const result = computeCompleteSetResult(base.exercises, exerciseIndex, setIndex, new Date().toISOString())
+    commit(result.exercises)
+    setFocusSet(null)
 
     if (result.rest.show) {
       setRestSeconds(result.rest.seconds)
@@ -238,14 +260,15 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       advanceTimerRef.current = setTimeout(() => {
         setCelebrate(false)
         const next = nextIncompleteExerciseIndex(result.exercises, exerciseIndex)
-        if (next >= 0) setCurrentIndex(next)
+        if (next >= 0) goTo(next)
       }, 1100)
     }
   }
 
   const addSet = (exerciseIndex: number) => {
-    if (!session) return
-    const updated = [...session.exercises]
+    const base = sessionRef.current
+    if (!base) return
+    const updated = [...base.exercises]
     const exercise = updated[exerciseIndex]
     const lastSet = exercise.sets[exercise.sets.length - 1]
     const nextSet: SetData = {
@@ -258,8 +281,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       completed_at: null,
     }
     updated[exerciseIndex] = { ...exercise, planned_sets: exercise.planned_sets + 1, sets: [...exercise.sets, nextSet] }
-    setSession({ ...session, exercises: updated })
-    saveExercises(updated)
+    commit(updated)
   }
 
   const handleComplete = async () => {
@@ -271,6 +293,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       setSession(completed)
       setShowSummary(true)
       setShowMenu(false)
+      setShowRestTimer(false)
     } catch {
       toast.error('Failed to complete workout')
     } finally {
@@ -342,6 +365,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     const next = [...session.exercises, newExercise]
     setSession({ ...session, exercises: next })
     resetAddForm()
+    setDirection(1)
     setCurrentIndex(next.length - 1)
     updateWorkoutSession(sessionId, { exercises: next })
       .then(() => toast.success('Exercise added'))
@@ -359,7 +383,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       <div className="mx-auto min-h-dvh w-full max-w-md bg-cream px-4">
         <PushedHeader title="" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
         {/* motion-feel 3h: skeletons only after 150 ms without data, so a quick load goes straight to content. */}
-        <motion.div className="pt-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.12, delay: 0.15 }}><SessionSkeleton /></motion.div>
+        <motion.div className="pt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.12, delay: 0.15 }}><SessionSkeleton /></motion.div>
       </div>
     )
   }
@@ -379,147 +403,95 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     )
   }
 
-  // The summary fades in over the live screen, so finishing never cuts to an empty frame.
-  let summary: ReactNode = null
-  if (showSummary) {
-    const completedExercises = exercises.filter((exercise) => exercise.status === 'completed').length
-    const enter = (index: number) => ({
-      initial: reduce ? { opacity: 0 } : { opacity: 0, y: 12 },
-      animate: { opacity: 1, y: 0 },
-      transition: reduce ? reducedFade : { ...spring.glide, delay: 0.12 + index * 0.04 },
-    })
-    summary = (
-      <motion.div key="summary" role="dialog" aria-label="Session done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onAnimationComplete={() => setSummaryCovered(true)} transition={{ duration: 0.2, ease: 'easeOut' }} className="fixed inset-0 z-[80] mx-auto flex w-full max-w-md flex-col overflow-y-auto bg-cream px-4" style={{ paddingTop: 'var(--safe-top)', paddingBottom: 'calc(16px + var(--safe-bottom))' }}>
-        <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <motion.div initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={reduce ? reducedFade : spring.lens}>
-            <GeoAvatar variant="face" state="coach" size={64} />
-          </motion.div>
-          <motion.h1 {...enter(0)} className="font-wide mt-5 text-[30px] font-bold leading-[1.1] tracking-[-0.5px] text-ink">Session done</motion.h1>
-          <motion.p {...enter(1)} className="mt-1 max-w-full break-words text-[15px] text-ink-65">{session.day_name}</motion.p>
-          <div className="mt-6 grid w-full grid-cols-3 gap-[10px]">
-            {[
-              { label: 'Time', value: session.duration_minutes ?? 0, unit: 'min' },
-              { label: 'Exercises', value: completedExercises, unit: '' },
-              { label: 'Volume', value: session.total_volume_kg ?? 0, unit: 'kg' },
-            ].map((tile, index) => (
-              <motion.div key={tile.label} {...enter(index + 2)} className="flex flex-col items-start rounded-[22px] bg-card p-4 text-left shadow-[var(--shadow-card)]">
-                <span className="text-[13px] font-semibold text-ink-65">{tile.label}</span>
-                <span className="mt-2 flex items-baseline gap-1">
-                  <span className="font-wide text-[24px] font-bold leading-none text-ink tabular-nums"><CountUp value={tile.value} delay={0.3} /></span>
-                  {tile.unit ? <span className="text-[13px] font-semibold text-ink-65">{tile.unit}</span> : null}
-                </span>
-              </motion.div>
-            ))}
-          </div>
+  // A finished session opened from history is its receipt.
+  if (session.status === 'completed' && !showSummary) {
+    return (
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-cream px-4">
+        <PushedHeader title="" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
+        <div className="flex flex-1 flex-col pt-1">
+          <SessionReceipt session={session} tz={tz} animate={false} onDone={() => goBack(router, '/train')} />
         </div>
-        <PrimaryButton type="button" onClick={() => router.push('/train')}>Done</PrimaryButton>
-      </motion.div>
+      </div>
     )
   }
 
+  // The receipt fades in over the live screen, so finishing never cuts to an empty frame.
+  const summary = showSummary ? (
+    <motion.div key="summary" role="dialog" aria-label="Session done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onAnimationComplete={() => setSummaryCovered(true)} transition={{ duration: 0.2, ease: 'easeOut' }} className="fixed inset-0 z-[80] mx-auto flex w-full max-w-md flex-col overflow-y-auto bg-cream px-4" style={{ paddingTop: 'calc(28px + var(--safe-top))' }}>
+      <SessionReceipt session={session} tz={tz} animate onDone={() => router.push('/train')} />
+    </motion.div>
+  ) : null
+
   const allComplete = exercises.length > 0 && exercises.every(isExerciseComplete)
   const currentComplete = current ? isExerciseComplete(current) : false
+  const isLast = currentIndex === exercises.length - 1
+  const nextOpen = nextIncompleteExerciseIndex(exercises, currentIndex)
+  const activeSet = current ? (focusSet != null && !current.sets[focusSet]?.completed ? focusSet : current.sets.findIndex((set) => !set.completed)) : -1
+  const following = exercises[currentIndex + 1]
 
   return (
     <div className="mx-auto min-h-dvh w-full max-w-md bg-cream text-ink">
       <AnimatePresence>{summary}</AnimatePresence>
-      <RestTimer isActive={showRestTimer && !showSummary} duration={restSeconds} resetToken={restKey} onSkip={() => setShowRestTimer(false)} onComplete={() => setShowRestTimer(false)} />
+      <RestTimer isActive={showRestTimer && !showSummary} duration={restSeconds} resetToken={restKey} upNext={upNextText(exercises, currentIndex)} onSkip={() => setShowRestTimer(false)} onComplete={() => setShowRestTimer(false)} />
 
       <div className="px-4"><PushedHeader title={session.day_name} onBack={handleBack} backLabel="Go back" actions={optionsButton} /></div>
       <OfflineBand />
 
       {/* Content fades in on its own; an opacity ancestor would also hide the nav's backdrop filter. */}
-      <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className="pt-3" style={{ paddingBottom: `calc(${showRestTimer ? 300 : 120}px + var(--safe-bottom))` }}>
+      <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className="px-4 pt-2" style={{ paddingBottom: 'calc(120px + var(--safe-bottom))' }}>
         {exercises.length === 0 ? (
-          <div className="px-4">
-            <button type="button" onClick={() => setShowAddForm(true)} className="flex min-h-16 w-full items-center justify-center rounded-[24px] border-[1.5px] border-dashed border-ink-20 text-[15px] font-semibold text-ink-65 transition-transform active:scale-[.98]">
-              No exercises yet. Add one
-            </button>
-          </div>
+          <button type="button" onClick={() => setShowAddForm(true)} className="flex min-h-16 w-full items-center justify-center rounded-card border-[1.5px] border-dashed border-ink-20 text-body-sm font-semibold text-ink-65 transition-transform active:scale-[.98]">
+            No exercises yet. Add one
+          </button>
         ) : (
           <>
-            <div className="px-4"><SessionTimerCard elapsedSeconds={elapsedSeconds} exercises={exercises} currentIndex={currentIndex} /></div>
-            <div ref={pagerRef} data-no-swipe-back className="scrollbar-hide -mb-2 mt-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 pt-2">
-              {exercises.map((exercise, exerciseIndex) => (
-                <article key={`${exercise.name}-${exerciseIndex}`} data-exercise-index={exerciseIndex} aria-current={exerciseIndex === currentIndex ? 'step' : undefined} className="w-[calc(100vw-44px)] max-w-[388px] shrink-0 snap-center rounded-[24px] bg-card p-5 shadow-[var(--shadow-card)]">
-                  <ExerciseVisual group={exercise.muscle_group} name={exercise.name} />
-                  <h2 className="font-wide mt-3 line-clamp-3 break-words text-balance text-[22px] font-bold leading-[1.15] tracking-[-0.3px] text-ink">{exercise.name}</h2>
-                  {/* The how-to toggle shares the plan line so the set rows start higher up the screen. */}
-                  <div className="flex min-h-11 items-center justify-between gap-3">
-                    <p className="text-[14px] text-ink-65 tabular-nums">{exercise.planned_sets} × {exercise.planned_reps}{exercise.rest_seconds ? ` · ${exercise.rest_seconds} s rest` : ''}</p>
-                    {exercise.instructions && exercise.instructions.length > 0 ? (
-                      <button type="button" aria-expanded={howToOpen === exerciseIndex} onClick={() => setHowToOpen((open) => (open === exerciseIndex ? null : exerciseIndex))} className="-mr-2 min-h-11 shrink-0 px-2 text-[14px] font-semibold text-ink-65">How to do it</button>
+            <SessionTimerCard elapsedSeconds={elapsedSeconds} exercises={exercises} currentIndex={currentIndex} />
+            <div className="mt-2.5"><ExerciseNav index={currentIndex} count={exercises.length} onPrev={() => goTo(currentIndex - 1)} onNext={() => goTo(currentIndex + 1)} onAll={() => setShowAll(true)} /></div>
+            <div className="mt-2.5 grid">
+              <AnimatePresence initial={false} custom={direction}>
+                {current ? (
+                  <ExerciseCard key={`${currentIndex}-${current.name}`} index={currentIndex} count={exercises.length} direction={direction}>
+                    <ExerciseVisual group={current.muscle_group} name={current.name} />
+                    <h2 className="mt-3 line-clamp-3 break-words text-balance font-display text-[22px] font-extrabold leading-[1.14] tracking-[-0.01em] text-ink">{current.name}</h2>
+                    {/* The how-to toggle shares the plan line so the set rows start higher up the screen. */}
+                    <div className="flex min-h-11 items-center justify-between gap-3">
+                      <p className="text-body-sm text-ink-65 tabular-nums">{current.planned_sets} × {current.planned_reps}{current.rest_seconds ? ` · ${restText(current.rest_seconds)} rest` : ''}</p>
+                      {current.instructions && current.instructions.length > 0 ? (
+                        <button type="button" aria-expanded={howToOpen} onClick={() => setHowToOpen((open) => !open)} className="-mr-2 min-h-11 shrink-0 px-2 text-body-sm font-bold text-ink">{howToOpen ? 'Hide steps' : 'How to'}</button>
+                      ) : null}
+                    </div>
+                    {howToOpen && current.instructions?.length ? (
+                      <ol className="mb-2 list-decimal space-y-1 pl-5">{current.instructions.map((step, index) => <li key={index} className="text-body-sm text-ink-65">{step}</li>)}</ol>
                     ) : null}
-                  </div>
-                  {howToOpen === exerciseIndex && exercise.instructions?.length ? (
-                    <ol className="mb-2 list-decimal space-y-1 pl-5">{exercise.instructions.map((step, index) => <li key={index} className="text-[14px] text-ink-65">{step}</li>)}</ol>
-                  ) : null}
 
-                  <div className="mt-1 grid grid-cols-[32px_1fr_1fr_1fr_44px] items-center gap-1.5 text-[12px] font-semibold text-ink-65">
-                    <span>Set</span><span>Last</span><span className="text-center">kg</span><span className="text-center">Reps</span><span className="text-center">Done</span>
-                  </div>
-                  <div className="mt-1">
-                    {exercise.sets.map((set, setIndex) => (
-                      <div key={setIndex} className="grid h-14 grid-cols-[32px_1fr_1fr_1fr_44px] items-center gap-1.5 border-t border-ink-06 first:border-t-0">
-                        <span className="text-[15.5px] font-semibold text-ink tabular-nums">{set.set_number}</span>
-                        <span className="text-[13.5px] tabular-nums text-ink-65">{set.previous_reps != null && set.previous_weight_kg != null ? `${set.previous_reps}×${set.previous_weight_kg}` : '—'}</span>
-                        <input
-                          type="number" inputMode="decimal" aria-label={`${exercise.name} set ${set.set_number} kilograms`}
-                          value={set.actual_weight_kg ?? ''} placeholder={set.planned_weight_kg != null ? String(set.planned_weight_kg) : '—'}
-                          onChange={(event) => updateSet(exerciseIndex, setIndex, 'actual_weight_kg', event.target.value ? Number(event.target.value) : null)}
-                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink focus:ring-[1.5px] focus:ring-ink transition-colors duration-200', set.completed ? 'bg-transparent' : 'bg-ink-04')}
-                        />
-                        <input
-                          type="number" inputMode="numeric" aria-label={`${exercise.name} set ${set.set_number} reps`}
-                          value={set.actual_reps ?? ''} placeholder={String(set.planned_reps)}
-                          onChange={(event) => updateSet(exerciseIndex, setIndex, 'actual_reps', event.target.value ? Number(event.target.value) : null)}
-                          className={cn('h-11 w-full rounded-[14px] border-0 text-center text-[17px] font-semibold tabular-nums text-ink outline-none placeholder:text-ink focus:ring-[1.5px] focus:ring-ink transition-colors duration-200', set.completed ? 'bg-transparent' : 'bg-ink-04')}
-                        />
-                        <button
-                          type="button" onClick={() => completeSet(exerciseIndex, setIndex)} aria-label={`Complete set ${set.set_number}`}
-                          aria-pressed={set.completed}
-                          className="mx-auto grid size-11 place-items-center transition-transform active:scale-[.9]"
-                        >
-                          <span className="relative grid size-10 place-items-center rounded-full border-[1.5px] border-ink-20">
-                            {set.completed ? (
-                              // The ink disc grows in and the tick pops after it (transform and opacity only).
-                              <motion.span
-                                key={set.completed_at ?? 'done'}
-                                className="absolute -inset-[1.5px] grid place-items-center rounded-full bg-ink text-cream"
-                                initial={reduce ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
-                                animate={{ scale: celebrate && exerciseIndex === currentIndex ? 1.08 : 1, opacity: 1 }}
-                                transition={reduce ? reducedFade : spring.tap}
-                              >
-                                <TickIcon />
-                              </motion.span>
-                            ) : null}
-                          </span>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                    <SetTable
+                      exercise={current} activeSet={activeSet} celebrate={celebrate}
+                      onFocus={setFocusSet} onStep={stepSet} onToggle={(setIndex) => completeSet(currentIndex, setIndex)}
+                    />
 
-                  <button type="button" onClick={() => addSet(exerciseIndex)} className="mt-1 min-h-11 text-[14px] font-semibold text-ink-65">+ Add set</button>
+                    <button type="button" onClick={() => addSet(currentIndex)} className="mt-1 min-h-11 text-body-sm font-semibold text-ink-65">+ Add set</button>
 
-                  <textarea
-                    placeholder="Notes: form cues, how it felt" aria-label={`Notes for ${exercise.name}`} value={exercise.notes || ''}
-                    onChange={(event) => {
-                      if (!session) return
-                      const updated = [...session.exercises]
-                      updated[exerciseIndex] = { ...updated[exerciseIndex], notes: event.target.value }
-                      setSession({ ...session, exercises: updated })
-                      saveExercises(updated)
-                    }}
-                    className="mt-3 h-16 w-full resize-none rounded-[14px] border-0 bg-ink-04 px-3 py-2.5 text-[14px] text-ink outline-none placeholder:text-ink-65 focus:ring-[1.5px] focus:ring-ink"
-                  />
-                </article>
-              ))}
+                    <textarea
+                      placeholder="Notes: form cues, how it felt" aria-label={`Notes for ${current.name}`} value={current.notes || ''}
+                      onChange={(event) => {
+                        const base = sessionRef.current
+                        if (!base) return
+                        const updated = [...base.exercises]
+                        updated[currentIndex] = { ...updated[currentIndex], notes: event.target.value }
+                        commit(updated)
+                      }}
+                      className="mt-2 h-14 w-full resize-none rounded-[14px] border-0 bg-ink-04 px-3 py-2.5 text-body-sm text-ink outline-none placeholder:text-ink-65 focus:ring-[1.5px] focus:ring-ink"
+                    />
+                  </ExerciseCard>
+                ) : null}
+              </AnimatePresence>
             </div>
+            <p className="mt-2 truncate px-1 text-label text-ink-65">{following ? `Then: ${following.name}` : 'Last exercise'}</p>
           </>
         )}
 
         {showAddForm && (
-          <div className="mx-4 mt-4 space-y-3 rounded-[24px] bg-card p-5 shadow-[var(--shadow-card)]">
+          <div className="mt-4 space-y-3 rounded-card bg-card p-4 shadow-[var(--shadow-card)]">
             <SearchablePicker<ExerciseSearchResult>
               label="Exercise" placeholder="Search exercises…" search={searchExercises}
               renderItem={(item) => <div className="flex flex-col"><span className="text-sm text-ink">{item.name}</span>{item.primary_muscles?.length ? <span className="text-[12px] text-ink-65">{item.primary_muscles.join(', ')}</span> : null}</div>}
@@ -539,26 +511,20 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       </motion.main>
 
       {/* Portalled to body: the route frame's enter transform would otherwise make this fixed bar ride with the page
-          and jump into place when the push ends. Solid cream so it can animate in (a moving glass bar skips paints). */}
+          and jump into place when the push ends. A solid floating bar so it can animate in (a moving glass bar skips paints). */}
       {exercises.length > 0 && !summaryCovered ? createPortal(
-      <motion.nav initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={spring.sheet} className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-[28px] bg-cream px-4 pt-3 shadow-[0_-8px_24px_rgba(17,28,53,.06)]" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
-        {allComplete || currentIndex === exercises.length - 1 ? (
+      <motion.nav aria-label="Workout" initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={reduce ? reducedFade : spring.sheet} className="fixed inset-x-2 z-20 mx-auto max-w-[calc(28rem-16px)] rounded-[28px] bg-cream p-2 shadow-[var(--shadow-glass)]" style={{ bottom: 'calc(8px + var(--safe-bottom))' }}>
+        {allComplete || isLast ? (
           <PrimaryButton type="button" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
         ) : (
-          <div className="flex gap-[10px]">
-            <button type="button" onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex <= 0} className="flex h-14 flex-1 items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-[16px] font-semibold text-ink transition-transform enabled:active:scale-[.97] disabled:text-ink-35"><Chevron direction="left" /> Previous</button>
+          <div className="grid grid-cols-[1fr_1.4fr] gap-2">
+            <button type="button" onClick={() => goTo(currentIndex - 1)} disabled={currentIndex <= 0} className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-body font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:text-ink-35"><ChevronLeftIcon className="size-[18px]" /> Previous</button>
             <button
               type="button"
-              onClick={() => {
-                if (currentComplete) {
-                  const next = nextIncompleteExerciseIndex(exercises, currentIndex)
-                  if (next >= 0) setCurrentIndex(next)
-                } else setCurrentIndex((index) => Math.min(exercises.length - 1, index + 1))
-              }}
-              disabled={!currentComplete && currentIndex >= exercises.length - 1}
-              className="flex h-14 flex-[1.4] items-center justify-center gap-1 rounded-[18px] bg-ink text-[16px] font-semibold text-cream transition-transform enabled:active:scale-[.97] disabled:bg-ink-08 disabled:text-ink-35"
+              onClick={() => goTo(currentComplete && nextOpen >= 0 ? nextOpen : currentIndex + 1)}
+              className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97]"
             >
-              {currentComplete ? 'Next exercise' : 'Next'} <Chevron direction="right" />
+              {currentComplete ? 'Next exercise' : 'Next'} <ChevronRightIcon className="size-[18px]" />
             </button>
           </div>
         )}
@@ -566,33 +532,43 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       document.body,
       ) : null}
 
+      <BottomSheet open={showAll} onClose={() => setShowAll(false)} ariaLabel="All exercises">
+        <div className="flex items-center justify-between px-5 pb-3 pt-1">
+          <h2 className="font-display text-hero text-ink">All exercises</h2>
+          <RoundButton aria-label="Close" onClick={() => setShowAll(false)}><CloseIcon /></RoundButton>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5">
+          <AllExercisesList exercises={exercises} currentIndex={currentIndex} nextIndex={nextOpen} onPick={(index) => { setShowAll(false); goTo(index) }} />
+        </div>
+      </BottomSheet>
+
       <BottomSheet open={showMenu} onClose={() => { setShowMenu(false); setRemoveConfirm(false); setDiscardConfirm(false) }} ariaLabel="Workout options">
         <div className="px-4 pb-5 pt-2">
-          <div className="overflow-hidden rounded-[22px] bg-card shadow-[var(--shadow-card)]">
-            <button type="button" onClick={() => { setShowMenu(false); setShowAddForm(true) }} className="flex min-h-14 w-full items-center border-b border-ink-06 px-5 text-left text-[16px] font-semibold text-ink last:border-b-0 active:bg-ink-04">Add exercise</button>
-            <button type="button" onClick={() => void handleComplete()} disabled={completing} className="flex min-h-14 w-full items-center border-b border-ink-06 px-5 text-left text-[16px] font-semibold text-ink last:border-b-0 active:bg-ink-04">Finish workout</button>
+          <div className="overflow-hidden rounded-card bg-card shadow-[var(--shadow-card)]">
+            <button type="button" onClick={() => { setShowMenu(false); setShowAddForm(true) }} className="flex min-h-row w-full items-center border-b border-ink-06 px-5 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04">Add exercise</button>
+            <button type="button" onClick={() => void handleComplete()} disabled={completing} className="flex min-h-row w-full items-center border-b border-ink-06 px-5 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04">Finish workout</button>
             {current && (
               removeConfirm ? (
-                <div className="flex min-h-14 items-center gap-3 border-b border-ink-06 px-5"><button type="button" onClick={() => setRemoveConfirm(false)} className="min-h-11 flex-1 text-left text-[16px] text-ink-65">Keep it</button><button type="button" onClick={() => handleRemoveExercise(currentIndex)} className="min-h-11 text-[16px] font-semibold text-ink">Remove</button></div>
-              ) : <button type="button" onClick={() => setRemoveConfirm(true)} className="flex min-h-14 w-full items-center border-b border-ink-06 px-5 text-left text-[16px] font-semibold text-ink last:border-b-0 active:bg-ink-04"><span className="truncate">Remove {current.name}</span></button>
+                <div className="flex min-h-row items-center gap-3 border-b border-ink-06 px-5"><button type="button" onClick={() => setRemoveConfirm(false)} className="min-h-11 flex-1 text-left text-body text-ink-65">Keep it</button><button type="button" onClick={() => handleRemoveExercise(currentIndex)} className="min-h-11 text-body font-semibold text-ink">Remove</button></div>
+              ) : <button type="button" onClick={() => setRemoveConfirm(true)} className="flex min-h-row w-full items-center border-b border-ink-06 px-5 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04"><span className="truncate">Remove {current.name}</span></button>
             )}
             {discardConfirm ? (
-              <div className="flex min-h-14 items-center gap-3 border-b border-ink-06 px-5"><button type="button" onClick={() => setDiscardConfirm(false)} className="min-h-11 flex-1 text-left text-[16px] text-ink-65">Keep workout</button><button type="button" onClick={() => void handleDiscard()} className="min-h-11 text-[16px] font-semibold text-ink">Discard</button></div>
-            ) : <button type="button" onClick={() => setDiscardConfirm(true)} className="flex min-h-14 w-full items-center border-b border-ink-06 px-5 text-left text-[16px] font-semibold text-ink last:border-b-0 active:bg-ink-04">Discard workout</button>}
-            <button type="button" onClick={() => { setShowMenu(false); useUIStore.getState().openSheet('geo-companion') }} className="flex min-h-14 w-full items-center border-b border-ink-06 px-5 text-left text-[16px] font-semibold text-ink last:border-b-0 active:bg-ink-04">Ask Geo</button>
+              <div className="flex min-h-row items-center gap-3 border-b border-ink-06 px-5"><button type="button" onClick={() => setDiscardConfirm(false)} className="min-h-11 flex-1 text-left text-body text-ink-65">Keep workout</button><button type="button" onClick={() => void handleDiscard()} className="min-h-11 text-body font-semibold text-ink">Discard</button></div>
+            ) : <button type="button" onClick={() => setDiscardConfirm(true)} className="flex min-h-row w-full items-center border-b border-ink-06 px-5 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04">Discard workout</button>}
+            <button type="button" onClick={() => { setShowMenu(false); useUIStore.getState().openSheet('geo-companion') }} className="flex min-h-row w-full items-center border-b border-ink-06 px-5 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04">Ask Geo</button>
           </div>
         </div>
       </BottomSheet>
 
       <BottomSheet open={showExitSheet} onClose={() => { setShowExitSheet(false); setDiscardConfirm(false) }} ariaLabel="Exit workout">
         <div className="px-5 pb-5 pt-3">
-          <h2 className="font-wide text-[22px] font-bold leading-tight text-ink">Leave this workout?</h2>
-          <p className="mt-1 text-[15px] text-ink-65">Your sets are saved. Pick it up again from Train.</p>
-          <button type="button" onClick={handleSaveAndExit} className="mt-5 flex h-14 w-full items-center justify-center rounded-[18px] bg-ink text-[17px] font-semibold text-cream transition-transform active:scale-[.97]">Save and exit</button>
+          <h2 className="font-display text-hero text-ink">Leave this workout?</h2>
+          <p className="mt-1 text-body-sm text-ink-65">Your sets are saved. Pick it up again from Train.</p>
+          <button type="button" onClick={handleSaveAndExit} className="mt-5 flex h-btn w-full items-center justify-center rounded-full bg-ink text-body font-bold text-cream transition-transform active:scale-[.97]">Save and exit</button>
           {discardConfirm ? (
-            <div className="mt-2 flex items-center justify-center gap-6"><button type="button" onClick={() => setDiscardConfirm(false)} className="min-h-11 text-[15px] font-semibold text-ink-65">Keep workout</button><button type="button" onClick={() => void handleDiscard()} className="min-h-11 text-[15px] font-semibold text-ink">Discard for good</button></div>
-          ) : <button type="button" onClick={() => setDiscardConfirm(true)} className="mt-2 min-h-11 w-full text-[15px] font-semibold text-ink-65">Discard workout</button>}
-          <button type="button" onClick={() => setShowExitSheet(false)} className="min-h-11 w-full text-[15px] font-semibold text-ink-65">Keep going</button>
+            <div className="mt-2 flex items-center justify-center gap-6"><button type="button" onClick={() => setDiscardConfirm(false)} className="min-h-11 text-body-sm font-semibold text-ink-65">Keep workout</button><button type="button" onClick={() => void handleDiscard()} className="min-h-11 text-body-sm font-semibold text-ink">Discard for good</button></div>
+          ) : <button type="button" onClick={() => setDiscardConfirm(true)} className="mt-2 min-h-11 w-full text-body-sm font-semibold text-ink-65">Discard workout</button>}
+          <button type="button" onClick={() => setShowExitSheet(false)} className="min-h-11 w-full text-body-sm font-semibold text-ink-65">Keep going</button>
         </div>
       </BottomSheet>
     </div>

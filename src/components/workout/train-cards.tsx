@@ -9,9 +9,12 @@ import { reducedFade, spring } from '@/lib/motion'
 import { cn, plural } from '@/lib/utils'
 import type { WorkoutPlanDay } from '@/types/plans.types'
 import type { WorkoutSession } from '@/types/workout-session.types'
+import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
+import type { BodyPart } from './muscle-map-data'
+import { MuscleMap } from './muscle-map'
 import { formatExDetail, formatHistoryDate } from './train-data'
 
-export const CARD = 'rounded-[24px] bg-card shadow-[var(--shadow-card)]'
+export const CARD = 'rounded-card bg-card shadow-[var(--shadow-card)]'
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
 
 type Layer = 'hero' | 'tile' | 'row'
@@ -35,20 +38,39 @@ export function Enter({ first, layer, index = 0, className, children }: { first:
 
 export function SectionTitle({ children, trailing }: { children: ReactNode; trailing?: ReactNode }) {
   return (
-    <div className="mb-2 flex items-baseline justify-between gap-3 px-5">
-      <h2 className="text-[13px] font-semibold text-ink-65">{children}</h2>
-      {trailing ? <span className="min-w-0 truncate text-[13px] text-ink-65">{trailing}</span> : null}
+    <div className="mb-2 flex items-baseline justify-between gap-3 px-1">
+      <h2 className="text-headline text-ink">{children}</h2>
+      {trailing ? <span className="min-w-0 truncate text-body-sm font-semibold text-ink-65 tabular-nums">{trailing}</span> : null}
     </div>
   )
 }
 
-export function NextUpCard({ eyebrow, title, meta, action }: { eyebrow: string; title: string; meta: string; action: ReactNode }) {
-  // No muscle figure here: the card has one job (Start); the diagram lives on each exercise in the session (C7).
+/**
+ * A3 Muscle hero: the day's target-muscle figure beside its name, the muscles as quiet chips, then the one orange
+ * action. The figure is drawn in ink here because the card already carries the orange button (Q18).
+ */
+export function NextUpCard({ eyebrow, title, meta, action, parts, chips }: { eyebrow: string; title: string; meta: string; action: ReactNode; parts?: BodyPart[]; chips?: string[] }) {
+  const tilt = usePressTilt<HTMLElement>()
+  const head = (
+    <>
+      <p className="text-caption font-semibold text-ink-65">{eyebrow}</p>
+      <h2 className={cn('mt-1 line-clamp-3 break-words font-display font-extrabold leading-[1.12] tracking-[-0.01em] text-ink', parts ? 'text-[20px]' : 'text-hero')}>{title}</h2>
+      <p className="mt-1.5 text-body-sm text-ink-65">{meta}</p>
+    </>
+  )
   return (
-    <section className={cn(CARD, 'p-5')} aria-label="Next session" data-testid="activity-next-up-card">
-      <p className="text-[13px] font-semibold text-ink-65">{eyebrow}</p>
-      <h2 className="font-wide mt-1 line-clamp-2 break-words text-[26px] font-bold leading-[1.12] tracking-[-0.4px] text-ink">{title}</h2>
-      <p className="mt-1.5 text-[14px] text-ink-65">{meta}</p>
+    <section ref={tilt.ref} onPointerDown={tilt.onPointerDown} onPointerMove={tilt.onPointerMove} onPointerUp={tilt.onPointerUp} onPointerCancel={tilt.onPointerCancel} onPointerLeave={tilt.onPointerLeave} className={cn(CARD, 'p-4')} aria-label="Next session" data-testid="activity-next-up-card">
+      {parts ? (
+        <div className="grid grid-cols-[112px_minmax(0,1fr)] items-center gap-3.5">
+          <div className="flex h-[124px] items-center justify-center rounded-[18px] bg-ink-04 p-1.5" aria-hidden="true"><MuscleMap parts={parts} tone="ink" /></div>
+          <div className="min-w-0">{head}</div>
+        </div>
+      ) : head}
+      {chips?.length ? (
+        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Muscles worked">
+          {chips.map((chip) => <li key={chip} className="flex h-8 items-center rounded-full bg-ink-06 px-3 text-caption font-semibold text-ink">{chip}</li>)}
+        </ul>
+      ) : null}
       <div className="mt-4">{action}</div>
     </section>
   )
@@ -60,38 +82,38 @@ export function VolumeCard({ perDay, labels, todayIndex, sessions, planned, firs
   const total = perDay.reduce((a, b) => a + b, 0)
   const max = Math.max(...perDay, 1)
   return (
-    <section className={cn(CARD, 'p-5')} aria-label="This week">
+    <section className={cn(CARD, 'p-4')} aria-label="This week">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[13px] font-semibold text-ink-65">Volume</p>
+          <p className="text-caption font-semibold text-ink-65">Volume</p>
           <p className="mt-1 flex items-baseline gap-1">
-            <span className="font-wide text-[28px] font-bold leading-none tracking-[-0.6px] text-ink tabular-nums"><CountUp value={total} delay={0.2} /></span>
-            <span className="text-[14px] font-semibold text-ink-65">kg</span>
+            <span className="font-display text-[28px] font-extrabold leading-none tracking-[-0.02em] text-ink tabular-nums"><CountUp value={total} delay={0.2} /></span>
+            <span className="text-body-sm font-semibold text-ink-65">kg</span>
           </p>
         </div>
         <div className="text-right">
-          <p className="text-[13px] font-semibold text-ink-65">Sessions</p>
-          <p className="mt-1 text-[15px] font-semibold text-ink tabular-nums">{sessions}<span className="font-medium text-ink-65">{planned === null ? '' : ` of ${planned}`}</span></p>
+          <p className="text-caption font-semibold text-ink-65">Sessions</p>
+          <p className="mt-1 font-display text-hero text-ink tabular-nums">{sessions}<span className="text-body font-semibold text-ink-65">{planned === null ? '' : ` of ${planned}`}</span></p>
         </div>
       </div>
-      <div className="relative mt-4 grid grid-cols-7" aria-hidden="true">
-        {total === 0 ? <span className="absolute inset-x-0 top-3 text-center text-[14px] font-medium text-ink-65">Your sessions this week show up here</span> : null}
+      <div className="relative mt-4 grid grid-cols-7 gap-1.5" aria-hidden="true">
+        {total === 0 ? <span className="absolute inset-x-0 top-3 text-center text-body-sm font-medium text-ink-65">Your sessions this week show up here</span> : null}
         {perDay.map((kg, index) => {
           const fraction = kg / max
           return (
             <span key={labels[index] + index} className="flex flex-col items-center gap-1.5">
               {/* Every day stands on one continuous baseline; empty days are just the line. */}
-              <span className="flex h-[52px] w-full items-end justify-center border-b-[1.5px] border-ink-10">
+              <span className="flex h-[96px] w-full items-end justify-center border-b-[1.5px] border-ink-10">
                 {kg > 0 ? (
                   <motion.span
-                    className="block h-full w-full max-w-[22px] origin-bottom rounded-t-[6px] bg-ink"
+                    className="block h-full w-full max-w-[36px] origin-bottom rounded-t-[10px] bg-ink"
                     initial={first && !reduce ? { scaleY: 0 } : false}
                     animate={{ scaleY: Math.max(0.06, fraction) }}
                     transition={reduce ? reducedFade : { ...spring.glide, delay: 0.16 + index * 0.04 }}
                   />
-                ) : index === todayIndex ? <span className="block h-1 w-full max-w-[22px] rounded-t-[3px] bg-ink-20" /> : null}
+                ) : index === todayIndex ? <span className="block h-1 w-full max-w-[36px] rounded-t-[3px] bg-ink-20" /> : null}
               </span>
-              <span className={cn('text-[12px] text-ink-65', index === todayIndex ? 'font-bold text-ink' : 'font-medium')}>{labels[index]}</span>
+              <span className={cn('text-label text-ink-65', index === todayIndex ? 'font-bold text-ink' : 'font-medium')}>{labels[index]}</span>
             </span>
           )
         })}
@@ -116,23 +138,23 @@ export function ProgramCard({ days, nextIdx, first }: { days: WorkoutPlanDay[]; 
               type="button"
               onClick={() => canExpand && setExpanded(open ? null : index)}
               aria-expanded={canExpand ? open : undefined}
-              className="flex min-h-16 w-full items-center gap-3 px-5 py-3 text-left active:bg-ink-04"
+              className="flex min-h-row w-full items-center gap-3 px-4 py-3 text-left active:bg-ink-04"
             >
-              <span className={cn('grid size-7 shrink-0 place-items-center rounded-full text-[13px] font-semibold tabular-nums', isNext ? 'bg-ink text-cream' : 'bg-ink-06 text-ink')}>{index + 1}</span>
+              <span className={cn('grid size-7 shrink-0 place-items-center rounded-full text-caption font-semibold tabular-nums', isNext ? 'bg-ink text-cream' : 'bg-ink-06 text-ink')}>{index + 1}</span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15.5px] font-semibold text-ink">{day.is_rest_day ? 'Rest' : (day.name || `Day ${index + 1}`)}</span>
-                <span className="block text-[13px] text-ink-65">{day.is_rest_day ? 'Recovery' : plural(exercises.length, 'exercise')}{isNext ? ' · next' : ''}</span>
+                <span className="block truncate text-body font-semibold text-ink">{day.is_rest_day ? 'Rest' : (day.name || `Day ${index + 1}`)}</span>
+                <span className="block text-caption text-ink-65">{day.is_rest_day ? 'Recovery' : plural(exercises.length, 'exercise')}{isNext ? ' · next' : ''}</span>
               </span>
               {canExpand ? <ChevronRightIcon className={cn('size-4 text-ink-35 transition-transform duration-200', open && 'rotate-90')} /> : null}
             </button>
             {open ? (
-              <motion.ul initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }} className="space-y-2 pb-4 pl-[60px] pr-5">
+              <motion.ul initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }} className="space-y-2 pb-4 pl-[56px] pr-4">
                 {exercises.map((exercise, exerciseIndex) => {
                   const detail = formatExDetail(exercise)
                   return (
-                    <li key={`${exercise.name}-${exerciseIndex}`} className="flex items-baseline justify-between gap-3 text-[14px]">
+                    <li key={`${exercise.name}-${exerciseIndex}`} className="flex items-baseline justify-between gap-3 text-body-sm">
                       <span className="min-w-0 break-words text-ink">{exercise.name}</span>
-                      {detail ? <span className="shrink-0 text-[13px] text-ink-65 tabular-nums">{detail}</span> : null}
+                      {detail ? <span className="shrink-0 text-caption text-ink-65 tabular-nums">{detail}</span> : null}
                     </li>
                   )
                 })}
@@ -148,7 +170,7 @@ export function ProgramCard({ days, nextIdx, first }: { days: WorkoutPlanDay[]; 
 export function HistoryCard({ sessions, tz, first, onOpen, onLog }: { sessions: WorkoutSession[]; tz: string; first: boolean; onOpen: (id: string) => void; onLog: () => void }) {
   if (sessions.length === 0) {
     return (
-      <button type="button" onClick={onLog} className="flex min-h-16 w-full items-center justify-center rounded-[24px] border-[1.5px] border-dashed border-ink-20 px-5 text-center text-[15px] font-semibold text-ink-65 transition-transform active:scale-[.98]">
+      <button type="button" onClick={onLog} className="flex min-h-16 w-full items-center justify-center rounded-card border-[1.5px] border-dashed border-ink-20 px-5 text-center text-body-sm font-semibold text-ink-65 transition-transform active:scale-[.98]">
         No workouts yet. Log a freestyle one
       </button>
     )
@@ -159,12 +181,12 @@ export function HistoryCard({ sessions, tz, first, onOpen, onLog }: { sessions: 
         const sets = session.exercises.reduce((sum, exercise) => sum + exercise.sets.filter((set) => set.completed).length, 0)
         return (
           <Enter key={session.id} first={first} layer="row" index={index} className="border-b border-ink-06 last:border-b-0">
-            <button type="button" onClick={() => onOpen(session.id)} className="flex min-h-16 w-full items-center gap-3 px-5 py-3 text-left active:bg-ink-04" data-testid={index === 0 ? 'activity-last-session' : undefined}>
+            <button type="button" onClick={() => onOpen(session.id)} className="flex min-h-row w-full items-center gap-3 px-4 py-3 text-left active:bg-ink-04" data-testid={index === 0 ? 'activity-last-session' : undefined}>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15.5px] font-semibold text-ink">{session.day_name}</span>
-                <span className="block truncate text-[13px] text-ink-65">{formatHistoryDate(session.completed_at!, tz)} · {session.duration_minutes ?? 0} min · {plural(sets, 'set')}</span>
+                <span className="block truncate text-body font-semibold text-ink">{session.day_name}</span>
+                <span className="block truncate text-caption text-ink-65">{formatHistoryDate(session.completed_at!, tz)} · {session.duration_minutes ?? 0} min · {plural(sets, 'set')}</span>
               </span>
-              {session.total_volume_kg ? <span className="shrink-0 text-[15px] font-semibold text-ink tabular-nums">{fmt(session.total_volume_kg)}<span className="text-[13px] font-medium text-ink-65"> kg</span></span> : null}
+              {session.total_volume_kg ? <span className="shrink-0 text-body-sm font-semibold text-ink tabular-nums">{fmt(session.total_volume_kg)}<span className="text-caption font-medium text-ink-65"> kg</span></span> : null}
               <ChevronRightIcon className="size-4 shrink-0 text-ink-35" />
             </button>
           </Enter>
@@ -176,7 +198,7 @@ export function HistoryCard({ sessions, tz, first, onOpen, onLog }: { sessions: 
 
 /** Same boxes as the loaded screen, so the swap never shifts; blocks pulse only after 600 ms. */
 export function TrainSkeleton() {
-  const block = 'rounded-[24px] bg-ink-04 animate-[pulse_1.2s_ease-in-out_600ms_infinite]'
+  const block = 'rounded-card bg-ink-04 animate-[pulse_1.2s_ease-in-out_600ms_infinite]'
   return (
     <div className="mt-5 space-y-3" role="status" aria-busy="true" aria-label="Loading training">
       <div className={cn(block, 'h-[196px]')} />

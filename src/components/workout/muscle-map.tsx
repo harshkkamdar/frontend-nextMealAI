@@ -82,6 +82,11 @@ const PART_NAMES: Partial<Record<BodyPart, string>> = {
   'upper-back': 'Back', 'lower-back': 'Lower back', gluteal: 'Glutes', hamstring: 'Hamstrings', neck: 'Neck',
 }
 
+/** Readable names for body parts, deduplicated in order ("Chest", "Shoulders", ...). */
+export function muscleNames(parts: BodyPart[]): string[] {
+  return [...new Set(parts.map((part) => PART_NAMES[part]).filter((name): name is string => Boolean(name)))]
+}
+
 /** Readable list of what an exercise works, e.g. "Chest · Triceps · Shoulders". */
 export function muscleCaption(group: string | null | undefined, name = ''): string {
   if (group?.trim()) return group.trim().replace(/^./, (c) => c.toUpperCase())

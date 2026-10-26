@@ -14,6 +14,7 @@ import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { Enter, HistoryCard, NextUpCard, ProgramCard, SectionTitle, TrainSkeleton, VolumeCard } from '@/components/workout/train-cards'
 import { completedSessions, plannedDates, weekVolume } from '@/components/workout/train-data'
+import { muscleNames, musclesFor } from '@/components/workout/muscle-map'
 import { WeekStrip, weekDays } from '@/components/ui/fiqr/week-strip'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
@@ -140,6 +141,13 @@ export default function ActivityPage() {
   }
   const plannedSessions = workoutPlan ? days.filter((day) => !day.is_rest_day).length : null
   const exerciseCount = nextWorkout?.exercises?.length ?? 0
+  // A3: the muscles the day works (plan exercises carry only names), or the live exercise's when one is in progress.
+  const liveExercise = isResume && inProgress ? inProgress.exercises.find((exercise) => exercise.sets.some((set) => !set.completed)) ?? inProgress.exercises[0] : undefined
+  const dayParts = [...new Set((nextWorkout?.exercises ?? []).flatMap((exercise) => musclesFor(null, exercise.name)))]
+  const heroParts = liveExercise ? musclesFor(liveExercise.muscle_group, liveExercise.name) : dayParts
+  const heroChips = muscleNames(dayParts)
+  const liveSets = inProgress ? inProgress.exercises.flatMap((exercise) => exercise.sets) : []
+  const liveMinutes = inProgress?.started_at ? Math.max(0, Math.floor((Date.now() - new Date(inProgress.started_at).getTime()) / 60000)) : 0
   const afterRest = isRestDay ? days.slice(nextIdx + 1).concat(days.slice(0, nextIdx)).find((day) => !day.is_rest_day) : undefined
 
   const hero = !workoutPlan ? (
@@ -147,7 +155,7 @@ export default function ActivityPage() {
       eyebrow="Next up"
       title="No program yet"
       meta="Geo can build one around your goals and kit."
-      action={<PrimaryButton type="button" className="h-12 rounded-[14px] py-0" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a program</PrimaryButton>}
+      action={<PrimaryButton type="button" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a program</PrimaryButton>}
     />
   ) : isRestDay ? (
     <NextUpCard
@@ -155,18 +163,20 @@ export default function ActivityPage() {
       title="Rest day"
       meta={afterRest ? `Recover today. ${afterRest.name || 'Your next session'} is up next.` : 'Recover today.'}
       action={(
-        <button type="button" onClick={() => programRef.current?.scrollIntoView({ behavior: 'smooth' })} className="flex h-12 w-full items-center justify-center gap-1 rounded-[14px] bg-ink-06 text-[15px] font-semibold text-ink transition-transform active:scale-[.97]">
+        <button type="button" onClick={() => programRef.current?.scrollIntoView({ behavior: 'smooth' })} className="flex h-btn w-full items-center justify-center gap-1 rounded-full bg-ink-06 text-body font-bold text-ink transition-transform active:scale-[.97]">
           See program <ChevronRightIcon className="size-4" />
         </button>
       )}
     />
   ) : (
     <NextUpCard
-      eyebrow={isResume ? 'In progress' : 'Next up'}
-      title={nextWorkout?.name || `Day ${nextIdx + 1}`}
-      meta={`${plural(exerciseCount, 'exercise')} · about ${Math.max(15, Math.round((exerciseCount * 7.5) / 5) * 5)} min`}
+      eyebrow={isResume ? `In progress · ${liveMinutes} min` : 'Today'}
+      title={(isResume ? inProgress?.day_name : nextWorkout?.name) || `Day ${nextIdx + 1}`}
+      meta={isResume ? `${liveSets.filter((set) => set.completed).length} of ${liveSets.length} sets` : `${plural(exerciseCount, 'exercise')} · about ${Math.max(15, Math.round((exerciseCount * 7.5) / 5) * 5)} min`}
+      parts={heroParts}
+      chips={isResume ? undefined : heroChips.length > 4 ? [...heroChips.slice(0, 4), `+${heroChips.length - 4}`] : heroChips}
       action={(
-        <PrimaryButton type="button" disabled={starting} data-testid="activity-start-workout-button" className="h-12 rounded-[14px] py-0" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
+        <PrimaryButton type="button" disabled={starting} data-testid="activity-start-workout-button" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
           {starting ? 'Starting…' : isResume ? 'Resume workout' : 'Start workout'}
         </PrimaryButton>
       )}
@@ -202,9 +212,9 @@ export default function ActivityPage() {
 
           {workoutPlan ? (
             <section ref={programRef} className="mt-3 scroll-mt-24">
-              <SectionTitle trailing={days.length ? `Day ${nextIdx + 1} of the cycle` : undefined}>Program</SectionTitle>
+              <SectionTitle trailing={days.length ? `Day ${nextIdx + 1} of ${days.length}` : undefined}>Program</SectionTitle>
               <ProgramCard days={days} nextIdx={nextIdx} first={first} />
-              <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-1 flex min-h-11 items-center gap-1 px-5 text-[14px] font-semibold text-ink-65">
+              <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-1 flex min-h-11 items-center gap-1 px-4 text-body-sm font-semibold text-ink-65">
                 View full plan <ChevronRightIcon className="size-4" />
               </button>
             </section>
