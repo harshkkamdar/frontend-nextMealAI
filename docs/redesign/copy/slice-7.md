@@ -11,11 +11,12 @@
 | Card badge | ACTIVE | (removed; the section says it) |
 | Empty slot | No nutrition plan yet · Build one → | No nutrition plan yet / Build one, or ask Geo below |
 | Empty slot | No training program yet · Build one → | No training program yet / Build one, or ask Geo below |
-| New-plan card title | (none) | Want a new plan? |
-| New-plan card line | (none) | Tell Geo what you're after and it drafts one for you to check. |
+| New-plan heading | (none) | Want a new plan? |
+| New-plan line | (none) | Tell Geo what you're after and it drafts one for you to check. |
 | Primary action | Ask Geo for a plan | Ask Geo for a plan |
-| Link | Build a nutrition plan by hand → | Build a nutrition plan yourself |
-| Link | Build a training program by hand → | Build a training program yourself |
+| Links header (new) | (none) | Or build it yourself |
+| Link | Build a nutrition plan by hand → | Nutrition plan |
+| Link | Build a training program by hand → | Training program |
 | History section (new) | (none) | Earlier |
 | Earlier row meta | (none) | Training · 2 Jun – 24 Aug (or "Made 5 Apr" when the plan has no dates) |
 | Loading (screen reader) | (none) | Loading your plans |

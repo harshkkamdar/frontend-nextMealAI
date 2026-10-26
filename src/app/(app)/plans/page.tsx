@@ -19,6 +19,9 @@ import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui.store'
 import type { MealPlan, Plan, WorkoutPlan } from '@/types/plans.types'
 
+/** Section labels and every text column share one 20 px inset inside the 16 px gutter, in line with the back button. */
+const SECTION = 'px-5 text-[13px] font-semibold text-ink-65'
+
 export default function PlansPage() {
   useSetGeoScreen('plans', {})
   const router = useRouter()
@@ -50,32 +53,35 @@ export default function PlansPage() {
       ) : error && !data ? (
         <div className="mt-4"><ErrorState onRetry={refresh}>I couldn&apos;t load your plans. Check your connection and try again.</ErrorState></div>
       ) : (
-        <div className={cn('mt-4 flex flex-col gap-3', enter && 'enter-rows')}>
-          <h2 className="px-1 text-[13px] font-semibold text-ink-65">Active</h2>
-          {mealPlan
-            ? <PlanOverviewCard plan={mealPlan} onClick={() => open(mealPlan)} onEdit={() => router.push(`/plans/edit?id=${mealPlan.id}`)} />
-            : <EmptySlot label="No nutrition plan yet" href="/plans/new/meal" />}
-          {workoutPlan
-            ? <PlanOverviewCard plan={workoutPlan} onClick={() => open(workoutPlan)} onEdit={() => router.push(`/plans/edit?id=${workoutPlan.id}`)} />
-            : <EmptySlot label="No training program yet" href="/plans/new/workout" />}
+        <div className={cn('mt-4 flex flex-col', enter && 'enter-rows')}>
+          <section aria-labelledby="active-plans" className="flex flex-col gap-3">
+            <h2 id="active-plans" className={SECTION}>Active</h2>
+            {mealPlan
+              ? <PlanOverviewCard plan={mealPlan} onClick={() => open(mealPlan)} onEdit={() => router.push(`/plans/edit?id=${mealPlan.id}`)} />
+              : <EmptySlot label="No nutrition plan yet" href="/plans/new/meal" />}
+            {workoutPlan
+              ? <PlanOverviewCard plan={workoutPlan} onClick={() => open(workoutPlan)} onEdit={() => router.push(`/plans/edit?id=${workoutPlan.id}`)} />
+              : <EmptySlot label="No training program yet" href="/plans/new/workout" />}
+          </section>
 
-          <section className={cn(CARD, 'mt-5 p-5')} aria-labelledby="new-plan">
-            <h2 id="new-plan" className="font-wide text-[19px] font-bold leading-tight text-ink">Want a new plan?</h2>
-            <p className="mt-1 text-[14.5px] leading-[1.45] text-ink-65">Tell Geo what you&apos;re after and it drafts one for you to check.</p>
+          <section aria-labelledby="new-plan" className="mt-10">
+            <h2 id="new-plan" className="px-5 text-[17px] font-semibold text-ink">Want a new plan?</h2>
+            <p className="mt-1 px-5 text-[14.5px] leading-[1.45] text-ink-65">Tell Geo what you&apos;re after and it drafts one for you to check.</p>
             <PrimaryButton type="button" className="mt-4 h-[54px] rounded-full py-0" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a plan</PrimaryButton>
-            <div className="mt-3 border-t border-ink-06 pt-1">
-              <BuildLink href="/plans/new/meal" label="Build nutrition plan by hand">Build a nutrition plan yourself</BuildLink>
-              <BuildLink href="/plans/new/workout" label="Build training program by hand">Build a training program yourself</BuildLink>
+            <h3 className={cn(SECTION, 'mt-6')}>Or build it yourself</h3>
+            <div className="mt-1">
+              <BuildLink href="/plans/new/meal" label="Build nutrition plan by hand">Nutrition plan</BuildLink>
+              <BuildLink href="/plans/new/workout" label="Build training program by hand">Training program</BuildLink>
             </div>
           </section>
 
           {earlier.length > 0 ? (
-            <>
-              <h2 className="mt-5 px-1 text-[13px] font-semibold text-ink-65">Earlier</h2>
-              <section className={cn(CARD, 'overflow-hidden')} aria-label="Earlier plans">
+            <section aria-labelledby="earlier-plans" className="mt-10 flex flex-col gap-3">
+              <h2 id="earlier-plans" className={SECTION}>Earlier</h2>
+              <div className={cn(CARD, 'overflow-hidden')}>
                 {earlier.map((plan) => <PreviousPlanRow key={plan.id} plan={plan} onClick={() => open(plan)} />)}
-              </section>
-            </>
+              </div>
+            </section>
           ) : null}
         </div>
       )}
@@ -97,7 +103,7 @@ function EmptySlot({ label, href }: { label: string; href: string }) {
 
 function BuildLink({ href, label, children }: { href: string; label: string; children: string }) {
   return (
-    <Link href={href} aria-label={label} className="flex min-h-12 items-center justify-between text-[15px] font-semibold text-ink">
+    <Link href={href} aria-label={label} className="flex min-h-12 items-center justify-between border-b border-ink-06 px-5 text-[16px] font-semibold text-ink last:border-b-0 active:opacity-60">
       {children}
       <ChevronRightIcon className="size-4 text-ink-35" />
     </Link>

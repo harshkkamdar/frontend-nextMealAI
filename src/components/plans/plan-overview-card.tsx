@@ -28,10 +28,10 @@ export function planMeta(plan: Plan): string {
 export function PlanOverviewCard({ plan, onClick, onEdit }: { plan: Plan; onClick: () => void; onEdit?: () => void }) {
   return (
     <div className={cn(CARD, 'relative')}>
-      <button type="button" onClick={onClick} className="flex w-full rounded-[24px] p-5 pr-[72px] text-left transition-transform duration-100 ease-out active:scale-[.98]">
+      <button type="button" onClick={onClick} className="flex w-full rounded-[24px] p-5 pr-14 text-left transition-transform duration-100 ease-out active:scale-[.98]">
         <span className="min-w-0 flex-1">
           <span className="block text-[13px] font-semibold text-ink-65">{plan.type === 'meal' ? 'Nutrition' : 'Training'}</span>
-          <span className="font-wide mt-1 line-clamp-2 block break-words text-[21px] font-bold leading-[1.15] tracking-[-0.3px] text-ink">{planTitle(plan)}</span>
+          <span className="font-wide mt-1 line-clamp-2 block break-words text-[24px] font-bold leading-[1.12] tracking-[-0.4px] text-ink">{planTitle(plan)}</span>
           <span className="mt-1.5 line-clamp-2 block text-[14px] text-ink-65 tabular-nums">{planMeta(plan)}</span>
         </span>
       </button>
@@ -40,9 +40,9 @@ export function PlanOverviewCard({ plan, onClick, onEdit }: { plan: Plan; onClic
           type="button"
           aria-label={`Edit ${plan.type === 'meal' ? 'nutrition' : 'workout'} plan`}
           onClick={onEdit}
-          className="absolute right-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94]"
+          className="absolute right-2 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-ink-65 transition-transform active:scale-[.9]"
         >
-          <Pencil className="size-[18px]" strokeWidth={1.75} aria-hidden="true" />
+          <Pencil className="size-5" strokeWidth={1.75} aria-hidden="true" />
         </button>
       ) : null}
     </div>

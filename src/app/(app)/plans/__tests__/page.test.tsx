@@ -81,8 +81,8 @@ describe('PlansPage CTAs', () => {
 
     expect(screen.getByRole('link', { name: 'Build nutrition plan by hand' })).toHaveAttribute('href', '/plans/new/meal')
     expect(screen.getByRole('link', { name: 'Build training program by hand' })).toHaveAttribute('href', '/plans/new/workout')
-    expect(screen.getByText('Build a nutrition plan yourself')).toBeInTheDocument()
-    expect(screen.getByText('Build a training program yourself')).toBeInTheDocument()
+    expect(screen.getByText('Nutrition plan')).toBeInTheDocument()
+    expect(screen.getByText('Training program')).toBeInTheDocument()
     expect(screen.getByText('No nutrition plan yet')).toBeInTheDocument()
     expect(screen.getByText('No training program yet')).toBeInTheDocument()
   })
