@@ -110,7 +110,7 @@ describe('roundMacroKcalNumber', () => {
   })
 })
 
-// FB-06 — per-macro breakdown aggregator used by MacroBreakdownSheet
+// FB-06 — per-macro breakdown aggregator used by the Home macro sheet
 describe('computeMacroContributions', () => {
   const logs: Log[] = [
     foodLog('a', 'Chicken breast', { protein: 48, carbs: 0, fat: 5, calories: 240 }),
