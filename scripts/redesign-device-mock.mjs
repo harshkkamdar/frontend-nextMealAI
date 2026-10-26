@@ -96,6 +96,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   let shot = { name: 'none', url: '/' }
   let rec = { clock: null, init: [] }
   let created = []
+  let liveSession = null
 
   http.createServer((req, res) => {
     const origin = req.headers.origin
@@ -115,12 +116,28 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
           if (!found) return send(404, { error: `no shot ${slice}/${name}` })
           shot = found
           created = []
+          liveSession = null
           rec = await preload(shot)
           return send(200, { slice, name, url: shot.url, clock: rec.clock, init: rec.init.length })
         } catch (e) { return send(500, { error: e.message }) }
       }
       if (p.startsWith('/__photo')) { res.writeHead(200, { 'content-type': 'image/jpeg' }); return res.end(fs.readFileSync(PHOTO)) }
       if (p === '/auth/refresh' || p === '/auth/login') return send(200, { user: AUTH.state.user, session: { access_token: 'capture-token', refresh_token: 'capture-refresh' } })
+      // A workout started on the device runs on slice-6's mid-session fixture until the shot changes.
+      if (p === '/v1/workout-sessions' && req.method === 'POST') {
+        const fixture = (await sliceShots('slice-6')).find((s) => s.name === 'session-mid')?.api?.['/v1/workout-sessions']
+        if (!fixture) return send(500, { error: 'no slice-6 session fixture' })
+        const now = new Date().toISOString()
+        liveSession = { ...fixture, status: 'in_progress', started_at: now, completed_at: null }
+        return send(201, liveSession)
+      }
+      if (liveSession && p === '/v1/workout-sessions/in-progress') return send(200, { session: liveSession })
+      if (liveSession && p.startsWith(`/v1/workout-sessions/${liveSession.id}`)) {
+        if (p.endsWith('/complete')) { liveSession = { ...liveSession, status: 'completed', completed_at: new Date().toISOString() }; const done = liveSession; liveSession = null; return send(200, done) }
+        if (p.endsWith('/abandon') || req.method === 'DELETE') { liveSession = null; return send(200, {}) }
+        if (req.method === 'PATCH' || req.method === 'PUT') { try { liveSession = { ...liveSession, ...JSON.parse(raw || '{}') } } catch {} }
+        return send(200, liveSession)
+      }
       // Logs made on the device stay until the shot changes, so a quick log shows up on the next read (simulator demos).
       if (p === '/v1/logs' && req.method === 'POST') {
         let input = {}

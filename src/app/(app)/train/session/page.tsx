@@ -127,6 +127,8 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const loadSession = useCallback((showToast = false) => {
     return getWorkoutSession(sessionId)
       .then((nextSession) => {
+        // A malformed answer (no exercises array) shows the load error instead of crashing the screen.
+        if (!nextSession || !Array.isArray(nextSession.exercises)) throw new Error('Malformed workout session')
         setSession(nextSession)
         setLoadFailed(false)
         if (showToast) toast.success('Workout updated!')

@@ -123,6 +123,7 @@ export default function ActivityPage() {
     setStarting(true)
     try {
       const session = await startWorkoutSession({ plan_id: workoutPlan?.id, plan_day_index: nextIdx >= 0 ? nextIdx : undefined, day_name: nextWorkout?.name })
+      if (!session?.id) throw new Error('No session id')
       router.push(`/train/session?id=${session.id}`)
     } catch {
       toast.error("Couldn't start the workout. Try again.")
