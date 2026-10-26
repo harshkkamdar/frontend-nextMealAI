@@ -85,14 +85,14 @@ export default function PaywallPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-[calc(var(--safe-bottom)+16px)]">
+    <div className="mx-auto w-full max-w-md px-4 pb-[calc(var(--safe-bottom)+32px)]">
       <PushedHeader title="FIQR Plus" onBack={() => router.back()} />
       <div className="-mx-4 mb-4 [&:empty]:hidden"><OfflineBand /></div>
 
       <div className="enter-rows mt-1 flex flex-col gap-5">
         <header className="flex items-start gap-3 px-1">
           <GeoAvatar size={32} />
-          <h1 className="font-wide text-[24px] font-bold leading-[1.15] tracking-[-0.4px] text-ink">Coaching that keeps up with what you actually do</h1>
+          <h1 className="font-wide text-[24px] font-bold leading-[1.15] tracking-[-0.4px] text-balance text-ink">Coaching that keeps up with what you actually do</h1>
         </header>
 
         <ul aria-label="What you get" className={cn(CARD, 'overflow-hidden')}>

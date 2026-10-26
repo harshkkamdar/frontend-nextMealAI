@@ -19,9 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-[55] bg-cream" style={{ height: 'var(--safe-top)' }} />
         <Toaster
           position="top-center"
-          offset={{ top: 'calc(12px + var(--safe-top))' }}
-          mobileOffset={{ top: 'calc(12px + var(--safe-top))' }}
-          toastOptions={{ style: { background: '#FFFFFF', color: '#111C35', border: '1px solid rgba(17,28,53,.16)', borderRadius: 16, fontFamily: 'var(--font-archivo)', fontSize: 14.5, fontWeight: 600 } }}
+          // Below the 60px header row (PushedHeader and LargeTitleHeader) so a toast never covers the back button.
+          offset={{ top: 'calc(64px + var(--safe-top))' }}
+          mobileOffset={{ top: 'calc(64px + var(--safe-top))' }}
+          // height auto: sonner pins the measured first-paint height, which clips text that wraps once the font loads.
+          toastOptions={{ style: { height: 'auto', padding: '12px 16px', lineHeight: 1.35, background: '#FFFFFF', color: '#111C35', border: '1px solid rgba(17,28,53,.16)', borderRadius: 16, fontFamily: 'var(--font-archivo)', fontSize: 14.5, fontWeight: 600 } }}
         />
         <SplashHider />
       </body>

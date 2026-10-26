@@ -164,6 +164,7 @@ if (process.argv[1]?.endsWith('redesign-transitions.mjs')) {
         const req = route.request()
         const p = new URL(req.url()).pathname
         if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors })
+        if (p.startsWith('/v1/admin')) return route.fulfill({ status: 403, headers: cors })
         const key = Object.keys(TRANSITION_API).filter((k) => p === k || p.startsWith(k + '/')).sort((a, b) => b.length - a.length)[0]
         return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(key ? TRANSITION_API[key] : {}) })
       })
@@ -183,6 +184,10 @@ const transitions = [
   { name: 'paywall-plan-switch', url: '/paywall', native: { products: PRODUCTS }, act: (p) => p.getByRole('radio', { name: /Monthly/ }).click() },
   { name: 'settings-switch', url: '/settings', act: (p) => p.getByRole('switch', { name: 'Push notifications' }).click() },
 ]
+
+// The capture user is not an admin: the admin probe (/v1/admin/metrics) would otherwise hit the catch-all 200 and show
+// the Admin dashboard row. Any failure reads as "not admin".
+for (const s of shots) if (!s.guest) s.fail = [].concat(s.fail ?? [], '/v1/admin')
 
 const slice9 = { shots, transitions }
 export default slice9
