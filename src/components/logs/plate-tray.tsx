@@ -35,7 +35,7 @@ export function PlatePill({ items, saving, onOpen, onLog }: { items: PlateItem[]
               <ChevronUp aria-hidden="true" className="size-4 shrink-0 text-ink" />
               <span className="truncate text-body-sm font-bold text-ink tabular-nums">{count(items.length)} · {formatMacroKcal(kcal)} kcal</span>
             </button>
-            <PrimaryButton type="button" onClick={onLog} disabled={saving} aria-busy={saving} className="h-11 min-h-11 w-auto shrink-0 px-6 disabled:bg-accent/60 disabled:text-cream">
+            <PrimaryButton type="button" onClick={onLog} disabled={saving} aria-busy={saving} className="h-11 min-h-11 w-auto shrink-0 px-6 disabled:bg-accent/60 disabled:text-ink">
               {saving ? 'Saving…' : 'Log'}
             </PrimaryButton>
           </div>
