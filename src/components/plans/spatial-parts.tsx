@@ -14,13 +14,13 @@ import { cn } from '@/lib/utils'
  */
 
 export const CARD = 'rounded-card bg-card shadow-[var(--shadow-card)]'
-export const INK_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-ink px-5 text-[19px] font-bold text-cream transition-transform enabled:active:scale-[.97] disabled:opacity-45'
+export const INK_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-ink px-5 text-body font-bold text-cream transition-transform enabled:active:scale-[.97] disabled:opacity-45'
 /**
- * The screen's one orange action. Not PrimaryButton: its cn() drops text-cream against text-body (shared-file request).
- * Cream on orange is 3.3:1, so the label is large text (19 bold) to pass AA, as the button was before the kit resize.
+ * The screen's one orange action, as a plain class string (buttons and the busy state in the dock share it).
+ * Ink label (owner decision, 27 Oct 2026): cream on orange fails AA.
  */
-export const ORANGE_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-accent px-5 text-[19px] font-bold text-cream shadow-[inset_0_1px_0_rgba(255,255,255,.35)] transition-transform enabled:active:scale-[.97] disabled:opacity-45 aria-busy:opacity-100'
-export const SOFT_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-ink-06 px-5 text-[19px] font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:opacity-45'
+export const ORANGE_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-accent px-5 text-body font-bold text-ink shadow-[inset_0_1px_0_rgba(255,255,255,.35)] transition-transform enabled:active:scale-[.97] disabled:opacity-45 aria-busy:opacity-100'
+export const SOFT_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-ink-06 px-5 text-body font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:opacity-45'
 
 /** Section heading: 18 / 750, a little wide, 28 above and 10 below (the mock's `.sec`). */
 export function SectionHeading({ children, id, className }: { children: ReactNode; id?: string; className?: string }) {
