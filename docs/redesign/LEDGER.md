@@ -84,7 +84,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S4-R3 | R3 axe 0 / contrast / 44 pt | built 5aa376e: axe 0, small 0, orange <= 1 on 50 checks |
 | S4-R4 | R4 frame-diff 0 pops | pending |
 | S4-R5 | R5 60 fps on fiqr_lowend | blocked: no real low-end phone (F6) and no emulator trace could be taken: fiqr_lowend35 never booted (black screen, quit by owner 26 Oct 2026); earlier fiqr_lowend runs rendered 4-17 fps under host load and were discarded (549d674) |
-| S4-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
+| S4-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: critic scores of 3 fix rounds printed - r1 7/7.5/7, r2 7.5/7.5/7.5, r3 7.5/7/7.5 (ranks 1/1/1; top 3 every run, never >= 8). Recurring r3 notes: round shadowed back button (C3, signed), lone wrapped "Not sure" chip, disabled send reads muddy, timestamp and caption gaps |
 | S4-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-4.md? Resizable sheets settle by transform (pinned footer shifts slightly on release) vs animating height (forbidden by motion-feel) - keep? Inline food rows parse Geo's "Logged ... N cal" receipt text; a structured receipt from the backend would be sturdier (backend change, out of scope). New: Ask Geo field on /chat and a Rename/Delete sheet - approve? |
 | S4-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
