@@ -122,18 +122,24 @@ export function CheckInDue({ status, today, refetch, onApplied, onDone, source }
       <DockSpacer />
 
       <Dock>
-        {outcome ? (
-          <button type="button" onClick={onDone} className={INK_BUTTON}>Done</button>
-        ) : !changes ? (
-          // A hold changes nothing, so keeping records nothing: Apply is never called for it.
-          <button type="button" onClick={keep} className={INK_BUTTON}>Keep my targets</button>
-        ) : !online ? (
-          <button type="button" disabled className={SOFT_BUTTON}>Apply when you&apos;re back online</button>
-        ) : (
-          <button type="button" aria-busy={submitting || undefined} disabled={submitting} onClick={() => void handleApply()} className={ORANGE_BUTTON}>
-            {submitting ? <Busy>Updating your targets</Busy> : failed ? 'Try again' : 'Apply new targets'}
-          </button>
-        )}
+        {/* Apply and Done share one cell and crossfade, so the swap never jumps (opacity only). */}
+        <div className="grid">
+          <div inert={!!outcome} className={`col-start-1 row-start-1 transition-opacity duration-200 ease-out ${outcome ? 'opacity-0' : ''}`}>
+            {!changes ? (
+              // A hold changes nothing, so keeping records nothing: Apply is never called for it.
+              <button type="button" onClick={keep} className={INK_BUTTON}>Keep my targets</button>
+            ) : !online ? (
+              <button type="button" disabled className={SOFT_BUTTON}>Apply when you&apos;re back online</button>
+            ) : (
+              <button type="button" aria-busy={submitting || undefined} disabled={submitting} onClick={() => void handleApply()} className={ORANGE_BUTTON}>
+                {submitting || outcome ? <Busy>Updating your targets</Busy> : failed ? 'Try again' : 'Apply new targets'}
+              </button>
+            )}
+          </div>
+          <div inert={!outcome} className={`col-start-1 row-start-1 transition-opacity duration-200 ease-out ${outcome ? '' : 'opacity-0'}`}>
+            <button type="button" onClick={onDone} className={INK_BUTTON}>Done</button>
+          </div>
+        </div>
       </Dock>
     </div>
   )

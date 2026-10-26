@@ -191,8 +191,8 @@ describe('check-in states', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
 
     await waitFor(() => expect(screen.getByText('Saved. Home, your food diary and Lean cut now use 2,300 kcal.')).toBeInTheDocument())
-    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Apply new targets' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Done' }).closest('[inert]')).toBeNull()
+    expect(screen.getByRole('button', { name: /Updating your targets/ }).closest('[inert]')).not.toBeNull()
     expect(screen.queryByRole('button', { name: 'New targets' })).not.toBeInTheDocument()
   })
 
@@ -215,7 +215,7 @@ describe('check-in states', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("That didn't save, so your targets are still 2,200 kcal."))
     expect(refetch).not.toHaveBeenCalled()
     expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled()
-    expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Done' }).closest('[inert]')).not.toBeNull()
   })
 
   it('keeps targets on a hold without calling Apply', () => {
