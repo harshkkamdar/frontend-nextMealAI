@@ -40,13 +40,16 @@ describe('classifyNav', () => {
 
 describe('shouldCompleteSwipe', () => {
   const w = 390
-  it('completes past 35% of the width and snaps back short of it', () => {
-    expect(shouldCompleteSwipe(0.36 * w, w, 0)).toBe(true)
-    expect(shouldCompleteSwipe(0.34 * w, w, 0)).toBe(false)
+  it('with no flick, completes past half the width and snaps back short of it (UIKit)', () => {
+    expect(shouldCompleteSwipe(0.51 * w, w, 0)).toBe(true)
+    expect(shouldCompleteSwipe(0.49 * w, w, 0)).toBe(false)
   })
-  it('lets a rightward flick complete early and a leftward flick cancel late', () => {
+  it('projects the release velocity (Apple momentum): a short rightward flick completes, a leftward flick cancels late', () => {
+    // 40 px + 600 px/s projected (~300 px) lands past half.
     expect(shouldCompleteSwipe(40, w, 600)).toBe(true)
     expect(shouldCompleteSwipe(0.8 * w, w, -600)).toBe(false)
+    // A slow drift is not a flick: 120 px + 100 px/s (~50 px) stays short.
+    expect(shouldCompleteSwipe(120, w, 100)).toBe(false)
   })
 })
 

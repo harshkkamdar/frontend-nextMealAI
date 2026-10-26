@@ -15,6 +15,7 @@ import {
   WaterFill,
   WeightFill,
 } from '@/components/ui/fiqr/icons'
+import { useSheetDepth } from '@/lib/depth'
 import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
 import { useUIStore } from '@/stores/ui.store'
@@ -47,6 +48,8 @@ export function LogSheet() {
   const open = useUIStore((state) => state.activeSheet === LOG_SHEET)
   const [text, setText] = useState('')
   const panel = useRef<HTMLDivElement>(null)
+  // The screen behind steps back while the sheet is up and follows a drag down (the route frame moves it).
+  const depth = useSheetDepth(open)
 
   const close = () => useUIStore.getState().closeSheet()
   const go = (href: string) => {
@@ -70,9 +73,14 @@ export function LogSheet() {
     go(`/chat/session?id=${crypto.randomUUID()}&prefill=${encodeURIComponent(message)}&send=1`)
   }
 
+  const onDrag = (_: unknown, info: PanInfo) => {
+    const height = panel.current?.offsetHeight ?? 600
+    depth.drag(1 - Math.max(0, info.offset.y) / height)
+  }
   const onDragEnd = (_: unknown, info: PanInfo) => {
     const height = panel.current?.offsetHeight ?? 600
     if (info.offset.y > height * 0.25 || info.velocity.y > 400) close()
+    else depth.settle(true, -info.velocity.y / height)
   }
 
   // Content enters after the surface starts to grow: field at 80 ms, grid from 110 ms at 25 ms apart.
@@ -106,6 +114,7 @@ export function LogSheet() {
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0.08, bottom: 0.6 }}
+            onDrag={onDrag}
             onDragEnd={onDragEnd}
             style={{ borderRadius: 38 }}
             className="fixed inset-x-2 z-[70] mx-auto max-w-[calc(28rem-16px)] overflow-hidden bg-[rgba(253,246,236,.98)] shadow-[var(--shadow-glass)] outline-none bottom-[var(--nav-clearance)]"

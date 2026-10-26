@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, render, type RenderResult } from '@testing-library/react'
 import { RouteFrame } from '../route-frame'
 import { navHistory } from '@/lib/navigation'
+import { motionValue } from 'framer-motion'
+import { holdSheetDepth, releaseSheetDepth } from '@/lib/depth'
 
 // Fake clock before framer loads: its frame loop captures requestAnimationFrame at import.
 const route = vi.hoisted(() => {
@@ -34,6 +36,12 @@ const layer = (key: string) => document.querySelector<HTMLElement>(`[data-route=
 function x(key: string): number {
   const m = layer(key)?.style.transform.match(/translateX\((-?[\d.]+)px\)/)
   return m ? parseFloat(m[1]) : 0
+}
+
+/** The layer's depth scale (framer writes `scale(...)`), 1 when unscaled. */
+function scale(key: string): number {
+  const m = layer(key)?.style.transform.match(/scale\((-?[\d.]+)\)/)
+  return m ? parseFloat(m[1]) : 1
 }
 
 function touch(type: string, clientX: number, clientY = 300, timeStamp = performance.now()) {
@@ -88,7 +96,7 @@ describe('RouteFrame interrupted slides', () => {
     // The page under it stays shown until the half-slid page covers it.
     expect(layer('/food')?.style.display).not.toBe('none')
     await wait(800)
-    expect(x('/foods')).toBeCloseTo(-0.3 * W, 0)
+    expect(x('/foods')).toBeCloseTo(-0.04 * W, 0)
     expect(x('/logs')).toBe(0)
   })
 
@@ -98,7 +106,7 @@ describe('RouteFrame interrupted slides', () => {
     go('/food')
     await wait(80)
     const before = x('/food')
-    expect(before).toBeLessThan(-0.02 * W)
+    expect(before).toBeLessThan(-0.005 * W)
     go('/logs')
     await wait(16)
     // It keeps heading left from its live x; snapped to rest it would start again from x 0.
@@ -165,5 +173,63 @@ describe('RouteFrame focus', () => {
     go('/food')
     await wait(700)
     expect(document.activeElement).toBe(layer('/food')?.querySelector('h1'))
+  })
+})
+
+describe('RouteFrame Spatial Depth', () => {
+  it('a push steps the old page back (scale ~0.94, a little left) and lands the new page at full size; pop reverses it', async () => {
+    go('/foods')
+    await wait(80)
+    // Mid-push the incoming page is still growing toward 1 and is lifted off the document flow.
+    expect(scale('/foods')).toBeLessThan(1)
+    expect(scale('/foods')).toBeGreaterThanOrEqual(0.97)
+    expect(layer('/foods')?.dataset.lifted).toBe('true')
+    await wait(800)
+    expect(scale('/food')).toBeCloseTo(0.94, 2)
+    expect(x('/food')).toBeCloseTo(-0.04 * W, 0)
+    expect(scale('/foods')).toBe(1)
+    // At rest the live page is back in the document flow.
+    expect(layer('/foods')?.dataset.lifted).toBeUndefined()
+    go('/food')
+    await wait(800)
+    expect(scale('/food')).toBe(1)
+    expect(x('/food')).toBe(0)
+  })
+
+  it('a tab switch is a depth crossfade: the new tab comes forward from below 1 while the old one fades past 1', async () => {
+    go('/dashboard')
+    await wait(32)
+    expect(scale('/dashboard')).toBeLessThan(1)
+    expect(scale('/food')).toBeGreaterThan(1)
+    await wait(500)
+    expect(scale('/dashboard')).toBe(1)
+    expect(x('/dashboard')).toBe(0)
+  })
+
+  it('a short fast flick from the edge completes by momentum projection', async () => {
+    go('/foods')
+    await wait(700)
+    const back = vi.spyOn(window.history, 'back').mockImplementation(() => {})
+    // 100 px in 64 ms: about 1,500 px/s, projects well past half the width.
+    const t0 = performance.now()
+    touch('touchstart', 5, 300, t0)
+    for (let i = 1; i <= 4; i++) { touch('touchmove', 5 + 25 * i, 300, t0 + i * 16); await wait(16) }
+    touch('touchend', 105, 300, t0 + 5 * 16)
+    await wait(700)
+    expect(back).toHaveBeenCalled()
+  })
+
+  it('a sheet steps the live page back once it is lifted, and returns it to the flow when the sheet has closed', async () => {
+    const p = motionValue(0)
+    act(() => holdSheetDepth(p))
+    expect(layer('/food')?.dataset.lifted).toBe('true')
+    act(() => p.set(1))
+    await wait(32)
+    expect(scale('/food')).toBeCloseTo(0.945, 3)
+    act(() => p.set(0))
+    act(() => releaseSheetDepth(p))
+    await wait(32)
+    expect(scale('/food')).toBe(1)
+    expect(layer('/food')?.dataset.lifted).toBeUndefined()
   })
 })

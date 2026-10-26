@@ -1,7 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { holdSheetDepth, releaseSheetDepth } from '@/lib/depth'
 import { reducedFade, spring } from '@/lib/motion'
 
 /** Resolves a CSS length (custom properties and env() included) to pixels. */
@@ -57,6 +59,8 @@ export function ResizableSheet({
   // The dim follows the sheet: full while it rests, clearing as it travels off screen (vaul's behaviour).
   const travel = useTransform(() => Math.min(1, Math.max(0, 1 - y.get() / Math.max(1, height.get()))))
   const dim = useTransform(() => (reduce ? fade.get() : travel.get()))
+  // Floats forward: grows from 0.92 to full size as it rises, from its bottom edge (spatial mock).
+  const scale = useTransform(() => (reduce ? 1 : 0.92 + 0.08 * travel.get()))
   const drag = useRef<{ startY: number; startH: number; lastY: number; lastT: number; v: number } | null>(null)
   const closing = useRef(false)
   const mounted = useRef(false)
@@ -111,6 +115,13 @@ export function ResizableSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per close
   }, [open])
 
+  // While mounted, the screen behind steps back by how far the sheet is up (the route frame moves it).
+  useEffect(() => {
+    if (!render) return
+    holdSheetDepth(travel)
+    return () => releaseSheetDepth(travel)
+  }, [render, travel])
+
   useEffect(() => {
     if (!render) return
     document.body.style.overflow = 'hidden'
@@ -162,7 +173,8 @@ export function ResizableSheet({
 
   if (!render) return null
 
-  return (
+  // Portalled to body: inside a page it would step back (and scale) with the page behind it.
+  return createPortal(
     <div className="fixed inset-0 z-[60]">
       {/* The dim covers everything, the tab bar included (it sits at z 50). */}
       <motion.div onClick={onClose} style={{ opacity: dim }} className="absolute inset-0 bg-ink/30" />
@@ -170,7 +182,7 @@ export function ResizableSheet({
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
-        style={{ height, y, opacity: reduce ? fade : 1 }}
+        style={{ height, y, scale, originY: 1, opacity: reduce ? fade : 1 }}
         className="glass-cream absolute inset-x-2 bottom-[var(--nav-clearance)] z-[70] mx-auto flex max-w-[calc(28rem-16px)] flex-col overflow-hidden rounded-[38px]"
       >
         <div
@@ -185,6 +197,7 @@ export function ResizableSheet({
         </div>
         {children}
       </motion.div>
-    </div>
+    </div>,
+    document.body,
   )
 }

@@ -107,6 +107,9 @@
   /* The route frame moves focus to a new page's heading (or the page) after a push or pop, for screen readers and the
      keyboard; that landing spot is not a control, so it draws no ring. */
   [data-route][tabindex="-1"]:focus, [data-route] [tabindex="-1"]:focus { outline: none; }
+  /* A lifted page layer (route-frame.tsx) is fixed and scrolled inside itself, so its fixed bars ride with that scroll;
+     --lift-y (the layer's scrollTop) moves them back where they sit on screen. */
+  [data-lifted] .fixed:not([data-lifted] .fixed .fixed) { translate: 0 var(--lift-y, 0px); }
 }
 
 /* Reduced motion keeps state changes visible but drops loops and travel. */

@@ -1,15 +1,16 @@
 'use client'
 
-import { useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 // shortcut: Next exposes no public API to keep a page rendered after its route is left; these internal contexts
 // are the known way (frozen router). Re-check them on every Next major upgrade.
 import { LayoutRouterContext } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { PathParamsContext, PathnameContext, SearchParamsContext } from 'next/dist/shared/lib/hooks-client-context.shared-runtime'
-import { animate, motion, motionValue, useReducedMotion, type AnimationPlaybackControls, type MotionValue } from 'framer-motion'
+import { animate, motion, motionValue, useReducedMotion, useTransform, type AnimationPlaybackControls, type MotionValue, type Transition } from 'framer-motion'
 import { hidesTabBar } from '@/components/layout/tab-bar'
 import { isNative } from '@/lib/platform'
-import { PUSH_DIM, PUSH_PARALLAX, SWIPE_EDGE_PX, reducedFade, shouldCompleteSwipe, spring, SWIPE_SLOP_PX } from '@/lib/motion'
+import { useSheetHeld, sheetDepth } from '@/lib/depth'
+import { SWIPE_EDGE_PX, depthPair, reducedFade, sheetBehind, shouldCompleteSwipe, spring, SWIPE_SLOP_PX } from '@/lib/motion'
 import { TAB_ROOTS, classifyNav, navHistory, stampHistory, type NavKind } from '@/lib/navigation'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui.store'
@@ -21,8 +22,12 @@ interface Layer {
   /** Arrived by a slide: the slide is its entrance, so the page's own staggered entrance is skipped (globals.css). */
   slid?: boolean
   x: MotionValue<number>
+  /** Depth scale from the push (behind pages step back, the front page grows in) and the tab crossfade. */
+  scale: MotionValue<number>
   dim: MotionValue<number>
   opacity: MotionValue<number>
+  /** Progress of the sheet this page sits behind (0..1); written only by the route frame, from the sheet depth. */
+  sheet: MotionValue<number>
 }
 
 interface Step { kind: NavKind; top: Layer; old: Layer; settled: boolean }
@@ -32,16 +37,30 @@ interface Step { kind: NavKind; top: Layer; old: Layer; settled: boolean }
  */
 interface Nav { stack: Layer[]; exiting: Layer[]; step: Step | null; front: string | null; moving: boolean; deep?: boolean }
 
-const makeLayer = (key: string): Layer => ({ key, scrollY: 0, x: motionValue(0), dim: motionValue(0), opacity: motionValue(1) })
+const makeLayer = (key: string): Layer => ({ key, scrollY: 0, x: motionValue(0), scale: motionValue(1), dim: motionValue(0), opacity: motionValue(1), sheet: motionValue(0) })
 
-/** Places a push pair at progress p: 0 = top page covers the screen, 1 = top page gone and the page under it at rest. */
-function setPair(top: Layer, under: Layer | undefined, p: number) {
+/**
+ * Places a push pair at progress p (Spatial Depth, motion.ts depthPair): 0 = top page covers the screen, 1 = top page
+ * gone and the page under it at rest. `flat` (reduced motion): the top page only follows the finger, no depth.
+ */
+function setPair(top: Layer, under: Layer | undefined, p: number, flat = false) {
   const w = window.innerWidth
-  top.x.set(p * w)
+  const { front, behind } = depthPair(p)
+  top.x.set(front.x * w)
+  top.scale.set(flat ? 1 : front.scale)
   if (under) {
-    under.x.set(-PUSH_PARALLAX * w * (1 - p))
-    under.dim.set(PUSH_DIM * (1 - p))
+    under.x.set(behind.x * w)
+    under.scale.set(behind.scale)
+    under.dim.set(behind.dim)
   }
+}
+
+/** Puts a page fully behind (where a push leaves the page it covers). */
+function setBehind(layer: Layer) {
+  const { behind } = depthPair(0)
+  layer.x.set(behind.x * window.innerWidth)
+  layer.scale.set(behind.scale)
+  layer.dim.set(behind.dim)
 }
 
 /**
@@ -74,11 +93,11 @@ function advance(nav: Nav, to: string): Nav {
   top.opacity.set(1)
   if (kind !== 'tab') top.slid = true
   if (kind === 'pop') {
-    top.x.set(-PUSH_PARALLAX * window.innerWidth)
-    top.dim.set(PUSH_DIM)
+    setBehind(top)
     return { stack: [top], exiting: [...exiting, old], step: { kind, top, old, settled: false }, front: old.key, moving: true }
   }
   top.x.set(0)
+  top.scale.set(1)
   top.dim.set(0)
   if (kind === 'tab') return { stack: [top], exiting: [...exiting, old], step: { kind, top, old, settled: false }, front: null, moving: true }
   return { stack: [...nav.stack, top], exiting, step: { kind, top, old, settled: false }, front: top.key, moving: true, deep: old.x.get() > 0 }
@@ -111,13 +130,34 @@ function Freeze({ live, children }: { live: boolean; children: ReactNode }) {
  */
 type Role = 'top' | 'leaving' | 'under' | 'covered' | 'buried'
 
-function PageLayer({ layer, role, navMoving, front, children }: { layer: Layer; role: Role; navMoving: boolean; front: boolean; children: ReactNode }) {
+/**
+ * A layer is lifted (fixed to the screen, scrolled inside itself) whenever it can move: under or leaving, while a slide
+ * or fade runs on it, and while it sits behind a sheet. Scaling an in-flow page would scale about the middle of the
+ * whole document and drag its fixed bars along; lifted, it scales about the screen's middle. Its fixed bars then ride
+ * with its inner scroll, so `--lift-y` moves them back (globals.css). While the live page is lifted, `spacer` keeps the
+ * document its height, so the window scroll (and the tab bar's minimise) never sees a jump.
+ */
+function PageLayer({ layer, role, navMoving, front, sheet, spacer, children }: { layer: Layer; role: Role; navMoving: boolean; front: boolean; sheet: boolean; spacer: (px: number) => void; children: ReactNode }) {
   const live = role === 'top'
   const show = role === 'buried' ? 'none' : role === 'covered' ? 'hidden' : 'visible'
   const moving = navMoving && show === 'visible'
+  const lifted = !live || moving || sheet
   const ref = useRef<HTMLDivElement>(null)
-  // A fixed layer shows the page where its user left it; display:none drops scrollTop, so reapply on show.
-  useLayoutEffect(() => { if (!live && show !== 'none' && ref.current) ref.current.scrollTop = layer.scrollY }, [live, show, layer])
+  const wasLifted = useRef(false)
+  // One writer for the page transform: the push or tab depth times the sheet depth.
+  const y = useTransform(() => sheetBehind(layer.sheet.get()).y)
+  const scale = useTransform(() => layer.scale.get() * sheetBehind(layer.sheet.get()).scale)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    // A lifted layer shows the page where its user left it; display:none drops scrollTop, so reapply on show.
+    if (lifted && show !== 'none') el.scrollTop = layer.scrollY
+    if (live) {
+      spacer(lifted ? Math.max(el.scrollHeight, window.innerHeight) : 0)
+      if (!lifted && wasLifted.current) window.scrollTo(0, layer.scrollY)
+    }
+    wasLifted.current = lifted
+  }, [live, lifted, show, layer, spacer])
   return (
     <motion.div
       ref={ref}
@@ -125,15 +165,21 @@ function PageLayer({ layer, role, navMoving, front, children }: { layer: Layer; 
       aria-hidden={!live || undefined}
       style={{
         x: layer.x,
+        y,
+        scale,
         opacity: layer.opacity,
+        // The page in front of a slide grows from its leading edge, so its left edge never pulls away from the finger.
+        originX: front ? 0 : 0.5,
         display: show === 'none' ? 'none' : undefined,
         visibility: show === 'hidden' ? 'hidden' : undefined,
-        willChange: moving ? 'transform, opacity' : undefined,
+        willChange: moving || sheet ? 'transform, opacity' : undefined,
         boxShadow: front ? 'var(--shadow-push)' : undefined,
+        ...(lifted ? ({ position: 'fixed', inset: 0, overflow: 'hidden', contain: 'paint', '--lift-y': `${layer.scrollY}px` } as CSSProperties) : null),
       }}
       data-route={layer.key}
       data-slid={layer.slid || undefined}
-      className={cn('min-h-screen w-full bg-background', !live && 'fixed inset-0 overflow-hidden', !hidesTabBar(layer.key) && 'pb-[var(--tabbar-clearance)]')}
+      data-lifted={lifted || undefined}
+      className={cn('min-h-screen w-full bg-background', !hidesTabBar(layer.key) && 'pb-[var(--tabbar-clearance)]')}
     >
       <Freeze live={live}>{children}</Freeze>
       {/* The dim also rides on the live page while a pop uncovers it, so pop is the exact reverse of push. */}
@@ -143,10 +189,11 @@ function PageLayer({ layer, role, navMoving, front, children }: { layer: Layer; 
 }
 
 /**
- * Route motion for the app shell, as a native navigation stack (motion-feel 3c). A push slides the new page in from
- * the right edge over the old one, which parallaxes to -30% under an ink dim; pop is the exact reverse, and a swipe
- * from the left edge drives the pop with the finger. Pages stay mounted under the one that covers them, so going back
- * keeps their state and scroll. Tabs are peers: a quick crossfade, and the stack starts over.
+ * Route motion for the app shell, as a native navigation stack with Spatial Depth (SPATIAL-BUILD, motion-feel 3c). A
+ * push slides the new page in from the right edge, growing from 0.97, while the old one steps back (scale 0.94, a
+ * little left, under a light ink dim); pop is the exact reverse, and a swipe from the left edge drives the pop with the
+ * finger. Pages stay mounted under the one that covers them, so going back keeps their state and scroll. Tabs are
+ * peers: a quick depth crossfade, and the stack starts over. A sheet steps the live page back the same way (sheet depth).
  */
 export function RouteFrame({ children }: { children: ReactNode }) {
   // The static export (trailingSlash) reports '/food/'; keys and TAB_ROOTS use '/food'.
@@ -158,15 +205,40 @@ export function RouteFrame({ children }: { children: ReactNode }) {
   const [nav, setNav] = useState<Nav>(() => ({ stack: [makeLayer(pathname)], exiting: [], step: null, front: null, moving: false }))
   const navRef = useRef(nav)
   const active = useRef<{ stop: () => void } | null>(null)
+  const spacer = useRef<HTMLDivElement>(null)
+  const setSpacer = useCallback((px: number) => { if (spacer.current) spacer.current.style.height = `${px}px` }, [])
 
   const top = nav.stack[nav.stack.length - 1]
   if (top.key !== pathname) setNav(advance(nav, pathname))
 
+  // The page a sheet opened over steps back with it until the sheet has closed (it stays that page through a push).
+  // Reduced motion: no step back; the sheet's scrim is enough.
+  const wantSheet = useSheetHeld() && !reduce
+  const [sheetKey, setSheetKey] = useState<string | null>(null)
+  if (wantSheet && sheetKey === null) setSheetKey(top.key)
+  if (!wantSheet && sheetKey !== null) setSheetKey(null)
+  const sheetKeyRef = useRef(sheetKey)
+
   useLayoutEffect(() => { navRef.current = nav }, [nav])
 
-  // Track each page's scroll, so it can sit underneath (or come back) exactly where it was.
+  // Sheet depth reaches the page only once it is lifted (this commit), so it never scales an in-flow page.
+  useLayoutEffect(() => {
+    const find = (key: string | null) => [...navRef.current.stack, ...navRef.current.exiting].find((l) => l.key === key)
+    find(sheetKeyRef.current)?.sheet.set(0)
+    sheetKeyRef.current = sheetKey
+    find(sheetKey)?.sheet.set(sheetDepth.get())
+    if (!sheetKey) return
+    return sheetDepth.on('change', (v) => find(sheetKey)?.sheet.set(v))
+  }, [sheetKey])
+
+  // Track each page's scroll, so it can sit underneath (or come back) exactly where it was. A lifted page scrolls
+  // inside itself, so the window's scroll says nothing about it then.
   useEffect(() => {
-    const onScroll = () => { const s = navRef.current.stack; s[s.length - 1].scrollY = window.scrollY }
+    const onScroll = () => {
+      if (navRef.current.moving || sheetKeyRef.current) return
+      const s = navRef.current.stack
+      s[s.length - 1].scrollY = window.scrollY
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -195,21 +267,24 @@ export function RouteFrame({ children }: { children: ReactNode }) {
    * underneath starts where it is: one caught mid-slide (a push over a page still sliding in, a push during a pop)
    * keeps its offset from the pair geometry, and the offset shrinks to 0 as the spring arrives.
    */
-  const slide = (t: Layer, under: Layer | undefined, from: number, to: number, velocity: number) => {
+  const slide = (t: Layer, under: Layer | undefined, from: number, to: number, velocity: number, transition: Transition = spring.push) => {
     const p = motionValue(from)
     const w = window.innerWidth
-    const dx = under ? under.x.get() + PUSH_PARALLAX * w * (1 - from) : 0
-    const dDim = under ? under.dim.get() - PUSH_DIM * (1 - from) : 0
+    const start = depthPair(from).behind
+    const dx = under ? under.x.get() - start.x * w : 0
+    const dScale = under ? under.scale.get() - start.scale : 0
+    const dDim = under ? under.dim.get() - start.dim : 0
     const place = (v: number) => {
       setPair(t, under, v)
-      if (!under || from === to || (dx === 0 && dDim === 0)) return
+      if (!under || from === to || (dx === 0 && dScale === 0 && dDim === 0)) return
       const left = (v - to) / (from - to)
       under.x.set(under.x.get() + dx * left)
+      under.scale.set(under.scale.get() + dScale * left)
       under.dim.set(under.dim.get() + dDim * left)
     }
     place(from)
     const unsub = p.on('change', place)
-    const c = animate(p, to, { ...spring.push, velocity })
+    const c = animate(p, to, { ...transition, velocity })
     void c.finished.then(unsub, unsub)
     return [c]
   }
@@ -226,12 +301,16 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     if (step.settled) { land(); return }
     const drop = () => { setNav((n) => ({ ...n, exiting: n.exiting.filter((l) => l !== old || n.stack.includes(l)) })); land() }
     if (kind === 'tab' || reduce) {
-      // Tabs, and every route change under reduced motion: overlapping crossfade, no slide (motion-feel 3b).
+      // Tabs, and every route change under reduced motion: overlapping crossfade, no slide (motion-feel 3b). Tabs add
+      // depth: the new tab comes forward from 0.975, the old one passes the viewer to 1.02 as it fades (spatial mock).
       // A reduced push leaves the page underneath at rest (x 0), so a reduced pop uncovers it without a jump.
-      if (kind === 'pop') { t.x.set(0); t.dim.set(0) }
+      if (kind === 'pop') { t.x.set(0); t.scale.set(1); t.dim.set(0) }
       if (kind !== 'pop') t.opacity.set(0)
+      const depth = kind === 'tab' && !reduce
+      if (depth) t.scale.set(0.975)
       run(() => [
         ...(kind === 'pop' ? [] : [animate(t.opacity, 1, reduce ? reducedFade : { duration: 0.18, ease: 'easeOut' as const })]),
+        ...(depth ? [animate(t.scale, 1, spring.tab), animate(old.scale, 1.02, spring.tab)] : []),
         ...(kind === 'push' ? [] : [animate(old.opacity, 0, reduce ? reducedFade : { duration: 0.12, ease: 'easeOut' as const })]),
       ], drop)
       return
@@ -286,8 +365,9 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       track.x = touch.clientX
       track.t = e.timeStamp
       const { t, under } = pair()
-      // Reduced motion: the page still follows the finger (direct manipulation), but the page under it stays at rest.
-      setPair(t, reduceRef.current ? undefined : under, Math.max(0, track.base + dx) / window.innerWidth)
+      // Reduced motion: the page still follows the finger (direct manipulation), but nothing scales and the page under it stays at rest.
+      const reduced = !!reduceRef.current
+      setPair(t, reduced ? undefined : under, Math.max(0, track.base + dx) / window.innerWidth, reduced)
     }
     const onEnd = (e: TouchEvent) => {
       const done = track
@@ -305,7 +385,8 @@ export function RouteFrame({ children }: { children: ReactNode }) {
         return
       }
       // Reduced motion completes with the short crossfade (motion-feel 3c-native) instead of the spring slide.
-      const release = reduced ? () => [animate(t.opacity, 0, reducedFade)] : () => slide(t, under, Math.max(0, done.base + done.x - done.x0) / w, complete ? 1 : 0, v / w)
+      // The release hands the finger's velocity to the spring; a flick (over 600 px/s) earns a slight overshoot.
+      const release = reduced ? () => [animate(t.opacity, 0, reducedFade)] : () => slide(t, under, Math.max(0, done.base + done.x - done.x0) / w, complete ? 1 : 0, v / w, Math.abs(v) > 600 ? spring.pushFlick : spring.push)
       run(release, () => {
         if (!complete) return
         // Keep the page underneath shown until the route commits, or the screen would flash empty.
@@ -348,11 +429,12 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     <>
       {[...nav.stack, ...nav.exiting].map((layer, i) => {
         return (
-          <PageLayer key={layer.key} layer={layer} role={roleOf(layer, i)} navMoving={nav.moving} front={nav.front === layer.key}>
+          <PageLayer key={layer.key} layer={layer} role={roleOf(layer, i)} navMoving={nav.moving} front={nav.front === layer.key} sheet={sheetKey === layer.key} spacer={setSpacer}>
             {children}
           </PageLayer>
         )
       })}
+      <div ref={spacer} aria-hidden="true" />
     </>
   )
 }
