@@ -14,7 +14,7 @@ import path from 'node:path'
 
 const SLICE = process.argv[2] || 'slice-1'
 const OUT = path.join('docs/redesign/screens', SLICE, 'ios')
-const APP = 'http://localhost:3021'
+const APP = process.env.APP_URL || 'http://localhost:3021' // a production build (next start) avoids dev-server frame drops
 const MOCK = 'http://localhost:4011'
 const AUTH = { state: { user: { id: 'capture-user', email: 'capture@example.com' }, accessToken: 'capture-token', refreshToken: 'capture-refresh' }, version: 0 }
 const EMPTY = { name: '', sex: null, dob: '', heightCm: null, goal: null, activity: null, frequency: null, experience: null, equipment: [], injuries: [], weightKg: null, targetKg: null, allergies: [], diet: null, dislikes: [], cuisines: [], meals: null }
@@ -38,6 +38,22 @@ const SHOTS = {
     { name: 'reset-expired', url: '/reset-password', guest: true, draft: EMPTY, scenario: {} },
     { name: 'reset-valid', url: '/reset-password#access_token=capture&type=recovery', guest: true, draft: EMPTY, scenario: {} },
   ],
+  // Slice 2: Home states come from the mock API's `home` scenario (same fixtures as redesign-capture.mjs).
+  'slice-2': (() => {
+    const done = ['personal', 'fitness', 'nutrition']
+    const tap = (start) => `(() => { const b = [...document.querySelectorAll('button')].find((el) => (el.getAttribute('aria-label') || el.textContent).trim().startsWith(${JSON.stringify(start)})); b.click(); return 1 })()`
+    const home = (name, js, kind = 'returning') => ({ name, url: '/dashboard', draft: EMPTY, scenario: { done, consent: true, home: kind }, js })
+    return [
+      home('home'),
+      home('home-first-run', null, 'first-run'),
+      home('home-checkin-due', null, 'due'),
+      home('home-offline', `(() => { Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false }); window.dispatchEvent(new Event('offline')); return 1 })()`),
+      home('plus-sheet', tap('Log something')),
+      home('plus-sheet-typed', `(() => { document.querySelector('[aria-label="Log something"]').click(); setTimeout(() => { const i = document.querySelector('[aria-label="Tell Geo what you ate or did"]'); const set = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(i), 'value').set; set.call(i, '2 eggs and toast with butter'); i.dispatchEvent(new Event('input', { bubbles: true })) }, 600); return 1 })()`),
+      home('macro-sheet', tap('Protein')),
+      ...['Weight', 'Water', 'Sleep'].map((t) => home(`quicklog-${t.toLowerCase()}`, tap(t))),
+    ]
+  })(),
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))

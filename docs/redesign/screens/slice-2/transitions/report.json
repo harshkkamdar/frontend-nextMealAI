@@ -1,64 +1,65 @@
 {
   "header-condense-scroll": {
-    "frames": 52,
-    "chrome_px": 149962,
-    "content_px": 1555571,
-    "max_chrome_share": 0.065,
+    "frames": 46,
+    "chrome_px": 82496,
+    "content_px": 1533598,
+    "max_chrome_share": 0.079,
     "max_content_share": 0.042,
     "issues": [],
     "verdict": "smooth"
   },
   "home-first-load": {
-    "frames": 67,
-    "chrome_px": 110890,
-    "content_px": 746248,
-    "max_chrome_share": 0.28,
-    "max_content_share": 0.28,
+    "frames": 63,
+    "chrome_px": 42762,
+    "content_px": 406212,
+    "max_chrome_share": 0.179,
+    "max_content_share": 0.476,
     "issues": [
-      "chrome jump frame 4: 15% of chrome change"
+      "chrome jump frame 23: 18% of chrome change",
+      "late change frame 23 after 11 still frames (200931 px)"
     ],
     "verdict": "pop"
   },
   "plus-open-close": {
-    "frames": 56,
-    "chrome_px": 296106,
-    "content_px": 1258066,
-    "max_chrome_share": 0.143,
-    "max_content_share": 0.178,
-    "issues": [],
-    "verdict": "smooth"
-  },
-  "quicklog-open": {
-    "frames": 35,
-    "chrome_px": 180005,
-    "content_px": 108082,
-    "max_chrome_share": 0.131,
-    "max_content_share": 0.123,
-    "issues": [],
-    "verdict": "smooth"
-  },
-  "tab-food-to-home": {
-    "frames": 64,
-    "chrome_px": 80622,
-    "content_px": 647896,
-    "max_chrome_share": 0.326,
-    "max_content_share": 0.322,
+    "frames": 31,
+    "chrome_px": 139845,
+    "content_px": 682842,
+    "max_chrome_share": 0.274,
+    "max_content_share": 0.317,
     "issues": [
-      "chrome jump frame 4: 33% of chrome change",
-      "chrome jump frame 6: 22% of chrome change"
+      "chrome jump frame 3: 9% of chrome change",
+      "chrome jump frame 6: 27% of chrome change"
     ],
     "verdict": "pop"
   },
-  "tab-home-to-food": {
-    "frames": 41,
-    "chrome_px": 46524,
-    "content_px": 272379,
-    "max_chrome_share": 0.511,
-    "max_content_share": 0.504,
+  "quicklog-open": {
+    "frames": 20,
+    "chrome_px": 176262,
+    "content_px": 329746,
+    "max_chrome_share": 0.287,
+    "max_content_share": 0.739,
     "issues": [
-      "chrome jump frame 4: 51% of chrome change",
-      "chrome jump frame 9: 41% of chrome change",
-      "content hard cut frame 4: 50% of content change"
+      "content hard cut frame 6: 74% of content change"
+    ],
+    "verdict": "pop"
+  },
+  "tab-food-to-home": {
+    "frames": 26,
+    "chrome_px": 23063,
+    "content_px": 91908,
+    "max_chrome_share": 0.314,
+    "max_content_share": 0.332,
+    "issues": [],
+    "verdict": "smooth"
+  },
+  "tab-home-to-food": {
+    "frames": 29,
+    "chrome_px": 35435,
+    "content_px": 155263,
+    "max_chrome_share": 0.188,
+    "max_content_share": 0.164,
+    "issues": [
+      "late change frame 28 after 10 still frames (2750 px)"
     ],
     "verdict": "pop"
   }
