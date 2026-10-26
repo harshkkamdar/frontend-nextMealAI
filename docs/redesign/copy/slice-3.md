@@ -13,7 +13,7 @@ Q29 voice: short, plain, warm, sentence case, no exclamation marks, no emoji, no
 | Photo busy | Analysing… | Reading… plus a card: "Reading your photo. A few seconds. I'll fill in what I can see." |
 | Search error | Search isn't reachable right now. Try again, or use Photo or Menu. | I can't reach search right now. Try again, or snap a photo instead. |
 | No results | No foods match "x". Try a shorter name, or use Photo. | Nothing matches "x". Try a shorter name, or snap a photo. |
-| Result source | YOURS / USDA (all-caps eyebrow) | trailing tag: "Yours" (soft chip) / "USDA" (plain) |
+| Result source | YOURS / USDA (all-caps eyebrow) | quiet trailing tag: "• Yours" (ink dot, semibold) / "USDA" |
 | Section labels | RECENT / FAVOURITES | Recent / Favourites |
 | Estimate chip | Photo estimate · confidence 75% | From your photo · about 75% sure |
 | Name field | (no label) | Food |

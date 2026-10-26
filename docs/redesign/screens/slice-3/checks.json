@@ -178,7 +178,7 @@
   {
     "shot": "food-menu-to-geo",
     "width": 360,
-    "url": "/logs/new/food",
+    "url": "/chat/session?id=5276330b-d5dc-4672-b63b-813d2365f88b&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0
@@ -186,7 +186,7 @@
   {
     "shot": "food-menu-to-geo",
     "width": 390,
-    "url": "/logs/new/food",
+    "url": "/chat/session?id=fbb4852f-da5a-4eb6-8701-9d7b96c6e2e1&prefill=Scan%20this%20menu%20and%20suggest%20what%20fits%20my%20remaining%20macros",
     "axe": [],
     "smallTargets": [],
     "orangeActions": 0

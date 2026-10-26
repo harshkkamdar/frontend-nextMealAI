@@ -477,7 +477,7 @@ export function FoodLogForm() {
         />
       </div>
 
-      <div className="mt-3 flex gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2">
         <MethodChip
           icon={CameraFill}
           label={estimating ? 'Reading…' : 'Photo'}
@@ -520,7 +520,7 @@ export function FoodLogForm() {
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[15.5px] font-semibold text-ink">{food.name}</span>
-                  <span className="block truncate text-[13px] text-ink-65">
+                  <span className="block truncate text-[13px] text-ink-65 tabular-nums">
                     {food.serving_size_g ? `${food.serving_size_g} g` : '1 serving'} · {formatMacroKcal(food.macros_per_serving.calories)} kcal
                     {food.brand ? ` · ${food.brand}` : ''}
                   </span>
@@ -530,6 +530,14 @@ export function FoodLogForm() {
               </button>
             ))}
           </RiseList>
+          {results.length < 6 && recents.length > 0 ? (
+            <div className="mt-6">
+              <SectionTitle>Recent</SectionTitle>
+              <div className={LIST}>
+                {recents.filter((food) => !results.some((r) => r.id && r.id === food.id)).slice(0, 4).map((food) => <PersonalFoodRow key={`recent-under-${food.id}`} food={food} onSelect={handleSelectPersonalFood} />)}
+              </div>
+            </div>
+          ) : null}
         </motion.section>
       ) : null}
       </AnimatePresence>
@@ -669,7 +677,7 @@ export function FoodLogForm() {
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
             transition={reduce ? reducedFade : spring.sheet}
-            className="glass sticky z-30 mt-6 rounded-[28px] p-4"
+            className="glass sticky z-30 mt-6 rounded-[24px] p-4"
             style={{ bottom: 'calc(12px + var(--safe-bottom))' }}
           >
             <p className="flex items-baseline justify-between gap-3 px-1">
@@ -706,9 +714,13 @@ function AddMark() {
 function SourceTag({ source }: { source: string }) {
   const label = SOURCE_LABELS[source]
   if (!label) return null
-  return source === 'personal'
-    ? <span className="shrink-0 rounded-full bg-ink-06 px-2 py-0.5 text-[12px] font-semibold text-ink">{label}</span>
-    : <span className="shrink-0 text-[12px] font-medium text-ink-65">{label}</span>
+  const yours = source === 'personal'
+  return (
+    <span className={`flex shrink-0 items-center gap-1.5 text-[12px] ${yours ? 'font-semibold text-ink' : 'font-medium text-ink-65'}`}>
+      {yours ? <span aria-hidden="true" className="size-1.5 rounded-full bg-ink" /> : null}
+      {label}
+    </span>
+  )
 }
 
 function MethodChip({ icon: Icon, label, onClick, disabled, testId }: {
@@ -724,9 +736,10 @@ function MethodChip({ icon: Icon, label, onClick, disabled, testId }: {
       onClick={onClick}
       disabled={disabled}
       data-testid={testId}
-      className="flex h-11 items-center gap-2 rounded-full bg-card pl-3.5 pr-4 text-[15px] font-semibold text-ink shadow-[var(--shadow-card)] transition-transform active:scale-[.96] disabled:opacity-60"
+      className="flex h-11 items-center justify-center gap-2 rounded-full bg-card px-4 text-[15px] font-semibold text-ink shadow-[var(--shadow-card)] transition-transform active:scale-[.96] disabled:opacity-60"
     >
-      <Icon aria-hidden="true" className="size-[18px]" />
+      {/* Filled glyphs sit high in their box; nudge down half a point so they centre on the label. */}
+      <Icon aria-hidden="true" className="size-[18px] translate-y-[0.5px]" />
       {label}
     </button>
   )
@@ -769,7 +782,7 @@ function PersonalFoodRow({ food, onSelect }: { food: UserFood; onSelect: (f: Use
     >
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[15.5px] font-semibold text-ink">{food.name}</span>
-        <span className="block truncate text-[13px] text-ink-65">
+        <span className="block truncate text-[13px] text-ink-65 tabular-nums">
           1 serving · {formatMacroKcal(food.macros_per_serving.calories)} kcal
           {food.brand ? ` · ${food.brand}` : ''}
         </span>
