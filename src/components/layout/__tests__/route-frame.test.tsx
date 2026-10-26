@@ -66,6 +66,11 @@ describe('RouteFrame swipe-back', () => {
     touch('touchstart', 5)
     expect(touch('touchmove', 30, 302).defaultPrevented).toBe(true)
     touch('touchend', 30)
+    // A 2 px vertical wobble before the finger has travelled does not cancel the swipe.
+    touch('touchstart', 5)
+    expect(touch('touchmove', 6, 302).defaultPrevented).toBe(false)
+    expect(touch('touchmove', 30, 303).defaultPrevented).toBe(true)
+    touch('touchend', 30)
   })
 })
 

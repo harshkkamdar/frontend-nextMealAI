@@ -267,9 +267,9 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       const dx = touch.clientX - track.x0
       const dy = touch.clientY - track.y0
       if (!track.dragging) {
-        // Vertical first is a scroll and leftward is not a back swipe: let both go. Until the finger is past the slop the
+        // Vertical first (past the slop, so a wobble does not count) is a scroll and leftward is not a back swipe: let both go. Until the finger is past the slop the
         // gesture is undecided, and cancelling an early touchmove would kill the scroll for the whole gesture on iOS.
-        if (Math.abs(dy) > Math.abs(dx) || dx < -SWIPE_SLOP_PX) { track = null; return }
+        if ((Math.abs(dy) > SWIPE_SLOP_PX && Math.abs(dy) > Math.abs(dx)) || dx < -SWIPE_SLOP_PX) { track = null; return }
         if (dx < SWIPE_SLOP_PX || dx <= Math.abs(dy)) return
         track.dragging = true
         const caught = active.current

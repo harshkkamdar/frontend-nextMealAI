@@ -41,8 +41,8 @@ function useMinimised(): [boolean, () => void] {
   }
   useEffect(() => {
     // Anchor where the page now is: the route frame has already restored a popped page's scroll, and the scroll event
-    // that restore fires must not read as a scroll down from 0.
-    step.current = { ...initialMinimise, anchor: window.scrollY }
+    // that restore fires must not read as a scroll down from 0. Clamped like the reads below.
+    step.current = { ...initialMinimise, anchor: Math.min(window.scrollY, Math.max(0, document.documentElement.scrollHeight - window.innerHeight)) }
   }, [pathname])
   useEffect(() => {
     let frame = 0
