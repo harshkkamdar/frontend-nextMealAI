@@ -46,6 +46,20 @@ function setPair(top: Layer, under: Layer | undefined, p: number) {
   }
 }
 
+/**
+ * After a push or pop settles, focus moves to the new page (its h1, else its main landmark): the page that held focus
+ * went inert, which drops focus to the body. Focus the user already placed elsewhere (tab bar, a sheet) is left alone.
+ */
+function focusPage(key: string) {
+  const current = document.activeElement
+  if (current && current !== document.body && !current.closest('[inert]')) return
+  const page = document.querySelector<HTMLElement>(`[data-route="${key}"]`)
+  const target = page?.querySelector<HTMLElement>('h1') ?? page?.querySelector<HTMLElement>('main') ?? page
+  if (!target) return
+  if (!target.hasAttribute('tabindex')) target.tabIndex = -1
+  target.focus({ preventScroll: true })
+}
+
 /** The next nav state for a route change, decided during render so the old page never renders the new route. */
 function advance(nav: Nav, to: string): Nav {
   const keys = nav.stack.map((l) => l.key)
@@ -209,9 +223,10 @@ export function RouteFrame({ children }: { children: ReactNode }) {
     navHistory.backPending = null
     navHistory.swipeCommitted = false
     window.scrollTo(0, step.top.scrollY)
-    if (step.settled) return
     const { kind, top: t, old } = step
-    const drop = () => setNav((n) => ({ ...n, exiting: n.exiting.filter((l) => l !== old || n.stack.includes(l)) }))
+    const land = () => { if (kind !== 'tab') focusPage(t.key) }
+    if (step.settled) { land(); return }
+    const drop = () => { setNav((n) => ({ ...n, exiting: n.exiting.filter((l) => l !== old || n.stack.includes(l)) })); land() }
     if (kind === 'tab' || reduce) {
       // Tabs, and every route change under reduced motion: overlapping crossfade, no slide (motion-feel 3b).
       // A reduced push leaves the page underneath at rest (x 0), so a reduced pop uncovers it without a jump.
@@ -223,7 +238,7 @@ export function RouteFrame({ children }: { children: ReactNode }) {
       ], drop)
       return
     }
-    if (kind === 'push') { run(() => slide(t, old, 1, 0, 0), () => {}); return }
+    if (kind === 'push') { run(() => slide(t, old, 1, 0, 0), land); return }
     // Pop: start from wherever the leaving page is and with its velocity (an interrupted push reverses without a brick wall).
     const w = window.innerWidth
     run(() => slide(old, t, Math.max(0, old.x.get() / w), 1, old.x.getVelocity() / w), drop)

@@ -1,8 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, render, type RenderResult } from '@testing-library/react'
 import { RouteFrame } from '../route-frame'
+import { navHistory } from '@/lib/navigation'
 
-const route = vi.hoisted(() => ({ pathname: '/food', reduce: false }))
+// Fake clock before framer loads: its frame loop captures requestAnimationFrame at import.
+const route = vi.hoisted(() => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'Date'] })
+  return { pathname: '/food', reduce: false }
+})
 vi.mock('next/navigation', () => ({ usePathname: () => route.pathname }))
 vi.mock('framer-motion', async (original) => ({ ...(await original<typeof import('framer-motion')>()), useReducedMotion: () => route.reduce }))
 vi.mock('@/lib/platform', () => ({ isNative: () => false }))
@@ -13,9 +18,9 @@ function Page() {
   return <main><h1>{route.pathname}</h1><a href="#x">link</a></main>
 }
 
-/** Real time in small act steps: one long act starves framer's frame loop in jsdom. */
+/** Fake time, one frame per act step, so slide positions are deterministic however busy the machine is. */
 async function wait(ms: number) {
-  for (let t = 0; t < ms; t += 16) await act(async () => { await new Promise((r) => setTimeout(r, 16)) })
+  for (let t = 0; t < ms; t += 16) await act(async () => { vi.advanceTimersByTime(16) })
 }
 
 let view: RenderResult
@@ -40,6 +45,7 @@ function touch(type: string, clientX: number, clientY = 300, timeStamp = perform
 }
 
 beforeEach(() => {
+  Object.assign(navHistory, { backPending: null, index: 0, swipeCommitted: false })
   route.pathname = '/food'
   route.reduce = false
   window.history.replaceState({}, '', '/food')
@@ -143,5 +149,16 @@ describe('RouteFrame swipe-back under reduced motion', () => {
     await wait(300)
     expect(layer('/foods')?.style.opacity).toBe('0')
     expect(x('/food')).toBe(0)
+  })
+})
+
+describe('RouteFrame focus', () => {
+  it('moves focus to the new page heading after a push and after a pop settles', async () => {
+    go('/foods')
+    await wait(700)
+    expect(document.activeElement).toBe(layer('/foods')?.querySelector('h1'))
+    go('/food')
+    await wait(700)
+    expect(document.activeElement).toBe(layer('/food')?.querySelector('h1'))
   })
 })
