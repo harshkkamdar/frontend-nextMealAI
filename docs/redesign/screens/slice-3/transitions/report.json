@@ -27,16 +27,13 @@
     "verdict": "smooth"
   },
   "photo-tray": {
-    "frames": 72,
-    "chrome_px": 168701,
-    "content_px": 147872,
-    "max_chrome_share": 0.13,
-    "max_content_share": 0.522,
-    "issues": [
-      "content hard cut frame 48: 52% of content change",
-      "late change frame 48 after 44 still frames (77155 px)"
-    ],
-    "verdict": "pop"
+    "frames": 76,
+    "chrome_px": 186039,
+    "content_px": 110661,
+    "max_chrome_share": 0.12,
+    "max_content_share": 0.123,
+    "issues": [],
+    "verdict": "smooth"
   },
   "water-save": {
     "frames": 113,

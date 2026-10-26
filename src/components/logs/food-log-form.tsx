@@ -543,18 +543,26 @@ export function FoodLogForm() {
       ) : null}
       </AnimatePresence>
 
+      {/* Own presence boundary: the route frame's AnimatePresence initial={false} blocks every later-mounted entrance
+          on a page opened directly, so the skeleton-to-form hand-off was a one-frame cut. The reading card fades out
+          over 120 ms in place (popLayout) while the form fades and rises in, so the card never jumps size. */}
+      <AnimatePresence mode="popLayout">
       {estimating ? (
-        <motion.div role="status" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className={`${CARD} mt-4 p-5`}>
-          <p className="text-[15.5px] font-semibold text-ink">Reading your photo</p>
-          <p className="mt-0.5 text-[13px] text-ink-65">A few seconds. I&apos;ll fill in what I can see.</p>
-          <div className="mt-4 space-y-2.5" aria-hidden="true">
-            {[78, 56, 64].map((w) => <span key={w} className="block h-3 animate-pulse rounded-full bg-ink-06 [animation-duration:1.2s]" style={{ width: `${w}%` }} />)}
+        // pt-4, not mt-4: popLayout pins the exiting card at its offsetTop, and a margin would shift it down 16 px.
+        <motion.div key="reading" role="status" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: reduce ? 0.15 : 0.12 } }} transition={{ duration: 0.18, ease: 'easeOut' }} className="pt-4">
+          <div className={`${CARD} p-5`}>
+            <p className="text-[15.5px] font-semibold text-ink">Reading your photo</p>
+            <p className="mt-0.5 text-[13px] text-ink-65">A few seconds. I&apos;ll fill in what I can see.</p>
+            <div className="mt-4 space-y-2.5" aria-hidden="true">
+              {[78, 56, 64].map((w) => <span key={w} className="block h-3 animate-pulse rounded-full bg-ink-06 [animation-duration:1.2s]" style={{ width: `${w}%` }} />)}
+            </div>
           </div>
         </motion.div>
       ) : null}
 
       {foodName ? (
         <motion.div
+          key="form"
           ref={formRef}
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -647,6 +655,7 @@ export function FoodLogForm() {
           </div>
         </motion.div>
       ) : null}
+      </AnimatePresence>
 
       {showYourFoods ? (
         <div className="mt-6 space-y-6" data-testid="your-foods">
