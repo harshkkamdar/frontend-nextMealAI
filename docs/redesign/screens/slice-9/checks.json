@@ -64,6 +64,38 @@
     "orangeActions": 0
   },
   {
+    "shot": "delete-sheet-typed",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-sheet-typed",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-sheet",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "delete-sheet",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "not-found",
     "width": 360,
     "url": "/no-such-page",
@@ -336,6 +368,86 @@
     "orangeActions": 0
   },
   {
+    "shot": "settings-ai-confirm",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-ai-confirm",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-error",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-error",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-loading",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-loading",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-long",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-long",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-native-plus",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-native-plus",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
     "shot": "settings-native",
     "width": 360,
     "url": "/settings",
@@ -345,6 +457,38 @@
   },
   {
     "shot": "settings-native",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-offline",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-offline",
+    "width": 390,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-scrolled",
+    "width": 360,
+    "url": "/settings",
+    "axe": [],
+    "smallTargets": [],
+    "orangeActions": 0
+  },
+  {
+    "shot": "settings-scrolled",
     "width": 390,
     "url": "/settings",
     "axe": [],
