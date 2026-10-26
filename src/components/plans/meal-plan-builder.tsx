@@ -6,12 +6,12 @@ import { toast } from 'sonner'
 import {
   PlanNameField,
   PlanDateRangeField,
-  DateInput,
   NumberField,
   SearchablePicker,
   AddRowButton,
   RemoveRowButton,
 } from '@/components/plans/plan-builder-shared'
+import { DateInput } from '@/components/ui/fiqr/date-input'
 import { createPlan, updatePlan, activatePlan } from '@/lib/api/plans.api'
 import { searchFoods } from '@/lib/api/foods.api'
 import type { FoodSearchResult } from '@/types/foods.types'
