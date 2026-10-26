@@ -88,7 +88,7 @@ export function WorkoutProgramPreviewCard({
   return (
     <div
       data-testid="workout-program-preview-card"
-      className="space-y-3 rounded-[16px] border border-ink-12 bg-card p-[14px]"
+      className="space-y-3 rounded-[16px] border border-ink-12 card-glass p-[14px]"
     >
       <div className="flex items-center justify-between">
         <SectionLabel>Program from your photo</SectionLabel>

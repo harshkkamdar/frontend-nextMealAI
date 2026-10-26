@@ -5,14 +5,14 @@ import { Plus, Search, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DateInput } from '@/components/ui/fiqr/date-input'
 
-export const fieldClass = 'h-14 w-full rounded-[14px] bg-card px-4 text-[17px] text-ink outline outline-1 -outline-offset-1 outline-ink-08 placeholder:text-ink-65 transition-[outline-color] focus:outline-2 focus:outline-ink'
+export const fieldClass = 'h-14 w-full rounded-[14px] bg-[var(--surface-card)] px-4 text-[17px] text-ink outline outline-1 -outline-offset-1 outline-ink-08 placeholder:text-ink-65 transition-[outline-color] focus:outline-2 focus:outline-ink'
 export const labelClass = 'block text-[15px] font-semibold text-ink'
 
 export function PlanNameField({ value, onChange, placeholder = 'Plan name' }: { value: string; onChange: (value: string) => void; placeholder?: string }) {
   return <div className="space-y-2"><label className={labelClass} htmlFor="plan-name">Plan name</label><input id="plan-name" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={fieldClass} /></div>
 }
 
-const dateRowClass = 'h-14 bg-card text-[16px] outline outline-1 -outline-offset-1 outline-ink-08'
+const dateRowClass = 'h-14 bg-[var(--surface-card)] text-[16px] outline outline-1 -outline-offset-1 outline-ink-08'
 
 export function PlanDateRangeField({ startDate, endDate, onChange }: { startDate: string; endDate: string; onChange: (next: { startDate: string; endDate: string }) => void }) {
   return <div className="grid grid-cols-2 gap-[10px]">
@@ -63,6 +63,6 @@ export function SearchablePicker<T>({ placeholder = 'Search…', search, renderI
   return <div className="relative space-y-1.5">
     {label ? <label className={labelClass} htmlFor={inputId}>{label}</label> : null}
     <div className="relative"><Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-65" strokeWidth={1.75} aria-hidden="true" /><input id={inputId} value={query} onChange={(e) => setQuery(e.target.value)} placeholder={placeholder} onFocus={() => results.length > 0 && setOpen(true)} className={cn(fieldClass, 'pl-11')} /></div>
-    {open && (results.length > 0 || loading) ? <ul aria-label="Search results" className="absolute z-20 mt-1.5 max-h-64 w-full overflow-auto rounded-[16px] bg-card py-1 shadow-[0_12px_32px_rgba(17,28,53,.14)]">{loading ? <li className="flex min-h-12 items-center px-4 text-[14px] text-ink-65">Searching…</li> : results.map((item) => <li key={getItemKey(item)}><button type="button" onClick={() => { onSelect(item); setQuery(''); setResults([]); setOpen(false) }} className="min-h-12 w-full px-4 py-2 text-left text-[15.5px] text-ink active:bg-ink-04">{renderItem(item)}</button></li>)}</ul> : null}
+    {open && (results.length > 0 || loading) ? <ul aria-label="Search results" className="absolute z-20 mt-1.5 max-h-64 w-full overflow-auto rounded-[16px] bg-[var(--surface-card)] py-1 shadow-[0_12px_32px_rgba(17,28,53,.14)]">{loading ? <li className="flex min-h-12 items-center px-4 text-[14px] text-ink-65">Searching…</li> : results.map((item) => <li key={getItemKey(item)}><button type="button" onClick={() => { onSelect(item); setQuery(''); setResults([]); setOpen(false) }} className="min-h-12 w-full px-4 py-2 text-left text-[15.5px] text-ink active:bg-ink-04">{renderItem(item)}</button></li>)}</ul> : null}
   </div>
 }

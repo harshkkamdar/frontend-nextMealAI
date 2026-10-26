@@ -91,7 +91,7 @@ export function TodayPreview({ current, next, eaten, showNew, onShowNew, settled
         <div role="group" aria-label="Show today with" className="relative grid grid-cols-2 rounded-[24px] bg-ink-06 p-[3px]">
           <motion.span
             aria-hidden="true"
-            className="absolute left-[3px] top-[3px] h-11 w-[calc(50%-3px)] rounded-[22px] bg-card shadow-[0_2px_8px_-4px_rgba(17,28,53,.25)]"
+            className="absolute left-[3px] top-[3px] h-11 w-[calc(50%-3px)] rounded-[22px] bg-[var(--surface-card)] shadow-[0_2px_8px_-4px_rgba(17,28,53,.25)]"
             initial={false}
             animate={{ x: showNew ? '100%' : '0%' }}
             transition={reduce ? { duration: 0 } : spring.glide}

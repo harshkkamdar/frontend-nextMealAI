@@ -7,7 +7,7 @@ import { CARD, HueDot } from '@/components/plans/spatial-parts'
 
 /** Builder controls in the C1 Focused steps look (mocks/journey-plans.html): fields 60, steppers 56, cells 44. */
 
-const FIELD = 'h-field w-full rounded-[16px] bg-card px-4 text-body font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(17,28,53,.1)] outline-none placeholder:font-medium placeholder:text-ink-65 focus:shadow-[inset_0_0_0_2px_var(--color-ink)]'
+const FIELD = 'h-field w-full rounded-[16px] bg-[var(--surface-card)] px-4 text-body font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(17,28,53,.1)] outline-none placeholder:font-medium placeholder:text-ink-65 focus:shadow-[inset_0_0_0_2px_var(--color-ink)]'
 const LABEL = 'mb-2 block px-1 text-label text-ink-65'
 
 export function TextField({ label, value, onChange, placeholder, id }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string; id?: string }) {
@@ -32,7 +32,7 @@ export function NotesField({ value, onChange, placeholder }: { value: string; on
 
 /** Start and end side by side; the end is optional. */
 export function DateFields({ startDate, endDate, onChange }: { startDate: string; endDate: string; onChange: (next: { startDate: string; endDate: string }) => void }) {
-  const box = 'h-field bg-card text-body font-semibold shadow-[inset_0_0_0_1px_rgba(17,28,53,.1)] rounded-[16px]'
+  const box = 'h-field bg-[var(--surface-card)] text-body font-semibold shadow-[inset_0_0_0_1px_rgba(17,28,53,.1)] rounded-[16px]'
   return (
     <div className="grid grid-cols-2 gap-2.5">
       <div><label className={LABEL} htmlFor="plan-start">Start</label><DateInput id="plan-start" value={startDate} onChange={(v) => onChange({ startDate: v, endDate })} placeholder="Optional" className={box} /></div>
