@@ -105,9 +105,9 @@ export function TabBar() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={reducedFade}
-      className={cn('absolute left-0 top-0 grid size-16 place-items-center rounded-full text-ink transition-transform active:scale-[.94]', !logOpen && 'pointer-events-auto')}
+      className={cn('absolute left-0 top-0 grid size-[52px] place-items-center rounded-full text-ink transition-transform active:scale-[.94]', !logOpen && 'pointer-events-auto')}
     >
-      <motion.span layoutId={reduce ? undefined : `tab-icon-${activeTab.href}`} transition={spring.glide}><activeTab.icon className="size-[24px]" /></motion.span>
+      <motion.span layoutId={reduce ? undefined : `tab-icon-${activeTab.href}`} transition={spring.glide}><activeTab.icon className="size-[22px]" /></motion.span>
     </motion.button>
   ) : null
 
@@ -121,18 +121,18 @@ export function TabBar() {
   return (
     <>
     {/* Scroll edge (Liquid Glass "scroll edge effect"): content fades into the page under the bar instead of colliding with it. */}
-    <div aria-hidden="true" className={cn('pointer-events-none fixed inset-x-0 bottom-0 z-[45] h-[calc(104px+var(--safe-bottom))] bg-[linear-gradient(to_top,var(--color-cream)_calc(100%-24px),rgba(253,246,236,0))] transition-opacity duration-200', hidden && 'opacity-0')} />
+    <div aria-hidden="true" className={cn('pointer-events-none fixed inset-x-0 bottom-0 z-[45] h-[calc(90px+var(--safe-bottom))] bg-[linear-gradient(to_top,var(--color-cream)_calc(100%-24px),rgba(253,246,236,0))] transition-opacity duration-200', hidden && 'opacity-0')} />
     <div
       aria-hidden={hidden || undefined}
       inert={hidden || undefined}
       className={cn('pointer-events-none fixed inset-x-0 mx-auto flex max-w-md items-end gap-3 px-4 transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]', logOpen ? 'z-[80]' : 'z-[50]', hidden && 'translate-y-[calc(100%+24px)] opacity-0')}
-      style={{ bottom: 'calc(12px + var(--safe-bottom))' }}
+      style={{ bottom: 'calc(10px + var(--safe-bottom))' }}
     >
       <nav
         ref={navRef}
         aria-label="Main"
         className={cn(
-          'pointer-events-none relative h-16 flex-1 origin-bottom-left transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]',
+          'pointer-events-none relative h-[52px] flex-1 origin-bottom-left transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]',
           logOpen && 'scale-[.96] opacity-0',
         )}
         aria-hidden={logOpen || undefined}
@@ -141,12 +141,12 @@ export function TabBar() {
         {reduce ? (
           <>
             <motion.span aria-hidden="true" animate={{ opacity: collapsed ? 0 : 1 }} transition={reducedFade} className="glass absolute inset-0 rounded-full" />
-            <motion.span aria-hidden="true" initial={false} animate={{ opacity: collapsed ? 1 : 0 }} transition={reducedFade} className="glass absolute inset-y-0 left-0 w-16 rounded-full" />
+            <motion.span aria-hidden="true" initial={false} animate={{ opacity: collapsed ? 1 : 0 }} transition={reducedFade} className="glass absolute inset-y-0 left-0 w-[52px] rounded-full" />
           </>
         ) : (
-          <motion.span aria-hidden="true" layout transition={spring.glide} style={{ borderRadius: 32 }} className={cn('glass absolute inset-y-0 left-0', collapsed ? 'w-16' : 'w-full')} />
+          <motion.span aria-hidden="true" layout transition={spring.glide} style={{ borderRadius: 26 }} className={cn('glass absolute inset-y-0 left-0', collapsed ? 'w-[52px]' : 'w-full')} />
         )}
-        <div inert={collapsed || undefined} className={cn('relative flex h-full items-stretch p-1.5', !collapsed && !logOpen && 'pointer-events-auto')}>
+        <div inert={collapsed || undefined} className={cn('relative flex h-full items-stretch p-1', !collapsed && !logOpen && 'pointer-events-auto')}>
           {TABS.map(({ label, href, icon: Icon }) => {
             const active = isActive(href)
             return (
@@ -173,11 +173,11 @@ export function TabBar() {
                 {active && !reduce ? (
                   // The open tab's icon travels into the collapsed circle (shared layoutId with the circle's icon), one id per
                   // tab so switching tabs never flies an icon across the bar.
-                  collapsed ? <span key="gap" className="size-[22px]" /> : <motion.span key="travel" layoutId={`tab-icon-${href}`} transition={spring.glide} className="relative"><Icon className="size-[22px]" /></motion.span>
+                  collapsed ? <span key="gap" className="size-5" /> : <motion.span key="travel" layoutId={`tab-icon-${href}`} transition={spring.glide} className="relative"><Icon className="size-5" /></motion.span>
                 ) : active ? (
-                  <motion.span key="open" initial={false} animate={{ opacity: collapsed ? 0 : 1 }} transition={itemTransition} className="relative"><Icon className="size-[22px]" /></motion.span>
+                  <motion.span key="open" initial={false} animate={{ opacity: collapsed ? 0 : 1 }} transition={itemTransition} className="relative"><Icon className="size-5" /></motion.span>
                 ) : (
-                  <motion.span key="still" initial={false} animate={item} transition={itemTransition} className="relative will-change-transform"><Icon className="size-[22px]" /></motion.span>
+                  <motion.span key="still" initial={false} animate={item} transition={itemTransition} className="relative will-change-transform"><Icon className="size-5" /></motion.span>
                 )}
                 {/* will-change keeps the labels on their own layer, so they do not re-rasterise (a 1 px text shift) when the scale hands back from the compositor. */}
                 <motion.span initial={false} animate={item} transition={itemTransition} className={cn('relative text-[11px] leading-none will-change-transform', active ? 'font-semibold' : 'font-medium')}>{label}</motion.span>
@@ -193,15 +193,15 @@ export function TabBar() {
         aria-label={logOpen ? 'Close' : 'Log something'}
         aria-expanded={logOpen}
         onClick={toggleLog}
-        className="pointer-events-auto relative grid size-16 shrink-0 place-items-center rounded-full text-ink transition-transform duration-300 active:scale-[.94]"
+        className="pointer-events-auto relative grid size-[52px] shrink-0 place-items-center rounded-full text-ink transition-transform duration-300 active:scale-[.94]"
       >
         {/* The orb's surface: while closed it lives here; opening hands it to the sheet panel, which grows out of it. */}
         {logOpen ? (
           <span aria-hidden="true" className="absolute inset-0 rounded-full bg-card shadow-[var(--shadow-card)]" />
         ) : (
-          <motion.span aria-hidden="true" layoutId={reduce ? undefined : ORB_SURFACE} transition={spring.sheet} style={{ borderRadius: 32 }} className="glass absolute inset-0" />
+          <motion.span aria-hidden="true" layoutId={reduce ? undefined : ORB_SURFACE} transition={spring.sheet} style={{ borderRadius: 26 }} className="glass absolute inset-0" />
         )}
-        <PlusIcon className={cn('relative size-7 transition-transform duration-300 ease-[cubic-bezier(.22,1,.36,1)]', logOpen && 'rotate-45')} />
+        <PlusIcon className={cn('relative size-6 transition-transform duration-300 ease-[cubic-bezier(.22,1,.36,1)]', logOpen && 'rotate-45')} />
       </button>
     </div>
     </>
