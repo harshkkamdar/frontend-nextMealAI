@@ -43,13 +43,16 @@ describe('FIQR train markup contract', () => {
 })
 
 describe('FIQR live-session markup contract', () => {
-  it('uses the pushed header, digit-tile timer, segmented set progress, pager, five-column set table, and fixed nav', () => {
+  it('shows one exercise per screen with the depth step, B1 stepper rows, the All exercises sheet and a floating nav', () => {
     expect(sessionPage).toContain('<PushedHeader')
     expect(sessionCards).toContain('<DigitTiles')
     expect(sessionCards).toContain('completedSets / totalSets')
-    expect(sessionPage).toContain('snap-x snap-mandatory')
-    expect(sessionPage).toContain('grid-cols-[32px_1fr_1fr_1fr_44px]')
-    expect(sessionPage).toContain('fixed inset-x-0 bottom-0')
+    expect(sessionPage).not.toContain('snap-x')
+    expect(sessionPage).toContain('<ExerciseNav')
+    expect(sessionCards).toContain('Exercise {index + 1} of {count}')
+    expect(sessionPage).toContain('ariaLabel="All exercises"')
+    expect(sessionCards).toContain('h-stepper')
+    expect(sessionPage).toContain('fixed inset-x-2')
     expect(sessionPage).toContain('<ExerciseVisual')
     expect(sessionPage).toContain("haptic('success')")
   })
@@ -62,7 +65,7 @@ describe('FIQR live-session markup contract', () => {
     expect(sessionPage).toContain('Save and exit')
   })
 
-  it('uses the pinned rest card with digit tiles and the compact minimised pill', () => {
+  it('uses the C3 rest screen with digit tiles and the compact minimised pill', () => {
     expect(restTimer).toContain('<DigitTiles')
     expect(restTimer).toContain('−15')
     expect(restTimer).toContain('+15')
