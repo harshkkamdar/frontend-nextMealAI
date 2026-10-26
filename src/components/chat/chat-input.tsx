@@ -238,7 +238,8 @@ export function ChatInput({
     disabled || uploadingCount > 0 || (!value.trim() && attached.length === 0)
 
   return (
-    <div className={cn('rounded-[28px] p-1.5', variant === 'floating' ? 'glass' : 'bg-card shadow-[var(--shadow-card)]')}>
+    // A hairline on warm paper, not a lifted shadow: the composer reads as part of the page edge.
+    <div className={cn('rounded-[28px] border border-ink-10 p-1.5', variant === 'floating' ? 'glass-cream shadow-none!' : 'bg-card')}>
       {/* FB-R6-03: thumbnail strip + upload-in-flight placeholders + counter */}
       {(attached.length > 0 || uploadingCount > 0) && (
         <div className="px-2.5 pb-1 pt-2.5">

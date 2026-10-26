@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Ellipsis } from 'lucide-react'
 
 import { parseLoggedFoods, type LoggedFood } from '@/components/chat/logged-foods'
 import { ReportSheet } from '@/components/chat/report-sheet'
@@ -92,23 +91,26 @@ function LoggedFoods({ foods }: { foods: LoggedFood[] }) {
       {foods.map((food, index) => {
         const hasMacros = food.protein !== null || food.carbs !== null || food.fat !== null
         return (
-          <li key={index} className="flex min-h-14 items-center gap-3 border-b border-ink-06 px-4 py-3 last:border-b-0">
-            <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-semibold leading-snug text-ink">{food.name}</span>
-              {hasMacros ? (
-                <span className="mt-1 flex flex-wrap gap-x-3 text-[13px] font-medium text-ink-65 tabular-nums">
-                  <MacroValue value={food.protein} letter="P" color="var(--color-ink)" />
-                  <MacroValue value={food.carbs} letter="C" color="var(--color-macro-teal)" />
-                  <MacroValue value={food.fat} letter="F" color="var(--color-macro-ochre)" />
+          // Two rows on two shared baselines: name with kcal, macros with meal.
+          <li key={index} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-1 border-b border-ink-06 px-4 py-3 last:border-b-0">
+            <span className="min-w-0 text-[15px] font-semibold leading-snug text-ink">{food.name}</span>
+            <span className="text-right text-[15px] font-semibold text-ink tabular-nums">
+              {food.estimated ? '~' : ''}{fmt(food.kcal)}<span className="text-[13px] font-medium text-ink-65"> kcal</span>
+            </span>
+            {hasMacros || food.meal ? (
+              <>
+                <span className="flex min-w-0 flex-wrap gap-x-3 text-[13px] font-medium text-ink-65 tabular-nums">
+                  {hasMacros ? (
+                    <>
+                      <MacroValue value={food.protein} letter="P" color="var(--color-ink)" />
+                      <MacroValue value={food.carbs} letter="C" color="var(--color-macro-teal)" />
+                      <MacroValue value={food.fat} letter="F" color="var(--color-macro-ochre)" />
+                    </>
+                  ) : food.meal}
                 </span>
-              ) : food.meal ? <span className="mt-0.5 block text-[13px] text-ink-65">{food.meal}</span> : null}
-            </span>
-            <span className="shrink-0 text-right">
-              <span className="block text-[15px] font-semibold text-ink tabular-nums">
-                {food.estimated ? '~' : ''}{fmt(food.kcal)}<span className="text-[13px] font-medium text-ink-65"> kcal</span>
-              </span>
-              {food.meal && hasMacros ? <span className="block text-[12px] font-medium text-ink-65">{food.meal}</span> : null}
-            </span>
+                <span className="text-right text-[13px] font-medium text-ink-65">{hasMacros ? food.meal : null}</span>
+              </>
+            ) : null}
           </li>
         )
       })}
@@ -155,6 +157,7 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId }: Chat
   const [menuOpen, setMenuOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const press = useRef<{ x: number; y: number; timer: number } | null>(null)
 
   useEffect(() => {
     if (!menuOpen) return
@@ -197,13 +200,13 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId }: Chat
                   key={att.id}
                   src={safe}
                   alt="Your photo"
-                  className={isMulti ? 'aspect-square w-full rounded-[14px] bg-ink-06 object-cover' : 'max-h-[200px] max-w-[200px] rounded-[16px] bg-ink-06 object-cover'}
+                  className={isMulti ? 'aspect-square w-full rounded-[18px] bg-ink-06 object-cover' : 'max-h-[200px] max-w-[200px] rounded-[22px] bg-ink-06 object-cover'}
                 />
               )
             })}
           </div>
         ) : legacy ? (
-          <img src={legacy} alt="Your photo" className="max-h-[200px] max-w-[200px] rounded-[16px] bg-ink-06 object-cover" />
+          <img src={legacy} alt="Your photo" className="max-h-[200px] max-w-[200px] rounded-[22px] bg-ink-06 object-cover" />
         ) : null}
         {displayContent ? (
           <motion.p
@@ -226,13 +229,29 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId }: Chat
     setMenuOpen(false)
   }
 
+  // Long-press (or right-click) the reply for Copy and Report; the timestamp is the quiet, focusable way in.
+  const cancelPress = () => { if (press.current) window.clearTimeout(press.current.timer); press.current = null }
+  const longPress = {
+    onPointerDown: (e: React.PointerEvent) => {
+      cancelPress()
+      press.current = { x: e.clientX, y: e.clientY, timer: window.setTimeout(() => { press.current = null; setMenuOpen(true) }, 450) }
+    },
+    onPointerMove: (e: React.PointerEvent) => {
+      if (press.current && Math.hypot(e.clientX - press.current.x, e.clientY - press.current.y) > 10) cancelPress()
+    },
+    onPointerUp: cancelPress,
+    onPointerCancel: cancelPress,
+    onContextMenu: (e: React.MouseEvent) => { e.preventDefault(); cancelPress(); setMenuOpen(true) },
+  }
+
   return (
     <>
       <motion.div
         initial={fresh ? (reduce ? { opacity: 0 } : { opacity: 0, y: 6 }) : false}
         animate={{ opacity: 1, y: 0 }}
         transition={reduce ? reducedFade : { opacity: { duration: 0.18, ease: 'easeOut' }, y: spring.glide }}
-        className="flex flex-col gap-3 pr-2"
+        className="flex select-none flex-col gap-3 [-webkit-touch-callout:none]"
+        {...longPress}
       >
         {/* What was logged leads; Geo's line about it follows. */}
         {foods.length > 0 ? <LoggedFoods foods={foods} /> : null}
@@ -247,12 +266,12 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId }: Chat
           <button
             type="button"
             onClick={() => setMenuOpen((current) => !current)}
-            className="flex h-11 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium text-ink-65 transition-transform active:scale-[.96]"
+            className={formattedTime ? 'flex h-11 items-center rounded-full px-3 text-[12px] font-medium text-ink-65 transition-transform active:scale-[.96]' : 'sr-only focus:not-sr-only'}
             aria-label="Message options"
+            aria-haspopup="menu"
             aria-expanded={menuOpen}
           >
             {formattedTime ? <span aria-hidden="true">{formattedTime}</span> : null}
-            <Ellipsis className="size-4" strokeWidth={1.75} />
           </button>
           {menuOpen ? (
             <motion.div

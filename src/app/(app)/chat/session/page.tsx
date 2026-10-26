@@ -72,6 +72,8 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
   const [chipSent, setChipSent] = useState<string | null>(null)
   const composerRef = useRef<HTMLDivElement>(null)
   const [composerH, setComposerH] = useState(88)
+  // Only flips at the threshold, so scrolling never renders per frame.
+  const [scrolled, setScrolled] = useState(false)
   // FB-15: preview card for an extracted workout program. One at a time.
   const [programPreview, setProgramPreview] = useState<
     { program: WorkoutProgramContent; confidence: number } | null
@@ -221,7 +223,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
   return (
     // The thread scrolls in its own box, not the window: during the push the route frame is transformed, and a
     // window scroll would carry the fixed header and composer away with it until the transform clears.
-    <div className="h-dvh overflow-y-auto overscroll-contain">
+    <div className="h-dvh overflow-y-auto overscroll-contain" onScroll={(e) => { const past = e.currentTarget.scrollTop > 4; if (past !== scrolled) setScrolled(past) }}>
     <div
       className="mx-auto w-full max-w-md px-5"
       style={{ paddingBottom: composerH + 24, ['--chat-end-gap' as string]: `${composerH + 20}px` }}
@@ -232,6 +234,8 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
         </Suspense>
       )}
       <PushedHeader title={sessionTitle ?? 'Geo'} onBack={() => router.push('/chat')} backLabel="Back to conversations" />
+      {/* Scroll edge under the header (same idea as the tab bar's): the thread fades into the paper, never sliced. */}
+      <div aria-hidden="true" className={`pointer-events-none fixed inset-x-0 top-0 z-[39] h-[calc(var(--safe-top)+88px)] transition-opacity duration-200 ${scrolled ? 'opacity-100' : 'opacity-0'} bg-[linear-gradient(to_bottom,var(--color-cream)_calc(100%-28px),rgba(253,246,236,0))]`} />
       <div className="-mx-5">
         <OfflineBand />
       </div>
