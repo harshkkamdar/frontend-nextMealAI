@@ -1,7 +1,7 @@
 'use client'
 
 import { Drawer } from 'vaul'
-import { type ReactNode } from 'react'
+import { type CSSProperties, type ReactNode } from 'react'
 import { useSheetDepth } from '@/lib/depth'
 
 /** vaul's own release curve and duration (node_modules/vaul/style.css), so the screen behind moves with the sheet. */
@@ -59,8 +59,11 @@ export function BottomSheet({
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-[60] bg-ink/30 data-[state=open]:animate-[fiqr-fade-in_280ms_ease-out]" />
         {/* after:hidden drops vaul's ::after, which extends the glass 200% below the inset sheet as an undimmed strip. */}
+        {/* --initial-transform: vaul's open and close keyframes travel this far, so the inset sheet and its shadow leave the
+            screen entirely (at 100% its top 8 pt stayed in view, then vanished in one frame on unmount). */}
         <Drawer.Content
           aria-label={ariaLabel}
+          style={{ '--initial-transform': 'calc(100% + var(--nav-clearance) + 32px)' } as CSSProperties}
           className={`glass-cream fixed inset-x-2 z-[70] after:hidden mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[38px] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}
         >
           <Drawer.Handle className="!mx-auto !mt-2.5 !mb-1 !h-[5px] !w-9 shrink-0 !bg-ink-20" />

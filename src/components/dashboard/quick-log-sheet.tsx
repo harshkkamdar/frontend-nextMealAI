@@ -158,13 +158,16 @@ export function QuickLogSheet({ type, onDone, onClose, currentWeight }: {
   onClose: () => void
   currentWeight?: number
 }) {
+  // Keeps the last sheet's content while it slides away; cleared at once, the sheet collapsed to its handle in one frame.
+  const [shown, setShown] = useState(type)
+  if (type !== null && type !== shown) setShown(type)
   return (
-    <BottomSheet open={type !== null} onClose={onClose} ariaLabel={type ? `Log ${type}` : 'Quick log'}>
+    <BottomSheet open={type !== null} onClose={onClose} ariaLabel={shown ? `Log ${shown}` : 'Quick log'}>
       <div className="flex flex-col gap-5 px-5 pb-5 pt-3">
-        {type === 'water' ? <WaterSheet onDone={onDone} /> : null}
-        {type === 'mood' || type === 'energy' ? <MoodEnergySheet type={type} onDone={onDone} /> : null}
-        {type === 'sleep' ? <SleepSheet onDone={onDone} /> : null}
-        {type === 'weight' ? <WeightSheet currentWeight={currentWeight} onDone={onDone} /> : null}
+        {shown === 'water' ? <WaterSheet onDone={onDone} /> : null}
+        {shown === 'mood' || shown === 'energy' ? <MoodEnergySheet type={shown} onDone={onDone} /> : null}
+        {shown === 'sleep' ? <SleepSheet onDone={onDone} /> : null}
+        {shown === 'weight' ? <WeightSheet currentWeight={currentWeight} onDone={onDone} /> : null}
       </div>
     </BottomSheet>
   )

@@ -81,6 +81,11 @@ export function TabBar() {
   const hidden = hidesTabBar(pathname)
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
   const activeTab = TABS.find((tab) => isActive(tab.href))
+  // The pill fades in when a tab becomes open from a screen outside the tabs (a pop or swipe back to a tab root); between
+  // tabs it slides (shared layout), so it must not fade then.
+  const [lastTab, setLastTab] = useState(activeTab?.href)
+  const pillAppears = lastTab === undefined
+  if (activeTab?.href !== lastTab) setLastTab(activeTab?.href)
   // Like iOS, the bar minimises into the open tab, so a screen outside the four tabs keeps the full bar.
   const collapsed = minimised && activeTab !== undefined
   // Collapse: items leave fast while the glass shrinks. Expand: items arrive just behind the growing glass.
@@ -163,6 +168,7 @@ export function TabBar() {
                 {active ? (
                   <motion.span
                     layoutId="tab-pill"
+                    initial={pillAppears && !reduce ? { opacity: 0 } : false}
                     animate={{ opacity: collapsed ? 0 : 1 }}
                     transition={reduce ? reducedFade : { ...spring.lens, opacity: fade }}
                     className="absolute inset-0 rounded-full bg-ink-06"
