@@ -70,7 +70,7 @@ const MID = UPPER_B([3, 2, 0, 0, 0])
 const shots = [
   { name: 'train', url: T, api: trainApi(), act: fixClock },
   { name: 'train-scrolled', url: T, api: trainApi(), act: async (p) => { await fixClock(p); await p.mouse.wheel(0, 700); await p.waitForTimeout(700) } },
-  { name: 'train-day-open', url: T, api: trainApi(), act: async (p) => { await fixClock(p); await p.getByRole('button', { name: /^Upper A/ }).click(); await p.waitForTimeout(500) } },
+  { name: 'train-day-open', url: T, api: trainApi(), act: async (p) => { await fixClock(p); await p.evaluate(() => { const row = document.querySelectorAll('[data-testid=activity-program-overview] button')[3]; row.click(); row.scrollIntoView({ block: 'start' }); window.scrollBy(0, -90) }); await p.waitForTimeout(800) } },
   { name: 'train-rest-day', url: T, api: trainApi({ plans: [plan(2)] }), act: fixClock },
   { name: 'train-resume', url: T, api: trainApi({ '/v1/workout-sessions/in-progress': { session: live(MID) } }), act: fixClock },
   { name: 'train-no-program', url: T, api: trainApi({ plans: [] }), act: fixClock },
