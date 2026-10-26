@@ -141,7 +141,7 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 | S7-R3 | R3 axe 0 / contrast / 44 pt | built 56e322c: axe 0, small 0, orange <= 1 on 68 checks |
 | S7-R4 | R4 frame-diff 0 pops | pending |
 | S7-R5 | R5 60 fps on fiqr_lowend | pending |
-| S7-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
+| S7-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | stalled: 3 rounds x 3 runs (refs Bevel IMG_6865/6869/6905/6906): r1 ranks 1/3/4 scores 7/6.5/6; r2 1/2/1 7.5/7/7; r3 2/1/1 7/7.5/7. Remaining critiques: round glass back (C3), orange CTA size, card radii vs tab bar. Fix commits be0cd6e, a58d95c |
 | S7-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-7.md? Also: new Earlier plans list is an extra non-blocking getPlans() read (Q6 says no data-flow change) - keep or drop? Cancel removed from builders (Back does it) - OK? |
 | S7-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
