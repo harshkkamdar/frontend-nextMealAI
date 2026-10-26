@@ -49,3 +49,9 @@ next-env.d.ts
 graphify-out/
 /visual-check
 .context/
+
+# Redesign evidence (screenshots, motion frames, recordings) stays local; full history in branch redesign/fiqr-v2-evidence
+docs/**/*.png
+docs/**/*.mp4
+docs/**/*.gif
+docs/**/*.webm
