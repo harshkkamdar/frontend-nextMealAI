@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 import type { WorkoutSession } from '@/types/workout-session.types'
 import { bestText, compareExercise, deltaText, formatHistoryDate, receiptLine, sessionVolumeKg, type ExerciseCompare } from './train-data'
 
-const CARD = 'rounded-card bg-card shadow-[var(--shadow-card)]'
+const CARD = 'rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]'
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
 
 /** Volume per exercise, today (ink) against last time (light ink); bars grow from the left (scaleX only). */

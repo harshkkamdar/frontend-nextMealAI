@@ -232,7 +232,7 @@ export default function ActivityPage() {
       <BottomSheet open={calendarOpen} onClose={() => setCalendarOpen(false)} ariaLabel="Workout history calendar">
         <div className="px-4 pb-6 pt-3">
           <WeekStrip selected={selectedDate} today={today} onSelect={setSelectedDate} marked={doneDates} markLabel="workout done" planned={planned} weekStartsOn={1} />
-          <div className="mt-4 overflow-hidden rounded-[22px] bg-card shadow-[var(--shadow-card)]">
+          <div className="mt-4 overflow-hidden rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]">
             {selectedDateHistory.length === 0 ? <p className="px-5 py-5 text-[14px] text-ink-65">No workout on this day</p> : selectedDateHistory.map((session) => (
               <button key={session.id} type="button" onClick={() => router.push(`/train/session?id=${session.id}`)} className="flex min-h-16 w-full items-center gap-3 border-b border-ink-06 px-5 py-3 text-left last:border-b-0 active:bg-ink-04">
                 <span className="min-w-0 flex-1"><span className="block truncate text-[15.5px] font-semibold text-ink">{session.day_name}</span><span className="block text-[13px] text-ink-65">{session.duration_minutes ?? 0} min</span></span>

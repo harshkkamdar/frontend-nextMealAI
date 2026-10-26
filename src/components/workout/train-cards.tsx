@@ -14,7 +14,7 @@ import type { BodyPart } from './muscle-map-data'
 import { MuscleMap } from './muscle-map'
 import { formatExDetail, formatHistoryDate } from './train-data'
 
-export const CARD = 'rounded-card bg-card shadow-[var(--shadow-card)]'
+export const CARD = 'rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]'
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
 
 type Layer = 'hero' | 'tile' | 'row'

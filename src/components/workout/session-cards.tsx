@@ -12,7 +12,7 @@ import type { SessionExercise } from '@/types/workout-session.types'
 import { DigitTiles } from './digit-tiles'
 import { clockHMS, formatKg, formatLast, sessionVolumeKg, setReps, setWeight } from './train-data'
 
-const CARD = 'rounded-card bg-card shadow-[var(--shadow-card)]'
+const CARD = 'rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]'
 
 function TickIcon({ className = 'size-[18px]' }: { className?: string }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 4 4 10-10" /></svg>
@@ -207,7 +207,7 @@ export function AllExercisesList({ exercises, currentIndex, nextIndex, onPick }:
   return (
     <>
       <p className="mb-2 px-1 text-label text-ink-65 tabular-nums">{completedSets} of {totalSets} sets done</p>
-      <ol className="overflow-hidden rounded-card bg-card shadow-[var(--shadow-card)]">
+      <ol className="overflow-hidden rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]">
         {exercises.map((exercise, index) => {
           const done = isExerciseComplete(exercise)
           const setsDone = exercise.sets.filter((set) => set.completed).length

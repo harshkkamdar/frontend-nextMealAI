@@ -64,7 +64,7 @@ function ExerciseCard({ index, count, direction, then, children }: { index: numb
       inert={!present}
       className="origin-[50%_30%] [grid-area:1/1]"
     >
-      <article aria-current={present ? 'step' : undefined} aria-label={`Exercise ${index + 1} of ${count}`} className="rounded-card bg-card p-3.5 shadow-[var(--shadow-card)]">
+      <article aria-current={present ? 'step' : undefined} aria-label={`Exercise ${index + 1} of ${count}`} className="rounded-card bg-[var(--surface-card,var(--color-card))] p-3.5 shadow-[var(--shadow-card)]">
         {children}
       </article>
       <p className="mt-2 truncate px-1 text-label text-ink-65">{then}</p>
@@ -382,7 +382,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
   if (loading) {
     return (
-      <div className="mx-auto min-h-dvh w-full max-w-md bg-cream px-4">
+      <div className="mx-auto min-h-dvh w-full max-w-md px-4">
         <PushedHeader title="" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
         {/* motion-feel 3h: skeletons only after 150 ms without data, so a quick load goes straight to content. */}
         <motion.div className="pt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.12, delay: 0.15 }}><SessionSkeleton /></motion.div>
@@ -391,7 +391,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   }
   if (!session) {
     return (
-      <div className="mx-auto min-h-dvh w-full max-w-md bg-cream px-4">
+      <div className="mx-auto min-h-dvh w-full max-w-md px-4">
         <PushedHeader title="Workout" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
         <div className="-mx-4"><OfflineBand /></div>
         {loadFailed ? (
@@ -408,7 +408,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   // A finished session opened from history is its receipt.
   if (session.status === 'completed' && !showSummary) {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-cream px-4">
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-4">
         <PushedHeader title="" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
         <div className="flex flex-1 flex-col pt-1">
           <SessionReceipt session={session} tz={tz} animate={false} onDone={() => goBack(router, '/train')} />
@@ -432,7 +432,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const following = exercises[currentIndex + 1]
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-md bg-cream text-ink">
+    <div className="mx-auto min-h-dvh w-full max-w-md text-ink">
       <AnimatePresence>{summary}</AnimatePresence>
       <RestTimer isActive={showRestTimer && !showSummary} duration={restSeconds} resetToken={restKey} upNext={upNextText(exercises, currentIndex)} onSkip={() => setShowRestTimer(false)} onComplete={() => setShowRestTimer(false)} />
 
@@ -492,7 +492,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         )}
 
         {showAddForm && (
-          <div className="mt-4 space-y-3 rounded-card bg-card p-4 shadow-[var(--shadow-card)]">
+          <div className="mt-4 space-y-3 rounded-card bg-[var(--surface-card,var(--color-card))] p-4 shadow-[var(--shadow-card)]">
             <SearchablePicker<ExerciseSearchResult>
               label="Exercise" placeholder="Search exercises…" search={searchExercises}
               renderItem={(item) => <div className="flex flex-col"><span className="text-sm text-ink">{item.name}</span>{item.primary_muscles?.length ? <span className="text-[12px] text-ink-65">{item.primary_muscles.join(', ')}</span> : null}</div>}
@@ -545,7 +545,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
       <BottomSheet open={showMenu} onClose={() => { setShowMenu(false); setRemoveConfirm(false); setDiscardConfirm(false) }} ariaLabel="Workout options">
         <div className="px-4 pb-5 pt-2">
-          <div className="overflow-hidden rounded-card bg-card shadow-[var(--shadow-card)]">
+          <div className="overflow-hidden rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]">
             <button type="button" onClick={() => { setShowMenu(false); setShowAddForm(true) }} className="flex min-h-row w-full items-center border-b border-ink-06 px-5 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04">Add exercise</button>
             <button type="button" onClick={() => void handleComplete()} disabled={completing} className="flex min-h-row w-full items-center border-b border-ink-06 px-5 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04">Finish workout</button>
             {current && (
