@@ -13,9 +13,10 @@ const plural = (n: number) => `${n} change${n === 1 ? '' : 's'}`
 /**
  * The status capsule (SPATIAL-BUILD system states, mock "Status capsule"): one glass capsule under the header while
  * offline or while changes wait to sync. Callers bleed it to the screen edge; it insets itself to the 16 pt gutter.
+ * `queuesSaves`: the screen's save is queued while offline (log screens), so the capsule says it will send later.
  * When waiting changes finish syncing it hands over to a toast in the same capsule style ("Back online. 3 changes synced").
  */
-export function OfflineBand() {
+export function OfflineBand({ queuesSaves = false }: { queuesSaves?: boolean } = {}) {
   const online = useOnline()
   const count = useOfflineQueue(pendingCount)
   const dead = useOfflineQueue((state) => state.dead.length)
@@ -55,7 +56,7 @@ export function OfflineBand() {
         {/* Ring = nothing is moving (offline); filled = changes waiting. Ink, never orange (orange is the screen's action). */}
         <span aria-hidden="true" className={cn('size-2 shrink-0 rounded-full', online ? 'bg-ink' : 'shadow-[inset_0_0_0_2px_#111C35]')} />
         {!online ? (
-          <span className="py-2">Offline. Showing what you last synced.</span>
+          <span className="py-2">{queuesSaves ? 'Offline. This saves on your phone and sends later.' : 'Offline. Showing what you last synced.'}</span>
         ) : (
           <>
             <span className="flex-1 py-2">{plural(count)} waiting to sync</span>

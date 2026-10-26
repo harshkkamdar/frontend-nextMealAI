@@ -44,7 +44,7 @@ export function ManualLogShell({
   return (
     <div className="mx-auto w-full max-w-md px-4 pb-[calc(112px+var(--safe-bottom))]">
       <PushedHeader title={title} onBack={() => router.back()} />
-      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
+      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand queuesSaves /></div>
       <h1 className="font-display mt-2 px-0.5 text-title text-ink">{prompt}</h1>
       {sub ? <p className="mt-1.5 px-0.5 text-caption text-ink-65 tabular-nums">{sub}</p> : null}
       <div className="mt-5">{children}</div>

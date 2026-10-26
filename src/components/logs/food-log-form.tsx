@@ -204,6 +204,7 @@ export function FoodLogForm() {
     return (
       <div className="mx-auto w-full max-w-md px-4">
         {header}
+        {/* A photo needs the network to be read, so this band keeps the default copy; the photo card says what to do. */}
         <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
         {mealMenu}
         {fileInput}
@@ -223,7 +224,7 @@ export function FoodLogForm() {
   return (
     <div className="mx-auto w-full max-w-md px-4 pb-[calc(96px+var(--safe-bottom))]">
       {header}
-      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
+      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand queuesSaves /></div>
       {mealMenu}
 
       {/* Pinned under the bar so a focused field never scrolls beneath it: iOS draws the caret above fixed layers.

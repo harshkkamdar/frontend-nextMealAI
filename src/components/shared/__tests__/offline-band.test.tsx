@@ -45,4 +45,10 @@ describe('OfflineBand (status capsule)', () => {
     act(() => useOfflineQueue.setState({ items: [] }))
     expect(mocks.toast).toHaveBeenCalledWith('1 change synced', { id: 'fiqr-synced' })
   })
+
+  it('on a screen whose save is queued offline, says the save waits on the phone', () => {
+    mocks.online = false
+    render(<OfflineBand queuesSaves />)
+    expect(screen.getByRole('status')).toHaveTextContent('Offline. This saves on your phone and sends later.')
+  })
 })
