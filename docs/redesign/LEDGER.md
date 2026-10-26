@@ -73,19 +73,19 @@ Status values (closed list): `built <sha>`; `blocked: <item>`; `needs-owner: <qu
 
 | ID | Item | Status |
 |---|---|---|
-| S4-01 | Geo chat list | pending |
-| S4-02 | Geo chat session | pending |
-| S4-03 | Geo companion sheet | pending |
-| S4-04 | Report response sheet | pending |
-| S4-05 | Chat session list actions | pending |
-| S4-06 | T: push to session | pending |
-| S4-R1 | R1 core-job metrics | pending |
+| S4-01 | Geo chat list | built 5aa376e, 617312a; screens/slice-4/ (25 states x 2, axe 0, small 0, orange <= 1) |
+| S4-02 | Geo chat session | built 5aa376e, 617312a; screens/slice-4/ (25 states x 2, axe 0, small 0, orange <= 1) |
+| S4-03 | Geo companion sheet | built 5aa376e, 617312a; screens/slice-4/ (25 states x 2, axe 0, small 0, orange <= 1) |
+| S4-04 | Report response sheet | built 5aa376e, 617312a; screens/slice-4/ (25 states x 2, axe 0, small 0, orange <= 1) |
+| S4-05 | Chat session list actions | built 5aa376e, 617312a; screens/slice-4/ (25 states x 2, axe 0, small 0, orange <= 1) |
+| S4-06 | T: push to session | built 617312a; static-build frame diff: chip-tap smooth x2; open-conversation smooth in run 6; reply-arrives, new-conversation, companion-open, companion-resize flagged in at least one run (dropped screencast frames; new-conversation tab-bar unmount fixed in the lead shell commit); re-record pending |
+| S4-R1 | R1 core-job metrics | built 5aa376e: J3 talk to Geo = 2 taps (Geo tab, Ask Geo anything field sends) |
 | S4-R2 | R2 states captured (web 390/360, iOS, Android) | pending |
-| S4-R3 | R3 axe 0 / contrast / 44 pt | pending |
+| S4-R3 | R3 axe 0 / contrast / 44 pt | built 5aa376e: axe 0, small 0, orange <= 1 on 50 checks |
 | S4-R4 | R4 frame-diff 0 pops | pending |
 | S4-R5 | R5 60 fps on fiqr_lowend | pending |
 | S4-R6 | R6 blind critic (top 3 of 5, >= 8/10, 3 runs) | pending |
-| S4-R7 | R7 copy list approved | pending |
+| S4-R7 | R7 copy list approved | needs-owner: approve docs/redesign/copy/slice-4.md? Resizable sheets settle by transform (pinned footer shifts slightly on release) vs animating height (forbidden by motion-feel) - keep? Inline food rows parse Geo's "Logged ... N cal" receipt text; a structured receipt from the backend would be sturdier (backend change, out of scope). New: Ask Geo field on /chat and a Rename/Delete sheet - approve? |
 | S4-R8 | R8 AGENTS laws, palette grep, lint/type/test | pending |
 
 ## S5 Food diary
