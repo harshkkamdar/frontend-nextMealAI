@@ -12,7 +12,7 @@ export function Chip({ selected = false, className, ...props }: ChipProps) {
       type="button"
       aria-pressed={selected}
       className={cn(
-        'min-h-11 rounded-full px-4 text-[14px] font-semibold',
+        'min-h-chip rounded-full px-4 text-[14px] font-semibold',
         selected ? 'bg-ink text-cream' : 'bg-ink-08 text-ink',
         className,
       )}

@@ -10,14 +10,14 @@ export function SecondaryButton({ onNavy = false, arrow = false, children, class
   return (
     <button
       className={cn(
-        'w-full h-14 rounded-[15px] bg-cream text-ink font-bold text-[18px] flex items-center justify-center gap-2 disabled:bg-ink-08 disabled:text-ink-35 disabled:border-0',
+        'w-full h-btn rounded-full bg-cream text-ink font-bold text-body flex items-center justify-center gap-2 disabled:bg-ink-08 disabled:text-ink-35 disabled:border-0',
         !onNavy && 'border border-ink-16',
         className,
       )}
       {...props}
     >
       {children}
-      {arrow ? <span className="text-[17px]">→</span> : null}
+      {arrow ? <span className="text-body">→</span> : null}
     </button>
   )
 }

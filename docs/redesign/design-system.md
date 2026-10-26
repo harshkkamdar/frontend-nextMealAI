@@ -18,6 +18,33 @@ Only the four brand colours and the two macro colours, plus alpha tints of them 
 | `glass-fill` | white 72% | glass surfaces when glass is on |
 | `glass-solid` | white 96% | the same surfaces when glass is off |
 
+## Spatial sizing (SPATIAL-BUILD, 26 Oct 2026; supersedes the sizes below where they differ)
+
+True 390 pt values from `mocks/journey-today.html`'s sizing spec. Tokens in `globals.css` `@theme`; every target stays 44 pt or more.
+
+| Role | Token / utility | Value |
+|---|---|---|
+| Large title | `text-title` + `font-display` | 30, Archivo 800, stretch 102%, -0.02em |
+| Hero number, page title | `text-hero` + `font-display` | 24, 800 (page titles 700) |
+| Card title | `text-headline` | 18 / 700 (17-18) |
+| Body | `text-body` / `text-body-sm` | 16 / 15, line height 1.35 |
+| Caption | `text-caption` | 13 |
+| Label | `text-label` | 12 / 600 |
+| Tab label | `text-tab` | 11 |
+| Gutter, feed gap | `px-gutter`, `--spacing-gutter` | 16, 10 |
+| Card / tile radius | `rounded-card` / `rounded-bento` | 22 / 20; card padding 16, tile padding 14, tile min height `min-h-tile` 128 |
+| Sheet radius | `rounded-sheet` | 38 (36-40) |
+| List row | `min-h-row` | 58 (56-60) |
+| Button | `h-btn` / `min-h-btn` | 50, capsule |
+| Chip | `min-h-chip` | 44 |
+| Stepper | `h-stepper` | 56 |
+| Field | `h-field` | 60 |
+| Rings | `size-ring` / `size-ring-md` / `size-ring-sm` | 112 / 84 / 60 |
+
+Shared primitives in `src/components/ui/fiqr` (primary and secondary buttons, page header, chip, option rows, text field, metric tile, feature and action cards, section label) and the large-title header use these.
+
+Reduced transparency: the system setting (`prefers-reduced-transparency`) or the native flag passed to `applyGlassMode(true)` sets `html[data-transparency="reduced"]` and glass off, and every glass surface is solid card or cream with no blur.
+
 ## Type (Archivo only, variable width axis)
 
 Archivo is loaded with its `wdth` axis. Wide (`font-stretch: 112-118%`) is reserved for titles and hero numbers; everything else is normal width.
@@ -76,7 +103,9 @@ Decision from the data: low-end Android ships with glass off, which the auto-det
 | `tap` | 500 / 35 | press feedback, chips, steppers |
 | `sheet` | 320 / 32 | sheets, the + sheet, tab pill |
 | `page` | 260 / 30 | in-page step changes (onboarding steps, plan builder steps) |
-| `push` | 320 / 36 / 1, critically damped (zeta 1.0) | native push and pop between screens and the swipe-back release (owner approved the native push, 26 Oct 2026; motion-feel 3c-native) |
+| `push` | 224 / 30 / 1, critically damped (zeta 1.0, response 0.42 s) | Spatial Depth push and pop between screens and the swipe-back release (SPATIAL-BUILD; motion-feel 3c-native) |
+| `pushFlick` | 224 / 24.5 / 1 (zeta 0.82) | swipe-back released by a flick over 600 px/s: earned overshoot |
+| `tab` | 500 / 45 / 1, critically damped | tab switch depth scale (0.975 to 1 in, 1 to 1.02 out) |
 | `countUp` | 900 ms, ease-out cubic | hero and tile numbers, once per visit |
 | `draw` | 700 ms, ease-out | ring and chart draw-in, once per visit |
 

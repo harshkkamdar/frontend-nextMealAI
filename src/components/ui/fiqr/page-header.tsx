@@ -11,7 +11,7 @@ interface PageHeaderProps {
   className?: string
 }
 
-/** One header for every screen: optional 44px back chevron, left-aligned 22/600 title clamped to two lines. */
+/** One header for every screen: optional 44px back chevron, left-aligned 24/700 title (Spatial sizing) clamped to two lines. */
 export function PageHeader({ title, eyebrow, sub, onBack, backLabel = 'Back', trailing, className }: PageHeaderProps) {
   return (
     <header className={cn('flex items-start gap-1', className)}>
@@ -22,8 +22,8 @@ export function PageHeader({ title, eyebrow, sub, onBack, backLabel = 'Back', tr
       ) : null}
       <div className={cn('min-w-0 flex-1', onBack && 'pt-[7px]')}>
         {eyebrow ? <p className="truncate text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65">{eyebrow}</p> : null}
-        <h1 className="line-clamp-2 text-[22px] font-semibold leading-[1.2] tracking-[-0.4px] text-ink">{title}</h1>
-        {sub ? <p className="mt-1 text-[13.5px] text-ink-65">{sub}</p> : null}
+        <h1 className="font-display line-clamp-2 text-hero font-bold text-ink">{title}</h1>
+        {sub ? <p className="mt-1 text-caption text-ink-65">{sub}</p> : null}
       </div>
       {trailing ? <div className="shrink-0">{trailing}</div> : null}
     </header>

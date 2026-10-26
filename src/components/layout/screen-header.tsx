@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ChevronLeftIcon } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
+import { useTitleDrift } from '@/components/ui/fiqr/scroll-drift'
 import { cn } from '@/lib/utils'
 
 /** True once `ref` has scrolled under the top bar. */
@@ -59,12 +60,16 @@ interface LargeTitleHeaderProps {
 /** Main tabs (Home, Food, Train, Geo): large left title and subtitle, round glass actions top right (Q19). */
 export function LargeTitleHeader({ title, subtitle, actions, children }: LargeTitleHeaderProps) {
   const { ref, past } = useScrolledPast<HTMLDivElement>()
+  const drift = useTitleDrift<HTMLDivElement>()
   return (
     <>
       <TopBar title={title} filled={past} actions={actions} />
       <header className="pt-[calc(8px+var(--safe-top))]">
-        <h1 className="font-wide pr-28 text-[30px] font-bold leading-[1.1] tracking-[-0.5px] text-ink">{title}</h1>
-        {subtitle ? <p className="mt-1 text-[15px] text-ink-65">{subtitle}</p> : null}
+        {/* The title drifts and fades a little as the page scrolls under the bar (Spatial Depth). */}
+        <div ref={drift}>
+          <h1 className="font-display pr-28 text-title text-ink">{title}</h1>
+          {subtitle ? <p className="mt-1 text-body-sm text-ink-65">{subtitle}</p> : null}
+        </div>
         {/* The bar condenses once the line under the title passes under it. */}
         <div ref={ref} aria-hidden="true" />
         {children}

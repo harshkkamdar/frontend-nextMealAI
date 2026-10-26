@@ -48,15 +48,15 @@ export function OptionList<T extends string>(props: Single<T> | Multi<T>) {
             onClick={() => toggle(option.value)}
             style={{ '--i': i + 2 } as CSSProperties}
             className={cn(
-              'rise flex min-h-[62px] w-full items-start gap-3.5 rounded-[var(--radius-row)] bg-card px-4 py-3 text-left transition-[transform,outline-color,box-shadow] duration-200 active:scale-[.97] active:duration-75',
+              'rise flex min-h-row w-full items-start gap-3.5 rounded-[var(--radius-row)] bg-card px-4 py-3 text-left transition-[transform,outline-color,box-shadow] duration-200 active:scale-[.97] active:duration-75',
               'outline -outline-offset-1',
               selected ? 'outline-2 outline-ink shadow-[0_6px_18px_-8px_rgba(17,28,53,.25)]' : 'outline-1 outline-ink-08',
             )}
           >
             {option.icon ? <span className="grid size-10 shrink-0 self-center place-items-center rounded-full bg-ink-06 text-ink [&_svg]:size-5">{option.icon}</span> : null}
             <span className="min-w-0 flex-1">
-              <span className="block text-[16.5px] font-semibold text-ink">{option.label}</span>
-              {option.hint ? <span className="mt-0.5 block text-[14px] text-ink-80">{option.hint}</span> : null}
+              <span className="block text-body font-semibold text-ink">{option.label}</span>
+              {option.hint ? <span className="mt-0.5 block text-caption text-ink-80">{option.hint}</span> : null}
             </span>
             <span
               aria-hidden="true"

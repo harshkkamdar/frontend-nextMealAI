@@ -18,14 +18,14 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
   return (
     <div className="rise" style={{ '--i': i } as CSSProperties}>
       <label htmlFor={id} className="mb-2 block text-[15px] font-semibold text-ink">{label}</label>
-      <div className={cn('flex h-14 items-center rounded-[var(--radius-row)] bg-card outline -outline-offset-1 transition-[outline-color] focus-within:outline-2 focus-within:outline-ink', error ? 'outline-2 outline-ink' : 'outline-1 outline-ink-08')}>
+      <div className={cn('flex h-field items-center rounded-[var(--radius-row)] bg-card outline -outline-offset-1 transition-[outline-color] focus-within:outline-2 focus-within:outline-ink', error ? 'outline-2 outline-ink' : 'outline-1 outline-ink-08')}>
         <input
           ref={ref}
           id={id}
           type={isPassword && shown ? 'text' : type}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={cn('h-full min-w-0 flex-1 bg-transparent px-4 text-[17px] text-ink outline-none placeholder:text-ink-65', className)}
+          className={cn('h-full min-w-0 flex-1 bg-transparent px-4 text-body text-ink outline-none placeholder:text-ink-65', className)}
           {...props}
         />
         {isPassword ? (

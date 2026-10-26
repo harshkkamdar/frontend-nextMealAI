@@ -10,7 +10,7 @@ interface MetricTileProps extends HTMLAttributes<HTMLDivElement> {
 
 export function MetricTile({ label, value, unit, sub, className, ...props }: MetricTileProps) {
   return (
-    <div className={cn('bg-card rounded-[16px] border border-ink-12 px-[14px] py-[13px]', className)} {...props}>
+    <div className={cn('bg-card rounded-[20px] border border-ink-12 p-[14px]', className)} {...props}>
       <div className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-65">{label}</div>
       <div className="flex items-baseline gap-[3px]">
         <span className="text-[19px] font-semibold tracking-[-0.3px] text-ink">{value}</span>

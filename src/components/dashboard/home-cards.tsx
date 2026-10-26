@@ -9,10 +9,11 @@ import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import type { MacroKey } from '@/lib/macros'
 import { DRAW_MS } from '@/lib/motion'
 import { CountUp } from '@/components/ui/fiqr/count-up'
+import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { cn } from '@/lib/utils'
 import { formatSleep, type MealRow } from './home-data'
 
-const CARD = 'rounded-[24px] bg-card shadow-[var(--shadow-card)]'
+const CARD = 'rounded-[22px] bg-card shadow-[var(--shadow-card)]'
 
 /** False on a revisit in the same session: charts and numbers paint at rest instead of drawing again (motion-feel 7). */
 export const HomeEntrance = createContext(true)
@@ -50,7 +51,7 @@ function Ring({ consumed, target }: { consumed: number; target: number }) {
   // Round caps add half the 12 px stroke at each end; shorten the dash by one stroke so the arc equals the fraction.
   const arcOffset = fraction >= 1 ? 0 : Math.min(c, c * (1 - fraction) + 12)
   return (
-    <div className="relative size-[132px] shrink-0">
+    <div className="relative size-ring shrink-0">
       <svg viewBox="0 0 132 132" className="size-full -rotate-90" aria-hidden="true">
         <circle cx="66" cy="66" r={r} fill="none" stroke="var(--color-ink-06)" strokeWidth="12" />
         <circle
@@ -61,7 +62,7 @@ function Ring({ consumed, target }: { consumed: number; target: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-wide text-[40px] font-[750] leading-none tracking-[-1px] text-ink tabular-nums"><Count value={remaining} /></span>
+        <span className="font-display text-hero leading-none text-ink tabular-nums"><Count value={remaining} /></span>
         <span className="mt-1 text-[13px] font-semibold text-ink-65">{target > 0 ? (over ? 'kcal over' : 'kcal left') : 'kcal today'}</span>
       </div>
     </div>
@@ -112,8 +113,8 @@ export function HeroCard({ calories, macros, geoLine, onOpenMacro }: HeroCardPro
     { key: 'fat', label: 'Fat', current: macros.fat[0], target: macros.fat[1], color: 'var(--color-macro-ochre)' },
   ]
   return (
-    <section className={cn(CARD, 'p-5')} aria-label="Today's food">
-      <div className="flex items-center gap-5">
+    <section className={cn(CARD, 'p-4')} aria-label="Today's food">
+      <div className="flex items-center gap-[14px]">
         <button type="button" onClick={() => onOpenMacro('calories')} className="rounded-full transition-transform active:scale-[.97]">
           <Ring consumed={calories.current} target={calories.target} />
           <span className="sr-only">, {fmt(calories.current)} of {fmt(calories.target)} eaten, show breakdown</span>
@@ -124,7 +125,7 @@ export function HeroCard({ calories, macros, geoLine, onOpenMacro }: HeroCardPro
       </div>
       <div className="mt-4 flex items-start gap-3 border-t border-ink-06 pt-4">
         <GeoAvatar size={28} />
-        <p className="min-w-0 flex-1 text-[15px] leading-[1.45] text-ink">{geoLine}</p>
+        <p className="min-w-0 flex-1 text-body-sm text-ink">{geoLine}</p>
       </div>
     </section>
   )
@@ -144,13 +145,15 @@ interface TileProps {
 }
 
 function Tile({ icon: Icon, label, value, unit, caption, children, onClick, actionLabel }: TileProps) {
+  // Demo of the Spatial press tilt (5 deg for tiles); it owns the tile's press transform.
+  const tilt = usePressTilt<HTMLButtonElement>(5)
   const body = (
     <>
       <span className="flex items-center gap-1.5 text-[13px] font-semibold text-ink-65">
         <Icon className="size-4" />{label}
       </span>
       <span className="mt-2 flex items-baseline gap-1">
-        <span className="font-wide text-[28px] font-bold leading-none tracking-[-0.6px] text-ink tabular-nums">{value}</span>
+        <span className="font-display text-hero leading-none text-ink tabular-nums">{value}</span>
         {unit ? <span className="text-[14px] font-semibold text-ink-65">{unit}</span> : null}
       </span>
       <span className="mt-auto block pt-3">{children}</span>
@@ -158,9 +161,9 @@ function Tile({ icon: Icon, label, value, unit, caption, children, onClick, acti
       {actionLabel ? <span className="sr-only">, {actionLabel}</span> : null}
     </>
   )
-  const className = cn('flex min-h-[148px] flex-col rounded-[22px] bg-card p-4 text-left shadow-[var(--shadow-card)]', onClick && 'transition-transform active:scale-[.97]')
+  const className = 'flex min-h-tile flex-col rounded-[20px] bg-card p-[14px] text-left shadow-[var(--shadow-card)]'
   return onClick
-    ? <button type="button" onClick={onClick} className={className}>{body}</button>
+    ? <button type="button" onClick={onClick} className={className} {...tilt}>{body}</button>
     : <div className={className}>{body}</div>
 }
 

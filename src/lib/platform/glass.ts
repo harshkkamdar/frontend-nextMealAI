@@ -18,10 +18,18 @@ export function glassMode({ hardwareConcurrency, deviceMemory, reduceTransparenc
   return 'on'
 }
 
-/** CSS defaults to the opaque surface; this turns glass on only where the device can afford it. */
-export function applyGlassMode(reduceTransparency = false): GlassMode {
+/**
+ * CSS defaults to the opaque surface; this turns glass on only where the device can afford it. Reduce Transparency
+ * comes from the system setting (`prefers-reduced-transparency`, where the browser exposes it) or the native flag
+ * passed in; either way `data-transparency="reduced"` makes every glass surface solid (globals.css).
+ */
+export function applyGlassMode(nativeReduceTransparency = false): GlassMode {
   const nav = navigator as Navigator & { deviceMemory?: number }
+  const reduceTransparency = nativeReduceTransparency || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-transparency: reduce)').matches)
   const mode = glassMode({ hardwareConcurrency: nav.hardwareConcurrency, deviceMemory: nav.deviceMemory, reduceTransparency })
-  document.documentElement.dataset.glass = mode
+  const root = document.documentElement
+  root.dataset.glass = mode
+  if (reduceTransparency) root.dataset.transparency = 'reduced'
+  else delete root.dataset.transparency
   return mode
 }
