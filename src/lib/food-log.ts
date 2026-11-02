@@ -16,6 +16,8 @@ export interface FoodDraft {
   est_macros: FoodMacros
   meal_type?: string
   user_food_id?: string
+  servings?: number
+  serving_size_g?: number
 }
 
 /** True when a draft carries a usable (non-blank) food name. */
@@ -54,6 +56,8 @@ export function buildFoodLogItems(
       est_macros: cleanMacros(d.est_macros),
       meal_type: d.meal_type || undefined,
       user_food_id: d.user_food_id || undefined,
+      ...(d.servings != null ? { servings: d.servings } : {}),
+      ...(d.serving_size_g != null ? { serving_size_g: d.serving_size_g } : {}),
     },
     source: 'manual' as const,
     // R6-12 — bucket the whole meal onto the viewed diary date (not "today")

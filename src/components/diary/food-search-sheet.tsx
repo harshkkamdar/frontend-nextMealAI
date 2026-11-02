@@ -115,9 +115,11 @@ interface FoodSearchSheetProps {
   editSubtitle?: string
   /** Edit mode: Delete entry hands the log to the caller, which closes this sheet and confirms (a confirm over a modal sheet can't take focus). */
   onRequestDelete?: (log: Log) => void
+  /** Edit mode: close this sheet and open the existing copy flow for the log. */
+  onRequestCopy?: (log: Log) => void
 }
 
-export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDate, existingMealLogs, mode, existingLog, onLogUpdated, onLogDeleted, editSubtitle, onRequestDelete }: FoodSearchSheetProps) {
+export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDate, existingMealLogs, mode, existingLog, onLogUpdated, onLogDeleted, editSubtitle, onRequestDelete, onRequestCopy }: FoodSearchSheetProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<FoodSearchResult[]>([])
   const [searching, setSearching] = useState(false)
@@ -165,12 +167,26 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   useEffect(() => {
     if (!isOpen) return
     if (mode === 'edit' && existingLog) {
-      const payload = existingLog.payload as FoodPayload
+      const payload = existingLog.payload as FoodPayload & {
+        // A photo log keeps the estimate's breakdown (backend FoodEstimateItem): estimated_portion_g and estimated_macros.
+        estimate?: { items?: Array<{ name: string; estimated_portion_g?: number; estimated_macros?: { calories: number; protein: number; carbs: number; fat: number } }> }
+      }
       setEditMeal(mealOf(payload))
-      setEditItems(payload.items?.length ? payload.items : null)
-      const servingSize = payload.servings && payload.quantity_g
-        ? Math.round(payload.quantity_g / payload.servings)
-        : null
+      const photoItems = payload.items?.length
+        ? payload.items
+        : payload.estimate?.items?.map((item) => ({
+            name: item.name,
+            quantity_g: item.estimated_portion_g,
+            est_macros: item.estimated_macros ?? { calories: 0, protein: 0, carbs: 0, fat: 0 },
+          }))
+      setEditItems(photoItems?.length ? photoItems : null)
+      const hasSavedServing = typeof payload.servings === 'number' && payload.servings > 0
+        && typeof payload.serving_size_g === 'number' && payload.serving_size_g > 0
+      const servingSize = hasSavedServing
+        ? payload.serving_size_g!
+        : payload.servings && payload.quantity_g
+          ? Math.round(payload.quantity_g / payload.servings)
+          : null
       // payload.est_macros is the TOTAL for the logged amount, but the
       // confirmation view multiplies macros_per_serving × servings. So for a
       // multi-serving entry we must store the PER-SERVING macros here, else
@@ -756,6 +772,11 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
                   <PrimaryButton onClick={handleSaveEdit} disabled={saving || !selectedFood} aria-busy={saving} className="justify-center">
                     {saving ? 'Saving…' : 'Save'}
                   </PrimaryButton>
+                  {onRequestCopy && existingLog ? (
+                    <button type="button" onClick={() => onRequestCopy(existingLog)} disabled={saving} className="min-h-11 w-full rounded-full text-center text-[15.5px] font-semibold text-ink-65">
+                      Copy to another day
+                    </button>
+                  ) : null}
                   <button type="button" onClick={() => (onRequestDelete && existingLog ? onRequestDelete(existingLog) : setConfirmDeleteEdit(true))} disabled={saving} className="min-h-11 w-full rounded-full text-center text-[15.5px] font-semibold text-ink-65">
                     Delete entry
                   </button>

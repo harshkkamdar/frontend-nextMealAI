@@ -133,7 +133,7 @@ export function FoodLogForm() {
     if (items.length === 0 || saving) return
     setSaving(true)
     try {
-      const drafts = items.map((i) => ({ food_name: i.name, quantity_g: i.grams, est_macros: i.macros, meal_type: meal.toLowerCase(), user_food_id: i.user_food_id }))
+      const drafts = items.map((i) => ({ food_name: i.name, quantity_g: i.grams, est_macros: i.macros, meal_type: meal.toLowerCase(), user_food_id: i.user_food_id, servings: i.servings, serving_size_g: i.serving_size_g }))
       const { failures } = await createLogs(buildFoodLogItems(drafts, null, logDate))
       const done = items.length - failures.length
       if (failures.length === 0) {
@@ -212,6 +212,7 @@ export function FoodLogForm() {
           key={photoKey}
           file={photo}
           meal={meal}
+          localDate={logDate}
           onRetake={() => void openCamera()}
           onSearch={() => setPhoto(null)}
           onGeo={() => toGeo('Help me log what is on my plate')}

@@ -50,6 +50,20 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
     expect(screen.getByText(/servings/i)).toBeInTheDocument()
   })
 
+  it('uses the saved serving size and count when both are present', () => {
+    const twoServings: Log = {
+      ...baseLog,
+      payload: { ...baseLog.payload, quantity_g: 100, servings: 2, serving_size_g: 50 } as FoodPayload,
+    }
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={twoServings}
+        mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    expect(screen.getByLabelText('Servings')).toHaveValue(2)
+    fireEvent.click(screen.getByRole('button', { name: 'Grams' }))
+    expect(screen.getByLabelText('Grams')).toHaveValue(100)
+  })
+
   it('opens in grams mode when log has no `servings` field', () => {
     const gramLog: Log = { ...baseLog, payload: { ...baseLog.payload, servings: undefined, quantity_g: 31 } as any }
     render(
@@ -68,6 +82,16 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^log$/i })).not.toBeInTheDocument()
+  })
+
+  it('offers the existing copy flow under Save', () => {
+    const onRequestCopy = vi.fn()
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={baseLog}
+        mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} onRequestCopy={onRequestCopy} />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Copy to another day' }))
+    expect(onRequestCopy).toHaveBeenCalledWith(baseLog)
   })
 
   it('re-saving a MULTI-serving entry unchanged does NOT double its macros', async () => {
@@ -155,5 +179,23 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
     expect(arg.items?.[0].est_macros.calories).toBe(150)
     expect(arg.est_macros?.calories).toBe(250)
     expect(arg.meal_type).toBe('lunch')
+  })
+
+  it('opens legacy photo estimate items when payload.items is empty', () => {
+    const photoLog: Log = {
+      ...baseLog,
+      payload: {
+        food_name: 'Photo meal',
+        meal_type: 'lunch',
+        est_macros: { calories: 300 },
+        estimate: { items: [{ name: 'Chicken', estimated_portion_g: 150, estimated_macros: { calories: 250, protein: 30, carbs: 0, fat: 8 }, confidence: 0.8 }] },
+      } as never,
+    }
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={photoLog}
+        mealType="Lunch" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    expect(screen.getByText('1 item from your photo')).toBeInTheDocument()
+    expect(screen.getByText('Chicken')).toBeInTheDocument()
   })
 })

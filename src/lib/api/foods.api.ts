@@ -33,11 +33,12 @@ export async function estimateFoodFromPhoto(file: File): Promise<FoodEstimate> {
 /** FB-R6-13 — POST /v1/foods/log-from-estimate. `edits` merges over saved estimate. */
 export async function logFromEstimate(
   estimate_id: string,
-  edits?: Partial<FoodEstimate>
+  edits?: Partial<FoodEstimate>,
+  opts?: { meal_type?: string; local_date?: string },
 ): Promise<unknown> {
   return apiFetch('/v1/foods/log-from-estimate', {
     method: 'POST',
-    body: { estimate_id, ...(edits ? { edits } : {}) },
+    body: { estimate_id, ...(edits ? { edits } : {}), ...opts },
   })
 }
 

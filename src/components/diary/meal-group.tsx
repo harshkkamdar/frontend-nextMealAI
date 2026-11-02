@@ -14,7 +14,7 @@ interface MealGroupProps {
   mealType: string
   items: Log[]
   onAddFood: () => void
-  /** A row tap opens that log's actions sheet (journey-food D1 Tap for actions). */
+  /** A row tap opens that log's editor. */
   onOpenLog?: (log: Log) => void
   isToday?: boolean
   onCopyToToday?: () => void

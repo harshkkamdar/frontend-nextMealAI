@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { FoodEstimate } from '@/lib/api/foods.api'
 import type { Log } from '@/types/logs.types'
 import {
-  estimateEdits, groupLogsByDay, mealForTime, parseMeal, photoItemMacros, photoItemsFrom, photoTotals, scaleMacros, stepItem,
+  editPhotoMacros, estimateEdits, groupLogsByDay, mealForTime, parseMeal, photoItemMacros, photoItemsFrom, photoTotals, scaleMacros, stepItem,
 } from '../log-math'
 
 const at = (h: number, m = 0) => new Date(2026, 9, 26, h, m)
@@ -56,6 +56,11 @@ describe('photo items', () => {
     let small = { ...chicken, amount: 10 }
     small = stepItem(stepItem(small, -1), -1)
     expect(small.amount).toBe(5)
+  })
+  it('rescales later gram changes from edited macros', () => {
+    const [chicken] = photoItemsFrom(EST)
+    const edited = editPhotoMacros(chicken, { ...photoItemMacros(chicken), protein: 30 })
+    expect(photoItemMacros({ ...edited, amount: 240 }).protein).toBe(45)
   })
 })
 

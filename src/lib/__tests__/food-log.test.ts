@@ -48,4 +48,9 @@ describe('buildFoodLogItems (BUG-009 multi-add commit)', () => {
     expect(buildFoodLogItems([], null)).toEqual([])
     expect(buildFoodLogItems([], draft({ food_name: '' }))).toEqual([])
   })
+
+  it('keeps the chosen serving count and size with the total grams', () => {
+    const [item] = buildFoodLogItems([], draft({ quantity_g: 100, servings: 2, serving_size_g: 50 }))
+    expect(item.payload).toMatchObject({ quantity_g: 100, servings: 2, serving_size_g: 50 })
+  })
 })

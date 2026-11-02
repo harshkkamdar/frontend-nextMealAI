@@ -54,6 +54,8 @@ export function plateItemFor(food: FoodSearchResult, servings: number | null, gr
     portion: portionText(servings, grams),
     macros: override ?? scaleMacros(food.macros_per_serving, serving, grams),
     user_food_id: food.source === 'personal' && food.id ? food.id : undefined,
+    servings: servings ?? undefined,
+    serving_size_g: servings == null ? undefined : serving,
   }
 }
 

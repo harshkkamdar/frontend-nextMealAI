@@ -94,7 +94,7 @@ export default function DiaryPage() {
   const [selectedMealType, setSelectedMealType] = useState<string>('Breakfast')
   const [monthOpen, setMonthOpen] = useState(false)
   const [editingLog, setEditingLog] = useState<Log | null>(null)
-  // The row actions sheet keeps its log after closing, so it leaves with its content.
+  // The copy sheet keeps its log after closing, so it leaves with its content.
   const [actionsLog, setActionsLog] = useState<Log | null>(null)
   const [actionsOpen, setActionsOpen] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<Log | null>(null)
@@ -264,12 +264,14 @@ export default function DiaryPage() {
     setSearchOpen(false)
   }
 
-  const openLogActions = (log: Log) => {
+  const openCopyLog = (log: Log) => {
+    setSearchOpen(false)
+    setEditingLog(null)
     setActionsLog(log)
     setActionsOpen(true)
   }
 
-  // Row actions (journey-food D1): each change refetches, and its toast offers Undo for 4 s.
+  // Copy/move actions refetch, and their toast offers Undo for 4 s.
   const undoToast = (message: string, undo: () => Promise<unknown>) => {
     toast(message, {
       duration: 4000,
@@ -423,7 +425,7 @@ export default function DiaryPage() {
                       mealType={mealType}
                       items={groupedMeals[mealType] || []}
                       onAddFood={() => handleAddFood(mealType)}
-                      onOpenLog={openLogActions}
+                      onOpenLog={handleEditLog}
                       isToday={selectedDate === today}
                       onCopyToToday={() => handleCopyToToday(mealType)}
                       onSaveFavourite={() => handleSaveFavourite(mealType)}
@@ -449,6 +451,7 @@ export default function DiaryPage() {
         onLogUpdated={handleLogUpdated}
         onLogDeleted={handleLogDeleted}
         onRequestDelete={requestDelete}
+        onRequestCopy={openCopyLog}
         editSubtitle={editingLog ? `${mealOf(editingLog.payload as FoodPayload)}, ${dayLabel(selectedDate, today)}` : undefined}
       />
 
@@ -463,6 +466,7 @@ export default function DiaryPage() {
         onMove={handleMoveLog}
         onCopy={handleCopyLog}
         onDelete={requestDelete}
+        initialView="copy"
       />
 
       <ConfirmDialog

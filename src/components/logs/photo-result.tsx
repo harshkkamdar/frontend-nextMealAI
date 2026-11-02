@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Minus, Plus, RotateCcw, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { uploadChatAttachment } from '@/lib/api/chat.api'
 import { estimateFoodFromPhoto, logFromEstimate, type FoodEstimate } from '@/lib/api/foods.api'
 import { updateLog } from '@/lib/api/logs.api'
 import { OfflineError } from '@/lib/api/client'
@@ -13,12 +15,12 @@ import { formatMacroKcal } from '@/lib/macros'
 import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
 import { useOnline } from '@/lib/platform/network'
+import { useComposerStore } from '@/stores/composer.store'
 import { cn } from '@/lib/utils'
 import { ApiException } from '@/types/api.types'
-import type { Log } from '@/types/logs.types'
-import { CARD, LIST } from './log-ui'
+import { CARD, FIELD, LIST } from './log-ui'
 import { MacroDots } from './food-item-sheet'
-import { estimateEdits, photoItemMacros, photoItemsFrom, photoTotals, stepItem, UNSURE, type Meal, type PhotoItem } from './log-math'
+import { editPhotoMacros, estimateEdits, photoItemMacros, photoItemsFrom, photoTotals, stepItem, UNSURE, type Meal, type PhotoItem } from './log-math'
 
 type Phase = 'reading' | 'result' | 'nofood' | 'down' | 'expired' | 'offline'
 
@@ -27,16 +29,18 @@ const MUTED_BTN = 'flex h-11 w-full items-center justify-center rounded-full bg-
 /**
  * The photo result (journey-log C2): the backend's estimate as one row per item with its own grams stepper, and
  * "Not sure, check this" under any item the backend is unsure of. Logging sends the edits through log-from-estimate,
- * then files the log under the chosen meal. Reading, no food, reading down, expired and offline each get one card.
+ * with the chosen meal and date. Reading, no food, reading down, expired and offline each get one card.
  */
-export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }: {
+export function PhotoResult({ file, meal, localDate, onRetake, onSearch, onGeo, onLogged }: {
   file: File
   meal: Meal
+  localDate?: string
   onRetake: () => void
   onSearch: () => void
   onGeo: () => void
   onLogged: () => void
 }) {
+  const router = useRouter()
   const reduce = useReducedMotion()
   const online = useOnline()
   // A data URL, not an object URL: nothing to revoke, so a remount (StrictMode) can't leave a dead thumbnail.
@@ -52,6 +56,10 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
   const [items, setItems] = useState<PhotoItem[]>([])
   const [attempt, setAttempt] = useState(0)
   const [logging, setLogging] = useState(false)
+  const [amountInputs, setAmountInputs] = useState<Record<number, string>>({})
+  const [editingItems, setEditingItems] = useState<number[]>([])
+  const [context, setContext] = useState('')
+  const [askingGeo, setAskingGeo] = useState(false)
 
   useEffect(() => {
     if (phase !== 'reading') return
@@ -80,11 +88,23 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
     if (estimate.expires_at && Date.parse(estimate.expires_at) < Date.now()) { setPhase('expired'); return }
     setLogging(true)
     try {
-      const res = await logFromEstimate(estimate.estimate_id, estimateEdits(estimate, items)) as { log?: Log } | undefined
-      // log-from-estimate takes no meal; file it under the chosen one (a failure here leaves the log in place).
-      if (res?.log?.id) await updateLog(res.log.id, { meal_type: meal.toLowerCase() }).catch(() => {})
+      const chosenMeal = meal.toLowerCase()
+      const res = await logFromEstimate(
+        estimate.estimate_id,
+        estimateEdits(estimate, items),
+        { meal_type: chosenMeal, local_date: localDate },
+      ) as { log?: { id: string; payload?: { meal_type?: string } } } | undefined
+      let filed = true
+      if (res?.log?.id && res.log.payload?.meal_type !== chosenMeal) {
+        try {
+          await updateLog(res.log.id, { meal_type: chosenMeal })
+        } catch {
+          filed = false
+        }
+      }
       void haptic('success')
-      toast.success(`Logged ${kept.length === 1 ? kept[0].name : `${kept.length} items`} to ${meal}`)
+      if (filed) toast.success(`Logged ${kept.length === 1 ? kept[0].name : `${kept.length} items`} to ${meal}`)
+      else toast.error(`Logged, but I couldn't file it under ${meal}. Move it from Food.`)
       onLogged()
     } catch (error) {
       if (error instanceof ApiException && error.error === 'estimate_expired') setPhase('expired')
@@ -96,8 +116,33 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
   }
 
   const set = (index: number, next: PhotoItem) => {
-    void haptic('selection')
     setItems((current) => current.map((item, i) => (i === index ? next : item)))
+  }
+
+  const step = (index: number, item: PhotoItem, direction: 1 | -1) => {
+    void haptic('selection')
+    const next = stepItem(item, direction)
+    set(index, next)
+    setAmountInputs((current) => ({ ...current, [index]: String(next.amount) }))
+  }
+
+  const askGeo = async () => {
+    const details = context.trim()
+    if (!details || askingGeo) return
+    setAskingGeo(true)
+    try {
+      const attachment = await compressImage(file)
+      const { storage_path } = await uploadChatAttachment(attachment)
+      const sessionId = crypto.randomUUID()
+      const composer = useComposerStore.getState()
+      composer.addAttached(sessionId, { storage_path, preview_url: URL.createObjectURL(attachment), file: attachment })
+      composer.setText(sessionId, `Log this to ${meal}: ${details}`)
+      router.push(`/chat/session?id=${sessionId}`) // the photo and text wait in the composer for one tap
+    } catch {
+      toast.error("Couldn't send that photo to Geo. Try again.")
+    } finally {
+      setAskingGeo(false)
+    }
   }
 
   const enter = reduce
@@ -151,7 +196,6 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
             <ul className={LIST} aria-label="Items in your photo">
               {items.map((item, index) => {
                 const m = photoItemMacros(item)
-                const amount = item.baseG ? `${item.amount} g` : `${item.amount}×`
                 return (
                   <li key={`${item.name}-${index}`} className="border-b border-ink-06 px-4 pb-2 pt-3 last:border-b-0">
                     <div className="flex items-start gap-3">
@@ -166,24 +210,84 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
                         <span className="flex-1 text-caption text-ink-65">Left out</span>
                       ) : (
                         <div className="flex flex-1 items-center gap-1">
-                          <button type="button" aria-label={`Less ${item.name}`} onClick={() => set(index, stepItem(item, -1))} className="grid size-11 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.92]"><Minus className="size-4" /></button>
-                          <span aria-live="polite" className="min-w-16 text-center text-body-sm font-bold text-ink tabular-nums">{amount}</span>
-                          <button type="button" aria-label={`More ${item.name}`} onClick={() => set(index, stepItem(item, 1))} className="grid size-11 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.92]"><Plus className="size-4" /></button>
+                          <button type="button" aria-label={`Less ${item.name}`} onClick={() => step(index, item, -1)} className="grid size-11 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.92]"><Minus className="size-4" /></button>
+                          {item.baseG ? (
+                            <label className="flex min-w-16 items-center justify-center gap-1 text-body-sm font-bold text-ink tabular-nums">
+                              <input
+                                type="number"
+                                inputMode="decimal"
+                                aria-label={`${item.name}, grams`}
+                                value={amountInputs[index] ?? String(item.amount)}
+                                onChange={(event) => {
+                                  const value = event.target.value
+                                  setAmountInputs((current) => ({ ...current, [index]: value }))
+                                  const amount = Number(value)
+                                  if (amount > 0) set(index, { ...item, amount })
+                                }}
+                                onBlur={() => {
+                                  if (!(Number(amountInputs[index] ?? item.amount) > 0)) {
+                                    setAmountInputs((current) => ({ ...current, [index]: String(item.amount) }))
+                                  }
+                                }}
+                                className="w-[5ch] bg-transparent text-right text-body-sm font-bold text-ink outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                              <span>g</span>
+                            </label>
+                          ) : (
+                            <span aria-live="polite" className="min-w-16 text-center text-body-sm font-bold text-ink tabular-nums">{item.amount}×</span>
+                          )}
+                          <button type="button" aria-label={`More ${item.name}`} onClick={() => step(index, item, 1)} className="grid size-11 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.92]"><Plus className="size-4" /></button>
                         </div>
                       )}
                       <button
                         type="button"
                         aria-label={item.removed ? `Put ${item.name} back` : `Leave out ${item.name}`}
-                        onClick={() => set(index, { ...item, removed: !item.removed })}
+                        onClick={() => { void haptic('selection'); set(index, { ...item, removed: !item.removed }) }}
                         className="-mr-2 grid size-11 place-items-center rounded-full text-ink-65 transition-transform active:scale-[.92]"
                       >
                         {item.removed ? <RotateCcw className="size-4" /> : <X className="size-4" />}
                       </button>
                     </div>
+                    {!item.removed && editingItems.includes(index) ? (
+                      <div className="mt-2 grid grid-cols-4 gap-2">
+                        {(['calories', 'protein', 'carbs', 'fat'] as const).map((key) => (
+                          <label key={key} className="rounded-[14px] bg-ink-04 px-2 pb-0.5 pt-2 text-center focus-within:outline focus-within:outline-[1.5px] focus-within:outline-ink">
+                            <span className="block text-label text-ink-65">{key === 'calories' ? 'Calories' : `${key.charAt(0).toUpperCase()}${key.slice(1)} g`}</span>
+                            <input
+                              type="number"
+                              inputMode="decimal"
+                              aria-label={key === 'calories' ? 'Calories' : `${key.charAt(0).toUpperCase()}${key.slice(1)} g`}
+                              value={m[key]}
+                              onChange={(event) => set(index, editPhotoMacros(item, { ...m, [key]: Number(event.target.value) || 0 }))}
+                              className="h-11 w-full bg-transparent text-center text-body font-bold text-ink outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                          </label>
+                        ))}
+                      </div>
+                    ) : !item.removed ? (
+                      <button type="button" onClick={() => setEditingItems((current) => [...current, index])} className="-ml-1 min-h-11 px-1 text-body-sm font-semibold text-ink-80 underline decoration-ink-35 underline-offset-4">
+                        Edit numbers
+                      </button>
+                    ) : null}
                   </li>
                 )
               })}
             </ul>
+            <div className="mt-4">
+              <input
+                type="text"
+                value={context}
+                onChange={(event) => setContext(event.target.value)}
+                placeholder="Anything Geo should know? Half the plate, cooked in butter"
+                aria-label="Add details for Geo"
+                className={cn(FIELD, 'h-14')}
+              />
+              {context.trim() ? (
+                <button type="button" onClick={() => void askGeo()} disabled={askingGeo} className="min-h-11 px-1 text-body-sm font-semibold text-ink underline decoration-ink-35 underline-offset-4 disabled:opacity-40">
+                  Ask Geo with this photo
+                </button>
+              ) : null}
+            </div>
           </motion.div>
         ) : (
           <motion.div key={phase} {...enter} className="pt-4">

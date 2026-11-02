@@ -1,5 +1,5 @@
 /**
- * MealGroup rows: photo-led media, a tap opens the row's actions, itemised logs read as their item count (their
+ * MealGroup rows: photo-led media, a tap opens the row's editor, itemised logs read as their item count (their
  * components are edited in the edit sheet now), long meals fold.
  */
 
@@ -49,7 +49,7 @@ describe('MealGroup photo-led rows (journey-food C3, D1)', () => {
     vi.clearAllMocks()
   })
 
-  it('tapping a row opens its actions with that log', () => {
+  it('tapping a row opens its editor with that log', () => {
     const log = makeFoodLog({ id: 'plain' })
     const onOpenLog = vi.fn()
     render(<MealGroup mealType="Breakfast" items={[log]} onAddFood={() => {}} onOpenLog={onOpenLog} />)

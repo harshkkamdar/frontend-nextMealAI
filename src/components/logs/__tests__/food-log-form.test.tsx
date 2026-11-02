@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   createLogs: vi.fn(),
   getPersonalFoods: vi.fn(),
   searchFoods: vi.fn(),
+  upload: vi.fn(),
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
   back: vi.fn(),
@@ -37,9 +38,13 @@ vi.mock('@/lib/api/logs.api', () => ({
   createLogs: (...args: unknown[]) => mocks.createLogs(...args),
   updateLog: (...args: unknown[]) => mocks.updateLog(...args),
 }))
+vi.mock('@/lib/api/chat.api', () => ({
+  uploadChatAttachment: (...args: unknown[]) => mocks.upload(...args),
+}))
 vi.mock('@/lib/image/compress', () => ({ compressImage: (file: File) => Promise.resolve(file) }))
 
 import { FoodLogForm } from '@/components/logs/food-log-form'
+import { __resetComposerStoreForTests, useComposerStore } from '@/stores/composer.store'
 
 const FOOD: UserFood = {
   id: 'f1', user_id: 'u', name: 'Greek yoghurt', serving_size_g: 170, source: 'manual', is_favorite: true, use_count: 3,
@@ -70,7 +75,9 @@ describe('FoodLogForm', () => {
     mocks.getPersonalFoods.mockResolvedValue([FOOD, BANANA])
     mocks.searchFoods.mockResolvedValue([])
     mocks.createLogs.mockResolvedValue({ created: [{}], failures: [] })
+    mocks.upload.mockResolvedValue({ storage_path: 'chat/photo.jpg' })
     mocks.searchParamsStr = ''
+    __resetComposerStoreForTests()
   })
 
   it('lists recent and favourite foods before a search, favourites first', async () => {
@@ -105,7 +112,7 @@ describe('FoodLogForm', () => {
     await waitFor(() => expect(mocks.createLogs).toHaveBeenCalledTimes(1))
     const items = mocks.createLogs.mock.calls[0][0]
     expect(items).toHaveLength(2)
-    expect(items[0]).toMatchObject({ type: 'food', local_date: '2026-10-25', payload: { food_name: 'Greek yoghurt', quantity_g: 340, meal_type: 'dinner', user_food_id: 'f1', est_macros: { calories: 200 } } })
+    expect(items[0]).toMatchObject({ type: 'food', local_date: '2026-10-25', payload: { food_name: 'Greek yoghurt', quantity_g: 340, servings: 2, serving_size_g: 170, meal_type: 'dinner', user_food_id: 'f1', est_macros: { calories: 200 } } })
     await waitFor(() => expect(mocks.back).toHaveBeenCalled())
     expect(mocks.toastSuccess).toHaveBeenCalledWith('Logged 2 items to Dinner')
   })
@@ -122,23 +129,62 @@ describe('FoodLogForm', () => {
     expect(mocks.back).not.toHaveBeenCalled()
   })
 
-  it('photo: one row per item with steppers, unsure items marked, edits sent through log-from-estimate', async () => {
+  it('photo: editable grams and macros are sent with the chosen meal and date', async () => {
+    mocks.searchParamsStr = 'meal=lunch&date=2026-10-25'
     mocks.estimate.mockResolvedValueOnce(ESTIMATE)
-    mocks.logFromEstimate.mockResolvedValueOnce({ log: { id: 'log-9' } })
-    mocks.updateLog.mockResolvedValueOnce({})
+    mocks.logFromEstimate.mockResolvedValueOnce({ log: { id: 'log-9', payload: { meal_type: 'lunch' } } })
     const { container } = render(<FoodLogForm />)
     pickPhoto(container)
     await screen.findByTestId('photo-result')
     expect(screen.getByText('Not sure, check this')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'More Chicken' }))
+    const grams = screen.getByLabelText('Chicken, grams')
+    fireEvent.change(grams, { target: { value: '150' } })
+    const chicken = grams.closest('li') as HTMLElement
+    fireEvent.click(within(chicken).getByRole('button', { name: 'Edit numbers' }))
+    fireEvent.change(within(chicken).getByLabelText('Protein g'), { target: { value: '30' } })
     fireEvent.click(screen.getByRole('button', { name: 'Leave out Sauce' }))
-    fireEvent.click(screen.getByRole('button', { name: /^Log 1 item to/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Log 1 item to Lunch' }))
     await waitFor(() => expect(mocks.logFromEstimate).toHaveBeenCalledTimes(1))
-    const [id, edits] = mocks.logFromEstimate.mock.calls[0]
+    const [id, edits, opts] = mocks.logFromEstimate.mock.calls[0]
     expect(id).toBe('est-1')
-    expect(edits.items).toEqual([expect.objectContaining({ name: 'Chicken', quantity_g: 160, calories: 267 })])
-    await waitFor(() => expect(mocks.updateLog).toHaveBeenCalledWith('log-9', { meal_type: expect.any(String) }))
+    expect(edits.items).toEqual([expect.objectContaining({ name: 'Chicken', quantity_g: 150, protein: 30 })])
+    expect(opts).toEqual({ meal_type: 'lunch', local_date: '2026-10-25' })
+    expect(mocks.updateLog).not.toHaveBeenCalled()
     expect(mocks.back).toHaveBeenCalled()
+  })
+
+  it('photo: a failed fallback meal PATCH shows the filing error instead of success', async () => {
+    mocks.searchParamsStr = 'meal=lunch'
+    mocks.estimate.mockResolvedValueOnce(ESTIMATE)
+    mocks.logFromEstimate.mockResolvedValueOnce({ log: { id: 'log-9', payload: { meal_type: 'snack' } } })
+    mocks.updateLog.mockRejectedValueOnce(new Error('nope'))
+    const { container } = render(<FoodLogForm />)
+    pickPhoto(container)
+    await screen.findByTestId('photo-result')
+    fireEvent.click(screen.getByRole('button', { name: 'Log 2 items to Lunch' }))
+    await waitFor(() => expect(mocks.toastError).toHaveBeenCalledWith("Logged, but I couldn't file it under Lunch. Move it from Food."))
+    expect(mocks.toastSuccess).not.toHaveBeenCalledWith(expect.stringContaining('Logged'))
+  })
+
+  it('photo: context uploads the photo and prepares a new Geo session', async () => {
+    mocks.searchParamsStr = 'meal=breakfast'
+    mocks.estimate.mockResolvedValueOnce(ESTIMATE)
+    const uuid = vi.spyOn(crypto, 'randomUUID').mockReturnValue('session-1' as `${string}-${string}-${string}-${string}-${string}`)
+    const originalCreateObjectURL = URL.createObjectURL
+    URL.createObjectURL = vi.fn(() => 'blob:photo')
+    const { container } = render(<FoodLogForm />)
+    pickPhoto(container)
+    await screen.findByTestId('photo-result')
+    fireEvent.change(screen.getByLabelText('Add details for Geo'), { target: { value: 'half the plate' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Ask Geo with this photo' }))
+    await waitFor(() => expect(mocks.upload).toHaveBeenCalled())
+    expect(useComposerStore.getState().getDraft('session-1')).toMatchObject({
+      text: 'Log this to Breakfast: half the plate',
+      attached: [expect.objectContaining({ storage_path: 'chat/photo.jpg', preview_url: 'blob:photo' })],
+    })
+    expect(mocks.push).toHaveBeenCalledWith('/chat/session?id=session-1')
+    uuid.mockRestore()
+    URL.createObjectURL = originalCreateObjectURL
   })
 
   it('photo: no food and a reading failure each get their card', async () => {

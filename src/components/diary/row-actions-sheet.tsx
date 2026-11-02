@@ -33,15 +33,16 @@ interface RowActionsSheetProps {
   onCopy: (log: Log, date: string, meal: string) => void
   /** Delete asks first: the caller closes this sheet and shows the confirm (a confirm over a modal sheet can't take focus). */
   onDelete: (log: Log) => void
+  initialView?: 'list' | 'copy'
 }
 
 /**
  * One logged item's actions (journey-food D1 Tap for actions, "Row actions sheet and confirm"): edit the amount, copy it
  * to a day and meal, change its meal, or delete it (the caller confirms, then offers Undo).
  */
-export function RowActionsSheet({ open, log, date, today, dayLabel, onClose, onEdit, onMove, onCopy, onDelete }: RowActionsSheetProps) {
+export function RowActionsSheet({ open, log, date, today, dayLabel, onClose, onEdit, onMove, onCopy, onDelete, initialView = 'list' }: RowActionsSheetProps) {
   const reduce = useReducedMotion()
-  const [view, setView] = useState<'list' | 'move' | 'copy'>('list')
+  const [view, setView] = useState<'list' | 'move' | 'copy'>(initialView)
   const [copyDay, setCopyDay] = useState<string | null>(null)
   const [copyMeal, setCopyMeal] = useState<string | null>(null)
 
@@ -49,7 +50,7 @@ export function RowActionsSheet({ open, log, date, today, dayLabel, onClose, onE
   const [wasOpen, setWasOpen] = useState(open)
   if (open !== wasOpen) {
     setWasOpen(open)
-    if (open) { setView('list'); setCopyDay(null); setCopyMeal(null) }
+    if (open) { setView(initialView); setCopyDay(null); setCopyMeal(null) }
   }
 
   if (!log) return null

@@ -65,6 +65,21 @@ export interface PhotoItem {
   removed: boolean
 }
 
+/** Make the currently shown macros the new scaling baseline for later amount changes. */
+export function editPhotoMacros(item: PhotoItem, macros: Macros): PhotoItem {
+  if (item.baseG) return { ...item, baseG: item.amount, base: macros }
+  const divisor = item.amount || 1
+  return {
+    ...item,
+    base: {
+      calories: macros.calories / divisor,
+      protein: macros.protein / divisor,
+      carbs: macros.carbs / divisor,
+      fat: macros.fat / divisor,
+    },
+  }
+}
+
 export function photoItemsFrom(estimate: FoodEstimate): PhotoItem[] {
   return estimate.items.map((item) => {
     const g = typeof item.quantity_g === 'number' && item.quantity_g > 0 ? Math.round(item.quantity_g) : 0
@@ -164,6 +179,8 @@ export interface PlateItem {
   portion: string
   macros: Macros
   user_food_id?: string
+  servings?: number
+  serving_size_g?: number
 }
 
 /** "1 serving", "1½ servings", or grams when the amount is not one of the portion chips. */
