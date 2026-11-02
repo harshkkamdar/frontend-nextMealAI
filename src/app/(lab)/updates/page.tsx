@@ -141,7 +141,7 @@ export default function UpdatesPage() {
         <Changes items={LOOK} />
       </Chapter>
 
-      <Chapter n="04" id="mascot" title="Meet Geo: choose a character" intro="Geo is getting a character of its own. At rest it is just the character; a mouth and hands appear only when Geo is doing something. Four options, each with nine expressions.">
+      <Chapter n="04" id="mascot" title="Meet Geo: choose a character" intro="Geo is getting a character of its own. At rest you see the character alone; a mouth and hands appear when Geo is doing something. Four options, each with nine expressions.">
         <a href="/mascot" className="flex flex-wrap items-center gap-6 rounded-[20px] border border-ink-12 bg-card p-5 active:bg-ink-04">
           <span className="flex gap-4">{FINALISTS.map((id, i) => (
             <span key={id} className="flex flex-col items-center gap-1"><Mascot id={id} mood="rest" scheme="navy" size={72} /><span className="text-[13px] font-semibold tabular-nums text-ink-62">{i + 1}</span></span>
