@@ -9,6 +9,7 @@ import { LargeTitleHeader, PushedHeader } from '@/components/layout/screen-heade
 import { TabBar } from '@/components/layout/tab-bar'
 import { Dock, INK_BUTTON, TextButton } from '@/components/plans/spatial-parts'
 import { GeoLine } from '@/components/ui/fiqr/geo-line'
+import { GroupedList, GroupedRow } from '@/components/ui/fiqr/grouped-list'
 import { PersonFill } from '@/components/ui/fiqr/icons'
 import { MacroBar } from '@/components/ui/fiqr/macro-bar'
 import { MetricStrip } from '@/components/ui/fiqr/metric-strip'
@@ -36,14 +37,8 @@ const session = (hoursAgo: number) => ({
   exercises: [{ sets: [{ completed: true }, { completed: true }, { completed: false }, { completed: false }] }],
 }) as unknown as WorkoutSession
 
-/** What is still outside the system after the 2 Nov clean-up, and what replaces it. */
-const RETIRE: [string, string, string][] = [
-  ['Grouped list rows', 'Settings, food rows, plan days', 'Hand-built per screen today; one GroupedList component, to be added here'],
-  ['Aurora layout (name only)', 'Onboarding and sign-in', 'Already renders plain cream; rename when onboarding is next touched'],
-  ['Consent progress bar', 'Onboarding consent', 'Starts 60 pt in, behind an empty back slot; align to the gutter'],
-]
 /** Retired on 2 Nov: listed so nobody brings them back. */
-const RETIRED = 'Glass and glass-cream surfaces, the four CARD copies, wide and 800-weight type, ActionCard, MetricTile, PageHeader, press tilt, dashed empty boxes, gradient fades, filled icons, a face for Mood.'
+const RETIRED = 'Glass and glass-cream surfaces, the four CARD copies, wide and 800-weight type, ActionCard, MetricTile, PageHeader, press tilt, dashed empty boxes, gradient fades, filled icons, a face for Mood, the Aurora name, the glass flag.'
 
 export default function LabPage() {
   const [day, setDay] = useState(today)
@@ -171,18 +166,13 @@ export default function LabPage() {
             <ChatBubble message={{ role: 'assistant', content: 'Logged both to breakfast: 215 kcal, 9 g protein. You have 156 g protein left today.' }} clusterStart showTime={false} />
           </div>
         </Specimen>
-      </Chapter>
-
-      <Chapter n="08" id="retire" title="Not in the system yet" intro={<>Still on some screens. Each goes when its screen is next touched. Retired on 2 Nov: {RETIRED}</>}>
-        <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card">
-          {RETIRE.map(([what, where, instead]) => (
-            <div key={what} className="grid gap-x-6 gap-y-1 border-b border-ink-09 px-4 py-4 last:border-b-0 grid-cols-[repeat(auto-fill,minmax(min(100%,200px),1fr))]">
-              <span className="text-[15px] font-semibold">{what}</span>
-              <span className="text-[13.5px] text-ink-62">{where}</span>
-              <span className="text-[14px] text-ink-80">{instead}</span>
-            </div>
-          ))}
-        </div>
+        <Specimen name="Grouped list" file="components/ui/fiqr/grouped-list.tsx" use="Settings, and any list of rows in one tile">
+          <GroupedList title="Account" footer="Changes save as you go.">
+            <GroupedRow label="Name" value="George" />
+            <GroupedRow label="Units" value="Metric" onClick={noop} />
+          </GroupedList>
+        </Specimen>
+        <p className="text-[14px] text-ink-65">Retired on 2 Nov: {RETIRED}</p>
       </Chapter>
     </LabShell>
   )

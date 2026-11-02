@@ -6,7 +6,6 @@ import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion,
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { Wordmark } from '@/components/ui/fiqr/wordmark'
-import { auroraSurface, useAuroraScene, type SceneName } from '@/components/onboarding/aurora'
 import { arrivalDir, BEHIND, clearArrival, depthTo, FRONT, type DepthDir } from '@/components/onboarding/depth-nav'
 import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
@@ -33,7 +32,7 @@ const STAGE: CSSProperties = { top: `calc(var(--safe-top) + ${STAGE_TOP})`, heig
 const DOTS_TOP = `calc(var(--safe-top) + ${STAGE_TOP} + ${STAGE_H} + 18px)`
 
 /**
- * Pre-sign-up welcome (mocks/aurora-onboarding.html): four beats over one glass stage on the Aurora. Beats change in
+ * Pre-sign-up welcome : four beats over one stage. Beats change in
  * depth, not sideways: the beat you leave steps back and fades, the next arrives from just in front, its title and
  * visual separating at different rates. One fractional value `p` (0..3) drives it all: the finger scrubs it, release
  * hands the drag velocity to the spring, Continue, a tap and the arrow keys retarget it. Get started is the only orange action.
@@ -62,7 +61,6 @@ export function WelcomeBeats() {
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
-  useAuroraScene(`w${index}` as SceneName)
   const last = index === LAST
 
   useMotionValueEvent(p, 'change', (v) => {
@@ -102,7 +100,7 @@ export function WelcomeBeats() {
         animate={{ opacity: 1, scale: 1 }}
         transition={reduce ? reducedFade : { scale: spring.page, opacity: { duration: 0.3, delay: 0.08 } }}
       >
-        <div ref={stage} aria-hidden="true" className={cn('absolute inset-x-gutter rounded-[22px]', auroraSurface)} style={STAGE} />
+        <div ref={stage} aria-hidden="true" className={cn('absolute inset-x-gutter rounded-[22px]', 'tile')} style={STAGE} />
         <motion.div
           ref={region}
           tabIndex={0}

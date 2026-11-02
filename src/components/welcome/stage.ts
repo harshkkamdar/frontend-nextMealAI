@@ -1,4 +1,4 @@
-// Welcome beat physics (docs/redesign/motion-feel.md 3a; depth per mocks/aurora-onboarding.html).
+// Welcome beat physics (docs/redesign/motion-feel.md 3a).
 import { project, rubberband } from '@/lib/motion'
 
 /** Stage position while the finger is down: 1:1 inside [0, last], rubber band past either end. */
@@ -17,7 +17,7 @@ export function flickTarget(p: number, start: number, vx: number, w: number, las
 }
 
 /** A beat at depth distance d (p - i): d > 0 has stepped back (smaller, drifting up), d < 0 is arriving from in front
- *  (larger, drifting down into place), as in mocks/aurora-onboarding.html. Opacity clears by about 0.6 of the way, so
+ *  (larger, drifting down into place). Opacity clears by about 0.6 of the way, so
  *  the outgoing beat is nearly gone before the incoming one fills. Reduced motion: opacity only. */
 export function beatDepth(d: number, reduce = false): { opacity: number; scale: number; y: number } {
   const a = Math.abs(d)

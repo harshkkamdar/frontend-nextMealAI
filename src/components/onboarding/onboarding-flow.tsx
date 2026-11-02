@@ -9,7 +9,6 @@ import { OptionList, type Option } from '@/components/ui/fiqr/option-list'
 import { CM, FT_IN, KG, LB, RulerInput } from '@/components/ui/fiqr/ruler-input'
 import { WheelBand, WheelPicker } from '@/components/ui/fiqr/wheel-picker'
 import { WeightPath } from '@/components/onboarding/weight-path'
-import { questionScene } from '@/components/onboarding/aurora'
 import { depthTo } from '@/components/onboarding/depth-nav'
 import { submitFitnessOnboarding, submitNutritionOnboarding, submitPersonalOnboarding } from '@/lib/api/profile.api'
 import { haptic } from '@/lib/platform/app'
@@ -80,7 +79,7 @@ function NumberCells({ label, values, value, onChange }: { label: string; values
   )
 }
 
-/** Single choice as wrapping chips (mocks/aurora-onboarding.html, How do you eat?). Selected = ink fill, never orange. */
+/** Single choice as wrapping chips. Selected = ink fill, never orange. */
 function ChoiceChips<T extends string>({ label, options, value, onChange }: { label: string; options: Option<T>[]; value: T | null; onChange: (v: T) => void }) {
   return (
     <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
@@ -202,7 +201,6 @@ export function OnboardingFlow({ module }: { module: OnboardingModule }) {
     stepKey: id,
     progress: progressOf(id, draft.goal),
     segments: segmentsOf(id, draft.goal),
-    scene: questionScene(visibleSteps(draft.goal).findIndex((s) => s.id === id)),
     // Crossing into another module is a route change: step back through it in depth. Within a module only the question moves.
     onBack: back ? () => (back.startsWith(`/onboarding/${module}?`) ? router.push(back) : depthTo(() => router.push(back), -1)) : undefined,
     busy,

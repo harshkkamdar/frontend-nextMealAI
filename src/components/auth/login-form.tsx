@@ -9,7 +9,7 @@ import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { FormNotice } from '@/components/auth/form-notice'
 import { TextField } from '@/components/ui/fiqr/text-field'
 import { login } from '@/lib/api/auth.api'
-import { depthTo, leaveAurora } from '@/components/onboarding/depth-nav'
+import { depthTo, leaveOnboarding } from '@/components/onboarding/depth-nav'
 import { haptic } from '@/lib/platform/app'
 
 const loginSchema = z.object({
@@ -42,7 +42,7 @@ export function LoginForm() {
     try {
       await login(data.email, data.password)
       void haptic('success')
-      leaveAurora(() => router.push('/dashboard'))
+      leaveOnboarding(() => router.push('/dashboard'))
     } catch (error) {
       void haptic('warning')
       setFailure((f) => ({ message: error instanceof Error ? error.message : "That didn't work. Check your connection and try again.", attempt: (f?.attempt ?? 0) + 1 }))

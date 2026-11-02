@@ -4,7 +4,6 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion, type Transition } from 'framer-motion'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
-import { useAuroraScene, type SceneName } from '@/components/onboarding/aurora'
 import { arrivalDir, BEHIND, clearArrival, FRONT, type DepthDir } from '@/components/onboarding/depth-nav'
 import { useEdgeSwipeBack } from '@/components/onboarding/edge-swipe'
 import { reducedFade, spring } from '@/lib/motion'
@@ -29,8 +28,6 @@ interface OnboardingStepProps {
   secondary?: { label: string; onClick: () => void }
   /** Shown above the CTA, e.g. a form-level error. */
   notice?: ReactNode
-  /** Aurora scene behind this screen; question steps pass one of the q scenes. */
-  scene?: SceneName
   /** false while there is nothing to press yet (plan generating): the CTA bar steps away. */
   bar?: boolean
   children: ReactNode
@@ -46,13 +43,12 @@ let shown = { segments: [0, 0, 0], cta: '' }
 const OUT = [0.23, 1, 0.32, 1] as const
 
 /**
- * One question per screen on the Aurora (mocks/aurora-onboarding.html): round back, three section bars, question,
+ * One question per setup screen: round back, three section bars, question,
  * why-line, body, one CTA. The content steps in depth: forward, the old question steps back and fades while the new
  * one arrives from just in front; back is the reverse. The chrome never moves between steps.
  */
-export function OnboardingStep({ stepKey, progress, segments, question, why, onBack, cta = 'Continue', canContinue, busy, busyLabel = 'Saving…', onContinue, secondary, notice, scene = 'form', bar = true, children }: OnboardingStepProps) {
+export function OnboardingStep({ stepKey, progress, segments, question, why, onBack, cta = 'Continue', canContinue, busy, busyLabel = 'Saving…', onContinue, secondary, notice, bar = true, children }: OnboardingStepProps) {
   const reduce = useReducedMotion()
-  useAuroraScene(scene)
   // Read once per mount: a cross-route depthTo arrival animates in; a first paint does not.
   const [arrival] = useState<DepthDir | null>(() => arrivalDir())
   const [from] = useState(() => shown)
@@ -83,11 +79,11 @@ export function OnboardingStep({ stepKey, progress, segments, question, why, onB
           <RoundButton aria-label="Back" onClick={() => { markBack(); onBack() }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
           </RoundButton>
-        ) : (
+        ) : !bars ? (
           <span className="size-11 shrink-0" />
-        )}
+        ) : null}
         {bars ? (
-          <div role="progressbar" aria-label="Setup progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((progress ?? 1) * 100)} className="flex flex-1 gap-1.5 pr-1.5">
+          <div role="progressbar" aria-label="Setup progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((progress ?? 1) * 100)} className="flex flex-1 gap-1.5">
             {bars.map((fill, i) => (
               <span key={i} className="h-1 flex-1 overflow-hidden rounded-full bg-ink-08">
                 <motion.span className="block h-full origin-left rounded-full bg-ink" initial={{ scaleX: from.segments[i] ?? 0 }} animate={{ scaleX: fill }} transition={reduce ? reducedFade : spring.sheet} />

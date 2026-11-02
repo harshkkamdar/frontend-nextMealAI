@@ -1,8 +1,8 @@
 /**
- * Route changes inside the Aurora flow (welcome, sign-in, setup) step in depth instead of sliding (mocks/aurora-onboarding.html):
+ * Route changes inside onboarding (welcome, sign-in, setup) step in depth instead of sliding:
  * the screen you leave steps back and fades, the next one arrives from just in front. Only the content (`[data-depth]`)
  * moves; the back button, progress and CTA sit in the same place on every screen, so they stay put.
- * Leaving the flow for the app (`leaveAurora`) fades the whole screen, Aurora included, over the app.
+ * Leaving the flow for the app (`leaveOnboarding`) fades the whole screen over the app.
  */
 
 /** 1 = forward (the old screen steps back), -1 = back (it comes toward you), 0 = in place (one card turns into the next). */
@@ -70,19 +70,15 @@ function afterSwap(el: Element, selector: string, then: () => void, arrived = fa
 }
 
 /**
- * Navigate within the Aurora flow with a depth step. `go` runs at once (it usually calls router.push).
- * `crossLayout`: the next screen has its own Aurora (sign-up to setup), so a still copy of the fields stays under the
- * outgoing screen until the next one is in, and the new Aurora picks up the same scene instead of fading in.
+ * Navigate within onboarding with a depth step. `go` runs at once (it usually calls router.push).
  */
-export function depthTo(go: () => void, dir: DepthDir = 1, { crossLayout = false } = {}): void {
+export function depthTo(go: () => void, dir: DepthDir = 1): void {
   const el = typeof document !== 'undefined' ? document.querySelector<HTMLElement>('[data-depth]') : null
-  const field = crossLayout ? document.querySelector<HTMLElement>('[data-aurora]') : null
   pending = dir
   if (!el || typeof el.animate !== 'function') return go()
   const r = el.getBoundingClientRect()
   const ghost = freeze(el, 1)
   ghost.style.transformOrigin = `50% ${Math.round(window.innerHeight * 0.42 - r.top)}px`
-  const under = field ? freeze(field, 0) : null
   // The back button, bars and CTA: the next screen's fade in underneath (page-in, 220 ms) while these hold, then these
   // fade. Controls both screens share never flicker; ones that differ (the welcome's dots, a CTA's fill) crossfade.
   const liveChrome = [...document.querySelectorAll<HTMLElement>('[data-chrome]')]
@@ -99,22 +95,18 @@ export function depthTo(go: () => void, dir: DepthDir = 1, { crossLayout = false
     const frames = reduced() ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1, transform: 'none' }, { opacity: 0, offset: 0.55 }, { opacity: 0, transform: `scale(${scale})` }]
     ghost.animate(frames, { duration: reduced() ? 150 : 420, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'forwards' }).finished.then(() => ghost.remove(), () => ghost.remove())
     for (const { copy: c, from } of chrome) c.animate([{ opacity: from }, { opacity: 0 }], { duration: 200, delay: reduced() ? 0 : 180, easing: 'ease-out', fill: 'both' }).finished.then(() => c.remove(), () => c.remove())
-    // The new Aurora is already showing the same scene (carried over), so the still copy can go at once; fading it
-    // would hide the new screen's buttons under it for a moment.
-    under?.remove()
   }, true)
 }
 
-/** Leave the Aurora flow for the app: the screen and its fields fade together over the next page. */
-export function leaveAurora(go: () => void): void {
+/** Leave onboarding for the app: the screen fades over the next page. */
+export function leaveOnboarding(go: () => void): void {
   const page = typeof document !== 'undefined' ? document.querySelector<HTMLElement>('[data-page]') : null
-  const field = typeof document !== 'undefined' ? document.querySelector<HTMLElement>('[data-aurora]') : null
-  if (!page || !field || typeof page.animate !== 'function') return go()
+  if (!page || typeof page.animate !== 'function') return go()
   const layer = document.createElement('div')
   layer.setAttribute('aria-hidden', 'true')
   Object.assign(layer.style, { position: 'fixed', inset: '0', zIndex: '60', pointerEvents: 'none', isolation: 'isolate' })
   document.body.appendChild(layer)
-  for (const el of [field, page]) layer.appendChild(freeze(el, el === field ? -1 : 0))
+  layer.appendChild(freeze(page, 0))
   go()
   afterSwap(page, '[data-page]', () => {
     layer.animate([{ opacity: 1 }, { opacity: 0 }], { duration: reduced() ? 150 : 220, easing: 'ease-out', fill: 'forwards' }).finished.then(() => layer.remove(), () => layer.remove())

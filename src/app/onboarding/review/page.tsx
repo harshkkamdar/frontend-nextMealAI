@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { PlanCard } from '@/components/onboarding/plan-card'
-import { leaveAurora } from '@/components/onboarding/depth-nav'
+import { leaveOnboarding } from '@/components/onboarding/depth-nav'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { getPlans } from '@/lib/api/plans.api'
 import { useCountUp } from '@/lib/use-count-up'
@@ -50,7 +50,7 @@ export default function ReviewPage() {
 
   function finish(to: '/dashboard' | '/chat') {
     useOnboardingStore.getState().setStatus('complete')
-    leaveAurora(() => router.push(to))
+    leaveOnboarding(() => router.push(to))
   }
 
   const question = state === 'error' ? "Your plan didn't load" : state === 'ready' && !hasPlans ? 'Geo could not finish your plan' : 'Your plan is ready'
@@ -64,7 +64,6 @@ export default function ReviewPage() {
     <OnboardingStep
       stepKey="reveal"
      
-      scene="reveal"
       question={question}
       why={why}
       cta={hasPlans ? 'Start' : 'Go to Today'}

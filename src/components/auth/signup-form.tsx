@@ -63,7 +63,7 @@ export function SignupForm() {
     try {
       await signup(data.email, data.password)
       void haptic('success')
-      depthTo(() => router.push('/onboarding/personal'), 1, { crossLayout: true })
+      depthTo(() => router.push('/onboarding/personal'))
     } catch (error) {
       void haptic('warning')
       setFailure((f) => ({ message: error instanceof Error ? error.message : "That didn't work. Check your connection and try again.", attempt: (f?.attempt ?? 0) + 1 }))

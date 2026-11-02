@@ -7,7 +7,7 @@ import { DRAW_MS } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 /**
- * What sits on the welcome stage for each beat (mocks/aurora-onboarding.html). Decorative: the beat's title and line
+ * What sits on the welcome stage for each beat. Decorative: the beat's title and line
  * carry the meaning, so each visual is hidden from screen readers. `live` turns true the first time the beat is shown
  * and stays true, so values fill once and then hold; `active` is true while the beat is the settled one.
  */

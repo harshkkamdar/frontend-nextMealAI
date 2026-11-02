@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { SWIPE_EDGE_PX, SWIPE_SLOP_PX, shouldCompleteSwipe } from '@/lib/motion'
 
 /**
- * Left-edge swipe-back for the Aurora flow (welcome, sign-in, setup), the same gesture rules as the app's route frame
+ * Left-edge swipe-back for the welcome, sign-in and setup flow, with the same gesture rules as the app's route frame
  * (edge, slop, projected release past half the width). The flow's screens step in depth, not by sliding, so the
  * release runs the screen's own back action (its depth step) instead of dragging the page with the finger.
  * shortcut: no live finger tracking (depth-nav animates frozen copies on release); add it if the owner asks for a drag.

@@ -47,7 +47,7 @@ export default function GeneratingPage() {
   }, [reduce, router])
 
   return (
-    <OnboardingStep stepKey="generating" scene="plan" question="Geo is building your plan" why="This takes a few seconds." cta="Start" canContinue={false} onContinue={() => {}} bar={false}>
+    <OnboardingStep stepKey="generating" question="Geo is building your plan" why="This takes a few seconds." cta="Start" canContinue={false} onContinue={() => {}} bar={false}>
       <PlanCard>
         <ul aria-live="polite" className="flex flex-col gap-2">
           {ITEMS.map((item, i) => {

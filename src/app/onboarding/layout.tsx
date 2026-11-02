@@ -1,12 +1,12 @@
 'use client'
 
 import { AuthGate } from '@/components/auth/auth-gate'
-import { AuroraLayout } from '@/components/onboarding/aurora'
+import { CreamLayout } from '@/components/onboarding/cream-layout'
 
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGate mode="onboarding">
-      <AuroraLayout>{children}</AuroraLayout>
+      <CreamLayout>{children}</CreamLayout>
     </AuthGate>
   )
 }
