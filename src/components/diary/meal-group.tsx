@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { Apple, Croissant, Ellipsis, Sandwich, UtensilsCrossed } from 'lucide-react'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { ChevronRightIcon, PlusIcon } from '@/components/ui/fiqr/icons'
-import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { reducedFade, spring } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import type { FoodPayload, Log } from '@/types/logs.types'
@@ -56,7 +55,6 @@ const DIVIDER = <span aria-hidden="true" className="absolute left-4 right-0 top-
 
 export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = true, onCopyToToday, onSaveFavourite, enterDelay }: MealGroupProps) {
   const reduce = useReducedMotion()
-  const tilt = usePressTilt<HTMLDivElement>()
   const [actionsOpen, setActionsOpen] = useState(false)
   const [unfolded, setUnfolded] = useState(false)
 
@@ -79,9 +77,9 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
       transition={{ ...glide, delay: enterDelay ?? 0, layout: glide }}
       aria-label={mealType}
     >
-      <div className="mb-1 flex min-h-11 items-center gap-2.5 pl-1">
-        <h2 className="font-display min-w-0 flex-1 text-headline font-extrabold tracking-[-0.015em] text-ink">{mealType}</h2>
-        {calories > 0 ? <span className="text-caption font-semibold text-ink-65 tabular-nums">{kcalText(calories)} kcal</span> : null}
+      <div className="mb-1 flex min-h-11 items-center gap-2.5">
+        <h2 className="min-w-0 flex-1 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{mealType}</h2>
+        {calories > 0 ? <span className="text-[13px] text-ink-62 tabular-nums">{kcalText(calories)} kcal</span> : null}
         <button
           type="button"
           onClick={() => setActionsOpen(true)}
@@ -97,13 +95,13 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
         <button
           type="button"
           onClick={onAddFood}
-          className="flex min-h-14 w-full items-center gap-3.5 rounded-card border-[1.5px] border-dashed border-ink-20 px-4 text-left text-body-sm font-semibold text-ink-65 transition-transform active:scale-[.98]"
+          className="flex min-h-14 w-full items-center gap-3.5 rounded-[16px] border border-ink-12 bg-card px-4 text-left text-[15px] font-semibold text-ink active:bg-ink-04"
         >
           <span className="grid size-[30px] place-items-center rounded-full bg-ink-06 text-ink"><PlusIcon className="size-4" /></span>
           {addLabel(mealType)}
         </button>
       ) : (
-        <div {...tilt} className="overflow-hidden rounded-card card-glass">
+        <div className="overflow-hidden rounded-card card-glass">
           {shown.map((item, index) => {
             const payload = item.payload as FoodPayload
             const macros = payload.est_macros

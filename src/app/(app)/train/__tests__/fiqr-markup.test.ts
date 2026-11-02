@@ -24,6 +24,10 @@ describe('FIQR train markup contract', () => {
     // The navy feature card uses its cream secondary action in every hero state.
     expect(trainPage).toContain('SecondaryButton')
     expect(trainPage).not.toContain('PrimaryButton')
+    expect(trainPage).toContain('formatDashboardDate(today)')
+    expect(trainPage).not.toContain("workoutPlan.content.name || 'Your program'")
+    expect(trainPage).toContain('isResume && liveMinutes >= 720')
+    expect(trainPage).toContain('End it and start fresh')
   })
 
   it('renders the workout hierarchy and preserves train test ids', () => {
@@ -37,6 +41,9 @@ describe('FIQR train markup contract', () => {
   })
 
   it('animates the weekly volume bars with transforms only', () => {
+    expect(trainCards).toContain('total === 0 && sessions === 0')
+    expect(trainCards).toContain('<MetricStrip')
+    expect(trainCards).not.toContain('Your sessions this week show up here')
     expect(trainCards).toContain('origin-bottom')
     expect(trainCards).toContain('scaleY')
     expect(trainCards).not.toMatch(/transition-\[width|transition-all|animate=\{\{\s*(width|height)/)

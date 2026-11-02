@@ -46,18 +46,20 @@ interface DayHeroProps {
 export function DayHero({ calories, macros, kind, logged, dayLabel }: DayHeroProps) {
   const copy = summaryCopy({ eaten: calories.current, target: calories.target, kind, logged, dayLabel })
   return (
-    <section className={cn(CARD, 'px-4 pb-4 pt-[14px]')} aria-label="Day total">
+    <section aria-label="Day total">
       <div className="flex flex-col gap-[8px]">
         <MacroBar name="Calories" lead current={calories.current} target={calories.target} />
         <MacroBar name="Protein" unit="g" current={macros.protein[0]} target={macros.protein[1]} />
         <MacroBar name="Carbs" unit="g" current={macros.carbs[0]} target={macros.carbs[1]} />
         <MacroBar name="Fat" unit="g" current={macros.fat[0]} target={macros.fat[1]} />
       </div>
-      <p className="mt-3 text-caption text-ink-65 tabular-nums">
-        <FadeText text={`${copy.strong ?? ''}${copy.rest}`}>
-          {copy.strong ? <span className="font-semibold text-ink">{copy.strong}</span> : null}{copy.rest}
-        </FadeText>
-      </p>
+      {logged ? (
+        <p className="mt-2.5 text-[13px] text-ink-65 tabular-nums">
+          <FadeText text={`${copy.strong ?? ''}${copy.rest}`}>
+            {copy.strong ? <span className="font-semibold text-ink">{copy.strong}</span> : null}{copy.rest}
+          </FadeText>
+        </p>
+      ) : null}
     </section>
   )
 }
@@ -74,7 +76,7 @@ export function DaySkeleton() {
       animate={{ opacity: [1, 0.6, 1] }}
       transition={{ duration: 1.2, repeat: Infinity, delay: 0.6, ease: 'easeInOut' }}
     >
-      <div className={cn(CARD, 'p-4')}>
+      <div>
         <div className="flex flex-col gap-[14px]">
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className="flex flex-col gap-[9px]">

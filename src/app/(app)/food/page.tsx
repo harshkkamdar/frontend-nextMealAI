@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion'
 import { CalendarDays } from 'lucide-react'
+import { LOG_SHEET } from '@/components/layout/tab-bar'
 import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { DayHero, DaySkeleton, FadeText } from '@/components/diary/day-hero'
 import { MealGroup } from '@/components/diary/meal-group'
@@ -16,6 +17,7 @@ import { PlanLink } from '@/components/diary/plan-parts'
 import { dayKind, kcalText, mealOf } from '@/components/diary/diary-logic'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { WeekStrip, addDays } from '@/components/ui/fiqr/week-strip'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
@@ -34,6 +36,7 @@ import { useUserTimezone } from '@/hooks/useUserTimezone'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import type { MealPlan } from '@/types/plans.types'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
+import { useUIStore } from '@/stores/ui.store'
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
@@ -364,7 +367,7 @@ export default function DiaryPage() {
   const isFirstBlock = selectedDate === firstDateRef.current
 
   return (
-    <div className="mx-auto w-full max-w-md px-4">
+    <div className="mx-auto w-full max-w-md px-gutter">
       <LargeTitleHeader
         title="Food"
         subtitle={<FadeText text={daySubtitle(selectedDate, today)} />}
@@ -373,7 +376,7 @@ export default function DiaryPage() {
         <WeekStrip className="mt-4" selected={selectedDate} today={today} onSelect={selectDate} marked={loggedDays} markLabel="food logged" />
       </LargeTitleHeader>
 
-      <div className="-mx-4 mt-3">
+      <div className="-mx-gutter mt-3">
         <OfflineBand />
       </div>
 
@@ -398,15 +401,18 @@ export default function DiaryPage() {
             />
           </motion.div>
           <PlanLink planName={mealPlan ? mealPlan.content?.name ?? '' : null} targets={targets} onOpen={() => router.push('/food/plan')} />
+          {selectedDate === today ? (
+            <PrimaryButton type="button" className="mt-4" icon="+" trailing="Scan · Search" onClick={() => useUIStore.getState().openSheet(LOG_SHEET)}>Log food</PrimaryButton>
+          ) : null}
 
           {/* Day change: the old day fades out over 120 ms while the new one fades in over 180 ms, stacked in one cell. */}
           <LayoutGroup>
-            <div className="mt-4 grid grid-cols-1">
+            <div className="mt-6 grid grid-cols-1">
               <AnimatePresence initial={false}>
                 <motion.div
                   key={selectedDate}
                   style={{ gridArea: '1 / 1' }}
-                  className="flex flex-col gap-4"
+                  className="flex flex-col gap-5"
                   initial={isFirstBlock ? false : { opacity: 0 }}
                   animate={{ opacity: 1, transition: { duration: reduce ? 0.15 : 0.18, ease: 'easeOut' } }}
                   exit={{ opacity: 0, transition: { duration: 0.12, ease: 'easeOut' } }}

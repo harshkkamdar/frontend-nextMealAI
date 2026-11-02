@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { CalendarDays } from 'lucide-react'
 
+import { formatDashboardDate } from '@/components/dashboard/dashboard-helpers'
 import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
@@ -20,7 +21,7 @@ import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { getPlans } from '@/lib/api/plans.api'
-import { getInProgressSession, getWorkoutHistory, startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { abandonWorkoutSession, getInProgressSession, getWorkoutHistory, startWorkoutSession } from '@/lib/api/workout-sessions.api'
 import { todayLocalISO } from '@/lib/timezone'
 import { useFirstPaint } from '@/lib/use-first-paint'
 import { plural } from '@/lib/utils'
@@ -167,18 +168,23 @@ export default function ActivityPage() {
       title={(isResume ? inProgress?.day_name : nextWorkout?.name) || `Day ${nextIdx + 1}`}
       meta={isResume ? `${liveSets.filter((set) => set.completed).length} of ${liveSets.length} sets` : `${plural(exerciseCount, 'exercise')} · ${Math.max(15, Math.round((exerciseCount * 7.5) / 5) * 5)} min`}
       action={(
-        <SecondaryButton onNavy arrow type="button" disabled={starting} data-testid="activity-start-workout-button" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
-          {starting ? 'Starting…' : isResume ? 'Resume workout' : 'Start workout'}
-        </SecondaryButton>
+        <>
+          <SecondaryButton onNavy arrow type="button" disabled={starting} data-testid="activity-start-workout-button" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
+            {starting ? 'Starting…' : isResume ? 'Resume workout' : 'Start workout'}
+          </SecondaryButton>
+          {isResume && liveMinutes >= 720 ? (
+            <button type="button" onClick={() => void abandonWorkoutSession(inProgress!.id).then(() => { toast.success('Workout ended'); void refetch() }).catch(() => toast.error("Couldn't end the workout. Try again."))} className="-mb-2 mt-2 flex min-h-11 w-full items-center justify-center text-[15px] font-semibold text-cream-60 active:opacity-60">End it and start fresh</button>
+          ) : null}
+        </>
       )}
     />
   )
 
   return (
-    <div className="mx-auto w-full max-w-md px-4">
+    <div className="mx-auto w-full max-w-md px-gutter">
       <LargeTitleHeader
         title="Train"
-        subtitle={workoutPlan ? (workoutPlan.content.name || 'Your program') : 'No program yet'}
+        subtitle={formatDashboardDate(today)}
         actions={(
           <RoundButton aria-label="Open workout calendar" onClick={() => setCalendarOpen(true)}><CalendarDays strokeWidth={1.75} /></RoundButton>
         )}
@@ -186,7 +192,7 @@ export default function ActivityPage() {
         <WeekStrip className="mt-4" selected={selectedDate} today={today} onSelect={selectDay} marked={doneDates} markLabel="workout done" planned={planned} weekStartsOn={1} />
       </LargeTitleHeader>
 
-      <div className="-mx-4 mt-3"><OfflineBand /></div>
+      <div className="-mx-gutter mt-3"><OfflineBand /></div>
 
       {!data && loading ? (
         <TrainSkeleton />
@@ -196,13 +202,13 @@ export default function ActivityPage() {
         <div className="mt-5 flex flex-col gap-3">
           <Enter first={first} layer="hero">{hero}</Enter>
 
-          <Enter first={first} layer="tile" className="mt-3">
+          <Enter first={first} layer="tile">
             <SectionTitle>This week</SectionTitle>
             <VolumeCard perDay={perDay} labels={week.map(shortDay)} todayIndex={week.indexOf(today)} sessions={sessionsThisWeek} planned={plannedSessions} first={first} />
           </Enter>
 
           {workoutPlan ? (
-            <section ref={programRef} className="mt-3 scroll-mt-24">
+            <section ref={programRef} className="scroll-mt-24">
               <SectionTitle trailing={days.length ? `Day ${nextIdx + 1} of ${days.length}` : undefined}>Program</SectionTitle>
               <ProgramCard days={days} nextIdx={nextIdx} first={first} />
               <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-1 flex min-h-11 items-center gap-1 px-4 text-body-sm font-semibold text-ink-65">
@@ -211,7 +217,7 @@ export default function ActivityPage() {
             </section>
           ) : null}
 
-          <section className={workoutPlan ? 'mt-1' : 'mt-3'}>
+          <section>
             <SectionTitle>History</SectionTitle>
             <HistoryCard sessions={completedHistory} tz={tz} first={first} onOpen={(id) => router.push(`/train/session?id=${id}`)} onLog={() => router.push('/logs/new/workout')} />
           </section>

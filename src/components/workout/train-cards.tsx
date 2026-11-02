@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { CountUp } from '@/components/ui/fiqr/count-up'
+import { MetricStrip } from '@/components/ui/fiqr/metric-strip'
 import { reducedFade, spring } from '@/lib/motion'
 import { cn, plural } from '@/lib/utils'
 import type { WorkoutPlanDay } from '@/types/plans.types'
@@ -58,24 +59,29 @@ export function NextUpCard({ eyebrow, title, meta, action }: { eyebrow: string; 
 export function VolumeCard({ perDay, labels, todayIndex, sessions, planned, first }: { perDay: number[]; labels: string[]; todayIndex: number; sessions: number; planned: number | null; first: boolean }) {
   const reduce = useReducedMotion()
   const total = perDay.reduce((a, b) => a + b, 0)
+  if (total === 0 && sessions === 0) {
+    return <MetricStrip items={[
+      { label: 'Sessions', value: '0', unit: planned === null ? undefined : `of ${planned}`, sub: 'this week' },
+      { label: 'Volume', value: '0', unit: 'kg', sub: 'lifted' },
+    ]} />
+  }
   const max = Math.max(...perDay, 1)
   return (
     <section className={cn(CARD, 'p-4')} aria-label="This week">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-caption font-semibold text-ink-65">Volume</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-62">Volume</p>
           <p className="mt-1 flex items-baseline gap-1">
-            <span className="font-display text-[28px] font-extrabold leading-none tracking-[-0.02em] text-ink tabular-nums"><CountUp value={total} delay={0.2} /></span>
+            <span className="text-[28px] font-bold leading-none tracking-[-0.6px] text-ink tabular-nums"><CountUp value={total} delay={0.2} /></span>
             <span className="text-body-sm font-semibold text-ink-65">kg</span>
           </p>
         </div>
         <div className="text-right">
-          <p className="text-caption font-semibold text-ink-65">Sessions</p>
-          <p className="mt-1 font-display text-hero text-ink tabular-nums">{sessions}<span className="text-body font-semibold text-ink-65">{planned === null ? '' : ` of ${planned}`}</span></p>
+          <p className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-62">Sessions</p>
+          <p className="mt-1 text-[28px] font-bold leading-none tracking-[-0.6px] text-ink tabular-nums">{sessions}<span className="text-body font-semibold text-ink-65">{planned === null ? '' : ` of ${planned}`}</span></p>
         </div>
       </div>
       <div className="relative mt-4 grid grid-cols-7 gap-1.5" aria-hidden="true">
-        {total === 0 ? <span className="absolute inset-x-0 top-3 text-center text-body-sm font-medium text-ink-65">Your sessions this week show up here</span> : null}
         {perDay.map((kg, index) => {
           const fraction = kg / max
           return (
