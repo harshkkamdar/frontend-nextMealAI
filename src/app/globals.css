@@ -156,17 +156,13 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .px-gutter { padding-left: var(--gutter); padding-right: var(--gutter); }
-  /* Solid surfaces only (DESIGN.md section 9: no glass, no blur). The names stay for their call sites. */
-  .glass { background: var(--color-card); box-shadow: 0 0 0 1px rgba(17,28,53,.12); }
-  .glass-cream { background: var(--color-cream); }
+  /* Solid surfaces only (DESIGN.md section 9: no glass, no blur). */
   /* Round header buttons: George's avatar button, an ink-08 disc with a 1 pt ink-16 edge. */
-  .glass-btn { background: rgba(17,28,53,.06); box-shadow: inset 0 0 0 1px rgba(17,28,53,.14); }
-  /* Content cards: George's tile. */
-  .card-glass { background: var(--color-card); box-shadow: 0 0 0 1px rgba(17,28,53,.12); }
+  .round-btn { background: rgba(17,28,53,.06); box-shadow: inset 0 0 0 1px rgba(17,28,53,.14); }
+  /* George's tile: white with a 1 pt ink-12 edge, no shadow (DESIGN.md section 4). */
+  .tile { background: var(--color-card); box-shadow: 0 0 0 1px rgba(17,28,53,.12); }
   /* Condensed top bar once content scrolls under it: cream with a hairline. */
-  .glass-bar { background: var(--color-cream); box-shadow: 0 1px 0 rgba(17,28,53,.09); }
-  /* Archivo at its normal width everywhere (George's reference); the width utilities stay as no-ops for their call sites. */
-  .font-wide, .font-display, .font-wider { font-stretch: 100%; }
+  .topbar-fill { background: var(--color-cream); box-shadow: 0 1px 0 rgba(17,28,53,.09); }
   /* Entrance: rises once on mount; set --i on siblings to stagger them 40 ms apart. `backwards` so the element's own transform (press scale) works after it lands. */
   .rise { animation: fiqr-rise 420ms cubic-bezier(.25,1,.5,1) backwards; animation-delay: calc(var(--i, 0) * 40ms + var(--rise-delay, 0ms)); }
   /* Pending work: a light band sweeps across; compositor-only (translateX). */

@@ -94,7 +94,7 @@ export function TargetStepper({ label, macro, unit, value, step, onChange }: {
             min={0}
             value={value === undefined || Number.isNaN(value) ? '' : value}
             onChange={(e) => { const raw = e.target.value; if (raw === '') return onChange(undefined); const n = Number(raw); if (Number.isFinite(n)) onChange(Math.max(0, n)) }}
-            className="-my-2 h-11 w-[5.5ch] bg-transparent text-right font-display text-[20px] font-[800] text-ink tabular-nums outline-none [appearance:textfield] focus:underline [&::-webkit-inner-spin-button]:appearance-none"
+            className="-my-2 h-11 w-[5.5ch] bg-transparent text-right text-[20px] font-bold text-ink tabular-nums outline-none [appearance:textfield] focus:underline [&::-webkit-inner-spin-button]:appearance-none"
           />
           <span className="text-caption font-semibold text-ink-65">{unit}</span>
         </span>

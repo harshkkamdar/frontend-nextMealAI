@@ -111,12 +111,12 @@ export function TodayPreview({ current, next, eaten, showNew, onShowNew, settled
       ) : null}
       <div className={cn('grid grid-cols-[112px_1fr] items-center gap-3.5', next && !settled && 'mt-3.5')}>
         <Ring fraction={t.calories > 0 ? eaten.calories / t.calories : 0}>
-          <b className="font-display text-[20px] font-[750] leading-none tracking-[-0.015em] text-ink tabular-nums">{fmt(Math.abs(left))}</b>
+          <b className="text-[20px] font-[750] leading-none tracking-[-0.015em] text-ink tabular-nums">{fmt(Math.abs(left))}</b>
           <span className="mt-0.5 text-caption text-ink-65">{left < 0 ? 'kcal over' : 'kcal left'}</span>
         </Ring>
         <div className="min-w-0">
           <p className="text-caption text-ink-65">Eaten so far</p>
-          <p className="font-display text-[20px] font-[750] tracking-[-0.015em] text-ink tabular-nums">{fmt(eaten.calories)}<span className="text-caption font-semibold tracking-normal text-ink-65"> kcal</span></p>
+          <p className="text-[20px] font-[750] tracking-[-0.015em] text-ink tabular-nums">{fmt(eaten.calories)}<span className="text-caption font-semibold tracking-normal text-ink-65"> kcal</span></p>
           <p className="mt-1.5 text-caption text-ink-65 tabular-nums">of {fmt(t.calories)}{isNew && t.calories !== current.calories ? `, was ${fmt(current.calories)}` : ''}</p>
         </div>
       </div>

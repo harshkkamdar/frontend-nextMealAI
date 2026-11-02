@@ -68,7 +68,7 @@ function PlanCard({ option, on, busy, onPick }: { option: SubscriptionOption; on
           <span className={cn('absolute inset-0 rounded-full shadow-[inset_0_0_0_7px_#111C35] transition-opacity duration-150', on ? 'opacity-100' : 'opacity-0')} />
         </span>
       </span>
-      <span className="mt-auto block text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink tabular-nums [font-stretch:106%]">{option.price}</span>
+      <span className="mt-auto block text-[30px] font-bold leading-none tracking-[-0.02em] text-ink tabular-nums [font-stretch:106%]">{option.price}</span>
       <span className="mt-1 block text-caption leading-[1.35] text-ink-65">{per(option)}</span>
     </motion.button>
   )

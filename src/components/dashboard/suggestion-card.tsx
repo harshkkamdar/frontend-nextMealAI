@@ -25,7 +25,7 @@ export function SuggestionCard({
   }
 
   return (
-    <div className="rounded-[24px] card-glass p-5">
+    <div className="rounded-[24px] tile p-5">
       <div className="flex gap-[11px]">
         <span role="img" aria-label="Geo"><GeoMark size={24} nudge /></span>
         <div className="min-w-0 flex-1">

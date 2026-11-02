@@ -36,7 +36,7 @@ export interface ResizableSheetProps {
 
 /**
  * Draggable, snap-to-levels inset sheet: the FIQR v2 inset look of `BottomSheet` (8 pt in from the edges,
- * 38 pt corners, glass-cream, over the tab bar) with resizable height.
+ * 38 pt corners, bg-cream, over the tab bar) with resizable height.
  *
  * Height is the resized quantity, so a pinned footer (food search's "Log food", the companion composer) always
  * sits at the sheet's bottom edge. The height follows the finger 1:1 while dragging; it is never animated.
@@ -183,7 +183,7 @@ export function ResizableSheet({
         aria-modal="true"
         aria-label={ariaLabel}
         style={{ height, y, scale, originY: 1, opacity: reduce ? fade : 1 }}
-        className="glass-cream absolute inset-x-2 bottom-[var(--nav-clearance)] z-[70] mx-auto flex max-w-[calc(28rem-16px)] flex-col overflow-hidden rounded-[38px]"
+        className="bg-cream absolute inset-x-2 bottom-[var(--nav-clearance)] z-[70] mx-auto flex max-w-[calc(28rem-16px)] flex-col overflow-hidden rounded-[38px]"
       >
         <div
           onPointerDown={onPointerDown}

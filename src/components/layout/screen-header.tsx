@@ -28,7 +28,7 @@ function useScrolledPast<T extends Element>() {
 function TopBar({ title, filled, titleVisible = filled, leading, actions }: { title: ReactNode; filled: boolean; titleVisible?: boolean; leading?: ReactNode; actions?: ReactNode }) {
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[40]" style={{ paddingTop: 'var(--safe-top)' }}>
-      <div aria-hidden="true" className={cn('glass-bar absolute inset-0 transition-opacity duration-200', filled ? 'opacity-100' : 'opacity-0')} />
+      <div aria-hidden="true" className={cn('topbar-fill absolute inset-0 transition-opacity duration-200', filled ? 'opacity-100' : 'opacity-0')} />
       {/* 64 tall at the gutter: header buttons sit 10 pt down on every screen, level with Home's (DESIGN.md component 1). */}
       <div className="relative mx-auto flex h-[64px] max-w-md items-center gap-2 px-gutter">
         <div className="pointer-events-auto flex min-w-11 items-center">{leading}</div>

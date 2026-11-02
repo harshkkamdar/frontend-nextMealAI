@@ -49,7 +49,7 @@ export function SearchSheet<T>({ open, onClose, title, label, placeholder, searc
   return (
     <BottomSheet open={open} onClose={close} ariaLabel={title}>
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-4">
-        <h2 className="font-display px-1 pb-2.5 pt-1 text-hero font-[800] text-ink">{title}</h2>
+        <h2 className="px-1 pb-2.5 pt-1 text-hero font-bold text-ink">{title}</h2>
         {chips}
         <label className="relative block">
           <span className="sr-only">{label}</span>

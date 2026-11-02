@@ -115,7 +115,7 @@ export function OnboardingStep({ stepKey, progress, segments, question, why, onB
             style={{ '--rise-delay': '60ms', transformOrigin: '50% 30vh' } as CSSProperties}
             className="flex-1 px-gutter pb-[calc(170px+var(--safe-bottom))] pt-8"
           >
-            <h1 className="rise font-wide text-balance text-title text-ink">{question}</h1>
+            <h1 className="rise text-balance text-title text-ink">{question}</h1>
             {why ? <p className="rise mt-2.5 text-pretty text-body-sm text-ink-80" style={{ '--i': 1 } as CSSProperties}>{why}</p> : null}
             <div className="mt-7">{children}</div>
           </motion.div>

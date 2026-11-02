@@ -266,7 +266,7 @@ export default function SettingsPage() {
             aria-hidden={!settings.notifications_enabled || undefined}
             className={`mx-0.5 mt-2.5 grid transition-opacity duration-200 ${settings.notifications_enabled ? 'opacity-100' : 'opacity-35'} grid-cols-[32px_1fr_auto] gap-x-2.5 gap-y-0.5 rounded-[18px] bg-card/65 px-3 py-2.5 text-[14px] leading-[1.35] shadow-[0_0_0_.5px_rgba(17,28,53,.1)]`}
           >
-            <span aria-hidden="true" className="row-span-2 grid size-8 place-items-center rounded-[8px] bg-ink text-[10px] font-extrabold tracking-[.02em] text-cream">FIQR</span>
+            <span aria-hidden="true" className="row-span-2 grid size-8 place-items-center rounded-[8px] bg-ink text-[10px] font-bold tracking-[.02em] text-cream">FIQR</span>
             <b className="font-bold text-ink">Your check-in is ready</b>
             <time className="text-label font-normal text-ink-65">{formatClock(reminder)}</time>
             <span className="col-span-2 col-start-2 text-ink-80">Geo has read the week. Open FIQR to see what changes.</span>

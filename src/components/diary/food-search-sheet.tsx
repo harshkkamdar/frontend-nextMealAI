@@ -636,7 +636,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
       : `Add to ${mealType}`
   const amountInvalid = inputMode === 'grams' && !grams
   const stepButton = 'grid size-14 shrink-0 place-items-center rounded-full bg-card text-ink shadow-[var(--shadow-card)] transition-transform active:scale-[.94]'
-  const numberInput = 'font-wide h-16 w-28 rounded-[18px] bg-card px-3 text-center text-[28px] font-bold text-ink shadow-[var(--shadow-card)] outline-none tabular-nums focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-ink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+  const numberInput = 'h-16 w-28 rounded-[18px] bg-card px-3 text-center text-[28px] font-bold text-ink shadow-[var(--shadow-card)] outline-none tabular-nums focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-ink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
   const step = (fn: () => void) => () => { void haptic('selection'); fn() }
 
   return (
@@ -651,11 +651,11 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
         <div className={cn('flex justify-between gap-3 px-5 pb-3 pt-1', mode === 'edit' ? 'items-start' : 'items-center')}>
           {mode === 'edit' ? (
             <div className="min-w-0 flex-1">
-              <h2 id="food-sheet-title" className="font-display line-clamp-2 text-headline font-extrabold leading-tight text-ink [overflow-wrap:anywhere]">{title}</h2>
+              <h2 id="food-sheet-title" className="line-clamp-2 text-headline font-bold leading-tight text-ink [overflow-wrap:anywhere]">{title}</h2>
               {editSubtitle ? <p className="mt-0.5 text-caption text-ink-65">{editSubtitle}</p> : null}
             </div>
           ) : (
-            <h2 id="food-sheet-title" className="font-wide min-w-0 truncate text-[22px] font-bold leading-tight text-ink">{title}</h2>
+            <h2 id="food-sheet-title" className="min-w-0 truncate text-[22px] font-bold leading-tight text-ink">{title}</h2>
           )}
           <button type="button" aria-label="Close" onClick={onClose} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94] [&_svg]:size-5"><CloseIcon /></button>
         </div>
@@ -814,7 +814,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
             <button type="button" onClick={() => setShowCustomForm(false)} className="-ml-3 mb-1 min-h-11 rounded-full px-3 text-[15px] font-semibold text-ink-65">
               Back to search
             </button>
-            <h3 className="font-wide mb-4 text-[19px] font-bold text-ink">New food</h3>
+            <h3 className="mb-4 text-[19px] font-bold text-ink">New food</h3>
             <div className="space-y-4">
               <div>
                 <FieldLabel htmlFor="custom-name">Name</FieldLabel>

@@ -20,7 +20,7 @@ import { todayLocalISO } from '@/lib/timezone'
 import { useUIStore } from '@/stores/ui.store'
 import type { MealPlan } from '@/types/plans.types'
 
-const CARD = 'rounded-card card-glass'
+const CARD = 'rounded-card tile'
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
 const shortDate = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00`).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
 
@@ -78,7 +78,7 @@ export default function NutritionPlanPage() {
                 <p className="truncate text-caption text-ink-65">{source}</p>
                 {targets.calories > 0 ? (
                   <p className="mt-1 flex items-baseline gap-1.5">
-                    <span className="font-display text-hero text-ink tabular-nums">{fmt(targets.calories)}</span>
+                    <span className="text-hero text-ink tabular-nums">{fmt(targets.calories)}</span>
                     <span className="text-body-sm font-semibold text-ink-65">kcal a day</span>
                   </p>
                 ) : <p className="mt-1 text-headline text-ink">No daily target yet</p>}

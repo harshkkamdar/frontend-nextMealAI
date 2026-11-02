@@ -456,7 +456,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                 {current ? (
                   <ExerciseCard key={`${currentIndex}-${current.name}`} index={currentIndex} count={exercises.length} direction={direction} then={following ? `Then: ${following.name}` : 'Last exercise'}>
                     <ExerciseVisual group={current.muscle_group} name={current.name} />
-                    <h2 className="mt-3 line-clamp-3 break-words text-balance font-display text-[22px] font-extrabold leading-[1.14] tracking-[-0.01em] text-ink">{current.name}</h2>
+                    <h2 className="mt-3 line-clamp-3 break-words text-balance text-[22px] font-bold leading-[1.14] tracking-[-0.01em] text-ink">{current.name}</h2>
                     {/* The how-to toggle shares the plan line so the set rows start higher up the screen. */}
                     <div className="flex min-h-11 items-center justify-between gap-3">
                       <p className="text-body-sm text-ink-65 tabular-nums">{current.planned_sets} × {current.planned_reps}{current.rest_seconds ? ` · ${restText(current.rest_seconds)} rest` : ''}</p>
@@ -538,7 +538,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
       <BottomSheet open={showAll} onClose={() => setShowAll(false)} ariaLabel="All exercises">
         <div className="flex items-center justify-between px-5 pb-3 pt-1">
-          <h2 className="font-display text-hero text-ink">All exercises</h2>
+          <h2 className="text-hero text-ink">All exercises</h2>
           <RoundButton aria-label="Close" onClick={() => setShowAll(false)}><CloseIcon /></RoundButton>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5">
@@ -566,7 +566,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
       <BottomSheet open={showExitSheet} onClose={() => { setShowExitSheet(false); setDiscardConfirm(false) }} ariaLabel="Exit workout">
         <div className="px-5 pb-5 pt-3">
-          <h2 className="font-display text-hero text-ink">Leave this workout?</h2>
+          <h2 className="text-hero text-ink">Leave this workout?</h2>
           <p className="mt-1 text-body-sm text-ink-65">Your sets are saved. Pick it up again from Train.</p>
           <button type="button" onClick={handleSaveAndExit} className="mt-5 flex h-btn w-full items-center justify-center rounded-[15px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97]">Save and exit</button>
           {discardConfirm ? (

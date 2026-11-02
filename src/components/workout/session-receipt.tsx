@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 import type { WorkoutSession } from '@/types/workout-session.types'
 import { bestText, compareExercise, deltaText, formatHistoryDate, receiptLine, sessionVolumeKg, type ExerciseCompare } from './train-data'
 
-const CARD = 'rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]'
+const CARD = 'rounded-card tile'
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
 
 /** Volume per exercise, today (ink) against last time (light ink); bars grow from the left (scaleX only). */
@@ -78,7 +78,7 @@ export function SessionReceipt({ session, tz, title = 'Session done', animate, o
   ]
   return (
     <div className="flex min-h-full flex-col">
-      <motion.h1 {...enter(0)} className="font-display text-title text-ink">{title}</motion.h1>
+      <motion.h1 {...enter(0)} className="text-title text-ink">{title}</motion.h1>
       <motion.p {...enter(0)} className="mt-1 break-words text-body-sm text-ink-65">{session.day_name}{when ? ` · ${formatHistoryDate(when, tz)}` : ''}</motion.p>
 
       <motion.section {...enter(1)} aria-label="Session totals" className={cn(CARD, 'mt-4 grid grid-cols-3 divide-x divide-ink-06')}>
@@ -86,7 +86,7 @@ export function SessionReceipt({ session, tz, title = 'Session done', animate, o
           <p key={tile.label} className="min-w-0 px-4 py-3.5">
             <span className="block text-caption font-semibold text-ink-65">{tile.label}</span>
             <span className="mt-1.5 flex items-baseline gap-1">
-              <span className="font-display text-hero text-ink tabular-nums"><CountUp value={tile.value} delay={animate ? 0.3 : 0} /></span>
+              <span className="text-hero text-ink tabular-nums"><CountUp value={tile.value} delay={animate ? 0.3 : 0} /></span>
               {tile.unit ? <span className="text-caption font-semibold text-ink-65">{tile.unit}</span> : null}
             </span>
           </p>

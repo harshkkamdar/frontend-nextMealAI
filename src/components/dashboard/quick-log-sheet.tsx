@@ -44,7 +44,7 @@ function Stepper({ value, unit, label, onChange, step = 1, min = 0, max = 99, fo
     <div className="flex items-center justify-center gap-10">
       <button type="button" aria-label={label[0]} disabled={value <= min} onClick={() => set(value - step)} className={ROUND}><MinusLine className="size-5" /></button>
       <div className="min-w-20 text-center">
-        <span className="font-display text-title leading-none text-ink tabular-nums" aria-live="polite">{format(value)}</span>
+        <span className="text-title leading-none text-ink tabular-nums" aria-live="polite">{format(value)}</span>
         <p className="mt-1 text-caption font-semibold text-ink-65">{unit}</p>
       </div>
       <button type="button" aria-label={label[1]} disabled={value >= max} onClick={() => set(value + step)} className={ROUND}><PlusLine className="size-5" /></button>
@@ -245,7 +245,7 @@ function WeightSheet({ history, onDone }: { history: WeightHistory; onDone: () =
           aria-describedby={hintId}
           aria-invalid={bad}
           onChange={(event) => setKg(event.target.value.replace(',', '.'))}
-          className="font-display h-full min-w-0 flex-1 bg-transparent text-center text-title text-ink outline-none placeholder:text-ink-35 tabular-nums"
+          className="h-full min-w-0 flex-1 bg-transparent text-center text-title text-ink outline-none placeholder:text-ink-35 tabular-nums"
         />
         <span className="text-caption font-semibold text-ink-65" aria-hidden="true">kg</span>
         <button type="button" aria-label="Up 0.1 kg" onClick={() => nudge(0.1)} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink active:scale-[.94]"><PlusLine className="size-5" /></button>

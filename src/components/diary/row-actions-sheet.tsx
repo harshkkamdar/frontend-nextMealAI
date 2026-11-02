@@ -64,7 +64,7 @@ export function RowActionsSheet({ open, log, date, today, dayLabel, onClose, onE
   const header = (title: string, sub: string) => (
     <div className="flex items-start gap-3 px-1 pb-3">
       <div className="min-w-0 flex-1">
-        <h2 className="font-display line-clamp-2 text-headline font-extrabold leading-tight text-ink [overflow-wrap:anywhere]">{title}</h2>
+        <h2 className="line-clamp-2 text-headline font-bold leading-tight text-ink [overflow-wrap:anywhere]">{title}</h2>
         <p className="mt-0.5 text-caption text-ink-65 tabular-nums">{sub}</p>
       </div>
       <button type="button" onClick={onClose} aria-label="Close" className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94]">

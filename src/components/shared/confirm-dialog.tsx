@@ -77,13 +77,13 @@ export function ConfirmDialog({
             aria-modal="true"
             aria-labelledby={`${id}-title`}
             aria-describedby={`${id}-description`}
-            className="glass-cream absolute inset-x-2 bottom-[var(--nav-clearance)] mx-auto max-w-[calc(28rem-16px)] rounded-[38px] px-6 pb-4 pt-7"
+            className="bg-cream absolute inset-x-2 bottom-[var(--nav-clearance)] mx-auto max-w-[calc(28rem-16px)] rounded-[38px] px-6 pb-4 pt-7"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduce ? { opacity: 0, transition: reducedFade } : { opacity: 0, y: 16, transition: { duration: 0.2, ease: 'easeOut' } }}
             transition={reduce ? reducedFade : spring.sheet}
           >
-            <h2 id={`${id}-title`} className="font-wide text-[22px] font-bold leading-tight text-ink">{title}</h2>
+            <h2 id={`${id}-title`} className="text-[22px] font-bold leading-tight text-ink">{title}</h2>
             <p id={`${id}-description`} className="mt-2 text-[15.5px] leading-[1.45] text-ink-65">{description}</p>
             <button
               type="button"

@@ -64,7 +64,7 @@ export function BottomSheet({
         <Drawer.Content
           aria-label={ariaLabel}
           style={{ '--initial-transform': 'calc(100% + var(--nav-clearance) + 32px)' } as CSSProperties}
-          className={`glass-cream fixed inset-x-2 z-[70] after:hidden mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[38px] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}
+          className={`bg-cream fixed inset-x-2 z-[70] after:hidden mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[38px] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}
         >
           <Drawer.Handle className="!mx-auto !mt-2.5 !mb-1 !h-[5px] !w-9 shrink-0 !bg-ink-20" />
           {/* Radix/vaul require an accessible title; visually hidden. */}

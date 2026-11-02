@@ -126,7 +126,7 @@ export function RulerInput({ label, value, onChange, min, max, start, units }: R
           placeholder={unit.format(unit.toDisplay(start))}
           onChange={(e) => onType(e.target.value)}
           style={{ width: `${Math.max(2, (text || unit.format(unit.toDisplay(start))).length) * 0.62 + 0.2}em` }}
-          className="font-wide bg-transparent text-center text-[72px] font-[750] leading-none tracking-[-2px] text-ink tabular-nums outline-none placeholder:text-ink-20"
+          className="bg-transparent text-center text-[72px] font-[750] leading-none tracking-[-2px] text-ink tabular-nums outline-none placeholder:text-ink-20"
         />
         <span className="text-[20px] font-semibold text-ink-65">{unit.label}</span>
       </div>

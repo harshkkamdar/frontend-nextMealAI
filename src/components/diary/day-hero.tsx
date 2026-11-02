@@ -6,7 +6,7 @@ import { MacroBar } from '@/components/ui/fiqr/macro-bar'
 import { cn } from '@/lib/utils'
 import { summaryCopy, type DayKind } from './diary-logic'
 
-const CARD = 'rounded-card card-glass'
+const CARD = 'rounded-card tile'
 
 /**
  * Text that crossfades when it changes (old out over 120 ms, new in over 180 ms, overlapping), never a hard swap.

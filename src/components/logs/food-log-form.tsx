@@ -171,7 +171,7 @@ export function FoodLogForm() {
           onClick={() => { void haptic('selection'); setMealMenuOpen((open) => !open) }}
           aria-expanded={mealMenuOpen}
           aria-label={`Meal: ${meal}`}
-          className="glass flex h-11 shrink-0 items-center gap-1 rounded-full pl-4 pr-3 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]"
+          className="tile flex h-11 shrink-0 items-center gap-1 rounded-full pl-4 pr-3 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]"
         >
           {meal}
           <ChevronDown aria-hidden="true" className={cn('size-4 transition-transform duration-200', mealMenuOpen && 'rotate-180')} />
@@ -359,7 +359,7 @@ function MethodChip({ icon: Icon, label, onClick, testId }: { icon: ComponentTyp
       type="button"
       onClick={onClick}
       data-testid={testId}
-      className="flex h-11 items-center justify-center gap-2 rounded-full card-glass px-4 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]"
+      className="flex h-11 items-center justify-center gap-2 rounded-full tile px-4 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]"
     >
       <Icon aria-hidden="true" className="size-[18px] translate-y-[0.5px]" />
       {label}

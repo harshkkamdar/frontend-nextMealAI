@@ -120,7 +120,7 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
 function Stat({ value, label, divided }: { value: number; label: string; divided?: boolean }) {
   return (
     <div className={cn('px-4 py-3', divided && 'border-l border-ink-06')}>
-      <span className="font-display block text-[20px] font-[750] leading-none tracking-[-0.015em] text-ink tabular-nums">{value}</span>
+      <span className="block text-[20px] font-[750] leading-none tracking-[-0.015em] text-ink tabular-nums">{value}</span>
       <span className="mt-1 block text-label leading-4 text-ink-65">{label}</span>
     </div>
   )

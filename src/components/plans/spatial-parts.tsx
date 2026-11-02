@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
  */
 
 /** Card surface: George's tile, white with a 1 pt ink-12 border (DESIGN.md section 4). */
-export const CARD = 'rounded-card card-glass'
+export const CARD = 'rounded-card tile'
 /** Navy solid: a committing action that is not the screen's next step (Keep current targets, Done). */
 export const INK_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-[15px] bg-ink px-5 text-[18px] font-bold text-cream transition-transform enabled:active:scale-[.98] disabled:opacity-45'
 /**

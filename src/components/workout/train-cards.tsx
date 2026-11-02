@@ -12,7 +12,7 @@ import type { WorkoutPlanDay } from '@/types/plans.types'
 import type { WorkoutSession } from '@/types/workout-session.types'
 import { formatExDetail, formatHistoryDate } from './train-data'
 
-export const CARD = 'rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]'
+export const CARD = 'rounded-card tile'
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
 
 type Layer = 'hero' | 'tile' | 'row'

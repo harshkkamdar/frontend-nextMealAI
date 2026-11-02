@@ -7,7 +7,7 @@ import { PublicHeader } from './_components/public-back'
  */
 // Joined, not cn(): tailwind-merge reads text-title and text-ink as one group and would drop the size.
 const PROSE = [
-  '[&_h1]:[font-stretch:104%] [&_h1]:text-title [&_h1]:font-extrabold [&_h1]:text-ink',
+  '[&_h1]:[font-stretch:104%] [&_h1]:text-title [&_h1]:font-bold [&_h1]:text-ink',
   '[&_h2]:mt-8 [&_h2]:scroll-mt-[calc(72px+var(--safe-top))] [&_h2]:text-headline [&_h2]:text-ink',
   '[&_h3]:mt-5 [&_h3]:text-body [&_h3]:font-bold [&_h3]:leading-[1.3] [&_h3]:text-ink',
   '[&_p]:mt-2 [&_p]:text-body [&_p]:leading-[1.5] [&_p]:text-ink-80 sm:[&_p]:text-[17px]',

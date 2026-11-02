@@ -215,7 +215,7 @@ export function LogSheet() {
                           type="button"
                           onClick={() => logAgain(food)}
                           aria-label={`Log ${food.name} again, ${formatMacroKcal(food.macros_per_serving.calories)} kcal`}
-                          className="flex min-h-[72px] w-[156px] flex-col justify-between gap-1 rounded-bento card-glass px-3 py-2.5 text-left transition-transform active:scale-[.96]"
+                          className="flex min-h-[72px] w-[156px] flex-col justify-between gap-1 rounded-bento tile px-3 py-2.5 text-left transition-transform active:scale-[.96]"
                         >
                           <b className="line-clamp-2 text-body-sm font-semibold leading-[1.2] text-ink">{food.name}</b>
                           <span className="text-caption text-ink-65 tabular-nums">{food.serving_size_g || 100} g · {formatMacroKcal(food.macros_per_serving.calories)} kcal</span>

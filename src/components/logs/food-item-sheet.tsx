@@ -98,7 +98,7 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
         <h2 className="line-clamp-2 text-headline text-ink">{shown.name}</h2>
         <p className="mt-0.5 truncate text-caption text-ink-65">{source} · 1 serving is {serving} g{shown.brand ? ` · ${shown.brand}` : ''}</p>
         <div className="mt-3 flex items-baseline justify-between gap-3">
-          <p className="text-ink tabular-nums"><b className="font-display text-hero" data-testid="item-kcal">{formatMacroKcal(macros.calories)}</b> <span className="text-caption text-ink-65">kcal</span></p>
+          <p className="text-ink tabular-nums"><b className="text-hero" data-testid="item-kcal">{formatMacroKcal(macros.calories)}</b> <span className="text-caption text-ink-65">kcal</span></p>
           <p className="text-caption text-ink-65 tabular-nums">{amountLabel}</p>
         </div>
         <MacroDots macros={macros} className="mt-1" />
@@ -112,7 +112,7 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
               aria-checked={servings === n}
               aria-label={`${portionLabel(n)} serving${n <= 1 ? '' : 's'}`}
               onClick={() => pick(n)}
-              className={`h-11 min-w-11 flex-1 rounded-full text-body-sm font-bold transition-transform active:scale-[.94] ${servings === n ? 'bg-ink text-cream' : 'card-glass text-ink'}`}
+              className={`h-11 min-w-11 flex-1 rounded-full text-body-sm font-bold transition-transform active:scale-[.94] ${servings === n ? 'bg-ink text-cream' : 'tile text-ink'}`}
             >
               {portionLabel(n)}
             </button>

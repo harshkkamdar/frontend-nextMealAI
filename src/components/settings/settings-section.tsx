@@ -9,7 +9,7 @@ import { reducedFade, spring } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 /** White content card of the grouped list (Spatial: radius 22, no border, soft shadow; Q3 content stays solid). */
-export const GROUP_CARD = 'overflow-hidden rounded-card card-glass'
+export const GROUP_CARD = 'overflow-hidden rounded-card tile'
 /** Hairline between rows, inset to the label edge like iOS. */
 const HAIRLINES = "[&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:inset-x-0 [&>*+*]:before:left-[18px] [&>*+*]:before:top-0 [&>*+*]:before:h-px [&>*+*]:before:bg-ink-08 [&>*+*]:before:content-['']"
 
@@ -200,7 +200,7 @@ export function SettingsMenu<T extends string | number>({ label, value, options,
                 role="menu"
                 aria-label={label}
                 onKeyDown={onKey}
-                className="glass absolute rounded-card p-1.5"
+                className="tile absolute rounded-card p-1.5"
                 style={{
                   top: place?.top ?? 0,
                   left: place?.left ?? 0,

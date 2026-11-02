@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 import { formatSleep, type MealRow } from './home-data'
 import { AlertIcon, HeartIcon, PlusLine, SparkleIcon } from './home-icons'
 
-export const CARD = 'rounded-[22px] card-glass'
+export const CARD = 'rounded-card tile'
 
 /** False on a revisit in the same session: charts and numbers paint at rest instead of drawing again (motion-feel 7). */
 export const HomeEntrance = createContext(true)
@@ -129,7 +129,7 @@ export function HeroCard({ calories, macros, geoLine, action, onOpenMacro }: Her
       <div className="flex items-center gap-[14px]">
         <button type="button" onClick={() => onOpenMacro('calories')} className="rounded-full transition-transform active:scale-[.97]">
           <ArcRing fraction={target > 0 ? current / target : 0} color="var(--color-accent)" stroke={11} className="size-ring">
-            <span className="font-display text-hero leading-none text-ink tabular-nums"><Count value={remaining} /></span>
+            <span className="text-hero leading-none text-ink tabular-nums"><Count value={remaining} /></span>
             <span className="mt-1 text-label font-medium text-ink-65">{target > 0 ? (over ? 'kcal over' : 'kcal left') : 'kcal today'}</span>
           </ArcRing>
           <span className="sr-only">, {fmt(current)} of {fmt(target)} kcal eaten, show breakdown</span>
@@ -182,14 +182,14 @@ export function HomeErrorCard({ savedAt, onRetry }: { savedAt: string | null; on
 
 // ── Tiles, log first: Water, Weight, Steps, Sleep (Q32) ──
 
-const TILE = 'flex min-h-tile flex-col rounded-[20px] card-glass p-[14px] text-left'
+const TILE = 'flex min-h-tile flex-col rounded-[20px] tile p-[14px] text-left'
 
 function TileBody({ label, value, unit, caption, children }: { label: string; value: ReactNode; unit?: string; caption?: ReactNode; children?: ReactNode }) {
   return (
     <>
       <span className="text-caption font-semibold text-ink-65">{label}</span>
       <span className="mt-1.5 flex items-baseline gap-1">
-        <span className="font-display text-hero leading-none text-ink tabular-nums">{value}</span>
+        <span className="text-hero leading-none text-ink tabular-nums">{value}</span>
         {unit ? <span className="text-caption font-semibold text-ink-65">{unit}</span> : null}
       </span>
       <span className="mt-auto block pt-2">{children}</span>

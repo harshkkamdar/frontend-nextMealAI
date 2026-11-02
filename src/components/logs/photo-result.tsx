@@ -183,7 +183,7 @@ export function PhotoResult({ file, meal, localDate, onRetake, onSearch, onGeo, 
               {thumb('size-16')}
               <div>
                 <p className="text-caption text-ink-65">About</p>
-                <p className="text-ink tabular-nums"><b className="font-display text-hero">{formatMacroKcal(totals.calories)}</b> <span className="text-caption text-ink-65">kcal</span></p>
+                <p className="text-ink tabular-nums"><b className="text-hero">{formatMacroKcal(totals.calories)}</b> <span className="text-caption text-ink-65">kcal</span></p>
               </div>
             </div>
             <MacroDots macros={totals} className="mt-3 px-1" />

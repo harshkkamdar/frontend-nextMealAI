@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             },
             // height auto: sonner pins the measured first-paint height, which clips text that wraps once the font loads.
             // left/right 0 with auto margins and fit-content: the capsule hugs its words and stays centred.
-            style: { height: 'auto', minHeight: 48, left: 0, right: 0, marginInline: 'auto', width: 'fit-content', maxWidth: 'calc(100% - 32px)', fontFamily: 'var(--font-archivo)', boxShadow: '0 12px 28px -12px rgba(17,28,53,.45)' },
+            style: { height: 'auto', minHeight: 48, left: 0, right: 0, marginInline: 'auto', width: 'fit-content', maxWidth: 'calc(100% - 44px)', fontFamily: 'var(--font-archivo)' },
           }}
         />
         <SplashHider />

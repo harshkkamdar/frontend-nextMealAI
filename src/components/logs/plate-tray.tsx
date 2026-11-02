@@ -30,7 +30,7 @@ export function PlatePill({ items, saving, onOpen, onLog }: { items: PlateItem[]
           className="fixed inset-x-0 z-30 mx-auto w-full max-w-md px-3"
           style={{ bottom: 'calc(12px + var(--safe-bottom))' }}
         >
-          <div className="glass flex h-[56px] items-center rounded-full pl-1 pr-1.5">
+          <div className="tile flex h-[56px] items-center rounded-full pl-1 pr-1.5">
             <button type="button" onClick={() => { void haptic('selection'); onOpen() }} aria-label={`Your plate, ${count(items.length)}, ${formatMacroKcal(kcal)} kcal. Open the plate`} className="flex h-full min-w-0 flex-1 items-center gap-2 rounded-full pl-3 text-left">
               <ChevronUp aria-hidden="true" className="size-4 shrink-0 text-ink" />
               <span className="truncate text-body-sm font-bold text-ink tabular-nums">{count(items.length)} · {formatMacroKcal(kcal)} kcal</span>
@@ -76,7 +76,7 @@ export function PlateSheet({ open, items, meal, saving, failedNote, loggedCount,
               role="radio"
               aria-checked={m === meal}
               onClick={() => { void haptic('selection'); onMeal(m) }}
-              className={`h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold transition-transform active:scale-[.96] ${m === meal ? 'bg-ink text-cream' : 'card-glass text-ink'}`}
+              className={`h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold transition-transform active:scale-[.96] ${m === meal ? 'bg-ink text-cream' : 'tile text-ink'}`}
             >
               {m}
             </button>

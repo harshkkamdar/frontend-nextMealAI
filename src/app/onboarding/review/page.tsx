@@ -16,7 +16,7 @@ function Macro({ grams, label, color, i }: { grams: number; label: string; color
   return (
     <div className="rise rounded-[16px] bg-ink-04 px-3 py-2.5" style={{ '--i': i, '--rise-delay': '180ms' } as CSSProperties}>
       <span aria-hidden="true" className="block h-1 w-5 origin-left rounded-full motion-safe:animate-[fiqr-grow_700ms_cubic-bezier(.22,1,.36,1)_400ms_backwards]" style={{ background: color }} />
-      <p className="font-wide mt-2 text-hero tabular-nums text-ink">
+      <p className="mt-2 text-hero tabular-nums text-ink">
         {shown}<span className="ml-0.5 text-label text-ink-65" style={{ fontStretch: '100%' }}>g</span>
       </p>
       <p className="text-label font-medium text-ink-65">{label}</p>
@@ -80,7 +80,7 @@ export default function ReviewPage() {
         <PlanCard carried label="Your plan" className="p-5">
           {targets ? (
             <>
-              <p className="font-wide text-[56px] font-[800] leading-none tracking-[-0.035em] tabular-nums text-ink">{calories.toLocaleString('en-AU')}</p>
+              <p className="text-[56px] font-bold leading-none tracking-[-0.035em] tabular-nums text-ink">{calories.toLocaleString('en-AU')}</p>
               <p className="mt-1.5 text-caption font-semibold text-ink-65">calories a day</p>
               <div className="mt-4 grid grid-cols-3 gap-2">
                 <Macro i={2} grams={targets.protein} label="protein" color="var(--color-ink)" />

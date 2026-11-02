@@ -12,7 +12,7 @@ import type { SessionExercise } from '@/types/workout-session.types'
 import { DigitTiles } from './digit-tiles'
 import { clockHMS, formatKg, formatLast, sessionVolumeKg, setReps, setWeight } from './train-data'
 
-const CARD = 'rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]'
+const CARD = 'rounded-card tile'
 
 function TickIcon({ className = 'size-[18px]' }: { className?: string }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 4 4 10-10" /></svg>
@@ -64,7 +64,7 @@ export function SessionTimerCard({ elapsedSeconds, exercises, currentIndex }: { 
         <DigitTiles text={hms} label={`Time ${minutes} min ${elapsedSeconds % 60} s`} size="sm" />
         <p className="text-right">
           <span className="block text-caption font-semibold leading-none text-ink-65">Volume</span>
-          <span className="mt-1 flex items-baseline justify-end font-display text-hero font-extrabold text-ink tabular-nums"><CountUp value={sessionVolumeKg(exercises)} delay={0} /><span className="text-caption font-semibold text-ink-65">&nbsp;kg</span></span>
+          <span className="mt-1 flex items-baseline justify-end text-hero font-bold text-ink tabular-nums"><CountUp value={sessionVolumeKg(exercises)} delay={0} /><span className="text-caption font-semibold text-ink-65">&nbsp;kg</span></span>
         </p>
       </div>
       <div className="mt-3"><SetProgress exercises={exercises} currentIndex={currentIndex} /></div>
@@ -111,7 +111,7 @@ function Stepper({ label, value, unit, onStep }: { label: string; value: string;
   return (
     <div className="grid h-stepper grid-cols-[48px_minmax(0,1fr)_48px] items-center rounded-[14px] bg-ink-06">
       {button(-1)}
-      <output aria-live="polite" aria-label={`${label} ${value}`} className="whitespace-nowrap text-center text-[20px] font-extrabold text-ink tabular-nums">
+      <output aria-live="polite" aria-label={`${label} ${value}`} className="whitespace-nowrap text-center text-[20px] font-bold text-ink tabular-nums">
         {value}<small className="text-label font-semibold text-ink-65"> {unit}</small>
       </output>
       {button(1)}

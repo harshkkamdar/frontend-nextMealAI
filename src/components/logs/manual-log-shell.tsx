@@ -45,7 +45,7 @@ export function ManualLogShell({
     <div className="mx-auto w-full max-w-md px-gutter pb-[calc(112px+var(--safe-bottom))]">
       <PushedHeader title={title} onBack={() => router.back()} />
       <div className="-mx-gutter [&:not(:empty)]:mb-2"><OfflineBand queuesSaves /></div>
-      <h1 className="font-display mt-2 px-0.5 text-title text-ink">{prompt}</h1>
+      <h1 className="mt-2 px-0.5 text-title text-ink">{prompt}</h1>
       {sub ? <p className="mt-1.5 px-0.5 text-caption text-ink-65 tabular-nums">{sub}</p> : null}
       <div className="mt-5">{children}</div>
       {failed ? (
@@ -98,7 +98,7 @@ export function InlineStepper({ value, unit, onLess, onMore, lessLabel, moreLabe
       <div className="flex items-center gap-3">
         <button type="button" aria-label={lessLabel} disabled={lessDisabled} onClick={step(onLess)} className={button}><Minus className="size-5" /></button>
         <div className="min-w-0 flex-1 text-center" aria-live="polite">
-          <p className="font-display text-hero text-ink tabular-nums">{value}</p>
+          <p className="text-hero text-ink tabular-nums">{value}</p>
           <p className="mt-0.5 text-label font-medium text-ink-65">{unit}</p>
         </div>
         <button type="button" aria-label={moreLabel} disabled={moreDisabled} onClick={step(onMore)} className={button}><Plus className="size-5" /></button>
@@ -173,7 +173,7 @@ export function NumericSuffixInput({
         step={step}
         min={min}
         max={max}
-        className="font-wide h-full min-w-0 flex-1 bg-transparent text-[32px] font-bold tracking-[-0.6px] text-ink outline-none placeholder:text-ink-35 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="h-full min-w-0 flex-1 bg-transparent text-[32px] font-bold tracking-[-0.6px] text-ink outline-none placeholder:text-ink-35 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <span className="text-[17px] font-semibold text-ink-65">{suffix}</span>
     </label>

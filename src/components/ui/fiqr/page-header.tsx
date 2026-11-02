@@ -22,7 +22,7 @@ export function PageHeader({ title, eyebrow, sub, onBack, backLabel = 'Back', tr
       ) : null}
       <div className={cn('min-w-0 flex-1', onBack && 'pt-[7px]')}>
         {eyebrow ? <p className="truncate text-[12px] font-medium uppercase tracking-[1.4px] text-ink-65">{eyebrow}</p> : null}
-        <h1 className="font-display line-clamp-2 text-hero font-bold text-ink">{title}</h1>
+        <h1 className="line-clamp-2 text-hero font-bold text-ink">{title}</h1>
         {sub ? <p className="mt-1 text-caption text-ink-65">{sub}</p> : null}
       </div>
       {trailing ? <div className="shrink-0">{trailing}</div> : null}

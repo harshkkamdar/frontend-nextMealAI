@@ -186,7 +186,7 @@ export function LogList({ filterType, onBack }: LogListProps = {}) {
           title="Log"
           onBack={onBack}
           actions={visible.length > 0 && !loading ? (
-            <button type="button" onClick={selectMode ? exitSelectMode : () => setSelectMode(true)} className="glass h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]">
+            <button type="button" onClick={selectMode ? exitSelectMode : () => setSelectMode(true)} className="tile h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]">
               {selectMode ? 'Done' : 'Select'}
             </button>
           ) : undefined}
@@ -265,7 +265,7 @@ export function LogList({ filterType, onBack }: LogListProps = {}) {
       {/* Floating capsule for the delete, above the tab bar. */}
       {selectMode && selectedIds.size > 0 ? (
         <div className="fixed inset-x-0 z-40 flex justify-center px-4" style={{ bottom: 'calc(96px + var(--safe-bottom))' }}>
-          <div className="glass flex items-center gap-3 rounded-full py-1.5 pl-5 pr-1.5">
+          <div className="tile flex items-center gap-3 rounded-full py-1.5 pl-5 pr-1.5">
             <span className="text-body-sm font-semibold text-ink tabular-nums">{selectedIds.size} selected</span>
             <button type="button" onClick={handleBulkDelete} className="h-11 rounded-full bg-ink px-5 text-body-sm font-semibold text-cream transition-transform active:scale-[.96]">
               Delete

@@ -217,7 +217,7 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
         backLabel="Back to settings"
         // Always rendered (disabled until the profile loads), so the bar never changes shape mid-transition.
         actions={(
-          <button type="button" onClick={handleSave} disabled={saving || !profile} className="glass h-11 rounded-full px-4 text-body font-semibold text-ink transition-transform duration-100 enabled:active:scale-[.94] disabled:text-ink-65">
+          <button type="button" onClick={handleSave} disabled={saving || !profile} className="tile h-11 rounded-full px-4 text-body font-semibold text-ink transition-transform duration-100 enabled:active:scale-[.94] disabled:text-ink-65">
             {saving ? 'Saving…' : 'Save'}
           </button>
         )}

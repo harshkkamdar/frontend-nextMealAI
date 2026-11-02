@@ -38,14 +38,14 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
         <section className={cn(CARD, 'overflow-hidden p-4')} aria-label="Daily targets">
           <span className="text-label text-ink-65">Daily targets</span>
           <p className="mt-2 flex items-baseline gap-1.5">
-            <span className="font-display text-hero text-ink tabular-nums">{fmt(targets.calories)}</span>
+            <span className="text-hero text-ink tabular-nums">{fmt(targets.calories)}</span>
             <span className="text-body-sm font-semibold text-ink-65">kcal a day</span>
           </p>
           <div className="-mx-4 -mb-4 mt-3.5 grid grid-cols-3 border-t border-ink-06">
             {([['Protein', 'protein'], ['Carbs', 'carbs'], ['Fat', 'fat']] as const).map(([label, key], index) => (
               <div key={key} className={cn('px-4 py-3', index > 0 && 'border-l border-ink-06')}>
                 <span className="flex items-center gap-1.5 text-label text-ink-65"><HueDot macro={key} />{label}</span>
-                <p className="mt-0.5 font-display text-[20px] font-[750] tracking-[-0.015em] text-ink tabular-nums">{fmt(targets[key])}<span className="text-caption font-semibold tracking-normal text-ink-65"> g</span></p>
+                <p className="mt-0.5 text-[20px] font-[750] tracking-[-0.015em] text-ink tabular-nums">{fmt(targets[key])}<span className="text-caption font-semibold tracking-normal text-ink-65"> g</span></p>
               </div>
             ))}
           </div>

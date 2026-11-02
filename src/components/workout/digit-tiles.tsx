@@ -36,7 +36,7 @@ export function DigitTiles({ text, label, tone = 'light', size = 'lg', live }: {
               exit={reduce ? { opacity: 0 } : { rotateX: 75, opacity: 0 }}
               transition={reduce ? reducedFade : spring.tap}
               className={cn(
-                'font-wide font-bold leading-none tabular-nums [grid-area:1/1]',
+                'font-bold leading-none tabular-nums [grid-area:1/1]',
                 tone === 'light' ? (index < lead ? 'text-ink-50' : 'text-ink') : (index < lead ? 'text-cream-60' : 'text-cream'),
               )}
             >
