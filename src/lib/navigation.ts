@@ -1,11 +1,12 @@
-/** App navigation: the four tabs, how a route change is classified for motion, and in-app history. */
+/** App navigation: the five tabs, how a route change is classified for motion, and in-app history. */
 
 /** The tab bar's tabs, in order. The single source for which routes are tab roots. */
 export const TAB_ROUTES = [
   { label: 'Home', href: '/dashboard' },
   { label: 'Food', href: '/food' },
-  { label: 'Train', href: '/train' },
   { label: 'Geo', href: '/chat' },
+  { label: 'Train', href: '/train' },
+  { label: 'Check-in', href: '/check-in' },
 ] as const
 
 export const TAB_ROOTS: ReadonlySet<string> = new Set(TAB_ROUTES.map((tab) => tab.href))

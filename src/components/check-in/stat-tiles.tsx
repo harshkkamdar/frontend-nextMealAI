@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
-import { CARD, useDrawn } from './parts'
+import { CARD, TILE_LABEL } from './parts'
 
 interface StatTile {
   label: string
@@ -18,37 +18,18 @@ interface StatTile {
 /** value / target, or null when either side is missing. */
 export const ratio = (value: number | null, target: number | null) => (value === null || !target ? null : value / target)
 
-/** The track runs to 125% of target so the target is a tick, and over or under reads against it. */
-const SPAN = 1.25
-
-function Meter({ fraction, index }: { fraction: number; index: number }) {
-  const drawn = useDrawn()
-  return (
-    <span aria-hidden="true" className="relative mt-2.5 block h-[3px] rounded-full bg-ink-06">
-      <span className="absolute inset-0 overflow-hidden rounded-full">
-        <span
-          className="absolute inset-0 origin-left rounded-full bg-ink-65 transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)]"
-          style={{ transform: `scaleX(${drawn ? Math.min(SPAN, Math.max(0, fraction)) / SPAN : 0})`, transitionDelay: `${300 + index * 40}ms` }}
-        />
-      </span>
-      <span className="absolute -top-[3px] h-[9px] w-[1.5px] rounded-full bg-ink" style={{ left: `${100 / SPAN}%` }} />
-    </span>
-  )
-}
-
-/** The week in numbers: one quiet card, two columns, secondary to the weight trend above it. */
+/** The week in numbers (George's tiles): one quiet white tile split by hairlines; the caption carries the target. */
 export function StatTiles({ items, enter }: { items: StatTile[]; enter?: boolean }) {
   return (
     <div className={cn(CARD, 'grid grid-cols-2 overflow-hidden', enter && 'enter-tiles')}>
       {items.map((item, index) => (
-        <div key={item.label} className={cn('flex flex-col px-4 py-3.5', index % 2 === 1 && 'border-l border-ink-06', index > 1 && 'border-t border-ink-06')}>
-          <span className="text-label text-ink-65">{item.label}</span>
-          <span className="mt-1 flex h-6 items-baseline gap-1">
-            <span className="font-display text-[20px] font-[750] leading-none tracking-[-0.015em] text-ink tabular-nums">{item.value}</span>
-            {item.unit && item.value !== '—' ? <span className="text-[13px] font-semibold text-ink-65">{item.unit}</span> : null}
+        <div key={item.label} className={cn('flex flex-col px-[14px] py-[13px]', index % 2 === 1 && 'border-l border-ink-09', index > 1 && 'border-t border-ink-09')}>
+          <span className={TILE_LABEL}>{item.label}</span>
+          <span className="mt-[3px] flex items-baseline gap-[2px]">
+            <span className="text-[19px] font-semibold tracking-[-0.3px] text-ink tabular-nums">{item.value}</span>
+            {item.unit && item.value !== '—' ? <span className="text-[13px] font-medium text-ink-62">{item.unit}</span> : null}
           </span>
-          {item.fraction == null ? null : <Meter fraction={item.fraction} index={index} />}
-          {item.sub ? <span className="mt-1.5 block truncate text-caption text-ink-65">{item.sub}</span> : null}
+          {item.sub ? <span className="mt-[2px] block truncate text-[12.5px] text-ink-62">{item.sub}</span> : null}
         </div>
       ))}
     </div>

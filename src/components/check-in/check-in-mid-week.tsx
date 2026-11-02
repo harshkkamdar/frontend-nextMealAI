@@ -35,13 +35,13 @@ export function CheckInMidWeek({ status, current, enter, source }: { status: Che
     <div className="flex flex-col">
       <section className={cn(CARD, 'p-4', enter && 'enter-hero')} aria-label="Next check-in">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-label text-ink-65">Next check-in</span>
-          <span className="text-right text-label text-ink-65">{formatCheckInDate(status.next_check_in_date)}</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-62">Next check-in</span>
+          <span className="text-right text-[13px] text-ink-62">{formatCheckInDate(status.next_check_in_date)}</span>
         </div>
         <span className="sr-only">{status.days_to_go} {status.days_to_go === 1 ? 'day' : 'days'} to go</span>
         <div aria-hidden="true" className="mt-3 flex items-baseline gap-1.5">
-          <span className="font-display text-hero text-ink tabular-nums"><Count value={status.days_to_go} /></span>
-          <span className="text-body-sm font-semibold text-ink-65">{status.days_to_go === 1 ? 'day' : 'days'} to go</span>
+          <span className="text-[32px] font-bold leading-none tracking-[-0.6px] text-ink tabular-nums"><Count value={status.days_to_go} /></span>
+          <span className="text-[15.5px] font-medium text-ink-65">{status.days_to_go === 1 ? 'day' : 'days'} to go</span>
         </div>
         <div className="mt-3">
           <SegmentsBar filled={daysElapsed} total={7} label={`${daysElapsed} of 7 days gone`} />

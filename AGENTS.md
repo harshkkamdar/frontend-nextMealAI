@@ -14,12 +14,15 @@ Access the backend only through modules under `src/lib/api`.
 
 ## Design rules
 
+`DESIGN.md` (tokens and components) and `PRODUCT.md` (ethos, Geo) at the repo root are binding; read them first.
 Use Archivo as the only product font.
 Use ink navy `#111C35`, accent orange `#E8622A`, cream `#FDF6EC`, and card white `#FFFFFF`.
+Use `accent-ink` `#BD4A19` for orange text smaller than 19 pt bold.
 Reserve macro teal `#3E7C77` for carbs and macro ochre `#A07A3C` for fat.
 Do not introduce any other colours.
 Allow one orange primary action per screen.
 Do not add dark mode or `dark:` classes.
+No glass, blur, gradients or decorative shapes; neutral cards are flat with a hairline border.
 
 ## Architecture rules
 

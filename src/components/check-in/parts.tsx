@@ -44,20 +44,23 @@ export function useHealthSource(): string | null {
 
 export const SectionTitle = SectionHeading
 
-/** Geo's read of the week: avatar, label, a right-hand note (the week's change or the dates), the verdict. */
+/** Geo's read of the week (George): the navy card with the largest type on the screen; the data below is evidence. */
 export function GeoRead({ verdict, aside, children, className }: { verdict: string | null; aside: ReactNode; children?: ReactNode; className?: string }) {
   return (
-    <section className={cn(CARD, 'p-4', className)} aria-label="Geo's read">
-      <div className="flex items-center gap-2">
-        <GeoAvatar size={24} />
-        <span className="text-label text-ink-65">Geo&apos;s read</span>
-        <span className="ml-auto text-label text-ink-65 tabular-nums">{aside}</span>
+    <section className={cn('rounded-[22px] bg-ink p-[22px] text-cream', className)} aria-label="Geo's read">
+      <div className="flex items-center gap-[9px]">
+        <GeoAvatar size={22} onNavy />
+        <span className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Geo&apos;s read</span>
+        <span className="ml-auto text-[12px] font-medium text-cream-60 tabular-nums">{aside}</span>
       </div>
       {children}
-      {verdict ? <p className="mt-3 text-pretty text-body leading-[1.45] text-ink">{verdict}</p> : null}
+      {verdict ? <p className="mt-[14px] text-pretty text-[21px] font-semibold leading-[1.3] tracking-[-0.3px] text-cream">{verdict}</p> : null}
     </section>
   )
 }
+
+/** George's tile label: 11 / 600, uppercase, tracked. */
+export const TILE_LABEL = 'text-[11px] font-semibold uppercase tracking-[1.4px] text-ink-62'
 
 export function AskGeo({ label = 'Ask Geo about this' }: { label?: string }) {
   return <TextButton className="mt-1" onClick={() => useUIStore.getState().openSheet('geo-companion')}>{label}</TextButton>
@@ -76,7 +79,7 @@ export function TargetLedger({ targets }: { targets: Partial<Record<keyof DayTar
           <div key={key} className="flex min-h-[60px] items-center gap-2.5 border-b border-ink-06 px-4 py-2.5 last:border-b-0">
             <span className="flex flex-1 items-center gap-2 text-body font-semibold text-ink"><HueDot macro={key} />{label}</span>
             <span className="flex items-baseline gap-1.5 whitespace-nowrap tabular-nums">
-              <b className="font-display text-[20px] font-[800] tracking-[-0.015em] text-ink">{value == null ? '—' : fmt(value)}</b>
+              <b className="text-[19px] font-semibold tracking-[-0.3px] text-ink">{value == null ? '—' : fmt(value)}</b>
               {value == null ? null : <span className="text-caption font-semibold text-ink-65">{unit}</span>}
             </span>
           </div>

@@ -37,18 +37,15 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
 
   return (
     <section className={`${CARD} p-4`} aria-label="Weight trend">
-      <div className="flex items-center gap-2">
-        <span className="text-label text-ink-65">Weight</span>
-        {/* Right: where the weigh-ins come from (Q32), else how far back the line reaches. */}
-        <span className="ml-auto text-label text-ink-65">{source ?? (points.length >= 2 ? `${points.length} weeks` : null)}</span>
-      </div>
-      <div className="mt-1 flex items-baseline gap-1">
-        <span className="font-display text-[20px] font-[750] leading-none tracking-[-0.015em] text-ink tabular-nums">
-          {currentKg === null ? '—' : currentKg.toFixed(1)}
+      {/* George's header: the title left, today's weight and the week's change right; the source under it (Q32). */}
+      <div className="flex items-baseline gap-2">
+        <span className="text-[14px] font-semibold text-ink">Weight trend</span>
+        <span className="ml-auto whitespace-nowrap text-[13.5px] tabular-nums">
+          <b className="font-semibold text-ink">{currentKg === null ? '—' : `${currentKg.toFixed(1)} kg`}</b>
+          {deltaKg === null || hideDelta ? null : <span className="text-ink-65"> · {formatDelta(deltaKg)} this week</span>}
         </span>
-        {currentKg === null ? null : <span className="text-caption font-semibold text-ink-65">kg</span>}
-        {deltaKg === null || hideDelta ? null : <span className="ml-auto text-caption font-semibold text-ink-65 tabular-nums">{formatDelta(deltaKg)} kg this week</span>}
       </div>
+      {source ? <p className="mt-0.5 text-[12.5px] text-ink-62">{source}</p> : null}
 
       {ys.length === 0 ? (
         <div className="mt-4">

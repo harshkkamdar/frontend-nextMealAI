@@ -7,7 +7,9 @@ import { CheckInDue, currentTargets, type TodayContext } from '@/components/chec
 import { CheckInInsufficient } from '@/components/check-in/check-in-insufficient'
 import { CheckInMidWeek } from '@/components/check-in/check-in-mid-week'
 import { CARD, CheckInEntrance, useHealthSource } from '@/components/check-in/parts'
-import { PushedHeader } from '@/components/layout/screen-header'
+import { LargeTitleHeader } from '@/components/layout/screen-header'
+import { PersonFill } from '@/components/ui/fiqr/icons'
+import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { FailCard } from '@/components/plans/spatial-parts'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
@@ -74,16 +76,20 @@ export default function CheckInPage() {
   })
   useSyncRefetch(['logs:*'], useCallback(async () => { await Promise.all([refetch(), refetchToday()]) }, [refetch, refetchToday]))
 
-  // Reached from Home's check-in card or its "This week" button; a cold open (notification) has nothing to go back to.
+  // A tab now (George's nav); Keep and Done return to Home.
   const back = () => goBack(router, '/dashboard')
 
-  const title = !status ? 'Check-in' : status.state === 'mid_week' ? 'This week so far' : `Week ${status.week.number} check-in`
+  const title = !status ? 'Check-in' : status.state === 'mid_week' ? `Week ${status.week.number} so far` : `Week ${status.week.number} check-in`
 
   return (
-    <div className="mx-auto w-full max-w-md px-4">
-      <PushedHeader title={title} onBack={back} backLabel="Back to Home" />
+    <div className="mx-auto w-full max-w-md px-gutter">
+      <LargeTitleHeader
+        title={title}
+        subtitle={status?.week.label}
+        actions={<RoundButton aria-label="Profile and settings" onClick={() => router.push('/settings')}><PersonFill /></RoundButton>}
+      />
 
-      <div className="-mx-4 mb-2.5">
+      <div className="-mx-gutter mb-3 mt-2">
         <OfflineBand />
       </div>
 

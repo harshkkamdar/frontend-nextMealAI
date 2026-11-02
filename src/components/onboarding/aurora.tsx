@@ -1,8 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { arrivalDir } from '@/components/onboarding/depth-nav'
-import { cn } from '@/lib/utils'
+import { createContext, useContext, useEffect, type ReactNode } from 'react'
 import s from './aurora.module.css'
 
 /** A field's offset from its base, in mock px (the mock phone is 300 wide, so 3 px = 1vw), its scale and opacity. */
@@ -45,48 +43,16 @@ export function useAuroraScene(scene: SceneName) {
 /** The translucent surface for cards that sit on the fields (solid white under reduced transparency). */
 export const auroraSurface = s.surface
 
-/** The scene the last Aurora showed, so the next layout's Aurora (sign-up to setup) carries on from it. */
-let lastScene: SceneName | null = null
-
-const vw = (px: number) => `${(px / 3).toFixed(2)}vw`
-
 /**
- * Layout wrapper: the Aurora fields behind every screen in the group, kept across route changes so the colour drifts
- * from step to step instead of restarting. `isolate` makes the fixed fields (z -1) paint above the body's cream.
+ * Layout wrapper for sign-in and onboarding: plain cream (DESIGN.md: no decorative fields). The scene API is kept so
+ * screens can still name their scene; nothing is drawn for it.
  */
-export function AuroraLayout({ children, initial = 'form' }: { children: ReactNode; initial?: SceneName }) {
-  // Arriving from another Aurora screen: start where that one was and drift on, with no fade-in.
-  const [carried] = useState(() => (arrivalDir() !== null ? lastScene : null))
-  const [scene, setScene] = useState<SceneName>(carried ?? initial)
-  const [hidden, setHidden] = useState(false)
-  // The first scene is set by the screen's own effect: hold the fields still until then, so a first paint never drifts.
-  const [live, setLive] = useState(carried !== null)
-  useEffect(() => { lastScene = scene }, [scene])
-  useEffect(() => {
-    let id = requestAnimationFrame(() => { id = requestAnimationFrame(() => setLive(true)) })
-    return () => cancelAnimationFrame(id)
-  }, [])
-
-  useEffect(() => {
-    const sync = () => setHidden(document.hidden)
-    document.addEventListener('visibilitychange', sync)
-    return () => document.removeEventListener('visibilitychange', sync)
-  }, [])
-
-  const { f, s: slabs } = SCENES[scene]
+export function AuroraLayout({ children }: { children: ReactNode; initial?: SceneName }) {
   return (
-    <div className="relative isolate min-h-dvh">
-      <div data-aurora={scene} aria-hidden="true" className={cn(s.root, hidden && s.paused, !live && s.still, carried && s.carried)}>
-        {f.map(([x, y, scale = 1, opacity = 1], i) => (
-          <span key={i} className={s.wrap} style={{ transform: `translate3d(${vw(x)},${vw(y)},0) scale(${scale})`, opacity }}>
-            <i className={cn(s.f, [s.f1, s.f2, s.f3, s.f4][i])} />
-          </span>
-        ))}
-        {slabs.map(([x, y, r], i) => (
-          <span key={i} className={cn(s.slab, i ? s.s2 : s.s1)} style={{ transform: `translate3d(${vw(x)},${vw(y)},0) rotate(${r}deg)` }} />
-        ))}
-      </div>
-      <SetScene.Provider value={setScene}>{children}</SetScene.Provider>
+    <div className="relative min-h-dvh bg-cream">
+      <SetScene.Provider value={noScene}>{children}</SetScene.Provider>
     </div>
   )
 }
+
+const noScene = () => {}

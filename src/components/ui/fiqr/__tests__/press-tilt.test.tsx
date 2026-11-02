@@ -29,15 +29,16 @@ function setup() {
 afterEach(() => { env.reduce = false })
 
 describe('usePressTilt', () => {
-  it('tilts toward the finger while pressed and springs back flat on release', async () => {
+  it('sinks a little while pressed, never tilts, and springs back on release', async () => {
     const { el, view } = setup()
     fireEvent.pointerDown(el, { clientX: 100, clientY: 0, pointerType: 'touch' })
     await frames(200)
-    // Pressed at the top edge: the top sinks by half the max tilt.
-    expect(rotateX(el)).toBeCloseTo(2.5, 1)
+    // DESIGN.md section 8: no tilt, only a slight press.
+    expect(rotateX(el)).toBe(0)
+    expect(el.style.transform).toMatch(/scale\(0\.98/)
     fireEvent.pointerUp(el)
     await frames(600)
-    expect(Math.abs(rotateX(el))).toBeLessThan(0.05)
+    expect(el.style.transform).not.toMatch(/scale\(0\.98/)
     view.unmount()
   })
 

@@ -2,7 +2,7 @@
 
 import { useRef, type PointerEvent } from 'react'
 import { animate, useReducedMotion } from 'framer-motion'
-import { TILT_SLOP_PX, spring, tiltFor } from '@/lib/motion'
+import { TILT_SLOP_PX, spring } from '@/lib/motion'
 
 /** Press in: 140 ms, a strong ease-out (Emil's ease-out quint), so the card answers the finger at once. */
 const PRESS_IN = { duration: 0.14, ease: [0.23, 1, 0.32, 1] as const }
@@ -21,13 +21,13 @@ export function usePressTilt<T extends HTMLElement>(max = 2.5) {
   const lean = (e: PointerEvent<T>) => {
     const p = press.current
     if (!p || !ref.current || !p.rect.width || !p.rect.height) return
-    const { rotateX, rotateY } = tiltFor((e.clientX - p.rect.left) / p.rect.width, (e.clientY - p.rect.top) / p.rect.height, max)
-    animate(ref.current, { rotateX, rotateY, scale: 0.985, transformPerspective: 700 }, PRESS_IN)
+    // DESIGN.md section 8: no tilt; a pressed card only sinks a little.
+    animate(ref.current, { scale: 0.985 }, PRESS_IN)
   }
   const release = () => {
     if (!press.current || !ref.current) return
     press.current = null
-    animate(ref.current, { rotateX: 0, rotateY: 0, scale: 1 }, spring.tap)
+    animate(ref.current, { scale: 1 }, spring.tap)
   }
 
   return {

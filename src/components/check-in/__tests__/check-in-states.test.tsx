@@ -114,7 +114,7 @@ describe('check-in states', () => {
   it('renders the due state and only it applies the proposed targets', async () => {
     const { container, refetch } = renderStatus(baseStatus)
 
-    expect(screen.getByText('Week 6 check-in')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Week 6 check-in' })).toBeInTheDocument()
     expect(container.querySelector('polyline')).toHaveAttribute('stroke', 'var(--color-ink)')
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
@@ -160,7 +160,7 @@ describe('check-in states', () => {
     }
     const { container } = renderStatus(insufficient)
 
-    expect(screen.getByText('3 of 7 days logged')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: '3 of 7 days logged' })).toBeInTheDocument()
     expect(container.querySelector('polyline')).toHaveAttribute('stroke', 'var(--color-ink-35)')
 
     fireEvent.click(screen.getByRole('button', { name: 'Keep current targets' }))

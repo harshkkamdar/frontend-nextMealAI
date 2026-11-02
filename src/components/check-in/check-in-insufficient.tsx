@@ -25,22 +25,17 @@ export function CheckInInsufficient({ status, enter, source, onDone }: { status:
 
   return (
     <div className="flex flex-col">
-      {status.verdict ? <GeoRead verdict={status.verdict} aside={status.week.label} className={cn(enter && 'enter-hero')} /> : null}
+      {status.verdict ? <GeoRead verdict={status.verdict} aside={null} className={cn(enter && 'enter-hero')} /> : null}
 
-      <section className={cn(CARD, 'mt-2.5 p-4', enter && 'enter-hero')} aria-label="Days logged">
+      <section className={cn(CARD, 'mt-[10px] px-[16px] py-[14px]', enter && 'enter-hero')} aria-label="Days logged">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-label text-ink-65">Days logged</span>
-          <span className="text-label text-ink-65">{status.days_needed} needed</span>
-        </div>
-        <span className="sr-only">{status.days_logged} of 7 days logged</span>
-        <div aria-hidden="true" className="mt-3 flex items-baseline gap-1.5">
-          <span className="font-display text-hero text-ink tabular-nums"><Count value={status.days_logged} /></span>
-          <span className="text-body-sm font-semibold text-ink-65">of 7 days</span>
+          <span className="text-[15.5px] font-semibold text-ink tabular-nums"><Count value={status.days_logged} /> of 7 days logged</span>
+          <span className="text-[13px] text-ink-62">{status.days_needed} needed</span>
         </div>
         <div className="mt-3">
           <SegmentsBar filled={status.days_logged} total={7} label={`${status.days_logged} of 7 days logged`} />
         </div>
-        <p className="mt-3 text-pretty text-body leading-[1.45] text-ink">
+        <p className="mt-[10px] text-pretty text-[13px] leading-[1.4] text-ink-65">
           {capitalise(numberWord(status.days_needed))} days next week gives me a real answer.
         </p>
       </section>
@@ -55,7 +50,7 @@ export function CheckInInsufficient({ status, enter, source, onDone }: { status:
             { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked`, fraction: ratio(week.sleep_avg_h, 8) },
           ]}
         />
-        <p className="mx-1.5 text-caption text-ink-65">
+        <p className="rounded-[16px] bg-ink-06 px-[14px] py-3 text-[13px] leading-[1.4] text-ink-65">
           Food averages are hidden. {capitalise(numberWord(status.days_logged))} {status.days_logged === 1 ? 'day isn’t' : 'days aren’t'} a week.
         </p>
       </div>

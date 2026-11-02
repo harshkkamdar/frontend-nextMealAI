@@ -5,22 +5,9 @@ import { useRouter } from 'next/navigation'
 import { motion, useReducedMotion } from 'framer-motion'
 import { toast } from 'sonner'
 import { emphasizeGeoMeasurements, formatDashboardDate, getDashboardGeoLine } from '@/components/dashboard/dashboard-helpers'
-import {
-  CheckInCard,
-  HeroCard,
-  HomeEntrance,
-  HomeErrorCard,
-  HomeSkeleton,
-  MealsCard,
-  SleepTile,
-  StepsTile,
-  WATER_GOAL_GLASSES,
-  WaterTile,
-  WeightTile,
-  type HealthSource,
-  type HeroAction,
-} from '@/components/dashboard/home-cards'
-import { geoAction, mealRows, sleepTile, stepsTile, waterGlassesToday, weightTile } from '@/components/dashboard/home-data'
+import { HomeEntrance, HomeErrorCard, WATER_GOAL_GLASSES, weightDeltaText } from '@/components/dashboard/home-cards'
+import { CheckInDueRow, HomeHeader, HomeSkeleton } from '@/components/dashboard/home-today'
+import { geoAction, sleepTile, stepsTile, waterGlassesToday, weightTile } from '@/components/dashboard/home-data'
 import { useHealthSource } from '@/components/dashboard/health-week'
 import { logWithUndo } from '@/components/dashboard/log-with-undo'
 import { MacroSheet } from '@/components/dashboard/macro-sheet'
@@ -28,11 +15,13 @@ import { QuickLogSheet, type QuickLogType } from '@/components/dashboard/quick-l
 import { SuggestionCard } from '@/components/dashboard/suggestion-card'
 import { WorkoutCard } from '@/components/dashboard/workout-card'
 import { LOG_SHEET } from '@/components/layout/tab-bar'
-import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { ChartFill, PersonFill } from '@/components/ui/fiqr/icons'
-import { RoundButton } from '@/components/ui/fiqr/round-button'
+import { GeoLine } from '@/components/ui/fiqr/geo-line'
+import { MacroBar } from '@/components/ui/fiqr/macro-bar'
+import { MetricStrip } from '@/components/ui/fiqr/metric-strip'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { SectionLabel } from '@/components/ui/fiqr/section-label'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useFirstPaint } from '@/lib/use-first-paint'
@@ -46,7 +35,7 @@ import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { getSuggestions } from '@/lib/api/suggestions.api'
-import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { getInProgressSession, startWorkoutSession } from '@/lib/api/workout-sessions.api'
 import type { MacroKey } from '@/lib/macros'
 import { computeNudges } from '@/lib/nudges'
 import { todayLocalISO } from '@/lib/timezone'
@@ -55,6 +44,7 @@ import type { Log, LogsSummary } from '@/types/logs.types'
 import type { MealPlan, Plan, WorkoutPlan } from '@/types/plans.types'
 import type { Profile } from '@/types/profile.types'
 import type { Suggestion } from '@/types/suggestions.types'
+import type { WorkoutSession } from '@/types/workout-session.types'
 
 const EMPTY_LOGS: Log[] = []
 const EMPTY_PLANS: Plan[] = []
@@ -67,6 +57,8 @@ interface DashboardData {
   logs: Log[]
   checkIn: DashboardCheckIn | null
   status: CheckInStatus | null
+  /** An open workout: Next Up offers Resume. */
+  inProgress: WorkoutSession | null
 }
 
 async function withFallback<T>(request: Promise<T>, fallback: T, failures?: unknown[]): Promise<T> {
@@ -92,30 +84,28 @@ export default function DashboardPage() {
   const health = useHealthSource()
   const enter = useFirstPaint('dashboard')
 
-  // Six requests in parallel at most (Q24); suggestions follow once the screen is drawn.
+  // All in parallel; suggestions follow once the screen is drawn.
   const fetchAll = useCallback(async (): Promise<DashboardData> => {
     const failures: unknown[] = []
-    const [summary, plans, profile, logs, checkIn, status] = await Promise.all([
+    const [summary, plans, profile, logs, checkIn, status, inProgress] = await Promise.all([
       withFallback(getLogsSummary('day'), null, failures),
       withFallback(getPlans({ active_only: true }), [] as Plan[], failures),
       withFallback(getProfile(), null, failures),
-      withFallback(getLogs({ days: 8, limit: 500 }), [] as Log[]),
+      // The API caps a page at 100 rows; a larger limit is rejected with 400.
+      withFallback(getLogs({ days: 8, limit: 100 }), [] as Log[]),
       withFallback(getDashboardCheckIn().then((response) => response.check_in), null),
       withFallback(getCheckInStatus(), null),
+      withFallback(getInProgressSession(), null),
     ])
     // Targets, plan and profile all failing means Home has nothing true to show; report it instead of zeros.
     if (failures.length === 3) throw failures[0]
-    return { summary, plans, profile, logs, checkIn, status }
+    return { summary, plans, profile, logs, checkIn, status, inProgress }
   }, [])
 
   const { data, loading, savedAt, refetch } = useCachedQuery('dashboard', fetchAll, [today])
   const refresh = useCallback(() => { void refetch() }, [refetch])
   const fetchSuggestions = useCallback(() => getSuggestions({ status: 'pending' }).catch(() => [] as Suggestion[]), [])
   const { data: suggestions } = useCachedQuery('dashboard-suggestions', fetchSuggestions, [today, !!data])
-
-  // Glasses added with the tile's + before the refetch lands; tied to the data they were added on, so fresh data replaces them.
-  const [waterExtra, setWaterExtra] = useState<{ on: DashboardData | null; n: number }>({ on: null, n: 0 })
-  const addWater = (n: number) => setWaterExtra((prev) => ({ on: data, n: (prev.on === data ? prev.n : 0) + n }))
 
   useEffect(() => {
     window.addEventListener('workout:plan-deactivated', refresh)
@@ -154,39 +144,23 @@ export default function DashboardPage() {
   const steps = stepsTile(logs, today)
   const weight = weightTile(logs, profile?.current_weight_kg, today)
   const sleep = sleepTile(logs, today)
-  const water = waterGlassesToday(logs, today) + (waterExtra.on === data ? waterExtra.n : 0)
-  const source: HealthSource | null = health.label && health.connected ? { label: health.label, syncedAt: health.syncedAt } : null
+  const water = waterGlassesToday(logs, today)
 
   const openLogSheet = () => useUIStore.getState().openSheet(LOG_SHEET)
   const openGeo = () => useUIStore.getState().openSheet('geo-companion')
 
-  const addGlass = () => {
-    addWater(1)
-    void logWithUndo(
-      { type: 'water', payload: { glasses: 1 }, source: 'quick_log' },
-      `Glass added, ${water + 1} of ${WATER_GOAL_GLASSES}`,
-      refresh,
-      () => addWater(-1),
-    ).then((ok) => { if (!ok) addWater(-1) })
-  }
 
+
+  // Geo's one-tap suggestion: log a usual food again. "Log a meal" is already the screen's orange action.
   const suggested = data ? geoAction(logs, today, { kcal: targets.calories - (day?.calories ?? 0), protein: targets.protein - (day?.protein ?? 0) }) : null
-  let action: HeroAction | null = null
-  if (suggested?.kind === 'log-meal') {
-    action = { label: 'Log a meal', onRun: openLogSheet }
-  } else if (suggested?.kind === 'relog') {
-    const short = suggested.name.split(',')[0]
-    action = {
-      label: `Log ${short}`,
-      ariaLabel: `Log ${suggested.name} again, ${suggested.protein} g protein`,
-      busy: geoBusy,
-      onRun: () => {
-        setGeoBusy(true)
-        void logWithUndo(suggested.input, `${short} logged to Snack`, refresh, () => {}).finally(() => setGeoBusy(false))
-      },
-      onMore: openGeo,
-    }
+  const relog = suggested?.kind === 'relog' ? suggested : null
+  const relogShort = relog?.name.split(',')[0] ?? ''
+  const runRelog = () => {
+    if (!relog) return
+    setGeoBusy(true)
+    void logWithUndo(relog.input, `${relogShort} logged to Snack`, refresh, () => {}).finally(() => setGeoBusy(false))
   }
+  const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? null
 
   const startWorkout = async (plan: WorkoutPlan, dayIndex: number) => {
     try {
@@ -198,91 +172,120 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-md px-4">
-      <LargeTitleHeader
-        title="Today"
-        subtitle={formatDashboardDate(today)}
-        actions={(
-          <>
-            {checkInDue ? null : <RoundButton aria-label="This week" onClick={() => router.push('/check-in')}><ChartFill /></RoundButton>}
-            <RoundButton aria-label="Settings" onClick={() => router.push('/settings')}><PersonFill /></RoundButton>
-          </>
-        )}
-      />
+    <div className="relative mx-auto w-full max-w-md px-gutter">
+      <HomeHeader date={formatDashboardDate(today)} name={firstName} onProfile={() => router.push('/settings')} />
 
-      <div className="-mx-4 mt-3">
+      <div className="-mx-gutter mt-2">
         <OfflineBand />
       </div>
 
-      <div className="mt-4 pb-4">
+      <div className="pb-4">
         {!data && loading ? <HomeSkeleton /> : !data ? (
-          <HomeErrorCard savedAt={savedAt} onRetry={refresh} />
+          <div className="mt-4"><HomeErrorCard savedAt={savedAt} onRetry={refresh} /></div>
         ) : (
           <HomeEntrance.Provider value={enter}>
-            {/* Cold start: Home settles forward from 1.04 while the ring draws, once per session (Q23). */}
-            <motion.div
-              className="flex flex-col gap-[10px]"
-              initial={enter && !reduce ? { opacity: 0, scale: 1.04 } : false}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ scale: { type: 'spring', stiffness: 260, damping: 30 }, opacity: { duration: 0.22, ease: 'easeOut' } }}
-            >
-              {checkInDue && data.status ? (
-                <CheckInCard weekLabel={data.status.week.label} daysLogged={data.status.days_logged ?? null} onOpen={() => router.push('/check-in')} />
-              ) : null}
-
-              <HeroCard
-                calories={{ current: day?.calories ?? 0, target: targets.calories }}
-                macros={{
-                  protein: [day?.protein ?? 0, targets.protein],
-                  carbs: [day?.carbs ?? 0, targets.carbs],
-                  fat: [day?.fat ?? 0, targets.fat],
-                }}
-                geoLine={emphasizeGeoMeasurements(geoLine)}
-                action={action}
-                onOpenMacro={setActiveMacro}
-              />
-
-              <div className={cn('grid grid-cols-2 gap-[10px]', enter && 'enter-tiles')}>
-                <WaterTile glasses={water} onOpen={() => setQuickLog('water')} onAdd={addGlass} />
-                <WeightTile kg={weight.kg} weekDelta={weight.weekDelta} onLog={() => setQuickLog('weight')} />
-                <StepsTile
-                  today={steps.today}
-                  yesterday={steps.yesterday}
-                  source={source}
-                  connectLabel={health.connected === false ? health.label : null}
-                  onConnect={() => setConnectOpen(true)}
-                  onOpen={() => router.push('/dashboard/steps')}
-                />
-                <SleepTile hours={sleep.hours} nights={sleep.nights} source={source} onOpen={() => (sleep.hours === null ? setQuickLog('sleep') : router.push('/dashboard/sleep'))} />
+            <motion.div initial={enter && !reduce ? { opacity: 0 } : false} animate={{ opacity: 1 }} transition={{ duration: 0.24, ease: 'easeOut' }}>
+              {/* Geo's read leads the screen (PRODUCT.md ethos 1); the divider under it is George's. */}
+              <div className="border-b border-ink-09">
+                <GeoLine
+                  onOpen={openGeo}
+                  thinking={geoBusy}
+                  action={relog ? (
+                    <button
+                      type="button"
+                      onClick={runRelog}
+                      disabled={geoBusy}
+                      aria-label={`Log ${relog.name} again, ${relog.protein} g protein`}
+                      className="-ml-2 min-h-11 px-2 text-[15px] font-semibold text-ink underline decoration-ink-20 decoration-1 underline-offset-4 disabled:text-ink-35"
+                    >
+                      Log {relogShort} again
+                    </button>
+                  ) : null}
+                >
+                  {emphasizeGeoMeasurements(geoLine)}
+                </GeoLine>
               </div>
 
-              <div className={cn('flex flex-col gap-[10px]', enter && 'enter-rows')}>
+              {checkInDue && data.status ? (
+                <CheckInDueRow className="mt-4" weekLabel={data.status.week.label} daysLogged={data.status.days_logged ?? null} onOpen={() => router.push('/check-in')} />
+              ) : null}
+
+              <section aria-label="Today's targets" className={cn('mt-5', enter && 'enter-rows')}>
+                <SectionLabel>Today&apos;s targets</SectionLabel>
+                <div className="mt-[10px] flex flex-col gap-[8px]">
+                  <MacroBar name="Calories" lead current={day?.calories ?? 0} target={targets.calories} onClick={() => setActiveMacro('calories')} />
+                  <MacroBar name="Protein" unit="g" current={day?.protein ?? 0} target={targets.protein} onClick={() => setActiveMacro('protein')} />
+                  <MacroBar name="Carbs" unit="g" current={day?.carbs ?? 0} target={targets.carbs} onClick={() => setActiveMacro('carbs')} />
+                  <MacroBar name="Fat" unit="g" current={day?.fat ?? 0} target={targets.fat} onClick={() => setActiveMacro('fat')} />
+                </div>
+              </section>
+
+              <PrimaryButton type="button" className="mt-4" icon="+" trailing="Scan · Search" onClick={openLogSheet}>Log food</PrimaryButton>
+
+              <div className="mt-4">
                 <WorkoutCard
                   workoutPlan={workoutPlan}
                   today={today}
+                  inProgress={data.inProgress}
                   onStart={(plan, dayIndex) => void startWorkout(plan, dayIndex)}
+                  onResume={(session) => router.push(`/train/session?id=${session.id}`)}
                   onSeeProgram={() => router.push('/train')}
                   onAskGeo={openGeo}
                 />
-
-                <section className="mt-2">
-                  <h2 className="mb-2 px-1 text-caption font-semibold text-ink-65">Meals</h2>
-                  <MealsCard rows={mealRows(logs, today)} onOpen={() => router.push('/food')} onLog={openLogSheet} />
-                </section>
-
-                {(profile?.daily_targets_missing_fields?.length ?? 0) > 0 ? (
-                  <button type="button" onClick={() => router.push('/settings/profile')} className="flex min-h-16 items-center rounded-[22px] card-glass px-4 text-left active:scale-[.98]">
-                    <span className="flex-1">
-                      <span className="block text-body font-semibold text-ink">Add your height</span>
-                      <span className="block text-caption text-ink-65">Geo needs it to set your targets</span>
-                    </span>
-                  </button>
-                ) : null}
-
-                {pendingSuggestion ? (
-                  <SuggestionCard suggestion={pendingSuggestion} onAction={() => setHiddenSuggestionIds((ids) => [...ids, pendingSuggestion.id])} />
-                ) : null}
               </div>
+
+              <MetricStrip
+                className="mt-4"
+                items={[
+                  {
+                    label: 'Weight',
+                    value: weight.kg !== null ? weight.kg.toFixed(1) : '—',
+                    unit: weight.kg !== null ? 'kg' : undefined,
+                    sub: weightDeltaText(weight.weekDelta) ?? 'Log today',
+                    onClick: () => setQuickLog('weight'),
+                    ariaLabel: weight.kg !== null ? `Weight ${weight.kg.toFixed(1)} kg, log weight` : 'Log weight',
+                  },
+                  {
+                    label: 'Sleep',
+                    value: sleep.hours !== null ? sleep.hours.toFixed(1) : '—',
+                    unit: sleep.hours !== null ? 'h' : undefined,
+                    sub: sleep.hours !== null ? 'last night' : 'Not logged',
+                    onClick: () => (sleep.hours === null ? setQuickLog('sleep') : router.push('/dashboard/sleep')),
+                    ariaLabel: sleep.hours !== null ? `Sleep ${sleep.hours.toFixed(1)} hours, open the week` : 'Log sleep',
+                  },
+                  {
+                    label: 'Steps',
+                    value: steps.today !== null ? steps.today.toLocaleString('en-US') : '—',
+                    sub: health.connected === false && health.label ? 'Connect' : steps.today !== null ? 'today' : 'No data',
+                    onClick: () => (health.connected === false && health.label ? setConnectOpen(true) : router.push('/dashboard/steps')),
+                    ariaLabel: steps.today !== null ? `Steps ${steps.today}, open the week` : 'Steps, open the week',
+                  },
+                  {
+                    label: 'Water',
+                    value: String(water),
+                    unit: `/${WATER_GOAL_GLASSES}`,
+                    sub: 'glasses',
+                    onClick: () => setQuickLog('water'),
+                    ariaLabel: `Water ${water} of ${WATER_GOAL_GLASSES} glasses, log water`,
+                  },
+                ]}
+              />
+
+              {(profile?.daily_targets_missing_fields?.length ?? 0) > 0 ? (
+                <button type="button" onClick={() => router.push('/settings/profile')} className="mt-4 flex min-h-14 w-full items-center rounded-[16px] border border-ink-12 bg-card px-4 text-left active:bg-ink-04">
+                  <span className="flex-1">
+                    <span className="block text-body font-semibold text-ink">Add your height</span>
+                    <span className="block text-caption text-ink-65">Geo needs it to set your targets</span>
+                  </span>
+                  <span aria-hidden="true" className="text-ink-50">›</span>
+                </button>
+              ) : null}
+
+              {pendingSuggestion ? (
+                <div className="mt-4">
+                  <SuggestionCard suggestion={pendingSuggestion} onAction={() => setHiddenSuggestionIds((ids) => [...ids, pendingSuggestion.id])} />
+                </div>
+              ) : null}
             </motion.div>
 
             <MacroSheet

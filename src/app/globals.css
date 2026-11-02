@@ -1,10 +1,14 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* FIQR design system: DESIGN.md (tokens from George's FIQR design reference). Class names from the earlier build are
+   kept so every screen picks up the system from here; their values are now flat, solid and hairline-bordered. */
 @theme inline {
   /* FIQR base colours — the only ones allowed */
   --color-ink: #111C35;
   --color-accent: #E8622A;
+  /* Orange text under 19 pt bold: plain accent on cream is 3.1:1 (fails AA); this is 4.7:1. */
+  --color-accent-ink: #BD4A19;
   --color-cream: #FDF6EC;
   --color-card: #FFFFFF;
   --color-macro-teal: #3E7C77;
@@ -12,23 +16,25 @@
   /* derived opacities (ink over cream) */
   --color-ink-80: rgba(17,28,53,.8);
   --color-ink-62: rgba(17,28,53,.62);
-  /* Secondary text. Was .65, the lightest ink passing 4.5:1 on plain cream; raised to .76 so it stays AA over the
-     Spatial atmosphere fields (owner 27 Oct 2026). Name kept for its call sites. */
-  --color-ink-65: rgba(17,28,53,.76);
+  /* Secondary text: 5.3:1 on cream. */
+  --color-ink-65: rgba(17,28,53,.65);
   --color-ink-60: rgba(17,28,53,.6);
   --color-ink-55: rgba(17,28,53,.55);
   --color-ink-50: rgba(17,28,53,.5);
   --color-ink-35: rgba(17,28,53,.35);
+  --color-ink-20: rgba(17,28,53,.2);
   --color-ink-16: rgba(17,28,53,.16);
   --color-ink-12: rgba(17,28,53,.12);
   --color-ink-10: rgba(17,28,53,.1);
   --color-ink-09: rgba(17,28,53,.09);
   --color-ink-08: rgba(17,28,53,.08);
+  --color-ink-06: rgba(17,28,53,.06);
+  --color-ink-04: rgba(17,28,53,.04);
   --color-cream-60: rgba(253,246,236,.6);
   --color-cream-55: rgba(253,246,236,.55);
   --color-cream-22: rgba(253,246,236,.22);
   --color-accent-10: rgba(232,98,42,.10);
-  /* compatibility aliases used by existing screens; retire as screens are redesigned */
+  /* compatibility aliases used by existing screens */
   --color-background: #FDF6EC;
   --color-surface: #FFFFFF;
   --color-surface-hover: rgba(17,28,53,.04);
@@ -36,44 +42,43 @@
   --color-accent-hover: #E8622A;
   --color-accent-light: rgba(232,98,42,.10);
   --color-text-primary: #111C35;
-  --color-text-secondary: rgba(17,28,53,.76);
-  --color-text-tertiary: rgba(17,28,53,.76);
+  --color-text-secondary: rgba(17,28,53,.65);
+  --color-text-tertiary: rgba(17,28,53,.65);
   --color-success: #3E7C77;
-  --color-info: rgba(17,28,53,.76);
+  --color-info: rgba(17,28,53,.65);
   --color-warning: #A07A3C;
   --color-purple: #3E7C77;
-  --color-destructive: #E8622A;
+  --color-destructive: #BD4A19;
   /* shadcn token names still referenced by src/components/ui and the log forms */
   --color-primary: #E8622A;
   --color-primary-foreground: #FDF6EC;
   --color-secondary: rgba(17,28,53,.08);
   --color-secondary-foreground: #111C35;
   --color-muted: rgba(17,28,53,.08);
-  --color-muted-foreground: rgba(17,28,53,.76);
+  --color-muted-foreground: rgba(17,28,53,.65);
   --color-card-foreground: #111C35;
   --color-input: rgba(17,28,53,.12);
   --color-ring: #E8622A;
 
-  /* page gutter as a spacing step, so -mx-gutter bleeds to the screen edge (Spatial sizing: 16 at 390 pt) */
-  --spacing-gutter: 16px;
+  /* Page gutter (George: 22 pt), as a spacing step so -mx-gutter bleeds to the screen edge. */
+  --spacing-gutter: 22px;
 
-  /* Spatial Depth sizing at 390 pt (SPATIAL-BUILD "Sizing", mocks/journey-today.html sizing spec). Type: text-<role>. */
-  --text-title: 30px;      --text-title--line-height: 1.05;  --text-title--letter-spacing: -0.02em; --text-title--font-weight: 800;
-  --text-hero: 24px;       --text-hero--line-height: 1.05;   --text-hero--letter-spacing: -0.02em;  --text-hero--font-weight: 800;
-  --text-headline: 18px;   --text-headline--line-height: 1.2; --text-headline--font-weight: 700;
-  --text-body: 16px;       --text-body--line-height: 1.35;
-  --text-body-sm: 15px;    --text-body-sm--line-height: 1.35;
-  --text-caption: 13px;    --text-caption--line-height: 1.3;
+  /* Type roles (DESIGN.md section 2). */
+  --text-title: 24px;      --text-title--line-height: 1.15;  --text-title--letter-spacing: -0.02em;  --text-title--font-weight: 700;
+  --text-hero: 28px;       --text-hero--line-height: 1.1;    --text-hero--letter-spacing: -0.021em; --text-hero--font-weight: 700;
+  --text-headline: 18px;   --text-headline--line-height: 1.25; --text-headline--font-weight: 700;
+  --text-body: 15.5px;     --text-body--line-height: 1.4;
+  --text-body-sm: 14px;    --text-body-sm--line-height: 1.4;
+  --text-caption: 13px;    --text-caption--line-height: 1.35;
   --text-label: 12px;      --text-label--line-height: 1.3;  --text-label--font-weight: 600;
   --text-tab: 11px;        --text-tab--line-height: 1.2;
-  /* Heights (every target stays >= 44): list rows 56-60, buttons 50, chips 44, steppers 56, fields 60, tile min 128. */
-  --spacing-row: 58px;
-  --spacing-btn: 50px;
+  /* Heights (every target stays >= 44). */
+  --spacing-row: 56px;
+  --spacing-btn: 56px;
   --spacing-chip: 44px;
   --spacing-stepper: 56px;
-  --spacing-field: 60px;
-  --spacing-tile: 128px;
-  /* Rings: hero 112, macro detail 84, mini 60. */
+  --spacing-field: 56px;
+  --spacing-tile: 112px;
   --spacing-ring: 112px;
   --spacing-ring-md: 84px;
   --spacing-ring-sm: 60px;
@@ -81,28 +86,26 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-xl: 16px;
   --radius-btn: 18px;
   --radius-btn-secondary: 15px;
   --radius-tile: 16px;
   --radius-feature: 22px;
   --radius-full: 9999px;
-
-  /* FIQR v2 (docs/redesign/design-system.md): concentric radii, one soft shadow. Spatial sizing: card 22, tile 20, sheet 38. */
-  --radius-card: 22px;
-  --radius-bento: 20px;
-  --radius-row: 16px;
+  --radius-card: 16px;
+  --radius-bento: 16px;
+  --radius-row: 14px;
   --radius-control: 14px;
-  --radius-sheet: 38px;
-  --shadow-card: 0 1px 2px rgba(17,28,53,.04), 0 8px 24px rgba(17,28,53,.06);
-  --shadow-glass: inset 0 1px 0 rgba(255,255,255,.9), inset 0 0 0 .5px rgba(255,255,255,.6), 0 8px 24px rgba(17,28,53,.10);
-  --color-ink-04: rgba(17,28,53,.04);
-  --color-ink-06: rgba(17,28,53,.06);
-  --color-ink-20: rgba(17,28,53,.2);
+  --radius-sheet: 28px;
 
+  /* Neutral surfaces cast no shadow: a 1 pt ink-12 ring stands in for the tile border. Only the primary action and the
+     Geo button are raised. */
+  --shadow-card: 0 0 0 1px rgba(17,28,53,.12);
+  --shadow-glass: 0 0 0 1px rgba(17,28,53,.12);
   --shadow-action: 0 8px 20px rgba(232,98,42,.26);
   --shadow-raised: 0 6px 16px rgba(17,28,53,.28);
-  /* Left-edge shadow on the page in front of a push or pop slide (motion-feel 3c-native). */
+  --shadow-sheet: 0 -8px 24px rgba(17,28,53,.12);
+  /* Left-edge shadow on the page in front of a push or pop slide. */
   --shadow-push: -12px 0 32px rgba(17,28,53,.10);
 
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
@@ -111,12 +114,13 @@
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  /* Inset sheets float this far above the screen bottom (8 pt + safe area); they cover the tab bar. */
+  /* Inset sheets float this far above the screen bottom; they cover the nav bar. */
   --nav-clearance: calc(8px + var(--safe-bottom));
-  /* Scroll content ends this far up so the floating tab bar never covers it at rest (critic fix 7):
-     10 pt bar offset + 52 pt bar + 44 pt breathing room. */
-  --tabbar-clearance: calc(106px + var(--safe-bottom));
-  --gutter: 16px;
+  /* Scroll content ends this far up so the nav bar (74 pt + the safe area) never covers it at rest. */
+  --tabbar-clearance: calc(98px + var(--safe-bottom));
+  --gutter: 22px;
+  --surface-card: #FFFFFF;
+  --shadow-card-glass: 0 0 0 1px rgba(17,28,53,.12);
 }
 
 @layer base {
@@ -125,9 +129,9 @@
   /* App, not a web page: no scrollbar track, like native screens. Scrolling and the iOS scroll indicator are unchanged. */
   html { scrollbar-width: none; }
   html::-webkit-scrollbar { display: none; }
-  body { @apply bg-background text-text-primary font-sans antialiased; }
+  body { @apply bg-background text-text-primary font-sans antialiased; font-variant-numeric: tabular-nums; }
   /* iOS 18 WebKit's UA sheet gives buttons align-items: flex-start, so a flex-col button shrink-wraps its rows and
-     full-width children (macro dots, tile progress bars) collapse to 0 wide; reset to the initial value Chromium uses. */
+     full-width children (bars) collapse to 0 wide; reset to the initial value Chromium uses. */
   button { align-items: normal; }
   /* The route frame moves focus to a new page's heading (or the page) after a push or pop, for screen readers and the
      keyboard; that landing spot is not a control, so it draws no ring. */
@@ -151,45 +155,34 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .px-gutter { padding-left: var(--gutter); padding-right: var(--gutter); }
-  /* Controls-layer material. Opaque by default; glass only where applyGlassMode() turned it on. */
-  .glass { background: rgba(255,255,255,.96); box-shadow: var(--shadow-glass); }
-  .glass-cream { background: rgba(253,246,236,.98); box-shadow: var(--shadow-glass); }
-  /* Round header button glass (Spatial mock .back): clearer than the tab bar's glass, white rim and a soft drop. */
-  .glass-btn { background: rgba(255,255,255,.96); box-shadow: inset 0 1px 0 #FFFFFF, 0 0 0 .5px rgba(17,28,53,.1), 0 6px 16px -8px rgba(17,28,53,.3); }
-  html[data-glass="on"] .glass-btn { background: rgba(255,255,255,.6); -webkit-backdrop-filter: blur(14px) saturate(1.8); backdrop-filter: blur(14px) saturate(1.8); }
-  html[data-transparency="reduced"] .glass-btn { background: var(--color-card); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  html[data-glass="on"] .glass { background: rgba(255,255,255,.72); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }
-  /* Reduced transparency (system setting, or the native flag via applyGlassMode): solid surfaces, no blur. */
-  html[data-transparency="reduced"] .glass, html[data-transparency="reduced"] .glass-cream { background: var(--color-card); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  html[data-transparency="reduced"] .glass-cream { background: var(--color-cream); }
-  html[data-glass="on"] .glass-cream { background: rgba(253,246,236,.86); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }
-  /* Spatial content card (Q3 relaxed, owner 27 Oct): translucent white with a light rim; solid under reduced transparency. */
-  .card-glass { background: var(--surface-card); box-shadow: var(--shadow-card-glass); }
-  /* Condensed top bar: cream glass that fades out at its lower edge, like the mock's top fade. With blur on it stays .92 so scrolled text never reads through the bar title. */
-  .glass-bar { box-shadow: inset 0 1px 0 rgba(255,255,255,.85); background: rgba(253,246,236,.97); -webkit-mask-image: linear-gradient(#111C35 72%, transparent); mask-image: linear-gradient(#111C35 72%, transparent); }
-  html[data-glass="on"] .glass-bar { background: rgba(253,246,236,.92); -webkit-backdrop-filter: blur(16px) saturate(1.7); backdrop-filter: blur(16px) saturate(1.7); }
-  html[data-transparency="reduced"] .glass-bar { background: var(--color-cream); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .font-wide { font-stretch: 112%; }
-  /* Spatial large titles and hero numbers: barely wide (100-105%), tight. */
-  .font-display { font-stretch: 102%; }
-  .font-wider { font-stretch: 118%; }
+  /* Solid surfaces only (DESIGN.md section 9: no glass, no blur). The names stay for their call sites. */
+  .glass { background: var(--color-card); box-shadow: 0 0 0 1px rgba(17,28,53,.12); }
+  .glass-cream { background: var(--color-cream); }
+  /* Round header buttons: George's avatar button, an ink-08 disc with a 1 pt ink-16 edge. */
+  .glass-btn { background: rgba(17,28,53,.06); box-shadow: inset 0 0 0 1px rgba(17,28,53,.14); }
+  /* Content cards: George's tile. */
+  .card-glass { background: var(--color-card); box-shadow: 0 0 0 1px rgba(17,28,53,.12); }
+  /* Condensed top bar once content scrolls under it: cream with a hairline. */
+  .glass-bar { background: var(--color-cream); box-shadow: 0 1px 0 rgba(17,28,53,.09); }
+  /* Archivo at its normal width everywhere (George's reference); the width utilities stay as no-ops for their call sites. */
+  .font-wide, .font-display, .font-wider { font-stretch: 100%; }
   /* Entrance: rises once on mount; set --i on siblings to stagger them 40 ms apart. `backwards` so the element's own transform (press scale) works after it lands. */
-  .rise { animation: fiqr-rise 520ms cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(var(--i, 0) * 40ms + var(--rise-delay, 0ms)); }
+  .rise { animation: fiqr-rise 420ms cubic-bezier(.25,1,.5,1) backwards; animation-delay: calc(var(--i, 0) * 40ms + var(--rise-delay, 0ms)); }
   /* Pending work: a light band sweeps across; compositor-only (translateX). */
   .shimmer { position: relative; overflow: hidden; }
   .shimmer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(253,246,236,.75), transparent); transform: translateX(-100%); animation: fiqr-sweep 1.4s ease-in-out infinite; }
+  /* Bars fill once on first paint (DESIGN.md section 8). */
+  .bar-fill { transform-origin: left center; animation: fiqr-grow 600ms cubic-bezier(.25,1,.5,1) backwards; }
 }
 
-/* Home-style entrance choreography (motion-feel 3e), first paint per session only: hero scales in, tiles rise 12 px
-   from 160 ms at 40 ms apart, rows rise 8 px from 240 ms at 30 ms apart (rows past 6 come with row 6). */
-.enter-hero { animation: fiqr-hero 460ms cubic-bezier(.22,1,.36,1) backwards; }
-.enter-tiles > * { animation: fiqr-rise-12 480ms cubic-bezier(.22,1,.36,1) backwards; }
-.enter-tiles > :nth-child(1) { animation-delay: 160ms; } .enter-tiles > :nth-child(2) { animation-delay: 200ms; }
-.enter-tiles > :nth-child(3) { animation-delay: 240ms; } .enter-tiles > :nth-child(4) { animation-delay: 280ms; }
-.enter-rows > * { animation: fiqr-rise-8 420ms cubic-bezier(.22,1,.36,1) backwards; animation-delay: 390ms; }
-.enter-rows > :nth-child(1) { animation-delay: 240ms; } .enter-rows > :nth-child(2) { animation-delay: 270ms; }
-.enter-rows > :nth-child(3) { animation-delay: 300ms; } .enter-rows > :nth-child(4) { animation-delay: 330ms; }
-.enter-rows > :nth-child(5) { animation-delay: 360ms; }
+/* Home-style entrance, first paint per session only: blocks rise 8 px, 40 ms apart. */
+.enter-hero { animation: fiqr-fade-in 320ms cubic-bezier(.25,1,.5,1) backwards; }
+.enter-tiles > * { animation: fiqr-rise-8 420ms cubic-bezier(.25,1,.5,1) backwards; }
+.enter-tiles > :nth-child(1) { animation-delay: 120ms; } .enter-tiles > :nth-child(2) { animation-delay: 160ms; }
+.enter-tiles > :nth-child(3) { animation-delay: 200ms; } .enter-tiles > :nth-child(4) { animation-delay: 240ms; }
+.enter-rows > * { animation: fiqr-rise-8 420ms cubic-bezier(.25,1,.5,1) backwards; animation-delay: 320ms; }
+.enter-rows > :nth-child(1) { animation-delay: 160ms; } .enter-rows > :nth-child(2) { animation-delay: 200ms; }
+.enter-rows > :nth-child(3) { animation-delay: 240ms; } .enter-rows > :nth-child(4) { animation-delay: 280ms; }
 /* A page that slid in (push or pop, route-frame.tsx) is complete when the slide lands: the slide is its entrance. */
 [data-slid] .enter-rows > * { animation: none; }
 @utility skeleton-out { animation: fiqr-fade-out 220ms ease-out forwards; }
@@ -197,56 +190,20 @@
 @keyframes fiqr-hero { from { opacity: 0; transform: scale(.98); } }
 @keyframes fiqr-rise-12 { from { opacity: 0; transform: translateY(12px); } }
 @keyframes fiqr-rise-8 { from { opacity: 0; transform: translateY(8px); } }
-@keyframes fiqr-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes fiqr-rise { from { opacity: 0; transform: translateY(10px); } }
 @keyframes fiqr-grow { from { transform: scaleX(0); } }
 @keyframes fiqr-sweep { to { transform: translateX(100%); } }
-@utility pop { animation: fiqr-pop 320ms cubic-bezier(.22,1,.36,1) backwards; }
+@utility pop { animation: fiqr-pop 320ms cubic-bezier(.25,1,.5,1) backwards; }
 @utility page-in { animation: fiqr-fade-in 220ms ease-out backwards; }
 @keyframes fiqr-fade-in { from { opacity: 0; } }
 @utility shake { animation: fiqr-shake 420ms cubic-bezier(.36,.07,.19,.97) both; }
 @keyframes fiqr-shake { 15%, 85% { transform: translateX(-2px); } 30%, 70% { transform: translateX(5px); } 45%, 55% { transform: translateX(-7px); } }
-@keyframes fiqr-pop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
-@media (prefers-reduced-transparency: reduce) {
-  html .glass, html[data-glass="on"] .glass { background: var(--color-card); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  html .glass-cream, html[data-glass="on"] .glass-cream, html .glass-bar, html[data-glass="on"] .glass-bar { background: var(--color-cream); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  html .glass-btn, html[data-glass="on"] .glass-btn { background: var(--color-card); -webkit-backdrop-filter: none; backdrop-filter: none; }
-}
+@keyframes fiqr-pop { 0% { transform: scale(.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-/* Spatial Depth atmosphere (ui/fiqr/atmosphere.tsx; differs: Q3, owner 27 Oct 2026). Brand tints only, on cream:
-   far layer (drift 0.05x) a beige wash over the whole page (ochre into accent, .12-.13), a large peach field behind the
-   content (accent .22), teal mid right (.14, kept low so it never greys the beige) and an ochre hint top left; near
-   layer (drift 0.16x) the white glass slab behind the hero and an ochre slab. Painted once as SVG; nothing animates a
-   blur. Secondary text (ink-65 token) is ink .76 so it keeps >= 5.5:1 on the strongest field (measured per text node). */
-:root {
-  --atmo-far: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23A07A3C' stop-opacity='0.13'/><stop offset='1' stop-color='%23E8622A' stop-opacity='0.12'/></linearGradient><radialGradient id='p'><stop offset='0' stop-color='%23E8622A' stop-opacity='0.22'/><stop offset='.5' stop-color='%23E8622A' stop-opacity='0.165'/><stop offset='1' stop-color='%23E8622A' stop-opacity='0'/></radialGradient><radialGradient id='t'><stop offset='0' stop-color='%233E7C77' stop-opacity='0.14'/><stop offset='.5' stop-color='%233E7C77' stop-opacity='0.105'/><stop offset='1' stop-color='%233E7C77' stop-opacity='0'/></radialGradient><radialGradient id='c'><stop offset='0' stop-color='%23A07A3C' stop-opacity='0.2'/><stop offset='.5' stop-color='%23A07A3C' stop-opacity='0.15'/><stop offset='1' stop-color='%23A07A3C' stop-opacity='0'/></radialGradient></defs><rect width='390' height='844' fill='url(%23g)'/><circle cx='120' cy='400' r='360' fill='url(%23p)'/><circle cx='330' cy='860' r='300' fill='url(%23p)' fill-opacity='.8'/><circle cx='400' cy='520' r='240' fill='url(%23t)'/><circle cx='10' cy='120' r='170' fill='url(%23c)'/></svg>");
-  --atmo-near: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='w' x1='.65' y1='0' x2='.35' y2='1'><stop offset='0' stop-color='%23FFFFFF' stop-opacity='.95'/><stop offset='1' stop-color='%23FFFFFF' stop-opacity='.2'/></linearGradient><linearGradient id='o' x1='.35' y1='0' x2='.65' y2='1'><stop offset='0' stop-color='%23A07A3C' stop-opacity='.22'/><stop offset='1' stop-color='%23A07A3C' stop-opacity='.03'/></linearGradient><filter id='s' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='18'/></filter></defs><rect x='222' y='70' width='230' height='230' rx='64' transform='rotate(18 337 185)' fill='%23111C35' fill-opacity='.06' filter='url(%23s)'/><rect x='222' y='44' width='230' height='230' rx='64' transform='rotate(18 337 159)' fill='url(%23w)'/><rect x='-70' y='700' width='220' height='220' rx='64' transform='rotate(-14 40 810)' fill='url(%23o)'/></svg>");
-  /* Content cards: white glass at 76%, so the warm fields read through; ink and secondary text stay AA on top. */
-  --surface-card: rgba(255,255,255,.76);
-  --shadow-card-glass: inset 0 1px 0 #FFFFFF, inset 0 0 0 1px rgba(255,255,255,.7), 0 0 0 .5px rgba(17,28,53,.07), 0 1px 1px rgba(17,28,53,.04), 0 6px 12px -6px rgba(17,28,53,.08), 0 24px 38px -24px rgba(17,28,53,.3);
-}
-.atmo-field { position: absolute; inset: 0; background-position: top center; background-size: cover; background-repeat: no-repeat; }
-.atmo-far { background-image: var(--atmo-far); animation: atmo-breathe-far 38s ease-in-out infinite alternate; }
-.atmo-near { background-image: var(--atmo-near); animation: atmo-breathe-near 29s ease-in-out infinite alternate; }
-html[data-hidden] .atmo-field { animation-play-state: paused; }
-@keyframes atmo-breathe-far { to { transform: translate3d(14px, -18px, 0); } }
-@keyframes atmo-breathe-near { to { transform: translate3d(-10px, 12px, 0); } }
-/* With the atmosphere on, the live page is transparent over it; a lifted page (stepping back under a push, a sheet or
-   a tab fade) paints the same fields at its own scroll (--lift-y), so it keeps its tint and never pops. Unlayered, so
-   it wins over the layer's bg-background. */
-html[data-atmosphere] body, html[data-atmosphere] [data-route]:not([data-lifted]) { background: transparent; }
-html[data-atmosphere] [data-route][data-lifted] {
-  background:
-    var(--atmo-near) center calc(var(--lift-y, 0px) * -0.16) / cover no-repeat,
-    var(--atmo-far) center calc(var(--lift-y, 0px) * -0.05) / cover no-repeat,
-    var(--color-cream);
-}
-/* Reduced transparency: plain cream ground, solid cards. */
-html[data-transparency="reduced"] .atmosphere { display: none; }
-html[data-transparency="reduced"] body { background: var(--color-cream); }
-html[data-transparency="reduced"] [data-route] { background: var(--color-cream); }
-html[data-transparency="reduced"] { --surface-card: var(--color-card); }
-@media (prefers-reduced-transparency: reduce) {
-  .atmosphere { display: none; }
-  html body, html [data-route] { background: var(--color-cream); }
-  :root { --surface-card: var(--color-card); }
+/* Geo mark states (DESIGN.md section 7): the bar travels round the ring while Geo works. */
+@keyframes geo-orbit { to { transform: rotate(360deg); } }
+.geo-bar { transform-box: view-box; transform-origin: 50% 50%; transition: transform 320ms cubic-bezier(.25,1,.5,1); }
+.geo-working .geo-bar { animation: geo-orbit 1.4s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .geo-working .geo-bar { animation: none; opacity: .45; }
 }

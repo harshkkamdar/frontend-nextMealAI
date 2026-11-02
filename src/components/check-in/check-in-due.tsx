@@ -95,7 +95,8 @@ export function CheckInDue({ status, today, refetch, onApplied, onDone, source }
           ? <p className="mx-1.5 text-caption leading-[1.4] text-ink-65">{changeSentence(current, proposed, today.planName)}</p>
           : null
 
-  const aside = weight.delta_week_kg === null ? status.week.label : `${formatDelta(weight.delta_week_kg)} kg this week`
+  // The header already shows the week; the card's corner carries the week's weight change, when there is one.
+  const aside = weight.delta_week_kg === null ? null : `${formatDelta(weight.delta_week_kg)} kg this week`
 
   return (
     <div className="flex flex-col">

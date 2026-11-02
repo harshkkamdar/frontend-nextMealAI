@@ -2,217 +2,96 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { FoodFill, GeoFill, HomeFill, PlusIcon, TrainFill } from '@/components/ui/fiqr/icons'
+import type { ComponentType } from 'react'
+import { GeoMark } from '@/components/shared/geo-avatar'
 import { cn } from '@/lib/utils'
-import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
-import { initialMinimise, minimiseStep } from '@/lib/tab-bar-minimise'
-import { TAB_ROUTES } from '@/lib/navigation'
-import { useUIStore } from '@/stores/ui.store'
 
+/** The + sheet (log-sheet.tsx): opened by the Log food action on Home and Food. */
 export const LOG_SHEET = 'log-sheet'
-/** Shared by the orb's surface and the + sheet panel (log-sheet.tsx), so the orb grows into the sheet (motion-feel 3i). */
+/** Shared layout id for the + sheet panel; kept for log-sheet.tsx. */
 export const ORB_SURFACE = 'orb-surface'
 
-const ICONS = { '/dashboard': HomeFill, '/food': FoodFill, '/train': TrainFill, '/chat': GeoFill }
-const TABS = TAB_ROUTES.map((tab) => ({ ...tab, icon: ICONS[tab.href] }))
+const stroke = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.75, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, className: 'size-6', 'aria-hidden': true }
 
-/** Routes that own the whole screen (live workout, an open conversation) hide the bar. */
+function HomeIcon() {
+  return <svg {...stroke}><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v10h13V10M9.5 20v-6h5v6" /></svg>
+}
+function FoodIcon() {
+  return <svg {...stroke}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3.5" /></svg>
+}
+function TrainIcon() {
+  return <svg {...stroke}><path d="M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12" /></svg>
+}
+function CheckInIcon() {
+  return <svg {...stroke}><path d="M5 19V13M12 19V8M19 19V4" /></svg>
+}
+
+const SIDE: { label: string; href: string; icon: ComponentType }[] = [
+  { label: 'Home', href: '/dashboard', icon: HomeIcon },
+  { label: 'Food', href: '/food', icon: FoodIcon },
+  { label: 'Train', href: '/train', icon: TrainIcon },
+  { label: 'Check-in', href: '/check-in', icon: CheckInIcon },
+]
+
+/** Full-screen task flows (a conversation, a live workout, logging, builders) and pushed pages own the whole screen. */
 export function hidesTabBar(pathname: string): boolean {
-  // Full-screen task flows (a conversation, a live workout, logging, plan builders) own the whole screen.
   if (['/chat/session', '/train/session', '/logs/new/', '/plans/new', '/plans/edit', '/paywall'].some((prefix) => pathname.startsWith(prefix))) return true
-  // Pushed pages that dock their own actions (settings, check-in) hide it too, per the mock.
-  return ['/settings', '/check-in'].some((route) => pathname === route || pathname.startsWith(`${route}/`))
+  return pathname === '/settings' || pathname.startsWith('/settings/')
 }
 
 /**
- * iOS 26 tab bar minimise (motion-feel 3j): collapses on scroll down, expands on scroll up, near the top, on tap,
- * and on every route change. Passive listener, at most one state step per frame.
- */
-function useMinimised(): [boolean, () => void] {
-  const pathname = usePathname()
-  // The anchor moves every frame while scrolling; only the boolean is state, so the bar re-renders (and framer re-measures) only on a flip.
-  const step = useRef(initialMinimise)
-  const [minimised, setMinimised] = useState(false)
-  const [path, setPath] = useState(pathname)
-  if (path !== pathname) {
-    setPath(pathname)
-    setMinimised(false)
-  }
-  useEffect(() => {
-    // Anchor where the page now is: the route frame has already restored a popped page's scroll, and the scroll event
-    // that restore fires must not read as a scroll down from 0. Clamped like the reads below.
-    step.current = { ...initialMinimise, anchor: Math.min(window.scrollY, Math.max(0, document.documentElement.scrollHeight - window.innerHeight)) }
-  }, [pathname])
-  useEffect(() => {
-    let frame = 0
-    const read = () => {
-      frame = 0
-      // Clamp to the real scroll range so iOS's bottom rubber band (scrollY past the end, then back) never reads as a scroll up.
-      const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
-      const was = step.current.minimised
-      step.current = minimiseStep(step.current, { type: 'scroll', y: Math.min(window.scrollY, max) })
-      // Commit only a flip, and after the frame callback (motion-feel M11: no setState inside rAF).
-      if (step.current.minimised !== was) queueMicrotask(() => setMinimised(step.current.minimised))
-    }
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(read) }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(frame) }
-  }, [])
-  const expand = useCallback(() => {
-    step.current = minimiseStep(step.current, { type: 'tap', y: window.scrollY })
-    setMinimised(false)
-  }, [])
-  return [minimised, expand]
-}
-
-/**
- * Floating glass capsule with four tabs and the separate orb that opens the + sheet (C2, D2).
- * Sits under every sheet's dim (z 50). While the + sheet is open the bar rises above it with the capsule hidden, so the orb becomes the sheet's close control.
+ * George's nav (DESIGN.md section 6): five columns, Geo raised in the centre as the app icon in miniature.
+ * Solid cream with a hairline; it slides away on full-screen routes rather than unmounting, so nothing pops.
  */
 export function TabBar() {
   const pathname = usePathname()
-  const reduce = useReducedMotion()
-  const [minimised, expand] = useMinimised()
-  const navRef = useRef<HTMLElement>(null)
-  const logOpen = useUIStore((state) => state.activeSheet === LOG_SHEET)
-
-  // Full-screen routes slide the bar away instead of unmounting it, so entering and leaving them never pops.
   const hidden = hidesTabBar(pathname)
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
-  const activeTab = TABS.find((tab) => isActive(tab.href))
-  // The pill fades in when a tab becomes open from a screen outside the tabs (a pop or swipe back to a tab root); between
-  // tabs it slides (shared layout), so it must not fade then.
-  const [lastTab, setLastTab] = useState(activeTab?.href)
-  const pillAppears = lastTab === undefined
-  if (activeTab?.href !== lastTab) setLastTab(activeTab?.href)
-  // Like iOS, the bar minimises into the open tab, so a screen outside the four tabs keeps the full bar.
-  const collapsed = minimised && activeTab !== undefined
-  // Collapse: items leave fast while the glass shrinks. Expand: items arrive just behind the growing glass.
-  const fade = collapsed ? { duration: 0.12 } : { duration: 0.18, delay: 0.12 }
-  // The morph is scroll-driven, not a flick release, so it settles critically damped (glide) rather than with the lens overshoot.
-  const itemTransition = reduce ? reducedFade : { ...spring.glide, opacity: fade }
-  // Transform string, not the scale shorthand, so the scale runs on the compositor while the page scrolls.
-  const item = { opacity: collapsed ? 0 : 1, transform: collapsed && !reduce ? 'scale(0.8)' : 'scale(1)' }
-  // Collapsed, the bar is one button that shows the open tab and expands the bar rather than navigating (iOS 26).
-  const restore = collapsed && activeTab ? (
-    <motion.button
-      key="show-tabs"
-      type="button"
-      aria-label={`Show tabs, ${activeTab.label}`}
-      onClick={(event) => {
-        void haptic('light')
-        expand()
-        // Keyboard or screen reader activation (detail 0): the button is about to unmount, so hand focus to the open tab.
-        if (event.detail === 0) requestAnimationFrame(() => navRef.current?.querySelector<HTMLElement>('a[aria-current="page"]')?.focus())
-      }}
-      initial={reduce ? { opacity: 0 } : false}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={reducedFade}
-      className={cn('absolute left-0 top-0 grid size-[52px] place-items-center rounded-full text-ink transition-transform active:scale-[.94]', !logOpen && 'pointer-events-auto')}
-    >
-      <motion.span layoutId={reduce ? undefined : `tab-icon-${activeTab.href}`} transition={spring.glide}><activeTab.icon className="size-[22px]" /></motion.span>
-    </motion.button>
-  ) : null
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
-  const toggleLog = () => {
-    void haptic('light')
-    const ui = useUIStore.getState()
-    if (logOpen) ui.closeSheet()
-    else ui.openSheet(LOG_SHEET)
+  const item = ({ label, href, icon: Icon }: (typeof SIDE)[number]) => {
+    const active = isActive(href)
+    return (
+      <Link
+        key={href}
+        href={href}
+        aria-current={active ? 'page' : undefined}
+        onClick={() => { if (!active) void haptic('light') }}
+        className={cn('flex min-h-11 flex-col items-center justify-end gap-[5px] transition-transform active:scale-[.94]', active ? 'text-accent' : 'text-ink-50')}
+      >
+        <Icon />
+        <span className={cn('text-[11px] leading-none', active ? 'font-semibold text-accent' : 'font-medium text-ink-62')}>{label}</span>
+      </Link>
+    )
   }
 
   return (
-    <>
-    {/* Scroll edge (Liquid Glass "scroll edge effect"): content fades into the page under the bar instead of colliding with it. */}
-    <div aria-hidden="true" className={cn('pointer-events-none fixed inset-x-0 bottom-0 z-[45] h-[calc(90px+var(--safe-bottom))] bg-[linear-gradient(to_top,var(--color-cream)_calc(100%-24px),rgba(253,246,236,0))] transition-opacity duration-200', hidden && 'opacity-0')} />
-    <div
+    <nav
+      aria-label="Main"
       aria-hidden={hidden || undefined}
       inert={hidden || undefined}
-      className={cn('pointer-events-none fixed inset-x-0 mx-auto flex max-w-md items-end gap-3 px-4 transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]', logOpen ? 'z-[80]' : 'z-[50]', hidden && 'translate-y-[calc(100%+24px)] opacity-0')}
-      style={{ bottom: 'calc(10px + var(--safe-bottom))' }}
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-[50] border-t border-ink-10 bg-cream transition-[transform,opacity] duration-300 ease-[cubic-bezier(.25,1,.5,1)]',
+        hidden && 'pointer-events-none translate-y-[calc(100%+32px)] opacity-0',
+      )}
     >
-      <nav
-        ref={navRef}
-        aria-label="Main"
-        className={cn(
-          'pointer-events-none relative h-[52px] flex-1 origin-bottom-left transition-[transform,opacity] duration-300 ease-[cubic-bezier(.22,1,.36,1)]',
-          logOpen && 'scale-[.96] opacity-0',
-        )}
-        aria-hidden={logOpen || undefined}
-      >
-        {/* The glass surface: one element that shrinks from the capsule into the circle (framer layout projection, transforms only). Reduced motion crossfades two still surfaces instead. */}
-        {reduce ? (
-          <>
-            <motion.span aria-hidden="true" animate={{ opacity: collapsed ? 0 : 1 }} transition={reducedFade} className="glass absolute inset-0 rounded-full" />
-            <motion.span aria-hidden="true" initial={false} animate={{ opacity: collapsed ? 1 : 0 }} transition={reducedFade} className="glass absolute inset-y-0 left-0 w-[52px] rounded-full" />
-          </>
-        ) : (
-          <motion.span aria-hidden="true" layout transition={spring.glide} style={{ borderRadius: 26 }} className={cn('glass absolute inset-y-0 left-0', collapsed ? 'w-[52px]' : 'w-full')} />
-        )}
-        <div inert={collapsed || undefined} className={cn('relative flex h-full items-stretch p-1', !collapsed && !logOpen && 'pointer-events-auto')}>
-          {TABS.map(({ label, href, icon: Icon }) => {
-            const active = isActive(href)
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-current={active ? 'page' : undefined}
-                onClick={() => { if (!active) void haptic('light') }}
-                className={cn(
-                  // The open tab's ink fades in with its pill (200 ms) rather than cutting in after a pop.
-                  'relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full transition-[transform,color] duration-200 active:scale-[.94] active:duration-150',
-                  active ? 'text-ink' : 'text-ink-65',
-                )}
-              >
-                {active ? (
-                  <motion.span
-                    layoutId="tab-pill"
-                    initial={pillAppears && !reduce ? { opacity: 0 } : false}
-                    animate={{ opacity: collapsed ? 0 : 1 }}
-                    transition={reduce ? reducedFade : { ...spring.lens, opacity: fade }}
-                    className="absolute inset-0 rounded-full bg-ink-06"
-                  />
-                ) : null}
-                {/* Each role has its own key: a motion element reused across roles keeps stale shared-layout or animation
-                    state and can stay at opacity 0 after the open tab changes (seen on iOS, 26 Oct 2026). */}
-                {active && !reduce ? (
-                  // The open tab's icon travels into the collapsed circle (shared layoutId with the circle's icon), one id per
-                  // tab so switching tabs never flies an icon across the bar.
-                  collapsed ? <span key="gap" className="size-5" /> : <motion.span key="travel" layoutId={`tab-icon-${href}`} transition={spring.glide} className="relative"><Icon className="size-5" /></motion.span>
-                ) : active ? (
-                  <motion.span key="open" initial={false} animate={{ opacity: collapsed ? 0 : 1 }} transition={itemTransition} className="relative"><Icon className="size-5" /></motion.span>
-                ) : (
-                  <motion.span key="still" initial={false} animate={item} transition={itemTransition} className="relative will-change-transform"><Icon className="size-5" /></motion.span>
-                )}
-                {/* will-change keeps the labels on their own layer, so they do not re-rasterise (a 1 px text shift) when the scale hands back from the compositor. */}
-                <motion.span initial={false} animate={item} transition={itemTransition} className={cn('relative text-[11px] leading-none will-change-transform', active ? 'font-semibold' : 'font-medium')}>{label}</motion.span>
-              </Link>
-            )
-          })}
-        </div>
-        {/* Reduced motion fades the circle out; otherwise it hands its icon straight back to the open tab (layoutId), so it must leave at once. */}
-        {reduce ? <AnimatePresence initial={false}>{restore}</AnimatePresence> : restore}
-      </nav>
-      <button
-        type="button"
-        aria-label={logOpen ? 'Close' : 'Log something'}
-        aria-expanded={logOpen}
-        onClick={toggleLog}
-        className="pointer-events-auto relative grid size-[52px] shrink-0 place-items-center rounded-full text-ink transition-transform duration-300 active:scale-[.94]"
-      >
-        {/* The orb's surface: while closed it lives here; opening hands it to the sheet panel, which grows out of it. */}
-        {logOpen ? (
-          <span aria-hidden="true" className="absolute inset-0 rounded-full bg-card shadow-[var(--shadow-card)]" />
-        ) : (
-          <motion.span aria-hidden="true" layoutId={reduce ? undefined : ORB_SURFACE} transition={spring.sheet} style={{ borderRadius: 26 }} className="glass absolute inset-0" />
-        )}
-        <PlusIcon className={cn('relative size-6 transition-transform duration-300 ease-[cubic-bezier(.22,1,.36,1)]', logOpen && 'rotate-45')} />
-      </button>
-    </div>
-    </>
+      <div className="mx-auto grid max-w-md grid-cols-5 items-end px-2 pt-[10px]" style={{ paddingBottom: 'calc(22px + var(--safe-bottom))' }}>
+        {item(SIDE[0])}
+        {item(SIDE[1])}
+        <Link
+          href="/chat"
+          aria-current={isActive('/chat') ? 'page' : undefined}
+          onClick={() => void haptic('light')}
+          className="flex flex-col items-center"
+        >
+          <span className="-mt-6 grid size-14 place-items-center rounded-full bg-ink shadow-[var(--shadow-raised)] transition-transform active:scale-[.94]">
+            <GeoMark size={34} tone="cream" />
+          </span>
+          <span className={cn('mt-[6px] text-[11px] leading-none text-ink-62', isActive('/chat') ? 'font-semibold text-ink' : 'font-semibold')}>Geo</span>
+        </Link>
+        {item(SIDE[2])}
+        {item(SIDE[3])}
+      </div>
+    </nav>
   )
 }

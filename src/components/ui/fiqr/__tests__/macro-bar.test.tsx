@@ -12,7 +12,7 @@ describe('MacroBar', () => {
   it('shows the calories left readout while under target', () => {
     render(<MacroBar name="Calories" current={800} target={2000} />)
 
-    expect(screen.getByText(/1200 left/)).toBeInTheDocument()
+    expect(screen.getByText(/1,200 left/)).toBeInTheDocument()
   })
 
   it('shows an over-target readout', () => {

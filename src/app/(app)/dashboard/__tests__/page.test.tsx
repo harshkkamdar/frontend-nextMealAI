@@ -74,16 +74,16 @@ describe('Dashboard Steps tile', () => {
 
     expect(screen.getByText('Steps')).toBeInTheDocument()
     expect(screen.getByText('8,412')).toBeInTheDocument()
-    expect(screen.getByText('of 10,000')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Steps 8412, open the week/ })).toBeInTheDocument()
   })
 
   it('renders a dash, never a fake 0, when today has no steps', () => {
     mocks.data = dashboardData([])
     render(<DashboardPage />)
 
-    const tile = screen.getByRole('button', { name: 'Steps none yet, open the week' })
+    const tile = screen.getByRole('button', { name: 'Steps, open the week' })
     expect(within(tile).queryByText('0')).toBeNull()
-    expect(screen.getByText('Syncs from your phone')).toBeInTheDocument()
+    expect(within(tile).getByText('No data')).toBeInTheDocument()
   })
 })
 
@@ -96,18 +96,11 @@ describe('Dashboard one-tap logs with Undo', () => {
 
   const undo = () => (mocks.success.mock.calls[0][1] as { action: { label: string; onClick: () => void } }).action
 
-  it('the Water + logs one glass at once, and Undo deletes that log', async () => {
+  it('the Water column opens the water log instead of logging on a tap', () => {
     mocks.data = dashboardData([])
     render(<DashboardPage />)
-    fireEvent.click(screen.getByRole('button', { name: 'Add one glass of water' }))
-
-    expect(screen.getByRole('button', { name: /^Water 1 of 8 glasses/ })).toBeInTheDocument()
-    expect(mocks.create).toHaveBeenCalledWith({ type: 'water', payload: { glasses: 1 }, source: 'quick_log' })
-    await waitFor(() => expect(mocks.success).toHaveBeenCalledWith('Glass added, 1 of 8', expect.anything()))
-    expect(undo().label).toBe('Undo')
-    undo().onClick()
-    expect(mocks.remove).toHaveBeenCalledWith('log-new')
-    await waitFor(() => expect(screen.getByRole('button', { name: /^Water 0 of 8 glasses/ })).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /^Water 0 of 8 glasses/ }))
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it("Geo's chip re-logs a past high-protein food, and Undo deletes it", async () => {
@@ -128,9 +121,13 @@ describe('Dashboard one-tap logs with Undo', () => {
 
   it('a log queued offline says so and offers no Undo', async () => {
     mocks.create.mockResolvedValue({ queued: true, optimistic: { id: 'pending-1' } })
-    mocks.data = dashboardData([])
+    const past = new Date(Date.now() - 2 * 86400000).toISOString().slice(0, 10)
+    mocks.data = {
+      ...dashboardData([{ id: 'f1', user_id: 'u1', type: 'food', payload: { food_name: 'Greek yoghurt', est_macros: { calories: 100, protein: 17 } }, source: 'manual', local_date: past, created_at: `${past}T08:00:00.000Z`, updated_at: `${past}T08:00:00.000Z` }]),
+      profile: { daily_calorie_target: 2000, daily_protein_g: 140 },
+    }
     render(<DashboardPage />)
-    fireEvent.click(screen.getByRole('button', { name: 'Add one glass of water' }))
-    await waitFor(() => expect(mocks.success).toHaveBeenCalledWith("Glass added, 1 of 8. Saved on your phone, syncs when you're back online"))
+    fireEvent.click(screen.getByRole('button', { name: 'Log Greek yoghurt again, 17 g protein' }))
+    await waitFor(() => expect(mocks.success).toHaveBeenCalledWith("Greek yoghurt logged to Snack. Saved on your phone, syncs when you're back online"))
   })
 })

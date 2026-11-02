@@ -10,20 +10,22 @@ import { cn } from '@/lib/utils'
  * plans slice owns both folders.
  */
 
-/** Card surface: the shared glass card (--surface-card over the Spatial backdrop; solid under reduced transparency). */
+/** Card surface: George's tile, white with a 1 pt ink-12 border (DESIGN.md section 4). */
 export const CARD = 'rounded-card card-glass'
-export const INK_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-ink px-5 text-body font-bold text-cream transition-transform enabled:active:scale-[.97] disabled:opacity-45'
+/** Navy solid: a committing action that is not the screen's next step (Keep current targets, Done). */
+export const INK_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-[15px] bg-ink px-5 text-[18px] font-bold text-cream transition-transform enabled:active:scale-[.98] disabled:opacity-45'
 /**
  * The screen's one orange action, as a plain class string (buttons and the busy state in the dock share it).
- * Ink label (owner decision, 27 Oct 2026): cream on orange fails AA.
+ * Cream label at 19 pt bold: large text, so it passes AA on orange (owner decision, 2 Nov 2026).
  */
-export const ORANGE_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-accent px-5 text-body font-bold text-ink shadow-[inset_0_1px_0_rgba(255,255,255,.35)] transition-transform enabled:active:scale-[.97] disabled:opacity-45 aria-busy:opacity-100'
-export const SOFT_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-full bg-ink-06 px-5 text-body font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:opacity-45'
+export const ORANGE_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-[18px] bg-accent px-5 text-[19px] font-bold text-cream shadow-[var(--shadow-action)] transition-transform enabled:active:scale-[.98] disabled:opacity-45 aria-busy:opacity-100'
+/** Secondary: cream with a 1 pt ink-16 edge. */
+export const SOFT_BUTTON = 'flex h-btn w-full items-center justify-center gap-2 rounded-[15px] border border-ink-16 bg-cream px-5 text-[18px] font-bold text-ink transition-transform enabled:active:scale-[.98] disabled:opacity-45'
 
-/** Section heading: 18 / 750, a little wide, 28 above and 10 below (the mock's `.sec`). */
+/** Section label (George): 11.5 / 600, uppercase, tracked, 20 above and 10 below. */
 export function SectionHeading({ children, id, className }: { children: ReactNode; id?: string; className?: string }) {
-  // Plain strings, not cn(): tailwind-merge reads the custom size tokens (text-headline) as colours and drops one.
-  return <h2 id={id} className={`font-display mx-1 mb-2.5 mt-7 text-headline leading-[22px] font-[750] tracking-[-0.01em] text-ink ${className ?? ''}`}>{children}</h2>
+  // Plain strings, not cn(): tailwind-merge reads custom size tokens as colours and drops one.
+  return <h2 id={id} className={`mb-2.5 mt-5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62 ${className ?? ''}`}>{children}</h2>
 }
 
 /** Macro hue dot: calories orange, protein ink, carbs teal, fat ochre. */
@@ -63,22 +65,24 @@ export function FailCard({ title, children, onRetry }: { title: string; children
 /** Bottom offset of the dock: above the tab bar where it shows, else near the edge. */
 function useDockBottom(): string {
   const pathname = usePathname() ?? ''
-  return hidesTabBar(pathname) ? 'calc(12px + var(--safe-bottom))' : 'calc(74px + var(--safe-bottom))'
+  // Above the nav and the 24 pt the raised Geo button rises over it.
+  return hidesTabBar(pathname) ? '0px' : 'calc(96px + var(--safe-bottom))'
 }
 
 /** Space the scroll content leaves at its end so the dock never covers it at rest. */
 export function DockSpacer({ tall }: { tall?: boolean }) {
   const pathname = usePathname() ?? ''
-  const base = hidesTabBar(pathname) ? 84 : 146
+  const base = hidesTabBar(pathname) ? 96 : 192
   return <div aria-hidden="true" style={{ height: `calc(${base + (tall ? 40 : 0)}px + var(--safe-bottom))` }} />
 }
 
-/** The floating glass dock that holds a screen's action (the mock's `.dock`): always in view, glass on the control layer. */
+/** The screen's action, pinned above the nav on a solid cream band with a hairline, so it is always in view. */
 export function Dock({ children, className }: { children: ReactNode; className?: string }) {
   const bottom = useDockBottom()
+  const pathname = usePathname() ?? ''
   return (
-    <div className="pointer-events-none fixed inset-x-0 z-[46] mx-auto max-w-md px-4" style={{ bottom }}>
-      <div className={cn('glass pointer-events-auto grid gap-1 rounded-[32px] p-1.5', className)}>{children}</div>
+    <div className="fixed inset-x-0 z-[46] border-t border-ink-09 bg-cream" style={{ bottom }}>
+      <div className={cn('mx-auto grid max-w-md gap-1 px-gutter pt-3', className)} style={{ paddingBottom: hidesTabBar(pathname) ? 'calc(12px + var(--safe-bottom))' : '12px' }}>{children}</div>
     </div>
   )
 }

@@ -56,7 +56,7 @@ describe('WorkoutCard', () => {
     )
 
     expect(screen.getByText('Rest day')).toBeInTheDocument()
-    expect(screen.getByText('Recovery · no session')).toBeInTheDocument()
+    expect(screen.getByText('Recovery today, no session')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /See program/ })).toBeInTheDocument()
   })
 
