@@ -128,7 +128,7 @@ export function computeNudges(input: NudgeInput): Nudge[] {
     nudges.push({
       type: 'program_complete',
       title: 'Program Complete',
-      message: "You've been on this program 6+ weeks! Want Geo to refresh it?",
+      message: "You've been on this program 6+ weeks! Want me to refresh it?",
       cta: 'Chat with Geo',
       action: 'open_full_chat'
     })

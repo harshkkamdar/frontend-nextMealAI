@@ -149,6 +149,8 @@ export default function DashboardPage() {
     calories: Math.max(0, targets.calories - (day?.calories ?? 0)),
   })
   const geoLine = getDashboardGeoLine(data?.checkIn?.takeaway, hasFood ? nudges : [], quietLine)
+  // Geo steps out once when it has something new for you: a nudge in its line.
+  const geoNudge = !data?.checkIn?.takeaway?.trim() && hasFood && nudges.some((nudge) => nudge.message?.trim())
   const pendingSuggestion = suggestions?.find((suggestion) => !hiddenSuggestionIds.includes(suggestion.id))
   const checkInDue = data?.status?.state === 'due'
 
@@ -207,6 +209,7 @@ export default function DashboardPage() {
                 <GeoLine
                   onOpen={openGeo}
                   thinking={geoBusy}
+                  nudge={geoNudge}
                   action={relog ? (
                     <button
                       type="button"

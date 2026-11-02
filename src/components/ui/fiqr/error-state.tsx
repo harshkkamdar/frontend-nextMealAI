@@ -6,7 +6,7 @@ import { SecondaryButton } from './secondary-button'
 export function ErrorState({ children, onRetry }: { children: ReactNode; onRetry?: () => void }) {
   return (
     <div role="alert" className="mt-2">
-      <GeoLine>{children}</GeoLine>
+      <GeoLine pose="down">{children}</GeoLine>
       {onRetry ? <SecondaryButton type="button" onClick={onRetry}>Try again</SecondaryButton> : null}
     </div>
   )
