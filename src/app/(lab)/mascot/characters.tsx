@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 
 export type Mood = 'rest' | 'speak' | 'listening' | 'working' | 'done' | 'nudge' | 'up' | 'down' | 'offline'
 export type Scheme = 'navy' | 'volt' | 'sky'
-export type CharId = 'coach' | 'coach-full' | 'kettlebell' | 'kangaroo' | 'goat' | 'fox' | 'bear' | 'bot'
+export type CharId = 'kangaroo' | 'bear' | 'coach' | 'kettlebell' | 'quokka' | 'wombat' | 'shaker' | 'stopwatch'
 
 const NAVY = '#111C35'
 const ORANGE = '#E8622A'
@@ -38,7 +38,7 @@ export const MOODS: { mood: Mood; when: string }[] = [
 type Pt = [number, number]
 interface Spec {
   /** Eye centre line, eye gap, eye size, mouth line and width. `mouthOnPatch`: the mouth sits on the light muzzle. */
-  face: { cx: number; cy: number; gap: number; ew: number; eh: number; my: number; mw: number; mouthOnPatch?: boolean }
+  face: { cx: number; cy: number; gap: number; ew: number; eh: number; my: number; mw: number; mouthOnPatch?: boolean; eyesOnPatch?: boolean }
   /** Hand rest points left and right, the raised-hands line, and where a clipboard is held. */
   hands: { l: Pt; r: Pt; up: number; board: Pt; size?: number; fill?: string }
   /** Square crop for small spots (Geo's line, the nav button): x, y, side. */
@@ -61,23 +61,6 @@ const SPECS: Record<CharId, Spec> = {
       </>
     ),
   },
-  'coach-full': {
-    face: { cx: 60, cy: 43, gap: 17, ew: 6, eh: 10, my: 56, mw: 14 },
-    hands: { l: [31, 80], r: [89, 80], up: 26, board: [60, 82], size: 6.5 },
-    head: [28, 8, 64],
-    body: (mood, c, clip) => (
-      <>
-        <rect x="50" y="90" width="7" height="14" rx="3.5" fill={c.body} />
-        <rect x="63" y="90" width="7" height="14" rx="3.5" fill={c.body} />
-        <ellipse cx="52" cy="106" rx="9" ry="4.5" fill={ORANGE} />
-        <ellipse cx="68" cy="106" rx="9" ry="4.5" fill={ORANGE} />
-        <rect className="m-body" x="43" y="62" width="34" height="34" rx="15" fill={c.body} />
-        <defs><clipPath id={clip}><circle cx="60" cy="38" r="27" /></clipPath></defs>
-        <circle cx="60" cy="38" r="27" fill={c.body} />
-        <path clipPath={`url(#${clip})`} d={`M28 ${31 + lift(mood) / 2} Q60 ${19 + lift(mood) / 2} 92 ${31 + lift(mood) / 2}`} stroke={ORANGE} strokeWidth="8" fill="none" />
-      </>
-    ),
-  },
   kettlebell: {
     face: { cx: 60, cy: 75, gap: 24, ew: 8, eh: 14, my: 93, mw: 20 },
     hands: { l: [13, 84], r: [107, 84], up: 30, board: [60, 100] },
@@ -94,57 +77,23 @@ const SPECS: Record<CharId, Spec> = {
     ),
   },
   kangaroo: {
-    face: { cx: 60, cy: 39, gap: 16, ew: 5.5, eh: 9, my: 62, mw: 9, mouthOnPatch: true },
-    hands: { l: [36, 80], r: [84, 80], up: 26, board: [60, 84], size: 7.5, fill: ORANGE },
+    face: { cx: 60, cy: 36, gap: 18, ew: 5.5, eh: 9, my: 69, mw: 8, mouthOnPatch: true },
+    hands: { l: [36, 82], r: [84, 82], up: 26, board: [60, 86], size: 7.5, fill: ORANGE },
     head: [27, 0, 66],
     body: (_mood, c) => (
       <>
-        <path d="M73 101 Q97 104 113 117" stroke={c.body} strokeWidth="9" fill="none" strokeLinecap="round" />
+        <path d="M73 102 Q97 105 113 117" stroke={c.body} strokeWidth="9" fill="none" strokeLinecap="round" />
         <ellipse cx="48" cy="113" rx="13" ry="4" fill={c.body} />
         <ellipse cx="72" cy="113" rx="13" ry="4" fill={c.body} />
-        <ellipse className="m-body" cx="60" cy="88" rx="18" ry="23" fill={c.body} />
-        <ellipse cx="60" cy="96" rx="9.5" ry="11" fill={c.patch} />
-        <path d="M46 31 Q32 16 37 2 Q51 12 54 29 Z" fill={c.body} stroke={c.body} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M74 31 Q88 16 83 2 Q69 12 66 29 Z" fill={c.body} stroke={c.body} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M47 27 Q39 17 41 9 Q49 16 51 26 Z" fill={c.patch} />
-        <path d="M73 27 Q81 17 79 9 Q71 16 69 26 Z" fill={c.patch} />
-        <ellipse cx="60" cy="42" rx="19" ry="17" fill={c.body} />
-        <ellipse cx="60" cy="55" rx="10" ry="11" fill={c.patch} />
-        <ellipse cx="60" cy="49" rx="4.5" ry="3" fill={NAVY} />
-      </>
-    ),
-  },
-  goat: {
-    face: { cx: 60, cy: 50, gap: 24, ew: 9, eh: 5.5, my: 81, mw: 10, mouthOnPatch: true },
-    hands: { l: [11, 84], r: [109, 84], up: 26, board: [60, 104] },
-    head: [12, 6, 96],
-    body: (_mood, c) => (
-      <>
-        <path d="M48 30 Q40 9 22 13" stroke={NAVY} strokeWidth="10" fill="none" strokeLinecap="round" />
-        <path d="M72 30 Q80 9 98 13" stroke={NAVY} strokeWidth="10" fill="none" strokeLinecap="round" />
-        <path d="M48 30 Q40 9 22 13" stroke={c.patch} strokeWidth="6" fill="none" strokeLinecap="round" />
-        <path d="M72 30 Q80 9 98 13" stroke={c.patch} strokeWidth="6" fill="none" strokeLinecap="round" />
-        <ellipse cx="29" cy="50" rx="13" ry="5.5" transform="rotate(-20 29 50)" fill={c.body} />
-        <ellipse cx="91" cy="50" rx="13" ry="5.5" transform="rotate(20 91 50)" fill={c.body} />
-        <path d="M51 86 Q60 112 69 86 Z" fill={c.body} />
-        <ellipse cx="60" cy="58" rx="24" ry="30" fill={c.body} />
-        <ellipse cx="60" cy="77" rx="15" ry="11" fill={c.patch} />
-        <ellipse cx="55.5" cy="73" rx="1.8" ry="1.3" fill={NAVY} />
-        <ellipse cx="64.5" cy="73" rx="1.8" ry="1.3" fill={NAVY} />
-      </>
-    ),
-  },
-  fox: {
-    face: { cx: 60, cy: 57, gap: 23, ew: 6.5, eh: 11, my: 87, mw: 9, mouthOnPatch: true },
-    hands: { l: [12, 80], r: [108, 80], up: 28, board: [60, 104] },
-    head: [12, 10, 96],
-    body: (_mood, c) => (
-      <>
-        <path d="M60 98 L30 62 L25 18 L46 35 Q60 30 74 35 L95 18 L90 62 Z" fill={c.body} stroke={c.body} strokeWidth="7" strokeLinejoin="round" />
-        <path d="M31 27 L43 37 L33 45 Z" fill={ORANGE} stroke={ORANGE} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M89 27 L77 37 L87 45 Z" fill={ORANGE} stroke={ORANGE} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M60 98 L37 68 Q48 73 60 74 Q72 73 83 68 Z" fill={c.patch} stroke={c.patch} strokeWidth="4" strokeLinejoin="round" />
-        <ellipse cx="60" cy="93" rx="4.5" ry="3.2" fill={NAVY} />
+        <ellipse className="m-body" cx="60" cy="92" rx="18" ry="21" fill={c.body} />
+        <ellipse cx="60" cy="99" rx="9.5" ry="10" fill={c.patch} />
+        <path d="M47 27 Q28 16 30 1 Q46 8 53 25 Z" fill={c.body} stroke={c.body} strokeWidth="3" strokeLinejoin="round" />
+        <path d="M73 27 Q92 16 90 1 Q74 8 67 25 Z" fill={c.body} stroke={c.body} strokeWidth="3" strokeLinejoin="round" />
+        <path d="M47 23 Q36 16 35 7 Q45 12 50 22 Z" fill={c.patch} />
+        <path d="M73 23 Q84 16 85 7 Q75 12 70 22 Z" fill={c.patch} />
+        <path d="M60 22 C76 22 80 34 76 48 C73 60 67 72 60 72 C53 72 47 60 44 48 C40 34 44 22 60 22 Z" fill={c.body} />
+        <path d="M60 48 C67 48 70 56 68 63 C66 69 63 72 60 72 C57 72 54 69 52 63 C50 56 53 48 60 48 Z" fill={c.patch} />
+        <ellipse cx="60" cy="63" rx="4.2" ry="2.8" fill={NAVY} />
       </>
     ),
   },
@@ -166,40 +115,95 @@ const SPECS: Record<CharId, Spec> = {
       </>
     ),
   },
-  bot: {
-    face: { cx: 60, cy: 34, gap: 20, ew: 11, eh: 4.5, my: 52, mw: 12 },
-    hands: { l: [29, 80], r: [91, 80], up: 26, board: [60, 82], size: 6.5 },
-    head: [26, 2, 68],
-    body: (mood, c) => (
+  quokka: {
+    face: { cx: 60, cy: 42, gap: 22, ew: 6.5, eh: 10.5, my: 63, mw: 11, mouthOnPatch: true },
+    hands: { l: [30, 88], r: [90, 88], up: 30, board: [60, 92], size: 7 },
+    head: [20, 6, 80],
+    body: (_mood, c) => (
       <>
-        <rect x="49" y="92" width="8" height="12" rx="4" fill={c.body} />
-        <rect x="63" y="92" width="8" height="12" rx="4" fill={c.body} />
-        <ellipse cx="52" cy="106" rx="9" ry="4.5" fill={ORANGE} />
-        <ellipse cx="68" cy="106" rx="9" ry="4.5" fill={ORANGE} />
-        <rect className="m-body" x="42" y="62" width="36" height="33" rx="12" fill={c.body} />
-        <rect x="30" y="10" width="60" height="50" rx="18" fill={c.body} />
-        <rect x="36" y="23" width="48" height="22" rx="11" fill={c.feature} fillOpacity={mood === 'offline' ? 0.06 : 0.16} />
-        <circle className={mood === 'nudge' || mood === 'working' ? 'm-pulse' : undefined} cx="82" cy="15" r="4" fill={mood === 'offline' ? c.feature : ORANGE} fillOpacity={mood === 'offline' ? 0.3 : 1} />
+        <ellipse cx="50" cy="112" rx="9" ry="4" fill={c.body} />
+        <ellipse cx="70" cy="112" rx="9" ry="4" fill={c.body} />
+        <ellipse className="m-body" cx="60" cy="95" rx="22" ry="17" fill={c.body} />
+        <ellipse cx="60" cy="99" rx="12" ry="10" fill={c.patch} />
+        <ellipse cx="33" cy="25" rx="7" ry="8" fill={c.body} />
+        <ellipse cx="87" cy="25" rx="7" ry="8" fill={c.body} />
+        <ellipse cx="60" cy="42" rx="27" ry="25" fill={c.body} />
+        <circle cx="41" cy="56" r="16" fill={c.body} />
+        <circle cx="79" cy="56" r="16" fill={c.body} />
+        <ellipse cx="60" cy="61" rx="15" ry="11" fill={c.patch} />
+        <ellipse cx="60" cy="55" rx="5" ry="3.4" fill={NAVY} />
+        <path d="M51 63 Q60 70 69 63" stroke={NAVY} strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.9" />
       </>
     ),
+  },
+  wombat: {
+    face: { cx: 60, cy: 56, gap: 30, ew: 6, eh: 9.5, my: 88, mw: 12, mouthOnPatch: true },
+    hands: { l: [10, 92], r: [110, 92], up: 30, board: [60, 108] },
+    head: [12, 16, 96],
+    body: (_mood, c) => (
+      <>
+        <path d="M26 36 Q26 22 38 30 Z" fill={c.body} stroke={c.body} strokeWidth="6" strokeLinejoin="round" />
+        <path d="M94 36 Q94 22 82 30 Z" fill={c.body} stroke={c.body} strokeWidth="6" strokeLinejoin="round" />
+        <rect x="16" y="28" width="88" height="76" rx="36" fill={c.body} />
+        <ellipse cx="60" cy="83" rx="22" ry="15" fill={c.patch} />
+        <rect x="50" y="68" width="20" height="13" rx="6" fill={NAVY} />
+      </>
+    ),
+  },
+  shaker: {
+    face: { cx: 60, cy: 62, gap: 22, ew: 7, eh: 12, my: 82, mw: 16 },
+    hands: { l: [18, 82], r: [102, 82], up: 30, board: [60, 100] },
+    head: [12, 6, 96],
+    body: (_mood, c) => (
+      <>
+        <ellipse cx="49" cy="112" rx="8" ry="4" fill={c.body} />
+        <ellipse cx="71" cy="112" rx="8" ry="4" fill={c.body} />
+        <path d="M33 36 H87 L83 104 Q83 110 77 110 H43 Q37 110 37 104 Z" fill={c.body} />
+        <path d="M78 52 H84 M79 64 H84 M80 76 H84 M80 88 H84" stroke={c.patch} strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+        <rect x="30" y="22" width="60" height="17" rx="7" fill={ORANGE} />
+        <rect x="52" y="11" width="16" height="13" rx="4" fill={ORANGE} />
+      </>
+    ),
+  },
+  stopwatch: {
+    face: { cx: 60, cy: 73, gap: 26, ew: 7, eh: 12, my: 89, mw: 14, mouthOnPatch: true, eyesOnPatch: true },
+    hands: { l: [11, 84], r: [109, 84], up: 26, board: [60, 104] },
+    head: [12, 8, 96],
+    body: (mood, c) => {
+      const angle = mood === 'up' || mood === 'nudge' ? 0 : mood === 'down' ? 120 : mood === 'offline' ? 180 : mood === 'listening' ? -40 : 40
+      return (
+        <>
+          <rect x="53" y="8" width="14" height="10" rx="3" fill={c.body} />
+          <rect x="50" y="15" width="20" height="7" rx="3" fill={ORANGE} />
+          <rect x="84" y="22" width="11" height="8" rx="3" fill={c.body} transform="rotate(45 89 26)" />
+          <circle cx="60" cy="60" r="41" fill={c.body} />
+          <circle cx="60" cy="60" r="33" fill={c.patch} />
+          <path d="M60 30 V35 M90 60 H85 M60 90 V85 M30 60 H35" stroke={NAVY} strokeWidth="2.4" strokeLinecap="round" opacity="0.55" />
+          <g className={mood === 'working' ? 'm-spin' : 'm-hand'} style={{ transform: `rotate(${angle}deg)` }}>
+            <path d="M60 60 V33" stroke={ORANGE} strokeWidth="3.6" strokeLinecap="round" />
+          </g>
+          <circle cx="60" cy="60" r="4" fill={ORANGE} />
+        </>
+      )
+    },
   },
 }
 
 export const CHARACTERS: { id: CharId; name: string; kind: string; idea: string }[] = [
-  { id: 'coach', name: 'Coach', kind: 'Character', idea: 'The September pick, grown up: the sweatband is a brow, the mouth and hands come out to act.' },
-  { id: 'coach-full', name: 'Coach, full', kind: 'Character', idea: 'Same head on a small body with orange trainers. Can lift, stretch, wear kit.' },
-  { id: 'kettlebell', name: 'Kettlebell', kind: 'Object', idea: 'The bell is the body, the handle the ring from the FIQR mark. Unmistakably training.' },
   { id: 'kangaroo', name: 'Roo', kind: 'Creature', idea: 'Australian, athletic, boxes in orange gloves; the pouch holds your food log.' },
-  { id: 'goat', name: 'Goat', kind: 'Creature', idea: 'The GOAT. Sure-footed, eats anything, horizontal goat eyes for a dry wit.' },
-  { id: 'fox', name: 'Fox', kind: 'Creature', idea: 'The smart analyst: sharp, quick, reads your week before you do.' },
   { id: 'bear', name: 'Bear', kind: 'Creature', idea: 'Calm strength in a sweatband: the steady coach who never shouts.' },
-  { id: 'bot', name: 'Bot', kind: 'Humanoid', idea: 'A training bot with a lit visor; the orange light is Geo being on.' },
+  { id: 'coach', name: 'Coach', kind: 'Character', idea: 'The September pick, grown up: the sweatband is a brow, the mouth and hands come out to act.' },
+  { id: 'kettlebell', name: 'Kettlebell', kind: 'Object', idea: 'The bell is the body, the handle the ring from the FIQR mark. Unmistakably training.' },
+  { id: 'quokka', name: 'Quokka', kind: 'Creature', idea: "Australia's happiest animal: the supportive friend who's always glad you showed up." },
+  { id: 'wombat', name: 'Wombat', kind: 'Creature', idea: 'Stocky, steady, built like a powerlifter. Slow and sure wins the year.' },
+  { id: 'shaker', name: 'Shaker', kind: 'Object', idea: 'A protein shaker: the one thing that lives in both the kitchen and the gym, like Geo.' },
+  { id: 'stopwatch', name: 'Stopwatch', kind: 'Object', idea: "The coach's watch. The orange hand is a brow: it spins while Geo works, points up on a good week." },
 ]
 
 /** Eyes, brows and the mouth, shared by every character. */
 function Face({ mood, f, c }: { mood: Mood; f: Spec['face']; c: (typeof SCHEMES)[Scheme] }) {
   const { cx, cy, gap, ew, eh, my, mw } = f
-  const color = c.feature
+  const color = f.eyesOnPatch ? NAVY : c.feature
   const L = cx - gap / 2
   const R = cx + gap / 2
   const pill = (x: number, y: number, w: number, h: number, key: string) => <rect key={key} className="m-eye" x={x - w / 2} y={y - h / 2} width={w} height={h} rx={Math.min(w, h) / 2} fill={color} />
@@ -335,6 +339,9 @@ export const MASCOT_CSS = `
 @keyframes m-wave { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
 .m-pump { animation: m-pump 420ms cubic-bezier(.45,0,.55,1) infinite alternate; }
 @keyframes m-pump { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+.m-hand { transform-box: view-box; transform-origin: 50% 50%; transition: transform 500ms cubic-bezier(.25,1,.5,1); }
+.m-spin { transform-box: view-box; transform-origin: 50% 50%; animation: m-spin 1.2s linear infinite; }
+@keyframes m-spin { to { transform: rotate(360deg); } }
 .m-pulse { animation: m-pulse 1.4s ease-in-out infinite; }
 @keyframes m-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 .m-dim { opacity: .5; }

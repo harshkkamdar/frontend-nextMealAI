@@ -70,7 +70,7 @@ function InContext({ id, scheme }: { id: CharId; scheme: Scheme }) {
 export default function MascotPage() {
   const [scheme, setScheme] = useState<Scheme>('navy')
   const [held, setHeld] = useState<Mood | null>(null)
-  const [picked, setPicked] = useState<CharId>('coach')
+  const [picked, setPicked] = useState<CharId>('kangaroo')
   const mood = useCycle(held)
   const pickedChar = CHARACTERS.find((c) => c.id === picked)!
 
@@ -99,7 +99,7 @@ export default function MascotPage() {
         <p className="mt-3 text-[14px] text-ink-62">{held ? <>Holding <b>{held}</b>: {MOODS.find((m) => m.mood === held)?.when} Tap it again to play all nine.</> : 'Playing all nine expressions. Tap one to hold it.'}</p>
       </Chapter>
 
-      <Chapter n="01" id="all" title="All eight" intro="Tap one to see its expressions and how it sits in the app.">
+      <Chapter n="01" id="all" title="All eight" intro="Your four picks first, then four new ones in the same spirit. Tap one to see its expressions and how it sits in the app.">
         <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))]">
           {CHARACTERS.map((c, i) => (
             <button key={c.id} type="button" onClick={() => { setPicked(c.id); document.getElementById('detail')?.scrollIntoView({ behavior: 'smooth' }) }} className={cn('flex flex-col rounded-[20px] border bg-card p-4 text-left', picked === c.id ? 'border-ink' : 'border-ink-12')}>
