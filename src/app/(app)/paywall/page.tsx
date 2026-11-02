@@ -58,10 +58,10 @@ function PlanCard({ option, on, busy, onPick }: { option: SubscriptionOption; on
       disabled={busy}
       onClick={onPick}
       style={{ y, scale, opacity, zIndex }}
-      className="absolute inset-x-0 bottom-0 flex h-[180px] origin-top flex-col rounded-card bg-card p-4 text-left shadow-[0_1px_2px_rgba(17,28,53,.04)]"
+      className="absolute inset-x-0 bottom-0 flex h-[180px] origin-top flex-col rounded-card bg-card p-4 text-left shadow-[0_0_0_1px_rgba(17,28,53,.12)]"
     >
-      {/* Ring and lift shadow of the front card: their own layer, faded, so no shadow value animates. */}
-      <motion.span aria-hidden="true" style={{ opacity: front }} className="pointer-events-none absolute inset-0 rounded-card shadow-[0_0_0_1.5px_#111C35,0_22px_34px_-18px_rgba(17,28,53,.45)]" />
+      {/* The chosen plan: a 1.5 pt ink edge on its own layer, faded with the stack (state, not decoration). */}
+      <motion.span aria-hidden="true" style={{ opacity: front }} className="pointer-events-none absolute inset-0 rounded-card shadow-[0_0_0_1.5px_#111C35]" />
       <span className="flex w-full items-center gap-2">
         <span className="min-w-0 flex-1 text-caption font-semibold text-ink">{option.period === 'yearly' ? 'Yearly' : 'Monthly'}</span>
         <span aria-hidden="true" className="relative size-[22px] shrink-0 rounded-full shadow-[inset_0_0_0_1.5px_rgba(17,28,53,.22)]">
@@ -142,7 +142,7 @@ export default function PaywallPage() {
             <button
               type="button"
               onClick={() => void manageSubscription()}
-              className="mt-4 h-btn w-full rounded-full bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]"
+              className="mt-4 h-btn w-full rounded-[15px] bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]"
             >
               Manage subscription
             </button>
@@ -181,7 +181,7 @@ export default function PaywallPage() {
           </section>
         )}
 
-        <h2 className="mb-[7px] mt-[22px] px-4 text-caption font-semibold text-ink-65">What you get</h2>
+        <h2 className="mb-2.5 mt-5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">What you get</h2>
         <ul aria-label="What you get" className={GROUP_CARD}>
           {BENEFITS.map(({ title, sub }, index) => (
             <li key={title} className={cn('relative py-3 pl-[18px] pr-4', index > 0 && "before:absolute before:left-4 before:right-0 before:top-0 before:h-px before:bg-ink-08 before:content-['']")}>

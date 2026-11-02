@@ -151,7 +151,7 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <button type="button" disabled={!grams} onClick={() => { void haptic('selection'); onAdd(item()) }} className="flex h-btn items-center justify-center gap-1.5 rounded-full bg-ink-06 text-body font-bold text-ink transition-transform active:scale-[.97] disabled:opacity-40">
+          <button type="button" disabled={!grams} onClick={() => { void haptic('selection'); onAdd(item()) }} className="flex h-btn items-center justify-center gap-1.5 rounded-[15px] bg-ink-06 text-body font-bold text-ink transition-transform active:scale-[.97] disabled:opacity-40">
             <Plus aria-hidden="true" className="size-4" />Add to meal
           </button>
           <PrimaryButton type="button" disabled={!grams} onClick={() => onLogNow(item())}>Log now</PrimaryButton>

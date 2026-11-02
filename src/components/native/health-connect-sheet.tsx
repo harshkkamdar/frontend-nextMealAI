@@ -45,7 +45,7 @@ export function HealthConnectSheet({
   return (
     <BottomSheet open={open} onClose={onClose} ariaLabel={`Connect ${label}`}>
       <div className="flex flex-col gap-4 px-5 pb-5 pt-2">
-        <h2 className="font-display text-[22px] font-extrabold leading-tight text-ink">Connect {label}</h2>
+        <h2 className="text-[22px] font-bold leading-tight tracking-[-0.4px] text-ink">Connect {label}</h2>
         <p className="text-body-sm text-ink-65">
           FIQR reads these so Geo and your weekly check-in can use them. Nothing is shared with anyone else, and you can
           disconnect in Settings.

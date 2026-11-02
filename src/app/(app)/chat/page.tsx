@@ -145,7 +145,7 @@ export default function ChatListPage() {
       </form>
 
       <section className="mt-6" aria-labelledby="conversations-label">
-        <h2 id="conversations-label" className="mb-2 px-1 text-label text-ink-65">Conversations</h2>
+        <h2 id="conversations-label" className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Conversations</h2>
         {!data && loading ? (
           <ListSkeleton />
         ) : !data && error ? (
@@ -184,7 +184,7 @@ export default function ChatListPage() {
                 type="button"
                 onClick={() => void showOlder()}
                 disabled={loadingOlder}
-                className="mt-2 h-btn w-full rounded-full text-body-sm font-semibold text-ink transition-transform active:scale-[.98] disabled:text-ink-65"
+                className="mt-2 h-btn w-full rounded-[15px] text-body-sm font-semibold text-ink transition-transform active:scale-[.98] disabled:text-ink-65"
               >
                 {loadingOlder ? 'Loading older conversations' : 'Show older conversations'}
               </button>

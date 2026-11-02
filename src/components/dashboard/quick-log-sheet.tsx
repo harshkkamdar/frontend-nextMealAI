@@ -19,7 +19,7 @@ export type QuickLogType = 'water' | 'mood' | 'sleep' | 'energy' | 'weight' | nu
 const glasses = (n: number) => `${n} ${n === 1 ? 'glass' : 'glasses'}`
 
 function Title({ children }: { children: ReactNode }) {
-  return <h2 className="font-display text-[22px] font-extrabold leading-tight text-ink">{children}</h2>
+  return <h2 className="text-[22px] font-bold leading-tight tracking-[-0.4px] text-ink">{children}</h2>
 }
 
 const ROUND = 'grid size-stepper shrink-0 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94] disabled:opacity-35'

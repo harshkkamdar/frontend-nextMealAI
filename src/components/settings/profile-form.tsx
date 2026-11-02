@@ -370,7 +370,7 @@ function NumberRow({ id, label, unit, needed, numeric, step, value, onChange, pl
 function ChipGroup({ label, children }: { label: string; children: ReactNode }) {
   return (
     <section role="group" aria-label={label}>
-      <h2 className="mb-[7px] px-4 text-caption font-semibold text-ink-65">{label}</h2>
+      <h2 className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{label}</h2>
       <div className={`${GROUP_CARD} flex flex-wrap gap-1.5 p-3 [&>button]:text-body`}>{children}</div>
     </section>
   )

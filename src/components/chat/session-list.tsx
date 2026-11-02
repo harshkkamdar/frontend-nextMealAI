@@ -183,7 +183,7 @@ export function SessionList({
               className="mt-3 h-field w-full min-w-0 rounded-[16px] bg-card px-4 text-body font-medium text-ink outline outline-[1.5px] -outline-offset-[1.5px] outline-ink"
             />
             <p className="mt-1.5 text-right text-label font-medium text-ink-65 tabular-nums">{editValue.length} of {TITLE_MAX}</p>
-            <button type="submit" disabled={!editValue.trim() || busy} className="mt-3 h-btn w-full rounded-full bg-ink text-body font-bold text-cream transition-transform enabled:active:scale-[.97] disabled:bg-ink-08 disabled:text-ink-35">
+            <button type="submit" disabled={!editValue.trim() || busy} className="mt-3 h-btn w-full rounded-[15px] bg-ink text-body font-bold text-cream transition-transform enabled:active:scale-[.97] disabled:bg-ink-08 disabled:text-ink-35">
               {busy ? 'Saving' : 'Save'}
             </button>
             <button type="button" onClick={close} className="mt-1 h-btn w-full text-body font-semibold text-ink-65">Cancel</button>
@@ -193,7 +193,7 @@ export function SessionList({
           <div className="px-4 pb-4 pt-2">
             <h2 className="text-headline text-ink">Delete this conversation?</h2>
             <p className="mt-1 text-body-sm text-ink-65">Geo&apos;s replies and your messages in it go for good. What Geo logged stays in your diary.</p>
-            <button type="button" onClick={() => void confirmDelete()} disabled={busy} className="mt-4 h-btn w-full rounded-full bg-ink text-body font-bold text-cream transition-transform enabled:active:scale-[.97] disabled:opacity-60">
+            <button type="button" onClick={() => void confirmDelete()} disabled={busy} className="mt-4 h-btn w-full rounded-[15px] bg-ink text-body font-bold text-cream transition-transform enabled:active:scale-[.97] disabled:opacity-60">
               {busy ? 'Deleting' : 'Delete'}
             </button>
             <button type="button" onClick={close} className="mt-1 h-btn w-full text-body font-semibold text-ink-65">Keep</button>

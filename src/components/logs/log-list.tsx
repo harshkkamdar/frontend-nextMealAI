@@ -204,7 +204,7 @@ export function LogList({ filterType, onBack }: LogListProps = {}) {
 
       {loading ? (
         <div className="mt-2">
-          <p className="mb-2 px-1 text-label text-ink-65">Today</p>
+          <p className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Today</p>
           <RowsSkeleton rows={5} label="Loading your logs" />
         </div>
       ) : loadFailed ? (
@@ -221,7 +221,7 @@ export function LogList({ filterType, onBack }: LogListProps = {}) {
         <div className="space-y-5">
           {groups.map((group) => (
             <section key={group.label} aria-label={group.label}>
-              <h2 className="mb-2 px-1 text-label text-ink-65">{group.label}</h2>
+              <h2 className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{group.label}</h2>
               <ul className={LIST}>
                 {group.logs.map((log) => {
                   const selected = selectedIds.has(log.id)

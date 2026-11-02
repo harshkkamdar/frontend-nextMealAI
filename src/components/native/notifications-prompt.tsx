@@ -45,13 +45,13 @@ export function NotificationsPrompt() {
       <div className="flex flex-col gap-4 px-5 pb-5 pt-2">
         {mode === 'off' ? (
           <>
-            <h2 className="font-display text-[22px] font-extrabold leading-tight text-ink">Notifications are off</h2>
+            <h2 className="text-[22px] font-bold leading-tight tracking-[-0.4px] text-ink">Notifications are off</h2>
             <p className="text-body-sm text-ink-65">Turn them on in your phone&apos;s Settings, under FIQR, to hear when your weekly check-in is ready.</p>
             <PrimaryButton className="bg-ink text-cream text-[16px]" onClick={() => { close(); router.push('/settings') }}>Open Settings</PrimaryButton>
           </>
         ) : (
           <>
-            <h2 className="font-display text-[22px] font-extrabold leading-tight text-ink">Let Geo nudge you?</h2>
+            <h2 className="text-[22px] font-bold leading-tight tracking-[-0.4px] text-ink">Let Geo nudge you?</h2>
             <p className="text-body-sm text-ink-65">
               Geo can tell you when a check-in is ready or when you&apos;ve gone quiet for a few days. No marketing, ever. You can
               turn this off in Settings.

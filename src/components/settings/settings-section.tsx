@@ -20,7 +20,7 @@ const HAIRLINES = "[&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:b
 export function SettingsSection({ title, footer, children, label }: { title?: string; footer?: ReactNode; children: ReactNode; label?: string }) {
   return (
     <section aria-label={title ?? label}>
-      {title ? <h2 className="mb-[7px] px-4 text-caption font-semibold text-ink-65">{title}</h2> : null}
+      {title ? <h2 className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{title}</h2> : null}
       <div className={cn(GROUP_CARD, HAIRLINES)}>{children}</div>
       {footer ? <div className="mt-[7px] px-4 text-caption leading-[1.45] text-ink-65">{footer}</div> : null}
     </section>

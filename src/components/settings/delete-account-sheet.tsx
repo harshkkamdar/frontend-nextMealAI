@@ -83,7 +83,7 @@ export function DeleteAccountSheet({ open, onClose, onDownload, exporting = fals
           type="button"
           disabled={!ready || deleting}
           onClick={handleDelete}
-          className="mt-4 h-btn w-full rounded-full bg-ink text-body font-bold text-cream transition-[transform,opacity] duration-150 enabled:active:scale-[.97] disabled:opacity-35"
+          className="mt-4 h-btn w-full rounded-[15px] bg-ink text-body font-bold text-cream transition-[transform,opacity] duration-150 enabled:active:scale-[.97] disabled:opacity-35"
         >
           {deleting ? 'Deleting…' : 'Delete account'}
         </button>

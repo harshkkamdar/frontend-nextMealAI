@@ -345,7 +345,7 @@ export default function SettingsPage() {
         <div className="px-6 pb-4 pt-3">
           <h2 className="text-hero font-bold text-ink">Your plan lives in the app</h2>
           <p className="mt-2 text-body leading-[1.45] text-ink-65">FIQR Plus is sold in the FIQR app on iPhone and Android. Open it there to subscribe or change your plan.</p>
-          <button type="button" onClick={() => setShowPlanNote(false)} className="mt-5 h-btn w-full rounded-full bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]">
+          <button type="button" onClick={() => setShowPlanNote(false)} className="mt-5 h-btn w-full rounded-[15px] bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]">
             Got it
           </button>
         </div>

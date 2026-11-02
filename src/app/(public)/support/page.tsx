@@ -21,7 +21,7 @@ export default function SupportPage() {
       <a
         data-action
         href={`mailto:${SUPPORT_EMAIL}`}
-        className="mt-5 flex h-btn w-full items-center justify-center rounded-full bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]"
+        className="mt-5 flex h-btn w-full items-center justify-center rounded-[15px] bg-ink text-body font-bold text-cream transition-transform duration-100 active:scale-[.97]"
       >
         Email {SUPPORT_EMAIL}
       </a>

@@ -19,7 +19,7 @@ export const FIELD = 'w-full rounded-[16px] bg-[var(--surface-card)] px-4 text-[
 export function SectionTitle({ children, action, className }: { children: ReactNode; action?: ReactNode; className?: string }) {
   return (
     <div className={cn('mb-2 flex min-h-6 items-end justify-between px-1', className)}>
-      <h2 className="text-[13px] font-semibold text-ink-65">{children}</h2>
+      <h2 className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{children}</h2>
       {action}
     </div>
   )
