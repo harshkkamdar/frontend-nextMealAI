@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useReducedMotion } from 'framer-motion'
 import { toast } from 'sonner'
-import { emphasizeGeoMeasurements, formatDashboardDate, getDashboardGeoLine } from '@/components/dashboard/dashboard-helpers'
+import { emphasizeGeoMeasurements, formatDashboardDate, getDashboardGeoLine, quietDayGeoLine } from '@/components/dashboard/dashboard-helpers'
 import { HomeEntrance, HomeErrorCard, WATER_GOAL_GLASSES, weightDeltaText } from '@/components/dashboard/home-cards'
 import { CheckInDueRow, HomeHeader, HomeSkeleton } from '@/components/dashboard/home-today'
 import { geoAction, sleepTile, stepsTile, waterGlassesToday, weightTile } from '@/components/dashboard/home-data'
@@ -35,10 +35,11 @@ import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { getSuggestions } from '@/lib/api/suggestions.api'
-import { getInProgressSession, startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { abandonWorkoutSession, getInProgressSession, startWorkoutSession } from '@/lib/api/workout-sessions.api'
 import type { MacroKey } from '@/lib/macros'
 import { computeNudges } from '@/lib/nudges'
 import { todayLocalISO } from '@/lib/timezone'
+import { computeSelectedPlanDayIndex } from '@/lib/workout-session'
 import { useUIStore } from '@/stores/ui.store'
 import type { Log, LogsSummary } from '@/types/logs.types'
 import type { MealPlan, Plan, WorkoutPlan } from '@/types/plans.types'
@@ -137,7 +138,14 @@ export default function DashboardPage() {
   )
   // Nothing logged all week (a new account): Geo's first-meal line, not "you haven't eaten in a while".
   const hasFood = logs.some((log) => log.type === 'food')
-  const geoLine = getDashboardGeoLine(data?.checkIn?.takeaway, hasFood ? nudges : [])
+  const planDay = workoutPlan ? workoutPlan.content.days?.[computeSelectedPlanDayIndex(workoutPlan, today, today)] : undefined
+  const quietLine = quietDayGeoLine({
+    workout: planDay && !planDay.is_rest_day ? planDay.name || null : null,
+    restDay: !!planDay?.is_rest_day,
+    protein: Math.max(0, targets.protein - (day?.protein ?? 0)),
+    calories: Math.max(0, targets.calories - (day?.calories ?? 0)),
+  })
+  const geoLine = getDashboardGeoLine(data?.checkIn?.takeaway, hasFood ? nudges : [], quietLine)
   const pendingSuggestion = suggestions?.find((suggestion) => !hiddenSuggestionIds.includes(suggestion.id))
   const checkInDue = data?.status?.state === 'due'
 
@@ -212,7 +220,7 @@ export default function DashboardPage() {
 
               <section aria-label="Today's targets" className={cn('mt-5', enter && 'enter-rows')}>
                 <SectionLabel>Today&apos;s targets</SectionLabel>
-                <div className="mt-[10px] flex flex-col gap-[8px]">
+                <div className="mt-[10px] flex flex-col gap-[6px]">
                   <MacroBar name="Calories" lead current={day?.calories ?? 0} target={targets.calories} onClick={() => setActiveMacro('calories')} />
                   <MacroBar name="Protein" unit="g" current={day?.protein ?? 0} target={targets.protein} onClick={() => setActiveMacro('protein')} />
                   <MacroBar name="Carbs" unit="g" current={day?.carbs ?? 0} target={targets.carbs} onClick={() => setActiveMacro('carbs')} />
@@ -229,6 +237,11 @@ export default function DashboardPage() {
                   inProgress={data.inProgress}
                   onStart={(plan, dayIndex) => void startWorkout(plan, dayIndex)}
                   onResume={(session) => router.push(`/train/session?id=${session.id}`)}
+                  onDiscard={(session) => {
+                    void abandonWorkoutSession(session.id)
+                      .then(() => { toast.success('Workout ended'); refresh() })
+                      .catch(() => toast.error("Couldn't end the workout. Try again."))
+                  }}
                   onSeeProgram={() => router.push('/train')}
                   onAskGeo={openGeo}
                 />
@@ -263,7 +276,7 @@ export default function DashboardPage() {
                   {
                     label: 'Water',
                     value: String(water),
-                    unit: `/${WATER_GOAL_GLASSES}`,
+                    unit: `of ${WATER_GOAL_GLASSES}`,
                     sub: 'glasses',
                     onClick: () => setQuickLog('water'),
                     ariaLabel: `Water ${water} of ${WATER_GOAL_GLASSES} glasses, log water`,

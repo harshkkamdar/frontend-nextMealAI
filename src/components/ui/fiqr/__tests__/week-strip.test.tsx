@@ -8,23 +8,23 @@ describe('week dates', () => {
     expect(addDays('2027-01-01', -1)).toBe('2026-12-31')
   })
 
-  it('returns the Sunday-start week containing the date', () => {
+  it('returns the Monday-start week containing the date (the check-in week)', () => {
     // 26 Oct 2026 is a Monday.
-    expect(weekDays('2026-10-26')).toEqual(['2026-10-25', '2026-10-26', '2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30', '2026-10-31'])
-    expect(weekDays('2026-10-25')[0]).toBe('2026-10-25')
+    expect(weekDays('2026-10-26')).toEqual(['2026-10-26', '2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30', '2026-10-31', '2026-11-01'])
+    expect(weekDays('2026-10-25')[0]).toBe('2026-10-19')
   })
 
-  it('supports Monday-start weeks', () => {
-    expect(weekDays('2026-10-25', 1)[0]).toBe('2026-10-19')
-    expect(weekDays('2026-10-26', 1)[6]).toBe('2026-11-01')
+  it('supports Sunday-start weeks when asked', () => {
+    expect(weekDays('2026-10-26', 0)[0]).toBe('2026-10-25')
+    expect(weekDays('2026-10-25', 0)[6]).toBe('2026-10-31')
   })
 })
 
 describe('WeekStrip', () => {
   it('marks today, the selected day and logged days for screen readers', () => {
-    render(<WeekStrip selected="2026-10-25" today="2026-10-26" onSelect={() => {}} marked={new Set(['2026-10-25'])} markLabel="food logged" />)
+    render(<WeekStrip selected="2026-10-27" today="2026-10-26" onSelect={() => {}} marked={new Set(['2026-10-27'])} markLabel="food logged" />)
     expect(screen.getByRole('button', { name: /monday 26 october, today/i })).toHaveAttribute('aria-current', 'date')
-    const selected = screen.getByRole('button', { name: /sunday 25 october, food logged/i })
+    const selected = screen.getByRole('button', { name: /tuesday 27 october, food logged/i })
     expect(selected).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getAllByRole('button')).toHaveLength(7)
   })

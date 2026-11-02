@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 /** George's Home header: the mark, wordmark and date on one line, the greeting under it, the profile button right. */
 export function HomeHeader({ date, name, onProfile }: { date: string; name: string | null; onProfile: () => void }) {
   return (
-    <header className="flex items-start justify-between gap-[14px] pt-[calc(20px+var(--safe-top))]">
+    <header className="flex items-start justify-between gap-[14px] pt-[calc(10px+var(--safe-top))]">
       <div className="min-w-0">
         <div className="flex items-center gap-[9px]">
           <Wordmark size={20} />

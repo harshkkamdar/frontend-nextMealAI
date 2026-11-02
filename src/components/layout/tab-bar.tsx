@@ -62,7 +62,7 @@ export function TabBar() {
         className={cn('flex min-h-11 flex-col items-center justify-end gap-[5px] transition-transform active:scale-[.94]', active ? 'text-accent' : 'text-ink-50')}
       >
         <Icon />
-        <span className={cn('text-[11px] leading-none', active ? 'font-semibold text-accent' : 'font-medium text-ink-62')}>{label}</span>
+        <span className={cn('text-[11px] leading-none', active ? 'font-semibold text-accent-ink' : 'font-medium text-ink-62')}>{label}</span>
       </Link>
     )
   }

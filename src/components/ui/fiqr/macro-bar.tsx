@@ -54,7 +54,7 @@ export function MacroBar({ name, current, target, unit, lead = false, onClick }:
 
   if (!onClick) return <div>{body}</div>
   return (
-    <button type="button" onClick={onClick} aria-label={`${name}: ${fmt(c)} of ${fmt(t)}${unit ?? ''}, open details`} className="block w-full py-[3px] text-left transition-opacity active:opacity-60">
+    <button type="button" onClick={onClick} aria-label={`${name}: ${fmt(c)} of ${fmt(t)}${unit ?? ''}, open details`} className="block w-full py-[2px] text-left transition-opacity active:opacity-60">
       {body}
     </button>
   )

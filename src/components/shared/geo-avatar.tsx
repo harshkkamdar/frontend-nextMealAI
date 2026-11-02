@@ -41,12 +41,20 @@ export function GeoAvatar({
   className?: string
   onNavy?: boolean
 }) {
+  if (onNavy) {
+    // On a navy surface the card is the disc: the bare cream mark, as on the app icon.
+    return (
+      <span role="img" aria-label="Geo" data-geo-state={state} className={cn('grid shrink-0 place-items-center', className)} style={{ width: size, height: size }}>
+        <GeoMark size={size} tone="cream" working={state === 'thinking'} />
+      </span>
+    )
+  }
   return (
     <span
       role="img"
       aria-label="Geo"
       data-geo-state={state}
-      className={cn('grid shrink-0 place-items-center rounded-full bg-ink', onNavy && 'ring-1 ring-cream-55', className)}
+      className={cn('grid shrink-0 place-items-center rounded-full bg-ink', className)}
       style={{ width: size, height: size }}
     >
       <GeoMark size={Math.round(size * 0.72)} tone="cream" working={state === 'thinking'} />

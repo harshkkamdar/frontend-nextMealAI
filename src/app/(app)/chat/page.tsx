@@ -8,6 +8,9 @@ import { SessionList } from '@/components/chat/session-list'
 import { sessionTitles } from '@/components/chat/session-titles'
 import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { formatDashboardDate } from '@/components/dashboard/dashboard-helpers'
+import { useUserTimezone } from '@/hooks/useUserTimezone'
+import { todayLocalISO } from '@/lib/timezone'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { ArrowUpIcon } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
@@ -62,6 +65,7 @@ function appendPage(shown: ChatSession[], page: ChatSession[]): ChatSession[] {
 export default function ChatListPage() {
   useSetGeoScreen('chat_list', {})
   const router = useRouter()
+  const tz = useUserTimezone()
   const [draft, setDraft] = useState('')
   const askRef = useRef<HTMLInputElement>(null)
   const [removed, setRemoved] = useState<string[]>([])
@@ -108,7 +112,7 @@ export default function ChatListPage() {
     <div className="mx-auto w-full max-w-md px-gutter pb-6">
       <LargeTitleHeader
         title="Geo"
-        subtitle="Your coach"
+        subtitle={formatDashboardDate(todayLocalISO(tz))}
         actions={(
           <RoundButton aria-label="New conversation" onClick={() => router.push(newSessionUrl())}>
             <SquarePen strokeWidth={1.75} />

@@ -10,7 +10,7 @@ export function PrimaryButton({ icon, trailing, children, className, ...props }:
   return (
     <button
       // George's primary action (DESIGN.md component 3): cream label at 19 pt bold, which passes AA on orange as large text.
-      className={cn('w-full min-h-btn bg-accent text-cream rounded-[18px] px-[18px] py-[12px] font-bold text-[19px] leading-tight flex items-center gap-[13px] shadow-[var(--shadow-action)] disabled:bg-ink-08 disabled:text-ink-35 disabled:shadow-none transition-[background-color,color,transform] duration-200 enabled:active:scale-[.98] enabled:active:duration-75', !icon && 'justify-center', className)}
+      className={cn('w-full bg-accent text-cream rounded-[18px] px-[18px] py-[12px] font-bold text-[19px] leading-tight flex items-center gap-[13px] shadow-[var(--shadow-action)] disabled:bg-ink-08 disabled:text-ink-35 disabled:shadow-none transition-[background-color,color,transform] duration-200 enabled:active:scale-[.98] enabled:active:duration-75', icon ? 'min-h-[64px]' : 'min-h-btn justify-center', className)}
       {...props}
     >
       {icon ? (

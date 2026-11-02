@@ -29,7 +29,8 @@ function TopBar({ title, filled, titleVisible = filled, leading, actions }: { ti
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[40]" style={{ paddingTop: 'var(--safe-top)' }}>
       <div aria-hidden="true" className={cn('glass-bar absolute inset-0 transition-opacity duration-200', filled ? 'opacity-100' : 'opacity-0')} />
-      <div className="relative mx-auto flex h-[56px] max-w-md items-center gap-2 px-[14px]">
+      {/* 64 tall at the gutter: header buttons sit 10 pt down on every screen, level with Home's (DESIGN.md component 1). */}
+      <div className="relative mx-auto flex h-[64px] max-w-md items-center gap-2 px-gutter">
         <div className="pointer-events-auto flex min-w-11 items-center">{leading}</div>
         <p
           aria-hidden={!titleVisible}
@@ -62,7 +63,7 @@ export function LargeTitleHeader({ title, subtitle, actions, children }: LargeTi
   return (
     <>
       <TopBar title={title} filled={past} actions={actions} />
-      <header className="pt-[calc(16px+var(--safe-top))]">
+      <header className="pt-[calc(10px+var(--safe-top))]">
         <div className={cn('min-h-11', actions && 'pr-28')}>
           {subtitle ? <p className="truncate text-[12px] font-medium uppercase tracking-[1.4px] text-ink-62">{subtitle}</p> : null}
           <h1 className="mt-[5px] text-title text-ink">{title}</h1>
@@ -102,7 +103,7 @@ function LargeTitle({ title, subtitle }: { title: string; subtitle?: ReactNode }
 /** A plain back chevron with a 44 pt target (DESIGN.md component 1). */
 function BackButton({ label, onBack }: { label: string; onBack: () => void }) {
   return (
-    <button type="button" aria-label={label} onClick={onBack} className="-ml-[6px] grid size-11 place-items-center rounded-full text-ink transition-transform active:scale-[.94] [&_svg]:size-6">
+    <button type="button" aria-label={label} onClick={onBack} className="-ml-[10px] grid size-11 place-items-center rounded-full text-ink transition-transform active:scale-[.94] [&_svg]:size-6">
       <ChevronLeftIcon />
     </button>
   )
@@ -125,12 +126,12 @@ export function PushedHeader({ title, onBack, backLabel = 'Back', actions, large
       />
       {large ? (
         <>
-          <div aria-hidden="true" className="h-[calc(56px+var(--safe-top))]" />
+          <div aria-hidden="true" className="h-[calc(64px+var(--safe-top))]" />
           <LargeTitle title={title} subtitle={subtitle} />
           <div ref={ref} aria-hidden="true" />
         </>
       ) : (
-        <div ref={ref} aria-hidden="true" className="h-[calc(56px+var(--safe-top))]" />
+        <div ref={ref} aria-hidden="true" className="h-[calc(64px+var(--safe-top))]" />
       )}
     </>
   )

@@ -14,8 +14,17 @@ export function getDashboardFirstName(
 export function getDashboardGeoLine(
   takeaway: string | null | undefined,
   nudges: Array<{ message?: string | null }>,
+  fallback: string = DEFAULT_GEO_LINE,
 ): string {
-  return takeaway?.trim() || nudges.find((nudge) => nudge.message?.trim())?.message?.trim() || DEFAULT_GEO_LINE
+  return takeaway?.trim() || nudges.find((nudge) => nudge.message?.trim())?.message?.trim() || fallback
+}
+
+/** Geo's line on a quiet day, in George's pattern ("Legs today, then 83g more protein to close the gap"). */
+export function quietDayGeoLine({ workout, restDay, protein, calories }: { workout: string | null; restDay: boolean; protein: number; calories: number }): string {
+  if (protein <= 0) return DEFAULT_GEO_LINE
+  if (workout) return `${workout} today, then ${Math.round(protein)} g protein to hit.`
+  if (restDay) return `Rest day. ${Math.round(protein)} g protein still counts.`
+  return `${Math.round(calories).toLocaleString('en-US')} kcal and ${Math.round(protein)} g protein to hit today.`
 }
 
 export function emphasizeGeoMeasurements(line: string): ReactNode {
