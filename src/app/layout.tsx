@@ -23,20 +23,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           offset={{ top: 'calc(64px + var(--safe-top))' }}
           // left/right 0: sonner's phone layout is 100% wide from its side offset, which pushed a long capsule (and Undo) 16 px off screen.
           mobileOffset={{ top: 'calc(64px + var(--safe-top))', left: 0, right: 0 }}
-          // The status capsule (mock "Status capsule"): toasts share the offline band's glass capsule and ink dot (a ring
-          // for errors), so every message lives in one place under the header. Our dot replaces sonner's type icons.
+          // The status capsule (DESIGN.md component 12): a navy pill with cream text, a cream dot (a ring for errors), the
+          // same capsule as the offline band, so every message lives in one place under the header.
           icons={{ success: null, error: null, info: null, warning: null }}
           toastOptions={{
             unstyled: true,
             classNames: {
-              toast: "glass flex items-center gap-2.5 rounded-[24px] py-0.5 pl-4 pr-0.5 text-body-sm font-semibold leading-[1.35] text-ink before:size-2 before:shrink-0 before:rounded-full before:bg-ink before:content-['']",
-              error: 'before:bg-transparent before:shadow-[inset_0_0_0_2px_#111C35]',
+              toast: "flex items-center gap-2.5 rounded-[24px] bg-ink py-0.5 pl-4 pr-0.5 text-[14px] font-medium leading-[1.35] text-cream before:size-2 before:shrink-0 before:rounded-full before:bg-cream before:content-['']",
+              error: 'before:bg-transparent before:shadow-[inset_0_0_0_2px_#FDF6EC]',
               content: 'min-w-0 flex-1 py-[13px] pr-3.5',
-              actionButton: 'relative h-11 min-w-11 shrink-0 rounded-[20px] bg-ink-08 px-3.5 font-bold text-ink',
+              actionButton: 'relative h-11 min-w-11 shrink-0 rounded-[20px] px-3.5 text-[14px] font-bold text-cream active:opacity-60',
             },
             // height auto: sonner pins the measured first-paint height, which clips text that wraps once the font loads.
             // left/right 0 with auto margins and fit-content: the capsule hugs its words and stays centred.
-            style: { height: 'auto', minHeight: 48, left: 0, right: 0, marginInline: 'auto', width: 'fit-content', maxWidth: 'calc(100% - 32px)', fontFamily: 'var(--font-archivo)', boxShadow: 'inset 0 1px 0 #fff, 0 0 0 .5px rgba(17,28,53,.1), 0 16px 34px -14px rgba(17,28,53,.4)' },
+            style: { height: 'auto', minHeight: 48, left: 0, right: 0, marginInline: 'auto', width: 'fit-content', maxWidth: 'calc(100% - 32px)', fontFamily: 'var(--font-archivo)', boxShadow: '0 12px 28px -12px rgba(17,28,53,.45)' },
           }}
         />
         <SplashHider />

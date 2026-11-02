@@ -7,7 +7,7 @@ import { ActionCard } from '@/components/chat/action-card'
 import { parseLoggedFoods } from '@/components/chat/logged-foods'
 import type { ActionCardModel } from '@/components/chat/thread-actions'
 import { ReportSheet } from '@/components/chat/report-sheet'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { GeoMark } from '@/components/shared/geo-avatar'
 import { reducedFade, spring } from '@/lib/motion'
 import { cn, safeImageUrl } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat.types'
@@ -99,10 +99,11 @@ function describeFailure(a: { tool: string; error?: string }) {
 }
 
 /** Opens a run of Geo's turns, so its plain text reads as a reply, not an unsent draft. Shared with the typing dots. */
-export function GeoAnchor() {
+/** The Geo mark and name at the start of a run of Geo's turns: working while Geo writes, one turn when a fresh reply lands. */
+export function GeoAnchor({ working = false, done = false }: { working?: boolean; done?: boolean }) {
   return (
     <div className="flex h-5 items-center gap-2">
-      <GeoAvatar variant="face" size={20} />
+      <span role="img" aria-label="Geo"><GeoMark size={20} working={working} done={done} /></span>
       <span aria-hidden="true" className="text-[13px] font-semibold text-ink">Geo</span>
     </div>
   )
@@ -238,7 +239,7 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId, cluste
         className="flex select-none flex-col gap-3 [-webkit-touch-callout:none]"
         {...longPress}
       >
-        {clusterStart ? <GeoAnchor /> : null}
+        {clusterStart ? <GeoAnchor done={fresh} /> : null}
         {/* What Geo did leads, as one card; Geo's line about it follows. A draft plan's description sits on its card. */}
         {card?.kind === 'draft' ? (
           // Once saved, the draft's "nothing changes until you say so" line no longer holds.

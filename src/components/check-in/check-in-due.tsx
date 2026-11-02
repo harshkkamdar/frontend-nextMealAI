@@ -10,7 +10,7 @@ import { syncBus } from '@/lib/sync/sync-bus'
 
 import { appliedTargets, changeSentence, proposalChanges, savedTargets, type DayTargets } from './apply-targets'
 import { formatDelta, formatMetric } from './format'
-import { AskGeo, GeoRead, SectionTitle } from './parts'
+import { AskGeo, GeoRead, SectionTitle, weekPose } from './parts'
 import { ratio, StatTiles } from './stat-tiles'
 import { TodayPreview } from './today-preview'
 import { WeightTrendCard } from './weight-trend-card'
@@ -100,7 +100,7 @@ export function CheckInDue({ status, today, refetch, onApplied, onDone, source }
 
   return (
     <div className="flex flex-col">
-      <GeoRead verdict={status.verdict} aside={aside} />
+      <GeoRead verdict={status.verdict} aside={aside} pose={weekPose(status.week_so_far.sessions_done, status.week_so_far.sessions_planned)} />
 
       <div className="mt-2.5">
         <TodayPreview current={current} next={next} eaten={today.eaten} showNew={showNew} onShowNew={setShowNew} settled={!!outcome} />

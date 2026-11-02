@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { GeoRead } from '@/components/check-in/parts'
 import { SegmentsBar } from '@/components/check-in/segments-bar'
-import { GeoMark, type GeoPose } from '@/components/shared/geo-avatar'
+import { GeoMark } from '@/components/shared/geo-avatar'
 import { GeoLine } from '@/components/ui/fiqr/geo-line'
 import { Wordmark } from '@/components/ui/fiqr/wordmark'
 import { Chapter, LabShell } from '../_parts'
@@ -16,15 +16,6 @@ const ETHOS = [
   ['Numbers are the hero', 'Big, tabular and exact. Bars, because bars compare at a glance.'],
   ['One orange thing per screen', 'It is what Geo would tell you to do next. A screen with nothing to act on has no orange.'],
 ] as const
-
-const POSES: { name: string; when: string; pose?: GeoPose; working?: boolean; done?: boolean; arrive?: boolean }[] = [
-  { name: 'Rest', when: 'The logo. Geo is idle; the app icon and the nav.', pose: 'rest' },
-  { name: 'Working', when: 'Thinking, logging or building. The bar travels round the ring.', working: true },
-  { name: 'Done', when: 'Something landed. One turn, then rest. Plays as Home opens.', done: true },
-  { name: 'Speak', when: 'The bar turns to the line beside it: Geo is talking to you.', pose: 'speak', arrive: true },
-  { name: 'Up', when: 'A trend going the way you want it to.', pose: 'up', arrive: true },
-  { name: 'Down', when: 'Something needs your attention this week.', pose: 'down', arrive: true },
-]
 
 const VOICE: [string, string][] = [
   ['Great job today! 🎉 You’re crushing your goals!', 'Banana’s in, 105 kcal. 179 g protein to go.'],
@@ -98,20 +89,6 @@ function Construction() {
   )
 }
 
-function PoseTile({ name, when, pose, working, done, arrive }: (typeof POSES)[number]) {
-  const [run, setRun] = useState(0)
-  return (
-    <button type="button" onClick={() => setRun((r) => r + 1)} className="group flex flex-col items-start rounded-[16px] border border-ink-12 bg-card p-4 text-left active:bg-ink-04" aria-label={`Replay ${name}`}>
-      <span className="grid h-[84px] w-full place-items-center">
-        <GeoMark key={run} size={72} pose={pose} working={working} done={done} arrive={arrive} />
-      </span>
-      <span className="mt-3 text-[15.5px] font-semibold">{name}</span>
-      <span className="mt-1 text-[13.5px] leading-[1.4] text-ink-65">{when}</span>
-      <span className="mt-2 text-[12px] font-semibold text-ink-62 group-active:text-ink">Tap to replay</span>
-    </button>
-  )
-}
-
 function Row({ children }: { children: ReactNode }) {
   return <div className="grid gap-x-8 gap-y-6 grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))]">{children}</div>
 }
@@ -152,10 +129,14 @@ export default function BrandPage() {
           </div>
         </div>
 
-        <h3 className="mb-4 mt-12 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Expression</h3>
-        <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))]">
-          {POSES.map((p) => <PoseTile key={p.name} {...p} />)}
-        </div>
+        <a href="/geo" className="mt-12 flex items-center gap-5 rounded-[16px] border border-ink-12 bg-card px-5 py-4 active:bg-ink-04">
+          <span className="flex gap-3">{(['rest', 'speak', 'up', 'down'] as const).map((pose) => <GeoMark key={pose} size={28} pose={pose} />)}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15.5px] font-semibold">Nine expressions, ten situations</span>
+            <span className="block text-[13.5px] text-ink-65">How Geo moves and what it says in each part of the app</span>
+          </span>
+          <span aria-hidden="true" className="text-[17px] text-ink-50">→</span>
+        </a>
 
         <h3 className="mb-4 mt-12 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Where Geo lives</h3>
         <Row>

@@ -17,7 +17,7 @@ import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { handleGeoToolResults } from '@/lib/sync/dispatch-from-chat'
 import type { AttachedImage, ChatMessage, ChatSession } from '@/types/chat.types'
 import type { WorkoutProgramContent } from '@/types/plans.types'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { GeoMark } from '@/components/shared/geo-avatar'
 import { ApiException } from '@/types/api.types'
 import { goBack } from '@/lib/navigation'
 
@@ -296,7 +296,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
 function NewChatIntro() {
   return (
     <div className="mb-6 flex flex-col gap-3">
-      <GeoAvatar variant="face" state="happy" size={36} />
+      <span role="img" aria-label="Geo"><GeoMark size={36} pose="speak" arrive /></span>
       <p className="text-[16px] leading-[1.5] text-ink">
         Hi, I&apos;m Geo. Tell me what you ate, ask what to eat next, or ask how your week is going. A photo works too.
       </p>

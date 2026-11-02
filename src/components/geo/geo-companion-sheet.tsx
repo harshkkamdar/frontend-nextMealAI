@@ -11,7 +11,7 @@ import { toast } from 'sonner'
 import { useUIStore } from '@/stores/ui.store'
 import { useGeoScreenContext } from '@/contexts/geo-screen-context'
 import { useOnline } from '@/lib/platform/network'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { GeoMark } from '@/components/shared/geo-avatar'
 import { ChatInput } from '@/components/chat/chat-input'
 import { ChatThread } from '@/components/chat/chat-thread'
 import {
@@ -298,9 +298,9 @@ export function GeoCompanionSheet() {
     <ResizableSheet open={isOpen} onClose={handleClose} ariaLabel="Geo" levels={[0.55, 0.94]} defaultLevelIndex={0}>
       <div ref={bodyRef} className="flex min-h-0 flex-1 flex-col">
       <div className="flex shrink-0 items-center gap-3 px-5 pb-3">
-        <GeoAvatar variant="face" state="happy" size={36} />
+        <span role="img" aria-label="Geo"><GeoMark size={36} pose="speak" arrive muted={!online} /></span>
         <div className="min-w-0 flex-1">
-          <p className="font-wide text-[19px] font-bold leading-tight text-ink">Geo</p>
+          <p className="text-[19px] font-bold leading-tight text-ink">Geo</p>
           <p className="truncate text-caption font-medium text-ink-65">{!online ? "You're offline" : screen ? `Looking at ${screen}` : 'Here to help'}</p>
         </div>
         {messages.length > 0 ? (

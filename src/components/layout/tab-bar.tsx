@@ -49,6 +49,8 @@ export function TabBar() {
   const pathname = usePathname()
   const hidden = hidesTabBar(pathname)
   const geoWorking = useUIStore((state) => state.geoWorking > 0)
+  // Each finished Geo task remounts the mark with `done`, so it turns once.
+  const geoDone = useUIStore((state) => state.geoDone)
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
   const item = ({ label, href, icon: Icon }: (typeof SIDE)[number]) => {
@@ -87,7 +89,7 @@ export function TabBar() {
           className="flex flex-col items-center"
         >
           <span className="-mt-6 grid size-14 place-items-center rounded-full bg-ink shadow-[var(--shadow-raised)] transition-transform active:scale-[.94]">
-            <GeoMark size={34} tone="cream" working={geoWorking} />
+            <GeoMark key={geoDone} size={34} tone="cream" working={geoWorking} done={geoDone > 0} />
           </span>
           <span className={cn('mt-[6px] text-[11px] leading-none text-ink-62', isActive('/chat') ? 'font-semibold text-ink' : 'font-semibold')}>Geo</span>
         </Link>

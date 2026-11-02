@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useReducedMotion } from 'framer-motion'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { GeoMark, type GeoPose } from '@/components/shared/geo-avatar'
 import { CARD, HueDot, SectionHeading, TextButton } from '@/components/plans/spatial-parts'
 import { CountUp } from '@/components/ui/fiqr/count-up'
 import { healthLabel, isHealthConnected } from '@/lib/platform/health'
@@ -44,12 +44,15 @@ export function useHealthSource(): string | null {
 
 export const SectionTitle = SectionHeading
 
-/** Geo's read of the week (George): the navy card with the largest type on the screen; the data below is evidence. */
-export function GeoRead({ verdict, aside, children, footer, className }: { verdict: string | null; aside: ReactNode; children?: ReactNode; footer?: ReactNode; className?: string }) {
+/**
+ * Geo's read of the week (George): the navy card with the largest type on the screen; the data below is evidence.
+ * `pose`: Geo turns its bar as the card opens (up for a week that went to plan, down for one that didn't).
+ */
+export function GeoRead({ verdict, aside, children, footer, pose = 'rest', className }: { verdict: string | null; aside: ReactNode; children?: ReactNode; footer?: ReactNode; pose?: GeoPose; className?: string }) {
   return (
     <section className={cn('rounded-[22px] bg-ink p-[22px] text-cream', className)} aria-label="Geo's read">
       <div className="flex items-center gap-[9px]">
-        <GeoAvatar size={22} onNavy state="default" />
+        <span role="img" aria-label="Geo"><GeoMark size={22} tone="cream" pose={pose} arrive={pose !== 'rest'} /></span>
         <span className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Geo&apos;s read</span>
         <span className="ml-auto text-[12px] font-medium text-cream-60 tabular-nums">{aside}</span>
       </div>
@@ -58,6 +61,12 @@ export function GeoRead({ verdict, aside, children, footer, className }: { verdi
       {footer}
     </section>
   )
+}
+
+/** How the week went against the plan, as Geo's pose: all planned sessions done reads up, fewer than half reads down. */
+export function weekPose(done: number, planned: number): GeoPose {
+  if (planned <= 0) return 'speak'
+  return done >= planned ? 'up' : done * 2 < planned ? 'down' : 'speak'
 }
 
 /** George's tile label: 11 / 600, uppercase, tracked. */

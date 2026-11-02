@@ -1,3 +1,4 @@
+import { geoTask } from '@/stores/ui.store'
 import { apiFetch } from './client'
 import type { FoodSearchResult, UserFood, CreateFoodInput } from '@/types/foods.types'
 
@@ -23,11 +24,11 @@ export interface FoodEstimate {
   error?: string
 }
 
-/** FB-R6-13 — Multipart upload to POST /v1/foods/estimate-from-photo. */
+/** FB-R6-13 — Multipart upload to POST /v1/foods/estimate-from-photo. Geo reads the photo, so the nav's Geo works meanwhile. */
 export async function estimateFoodFromPhoto(file: File): Promise<FoodEstimate> {
   const form = new FormData()
   form.append('image', file)
-  return apiFetch<FoodEstimate>('/v1/foods/estimate-from-photo', { method: 'POST', body: form })
+  return geoTask(() => apiFetch<FoodEstimate>('/v1/foods/estimate-from-photo', { method: 'POST', body: form }))
 }
 
 /** FB-R6-13 — POST /v1/foods/log-from-estimate. `edits` merges over saved estimate. */

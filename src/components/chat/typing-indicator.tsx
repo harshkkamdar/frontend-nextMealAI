@@ -18,7 +18,7 @@ export function TypingIndicator({ anchor = false }: { anchor?: boolean }) {
       transition={{ duration: 0.15, ease: 'easeOut', delay: reduce ? 0 : 0.12 }}
       className="flex flex-col gap-3"
     >
-      {anchor ? <GeoAnchor /> : null}
+      {anchor ? <GeoAnchor working /> : null}
       <div className="flex h-6 items-center gap-1.5">
         {[0, 1, 2].map((i) => (
           <motion.span

@@ -1,15 +1,10 @@
 import { apiFetch } from './client'
-import { useUIStore } from '@/stores/ui.store'
+import { geoTask } from '@/stores/ui.store'
 import type { ChatResponse, ChatSession, ChatMessage, SendMessageInput } from '@/types/chat.types'
 
 /** Every message to Geo goes through here, so the nav's Geo mark can show Geo working from any screen. */
 export async function sendMessage(input: SendMessageInput): Promise<ChatResponse> {
-  useUIStore.getState().geoStart()
-  try {
-    return await apiFetch<ChatResponse>('/v1/chat', { method: 'POST', body: input })
-  } finally {
-    useUIStore.getState().geoEnd()
-  }
+  return geoTask(() => apiFetch<ChatResponse>('/v1/chat', { method: 'POST', body: input }))
 }
 
 // FB-R6-02 — step one of the two-step chat image flow. The composer calls

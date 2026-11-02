@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
+import { GeoMark } from '@/components/shared/geo-avatar'
 import { takeSuggestionAction } from '@/lib/api/suggestions.api'
 import type { Suggestion } from '@/types/suggestions.types'
 
@@ -27,7 +27,7 @@ export function SuggestionCard({
   return (
     <div className="rounded-[24px] card-glass p-5">
       <div className="flex gap-[11px]">
-        <GeoAvatar variant="face" state="suggest" size={24} />
+        <span role="img" aria-label="Geo"><GeoMark size={24} nudge /></span>
         <div className="min-w-0 flex-1">
           <p className="text-[15.5px] font-semibold text-ink">{suggestion.title}</p>
           <p className="mt-0.5 text-[13.5px] font-normal text-ink-65">{suggestion.description}</p>
