@@ -147,7 +147,7 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
                 <b className="font-semibold">I&apos;m not sure about this plate.</b> Check the items marked below before you log.
               </p>
             ) : null}
-            <p className="mb-2 mt-4 px-1 text-label text-ink-65">{kept.length} item{kept.length === 1 ? '' : 's'} I can see · tap − or + to match what you ate</p>
+            <p className="mb-2 mt-4 px-1 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{kept.length} item{kept.length === 1 ? '' : 's'} I can see · tap − or + to match what you ate</p>
             <ul className={LIST} aria-label="Items in your photo">
               {items.map((item, index) => {
                 const m = photoItemMacros(item)
@@ -224,7 +224,7 @@ export function PhotoResult({ file, meal, onRetake, onSearch, onGeo, onLogged }:
           transition={reduce ? reducedFade : spring.sheet}
           className="fixed inset-x-0 bottom-0 z-30 pb-[calc(12px+var(--safe-bottom))] pt-3"
         >
-          <div className="mx-auto w-full max-w-md px-4">
+          <div className="mx-auto w-full max-w-md px-gutter">
             <PrimaryButton type="button" onClick={() => void log()} disabled={logging || kept.length === 0} aria-busy={logging} className="shadow-[var(--shadow-action)]">
               {logging ? 'Logging…' : kept.length === 0 ? 'Nothing left to log' : `Log ${kept.length} item${kept.length === 1 ? '' : 's'} to ${meal}`}
             </PrimaryButton>

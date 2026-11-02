@@ -7,7 +7,7 @@ import { goBack } from '@/lib/navigation'
 export default function ProfilePage() {
   const router = useRouter()
   return (
-    <div className="mx-auto w-full max-w-md px-4">
+    <div className="mx-auto w-full max-w-md px-gutter">
       <ProfileForm onBack={() => goBack(router, '/settings')} />
     </div>
   )

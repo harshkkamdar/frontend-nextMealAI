@@ -384,7 +384,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
   if (loading) {
     return (
-      <div className="mx-auto min-h-dvh w-full max-w-md px-4">
+      <div className="mx-auto min-h-dvh w-full max-w-md px-gutter">
         <PushedHeader title="" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
         {/* motion-feel 3h: skeletons only after 150 ms without data, so a quick load goes straight to content. */}
         <motion.div className="pt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.12, delay: 0.15 }}><SessionSkeleton /></motion.div>
@@ -393,9 +393,9 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   }
   if (!session) {
     return (
-      <div className="mx-auto min-h-dvh w-full max-w-md px-4">
+      <div className="mx-auto min-h-dvh w-full max-w-md px-gutter">
         <PushedHeader title="Workout" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
-        <div className="-mx-4"><OfflineBand /></div>
+        <div className="-mx-gutter"><OfflineBand /></div>
         {loadFailed ? (
           <div className="mt-4">
             <ErrorState onRetry={() => { setLoading(true); void loadSession().finally(() => setLoading(false)) }}>
@@ -410,7 +410,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   // A finished session opened from history is its receipt.
   if (session.status === 'completed' && !showSummary) {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-4">
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-gutter">
         <PushedHeader title="" onBack={() => goBack(router, '/train')} backLabel="Back to training" />
         <div className="flex flex-1 flex-col pt-1">
           <SessionReceipt session={session} tz={tz} animate={false} onDone={() => goBack(router, '/train')} />
@@ -421,7 +421,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
   // The receipt fades in over the live screen, so finishing never cuts to an empty frame.
   const summary = showSummary ? (
-    <motion.div key="summary" role="dialog" aria-label="Session done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onAnimationComplete={() => setSummaryCovered(true)} transition={{ duration: 0.2, ease: 'easeOut' }} className="fixed inset-0 z-[80] mx-auto flex w-full max-w-md flex-col overflow-y-auto bg-cream px-4" style={{ paddingTop: 'calc(28px + var(--safe-top))' }}>
+    <motion.div key="summary" role="dialog" aria-label="Session done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onAnimationComplete={() => setSummaryCovered(true)} transition={{ duration: 0.2, ease: 'easeOut' }} className="fixed inset-0 z-[80] mx-auto flex w-full max-w-md flex-col overflow-y-auto bg-cream px-gutter" style={{ paddingTop: 'calc(28px + var(--safe-top))' }}>
       <SessionReceipt session={session} tz={tz} animate onDone={() => router.push('/train')} />
     </motion.div>
   ) : null
@@ -438,11 +438,11 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       <AnimatePresence>{summary}</AnimatePresence>
       <RestTimer isActive={showRestTimer && !showSummary} duration={restSeconds} resetToken={restKey} upNext={upNextText(exercises, currentIndex)} onSkip={() => setShowRestTimer(false)} onComplete={() => setShowRestTimer(false)} />
 
-      <div className="px-4"><PushedHeader title={session.day_name} onBack={handleBack} backLabel="Go back" actions={optionsButton} /></div>
+      <div className="px-gutter"><PushedHeader title={session.day_name} onBack={handleBack} backLabel="Go back" actions={optionsButton} /></div>
       <OfflineBand />
 
       {/* Content fades in on its own; an opacity ancestor would also hide the nav's backdrop filter. */}
-      <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className="px-4 pt-2" style={{ paddingBottom: 'calc(120px + var(--safe-bottom))' }}>
+      <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className="px-gutter pt-2" style={{ paddingBottom: 'calc(120px + var(--safe-bottom))' }}>
         {exercises.length === 0 ? (
           <button type="button" onClick={() => setShowAddForm(true)} className="flex min-h-16 w-full items-center justify-center rounded-card border-[1.5px] border-dashed border-ink-20 text-body-sm font-semibold text-ink-65 transition-transform active:scale-[.98]">
             No exercises yet. Add one

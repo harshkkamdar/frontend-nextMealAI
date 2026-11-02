@@ -10,7 +10,7 @@ export default function LogsPage() {
   const router = useRouter()
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-[calc(106px+var(--safe-bottom))]">
+    <div className="mx-auto w-full max-w-md px-gutter pb-[calc(106px+var(--safe-bottom))]">
       <LogList onBack={() => router.back()} />
     </div>
   )

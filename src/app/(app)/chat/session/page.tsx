@@ -53,7 +53,7 @@ export default function ActiveChatPage() {
 function ActiveChatRoute() {
   const params = useSearchParams()
   const sessionId = params.get('id') ?? ''
-  if (!sessionId) return <p className="px-5 pt-[calc(24px+var(--safe-top))] text-[16px] text-ink-65">No conversation picked. <Link href="/chat" className="font-semibold text-ink underline">See your conversations</Link></p>
+  if (!sessionId) return <p className="px-gutter pt-[calc(24px+var(--safe-top))] text-[16px] text-ink-65">No conversation picked. <Link href="/chat" className="font-semibold text-ink underline">See your conversations</Link></p>
   return <ActiveChatSession sessionId={sessionId} autoSend={params.get('send') === '1' ? params.get('prefill') : null} />
 }
 
@@ -235,7 +235,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
     // window scroll would carry the fixed header and composer away with it until the transform clears.
     <div className="h-dvh overflow-y-auto overscroll-contain" onScroll={(e) => { const past = e.currentTarget.scrollTop > 4; if (past !== scrolled) setScrolled(past) }}>
     <div
-      className="mx-auto w-full max-w-md px-5"
+      className="mx-auto w-full max-w-md px-gutter"
       style={{ paddingBottom: composerH + 24, ['--chat-end-gap' as string]: `${composerH + 20}px` }}
     >
       {loading ? null : (
@@ -246,7 +246,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
       <PushedHeader title={sessionTitle ?? 'Geo'} onBack={() => goBack(router, '/chat')} backLabel="Back to conversations" />
       {/* Scroll edge under the header (same idea as the tab bar's): the thread fades into the paper, never sliced. */}
       <div aria-hidden="true" className={`pointer-events-none fixed inset-x-0 top-0 z-[39] h-[calc(var(--safe-top)+88px)] transition-opacity duration-200 ${scrolled ? 'opacity-100' : 'opacity-0'} bg-[linear-gradient(to_bottom,var(--color-cream)_calc(100%-28px),rgba(253,246,236,0))]`} />
-      <div className="-mx-5">
+      <div className="-mx-gutter">
         <OfflineBand />
       </div>
       {programPreview && (

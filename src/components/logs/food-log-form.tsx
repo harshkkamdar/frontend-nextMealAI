@@ -182,7 +182,7 @@ export function FoodLogForm() {
 
   const mealMenu = mealMenuOpen ? (
     <Chips
-      className="scrollbar-hide -mx-4 mb-2 overflow-x-auto px-4 py-1"
+      className="scrollbar-hide -mx-gutter mb-2 overflow-x-auto px-gutter py-1"
       label="Meal"
       options={MEAL_OPTIONS}
       value={meal}
@@ -202,10 +202,10 @@ export function FoodLogForm() {
 
   if (photo) {
     return (
-      <div className="mx-auto w-full max-w-md px-4">
+      <div className="mx-auto w-full max-w-md px-gutter">
         {header}
         {/* A photo needs the network to be read, so this band keeps the default copy; the photo card says what to do. */}
-        <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
+        <div className="-mx-gutter [&:not(:empty)]:mb-2"><OfflineBand /></div>
         {mealMenu}
         {fileInput}
         <PhotoResult
@@ -222,14 +222,14 @@ export function FoodLogForm() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-[calc(96px+var(--safe-bottom))]">
+    <div className="mx-auto w-full max-w-md px-gutter pb-[calc(96px+var(--safe-bottom))]">
       {header}
-      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand queuesSaves /></div>
+      <div className="-mx-gutter [&:not(:empty)]:mb-2"><OfflineBand queuesSaves /></div>
       {mealMenu}
 
       {/* Pinned under the bar so a focused field never scrolls beneath it: iOS draws the caret above fixed layers.
           No band of its own: the bar above fills with glass once the page scrolls. */}
-      <div className="sticky top-[calc(60px+var(--safe-top))] z-[30] -mx-4 px-4 pb-2 pt-1">
+      <div className="sticky top-[calc(60px+var(--safe-top))] z-[30] -mx-gutter px-gutter pb-2 pt-1">
         <SearchField
           label="Search foods"
           value={query}

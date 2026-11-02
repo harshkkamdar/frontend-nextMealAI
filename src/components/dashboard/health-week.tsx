@@ -55,9 +55,9 @@ export function HealthWeek({ metric }: { metric: 'steps' | 'sleep' }) {
   const source = health.label && health.connected ? `From ${health.label}${time ? `, synced ${time}` : ''}` : metric === 'sleep' ? 'Logged by you' : 'Syncs from your phone'
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-6">
+    <div className="mx-auto w-full max-w-md px-gutter pb-6">
       <PushedHeader large title={title} onBack={() => goBack(router, '/dashboard')} backLabel="Back to Today" />
-      <div className="-mx-4"><OfflineBand /></div>
+      <div className="-mx-gutter"><OfflineBand /></div>
       <p className="mt-2 flex items-baseline gap-2 px-1">
         <span className="font-display text-title text-ink tabular-nums">{latest === null ? '—' : show(latest)}</span>
         <span className="text-caption font-semibold text-ink-65">{metric === 'steps' ? 'of 10,000 today' : 'last night'}</span>

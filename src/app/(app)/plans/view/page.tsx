@@ -26,7 +26,7 @@ function PlanDetailRoute() {
   const id = useSearchParams().get('id') ?? ''
   if (!id) {
     return (
-      <div className="mx-auto w-full max-w-md px-4">
+      <div className="mx-auto w-full max-w-md px-gutter">
         <PushedHeader title="Plan" onBack={() => goBack(router, '/plans')} backLabel="Back to plans" />
         <p className="mt-4 px-1 text-[15px] text-ink-65">No plan picked. <Link href="/plans" className="inline-flex min-h-11 items-center font-semibold text-ink underline">Back to plans</Link></p>
       </div>
@@ -45,11 +45,11 @@ function PlanDetailView({ id }: { id: string }) {
   useSyncRefetch(['plans:updated', 'plans:deactivated'], refetch)
 
   return (
-    <div className="mx-auto w-full max-w-md px-4">
+    <div className="mx-auto w-full max-w-md px-gutter">
       {loading && !plan ? (
         <>
           <PushedHeader title="Plan" onBack={() => goBack(router, '/plans')} backLabel="Back to plans" />
-          <div className="-mx-4"><OfflineBand /></div>
+          <div className="-mx-gutter"><OfflineBand /></div>
           <div className="mt-1 flex flex-col gap-2.5 px-1" role="status" aria-busy="true" aria-label="Loading this plan">
             <div aria-hidden="true" className="h-8 w-3/4 animate-pulse rounded-[10px] bg-ink-06" />
             <div aria-hidden="true" className="h-5 w-1/2 animate-pulse rounded-[8px] bg-ink-06" />
@@ -60,7 +60,7 @@ function PlanDetailView({ id }: { id: string }) {
       ) : !plan ? (
         <>
           <PushedHeader title="Plan" onBack={() => goBack(router, '/plans')} backLabel="Back to plans" />
-          <div className="-mx-4"><OfflineBand /></div>
+          <div className="-mx-gutter"><OfflineBand /></div>
           <div className="mt-1">
             {error && !(error instanceof ApiException && error.statusCode === 404)
               ? <FailCard title="I couldn't load this plan" onRetry={() => void refetch()}>Check your connection and try again.</FailCard>

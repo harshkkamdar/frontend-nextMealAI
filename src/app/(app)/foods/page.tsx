@@ -201,13 +201,13 @@ export default function FoodsPage() {
   const optionRow = 'flex min-h-row w-full items-center gap-3 border-b border-ink-06 px-4 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04'
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-[calc(106px+var(--safe-bottom))]">
+    <div className="mx-auto w-full max-w-md px-gutter pb-[calc(106px+var(--safe-bottom))]">
       <PushedHeader
         title="Your foods"
         onBack={() => router.back()}
         actions={<RoundButton aria-label="Add a food" onClick={() => openForm(null)}><PlusIcon /></RoundButton>}
       />
-      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand /></div>
+      <div className="-mx-gutter [&:not(:empty)]:mb-2"><OfflineBand /></div>
 
       {/* Nothing saved yet: nothing to search. */}
       <div className={!loading && !loadFailed && shown.length === 0 ? 'hidden' : 'mt-1'}>

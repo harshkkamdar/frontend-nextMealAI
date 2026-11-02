@@ -59,9 +59,9 @@ export default function NutritionPlanPage() {
   const askGeo = () => useUIStore.getState().openSheet('geo-companion')
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-10">
+    <div className="mx-auto w-full max-w-md px-gutter pb-10">
       <PushedHeader title={data && !plan ? 'Your targets' : 'Nutrition plan'} onBack={() => goBack(router, '/food')} backLabel="Back to Food" />
-      <div className="-mx-4"><OfflineBand /></div>
+      <div className="-mx-gutter"><OfflineBand /></div>
 
       {!data && loading ? (
         <div className="mt-2 space-y-2.5" role="status" aria-busy="true" aria-label="Loading your targets">

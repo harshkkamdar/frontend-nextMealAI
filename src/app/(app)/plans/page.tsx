@@ -37,9 +37,9 @@ export default function PlansPage() {
   const open = (plan: Plan) => router.push(`/plans/view?id=${plan.id}`)
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-[var(--tabbar-clearance)]">
+    <div className="mx-auto w-full max-w-md px-gutter pb-[var(--tabbar-clearance)]">
       <PushedHeader large title="Plans" onBack={() => goBack(router, '/settings')} />
-      <div className="-mx-4 mt-3"><OfflineBand /></div>
+      <div className="-mx-gutter mt-3"><OfflineBand /></div>
 
       {loading && !data ? (
         <div className="mt-7 flex flex-col gap-2.5" role="status" aria-busy="true" aria-label="Loading your plans">

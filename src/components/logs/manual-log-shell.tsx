@@ -42,9 +42,9 @@ export function ManualLogShell({
   const router = useRouter()
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-[calc(112px+var(--safe-bottom))]">
+    <div className="mx-auto w-full max-w-md px-gutter pb-[calc(112px+var(--safe-bottom))]">
       <PushedHeader title={title} onBack={() => router.back()} />
-      <div className="-mx-4 [&:not(:empty)]:mb-2"><OfflineBand queuesSaves /></div>
+      <div className="-mx-gutter [&:not(:empty)]:mb-2"><OfflineBand queuesSaves /></div>
       <h1 className="font-display mt-2 px-0.5 text-title text-ink">{prompt}</h1>
       {sub ? <p className="mt-1.5 px-0.5 text-caption text-ink-65 tabular-nums">{sub}</p> : null}
       <div className="mt-5">{children}</div>
@@ -53,7 +53,7 @@ export function ManualLogShell({
       ) : null}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 pb-[calc(16px+var(--safe-bottom))] pt-3">
         {/* No band behind Save: the app's tinted backdrop shows through, and the page pads its end clear of it. */}
-        <div className="pointer-events-auto mx-auto w-full max-w-md px-4">
+        <div className="pointer-events-auto mx-auto w-full max-w-md px-gutter">
           <PrimaryButton type="button" onClick={onSave} disabled={saving} aria-busy={saving}>
             {saving ? savingLabel : failed ? 'Try again' : actionLabel}
           </PrimaryButton>

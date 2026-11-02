@@ -38,7 +38,7 @@ export function EditPlanView({ id }: { id: string }) {
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-md px-4">
+      <div className="mx-auto w-full max-w-md px-gutter">
         <PushedHeader title="Edit plan" onBack={() => goBack(router, '/plans')} />
         <div className="mx-1 mt-1 h-1 rounded-full bg-ink-08" />
         <div className="space-y-3 px-1 pt-7" role="status" aria-busy="true" aria-label="Loading your plan">
