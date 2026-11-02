@@ -568,7 +568,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         <div className="px-5 pb-5 pt-3">
           <h2 className="font-display text-hero text-ink">Leave this workout?</h2>
           <p className="mt-1 text-body-sm text-ink-65">Your sets are saved. Pick it up again from Train.</p>
-          <button type="button" onClick={handleSaveAndExit} className="mt-5 flex h-btn w-full items-center justify-center rounded-full bg-ink text-body font-bold text-cream transition-transform active:scale-[.97]">Save and exit</button>
+          <button type="button" onClick={handleSaveAndExit} className="mt-5 flex h-btn w-full items-center justify-center rounded-[15px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97]">Save and exit</button>
           {discardConfirm ? (
             <div className="mt-2 flex items-center justify-center gap-6"><button type="button" onClick={() => setDiscardConfirm(false)} className="min-h-11 text-body-sm font-semibold text-ink-65">Keep workout</button><button type="button" onClick={() => void handleDiscard()} className="min-h-11 text-body-sm font-semibold text-ink">Discard for good</button></div>
           ) : <button type="button" onClick={() => setDiscardConfirm(true)} className="mt-2 min-h-11 w-full text-body-sm font-semibold text-ink-65">Discard workout</button>}

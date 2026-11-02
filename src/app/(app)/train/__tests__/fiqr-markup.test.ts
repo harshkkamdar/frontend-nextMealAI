@@ -11,7 +11,7 @@ const sessionCards = read('src/components/workout/session-cards.tsx')
 const restTimer = read('src/components/workout/rest-timer.tsx')
 
 describe('FIQR train markup contract', () => {
-  it('uses the cached train query, large-title header, week strip, offline band, calendar sheet, and one primary action', () => {
+  it('uses the cached train query, large-title header, week strip, offline band, calendar sheet, and navy feature actions', () => {
     expect(trainPage).toContain("useCachedQuery('train', fetchData, [])")
     expect(trainPage).toContain('<LargeTitleHeader')
     expect(trainPage).toContain('<WeekStrip')
@@ -21,8 +21,9 @@ describe('FIQR train markup contract', () => {
     // Freestyle logging stays reachable from the empty history slot (and the orb's + sheet).
     expect(trainPage).toContain("router.push('/logs/new/workout')")
     expect(trainPage).not.toContain('PlusIcon')
-    // One orange action: whichever hero state renders, exactly one PrimaryButton shows.
-    expect(trainPage).not.toContain('SecondaryButton')
+    // The navy feature card uses its cream secondary action in every hero state.
+    expect(trainPage).toContain('SecondaryButton')
+    expect(trainPage).not.toContain('PrimaryButton')
   })
 
   it('renders the workout hierarchy and preserves train test ids', () => {

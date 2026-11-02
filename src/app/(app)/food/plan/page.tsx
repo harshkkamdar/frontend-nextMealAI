@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PushedHeader } from '@/components/layout/screen-header'
-import { MACRO_HUES, SplitRing, macroSplit, type Targets } from '@/components/diary/plan-parts'
+import { MACRO_HUES, SplitBar, macroSplit, type Targets } from '@/components/diary/plan-parts'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
@@ -83,8 +83,8 @@ export default function NutritionPlanPage() {
                   </p>
                 ) : <p className="mt-1 text-headline text-ink">No daily target yet</p>}
               </div>
-              {targets.calories > 0 ? <SplitRing targets={targets} size={60} stroke={8} /> : null}
             </div>
+            {targets.calories > 0 ? <SplitBar targets={targets} className="mt-4" /> : null}
             {targets.calories > 0 ? (
               <ul className="mt-3">
                 {MACRO_HUES.map(({ key, label, color }) => (
@@ -101,7 +101,7 @@ export default function NutritionPlanPage() {
 
           {todayMeals.length ? (
             <section className={`${CARD} overflow-hidden`} aria-label="Today on the plan">
-              <h2 className="px-4 pb-1 pt-3.5 text-label text-ink-65">Today on the plan</h2>
+              <h2 className="px-4 pb-1 pt-3.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Today on the plan</h2>
               {todayMeals.map((meal, index) => (
                 <div key={`${meal.label}-${index}`} className="flex min-h-14 items-center gap-3 border-t border-ink-06 px-4 py-2 first-of-type:border-t-0">
                   <span className="min-w-0 flex-1">

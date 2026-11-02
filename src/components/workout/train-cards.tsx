@@ -9,9 +9,6 @@ import { reducedFade, spring } from '@/lib/motion'
 import { cn, plural } from '@/lib/utils'
 import type { WorkoutPlanDay } from '@/types/plans.types'
 import type { WorkoutSession } from '@/types/workout-session.types'
-import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
-import type { BodyPart } from './muscle-map-data'
-import { MuscleMap } from './muscle-map'
 import { formatExDetail, formatHistoryDate } from './train-data'
 
 export const CARD = 'rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]'
@@ -38,40 +35,21 @@ export function Enter({ first, layer, index = 0, className, children }: { first:
 
 export function SectionTitle({ children, trailing }: { children: ReactNode; trailing?: ReactNode }) {
   return (
-    <div className="mb-2 flex items-baseline justify-between gap-3 px-1">
-      <h2 className="text-headline text-ink">{children}</h2>
-      {trailing ? <span className="min-w-0 truncate text-body-sm font-semibold text-ink-65 tabular-nums">{trailing}</span> : null}
+    <div className="mb-2.5 mt-5 flex items-baseline justify-between gap-3">
+      <h2 className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{children}</h2>
+      {trailing ? <span className="min-w-0 truncate text-[13px] text-ink-62 tabular-nums">{trailing}</span> : null}
     </div>
   )
 }
 
-/**
- * A3 Muscle hero: the day's target-muscle figure beside its name, the muscles as quiet chips, then the one orange
- * action. The figure is drawn in ink here because the card already carries the orange button (Q18).
- */
-export function NextUpCard({ eyebrow, title, meta, action, parts, chips }: { eyebrow: string; title: string; meta: string; action: ReactNode; parts?: BodyPart[]; chips?: string[] }) {
-  const tilt = usePressTilt<HTMLElement>()
-  const head = (
-    <>
-      <p className="text-caption font-semibold text-ink-65">{eyebrow}</p>
-      <h2 className={cn('mt-1 line-clamp-3 break-words font-display font-extrabold leading-[1.12] tracking-[-0.01em] text-ink', parts ? 'text-[20px]' : 'text-hero')}>{title}</h2>
-      <p className="mt-1.5 text-body-sm text-ink-65">{meta}</p>
-    </>
-  )
+/** George's Next Up card (DESIGN.md component 4), the same as Home's: navy, the workout name as the largest type. */
+export function NextUpCard({ eyebrow, title, meta, action }: { eyebrow: string; title: string; meta: string; action: ReactNode }) {
   return (
-    <section ref={tilt.ref} onPointerDown={tilt.onPointerDown} onPointerMove={tilt.onPointerMove} onPointerUp={tilt.onPointerUp} onPointerCancel={tilt.onPointerCancel} onPointerLeave={tilt.onPointerLeave} className={cn(CARD, 'p-4')} aria-label="Next session" data-testid="activity-next-up-card">
-      {parts ? (
-        <div className="grid grid-cols-[112px_minmax(0,1fr)] items-center gap-3.5">
-          <div className="flex h-[124px] items-center justify-center rounded-[18px] bg-ink-04 p-1.5" aria-hidden="true"><MuscleMap parts={parts} tone="ink" /></div>
-          <div className="min-w-0">{head}</div>
-        </div>
-      ) : head}
-      {chips?.length ? (
-        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Muscles worked">
-          {chips.map((chip) => <li key={chip} className="flex h-8 items-center rounded-full bg-ink-06 px-3 text-caption font-semibold text-ink">{chip}</li>)}
-        </ul>
-      ) : null}
-      <div className="mt-4">{action}</div>
+    <section className="rounded-[22px] bg-ink p-[22px] text-cream" aria-label="Next session" data-testid="activity-next-up-card">
+      <p className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">{eyebrow}</p>
+      <h2 className="mt-[3px] line-clamp-2 break-words text-[28px] font-bold leading-[1.1] tracking-[-0.6px] text-cream">{title}</h2>
+      <p className="mt-[3px] text-[14px] text-cream-60">{meta}</p>
+      <div className="mt-[18px]">{action}</div>
     </section>
   )
 }
