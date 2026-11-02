@@ -48,7 +48,7 @@ Screen gutter 22. Gap between major blocks 16; after a section label 10; between
 
 Radius: tiles and grouped lists 16, primary action 18, feature cards 22, secondary buttons 15, sheets 28, chips full.
 
-Neutral surfaces never cast a shadow: a white tile sits on cream with a 1 pt `ink-12` border. Only two things are raised: the orange primary action (`0 8 20 accent/.26`) and the Geo button (`0 6 16 ink/.28`). Sheets carry `0 -8 24 ink/.12`.
+Neutral surfaces never cast a shadow: a white tile (the `tile` class, with `rounded-card`) sits on cream with a 1 pt `ink-12` edge. Only two things are raised: the orange primary action (`0 8 20 accent/.26`) and the Geo button (`0 6 16 ink/.28`). Sheets carry `0 -8 24 ink/.12`; a popover menu `0 8 24 ink/.12`. The status capsule has no shadow: navy on cream needs none.
 
 ## 5. Components
 
@@ -62,11 +62,11 @@ The whole app is built from these. A screen that needs something else needs a re
 6. **Metric strip.** One white tile container split into columns by `ink-09` hairlines (refined from separate tiles: fewer boxes). Each column: `tile-label`, then the value in `metric` with its unit, then an optional `meta` line. Tapping a column opens its detail.
 7. **Grouped list.** A white container, radius 16, `ink-12` border; rows 56 tall, `body` label left, value right in `ink-65`, chevron `ink-50`; `ink-09` hairlines inset 16. Settings, plan days, food lists.
 8. **Section label.** `section` style in `ink-62`, 20 above, 10 below.
-9. **Sheet.** Cream, radius 28 on top, a 36 x 5 `ink-16` grabber, scrim ink at .35. Drag down to close.
+9. **Sheet.** Solid cream, inset 8 from the screen edges and the safe area, radius 28, the sheet shadow, a 36 x 5 `ink-16` grabber, scrim ink at .35. Drag down to close.
 10. **Nav bar.** See section 6.
 11. **Buttons beyond the primary.** Secondary: cream fill, 1 pt `ink-16` border, ink text, radius 15, 56 tall. Navy solid for a committing action that is not the screen's next step (Keep current targets). Text buttons: 15 / 600 ink, 44 pt target.
-12. **Status capsule.** One message at a time under the header: a navy pill, cream 14 / 500 text, an optional Undo in 14 / 700.
-13. **Chat.** Geo's messages are plain `body` text on cream with the Geo mark at the start of each run of Geo turns; the user's are navy bubbles with cream text, radius 18. A logged or changed item shows as a compact grouped-list row with Undo.
+12. **Status capsule.** One message at a time under the header, 22 from the edges: a navy pill, cream 14 / 500 text, a cream dot (a ring for errors), an optional Undo in 14 / 700. The offline band uses the same capsule with the Geo mark (dimmed offline, working while syncing).
+13. **Chat.** Geo's messages are plain `body` text on cream with the bare Geo mark at the start of each run of Geo turns (working while Geo writes, one turn when a reply lands); the user's are navy bubbles with cream text, radius 18. A logged or changed item shows as a compact grouped-list row with Undo.
 
 ## 6. Nav bar
 
@@ -78,7 +78,23 @@ Scrolling content always clears the bar and the raised button (`--tabbar-clearan
 
 ## 7. The Geo mark
 
-A stroked circle with a short bar crossing its lower-right edge at -45 deg. Stroke 9% of the outer diameter, bar 33% of the diameter, round caps. Cream ring and orange bar on navy; ink ring and orange bar on cream. Geo's only expression is where the bar sits round the ring (`GeoMark` `pose`): `rest` (the logo), `speak` (turned to the line beside it), `up` and `down` (a trend). Motion: `working` the bar travels round the ring (1.4 s per turn, linear); `done` one turn then rest (760 ms ease-out-quart); pose changes ease over 420 ms. Reduced motion: no turns, `working` shows the bar at reduced opacity. The live reference is `/brand` (Geo) and `/lab` (every component).
+A stroked circle with a short bar crossing its lower-right edge at -45 deg. Stroke 9% of the outer diameter, bar 33% of the diameter, round caps. Cream ring and orange bar on navy; ink ring and orange bar on cream. Smallest size 16.
+
+Geo's only expression is the bar (`GeoMark`). Nine expressions, no more; the live reference is `/geo`:
+
+| Expression | What it is | Used for |
+|---|---|---|
+| Rest | Bar at the lower right, still | The icon, the nav, anywhere Geo has nothing to add |
+| Speak | Bar turns to point at the words (420 ms) | A new chat, the companion sheet |
+| Listening | Bar sways 10 deg either side, 1.1 s each way | While the user types to Geo |
+| Working | Bar travels round the ring, 1.4 s a turn | Chat replies, photo reads (the nav's Geo, chat's anchor) |
+| Done | One turn, 760 ms, back to rest | A Geo task landed; Geo's line on Home as it opens |
+| Nudge | 16 deg out and back once, 560 ms | Something new to look at (a suggestion, check-in ready) |
+| Up | Bar to the upper right | Check-in for a week that went to plan; a new best |
+| Down | Bar straight down | Check-in for a week that didn't; a failure |
+| Offline | Ring at 35%, bar still | The offline capsule, the companion sheet offline |
+
+Rules: Geo moves only in answer to something; one Geo moves at a time; Working is the only loop; no face, eyes or limbs. Reduced motion: poses change instantly and Working dims the bar instead of orbiting.
 
 ## 8. Motion
 

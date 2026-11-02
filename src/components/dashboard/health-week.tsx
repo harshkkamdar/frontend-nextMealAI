@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PushedHeader } from '@/components/layout/screen-header'
+import { INK_BUTTON } from '@/components/plans/spatial-parts'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
@@ -58,28 +58,32 @@ export function HealthWeek({ metric }: { metric: 'steps' | 'sleep' }) {
     <div className="mx-auto w-full max-w-md px-gutter pb-6">
       <PushedHeader large title={title} onBack={() => goBack(router, '/dashboard')} backLabel="Back to Today" />
       <div className="-mx-gutter"><OfflineBand /></div>
-      <p className="mt-2 flex items-baseline gap-2 px-1">
-        <span className="text-title text-ink tabular-nums">{latest === null ? '—' : show(latest)}</span>
-        <span className="text-caption font-semibold text-ink-65">{metric === 'steps' ? 'of 10,000 today' : 'last night'}</span>
-      </p>
-      <p className="mt-0.5 px-1 text-caption text-ink-65">{source}</p>
-      <section className={cn(CARD, 'mt-3 p-4')} aria-label={`${title}, last seven days`}>
-        <ol className="flex h-[168px] items-end gap-2">
-          {days.map((day, index) => (
-            <li key={day.date} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
-              <span className="sr-only">{weekday(day.date)}: {day.value === null ? 'nothing logged' : show(day.value)}</span>
-              <span className="flex w-full flex-1 items-end" aria-hidden="true">
-                <span className={cn('block w-full rounded-[8px]', index === 6 ? 'bg-ink' : 'bg-ink-10')} style={{ height: `${Math.max(day.value ? 4 : 2, ((day.value ?? 0) / top) * 100)}%` }} />
-              </span>
-              <span className="text-label font-medium text-ink-65" aria-hidden="true">{weekday(day.date)}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-      <p className="mt-3 px-0.5 text-caption text-ink-65">{average === null ? 'Nothing logged this week yet.' : `7-day average ${show(average)}`}</p>
+      {latest !== null ? <>
+        <p className="mt-2 flex items-baseline gap-2 px-1">
+          <span className="text-title text-ink tabular-nums">{show(latest)}</span>
+          <span className="text-caption font-semibold text-ink-65">{metric === 'steps' ? 'of 10,000 today' : 'last night'}</span>
+        </p>
+        <p className="mt-0.5 px-1 text-caption text-ink-65">{source}</p>
+      </> : null}
+      {logged.length ? <>
+        <section className={cn(CARD, 'mt-3 p-4')} aria-label={`${title}, last seven days`}>
+          <ol className="flex h-[168px] items-end gap-2">
+            {days.map((day, index) => (
+              <li key={day.date} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
+                <span className="sr-only">{weekday(day.date)}: {day.value === null ? 'nothing logged' : show(day.value)}</span>
+                <span className="flex w-full flex-1 items-end" aria-hidden="true">
+                  <span className={cn('block w-full rounded-[8px]', index === 6 ? 'bg-ink' : 'bg-ink-10')} style={{ height: `${Math.max(day.value ? 4 : 2, ((day.value ?? 0) / top) * 100)}%` }} />
+                </span>
+                <span className="text-label font-medium text-ink-65" aria-hidden="true">{weekday(day.date)}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <p className="mt-3 px-0.5 text-caption text-ink-65">7-day average {show(average!)}</p>
+      </> : <p className="mt-2 text-[15px] text-ink-65">{metric === 'sleep' ? 'No nights logged this week.' : 'No steps synced this week.'}</p>}
       {metric === 'sleep' ? (
         <>
-          <PrimaryButton type="button" className="mt-4 bg-ink text-cream text-[16px]" onClick={() => setLogging(true)}>Log last night</PrimaryButton>
+          <button type="button" className={`${INK_BUTTON} mt-4`} onClick={() => setLogging(true)}>Log last night</button>
           <QuickLogSheet type={logging ? 'sleep' : null} onClose={() => setLogging(false)} onDone={() => { setLogging(false); void refetch() }} water={0} weight={{ kg: null, weekDelta: null, series: [], date: null, today }} />
         </>
       ) : null}

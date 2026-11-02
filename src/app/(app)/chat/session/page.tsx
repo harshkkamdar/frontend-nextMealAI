@@ -244,8 +244,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
         </Suspense>
       )}
       <PushedHeader title={sessionTitle ?? 'Geo'} onBack={() => goBack(router, '/chat')} backLabel="Back to conversations" />
-      {/* Scroll edge under the header (same idea as the tab bar's): the thread fades into the paper, never sliced. */}
-      <div aria-hidden="true" className={`pointer-events-none fixed inset-x-0 top-0 z-[39] h-[calc(var(--safe-top)+88px)] transition-opacity duration-200 ${scrolled ? 'opacity-100' : 'opacity-0'} bg-[linear-gradient(to_bottom,var(--color-cream)_calc(100%-28px),rgba(253,246,236,0))]`} />
+      <div aria-hidden="true" className={`pointer-events-none fixed inset-x-0 top-0 z-[39] h-[calc(var(--safe-top)+88px)] border-b border-ink-09 bg-cream transition-opacity duration-200 ${scrolled ? 'opacity-100' : 'opacity-0'}`} />
       <div className="-mx-gutter">
         <OfflineBand />
       </div>
@@ -278,10 +277,8 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
           </motion.div>
         )}
       </div>
-      {/* Floating glass composer (Q25): the only glass on this screen; the thread under it stays solid. */}
-      <div ref={composerRef} className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] mx-auto max-w-md px-3" style={{ paddingBottom: 'calc(10px + var(--safe-bottom))' }}>
-        {/* Scroll edge: text fades into the page under the composer instead of colliding with it. */}
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 top-[-24px] bg-[linear-gradient(to_top,var(--color-cream)_calc(100%-36px),rgba(253,246,236,0))]" />
+      <div ref={composerRef} className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] mx-auto max-w-md px-gutter" style={{ paddingBottom: 'calc(10px + var(--safe-bottom))' }}>
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 top-[-24px] border-t border-ink-09 bg-cream" />
         {/* FB-R6-FE-D: pass sessionId so a draft started in the companion sheet survives the navigation here. */}
         <div className="pointer-events-auto relative">
           <ChatInput onSend={send} disabled={isTyping || loading} showCamera defaultValue={prefill} sessionId={sessionId} />

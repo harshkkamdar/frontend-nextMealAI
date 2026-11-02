@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useMemo, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Dumbbell, Utensils } from 'lucide-react'
 import { MealPlanCard, PreviousPlanRow, SkeletonCard, WorkoutPlanCard } from '@/components/plans/plan-overview-card'
 import { previousPlans } from '@/components/plans/plan-format'
-import { CARD, FailCard, ORANGE_BUTTON, SectionHeading } from '@/components/plans/spatial-parts'
+import { CARD, FailCard, SectionHeading } from '@/components/plans/spatial-parts'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { goBack } from '@/lib/navigation'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { ChevronRightIcon, FoodFill, TrainFill } from '@/components/ui/fiqr/icons'
+import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
+import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { getPlans } from '@/lib/api/plans.api'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
@@ -62,12 +64,10 @@ export default function PlansPage() {
           <section aria-labelledby="new-plan">
             <SectionHeading id="new-plan">New plan</SectionHeading>
             <div className={cn(CARD, 'p-2')}>
-              <button type="button" className={ORANGE_BUTTON} onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a plan</button>
-              <div className="mt-1">
-                <BuildLink href="/plans/new/meal" icon={<FoodFill className="size-5" />} title="Build a nutrition plan" sub="By hand, three questions" />
-                <BuildLink href="/plans/new/workout" icon={<TrainFill className="size-5" />} title="Build a training plan" sub="By hand, two questions" />
-              </div>
+              <BuildLink href="/plans/new/meal" icon={<Utensils className="size-5" strokeWidth={1.75} />} title="Build a nutrition plan" sub="By hand, three questions" />
+              <BuildLink href="/plans/new/workout" icon={<Dumbbell className="size-5" strokeWidth={1.75} />} title="Build a training plan" sub="By hand, two questions" />
             </div>
+            <PrimaryButton className="mt-4" onClick={() => useUIStore.getState().openSheet('geo-companion')}>Ask Geo for a plan</PrimaryButton>
           </section>
 
           {earlier.length > 0 ? (
@@ -86,9 +86,8 @@ export default function PlansPage() {
 
 function EmptySlot({ label, href }: { label: string; href: string }) {
   return (
-    <Link href={href} className="flex min-h-[68px] flex-col justify-center rounded-card border-[1.5px] border-dashed border-ink-20 px-[18px] py-3 transition-transform duration-100 ease-out active:scale-[.98]">
-      <span className="block text-body font-bold text-ink">{label}</span>
-      <span className="block text-caption text-ink-65">Build one, or ask Geo below</span>
+    <Link href={href} className="flex min-h-11 w-full items-center justify-center text-[15px] font-semibold text-ink-65 active:opacity-60">
+      <span><span className="block text-center">{label}</span><span className="block text-center">Build one, or ask Geo below</span></span>
     </Link>
   )
 }

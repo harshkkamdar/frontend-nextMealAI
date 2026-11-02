@@ -138,7 +138,7 @@ export function WelcomeBeats() {
       <div data-chrome aria-hidden="true" className="absolute inset-x-0 z-10 page-in" style={{ top: DOTS_TOP }}><Dots p={p} reduce={reduce} /></div>
 
       <div data-chrome className={cn('absolute inset-x-0 bottom-0 z-10 px-gutter pb-[calc(var(--safe-bottom)+16px)] pt-6', 'page-in')}>
-        <PrimaryButton type="button" onClick={onContinue} className={cn('relative', !last && 'bg-transparent')}>
+        <PrimaryButton type="button" onClick={onContinue} className={cn('relative', !last && 'bg-transparent shadow-none')}>
           {/* Ink base with the orange layer fading over it: the fill changes by opacity, never background-color. Cream label on both. */}
           <span aria-hidden="true" className="absolute inset-0 rounded-[18px] bg-ink" />
           <span aria-hidden="true" className={cn('absolute inset-0 rounded-[18px] bg-accent shadow-[var(--shadow-action)] transition-opacity duration-150 ease-out', last ? 'opacity-100' : 'opacity-0')} />
@@ -177,7 +177,7 @@ function Beat({ p, i, reduce, title, line, current, fit, children }: { p: Motion
       className={cn('absolute inset-0', !current && 'pointer-events-none')}
     >
       <motion.div style={{ y, top: 'calc(var(--safe-top) + 84px)' }} className="absolute inset-x-0 px-gutter">
-        <h1 className={cn('text-[32px] font-bold leading-[1.05] tracking-[-0.8px] text-ink', i === 0 && 'rise')} style={intro(0)}>{title}</h1>
+        <h1 className={cn('text-[28px] font-bold leading-[1.1] tracking-[-0.6px] text-ink', i === 0 && 'rise')} style={intro(0)}>{title}</h1>
         <p className={cn('mt-3 max-w-[32ch] text-pretty text-body text-ink-80', i === 0 && 'rise')} style={intro(1)}>{line}</p>
       </motion.div>
       <motion.div style={{ ...STAGE, y: visualY }} className="absolute inset-x-gutter overflow-hidden p-[22px]">

@@ -154,7 +154,7 @@ export function ProgramCard({ days, nextIdx, first }: { days: WorkoutPlanDay[]; 
 export function HistoryCard({ sessions, tz, first, onOpen, onLog }: { sessions: WorkoutSession[]; tz: string; first: boolean; onOpen: (id: string) => void; onLog: () => void }) {
   if (sessions.length === 0) {
     return (
-      <button type="button" onClick={onLog} className="flex min-h-16 w-full items-center justify-center rounded-card border-[1.5px] border-dashed border-ink-20 px-5 text-center text-body-sm font-semibold text-ink-65 transition-transform active:scale-[.98]">
+      <button type="button" onClick={onLog} className="flex min-h-11 w-full items-center justify-center text-[15px] font-semibold text-ink-65 active:opacity-60">
         No workouts yet. Log a freestyle one
       </button>
     )

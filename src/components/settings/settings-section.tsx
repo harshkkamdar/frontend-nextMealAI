@@ -200,14 +200,13 @@ export function SettingsMenu<T extends string | number>({ label, value, options,
                 role="menu"
                 aria-label={label}
                 onKeyDown={onKey}
-                className="tile absolute rounded-card p-1.5"
+                className="tile absolute rounded-card p-1.5 shadow-[0_8px_24px_rgba(17,28,53,.12)]"
                 style={{
                   top: place?.top ?? 0,
                   left: place?.left ?? 0,
                   width: `min(${MENU_W}px, calc(100vw - 32px))`,
                   visibility: place ? 'visible' : 'hidden',
                   transformOrigin: place?.up ? '90% 100%' : '90% 0',
-                  boxShadow: 'inset 0 1px 0 #fff, 0 0 0 .5px rgba(17,28,53,.1), 0 24px 50px -16px rgba(17,28,53,.45)',
                 }}
                 initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1, transition: reduce ? reducedFade : { scale: spring.lens, opacity: { duration: 0.16, ease: 'easeOut' } } }}

@@ -1,7 +1,6 @@
 'use client'
 
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
-import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { dayLetter, dayWeekday, formatDateRange, nextTrainingDay } from '@/components/plans/plan-format'
 import { CARD, HueDot } from '@/components/plans/spatial-parts'
 import { cn } from '@/lib/utils'
@@ -32,13 +31,11 @@ const TITLE = 'line-clamp-2 text-[20px] font-[750] leading-[1.15] tracking-[-0.0
 
 /** B1 Answer card, nutrition: the day's calories with the three macros, so the list answers "what are my targets". */
 export function MealPlanCard({ plan, onClick }: { plan: MealPlan; onClick: () => void }) {
-  const tilt = usePressTilt<HTMLButtonElement>()
   const left = timeLeft(plan.end_date)
   const targets = plan.content.daily_targets
   const until = plan.end_date ? `until ${formatDateRange(undefined, plan.end_date).replace('Until ', '')}` : 'no end date'
   return (
     <button
-      {...tilt}
       type="button"
       onClick={onClick}
       aria-label={`${planTitle(plan)}, nutrition${targets ? `, ${fmt(targets.calories)} kcal a day` : ''}`}
@@ -75,7 +72,6 @@ export function MealPlanCard({ plan, onClick }: { plan: MealPlan; onClick: () =>
 
 /** B1 Answer card, training: the next workout by name, and the plan's days as dots with the next one filled orange. */
 export function WorkoutPlanCard({ plan, onClick }: { plan: WorkoutPlan; onClick: () => void }) {
-  const tilt = usePressTilt<HTMLButtonElement>()
   const days = plan.content.days ?? []
   const training = days.filter((day) => !day.is_rest_day).length
   const next = nextTrainingDay(days, plan.current_position)
@@ -84,7 +80,6 @@ export function WorkoutPlanCard({ plan, onClick }: { plan: WorkoutPlan; onClick:
   const weekday = nextDay ? dayWeekday(nextDay.date) : null
   return (
     <button
-      {...tilt}
       type="button"
       onClick={onClick}
       aria-label={`${planTitle(plan)}, training${nextName ? `, next ${nextName}` : ''}`}
@@ -104,8 +99,8 @@ export function WorkoutPlanCard({ plan, onClick }: { plan: WorkoutPlan; onClick:
             <span key={index} className="flex flex-1 flex-col items-center gap-1 text-caption font-semibold text-ink-65">
               {dayLetter(day.date, index)}
               <i className={cn(
-                'block size-[22px] rounded-full',
-                day.is_rest_day ? 'shadow-[inset_0_0_0_1.5px_rgba(17,28,53,.25)]' : index === next ? 'bg-accent shadow-[0_0_0_3px_rgba(232,98,42,.2)]' : 'bg-ink',
+                'block rounded-full',
+                day.is_rest_day ? 'size-[22px] shadow-[inset_0_0_0_1.5px_rgba(17,28,53,.25)]' : index === next ? 'size-2 bg-ink' : 'size-[22px] bg-ink',
               )} />
             </span>
           ))}

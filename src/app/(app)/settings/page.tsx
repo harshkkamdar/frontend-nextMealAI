@@ -13,7 +13,6 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
-import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { downloadExport } from '@/lib/api/account.api'
 import { logout } from '@/lib/api/auth.api'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
@@ -60,7 +59,6 @@ export default function SettingsPage() {
   const router = useRouter()
   const user = useAuthStore((state) => state.user)
   const isAdmin = useIsAdmin()
-  const tilt = usePressTilt<HTMLButtonElement>()
   const [settings, setSettings] = useState<Settings | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -215,7 +213,6 @@ export default function SettingsPage() {
         <section aria-label="Profile">
           <button
             type="button"
-            {...tilt}
             onClick={() => router.push('/settings/profile')}
             className={`${GROUP_CARD} flex min-h-[72px] w-full items-center gap-3 py-3 pl-3.5 pr-4 text-left`}
           >
@@ -264,9 +261,9 @@ export default function SettingsPage() {
           <figure
             aria-label="Example nudge"
             aria-hidden={!settings.notifications_enabled || undefined}
-            className={`mx-0.5 mt-2.5 grid transition-opacity duration-200 ${settings.notifications_enabled ? 'opacity-100' : 'opacity-35'} grid-cols-[32px_1fr_auto] gap-x-2.5 gap-y-0.5 rounded-[18px] bg-card/65 px-3 py-2.5 text-[14px] leading-[1.35] shadow-[0_0_0_.5px_rgba(17,28,53,.1)]`}
+            className={`tile mx-0.5 mt-2.5 grid transition-opacity duration-200 ${settings.notifications_enabled ? 'opacity-100' : 'opacity-35'} grid-cols-[32px_1fr_auto] gap-x-2.5 gap-y-0.5 rounded-[18px] px-3 py-2.5 text-[14px] leading-[1.35]`}
           >
-            <span aria-hidden="true" className="row-span-2 grid size-8 place-items-center rounded-[8px] bg-ink text-[10px] font-bold tracking-[.02em] text-cream">FIQR</span>
+            <span aria-hidden="true" className="row-span-2 grid size-8 place-items-center rounded-[8px] bg-ink text-[11px] font-bold tracking-[.02em] text-cream">FIQR</span>
             <b className="font-bold text-ink">Your check-in is ready</b>
             <time className="text-label font-normal text-ink-65">{formatClock(reminder)}</time>
             <span className="col-span-2 col-start-2 text-ink-80">Geo has read the week. Open FIQR to see what changes.</span>

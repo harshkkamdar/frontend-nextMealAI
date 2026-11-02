@@ -51,9 +51,8 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
           </div>
         </section>
       ) : (
-        <button type="button" onClick={() => useUIStore.getState().openSheet('geo-companion')} className="flex min-h-[68px] w-full flex-col justify-center rounded-card border-[1.5px] border-dashed border-ink-20 px-[18px] py-3 text-left transition-transform active:scale-[.98]">
-          <span className="block text-body font-bold text-ink">No targets yet</span>
-          <span className="block text-caption text-ink-65">Ask Geo to work them out with you</span>
+        <button type="button" onClick={() => useUIStore.getState().openSheet('geo-companion')} className="flex min-h-11 w-full items-center justify-center text-[15px] font-semibold text-ink-65 active:opacity-60">
+          <span><span className="block text-center">No targets yet</span><span className="block text-center">Ask Geo to work them out with you</span></span>
         </button>
       )}
 
@@ -83,9 +82,8 @@ export function MealPlanDetail({ plan }: { plan: MealPlan }) {
                     {day.snacks?.map((snack, index) => <FoodRow key={`${snack.name}-${index}`} label="Snack" food={snack} />)}
                   </section>
                 ) : (
-                  <div className="flex min-h-[68px] flex-col justify-center rounded-card border-[1.5px] border-dashed border-ink-20 px-[18px] py-3">
-                    <span className="text-body font-bold text-ink">Nothing planned for {formatDayDate(day.date, selectedDay)}</span>
-                    <span className="text-caption text-ink-65">Edit the plan to add meals, or ask Geo</span>
+                  <div className="flex min-h-11 w-full items-center justify-center text-[15px] font-semibold text-ink-65 active:opacity-60">
+                    <span><span className="block text-center">Nothing planned for {formatDayDate(day.date, selectedDay)}</span><span className="block text-center">Edit the plan to add meals, or ask Geo</span></span>
                   </div>
                 )}
               </motion.div>

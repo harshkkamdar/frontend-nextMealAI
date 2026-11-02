@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import { toast } from 'sonner'
 import { PushedHeader } from '@/components/layout/screen-header'
-import { GeoAvatar } from '@/components/shared/geo-avatar'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { GROUP_CARD } from '@/components/settings/settings-section'
 import { per, renewalLine } from '@/components/settings/paywall-copy'
@@ -130,8 +129,7 @@ export default function PaywallPage() {
       <div className="-mx-gutter mb-2.5 [&:empty]:hidden"><OfflineBand /></div>
 
       <div className="enter-rows mt-0.5 flex flex-col">
-        <header className="mx-1 flex items-start gap-2.5">
-          <GeoAvatar size={28} />
+        <header>
           <h1 className="text-hero leading-[1.15] text-balance text-ink">Coaching that keeps up with you</h1>
         </header>
 
@@ -185,7 +183,7 @@ export default function PaywallPage() {
         <ul aria-label="What you get" className={GROUP_CARD}>
           {BENEFITS.map(({ title, sub }, index) => (
             <li key={title} className={cn('relative py-3 pl-[18px] pr-4', index > 0 && "before:absolute before:left-4 before:right-0 before:top-0 before:h-px before:bg-ink-08 before:content-['']")}>
-              <span className="block text-body font-semibold text-ink-65">{title}</span>
+              <span className="block text-body font-semibold text-ink">{title}</span>
               <span className="mt-px block text-[13.5px] leading-[1.4] text-ink-65">{sub}</span>
             </li>
           ))}

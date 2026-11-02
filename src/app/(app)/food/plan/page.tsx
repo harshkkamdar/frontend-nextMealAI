@@ -4,10 +4,10 @@ import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { MACRO_HUES, SplitBar, macroSplit, type Targets } from '@/components/diary/plan-parts'
+import { INK_BUTTON } from '@/components/plans/spatial-parts'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
-import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
@@ -71,36 +71,37 @@ export default function NutritionPlanPage() {
       ) : !data ? (
         <div className="mt-2"><ErrorState onRetry={() => void refetch()}>I couldn&apos;t load your targets. Check your connection and try again.</ErrorState></div>
       ) : (
-        <div className="mt-2 flex flex-col gap-2.5">
-          <section className={`${CARD} p-4`} aria-label="Daily targets">
-            <div className="flex items-center gap-4">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-caption text-ink-65">{source}</p>
-                {targets.calories > 0 ? (
-                  <p className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-hero text-ink tabular-nums">{fmt(targets.calories)}</span>
-                    <span className="text-body-sm font-semibold text-ink-65">kcal a day</span>
-                  </p>
-                ) : <p className="mt-1 text-headline text-ink">No daily target yet</p>}
+        <div className="mt-2">
+          <div className={`${CARD} divide-y divide-ink-09`}>
+            <section className="p-4" aria-label="Daily targets">
+              <div className="flex items-center gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-caption text-ink-65">{source}</p>
+                  {targets.calories > 0 ? (
+                    <p className="mt-1 flex items-baseline gap-1.5">
+                      <span className="text-hero text-ink tabular-nums">{fmt(targets.calories)}</span>
+                      <span className="text-body-sm font-semibold text-ink-65">kcal a day</span>
+                    </p>
+                  ) : <p className="mt-1 text-headline text-ink">No daily target yet</p>}
+                </div>
               </div>
-            </div>
-            {targets.calories > 0 ? <SplitBar targets={targets} className="mt-4" /> : null}
-            {targets.calories > 0 ? (
-              <ul className="mt-3">
-                {MACRO_HUES.map(({ key, label, color }) => (
-                  <li key={key} className="flex min-h-12 items-center gap-3 border-t border-ink-06">
-                    <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ background: color }} />
-                    <span className="flex-1 text-body text-ink">{label}</span>
-                    <span className="text-caption text-ink-65 tabular-nums">{split[key]}% of kcal</span>
-                    <span className="min-w-[64px] text-right text-body font-bold text-ink tabular-nums">{fmt(targets[key])} g</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </section>
+              {targets.calories > 0 ? <SplitBar targets={targets} className="mt-4" /> : null}
+              {targets.calories > 0 ? (
+                <ul className="mt-3">
+                  {MACRO_HUES.map(({ key, label, color }) => (
+                    <li key={key} className="flex min-h-12 items-center gap-3 border-t border-ink-06">
+                      <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ background: color }} />
+                      <span className="flex-1 text-body text-ink">{label}</span>
+                      <span className="text-caption text-ink-65 tabular-nums">{split[key]}% of kcal</span>
+                      <span className="min-w-[64px] text-right text-body font-bold text-ink tabular-nums">{fmt(targets[key])} g</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
 
           {todayMeals.length ? (
-            <section className={`${CARD} overflow-hidden`} aria-label="Today on the plan">
+            <section className="overflow-hidden" aria-label="Today on the plan">
               <h2 className="px-4 pb-1 pt-3.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Today on the plan</h2>
               {todayMeals.map((meal, index) => (
                 <div key={`${meal.label}-${index}`} className="flex min-h-14 items-center gap-3 border-t border-ink-06 px-4 py-2 first-of-type:border-t-0">
@@ -114,18 +115,20 @@ export default function NutritionPlanPage() {
             </section>
           ) : null}
 
-          <section className={`${CARD} p-4`}>
-            <p className="text-body-sm text-ink-65">
+          <section className="p-4">
+            <p className="text-[14px] text-ink-65">
               {plan
                 ? plan.content?.notes?.trim() || 'Your diary measures every day against these numbers.'
                 : 'A plan adds meal ideas that fit these numbers.'}
             </p>
-            <button type="button" onClick={askGeo} className="mt-3.5 h-btn w-full rounded-[18px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97]">
-              {plan ? 'Ask Geo to change it' : 'Build a plan with Geo'}
-            </button>
           </section>
+          </div>
 
-          {plan ? <FullPlanRow onOpen={() => router.push(`/plans/view?id=${plan.id}`)} /> : null}
+          <button type="button" onClick={askGeo} className={`${INK_BUTTON} mt-4`}>
+            {plan ? 'Ask Geo to change it' : 'Build a plan with Geo'}
+          </button>
+
+          {plan ? <div className="mt-2.5"><FullPlanRow onOpen={() => router.push(`/plans/view?id=${plan.id}`)} /></div> : null}
         </div>
       )}
     </div>
@@ -133,11 +136,10 @@ export default function NutritionPlanPage() {
 }
 
 function FullPlanRow({ onOpen }: { onOpen: () => void }) {
-  const tilt = usePressTilt<HTMLButtonElement>()
   return (
-    <button type="button" onClick={onOpen} {...tilt} className={`${CARD} flex min-h-row w-full items-center gap-3 px-4 text-left`}>
+    <button type="button" onClick={onOpen} className={`${CARD} flex min-h-row w-full items-center gap-3 px-4 text-left`}>
       <span className="flex-1 text-body font-semibold text-ink">See the whole plan</span>
-      <ChevronRightIcon className="size-4 text-ink-35" />
+      <ChevronRightIcon className="size-4 text-ink-50" />
     </button>
   )
 }

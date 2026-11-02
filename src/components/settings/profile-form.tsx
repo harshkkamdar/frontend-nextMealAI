@@ -208,7 +208,6 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
     })
   }, [currentWeight, height, targetWeight, goal, activity, profile?.dob, profile?.sex])
 
-  // Save lives in the bar as a glass pill (iOS idiom), so nothing sits over the form and covers its controls.
   const header = (
     <>
       <PushedHeader
@@ -217,7 +216,7 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
         backLabel="Back to settings"
         // Always rendered (disabled until the profile loads), so the bar never changes shape mid-transition.
         actions={(
-          <button type="button" onClick={handleSave} disabled={saving || !profile} className="tile h-11 rounded-full px-4 text-body font-semibold text-ink transition-transform duration-100 enabled:active:scale-[.94] disabled:text-ink-65">
+          <button type="button" onClick={handleSave} disabled={saving || !profile} className="h-11 px-2 text-[15px] font-semibold text-ink active:opacity-60 disabled:text-ink-35">
             {saving ? 'Saving…' : 'Save'}
           </button>
         )}
@@ -371,7 +370,7 @@ function ChipGroup({ label, children }: { label: string; children: ReactNode }) 
   return (
     <section role="group" aria-label={label}>
       <h2 className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{label}</h2>
-      <div className={`${GROUP_CARD} flex flex-wrap gap-1.5 p-3 [&>button]:text-body`}>{children}</div>
+      <div className="flex flex-wrap gap-1.5 [&>button]:text-body">{children}</div>
     </section>
   )
 }

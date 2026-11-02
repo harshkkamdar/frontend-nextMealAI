@@ -211,7 +211,7 @@ export default function ActivityPage() {
             <section ref={programRef} className="scroll-mt-24">
               <SectionTitle trailing={days.length ? `Day ${nextIdx + 1} of ${days.length}` : undefined}>Program</SectionTitle>
               <ProgramCard days={days} nextIdx={nextIdx} first={first} />
-              <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-1 flex min-h-11 items-center gap-1 px-4 text-body-sm font-semibold text-ink-65">
+              <button type="button" onClick={() => router.push(`/plans/view?id=${workoutPlan.id}`)} className="mt-1 flex min-h-11 items-center gap-1 px-2 text-[15px] font-semibold text-ink active:opacity-60">
                 View full plan <ChevronRightIcon className="size-4" />
               </button>
             </section>

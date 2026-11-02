@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Plus, Search, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DateInput } from '@/components/ui/fiqr/date-input'
+import { SOFT_BUTTON } from '@/components/plans/spatial-parts'
 
 export const fieldClass = 'h-14 w-full rounded-[14px] bg-[var(--surface-card)] px-4 text-[17px] text-ink outline outline-1 -outline-offset-1 outline-ink-08 placeholder:text-ink-65 transition-[outline-color] focus:outline-2 focus:outline-ink'
 export const labelClass = 'block text-[15px] font-semibold text-ink'
@@ -35,7 +36,7 @@ export function IconButton({ icon, label, onClick, variant: _variant = 'ghost', 
 }
 
 export function AddRowButton({ label, onClick }: { label: string; onClick: () => void }) {
-  return <button type="button" onClick={onClick} className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-[16px] border-[1.5px] border-dashed border-ink-20 text-[15px] font-semibold text-ink transition-transform active:scale-[.98]"><Plus className="size-4" strokeWidth={2} aria-hidden="true" />{label}</button>
+  return <button type="button" onClick={onClick} className={SOFT_BUTTON}><Plus className="size-4" strokeWidth={2} aria-hidden="true" />{label}</button>
 }
 
 export function RemoveRowButton({ label, onClick }: { label: string; onClick: () => void }) {

@@ -3,7 +3,7 @@
 import { useId, type ReactNode } from 'react'
 import { DateInput } from '@/components/ui/fiqr/date-input'
 import { haptic } from '@/lib/platform/app'
-import { CARD, HueDot } from '@/components/plans/spatial-parts'
+import { CARD, HueDot, SOFT_BUTTON } from '@/components/plans/spatial-parts'
 
 /** Builder controls in the C1 Focused steps look (mocks/journey-plans.html): fields 60, steppers 56, cells 44. */
 
@@ -125,7 +125,7 @@ export function NumberCell({ label, value, onChange, ariaLabel, min = 0 }: { lab
 /** Dashed add row (Add meal, Add exercise, Add day). */
 export function AddButton({ children, onClick }: { children: ReactNode; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-[16px] border-[1.5px] border-dashed border-ink-20 text-body-sm font-semibold text-ink transition-transform active:scale-[.98]">
+    <button type="button" onClick={onClick} className={SOFT_BUTTON}>
       <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
       {children}
     </button>

@@ -8,7 +8,6 @@ import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import type { MacroKey } from '@/lib/macros'
 import { DRAW_MS } from '@/lib/motion'
 import { CountUp } from '@/components/ui/fiqr/count-up'
-import { usePressTilt } from '@/components/ui/fiqr/press-tilt'
 import { cn } from '@/lib/utils'
 import { formatSleep, type MealRow } from './home-data'
 import { AlertIcon, HeartIcon, PlusLine, SparkleIcon } from './home-icons'
@@ -199,8 +198,7 @@ function TileBody({ label, value, unit, caption, children }: { label: string; va
 }
 
 function TileButton({ onClick, label, className, children }: { onClick?: () => void; label: string; className?: string; children: ReactNode }) {
-  const tilt = usePressTilt<HTMLButtonElement>(5)
-  return <button type="button" onClick={onClick} aria-label={label} className={cn(TILE, 'w-full', className)} {...tilt}>{children}</button>
+  return <button type="button" onClick={onClick} aria-label={label} className={cn(TILE, 'w-full', className)}>{children}</button>
 }
 
 /** One thin progress line, 0 to 1; grows from the left once per visit. */
@@ -311,7 +309,7 @@ export function SleepTile({ hours, nights, source, onOpen }: { hours: number | n
 export function MealsCard({ rows, onOpen, onLog }: { rows: MealRow[]; onOpen: () => void; onLog: () => void }) {
   if (rows.length === 0) {
     return (
-      <button type="button" onClick={onLog} className="flex min-h-16 w-full items-center justify-center rounded-[22px] border-[1.5px] border-dashed border-ink-20 text-body-sm font-semibold text-ink-65 transition-transform active:scale-[.98]">
+      <button type="button" onClick={onLog} className="flex min-h-11 w-full items-center justify-center text-[15px] font-semibold text-ink-65 active:opacity-60">
         Nothing logged yet. Tap to add a meal
       </button>
     )

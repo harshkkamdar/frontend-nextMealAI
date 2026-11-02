@@ -7,6 +7,7 @@ import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, ty
 import { toast } from 'sonner'
 
 import { NumberField, SearchablePicker } from '@/components/plans/plan-builder-shared'
+import { SOFT_BUTTON } from '@/components/plans/spatial-parts'
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'framer-motion'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
@@ -444,7 +445,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       {/* Content fades in on its own; an opacity ancestor would also hide the nav's backdrop filter. */}
       <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} className="px-gutter pt-2" style={{ paddingBottom: 'calc(120px + var(--safe-bottom))' }}>
         {exercises.length === 0 ? (
-          <button type="button" onClick={() => setShowAddForm(true)} className="flex min-h-16 w-full items-center justify-center rounded-card border-[1.5px] border-dashed border-ink-20 text-body-sm font-semibold text-ink-65 transition-transform active:scale-[.98]">
+          <button type="button" onClick={() => setShowAddForm(true)} className={SOFT_BUTTON}>
             No exercises yet. Add one
           </button>
         ) : (

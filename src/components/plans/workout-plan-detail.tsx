@@ -6,7 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { toast } from 'sonner'
 import { PlanDetailFrame } from '@/components/plans/plan-detail-parts'
 import { dayWeekday, nextTrainingDay } from '@/components/plans/plan-format'
-import { Busy, CARD, INK_BUTTON, ORANGE_BUTTON, SectionHeading } from '@/components/plans/spatial-parts'
+import { Busy, CARD, SOFT_BUTTON, SectionHeading } from '@/components/plans/spatial-parts'
 import { ChevronRightIcon, PlayFill } from '@/components/ui/fiqr/icons'
 import { activatePlan } from '@/lib/api/plans.api'
 import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
@@ -38,8 +38,6 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
   const [activating, setActivating] = useState(false)
   const training = days.filter((day) => !day.is_rest_day)
   const exerciseCount = training.reduce((sum, day) => sum + (day.exercises?.length ?? 0), 0)
-  // One orange action per screen: an earlier plan's dock owns it ("Make this my plan"), so Start goes ink there.
-  const startClass = plan.status === 'active' ? ORANGE_BUTTON : INK_BUTTON
   async function handleStartWorkout(dayIdx: number) { if (startingIdx !== null) return; setStartingIdx(dayIdx); try { const session = await startWorkoutSession({ plan_id: plan.id, plan_day_index: dayIdx }); router.push(`/train/session?id=${session.id}`) } catch { toast.error("Couldn't start the workout. Try again."); setStartingIdx(null) } }
   async function makeActive() { setActivating(true); try { await activatePlan(plan.id); toast.success('This is your plan now'); router.refresh() } catch { toast.error("Couldn't make it active. Try again.") } finally { setActivating(false) } }
   // Height never animates: the card and the rows below glide by transform (framer layout), the panel fades.
@@ -85,19 +83,18 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
                       initial={{ opacity: 0, y: reduce ? 0 : -6 }}
                       animate={{ opacity: 1, y: 0, transition: reduce ? reducedFade : { ...spring.glide, opacity: { duration: 0.2, delay: 0.12 } } }}
                       exit={{ opacity: 0, transition: { duration: reduce ? 0.15 : 0.1 } }}
-                      className="px-4 pb-3.5"
                     >
                       {count ? (
-                        <ol className="rounded-[16px] bg-ink-04 px-3.5">
+                        <ol>
                           {day.exercises?.map((exercise, exerciseIndex) => (
-                            <li key={`${exercise.name}-${exerciseIndex}`} className="flex min-h-11 items-center gap-2.5 border-b border-ink-06 py-1.5 last:border-b-0">
+                            <li key={`${exercise.name}-${exerciseIndex}`} className="flex min-h-14 items-center gap-3 border-t border-ink-09 px-4">
                               <span className="min-w-0 flex-1 text-body-sm text-ink">{exercise.name}</span>
                               {formatExerciseDetail(exercise) ? <span className="shrink-0 whitespace-nowrap text-caption text-ink-65 tabular-nums">{formatExerciseDetail(exercise)}</span> : null}
                             </li>
                           ))}
                         </ol>
                       ) : null}
-                      <button type="button" onClick={() => handleStartWorkout(index)} disabled={startingIdx !== null} aria-busy={startingIdx === index || undefined} className={`${startClass} mt-2.5`}>
+                      <button type="button" onClick={() => handleStartWorkout(index)} disabled={startingIdx !== null} aria-busy={startingIdx === index || undefined} className={`${SOFT_BUTTON} mx-4 mb-4 mt-1 max-w-[calc(100%-2rem)]`}>
                         {startingIdx === index ? <Busy>Starting {title}</Busy> : <><PlayFill className="size-4" aria-hidden="true" />Start {title}</>}
                       </button>
                     </motion.div>
@@ -108,9 +105,8 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
           })}
         </motion.div>
       ) : (
-        <div className="flex min-h-[68px] flex-col justify-center rounded-card border-[1.5px] border-dashed border-ink-20 px-[18px] py-3">
-          <span className="text-body font-bold text-ink">No workout days yet</span>
-          <span className="text-caption text-ink-65">Edit the plan to add some, or ask Geo</span>
+        <div className="flex min-h-11 w-full items-center justify-center text-[15px] font-semibold text-ink-65 active:opacity-60">
+          <span><span className="block text-center">No workout days yet</span><span className="block text-center">Edit the plan to add some, or ask Geo</span></span>
         </div>
       )}
     </PlanDetailFrame>

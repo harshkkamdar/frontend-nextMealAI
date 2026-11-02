@@ -20,7 +20,7 @@ const arrive = (live: boolean, delay: number): CSSProperties => ({ opacity: live
 /** A rice bowl from above: rice, sliced chicken and greens. Ink, cream and orange only. */
 function Bowl() {
   return (
-    <svg viewBox="0 0 120 120" className="size-full drop-shadow-[0_8px_10px_rgba(17,28,53,.18)]">
+    <svg viewBox="0 0 120 120" className="size-full">
       <circle cx="60" cy="60" r="54" fill="var(--color-card)" />
       <circle cx="60" cy="60" r="46" fill="var(--color-cream)" stroke="var(--color-ink)" strokeOpacity=".08" />
       {[[40, 44], [48, 37], [36, 56], [46, 52], [54, 46], [42, 66], [52, 60], [58, 34]].map(([x, y]) => <ellipse key={`${x}-${y}`} cx={x} cy={y} rx="3.4" ry="2" fill="var(--color-ink)" fillOpacity=".22" transform={`rotate(${x * 7} ${x} ${y})`} />)}
@@ -57,7 +57,7 @@ export function FoodVisual({ live }: BeatVisualProps) {
           </div>
         ))}
       </div>
-      <div className="mt-3.5 flex flex-col gap-1 rounded-[16px] bg-ink-04 px-3 py-2.5">
+      <div className="mt-3.5 flex flex-col gap-1 border-t border-ink-09 pt-2.5">
         <span className="text-label text-ink-65">Today</span>
         {([['Oats with berries', 380], ['Rice bowl', 612], ['Greek yogurt', 148]] as const).map(([name, k], i) => (
           <p key={name} className="flex justify-between text-caption font-semibold text-ink" style={arrive(live, 300 + i * 120)}>
