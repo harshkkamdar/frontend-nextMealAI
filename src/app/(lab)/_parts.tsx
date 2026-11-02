@@ -18,7 +18,7 @@ export function LabShell({ eyebrow, title, lede, children }: { eyebrow: string; 
         <div className="mx-auto flex h-14 max-w-[1180px] items-center gap-6 px-gutter">
           <Link href="/brand" aria-label="FIQR brand"><Wordmark size={22} /></Link>
           <div className="ml-auto flex gap-1">
-            {[['/brand', 'Brand'], ['/geo', 'Geo'], ['/lab', 'Components']].map(([href, label]) => (
+            {[['/brand', 'Brand'], ['/mascot', 'Mascot'], ['/geo', 'Geo'], ['/lab', 'Components']].map(([href, label]) => (
               <Link key={href} href={href} className={cn('flex h-11 items-center rounded-full px-3.5 text-[15px] font-semibold', pathname === href ? 'text-ink' : 'text-ink-62')}>
                 {label}
               </Link>
