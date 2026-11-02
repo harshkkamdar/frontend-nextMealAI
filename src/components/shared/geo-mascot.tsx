@@ -152,3 +152,25 @@ export const GEO_MASCOT_CSS = `
 @keyframes m-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .m-root *, .m-root { animation: none !important; } }
 `
+
+/** The option shown in the app once the owner picks one on /mascot. */
+export const GEO_KIND: Kind = 'coach'
+
+/**
+ * Geo the character, taking GeoMark's props so a call site switches by name. One expression at a time, strongest
+ * first: working, listening, offline, done, nudge, then the pose. `tone="cream"` means the mascot sits on navy.
+ */
+export function Geo({ size = 24, tone = 'ink', pose = 'rest', working = false, done = false, listening = false, nudge = false, muted = false, kind = GEO_KIND }: {
+  size?: number
+  tone?: 'ink' | 'cream'
+  pose?: 'rest' | 'speak' | 'up' | 'down'
+  working?: boolean
+  done?: boolean
+  listening?: boolean
+  nudge?: boolean
+  muted?: boolean
+  kind?: Kind
+}) {
+  const mood: Mood = working ? 'working' : listening ? 'listening' : muted ? 'offline' : done ? 'done' : nudge ? 'nudge' : pose
+  return <GeoMascot kind={kind} mood={mood} size={size} onNavy={tone === 'cream'} />
+}
