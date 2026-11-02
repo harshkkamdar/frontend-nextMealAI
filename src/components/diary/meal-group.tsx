@@ -95,9 +95,9 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
         <button
           type="button"
           onClick={onAddFood}
-          className="flex min-h-14 w-full items-center gap-3.5 rounded-[16px] border border-ink-12 bg-card px-4 text-left text-[15px] font-semibold text-ink active:bg-ink-04"
+          className="flex min-h-11 w-full items-center gap-2 text-left text-[15px] font-semibold text-ink-65 active:opacity-60"
         >
-          <span className="grid size-[30px] place-items-center rounded-full bg-ink-06 text-ink"><PlusIcon className="size-4" /></span>
+          <span aria-hidden="true" className="text-ink-50">+</span>
           {addLabel(mealType)}
         </button>
       ) : (
@@ -163,7 +163,7 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
 
 function ActionRow({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="flex min-h-14 w-full items-center justify-between border-b border-ink-06 px-4 py-3 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04">
+    <button type="button" onClick={onClick} className="flex min-h-14 w-full items-center justify-between border-b border-ink-09 px-4 py-3 text-left text-body font-semibold text-ink last:border-b-0 active:bg-ink-04">
       {label}
       <ChevronRightIcon className="size-4 text-ink-35" />
     </button>

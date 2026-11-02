@@ -5,6 +5,7 @@ import { MessageCircle, Plus, Star, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
+import { MetricStrip } from '@/components/ui/fiqr/metric-strip'
 import { CloseIcon } from '@/components/ui/fiqr/icons'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { CARD, Chips, EmptySlot, FIELD, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
@@ -749,14 +750,24 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
 
               </>)}
 
-              {shownMacros && (
+              {shownMacros && (mode === 'edit' ? (
+                <MetricStrip
+                  className={editItems ? 'mt-3' : 'mt-6'}
+                  items={[
+                    { label: 'Calories', value: formatMacroKcal(shownMacros.calories), unit: 'kcal' },
+                    { label: 'Protein', value: formatMacroGrams(shownMacros.protein).slice(0, -1), unit: 'g' },
+                    { label: 'Carbs', value: formatMacroGrams(shownMacros.carbs).slice(0, -1), unit: 'g' },
+                    { label: 'Fat', value: formatMacroGrams(shownMacros.fat).slice(0, -1), unit: 'g' },
+                  ]}
+                />
+              ) : (
                 <div className={cn('grid grid-cols-4 gap-2', editItems ? 'mt-3' : 'mt-6')}>
                   <MacroTile value={formatMacroKcal(shownMacros.calories)} label="kcal" />
                   <MacroTile value={formatMacroGrams(shownMacros.protein)} label="protein" />
                   <MacroTile value={formatMacroGrams(shownMacros.carbs)} label="carbs" />
                   <MacroTile value={formatMacroGrams(shownMacros.fat)} label="fat" />
                 </div>
-              )}
+              ))}
 
               {mode === 'edit' ? (
                 <>

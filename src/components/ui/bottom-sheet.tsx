@@ -24,8 +24,8 @@ export interface BottomSheetProps {
 /**
  * The single bottom-sheet primitive for the whole app, built on `vaul`.
  *
- * FIQR v2 inset sheet (design-system.md): floats 8 pt in from the screen edges, 38 pt corners, glass
- * material on the controls layer. It covers the tab bar (overlay z 60, sheet z 70; the bar is z 50), so
+ * FIQR v2 inset sheet (design-system.md): floats 8 pt in from the screen edges, with 28 pt corners and a solid
+ * cream surface. It covers the tab bar (overlay z 60, sheet z 70; the bar is z 50), so
  * nothing peeks between the sheet and the nav.
  *
  * Depth: the screen behind steps back with the sheet (useSheetDepth; the route frame moves it), following the
@@ -64,9 +64,9 @@ export function BottomSheet({
         <Drawer.Content
           aria-label={ariaLabel}
           style={{ '--initial-transform': 'calc(100% + var(--nav-clearance) + 32px)' } as CSSProperties}
-          className={`bg-cream fixed inset-x-2 z-[70] after:hidden mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[38px] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}
+          className={`bg-cream fixed inset-x-2 z-[70] after:hidden mx-auto flex max-w-[calc(28rem-16px)] flex-col rounded-[28px] shadow-[0_-8px_24px_rgba(17,28,53,.12)] outline-none bottom-[var(--nav-clearance)] max-h-[calc(92vh-var(--nav-clearance)-var(--safe-top))] ${className}`}
         >
-          <Drawer.Handle className="!mx-auto !mt-2.5 !mb-1 !h-[5px] !w-9 shrink-0 !bg-ink-20" />
+          <Drawer.Handle className="!mx-auto !mt-2.5 !mb-1 !h-[5px] !w-9 shrink-0 !bg-ink-16" />
           {/* Radix/vaul require an accessible title; visually hidden. */}
           <Drawer.Title className="sr-only">{ariaLabel ?? 'Sheet'}</Drawer.Title>
           {children}

@@ -3,18 +3,8 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion, type PanInfo } from 'framer-motion'
-import {
-  ArrowUpIcon,
-  CameraFill,
-  EnergyFill,
-  MenuFill,
-  MoodFill,
-  SearchFill,
-  SleepFill,
-  TrainFill,
-  WaterFill,
-  WeightFill,
-} from '@/components/ui/fiqr/icons'
+import { Camera, Dumbbell, GlassWater, Heart, Moon, Scale, ScrollText, Search, Zap } from 'lucide-react'
+import { ArrowUpIcon } from '@/components/ui/fiqr/icons'
 import { logWithUndo } from '@/components/dashboard/log-with-undo'
 import { mealForTime } from '@/components/logs/log-math'
 import { getPersonalFoods } from '@/lib/api/foods.api'
@@ -33,19 +23,19 @@ const MENU_PROMPT = 'Scan this menu and suggest what fits my remaining macros'
 
 type Method = { label: string; icon: ComponentType<SVGProps<SVGSVGElement>>; href: () => string; online?: boolean }
 
-const PHOTO: Method = { label: 'Photo', icon: CameraFill, href: () => '/logs/new/food?photo=1', online: true }
+const PHOTO: Method = { label: 'Photo', icon: Camera, href: () => '/logs/new/food?photo=1', online: true }
 const FOOD_METHODS: Method[] = [
   PHOTO,
-  { label: 'Search', icon: SearchFill, href: () => '/logs/new/food' },
-  { label: 'Menu', icon: MenuFill, href: () => `/chat/session?id=${crypto.randomUUID()}&prefill=${encodeURIComponent(MENU_PROMPT)}`, online: true },
+  { label: 'Search', icon: Search, href: () => '/logs/new/food' },
+  { label: 'Menu', icon: ScrollText, href: () => `/chat/session?id=${crypto.randomUUID()}&prefill=${encodeURIComponent(MENU_PROMPT)}`, online: true },
 ]
 const QUICK_METHODS: Method[] = [
-  { label: 'Water', icon: WaterFill, href: () => '/logs/new/water' },
-  { label: 'Weight', icon: WeightFill, href: () => '/logs/new/weight' },
-  { label: 'Sleep', icon: SleepFill, href: () => '/logs/new/sleep' },
-  { label: 'Mood', icon: MoodFill, href: () => '/logs/new/mood' },
-  { label: 'Energy', icon: EnergyFill, href: () => '/logs/new/energy' },
-  { label: 'Workout', icon: TrainFill, href: () => '/logs/new/workout' },
+  { label: 'Water', icon: GlassWater, href: () => '/logs/new/water' },
+  { label: 'Weight', icon: Scale, href: () => '/logs/new/weight' },
+  { label: 'Sleep', icon: Moon, href: () => '/logs/new/sleep' },
+  { label: 'Mood', icon: Heart, href: () => '/logs/new/mood' },
+  { label: 'Energy', icon: Zap, href: () => '/logs/new/energy' },
+  { label: 'Workout', icon: Dumbbell, href: () => '/logs/new/workout' },
 ]
 
 /** Recently used foods first, the "Log again" row (journey-log A2). */
@@ -168,11 +158,11 @@ export function LogSheet() {
             dragElastic={{ top: 0.08, bottom: 0.6 }}
             onDrag={onDrag}
             onDragEnd={onDragEnd}
-            style={{ borderRadius: 38 }}
-            className="fixed inset-x-2 z-[70] mx-auto max-w-[calc(28rem-16px)] overflow-hidden bg-[rgba(253,246,236,.98)] shadow-[var(--shadow-glass)] outline-none bottom-[var(--nav-clearance)]"
+            style={{ borderRadius: 28 }}
+            className="fixed inset-x-2 z-[70] mx-auto max-w-[calc(28rem-16px)] overflow-hidden bg-cream shadow-[0_-8px_24px_rgba(17,28,53,.12)] outline-none bottom-[var(--nav-clearance)]"
           >
             <div className="relative px-4 pb-[88px] pt-3">
-              <span aria-hidden="true" className="mx-auto mb-3 block h-[5px] w-9 rounded-full bg-ink-20" />
+              <span aria-hidden="true" className="mx-auto mb-3 block h-[5px] w-9 rounded-full bg-ink-16" />
               {!online ? (
                 <p role="status" className="mb-3 flex min-h-11 items-center gap-2.5 rounded-[14px] bg-ink px-4 py-2.5 text-[14px] font-medium leading-snug text-cream">
                   <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-cream/60" />
@@ -198,7 +188,7 @@ export function LogSheet() {
                     </button>
                   ) : (
                     <button type="button" aria-label="Log with a photo" disabled={!online} onClick={() => go(PHOTO.href())} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.94] disabled:text-ink-35">
-                      <CameraFill className="size-5" />
+                      <Camera className="size-5" strokeWidth={1.75} />
                     </button>
                   )}
                 </form>
@@ -208,7 +198,7 @@ export function LogSheet() {
                 <p className="mb-2 mt-4 px-1 text-label text-ink-65">{again.length ? `Log again · ${meal}` : 'Log again'}</p>
                 {again.length ? (
                   // The row scrolls sideways from the sheet edge, so it opts out of swipe-back.
-                  <ul data-no-swipe-back aria-label={`Log again to ${meal}`} className="scrollbar-hide -mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-1 pt-0.5">
+                  <ul data-no-swipe-back aria-label={`Log again to ${meal}`} className="scrollbar-hide -mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 scroll-px-4 pb-1 pt-0.5">
                     {again.map((food) => (
                       <li key={food.id} className="shrink-0 snap-start">
                         <button
@@ -245,7 +235,7 @@ export function LogSheet() {
                         }}
                         className={cn('flex h-[72px] w-full flex-col items-center justify-center gap-1.5 rounded-bento bg-ink-04 text-[13px] font-semibold transition-transform active:scale-[.95]', off ? 'text-ink-35' : 'text-ink')}
                       >
-                        <Icon aria-hidden="true" className="size-5" />
+                        <Icon aria-hidden="true" className="size-5" strokeWidth={1.75} />
                         {label}
                       </button>
                     </motion.li>
@@ -260,7 +250,7 @@ export function LogSheet() {
                       onClick={() => { void haptic('selection'); go(href()) }}
                       className="flex h-11 w-full items-center justify-center gap-1.5 rounded-full bg-ink-04 text-[13px] font-semibold text-ink transition-transform active:scale-[.95]"
                     >
-                      <Icon aria-hidden="true" className="size-[18px]" />
+                      <Icon aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
                       {label}
                     </button>
                   </motion.li>

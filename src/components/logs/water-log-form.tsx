@@ -55,7 +55,7 @@ export function WaterLogForm() {
       >
         <p aria-hidden="true" className="mt-3 flex justify-center gap-1.5">
           {Array.from({ length: Math.max(WATER_GOAL_GLASSES, filled) }, (_, i) => (
-            <span key={i} className={`size-2.5 rounded-full ${i < (today?.count ?? 0) ? 'bg-macro-teal' : i < filled ? 'bg-macro-teal/60' : 'bg-ink-08'}`} />
+            <span key={i} className={`size-2.5 rounded-full ${i < filled ? 'bg-ink' : 'bg-ink-10'}`} />
           )).slice(0, 16)}
         </p>
       </InlineStepper>

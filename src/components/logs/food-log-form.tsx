@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ChevronDown, Plus } from 'lucide-react'
+import { Camera, ChevronDown, Plus, ScrollText } from 'lucide-react'
 import { toast } from 'sonner'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { CameraFill, MenuFill } from '@/components/ui/fiqr/icons'
+import { SOFT_BUTTON } from '@/components/plans/spatial-parts'
 import { createLogs } from '@/lib/api/logs.api'
 import { getPersonalFoods, searchFoods } from '@/lib/api/foods.api'
 import { buildFoodLogItems } from '@/lib/food-log'
@@ -163,19 +163,22 @@ export function FoodLogForm() {
 
   const header = (
     <PushedHeader
-      title={photo ? 'Your photo' : 'Log food'}
+      title=""
       onBack={() => (photo ? setPhoto(null) : router.back())}
       actions={(
-        <button
-          type="button"
-          onClick={() => { void haptic('selection'); setMealMenuOpen((open) => !open) }}
-          aria-expanded={mealMenuOpen}
-          aria-label={`Meal: ${meal}`}
-          className="tile flex h-11 shrink-0 items-center gap-1 rounded-full pl-4 pr-3 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]"
-        >
-          {meal}
-          <ChevronDown aria-hidden="true" className={cn('size-4 transition-transform duration-200', mealMenuOpen && 'rotate-180')} />
-        </button>
+        <>
+          <h1 className="pointer-events-none absolute inset-x-0 text-center text-[17px] font-semibold text-ink">{photo ? 'Your photo' : 'Log food'}</h1>
+          <button
+            type="button"
+            onClick={() => { void haptic('selection'); setMealMenuOpen((open) => !open) }}
+            aria-expanded={mealMenuOpen}
+            aria-label={`Meal: ${meal}`}
+            className="tile flex h-11 shrink-0 items-center gap-1 rounded-full pl-4 pr-3 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]"
+          >
+            {meal}
+            <ChevronDown aria-hidden="true" className={cn('size-4 transition-transform duration-200', mealMenuOpen && 'rotate-180')} />
+          </button>
+        </>
       )}
     />
   )
@@ -241,9 +244,9 @@ export function FoodLogForm() {
           testId="food-search-input"
         />
       </div>
-      <div className="mt-1 grid grid-cols-2 gap-2">
-        <MethodChip icon={CameraFill} label="Photo" onClick={() => void openCamera()} testId="photo-estimate-button" />
-        <MethodChip icon={MenuFill} label="Menu" onClick={() => toGeo(MENU_PROMPT)} />
+      <div className="mt-1 grid grid-cols-2 gap-2.5">
+        <MethodChip icon={Camera} label="Photo" onClick={() => void openCamera()} testId="photo-estimate-button" />
+        <MethodChip icon={ScrollText} label="Menu" onClick={() => toGeo(MENU_PROMPT)} />
       </div>
       {fileInput}
 
@@ -359,9 +362,9 @@ function MethodChip({ icon: Icon, label, onClick, testId }: { icon: ComponentTyp
       type="button"
       onClick={onClick}
       data-testid={testId}
-      className="flex h-11 items-center justify-center gap-2 rounded-full tile px-4 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]"
+      className={SOFT_BUTTON}
     >
-      <Icon aria-hidden="true" className="size-[18px] translate-y-[0.5px]" />
+      <Icon aria-hidden="true" className="size-[18px] translate-y-[0.5px]" strokeWidth={1.75} />
       {label}
     </button>
   )

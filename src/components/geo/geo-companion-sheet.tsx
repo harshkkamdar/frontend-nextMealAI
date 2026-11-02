@@ -361,7 +361,7 @@ export function GeoCompanionSheet() {
 
       <div className="shrink-0 px-3 pb-3">
         <div className="flex justify-center pb-1">
-          <button type="button" onClick={handleOpenFullChat} className="h-11 rounded-full px-4 text-caption font-semibold text-ink-65 active:bg-ink-06">
+          <button type="button" onClick={handleOpenFullChat} className="min-h-11 px-2 text-[15px] font-semibold text-ink active:opacity-60">
             Open in Geo tab
           </button>
         </div>

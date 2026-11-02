@@ -17,7 +17,7 @@ interface ConfirmDialogProps {
 }
 
 /**
- * v2 confirm: an inset glass panel that rises from the bottom like the app's sheets, over an ink dim.
+ * v2 confirm: an inset cream panel that rises from the bottom like the app's sheets, over an ink dim.
  * The action is ink and stated plainly; Cancel sits under it and takes focus first.
  */
 export function ConfirmDialog({
@@ -77,7 +77,7 @@ export function ConfirmDialog({
             aria-modal="true"
             aria-labelledby={`${id}-title`}
             aria-describedby={`${id}-description`}
-            className="bg-cream absolute inset-x-2 bottom-[var(--nav-clearance)] mx-auto max-w-[calc(28rem-16px)] rounded-[38px] px-6 pb-4 pt-7"
+            className="bg-cream absolute inset-x-2 bottom-[var(--nav-clearance)] mx-auto max-w-[calc(28rem-16px)] rounded-[28px] px-6 pb-4 pt-7 shadow-[0_-8px_24px_rgba(17,28,53,.12)]"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduce ? { opacity: 0, transition: reducedFade } : { opacity: 0, y: 16, transition: { duration: 0.2, ease: 'easeOut' } }}

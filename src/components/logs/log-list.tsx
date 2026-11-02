@@ -2,14 +2,13 @@
 
 import type { ComponentType, SVGProps } from 'react'
 import { useEffect, useState } from 'react'
-import { Check, History } from 'lucide-react'
+import { Check, Dumbbell, Footprints, GlassWater, Heart, History, Moon, Scale, UtensilsCrossed, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import { getLogs, bulkDeleteLogs } from '@/lib/api/logs.api'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { formatMacroKcal } from '@/lib/macros'
 import type { Log, LogType, FoodPayload, WorkoutPayload, SleepPayload, MoodPayload, EnergyPayload, WaterPayload, WeightPayload, StepsPayload } from '@/types/logs.types'
-import { EnergyFill, FoodFill, MoodFill, SleepFill, StepsFill, TrainFill, WaterFill, WeightFill } from '@/components/ui/fiqr/icons'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import { CARD, Chips, LIST, RowsSkeleton } from './log-ui'
@@ -32,14 +31,14 @@ type Icon = ComponentType<SVGProps<SVGSVGElement>>
 const FALLBACK_ICON = { icon: History as Icon, label: 'Activity' }
 
 const TYPE_ICONS: Record<LogType, { icon: Icon; label: string }> = {
-  food: { icon: FoodFill, label: 'Food activity' },
-  workout: { icon: TrainFill, label: 'Workout activity' },
-  water: { icon: WaterFill, label: 'Water activity' },
-  weight: { icon: WeightFill, label: 'Weight activity' },
-  mood: { icon: MoodFill, label: 'Mood activity' },
-  sleep: { icon: SleepFill, label: 'Sleep activity' },
-  energy: { icon: EnergyFill, label: 'Energy activity' },
-  steps: { icon: StepsFill, label: 'Steps activity' },
+  food: { icon: UtensilsCrossed, label: 'Food activity' },
+  workout: { icon: Dumbbell, label: 'Workout activity' },
+  water: { icon: GlassWater, label: 'Water activity' },
+  weight: { icon: Scale, label: 'Weight activity' },
+  mood: { icon: Heart, label: 'Mood activity' },
+  sleep: { icon: Moon, label: 'Sleep activity' },
+  energy: { icon: Zap, label: 'Energy activity' },
+  steps: { icon: Footprints, label: 'Steps activity' },
   correction: { icon: History, label: 'Correction activity' },
 }
 
@@ -48,7 +47,7 @@ function LogTypeIcon({ type }: { type: LogType }) {
   const Icon = entry.icon
   return (
     <>
-      <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-80" />
+      <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-80" strokeWidth={1.75} />
       <span className="sr-only">{entry.label}</span>
     </>
   )
@@ -186,7 +185,7 @@ export function LogList({ filterType, onBack }: LogListProps = {}) {
           title="Log"
           onBack={onBack}
           actions={visible.length > 0 && !loading ? (
-            <button type="button" onClick={selectMode ? exitSelectMode : () => setSelectMode(true)} className="tile h-11 shrink-0 rounded-full px-4 text-body-sm font-semibold text-ink transition-transform active:scale-[.96]">
+            <button type="button" onClick={selectMode ? exitSelectMode : () => setSelectMode(true)} className="h-11 px-2 text-[15px] font-semibold text-ink active:opacity-60">
               {selectMode ? 'Done' : 'Select'}
             </button>
           ) : undefined}

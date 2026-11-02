@@ -18,7 +18,7 @@ export const FIELD = 'w-full rounded-[16px] bg-[var(--surface-card)] px-4 text-[
 
 export function SectionTitle({ children, action, className }: { children: ReactNode; action?: ReactNode; className?: string }) {
   return (
-    <div className={cn('mb-2 flex min-h-6 items-end justify-between px-1', className)}>
+    <div className={cn('mb-2.5 flex min-h-6 items-end justify-between', className)}>
       <h2 className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{children}</h2>
       {action}
     </div>
@@ -156,11 +156,11 @@ export function RowsSkeleton({ rows = 3, label }: { rows?: number; label: string
   )
 }
 
-/** Dashed slot that keeps the layout when a list is empty; optionally one tap to fill it. */
+/** Quiet empty state; optionally one tap to fill it. */
 export function EmptySlot({ children, onClick }: { children: ReactNode; onClick?: () => void }) {
-  const className = 'flex min-h-16 w-full items-center justify-center rounded-[24px] border-[1.5px] border-dashed border-ink-20 px-6 py-4 text-center text-[15px] font-semibold leading-snug text-ink-65'
+  const className = 'flex min-h-11 w-full items-center justify-center text-[15px] font-semibold text-ink-65 active:opacity-60'
   return onClick
-    ? <button type="button" onClick={onClick} className={cn(className, 'transition-transform active:scale-[.98]')}>{children}</button>
+    ? <button type="button" onClick={onClick} className={className}>{children}</button>
     : <p className={className}>{children}</p>
 }
 
