@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   createLogs: vi.fn(),
   getPersonalFoods: vi.fn(),
   searchFoods: vi.fn(),
+  saveFood: vi.fn(),
   upload: vi.fn(),
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
@@ -33,6 +34,8 @@ vi.mock('@/lib/api/foods.api', () => ({
   logFromEstimate: (...args: unknown[]) => mocks.logFromEstimate(...args),
   searchFoods: (...args: unknown[]) => mocks.searchFoods(...args),
   getPersonalFoods: () => mocks.getPersonalFoods(),
+  saveFood: (...args: unknown[]) => mocks.saveFood(...args),
+  updateFood: vi.fn(),
 }))
 vi.mock('@/lib/api/logs.api', () => ({
   createLogs: (...args: unknown[]) => mocks.createLogs(...args),
@@ -74,6 +77,7 @@ describe('FoodLogForm', () => {
     vi.clearAllMocks()
     mocks.getPersonalFoods.mockResolvedValue([FOOD, BANANA])
     mocks.searchFoods.mockResolvedValue([])
+    mocks.saveFood.mockResolvedValue({ ...FOOD, id: 'created', name: 'dosa', source: 'manual', serving_size_g: 100, macros_per_serving: { calories: 0, protein: 0, carbs: 0, fat: 0 } })
     mocks.createLogs.mockResolvedValue({ created: [{}], failures: [] })
     mocks.upload.mockResolvedValue({ storage_path: 'chat/photo.jpg' })
     mocks.searchParamsStr = ''
@@ -86,17 +90,46 @@ describe('FoodLogForm', () => {
     expect(rows.map((r) => r.textContent)).toEqual([expect.stringContaining('Greek yoghurt'), expect.stringContaining('Banana')])
   })
 
-  it('the item sheet scales macros with the portion chips and grams', async () => {
+  it('the item sheet accepts any serving amount and logs that amount', async () => {
     render(<FoodLogForm />)
     fireEvent.click((await screen.findAllByTestId('personal-food-row'))[0])
     const sheet = screen.getByTestId('food-item-sheet')
     expect(within(sheet).getByTestId('item-kcal').textContent).toBe('100')
-    fireEvent.click(within(sheet).getByRole('radio', { name: '1½ servings' }))
-    expect(within(sheet).getByTestId('item-kcal').textContent).toBe('150')
-    expect((within(sheet).getByLabelText('Grams') as HTMLInputElement).value).toBe('255')
-    fireEvent.change(within(sheet).getByLabelText('Grams'), { target: { value: '85' } })
-    expect(within(sheet).getByTestId('item-kcal').textContent).toBe('50')
-    expect(within(sheet).getByRole('radio', { name: '½ serving' })).toHaveAttribute('aria-checked', 'true')
+    fireEvent.click(within(sheet).getByRole('button', { name: 'More servings' }))
+    fireEvent.click(within(sheet).getByRole('button', { name: 'More servings' }))
+    expect(within(sheet).getByLabelText('Servings')).toHaveValue(2)
+    fireEvent.change(within(sheet).getByLabelText('Servings'), { target: { value: '3' } })
+    expect(within(sheet).getByLabelText('Servings')).toHaveValue(3)
+    expect(within(sheet).getByLabelText('Grams')).toHaveValue(510)
+    fireEvent.change(within(sheet).getByLabelText('Servings'), { target: { value: '' } })
+    fireEvent.blur(within(sheet).getByLabelText('Servings'))
+    expect(within(sheet).getByLabelText('Servings')).toHaveValue(3)
+    fireEvent.change(within(sheet).getByLabelText('Servings'), { target: { value: '0' } })
+    fireEvent.blur(within(sheet).getByLabelText('Servings'))
+    expect(within(sheet).getByLabelText('Servings')).toHaveValue(3)
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Log now' }))
+    await waitFor(() => expect(mocks.createLogs).toHaveBeenCalled())
+    expect(mocks.createLogs.mock.calls[0][0][0]).toMatchObject({ payload: { servings: 3, serving_size_g: 170, quantity_g: 510 } })
+  })
+
+  it('typing grams updates servings to two decimal places', async () => {
+    render(<FoodLogForm />)
+    fireEvent.click((await screen.findAllByTestId('personal-food-row'))[0])
+    const sheet = screen.getByTestId('food-item-sheet')
+    fireEvent.change(within(sheet).getByLabelText('Grams'), { target: { value: '100' } })
+    expect(within(sheet).getByTestId('item-kcal').textContent).toBe('59')
+    expect(within(sheet).getByLabelText('Servings')).toHaveValue(0.59)
+  })
+
+  it('scales edited macros when the amount changes', async () => {
+    render(<FoodLogForm />)
+    fireEvent.click((await screen.findAllByTestId('personal-food-row'))[0])
+    const sheet = screen.getByTestId('food-item-sheet')
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Edit the numbers' }))
+    fireEvent.change(within(sheet).getByLabelText('Calories'), { target: { value: '300' } })
+    fireEvent.click(within(sheet).getByRole('button', { name: 'More servings' }))
+    fireEvent.click(within(sheet).getByRole('button', { name: 'More servings' }))
+    expect(within(sheet).getByTestId('item-kcal')).toHaveTextContent('600')
   })
 
   it('Add to meal fills the plate pill; Log logs the plate to the meal and day from the URL', async () => {
@@ -104,7 +137,7 @@ describe('FoodLogForm', () => {
     mocks.createLogs.mockResolvedValueOnce({ created: [{}, {}], failures: [] })
     render(<FoodLogForm />)
     fireEvent.click((await screen.findAllByTestId('personal-food-row'))[0])
-    fireEvent.click(screen.getByRole('radio', { name: '2 servings' }))
+    fireEvent.change(within(screen.getByTestId('food-item-sheet')).getByLabelText('Servings'), { target: { value: '2' } })
     fireEvent.click(screen.getByRole('button', { name: /Add to meal/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Add Banana to your plate' }))
     expect(screen.getByTestId('food-meal-tray').textContent).toContain('2 items · 305 kcal')
@@ -199,5 +232,17 @@ describe('FoodLogForm', () => {
     mocks.estimate.mockResolvedValueOnce(ESTIMATE)
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     expect(await screen.findByTestId('photo-result')).toBeInTheDocument()
+  })
+
+  it('creates a food from a no-match search and opens its amount sheet', async () => {
+    render(<FoodLogForm />)
+    fireEvent.change(screen.getByTestId('food-search-input'), { target: { value: 'dosa' } })
+    const create = await screen.findByRole('button', { name: 'Create "dosa"' })
+    fireEvent.click(create)
+    expect(screen.getByLabelText('Name')).toHaveValue('dosa')
+    fireEvent.click(screen.getByRole('button', { name: 'Save food' }))
+    await waitFor(() => expect(mocks.saveFood).toHaveBeenCalledWith(expect.objectContaining({ name: 'dosa', serving_size_g: 100, source: 'manual' })))
+    const sheet = await screen.findByTestId('food-item-sheet')
+    expect(within(sheet).getByRole('heading', { name: 'dosa' })).toBeInTheDocument()
   })
 })

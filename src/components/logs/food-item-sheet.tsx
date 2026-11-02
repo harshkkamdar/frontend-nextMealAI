@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Minus, Plus } from 'lucide-react'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { formatMacroKcal } from '@/lib/macros'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import type { FoodSearchResult } from '@/types/foods.types'
-import { PORTIONS, portionLabel, portionText, scaleMacros, type Macros, type PlateItem } from './log-math'
+import { portionText, scaleMacros, type Macros, type PlateItem } from './log-math'
 
 export const SOURCE_LABELS: Record<string, string> = {
   personal: 'Yours',
@@ -20,7 +20,10 @@ export const SOURCE_LABELS: Record<string, string> = {
   usda: 'USDA',
 }
 
-const fmt = (n: number) => String(Math.round(n * 10) / 10)
+const round1 = (n: number) => Math.round(n * 10) / 10
+const round2 = (n: number) => Math.round(n * 100) / 100
+const fmt = (n: number) => String(round1(n))
+const amountText = (n: number) => String(round2(n))
 
 /** "● 46.5 g protein ● 0 g carbs ● 5.4 g fat", each dot in its macro hue. */
 export function MacroDots({ macros, className }: { macros: Macros; className?: string }) {
@@ -60,7 +63,7 @@ export function plateItemFor(food: FoodSearchResult, servings: number | null, gr
 }
 
 /**
- * The item sheet (journey-log B2): portion chips (½, 1, 1½, 2) or grams, the macros for that amount, and
+ * The item sheet (journey-log B2): editable servings or grams, the macros for that amount, and
  * "Edit the numbers" for a label that disagrees. Add to meal puts it on the plate; Log now logs the plate with it.
  */
 export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
@@ -70,8 +73,10 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
   onLogNow: (item: PlateItem) => void
 }) {
   const [shown, setShown] = useState(food)
-  const [servings, setServings] = useState<number | null>(1)
+  const [servings, setServings] = useState(1)
+  const [servingsInput, setServingsInput] = useState('1')
   const [grams, setGrams] = useState(food?.serving_size_g || 100)
+  const [gramsInput, setGramsInput] = useState(String(food?.serving_size_g || 100))
   const [editing, setEditing] = useState(false)
   const [override, setOverride] = useState<Macros | null>(null)
 
@@ -79,7 +84,9 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
   if (food && food !== shown) {
     setShown(food)
     setServings(1)
+    setServingsInput('1')
     setGrams(food.serving_size_g || 100)
+    setGramsInput(String(food.serving_size_g || 100))
     setEditing(false)
     setOverride(null)
   }
@@ -88,9 +95,25 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
   const serving = shown.serving_size_g || 100
   const macros = override ?? scaleMacros(shown.macros_per_serving, serving, grams)
   const source = SOURCE_LABELS[shown.source] ?? 'Database'
-  const pick = (n: number) => { void haptic('selection'); setServings(n); setGrams(Math.round(n * serving)); setOverride(null) }
+  const setAmount = (nextServings: number, nextGrams: number, nextServingsInput = amountText(nextServings), nextGramsInput = amountText(nextGrams)) => {
+    setOverride((current) => current && grams > 0 ? {
+      calories: Math.round(current.calories * nextGrams / grams),
+      protein: round1(current.protein * nextGrams / grams),
+      carbs: round1(current.carbs * nextGrams / grams),
+      fat: round1(current.fat * nextGrams / grams),
+    } : current)
+    setServings(nextServings)
+    setServingsInput(nextServingsInput)
+    setGrams(nextGrams)
+    setGramsInput(nextGramsInput)
+  }
+  const stepServings = (direction: 1 | -1) => {
+    void haptic('selection')
+    const next = Math.max(0.5, round2(servings + direction * 0.5))
+    setAmount(next, round2(next * serving))
+  }
   const item = () => plateItemFor(shown, servings, grams, override ?? undefined)
-  const amountLabel = servings != null ? portionText(servings, grams) : `${fmt(grams / serving)} servings`
+  const amountLabel = portionText(servings, grams)
 
   return (
     <BottomSheet open={!!food} onClose={onClose} ariaLabel={shown.name}>
@@ -103,32 +126,49 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
         </div>
         <MacroDots macros={macros} className="mt-1" />
 
-        <div role="radiogroup" aria-label="Portion" className="mt-4 flex gap-2">
-          {PORTIONS.map((n) => (
-            <button
-              key={n}
-              type="button"
-              role="radio"
-              aria-checked={servings === n}
-              aria-label={`${portionLabel(n)} serving${n <= 1 ? '' : 's'}`}
-              onClick={() => pick(n)}
-              className={`h-11 min-w-11 flex-1 rounded-full text-body-sm font-bold transition-transform active:scale-[.94] ${servings === n ? 'bg-ink text-cream' : 'tile text-ink'}`}
-            >
-              {portionLabel(n)}
-            </button>
-          ))}
-          <label className={cn('flex h-11 min-w-0 flex-[1.8] items-center gap-1 rounded-full bg-[var(--surface-card)] pl-3 pr-4 shadow-[0_0_0_1px_rgba(17,28,53,.1)] focus-within:shadow-[0_0_0_1.5px_var(--color-ink)]', servings == null && 'shadow-[0_0_0_1.5px_var(--color-ink)]')}>
+        <div className="mt-4 flex items-center justify-center gap-1">
+          <button type="button" aria-label="Fewer servings" disabled={servings <= 0.5} onClick={() => stepServings(-1)} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.92] disabled:opacity-40">
+            <Minus aria-hidden="true" className="size-4" />
+          </button>
+          <label className="flex min-w-0 flex-1 items-baseline justify-center gap-1 text-body-sm font-bold text-ink tabular-nums">
             <input
               type="number"
               inputMode="decimal"
-              aria-label="Grams"
-              value={grams || ''}
-              onChange={(event) => { const g = Number(event.target.value) || 0; setGrams(g); setServings(PORTIONS.find((n) => Math.round(n * serving) === g) ?? null); setOverride(null) }}
-              className="h-full min-w-0 flex-1 bg-transparent text-right text-body-sm font-bold text-ink outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+              step="any"
+              aria-label="Servings"
+              value={servingsInput}
+              onChange={(event) => {
+                const value = event.target.value
+                setServingsInput(value)
+                const next = Number(value)
+                if (next > 0) setAmount(next, round2(next * serving), value)
+              }}
+              onBlur={() => setServingsInput(amountText(servings))}
+              className="w-[4ch] bg-transparent text-right text-body-sm font-bold text-ink outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
             />
-            <span className="text-caption font-semibold text-ink-65">g</span>
+            <span className="text-caption font-semibold text-ink-65">servings · {amountText(grams)} g</span>
           </label>
+          <button type="button" aria-label="More servings" onClick={() => stepServings(1)} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink transition-transform active:scale-[.92]">
+            <Plus aria-hidden="true" className="size-4" />
+          </button>
         </div>
+        <label className={cn('mt-2 flex h-11 w-full items-center gap-1 rounded-full bg-[var(--surface-card)] pl-3 pr-4 shadow-[0_0_0_1px_rgba(17,28,53,.1)] focus-within:shadow-[0_0_0_1.5px_var(--color-ink)]')}>
+          <input
+            type="number"
+            inputMode="decimal"
+            step="any"
+            aria-label="Grams"
+            value={gramsInput}
+            onChange={(event) => {
+              const value = event.target.value
+              setGramsInput(value)
+              const next = Number(value)
+              if (next > 0) setAmount(round2(next / serving), next, amountText(round2(next / serving)), value)
+            }}
+            className="h-full min-w-0 flex-1 bg-transparent text-right text-body-sm font-bold text-ink outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          <span className="text-caption font-semibold text-ink-65">g</span>
+        </label>
 
         {editing ? (
           <div className="mt-4 grid grid-cols-4 gap-2">
@@ -153,10 +193,10 @@ export function FoodItemSheet({ food, onClose, onAdd, onLogNow }: {
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <button type="button" disabled={!grams} onClick={() => { void haptic('selection'); onAdd(item()) }} className="flex h-btn items-center justify-center gap-1.5 rounded-[15px] bg-ink-06 text-body font-bold text-ink transition-transform active:scale-[.97] disabled:opacity-40">
+          <button type="button" disabled={!(Number(gramsInput) > 0)} onClick={() => { void haptic('selection'); onAdd(item()) }} className="flex h-btn items-center justify-center gap-1.5 rounded-[15px] bg-ink-06 text-body font-bold text-ink transition-transform active:scale-[.97] disabled:opacity-40">
             <Plus aria-hidden="true" className="size-4" />Add to meal
           </button>
-          <PrimaryButton type="button" disabled={!grams} onClick={() => onLogNow(item())}>Log now</PrimaryButton>
+          <PrimaryButton type="button" disabled={!(Number(gramsInput) > 0)} onClick={() => onLogNow(item())}>Log now</PrimaryButton>
         </div>
       </div>
     </BottomSheet>

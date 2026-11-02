@@ -25,8 +25,6 @@ export function parseMeal(value: string | null | undefined): Meal | null {
   return (MEALS as readonly string[]).includes(meal) ? (meal as Meal) : null
 }
 
-/** Portion chips in the item sheet (B2): servings, then a grams field. */
-export const PORTIONS = [0.5, 1, 1.5, 2] as const
 export const portionLabel = (n: number) => ({ 0.5: '½', 1: '1', 1.5: '1½', 2: '2' } as Record<number, string>)[n] ?? String(n)
 
 export interface Macros { calories: number; protein: number; carbs: number; fat: number }
@@ -183,7 +181,7 @@ export interface PlateItem {
   serving_size_g?: number
 }
 
-/** "1 serving", "1½ servings", or grams when the amount is not one of the portion chips. */
+/** "1 serving", "1½ servings", an arbitrary serving count, or grams. */
 export function portionText(servings: number | null, grams: number): string {
   if (servings == null) return `${grams} g`
   return `${portionLabel(servings)} serving${servings <= 1 ? '' : 's'}`

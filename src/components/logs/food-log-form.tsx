@@ -18,6 +18,7 @@ import { pickPhoto } from '@/lib/platform/camera'
 import { useOnline } from '@/lib/platform/network'
 import { cn } from '@/lib/utils'
 import type { FoodSearchResult, UserFood } from '@/types/foods.types'
+import { FoodFormSheet } from './food-form-sheet'
 import { FoodItemSheet, plateItemFor, SOURCE_LABELS } from './food-item-sheet'
 import { CARD, Chips, LIST, RiseList, RowsSkeleton, SearchField, SectionTitle } from './log-ui'
 import { MEALS, mealForTime, parseMeal, type Meal, type PlateItem } from './log-math'
@@ -72,6 +73,7 @@ export function FoodLogForm() {
   }, [personalFoods])
 
   const [picked, setPicked] = useState<FoodSearchResult | null>(null)
+  const [createForm, setCreateForm] = useState({ open: false, name: '', seq: 0 })
   const [plate, setPlate] = useState<PlateItem[]>([])
   const [plateOpen, setPlateOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -271,6 +273,9 @@ export function FoodLogForm() {
         ) : noMatch ? (
           <>
             <p role="status" className="px-1 text-body-sm leading-[1.4] text-ink">Nothing matches &ldquo;{trimmed}&rdquo;. Try a shorter name, or snap a photo.</p>
+            <button type="button" onClick={() => setCreateForm((current) => ({ open: true, name: trimmed, seq: current.seq + 1 }))} className={`${SOFT_BUTTON} mt-3`}>
+              {`Create "${trimmed}"`}
+            </button>
             <FoodList title="Recent" foods={usual.slice(0, 4).map(asResult)} onPick={setPicked} onAdd={quickAdd} personal className="mt-5" />
           </>
         ) : (
@@ -278,6 +283,18 @@ export function FoodLogForm() {
         )}
       </div>
 
+      <FoodFormSheet
+        key={createForm.seq}
+        open={createForm.open}
+        food={null}
+        initialName={createForm.name}
+        onClose={() => setCreateForm((current) => ({ ...current, open: false }))}
+        onSaved={(food) => {
+          setPersonalFoods((current) => [food, ...current.filter((item) => item.id !== food.id)])
+          setCreateForm((current) => ({ ...current, open: false }))
+          setPicked(asResult(food))
+        }}
+      />
       <FoodItemSheet
         food={picked}
         onClose={() => setPicked(null)}

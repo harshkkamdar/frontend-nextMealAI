@@ -5,15 +5,14 @@ import { useRouter } from 'next/navigation'
 import { MoreHorizontal, Pencil, Star, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { PushedHeader } from '@/components/layout/screen-header'
-import { CARD, FIELD, LIST, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
-import { FieldLabel } from '@/components/logs/manual-log-shell'
+import { CARD, LIST, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
+import { FoodFormSheet } from '@/components/logs/food-form-sheet'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PlusIcon } from '@/components/ui/fiqr/icons'
-import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
-import { deleteUserFood, getPersonalFoods, saveFood, updateFood } from '@/lib/api/foods.api'
+import { deleteUserFood, getPersonalFoods, updateFood } from '@/lib/api/foods.api'
 import { formatMacroKcal } from '@/lib/macros'
 import { haptic } from '@/lib/platform/app'
 import type { UserFood } from '@/types/foods.types'
@@ -62,72 +61,6 @@ function FoodRow({ food, onToggleFavorite, onMore }: { food: UserFood; onToggleF
         <MoreHorizontal className="size-5" />
       </button>
     </div>
-  )
-}
-
-/** Add a food, or edit one (name and macros; the API takes no serving or brand change). */
-function FoodForm({ food, onSaved }: { food: UserFood | null; onSaved: (food: UserFood) => void }) {
-  const m = food?.macros_per_serving
-  const [name, setName] = useState(food?.name ?? '')
-  const [brand, setBrand] = useState('')
-  const [servingSize, setServingSize] = useState('100')
-  const [calories, setCalories] = useState(m?.calories != null ? String(m.calories) : '')
-  const [protein, setProtein] = useState(m?.protein != null ? String(m.protein) : '')
-  const [carbs, setCarbs] = useState(m?.carbs != null ? String(m.carbs) : '')
-  const [fat, setFat] = useState(m?.fat != null ? String(m.fat) : '')
-  const [saving, setSaving] = useState(false)
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    if (!name.trim()) {
-      toast.error('Give the food a name')
-      return
-    }
-    const macros = { calories: parseInt(calories) || 0, protein: parseFloat(protein) || 0, carbs: parseFloat(carbs) || 0, fat: parseFloat(fat) || 0 }
-    setSaving(true)
-    try {
-      const saved = food
-        ? await updateFood(food.id, { name: name.trim(), macros_per_serving: macros })
-        : await saveFood({ name: name.trim(), brand: brand.trim() || undefined, serving_size_g: parseFloat(servingSize) || 100, macros_per_serving: macros, source: 'manual', is_favorite: false })
-      onSaved(food ? { ...food, ...saved, name: name.trim(), macros_per_serving: macros } : saved)
-      void haptic('success')
-      toast.success(food ? 'Food updated' : 'Food saved')
-    } catch {
-      toast.error("Couldn't save that food. Try again.")
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const field = (id: string, label: string, value: string, set: (v: string) => void, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
-    <div className="min-w-0">
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <input id={id} value={value} onChange={(event) => set(event.target.value)} className={`${FIELD} h-14`} {...props} />
-    </div>
-  )
-
-  return (
-    <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-2 pt-2">
-        <h2 className="text-headline text-ink">{food ? 'Edit food' : 'Add a food'}</h2>
-        {field('food-name', 'Name', name, setName, { type: 'text', placeholder: 'Overnight oats', autoFocus: !food })}
-        {food ? null : field('food-brand', 'Brand, optional', brand, setBrand, { type: 'text' })}
-        <div className="grid grid-cols-2 gap-3">
-          {food ? null : field('food-serving', 'Serving, g', servingSize, setServingSize, { type: 'number', inputMode: 'decimal' })}
-          {field('food-kcal', 'Calories', calories, setCalories, { type: 'number', inputMode: 'numeric' })}
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          {field('food-protein', 'Protein, g', protein, setProtein, { type: 'number', inputMode: 'decimal' })}
-          {field('food-carbs', 'Carbs, g', carbs, setCarbs, { type: 'number', inputMode: 'decimal' })}
-          {field('food-fat', 'Fat, g', fat, setFat, { type: 'number', inputMode: 'decimal' })}
-        </div>
-      </div>
-      <div className="px-4 pb-4 pt-3">
-        <PrimaryButton type="submit" disabled={saving} aria-busy={saving}>
-          {saving ? 'Saving…' : food ? 'Save changes' : 'Save food'}
-        </PrimaryButton>
-      </div>
-    </form>
   )
 }
 
@@ -278,9 +211,7 @@ export default function FoodsPage() {
         ) : null}
       </BottomSheet>
 
-      <BottomSheet open={formOpen} onClose={() => setFormOpen(false)} ariaLabel={sheetForm.food ? 'Edit food' : 'Add a food'}>
-        <FoodForm key={sheetForm.seq} food={sheetForm.food} onSaved={handleSaved} />
-      </BottomSheet>
+      <FoodFormSheet key={sheetForm.seq} open={formOpen} food={sheetForm.food} onClose={() => setFormOpen(false)} onSaved={handleSaved} />
     </div>
   )
 }
