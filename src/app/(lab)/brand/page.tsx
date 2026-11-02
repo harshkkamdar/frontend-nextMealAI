@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { GeoRead } from '@/components/check-in/parts'
 import { SegmentsBar } from '@/components/check-in/segments-bar'
 import { GeoMark } from '@/components/shared/geo-avatar'
+import { FINALISTS, Mascot } from '../mascot/characters'
 import { GeoLine } from '@/components/ui/fiqr/geo-line'
 import { Wordmark } from '@/components/ui/fiqr/wordmark'
 import { Chapter, LabShell } from '../_parts'
@@ -102,7 +103,7 @@ export default function BrandPage() {
     >
       <div className="mt-6 flex flex-wrap items-end gap-x-12 gap-y-8 border-t border-ink-12 pt-10">
         <figure><AppIcon size={128} /><figcaption className="mt-3 text-[13px] text-ink-65">App icon</figcaption></figure>
-        <figure><span className="grid size-[128px] place-items-center rounded-[29px] border border-ink-12 bg-card"><GeoMark size={92} /></span><figcaption className="mt-3 text-[13px] text-ink-65">Geo on paper</figcaption></figure>
+        <figure><span className="grid size-[128px] place-items-center rounded-[29px] border border-ink-12 bg-card"><GeoMark size={92} /></span><figcaption className="mt-3 text-[13px] text-ink-65">The mark</figcaption></figure>
         <figure><span className="flex h-[128px] items-center"><Wordmark size={44} /></span><figcaption className="mt-3 text-[13px] text-ink-65">Wordmark</figcaption></figure>
       </div>
 
@@ -120,7 +121,7 @@ export default function BrandPage() {
         </ol>
       </Chapter>
 
-      <Chapter n="02" id="geo" title="Geo" intro={<>Geo is the FIQR mark: a ring, Geo&apos;s attention on your week, crossed by a short orange bar, the nudge. Geo has no face and no body. The bar is its only expression.</>}>
+      <Chapter n="02" id="mark" title="The mark and Geo" intro={<>The FIQR mark is a ring crossed by a short orange bar: the logo, on the app icon and beside the wordmark. Geo, the coach, is a character of its own; the four candidates are on the Mascot page.</>}>
         <div className="flex flex-wrap items-center gap-10">
           <div className="w-[300px] shrink-0"><Construction /></div>
           <div className="min-w-[260px] flex-1 max-w-[46ch] text-[15.5px] leading-[1.55] text-ink-80">
@@ -129,11 +130,11 @@ export default function BrandPage() {
           </div>
         </div>
 
-        <a href="/geo" className="mt-12 flex items-center gap-5 rounded-[16px] border border-ink-12 bg-card px-5 py-4 active:bg-ink-04">
-          <span className="flex gap-3">{(['rest', 'speak', 'up', 'down'] as const).map((pose) => <GeoMark key={pose} size={28} pose={pose} />)}</span>
+        <a href="/mascot" className="mt-12 flex items-center gap-5 rounded-[16px] border border-ink-12 bg-card px-5 py-4 active:bg-ink-04">
+          <span className="flex gap-3">{FINALISTS.map((id) => <Mascot key={id} id={id} mood="rest" scheme="navy" size={32} framing="head" />)}</span>
           <span className="min-w-0 flex-1">
-            <span className="block text-[15.5px] font-semibold">Nine expressions, ten situations</span>
-            <span className="block text-[13.5px] text-ink-65">How Geo moves and what it says in each part of the app</span>
+            <span className="block text-[15.5px] font-semibold">Geo, the character</span>
+            <span className="block text-[13.5px] text-ink-65">Four candidates, nine expressions each, shown where Geo lives in the app</span>
           </span>
           <span aria-hidden="true" className="text-[17px] text-ink-50">→</span>
         </a>

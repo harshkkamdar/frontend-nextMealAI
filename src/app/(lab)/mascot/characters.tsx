@@ -38,7 +38,7 @@ export const MOODS: { mood: Mood; when: string }[] = [
 type Pt = [number, number]
 interface Spec {
   /** Eye centre line, eye gap, eye size, mouth line and width. `mouthOnPatch`: the mouth sits on the light muzzle. */
-  face: { cx: number; cy: number; gap: number; ew: number; eh: number; my: number; mw: number; mouthOnPatch?: boolean; eyesOnPatch?: boolean }
+  face: { cx: number; cy: number; gap: number; ew: number; eh: number; my: number; mw: number; mouthOnPatch?: boolean; eyesOnPatch?: boolean; mx?: number }
   /** Hand rest points left and right, the raised-hands line, and where a clipboard is held. */
   hands: { l: Pt; r: Pt; up: number; board: Pt; size?: number; fill?: string }
   /** Square crop for small spots (Geo's line, the nav button): x, y, side. */
@@ -77,23 +77,25 @@ const SPECS: Record<CharId, Spec> = {
     ),
   },
   kangaroo: {
-    face: { cx: 60, cy: 36, gap: 18, ew: 5.5, eh: 9, my: 69, mw: 8, mouthOnPatch: true },
-    hands: { l: [36, 82], r: [84, 82], up: 26, board: [60, 86], size: 7.5, fill: ORANGE },
-    head: [27, 0, 66],
+    face: { cx: 66, cy: 35, gap: 12, ew: 4.8, eh: 8.2, my: 54, mw: 7.5, mx: 86, mouthOnPatch: true },
+    hands: { l: [72, 72], r: [88, 66], up: 26, board: [76, 80], size: 6.5, fill: ORANGE },
+    head: [36, 0, 64],
     body: (_mood, c) => (
       <>
-        <path d="M73 102 Q97 105 113 117" stroke={c.body} strokeWidth="9" fill="none" strokeLinecap="round" />
-        <ellipse cx="48" cy="113" rx="13" ry="4" fill={c.body} />
-        <ellipse cx="72" cy="113" rx="13" ry="4" fill={c.body} />
-        <ellipse className="m-body" cx="60" cy="92" rx="18" ry="21" fill={c.body} />
-        <ellipse cx="60" cy="99" rx="9.5" ry="10" fill={c.patch} />
-        <path d="M47 27 Q28 16 30 1 Q46 8 53 25 Z" fill={c.body} stroke={c.body} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M73 27 Q92 16 90 1 Q74 8 67 25 Z" fill={c.body} stroke={c.body} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M47 23 Q36 16 35 7 Q45 12 50 22 Z" fill={c.patch} />
-        <path d="M73 23 Q84 16 85 7 Q75 12 70 22 Z" fill={c.patch} />
-        <path d="M60 22 C76 22 80 34 76 48 C73 60 67 72 60 72 C53 72 47 60 44 48 C40 34 44 22 60 22 Z" fill={c.body} />
-        <path d="M60 48 C67 48 70 56 68 63 C66 69 63 72 60 72 C57 72 54 69 52 63 C50 56 53 48 60 48 Z" fill={c.patch} />
-        <ellipse cx="60" cy="63" rx="4.2" ry="2.8" fill={NAVY} />
+        <path d="M48 100 Q28 108 7 115 Q3 118 9 118 Q34 117 56 111 Z" fill={c.body} />
+        <ellipse cx="82" cy="114" rx="20" ry="4.6" fill={c.body} />
+        <circle cx="57" cy="97" r="17" fill={c.body} />
+        <ellipse cx="66" cy="74" rx="14" ry="23" transform="rotate(20 66 74)" fill={c.body} />
+        <ellipse cx="70" cy="77" rx="6.5" ry="14" transform="rotate(20 70 77)" fill={c.patch} />
+        <ellipse cx="70" cy="50" rx="10" ry="11" fill={c.body} />
+        <path d="M60 27 Q46 18 47 3 Q59 9 66 25 Z" fill={c.body} stroke={c.body} strokeWidth="3" strokeLinejoin="round" />
+        <path d="M70 24 Q70 10 79 1 Q85 13 78 27 Z" fill={c.body} stroke={c.body} strokeWidth="3" strokeLinejoin="round" />
+        <path d="M59 22 Q52 15 51 8 Q58 12 62 21 Z" fill={c.patch} />
+        <path d="M73 21 Q74 13 78 8 Q80 15 76 22 Z" fill={c.patch} />
+        <ellipse cx="68" cy="38" rx="16" ry="15" fill={c.body} />
+        <ellipse cx="82" cy="45" rx="13" ry="9" transform="rotate(22 82 45)" fill={c.body} />
+        <ellipse cx="86" cy="49" rx="8.5" ry="6" transform="rotate(22 86 49)" fill={c.patch} />
+        <ellipse cx="91" cy="50" rx="3.2" ry="2.4" transform="rotate(22 91 50)" fill={NAVY} />
       </>
     ),
   },
@@ -189,6 +191,9 @@ const SPECS: Record<CharId, Spec> = {
   },
 }
 
+/** The four going to George. */
+export const FINALISTS: CharId[] = ['kangaroo', 'bear', 'coach', 'kettlebell']
+
 export const CHARACTERS: { id: CharId; name: string; kind: string; idea: string }[] = [
   { id: 'kangaroo', name: 'Roo', kind: 'Creature', idea: 'Australian, athletic, boxes in orange gloves; the pouch holds your food log.' },
   { id: 'bear', name: 'Bear', kind: 'Creature', idea: 'Calm strength in a sweatband: the steady coach who never shouts.' },
@@ -203,6 +208,7 @@ export const CHARACTERS: { id: CharId; name: string; kind: string; idea: string 
 /** Eyes, brows and the mouth, shared by every character. */
 function Face({ mood, f, c }: { mood: Mood; f: Spec['face']; c: (typeof SCHEMES)[Scheme] }) {
   const { cx, cy, gap, ew, eh, my, mw } = f
+  const mx = f.mx ?? cx
   const color = f.eyesOnPatch ? NAVY : c.feature
   const L = cx - gap / 2
   const R = cx + gap / 2
@@ -229,12 +235,12 @@ function Face({ mood, f, c }: { mood: Mood; f: Spec['face']; c: (typeof SCHEMES)
   const sw = Math.max(1.6, mw * 0.14)
   let mouth: ReactNode = null
   switch (mood) {
-    case 'speak': mouth = <ellipse className="m-talk" cx={cx} cy={my} rx={mw * 0.32} ry={mw * 0.26} fill={mc} />; break
-    case 'working': mouth = <path d={`M${cx - mw * 0.1} ${my + 1} L${cx + mw * 0.28} ${my - 0.5}`} stroke={mc} strokeWidth={sw} strokeLinecap="round" />; break
-    case 'done': mouth = <path d={`M${cx - mw * 0.4} ${my - 1} Q${cx} ${my + mw * 0.35} ${cx + mw * 0.4} ${my - 1}`} stroke={mc} strokeWidth={sw} strokeLinecap="round" fill="none" />; break
-    case 'nudge': mouth = <path d={`M${cx - mw * 0.25} ${my - 1} Q${cx} ${my + mw * 0.22} ${cx + mw * 0.25} ${my - 1}`} stroke={mc} strokeWidth={sw} strokeLinecap="round" fill="none" />; break
-    case 'up': mouth = <path d={`M${cx - mw * 0.48} ${my - 2} Q${cx} ${my + mw * 0.75} ${cx + mw * 0.48} ${my - 2} Z`} fill={mc} stroke={mc} strokeWidth={sw * 0.6} strokeLinejoin="round" />; break
-    case 'down': mouth = <path d={`M${cx - mw * 0.32} ${my + 1.5} Q${cx} ${my - mw * 0.12} ${cx + mw * 0.32} ${my + 1.5}`} stroke={mc} strokeWidth={sw} strokeLinecap="round" fill="none" />; break
+    case 'speak': mouth = <ellipse className="m-talk" cx={mx} cy={my} rx={mw * 0.32} ry={mw * 0.26} fill={mc} />; break
+    case 'working': mouth = <path d={`M${mx - mw * 0.1} ${my + 1} L${mx + mw * 0.28} ${my - 0.5}`} stroke={mc} strokeWidth={sw} strokeLinecap="round" />; break
+    case 'done': mouth = <path d={`M${mx - mw * 0.4} ${my - 1} Q${mx} ${my + mw * 0.35} ${mx + mw * 0.4} ${my - 1}`} stroke={mc} strokeWidth={sw} strokeLinecap="round" fill="none" />; break
+    case 'nudge': mouth = <path d={`M${mx - mw * 0.25} ${my - 1} Q${mx} ${my + mw * 0.22} ${mx + mw * 0.25} ${my - 1}`} stroke={mc} strokeWidth={sw} strokeLinecap="round" fill="none" />; break
+    case 'up': mouth = <path d={`M${mx - mw * 0.48} ${my - 2} Q${mx} ${my + mw * 0.75} ${mx + mw * 0.48} ${my - 2} Z`} fill={mc} stroke={mc} strokeWidth={sw * 0.6} strokeLinejoin="round" />; break
+    case 'down': mouth = <path d={`M${mx - mw * 0.32} ${my + 1.5} Q${mx} ${my - mw * 0.12} ${mx + mw * 0.32} ${my + 1.5}`} stroke={mc} strokeWidth={sw} strokeLinecap="round" fill="none" />; break
   }
   return <g>{eyes}{mouth}</g>
 }

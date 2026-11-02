@@ -15,11 +15,11 @@ export function LabShell({ eyebrow, title, lede, children }: { eyebrow: string; 
   return (
     <div className="min-h-screen bg-cream text-ink">
       <nav className="sticky top-0 z-[30] border-b border-ink-09 bg-cream" style={{ paddingTop: 'var(--safe-top)' }}>
-        <div className="mx-auto flex h-14 max-w-[1180px] items-center gap-6 px-gutter">
-          <Link href="/brand" aria-label="FIQR brand"><Wordmark size={22} /></Link>
-          <div className="ml-auto flex gap-1">
-            {[['/brand', 'Brand'], ['/mascot', 'Mascot'], ['/geo', 'Geo'], ['/lab', 'Components']].map(([href, label]) => (
-              <Link key={href} href={href} className={cn('flex h-11 items-center rounded-full px-3.5 text-[15px] font-semibold', pathname === href ? 'text-ink' : 'text-ink-62')}>
+        <div className="mx-auto flex h-14 max-w-[1180px] items-center gap-3 px-gutter">
+          <Link href="/brand" aria-label="FIQR brand" className="shrink-0"><Wordmark size={22} /></Link>
+          <div className="ml-auto flex min-w-0 overflow-x-auto [scrollbar-width:none]">
+            {[['/updates', 'Updates'], ['/mascot', 'Mascot'], ['/brand', 'Brand'], ['/lab', 'Components']].map(([href, label]) => (
+              <Link key={href} href={href} className={cn('flex h-11 shrink-0 items-center rounded-full px-3 text-[15px] font-semibold', pathname === href ? 'text-ink' : 'text-ink-62')}>
                 {label}
               </Link>
             ))}
