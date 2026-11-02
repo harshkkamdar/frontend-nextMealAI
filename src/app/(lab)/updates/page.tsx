@@ -54,7 +54,7 @@ const TRUST: Item[] = [
   ['Never says "done" unless it saved', 'If a change did not save, Geo says so and offers to try again, instead of claiming success.', '20 Oct'],
   ['Calories always add up', 'Every calorie number Geo quotes is worked out from the protein, carbs and fat, so the totals match.', 'Aug'],
   ['Safe by design', 'Geo will not advise on medication or supplement doses and will not set targets below 1,200 kcal for women or 1,500 kcal for men.', '17 Sep'],
-  ['Faster and steadier', 'The server moved next to the database (Home loads three to four times faster), Geo retries a failed call up to three times, and its instructions are half the size. Reading a workout program from a photo, and Geo remembering your preferences, work again.', '2 Nov'],
+  ['Faster and steadier', 'The server moved next to the database (Home loads three to four times faster), Geo retries a failed call up to three times (the last on a second AI model), and its instructions are half the size. Reading a workout program from a photo, and Geo remembering your preferences, work again.', '2 Nov'],
 ]
 
 const LOOK: Item[] = [
