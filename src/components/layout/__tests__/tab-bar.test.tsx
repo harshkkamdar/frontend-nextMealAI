@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { TabBar, hidesTabBar } from '../tab-bar'
 
 const route = vi.hoisted(() => ({ pathname: '/dashboard' }))
@@ -42,5 +42,24 @@ describe('hidesTabBar', () => {
     for (const path of ['/dashboard', '/food', '/train', '/chat', '/check-in', '/plans', '/plans/view', '/settingsx']) {
       expect(hidesTabBar(path), path).toBe(false)
     }
+  })
+})
+
+describe('Geo working', () => {
+  it('orbits the nav mark while a Geo reply is in flight, and settles when the last one lands', async () => {
+    const { useUIStore } = await import('@/stores/ui.store')
+    const { container, rerender } = render(<TabBar />)
+    const mark = () => container.querySelector('a[href="/chat"] svg')
+    expect(mark()).not.toHaveClass('geo-working')
+    act(() => { useUIStore.getState().geoStart(); useUIStore.getState().geoStart() })
+    rerender(<TabBar />)
+    expect(mark()).toHaveClass('geo-working')
+    act(() => { useUIStore.getState().geoEnd() })
+    rerender(<TabBar />)
+    expect(mark()).toHaveClass('geo-working')
+    act(() => { useUIStore.getState().geoEnd(); useUIStore.getState().geoEnd() })
+    rerender(<TabBar />)
+    expect(mark()).not.toHaveClass('geo-working')
+    expect(useUIStore.getState().geoWorking).toBe(0)
   })
 })

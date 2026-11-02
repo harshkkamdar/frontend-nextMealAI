@@ -6,6 +6,7 @@ import type { ComponentType } from 'react'
 import { GeoMark } from '@/components/shared/geo-avatar'
 import { cn } from '@/lib/utils'
 import { haptic } from '@/lib/platform/app'
+import { useUIStore } from '@/stores/ui.store'
 
 /** The + sheet (log-sheet.tsx): opened by the Log food action on Home and Food. */
 export const LOG_SHEET = 'log-sheet'
@@ -47,6 +48,7 @@ export function hidesTabBar(pathname: string): boolean {
 export function TabBar() {
   const pathname = usePathname()
   const hidden = hidesTabBar(pathname)
+  const geoWorking = useUIStore((state) => state.geoWorking > 0)
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
   const item = ({ label, href, icon: Icon }: (typeof SIDE)[number]) => {
@@ -85,7 +87,7 @@ export function TabBar() {
           className="flex flex-col items-center"
         >
           <span className="-mt-6 grid size-14 place-items-center rounded-full bg-ink shadow-[var(--shadow-raised)] transition-transform active:scale-[.94]">
-            <GeoMark size={34} tone="cream" />
+            <GeoMark size={34} tone="cream" working={geoWorking} />
           </span>
           <span className={cn('mt-[6px] text-[11px] leading-none text-ink-62', isActive('/chat') ? 'font-semibold text-ink' : 'font-semibold')}>Geo</span>
         </Link>

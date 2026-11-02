@@ -190,7 +190,7 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId, cluste
           <motion.p
             layoutId={reduce ? undefined : layoutId}
             transition={spring.glide}
-            className="whitespace-pre-wrap break-words rounded-[22px] bg-ink-08 px-4 py-2.5 text-[16px] leading-[1.45] text-ink"
+            className="whitespace-pre-wrap break-words rounded-[18px] rounded-br-[6px] bg-ink px-4 py-2.5 text-[15.5px] leading-[1.45] text-cream"
           >
             {displayContent}
           </motion.p>
