@@ -108,7 +108,7 @@ export default function ChatListPage() {
     <div className="mx-auto w-full max-w-md px-gutter pb-6">
       <LargeTitleHeader
         title="Geo"
-        subtitle="Food, training and your week"
+        subtitle="Your coach"
         actions={(
           <RoundButton aria-label="New conversation" onClick={() => router.push(newSessionUrl())}>
             <SquarePen strokeWidth={1.75} />
@@ -116,33 +116,41 @@ export default function ChatListPage() {
         )}
       />
 
-      <div className="-mx-4 mt-3">
+      <div className="-mx-gutter mt-3">
         <OfflineBand />
       </div>
 
-      {/* Two taps to talk (J3): the Geo tab, then this field. */}
-      <form
-        className="mt-3 flex h-field items-center gap-1.5 rounded-full card-glass pl-5 pr-2"
-        onSubmit={(event) => { event.preventDefault(); ask() }}
-      >
-        <input
-          ref={askRef}
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          placeholder="Ask Geo anything"
-          aria-label="Ask Geo anything"
-          enterKeyHint="send"
-          className="h-full min-w-0 flex-1 bg-transparent text-body text-ink outline-none placeholder:text-ink-65"
-        />
-        <button
-          type="submit"
-          aria-label="Send to Geo"
-          disabled={!draft.trim()}
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-cream transition-transform active:scale-[.94] disabled:bg-ink-06 disabled:text-ink-35"
+      {/* Geo's home: the same navy card that carries Geo's read on Check-in, with the way to talk inside it.
+          Two taps to talk (J3): the Geo tab, then this field. */}
+      <section aria-label="Ask Geo" className="mt-4 rounded-[22px] bg-ink p-[22px] text-cream">
+        <div className="flex items-center gap-[9px]">
+          <GeoAvatar size={22} onNavy />
+          <span className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Ask Geo</span>
+        </div>
+        <p className="mt-[14px] text-pretty text-[21px] font-semibold leading-[1.3] tracking-[-0.3px]">What did you eat, or what should change?</p>
+        <form
+          className="mt-[18px] flex h-14 items-center gap-1.5 rounded-[15px] bg-cream pl-4 pr-1.5"
+          onSubmit={(event) => { event.preventDefault(); ask() }}
         >
-          <ArrowUpIcon className="size-5" />
-        </button>
-      </form>
+          <input
+            ref={askRef}
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder="Tell Geo"
+            aria-label="Ask Geo anything"
+            enterKeyHint="send"
+            className="h-full min-w-0 flex-1 bg-transparent text-body text-ink outline-none placeholder:text-ink-62"
+          />
+          <button
+            type="submit"
+            aria-label="Send to Geo"
+            disabled={!draft.trim()}
+            className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-cream transition-transform active:scale-[.94] disabled:bg-ink-08 disabled:text-ink-35"
+          >
+            <ArrowUpIcon className="size-5" />
+          </button>
+        </form>
+      </section>
 
       <section className="mt-6" aria-labelledby="conversations-label">
         <h2 id="conversations-label" className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Conversations</h2>
@@ -156,8 +164,7 @@ export default function ChatListPage() {
           </div>
         ) : sessions.length === 0 ? (
           <div className="rounded-card card-glass p-4">
-            <GeoAvatar variant="face" state="happy" size={32} />
-            <p className="mt-3 text-body-sm leading-[1.4] text-ink">Our conversations land here. Tell me what you ate, or try one of these.</p>
+            <p className="text-body-sm leading-[1.4] text-ink">Our conversations land here. Tell me what you ate, or try one of these.</p>
             <div className="mt-3 flex flex-col gap-2">
               {EXAMPLES.map((example) => (
                 <button
