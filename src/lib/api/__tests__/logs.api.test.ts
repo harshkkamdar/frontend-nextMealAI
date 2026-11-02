@@ -21,10 +21,12 @@ vi.mock('@/lib/api/client', () => ({
 }))
 
 import { apiFetch } from '@/lib/api/client'
-import { createLogs, createLog } from '@/lib/api/logs.api'
+import { createLogs, createLog, deleteLog, updateLog } from '@/lib/api/logs.api'
+import { syncBus } from '@/lib/sync/sync-bus'
 import type { CreateLogInput } from '@/types/logs.types'
 
 const mockedApiFetch = vi.mocked(apiFetch)
+const emitSpy = vi.spyOn(syncBus, 'emit')
 
 function foodLogInput(name: string): CreateLogInput {
   return {
@@ -117,5 +119,41 @@ describe('FE-RCA F3 — createLog singleton remains unchanged', () => {
       body: foodLogInput('Oats'),
       idempotencyKey: expect.any(String),
     })
+  })
+})
+
+describe('log sync events', () => {
+  beforeEach(() => {
+    mockedApiFetch.mockReset()
+    emitSpy.mockClear()
+  })
+
+  it('emits once after creating one log', async () => {
+    mockedApiFetch.mockResolvedValueOnce({ id: 'log-1' })
+    await createLog(foodLogInput('Oats'))
+    expect(emitSpy).toHaveBeenCalledTimes(1)
+    expect(emitSpy).toHaveBeenCalledWith('logs:created')
+  })
+
+  it('emits once after creating three logs', async () => {
+    mockedApiFetch
+      .mockResolvedValueOnce({ id: 'log-1' })
+      .mockResolvedValueOnce({ id: 'log-2' })
+      .mockResolvedValueOnce({ id: 'log-3' })
+    await createLogs([foodLogInput('Oats'), foodLogInput('Whey'), foodLogInput('Banana')])
+    expect(emitSpy).toHaveBeenCalledTimes(1)
+    expect(emitSpy).toHaveBeenCalledWith('logs:created')
+  })
+
+  it('emits after deleting a log', async () => {
+    mockedApiFetch.mockResolvedValueOnce(undefined)
+    await deleteLog('log-1')
+    expect(emitSpy).toHaveBeenCalledWith('logs:deleted')
+  })
+
+  it('does not emit when updating a log fails', async () => {
+    mockedApiFetch.mockRejectedValueOnce(new Error('500'))
+    await expect(updateLog('log-1', {})).rejects.toThrow('500')
+    expect(emitSpy).not.toHaveBeenCalled()
   })
 })

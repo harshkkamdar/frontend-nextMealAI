@@ -1,5 +1,6 @@
 import { apiFetch } from './client'
 import { offlineMutate } from '@/lib/offline/mutate'
+import { syncBus } from '@/lib/sync/sync-bus'
 import type { Log, LogsSummary, CreateLogInput } from '@/types/logs.types'
 import type { OfflineResult } from '@/types/offline.types'
 
@@ -23,7 +24,7 @@ export async function createLog(data: CreateLogInput): Promise<Log> {
   return result.queued ? result.optimistic : result.data
 }
 
-export async function createLogWithStatus(data: CreateLogInput): Promise<OfflineResult<Log>> {
+async function createLogQuiet(data: CreateLogInput): Promise<OfflineResult<Log>> {
   return offlineMutate(
     data.type === 'food' ? 'food_log' : 'log',
     'POST',
@@ -40,6 +41,12 @@ export async function createLogWithStatus(data: CreateLogInput): Promise<Offline
       } as unknown as Log
     },
   )
+}
+
+export async function createLogWithStatus(data: CreateLogInput): Promise<OfflineResult<Log>> {
+  const result = await createLogQuiet(data)
+  syncBus.emit('logs:created')
+  return result
 }
 
 /**
@@ -64,7 +71,10 @@ export interface BatchCreateLogResult {
 export async function createLogs(items: CreateLogInput[]): Promise<BatchCreateLogResult> {
   if (items.length === 0) return { created: [], failures: [] }
 
-  const settled = await Promise.allSettled(items.map((item) => createLog(item)))
+  const settled = await Promise.allSettled(items.map(async (item) => {
+    const result = await createLogQuiet(item)
+    return result.queued ? result.optimistic : result.data
+  }))
   const created: Log[] = []
   const failures: BatchCreateLogResult['failures'] = []
   settled.forEach((res, index) => {
@@ -75,6 +85,7 @@ export async function createLogs(items: CreateLogInput[]): Promise<BatchCreateLo
       failures.push({ index, error })
     }
   })
+  if (created.length > 0) syncBus.emit('logs:created')
   return { created, failures }
 }
 
@@ -82,13 +93,18 @@ export async function updateLog(
   id: string,
   payload: Partial<Log['payload']>
 ): Promise<Log> {
-  return apiFetch<Log>(`/v1/logs/${id}`, { method: 'PATCH', body: { payload } })
+  const log = await apiFetch<Log>(`/v1/logs/${id}`, { method: 'PATCH', body: { payload } })
+  syncBus.emit('logs:updated')
+  return log
 }
 
 export async function deleteLog(id: string): Promise<void> {
   await apiFetch(`/v1/logs/${id}`, { method: 'DELETE' })
+  syncBus.emit('logs:deleted')
 }
 
 export async function bulkDeleteLogs(ids: string[]): Promise<{ deleted: number }> {
-  return apiFetch<{ deleted: number }>('/v1/logs/bulk-delete', { method: 'POST', body: { ids } })
+  const result = await apiFetch<{ deleted: number }>('/v1/logs/bulk-delete', { method: 'POST', body: { ids } })
+  syncBus.emit('logs:deleted')
+  return result
 }
