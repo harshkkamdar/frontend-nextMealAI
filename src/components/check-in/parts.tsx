@@ -45,16 +45,17 @@ export function useHealthSource(): string | null {
 export const SectionTitle = SectionHeading
 
 /** Geo's read of the week (George): the navy card with the largest type on the screen; the data below is evidence. */
-export function GeoRead({ verdict, aside, children, className }: { verdict: string | null; aside: ReactNode; children?: ReactNode; className?: string }) {
+export function GeoRead({ verdict, aside, children, footer, className }: { verdict: string | null; aside: ReactNode; children?: ReactNode; footer?: ReactNode; className?: string }) {
   return (
     <section className={cn('rounded-[22px] bg-ink p-[22px] text-cream', className)} aria-label="Geo's read">
       <div className="flex items-center gap-[9px]">
-        <GeoAvatar size={22} onNavy />
+        <GeoAvatar size={22} onNavy state="default" />
         <span className="text-[11.5px] font-semibold uppercase tracking-[1.8px] text-cream-55">Geo&apos;s read</span>
         <span className="ml-auto text-[12px] font-medium text-cream-60 tabular-nums">{aside}</span>
       </div>
       {children}
       {verdict ? <p className="mt-[14px] text-pretty text-[21px] font-semibold leading-[1.3] tracking-[-0.3px] text-cream">{verdict}</p> : null}
+      {footer}
     </section>
   )
 }

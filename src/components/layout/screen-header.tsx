@@ -55,14 +55,16 @@ interface LargeTitleHeaderProps {
   actions?: ReactNode
   /** Under the title, e.g. the week strip on Food and Train. */
   children?: ReactNode
+  /** The condensed bar's title when it differs from the large one (Home: "Today"). */
+  barTitle?: string
 }
 
-/** Tab roots (Food, Train, Check-in, Geo): George's header, an uppercase eyebrow over a 24 pt title, buttons top right. */
-export function LargeTitleHeader({ title, subtitle, actions, children }: LargeTitleHeaderProps) {
+/** Every tab root, Home included: an uppercase eyebrow over a 24 pt title, buttons top right. */
+export function LargeTitleHeader({ title, subtitle, actions, children, barTitle = title }: LargeTitleHeaderProps) {
   const { ref, past } = useScrolledPast<HTMLDivElement>()
   return (
     <>
-      <TopBar title={title} filled={past} actions={actions} />
+      <TopBar title={barTitle} filled={past} actions={actions} />
       <header className="pt-[calc(10px+var(--safe-top))]">
         <div className={cn('min-h-11', actions && 'pr-28')}>
           {subtitle ? <p className="truncate text-[12px] font-medium uppercase tracking-[1.4px] text-ink-62">{subtitle}</p> : null}

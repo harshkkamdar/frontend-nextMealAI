@@ -24,12 +24,13 @@ const LAST = BEATS.length - 1
 const STEP = 12 // progress dots: 6 px dot + 6 px gap
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 
-/** Stage top below the title block: 236 px on tall phones, closing up to 188 px (just under a two-line line) on short ones (iPhone SE). */
-const STAGE_TOP = 'min(236px, max(188px, 100dvh - 520px))'
-/** The shared stage under every beat's visual: below the title block, ending just above the dots (the dots, CTA and link take 200 px plus the safe area). */
-const STAGE: CSSProperties = { top: `calc(var(--safe-top) + ${STAGE_TOP})`, height: `min(420px, calc(100dvh - var(--safe-top) - var(--safe-bottom) - ${STAGE_TOP} - 200px))` }
-/** The stage leans a little differently on each beat, so it settles like a card being set down. */
-const LEAN = ['none', 'translateY(4px) rotate(-.6deg)', 'translateY(-2px) rotate(.5deg)', 'translateY(2px) rotate(-.3deg)']
+/** Stage top: 24 under the title block (a 32 pt title and two lines), closing up on short phones (iPhone SE). */
+const STAGE_TOP = 'min(200px, max(188px, 100dvh - 520px))'
+/** The stage fills the room between the title block and the CTA (up to 420), its visual centred; it shrinks on short phones. */
+const STAGE_H = `min(420px, calc(100dvh - var(--safe-top) - var(--safe-bottom) - ${STAGE_TOP} - 220px))`
+const STAGE: CSSProperties = { top: `calc(var(--safe-top) + ${STAGE_TOP})`, height: STAGE_H }
+/** The dots sit 18 under the stage, so they read as the stage's own page count. */
+const DOTS_TOP = `calc(var(--safe-top) + ${STAGE_TOP} + ${STAGE_H} + 18px)`
 
 /**
  * Pre-sign-up welcome (mocks/aurora-onboarding.html): four beats over one glass stage on the Aurora. Beats change in
@@ -57,7 +58,7 @@ export function WelcomeBeats() {
   useEffect(() => {
     const el = stage.current
     if (!el || typeof ResizeObserver === 'undefined') return
-    const observer = new ResizeObserver(() => setFit(fitScale(el.clientHeight - 32))) // the stage's p-4
+    const observer = new ResizeObserver(() => setFit(fitScale(el.clientHeight - 44))) // the stage's 22 a side
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
@@ -101,7 +102,7 @@ export function WelcomeBeats() {
         animate={{ opacity: 1, scale: 1 }}
         transition={reduce ? reducedFade : { scale: spring.page, opacity: { duration: 0.3, delay: 0.08 } }}
       >
-        <div ref={stage} aria-hidden="true" className={cn('absolute inset-x-gutter rounded-[30px] transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)]', auroraSurface)} style={{ ...STAGE, transform: reduce ? 'none' : LEAN[index] }} />
+        <div ref={stage} aria-hidden="true" className={cn('absolute inset-x-gutter rounded-[22px]', auroraSurface)} style={STAGE} />
         <motion.div
           ref={region}
           tabIndex={0}
@@ -134,16 +135,16 @@ export function WelcomeBeats() {
         </motion.div>
       </motion.div>
 
+      <div data-chrome aria-hidden="true" className="absolute inset-x-0 z-10 page-in" style={{ top: DOTS_TOP }}><Dots p={p} reduce={reduce} /></div>
+
       <div data-chrome className={cn('absolute inset-x-0 bottom-0 z-10 px-gutter pb-[calc(var(--safe-bottom)+16px)] pt-6', 'page-in')}>
-        <Dots p={p} reduce={reduce} />
         <PrimaryButton type="button" onClick={onContinue} className={cn('relative', !last && 'bg-transparent')}>
-          {/* Ink base with the orange layer fading over it: the fill changes by opacity, never background-color. Label colours match
-              how PrimaryButton renders on orange today (ink; its class merge drops text-cream), cream on the ink base. */}
-          <span aria-hidden="true" className="absolute inset-0 rounded-full bg-ink" />
-          <span aria-hidden="true" className={cn('absolute inset-0 rounded-full bg-accent shadow-[var(--shadow-action)] transition-opacity duration-150 ease-out', last ? 'opacity-100' : 'opacity-0')} />
+          {/* Ink base with the orange layer fading over it: the fill changes by opacity, never background-color. Cream label on both. */}
+          <span aria-hidden="true" className="absolute inset-0 rounded-[18px] bg-ink" />
+          <span aria-hidden="true" className={cn('absolute inset-0 rounded-[18px] bg-accent shadow-[var(--shadow-action)] transition-opacity duration-150 ease-out', last ? 'opacity-100' : 'opacity-0')} />
           <span className="relative grid">
             <span aria-hidden={last || undefined} className={cn('col-start-1 row-start-1 text-cream transition-opacity duration-150 ease-out', last && 'opacity-0')}>Continue</span>
-            <span aria-hidden={!last || undefined} className={cn('col-start-1 row-start-1 text-ink transition-opacity duration-150 ease-out', !last && 'opacity-0')}>Get started</span>
+            <span aria-hidden={!last || undefined} className={cn('col-start-1 row-start-1 text-cream transition-opacity duration-150 ease-out', !last && 'opacity-0')}>Get started</span>
           </span>
         </PrimaryButton>
         <button type="button" onClick={() => depthTo(() => router.push('/login'))} className="mx-auto mt-1 flex h-11 items-center px-4 text-body-sm font-semibold text-ink">
@@ -176,10 +177,10 @@ function Beat({ p, i, reduce, title, line, current, fit, children }: { p: Motion
       className={cn('absolute inset-0', !current && 'pointer-events-none')}
     >
       <motion.div style={{ y, top: 'calc(var(--safe-top) + 84px)' }} className="absolute inset-x-0 px-gutter">
-        <h1 className={cn('font-wider text-[36px] font-[800] leading-none tracking-[-0.03em] text-ink', i === 0 && 'rise')} style={intro(0)}>{title}</h1>
+        <h1 className={cn('text-[32px] font-bold leading-[1.05] tracking-[-0.8px] text-ink', i === 0 && 'rise')} style={intro(0)}>{title}</h1>
         <p className={cn('mt-3 max-w-[32ch] text-pretty text-body text-ink-80', i === 0 && 'rise')} style={intro(1)}>{line}</p>
       </motion.div>
-      <motion.div style={{ ...STAGE, y: visualY }} className="absolute inset-x-gutter overflow-hidden p-4">
+      <motion.div style={{ ...STAGE, y: visualY }} className="absolute inset-x-gutter overflow-hidden p-[22px]">
         {/* fit < 1: laid out at its natural height and width / fit, then scaled into the stage from the top left. */}
         <div className={cn('h-full', i === 0 && 'rise')} style={fit < 1 ? { ...intro(3), height: VISUAL_MIN_H, width: `${100 / fit}%`, transform: `scale(${fit})`, transformOrigin: '0 0' } : intro(3)}>{children}</div>
       </motion.div>
@@ -194,7 +195,7 @@ function Dots({ p, reduce }: { p: MotionValue<number>; reduce: boolean }) {
   const x = useTransform(c, (v) => v * STEP)
   const scaleX = useTransform(c, (v) => 1 + 1.6 * (1 - Math.abs(2 * (v - Math.floor(v)) - 1)))
   return (
-    <div aria-hidden="true" className="relative mx-auto mb-14 flex w-fit gap-1.5">
+    <div className="relative mx-auto flex w-fit gap-1.5">
       {BEATS.map((b, i) => <Dot key={b.title} c={c} i={i} reduce={reduce} />)}
       {!reduce && <motion.span className="absolute left-0 top-0 size-1.5 rounded-full bg-ink" style={{ x, scaleX }} />}
     </div>

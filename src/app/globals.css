@@ -112,7 +112,8 @@
 }
 
 :root {
-  --safe-top: env(safe-area-inset-top, 0px);
+  /* The phone's inset; at least 20 on the web, so headers never touch the top of a browser window. */
+  --safe-top: max(env(safe-area-inset-top, 0px), 20px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   /* Inset sheets float this far above the screen bottom; they cover the nav bar. */
   --nav-clearance: calc(8px + var(--safe-bottom));
@@ -200,10 +201,13 @@
 @keyframes fiqr-shake { 15%, 85% { transform: translateX(-2px); } 30%, 70% { transform: translateX(5px); } 45%, 55% { transform: translateX(-7px); } }
 @keyframes fiqr-pop { 0% { transform: scale(.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-/* Geo mark states (DESIGN.md section 7): the bar travels round the ring while Geo works. */
-@keyframes geo-orbit { to { transform: rotate(360deg); } }
-.geo-bar { transform-box: view-box; transform-origin: 50% 50%; transition: transform 320ms cubic-bezier(.25,1,.5,1); }
+/* Geo mark (DESIGN.md section 7). Geo's bar sits at --geo-turn round the ring (its pose); working orbits from there, done makes one turn and settles. */
+@keyframes geo-orbit { from { transform: rotate(var(--geo-turn, 0deg)); } to { transform: rotate(calc(var(--geo-turn, 0deg) + 360deg)); } }
+.geo-bar { transform-box: view-box; transform-origin: 50% 50%; transform: rotate(var(--geo-turn, 0deg)); transition: transform 420ms cubic-bezier(.25,1,.5,1); }
 .geo-working .geo-bar { animation: geo-orbit 1.4s linear infinite; }
+.geo-done .geo-bar { animation: geo-orbit 760ms cubic-bezier(.25,1,.5,1) 1; }
 @media (prefers-reduced-motion: reduce) {
+  .geo-bar { transition: none; }
+  .geo-done .geo-bar { animation: none; }
   .geo-working .geo-bar { animation: none; opacity: .45; }
 }

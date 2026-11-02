@@ -1,25 +1,6 @@
 'use client'
 
-import { PersonFill } from '@/components/ui/fiqr/icons'
-import { RoundButton } from '@/components/ui/fiqr/round-button'
-import { Wordmark } from '@/components/ui/fiqr/wordmark'
 import { cn } from '@/lib/utils'
-
-/** George's Home header: the mark, wordmark and date on one line, the greeting under it, the profile button right. */
-export function HomeHeader({ date, name, onProfile }: { date: string; name: string | null; onProfile: () => void }) {
-  return (
-    <header className="flex items-start justify-between gap-[14px] pt-[calc(10px+var(--safe-top))]">
-      <div className="min-w-0">
-        <div className="flex items-center gap-[9px]">
-          <Wordmark size={20} />
-          <span className="text-[12px] font-medium uppercase tracking-[1.4px] text-ink-62">{date}</span>
-        </div>
-        <h1 className="mt-[5px] truncate text-title text-ink">{name ? `Welcome back, ${name}` : 'Welcome back'}</h1>
-      </div>
-      <RoundButton aria-label="Profile and settings" onClick={onProfile}><PersonFill /></RoundButton>
-    </header>
-  )
-}
 
 /** The week is ready: a quiet row that leads to Check-in (the screen's orange stays on Log food). */
 export function CheckInDueRow({ weekLabel, daysLogged, onOpen, className }: { weekLabel: string; daysLogged: number | null; onOpen: () => void; className?: string }) {

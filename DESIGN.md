@@ -30,7 +30,8 @@ Archivo only, normal width. Tabular figures on every number.
 | metric | 19 / 600 | -0.3 | Tile values |
 | button | 19 / 700 | | Orange primary label (refined from 17: cream on orange needs 19 pt bold to pass AA as large text) |
 | button-2 | 18 / 700 | | Secondary button label |
-| body | 15.5 / 500, lh 1.4 | | Geo's line, row labels, macro names (600) |
+| geo-line | 17 / 500, lh 1.42 | -0.2 | Geo's line on Home, ink (refined: Geo's voice reads above the data) |
+| body | 15.5 / 500, lh 1.4 | | Row labels, macro names (600) |
 | meta | 14 / 400 | | Workout meta, supporting lines |
 | readout | 13.5 / 400 and 600 | | Bar readouts: current value 600 ink, `/ target` 400 ink-65 |
 | unit | 13 / 500 | | kg, h, g after a value |
@@ -53,8 +54,8 @@ Neutral surfaces never cast a shadow: a white tile sits on cream with a 1 pt `in
 
 The whole app is built from these. A screen that needs something else needs a reason.
 
-1. **Screen header.** Tab roots: a `date` eyebrow, a `title`, and one 40 pt round profile button on the right (`ink-08` fill, 1 pt `ink-16` border). Home adds the FIQR mark and wordmark in the eyebrow row. Pushed screens: a plain back chevron (44 pt target) and a 17 / 600 centred title; it gains a cream bar with an `ink-09` hairline once content scrolls under it.
-2. **Geo's line.** A 22 pt Geo mark, then Geo's sentence in `body` `ink-80`, two lines max; emphasised numbers 600 in `accent-ink`. An optional action sits under it as a text button. Tapping the line opens Geo.
+1. **Screen header.** Every tab root, Home included: a `date` eyebrow, a `title`, and one 44 pt round profile button on the right (`ink-08` fill, 1 pt `ink-16` border). Home carries no wordmark: the mark already sits in Geo's line and the nav (refined). The header starts 10 below the safe area; on the web the safe area is at least 20, a stand-in status bar. Pushed screens: a plain back chevron (44 pt target) and a 17 / 600 centred title; it gains a cream bar with an `ink-09` hairline once content scrolls under it.
+2. **Geo's line.** The bare 26 pt Geo mark (ink ring), then Geo's sentence in `geo-line` ink, two lines max; emphasised numbers 600 in `accent-ink`. The mark makes one `done` turn as the screen opens. An optional action sits under it as a text button. Tapping the line opens Geo.
 3. **Primary action.** Full gutter width, 64 tall, `accent`, radius 18, action shadow. A 32 pt `cream-22` circle with +, the label in `button` cream, optional trailing text 13.5 / 600 in ink. One per screen at most.
 4. **Feature card (navy).** Radius 22, padding 22. `date` eyebrow `cream-55`, a `display` title in cream, `meta` in `cream-60`, then a secondary button: cream fill, ink text, 56 tall, radius 15, trailing arrow. Used for Next Up and Geo's read.
 5. **Macro bars.** Name in `body` 600 left, readout right on the same baseline, the bar 6 below: 7 tall, radius 4, track `ink-10`, fill capped at 100%. Calories `accent` (readout adds `· N left` in `accent-ink` 600), protein `ink`, carbs `macro-teal`, fat `macro-ochre`. Calories leads and may run 9 tall (refined).
@@ -77,7 +78,7 @@ Scrolling content always clears the bar and the raised button (`--tabbar-clearan
 
 ## 7. The Geo mark
 
-A stroked circle with a short bar crossing its lower-right edge at -45 deg. Stroke 9% of the outer diameter, bar 33% of the diameter, round caps. Cream ring and orange bar on navy; ink ring and orange bar on cream. States, by motion only: `idle` still; `working` the bar travels round the ring (1.4 s per turn, linear); `done` the bar returns to -45 deg (320 ms ease-out-quart). Reduced motion: `working` shows the bar at reduced opacity instead.
+A stroked circle with a short bar crossing its lower-right edge at -45 deg. Stroke 9% of the outer diameter, bar 33% of the diameter, round caps. Cream ring and orange bar on navy; ink ring and orange bar on cream. Geo's only expression is where the bar sits round the ring (`GeoMark` `pose`): `rest` (the logo), `speak` (turned to the line beside it), `up` and `down` (a trend). Motion: `working` the bar travels round the ring (1.4 s per turn, linear); `done` one turn then rest (760 ms ease-out-quart); pose changes ease over 420 ms. Reduced motion: no turns, `working` shows the bar at reduced opacity. The live reference is `/brand` (Geo) and `/lab` (every component).
 
 ## 8. Motion
 

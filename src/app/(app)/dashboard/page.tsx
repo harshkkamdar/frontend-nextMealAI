@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { toast } from 'sonner'
 import { emphasizeGeoMeasurements, formatDashboardDate, getDashboardGeoLine, quietDayGeoLine } from '@/components/dashboard/dashboard-helpers'
 import { HomeEntrance, HomeErrorCard, WATER_GOAL_GLASSES, weightDeltaText } from '@/components/dashboard/home-cards'
-import { CheckInDueRow, HomeHeader, HomeSkeleton } from '@/components/dashboard/home-today'
+import { CheckInDueRow, HomeSkeleton } from '@/components/dashboard/home-today'
 import { geoAction, sleepTile, stepsTile, waterGlassesToday, weightTile } from '@/components/dashboard/home-data'
 import { useHealthSource } from '@/components/dashboard/health-week'
 import { logWithUndo } from '@/components/dashboard/log-with-undo'
@@ -17,6 +17,9 @@ import { WorkoutCard } from '@/components/dashboard/workout-card'
 import { LOG_SHEET } from '@/components/layout/tab-bar'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
 import { OfflineBand } from '@/components/shared/offline-band'
+import { LargeTitleHeader } from '@/components/layout/screen-header'
+import { PersonFill } from '@/components/ui/fiqr/icons'
+import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { GeoLine } from '@/components/ui/fiqr/geo-line'
 import { MacroBar } from '@/components/ui/fiqr/macro-bar'
 import { MetricStrip } from '@/components/ui/fiqr/metric-strip'
@@ -181,7 +184,13 @@ export default function DashboardPage() {
 
   return (
     <div className="relative mx-auto w-full max-w-md px-gutter">
-      <HomeHeader date={formatDashboardDate(today)} name={firstName} onProfile={() => router.push('/settings')} />
+      {/* Home's header is every tab root's header; Geo's line under it carries the mark (no wordmark: the nav and the icon hold the brand). */}
+      <LargeTitleHeader
+        title={firstName ? `Welcome back, ${firstName}` : 'Welcome back'}
+        barTitle="Today"
+        subtitle={formatDashboardDate(today)}
+        actions={<RoundButton aria-label="Profile and settings" onClick={() => router.push('/settings')}><PersonFill /></RoundButton>}
+      />
 
       <div className="-mx-gutter mt-2">
         <OfflineBand />
