@@ -2,9 +2,6 @@
 
 import type { ReactNode } from 'react'
 import { Chapter, LabShell } from '../_parts'
-import { GeoV2 } from '../mascot/geo-v2'
-
-const FINALISTS = ['roo', 'bear', 'coach', 'kettlebell'] as const
 
 type Item = [title: string, line: ReactNode]
 
@@ -106,7 +103,7 @@ export default function UpdatesPage() {
     <LabShell
       eyebrow="FIQR update"
       title="What's new in FIQR."
-      lede={<>Everything that has changed since the version you are using now. Geo&apos;s improvements are already live in your app. The new design is on this link, and you can sign in with your usual account. Geo is also getting a character, and we&apos;d like you to choose it.</>}
+      lede={<>Everything that has changed since the version you are using now. Geo&apos;s improvements are already live in your app. The new design is on this link, and you can sign in with your usual account.</>}
     >
       <a href="/login" className="mb-2 inline-flex h-12 items-center gap-2 rounded-[15px] bg-ink px-5 text-[16px] font-semibold text-cream active:opacity-80">Open the new app <span aria-hidden="true">→</span></a>
 
@@ -116,7 +113,6 @@ export default function UpdatesPage() {
           <li>Every screen is rebuilt on your FIQR design and your Home and Check-in mock-ups.</li>
           <li>Of your 8 feedback points, 4 are fixed and 4 are improved. All 13 problems we found in real Geo conversations are fixed.</li>
           <li>We test Geo against 26 real situations from your feedback, from logging 2 servings to reading a label in kJ, and it passes all 26.</li>
-          <li>Four options for Geo&apos;s character are below. Pick your favourite.</li>
         </ul>
       </Chapter>
 
@@ -143,20 +139,7 @@ export default function UpdatesPage() {
         <Changes items={LOOK} />
       </Chapter>
 
-      <Chapter n="04" id="mascot" title="Meet Geo: choose a character" intro="Geo is getting a character of its own. At rest you see the character alone; a mouth and hands appear when Geo is doing something. Four options, each with nine expressions.">
-        <a href="/mascot" className="flex flex-wrap items-center gap-6 rounded-[20px] border border-ink-12 bg-card p-5 active:bg-ink-04">
-          <span className="flex gap-4">{FINALISTS.map((id, i) => (
-            <span key={id} className="flex flex-col items-center gap-1"><GeoV2 id={id} mood="rest" size={72} /><span className="text-[13px] font-semibold tabular-nums text-ink-62">{i + 1}</span></span>
-          ))}</span>
-          <span className="min-w-[200px] flex-1">
-            <span className="block text-[17px] font-semibold">Roo, Bear, Coach or Kettlebell?</span>
-            <span className="block text-[14.5px] text-ink-65">See them large, small and in every expression, then tell us your favourite by number.</span>
-          </span>
-          <span aria-hidden="true" className="text-[19px] text-ink-50">→</span>
-        </a>
-      </Chapter>
-
-      <Chapter n="05" id="moved" title="What moved">
+      <Chapter n="04" id="moved" title="What moved">
         <ul className="overflow-hidden rounded-[16px] border border-ink-12 bg-card">
           {MOVED.map(([what, line]) => (
             <li key={what} className="border-b border-ink-09 px-5 py-4 last:border-b-0">
@@ -167,13 +150,12 @@ export default function UpdatesPage() {
         </ul>
       </Chapter>
 
-      <Chapter n="06" id="phone" title="The phone app">
+      <Chapter n="05" id="phone" title="The phone app">
         <Changes items={PHONE} />
       </Chapter>
 
-      <Chapter n="07" id="next" title="What we need from you">
+      <Chapter n="06" id="next" title="What we need from you">
         <ol className="grid max-w-[72ch] list-decimal gap-3 pl-5 text-[16px] leading-[1.5]">
-          <li>Pick Geo&apos;s character on the <a href="/mascot" className="font-semibold underline decoration-ink-35 underline-offset-4">Mascot page</a>, by number.</li>
           <li><a href="/login" className="font-semibold underline decoration-ink-35 underline-offset-4">Open the new app</a> and sign in with your own account: log a few meals, ask Geo something, open a workout.</li>
           <li>Ask Geo for a new program and tell us what you think of it.</li>
           <li>Send anything that feels off, with a screenshot if you can.</li>

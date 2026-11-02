@@ -4,9 +4,6 @@ import type { ReactNode } from 'react'
 import { GeoRead } from '@/components/check-in/parts'
 import { SegmentsBar } from '@/components/check-in/segments-bar'
 import { GeoMark } from '@/components/shared/geo-avatar'
-import { GeoV2 } from '../mascot/geo-v2'
-
-const FINALISTS = ['roo', 'bear', 'coach', 'kettlebell'] as const
 import { GeoLine } from '@/components/ui/fiqr/geo-line'
 import { Wordmark } from '@/components/ui/fiqr/wordmark'
 import { Chapter, LabShell } from '../_parts'
@@ -123,7 +120,7 @@ export default function BrandPage() {
         </ol>
       </Chapter>
 
-      <Chapter n="02" id="mark" title="The mark and Geo" intro={<>The FIQR mark is a ring crossed by a short orange bar: the logo, on the app icon and beside the wordmark. Geo, the coach, is a character of its own; the four candidates are on the Mascot page.</>}>
+      <Chapter n="02" id="mark" title="The mark and Geo" intro={<>The FIQR mark is a ring crossed by a short orange bar: the logo, on the app icon and beside the wordmark.</>}>
         <div className="flex flex-wrap items-center gap-10">
           <div className="w-[300px] shrink-0"><Construction /></div>
           <div className="min-w-[260px] flex-1 max-w-[46ch] text-[15.5px] leading-[1.55] text-ink-80">
@@ -132,14 +129,6 @@ export default function BrandPage() {
           </div>
         </div>
 
-        <a href="/mascot" className="mt-12 flex items-center gap-5 rounded-[16px] border border-ink-12 bg-card px-5 py-4 active:bg-ink-04">
-          <span className="flex gap-3">{FINALISTS.map((id) => <GeoV2 key={id} id={id} mood="rest" size={32} form="small" />)}</span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[15.5px] font-semibold">Geo, the character</span>
-            <span className="block text-[13.5px] text-ink-65">Four candidates, nine expressions each, shown where Geo lives in the app</span>
-          </span>
-          <span aria-hidden="true" className="text-[17px] text-ink-50">→</span>
-        </a>
 
         <h3 className="mb-4 mt-12 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">Where Geo lives</h3>
         <Row>
