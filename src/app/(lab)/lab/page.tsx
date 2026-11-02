@@ -36,15 +36,14 @@ const session = (hoursAgo: number) => ({
   exercises: [{ sets: [{ completed: true }, { completed: true }, { completed: false }, { completed: false }] }],
 }) as unknown as WorkoutSession
 
-/** The components still on screens that are not in this system yet, and what replaces them (counts are files, 2 Nov). */
+/** What is still outside the system after the 2 Nov clean-up, and what replaces it. */
 const RETIRE: [string, string, string][] = [
-  ['card-glass, glass, glass-cream', '41 files', 'A white tile (1 pt ink-12) or nothing; the toast becomes the navy status capsule'],
-  ['CARD constants (4 copies)', 'plans, dashboard, logs, workout', 'One tile class in ui/fiqr'],
-  ['font-wide, font-extrabold, text-hero, text-headline', '27 files', 'The type roles on the Brand page'],
-  ['ActionCard, MetricTile, PageHeader', '6 files', 'Feature card, Metric strip, Screen header'],
-  ['Press tilt, aurora surface', '10 files', 'Nothing (flat, printed)'],
-  ['Grouped list (settings, food rows, plan days)', 'hand-built per screen', 'One GroupedList component, to be added here'],
+  ['Grouped list rows', 'Settings, food rows, plan days', 'Hand-built per screen today; one GroupedList component, to be added here'],
+  ['Aurora layout (name only)', 'Onboarding and sign-in', 'Already renders plain cream; rename when onboarding is next touched'],
+  ['Consent progress bar', 'Onboarding consent', 'Starts 60 pt in, behind an empty back slot; align to the gutter'],
 ]
+/** Retired on 2 Nov: listed so nobody brings them back. */
+const RETIRED = 'Glass and glass-cream surfaces, the four CARD copies, wide and 800-weight type, ActionCard, MetricTile, PageHeader, press tilt, dashed empty boxes, gradient fades, filled icons, a face for Mood.'
 
 export default function LabPage() {
   const [day, setDay] = useState(today)
@@ -174,7 +173,7 @@ export default function LabPage() {
         </Specimen>
       </Chapter>
 
-      <Chapter n="08" id="retire" title="Not in the system yet" intro="Still on some screens. Each goes when its screen is rebuilt from the parts above.">
+      <Chapter n="08" id="retire" title="Not in the system yet" intro={<>Still on some screens. Each goes when its screen is next touched. Retired on 2 Nov: {RETIRED}</>}>
         <div className="overflow-hidden rounded-[16px] border border-ink-12 bg-card">
           {RETIRE.map(([what, where, instead]) => (
             <div key={what} className="grid gap-x-6 gap-y-1 border-b border-ink-09 px-4 py-4 last:border-b-0 grid-cols-[repeat(auto-fill,minmax(min(100%,200px),1fr))]">
