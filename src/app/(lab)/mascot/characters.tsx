@@ -195,10 +195,10 @@ const SPECS: Record<CharId, Spec> = {
 export const FINALISTS: CharId[] = ['kangaroo', 'bear', 'coach', 'kettlebell']
 
 export const CHARACTERS: { id: CharId; name: string; kind: string; idea: string }[] = [
-  { id: 'kangaroo', name: 'Roo', kind: 'Creature', idea: 'Australian, athletic, boxes in orange gloves; the pouch holds your food log.' },
-  { id: 'bear', name: 'Bear', kind: 'Creature', idea: 'Calm strength in a sweatband: the steady coach who never shouts.' },
-  { id: 'coach', name: 'Coach', kind: 'Character', idea: 'The September pick, grown up: the sweatband is a brow, the mouth and hands come out to act.' },
-  { id: 'kettlebell', name: 'Kettlebell', kind: 'Object', idea: 'The bell is the body, the handle the ring from the FIQR mark. Unmistakably training.' },
+  { id: 'kangaroo', name: 'Roo', kind: 'Creature', idea: 'Australian and athletic, in orange boxing gloves.' },
+  { id: 'bear', name: 'Bear', kind: 'Creature', idea: 'Calm strength in a sweatband. The steady coach.' },
+  { id: 'coach', name: 'Coach', kind: 'Character', idea: 'A round coach in an orange sweatband.' },
+  { id: 'kettlebell', name: 'Kettlebell', kind: 'Object', idea: 'A kettlebell with a face. Its handle echoes the ring in the FIQR logo.' },
   { id: 'quokka', name: 'Quokka', kind: 'Creature', idea: "Australia's happiest animal: the supportive friend who's always glad you showed up." },
   { id: 'wombat', name: 'Wombat', kind: 'Creature', idea: 'Stocky, steady, built like a powerlifter. Slow and sure wins the year.' },
   { id: 'shaker', name: 'Shaker', kind: 'Object', idea: 'A protein shaker: the one thing that lives in both the kitchen and the gym, like Geo.' },

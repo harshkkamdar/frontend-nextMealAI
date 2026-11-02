@@ -70,11 +70,11 @@ export default function MascotPage() {
     <LabShell
       eyebrow="Geo"
       title="Meet Geo: four options."
-      lede="Geo is getting a character. These are the four we like most, in the app's navy. Each has the same nine expressions: at rest it is just the character, and a mouth and hands appear only when Geo is doing something. Large versions are for big moments; the head alone stands in at small sizes. Tell us your favourite by number."
+      lede="Geo is getting a character. These are the four we like most. Each has nine expressions for the moments Geo shows up in the app, and a small version for tight spots like the tab bar. Tell us your favourite by number."
     >
       <style>{MASCOT_CSS}</style>
 
-      <Chapter n="00" id="compare" title="Side by side" intro={held ? <>Holding <b>{held}</b>: {MOODS.find((m) => m.mood === held)?.when} Tap it again to play all nine.</> : 'All four play the same nine expressions. Tap one to hold it.'}>
+      <Chapter n="00" id="compare" title="Side by side" intro={held ? <>{MOODS.find((m) => m.mood === held)?.when} Tap it again to play all nine.</> : 'Tap an expression to hold it.'}>
         <div className="flex flex-wrap gap-2">
           {MOODS.map((m) => (
             <button key={m.mood} type="button" onClick={() => setHeld((h) => (h === m.mood ? null : m.mood))} className={chip(mood === m.mood)}>{m.mood}</button>
@@ -83,10 +83,7 @@ export default function MascotPage() {
         <div className="mt-5 grid gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,200px),1fr))]">
           {OPTIONS.map((c, i) => (
             <a key={c.id} href={`#${c.id}`} className="flex flex-col rounded-[20px] border border-ink-12 bg-card p-4">
-              <span className="flex items-baseline justify-between">
-                <span className="text-[26px] font-bold tabular-nums">{i + 1}</span>
-                <span className="text-[12px] font-semibold uppercase tracking-[1.4px] text-ink-62">{c.kind}</span>
-              </span>
+              <span className="text-[26px] font-bold tabular-nums">{i + 1}</span>
               <span className="grid place-items-center py-2"><Mascot key={`${c.id}-${mood}`} id={c.id} mood={mood} scheme="navy" size={170} /></span>
               <span className="text-[19px] font-semibold">{c.name}</span>
               <span className="mt-1 text-[14px] leading-[1.45] text-ink-65">{c.idea}</span>
