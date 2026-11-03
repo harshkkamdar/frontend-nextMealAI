@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Log } from '@/types/logs.types'
 
 const mocks = vi.hoisted(() => ({ push: vi.fn(), refetch: vi.fn() }))
@@ -49,6 +49,10 @@ vi.mock('@/lib/api/profile.api', () => ({ getProfile: vi.fn() }))
 import DiaryPage from '../page'
 
 describe('Diary row editing', () => {
+  // The fixture log is dated 2 Nov; the diary opens on today.
+  beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date('2026-11-02T10:00:00Z')) })
+  afterEach(() => vi.useRealTimers())
+
   it('opens the editor directly without the row actions sheet', () => {
     render(<DiaryPage />)
     fireEvent.click(screen.getByRole('button', { name: 'Open Yoghurt' }))

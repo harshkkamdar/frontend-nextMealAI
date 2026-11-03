@@ -1,4 +1,5 @@
 import { todayLocalISO } from '@/lib/timezone'
+import { repsToRecord } from '@/lib/workout-session'
 import { addDays } from '@/components/ui/fiqr/week-strip'
 import type { WorkoutExercise, WorkoutPlanDay } from '@/types/plans.types'
 import type { SessionExercise, SetData, WorkoutSession } from '@/types/workout-session.types'
@@ -78,7 +79,7 @@ export function setWeight(set: SetData): number | null {
   return set.actual_weight_kg ?? set.planned_weight_kg ?? null
 }
 export function setReps(set: SetData): number {
-  return set.actual_reps ?? set.planned_reps ?? 0
+  return repsToRecord(set)
 }
 
 /** "kg × reps" for a set with no weight reads "BW × 8". */

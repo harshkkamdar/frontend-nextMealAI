@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { CountUp } from '@/components/ui/fiqr/count-up'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/fiqr/icons'
@@ -86,8 +86,14 @@ export function ExerciseNav({ index, count, onPrev, onNext, onAll }: { index: nu
   )
 }
 
-/** A stepper: tap for one step, hold to repeat (after 420 ms, every 90 ms). Keyboard clicks step once. */
-function Stepper({ label, value, unit, onStep }: { label: string; value: string; unit: string; onStep: (dir: 1 | -1) => void }) {
+/** A stepper: tap for one step, hold to repeat (after 420 ms, every 90 ms), or tap the number and type it. */
+function Stepper({ label, value, unit, decimal = false, onStep, onSet }: { label: string; value: string; unit: string; decimal?: boolean; onStep: (dir: 1 | -1) => void; onSet: (value: number) => void }) {
+  const [draft, setDraft] = useState<string | null>(null)
+  const commitDraft = () => {
+    const typed = draft == null ? NaN : Number(draft.replace(',', '.'))
+    if (Number.isFinite(typed) && typed >= 0) onSet(decimal ? Math.round(typed * 10) / 10 : Math.round(typed))
+    setDraft(null)
+  }
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const stop = () => { if (timer.current) clearTimeout(timer.current); timer.current = null }
   useEffect(() => stop, [])
@@ -111,9 +117,19 @@ function Stepper({ label, value, unit, onStep }: { label: string; value: string;
   return (
     <div className="grid h-stepper grid-cols-[48px_minmax(0,1fr)_48px] items-center rounded-[14px] bg-ink-06">
       {button(-1)}
-      <output aria-live="polite" aria-label={`${label} ${value}`} className="whitespace-nowrap text-center text-[20px] font-bold text-ink tabular-nums">
-        {value}<small className="text-label font-semibold text-ink-65"> {unit}</small>
-      </output>
+      <label className="flex min-w-0 items-baseline justify-center gap-1">
+        <input
+          aria-label={label}
+          inputMode={decimal ? 'decimal' : 'numeric'}
+          value={draft ?? value}
+          onFocus={(event) => { setDraft(value === '—' ? '' : value); event.currentTarget.select() }}
+          onChange={(event) => setDraft(event.target.value)}
+          onBlur={commitDraft}
+          onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
+          className="w-[4.5ch] min-w-0 bg-transparent text-center text-[20px] font-bold text-ink tabular-nums outline-none"
+        />
+        <small className="text-label font-semibold text-ink-65">{unit}</small>
+      </label>
       {button(1)}
     </div>
   )
@@ -125,12 +141,13 @@ const ROW = 'grid grid-cols-[26px_minmax(0,1fr)_72px_56px_48px] items-center gap
  * B1 Stepper rows: the set being worked on opens into two 56 pt steppers and a tall tick; every other set is one
  * compact row. Tapping an open set's numbers makes it the working set.
  */
-export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onToggle }: {
+export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onSet, onToggle }: {
   exercise: SessionExercise
   activeSet: number
   celebrate: boolean
   onFocus: (set: number) => void
   onStep: (set: number, field: 'kg' | 'reps', dir: 1 | -1) => void
+  onSet: (set: number, field: 'kg' | 'reps', value: number) => void
   onToggle: (set: number) => void
 }) {
   const reduce = useReducedMotion()
@@ -153,8 +170,8 @@ export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onTo
             >
               <p className="col-span-2 text-body-sm font-semibold text-ink-65 tabular-nums">Set {index + 1} · last time {formatLast(set)}</p>
               <div className="grid gap-1.5">
-                <Stepper label="weight" value={kgText} unit="kg" onStep={(dir) => onStep(index, 'kg', dir)} />
-                <Stepper label="reps" value={String(reps)} unit="reps" onStep={(dir) => onStep(index, 'reps', dir)} />
+                <Stepper label="weight" value={kgText} unit="kg" decimal onStep={(dir) => onStep(index, 'kg', dir)} onSet={(value) => onSet(index, 'kg', value)} />
+                <Stepper label="reps" value={String(reps)} unit="reps" onStep={(dir) => onStep(index, 'reps', dir)} onSet={(value) => onSet(index, 'reps', value)} />
               </div>
               <button type="button" onClick={() => onToggle(index)} aria-label={`Complete set ${set.set_number}`} aria-pressed={false} className="grid place-items-center rounded-[16px] bg-ink text-cream transition-transform active:scale-[.96]">
                 <TickIcon className="size-[22px]" />

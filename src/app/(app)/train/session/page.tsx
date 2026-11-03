@@ -243,6 +243,17 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     commit(updated)
   }
 
+  const setSetValue = (setIndex: number, field: 'kg' | 'reps', value: number) => {
+    const base = sessionRef.current
+    if (!base) return
+    const updated = [...base.exercises]
+    const exercise = updated[currentIndex]
+    const sets = [...exercise.sets]
+    sets[setIndex] = field === 'kg' ? { ...sets[setIndex], actual_weight_kg: value } : { ...sets[setIndex], actual_reps: Math.min(200, value) }
+    updated[currentIndex] = { ...exercise, sets }
+    commit(updated)
+  }
+
   const completeSet = (exerciseIndex: number, setIndex: number) => {
     const base = sessionRef.current
     if (!base) return
@@ -471,7 +482,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
 
                     <SetTable
                       exercise={current} activeSet={activeSet} celebrate={celebrate}
-                      onFocus={setFocusSet} onStep={stepSet} onToggle={(setIndex) => completeSet(currentIndex, setIndex)}
+                      onFocus={setFocusSet} onStep={stepSet} onSet={setSetValue} onToggle={(setIndex) => completeSet(currentIndex, setIndex)}
                     />
 
                     <button type="button" onClick={() => addSet(currentIndex)} className="mt-1 min-h-11 text-body-sm font-semibold text-ink-65">+ Add set</button>

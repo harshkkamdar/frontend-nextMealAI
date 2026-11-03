@@ -3,7 +3,8 @@ export type ExerciseStatus = 'pending' | 'in_progress' | 'completed' | 'skipped'
 
 export interface SetData {
   set_number: number
-  planned_reps: number
+  /** A number or a range such as "6-8". */
+  planned_reps: number | string
   planned_weight_kg: number | null
   actual_reps: number | null
   actual_weight_kg: number | null
@@ -17,7 +18,8 @@ export interface SessionExercise {
   name: string
   muscle_group: string | null
   planned_sets: number
-  planned_reps: number
+  /** A number or a range such as "6-8". */
+  planned_reps: number | string
   rest_seconds: number
   instructions?: string[]
   notes?: string | null
@@ -56,7 +58,7 @@ export interface StartSessionInput {
     name: string
     muscle_group?: string
     planned_sets?: number
-    planned_reps?: number
+    planned_reps?: number | string
     rest_seconds?: number
   }>
 }
