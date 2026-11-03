@@ -10,7 +10,7 @@ import { mergeHistory } from '@/components/chat/merge-history'
 import { sessionTitles } from '@/components/chat/session-titles'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
-import { getChatSession, getChatSessions, sendMessage } from '@/lib/api/chat.api'
+import { extractSessionMemories, getChatSession, getChatSessions, sendMessage } from '@/lib/api/chat.api'
 import { extractWorkoutProgram, isLikelyWorkoutProgramPrompt } from '@/lib/api/vision.api'
 import { WorkoutProgramPreviewCard } from '@/components/plans/workout-program-preview-card'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
@@ -60,6 +60,7 @@ function ActiveChatRoute() {
 function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSend?: string | null }) {
   const router = useRouter()
   const autoSent = useRef(false)
+  const sentMessageCount = useRef(0)
   const [prefill, setPrefill] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [sessionTitle, setSessionTitle] = useState<string | undefined>(() => sessionTitles.get(sessionId))
@@ -84,6 +85,24 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
   >(null)
 
   useSetGeoScreen('chat', { sessionId })
+
+  useEffect(() => {
+    const flush = () => {
+      if (sentMessageCount.current === 0) return
+      sentMessageCount.current = 0
+      void extractSessionMemories(sessionId).catch(() => {})
+    }
+    const flushWhenHidden = () => {
+      if (document.visibilityState === 'hidden') flush()
+    }
+    window.addEventListener('pagehide', flush)
+    document.addEventListener('visibilitychange', flushWhenHidden)
+    return () => {
+      window.removeEventListener('pagehide', flush)
+      document.removeEventListener('visibilitychange', flushWhenHidden)
+      flush()
+    }
+  }, [sessionId])
 
   useEffect(() => {
     let cancelled = false
@@ -162,6 +181,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
 
     try {
       const image_paths = attachments?.map((a) => a.storage_path)
+      sentMessageCount.current += 1
       const res = await sendMessage({ message, session_id: sessionId, image_paths })
       const geoMessage: ChatMessage = {
         id: res.response.id ?? `geo-${Date.now()}`,

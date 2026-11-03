@@ -15,6 +15,7 @@ import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { downloadExport } from '@/lib/api/account.api'
 import { logout } from '@/lib/api/auth.api'
+import { forgetMemory, getProfileMemories, type ProfileMemory } from '@/lib/api/memories.api'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
 import { getSettings, updateSettings } from '@/lib/api/settings.api'
 import { isNative } from '@/lib/platform'
@@ -28,6 +29,23 @@ import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { goBack } from '@/lib/navigation'
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev'
+
+const MEMORY_LABEL: Record<string, string> = {
+  preference: 'Preference',
+  pattern: 'Routine',
+  context: 'About you',
+  goal_progress: 'Goal',
+  fact: 'Fact',
+  feedback: 'Coaching',
+  milestone: 'Milestone',
+}
+const MEMORY_TYPE_ORDER = ['preference', 'pattern', 'context', 'goal_progress', 'feedback', 'fact', 'milestone']
+const sortMemories = (memories: ProfileMemory[]) => [...memories].sort((a, b) => {
+  const aType = MEMORY_TYPE_ORDER.indexOf(a.type)
+  const bType = MEMORY_TYPE_ORDER.indexOf(b.type)
+  return (aType < 0 ? MEMORY_TYPE_ORDER.length : aType) - (bType < 0 ? MEMORY_TYPE_ORDER.length : bType)
+    || b.created_at.localeCompare(a.created_at)
+})
 
 // Each style previews how Geo would say the same thing (the menu shows what the choice does, mock "Grouped list").
 const PERSONALITY_OPTIONS: MenuOption<GeoPersonality>[] = [
@@ -72,6 +90,7 @@ export default function SettingsPage() {
   const [connected, setConnected] = useState(false)
   const [lastSynced, setLastSynced] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState(false)
+  const [memories, setMemories] = useState<ProfileMemory[] | null>(null)
 
   const loadSettings = useCallback(() => {
     Promise.all([getSettings(), getProfile()])
@@ -84,6 +103,10 @@ export default function SettingsPage() {
   }, [])
 
   useEffect(loadSettings, [loadSettings])
+
+  useEffect(() => {
+    getProfileMemories().then((items) => setMemories(sortMemories(items))).catch(() => setMemories([]))
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -172,6 +195,16 @@ export default function SettingsPage() {
     } catch {
       toast.error("Couldn't log out. Try again.")
       setLoggingOut(false)
+    }
+  }
+
+  const handleForgetMemory = async (memory: ProfileMemory) => {
+    setMemories((items) => items?.filter((item) => item.id !== memory.id) ?? [])
+    try {
+      await forgetMemory(memory.id)
+    } catch {
+      setMemories((items) => sortMemories([...(items ?? []), memory]))
+      toast.error("Couldn't remove that. Try again.")
     }
   }
 
@@ -273,6 +306,32 @@ export default function SettingsPage() {
         <SettingsSection title="Coaching">
           <SettingsMenu label="Coaching style" value={settings.geo_personality} options={PERSONALITY_OPTIONS} onChange={(style) => void handleUpdate({ geo_personality: style })} />
           <SettingsMenu label="Rest timer" value={settings.rest_timer_seconds} options={REST_TIMER_OPTIONS} onChange={(seconds) => void handleUpdate({ rest_timer_seconds: seconds })} />
+        </SettingsSection>
+
+        <SettingsSection
+          title="What Geo knows about you"
+          footer="Geo keeps these from your conversations and uses them to coach you. Remove anything that's wrong."
+        >
+          {memories === null ? (
+            <div className="py-3 pl-[18px] pr-4 text-body text-ink-65">Loading…</div>
+          ) : memories.length === 0 ? (
+            <div className="py-3 pl-[18px] pr-4 text-body text-ink-65">Nothing yet. Geo adds things as you chat.</div>
+          ) : memories.map((memory) => (
+            <div key={memory.id} className="flex items-start gap-3 py-3 pl-[18px] pr-2">
+              <div className="min-w-0 flex-1">
+                <span className="block text-[11.5px] font-semibold uppercase tracking-[1.4px] text-ink-62">{MEMORY_LABEL[memory.type] ?? 'Note'}</span>
+                <span className="mt-0.5 block text-body text-ink">{memory.content}</span>
+              </div>
+              <button
+                type="button"
+                aria-label={`Remove: ${memory.content}`}
+                onClick={() => void handleForgetMemory(memory)}
+                className="h-11 shrink-0 px-2 text-[15px] font-semibold text-ink-65 active:opacity-60"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
         </SettingsSection>
 
         <SettingsSection title="Library">

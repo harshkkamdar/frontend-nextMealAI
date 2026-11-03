@@ -8,6 +8,8 @@ const mocks = vi.hoisted(() => ({
   getSettings: vi.fn(),
   getProfile: vi.fn(),
   updateSettings: vi.fn(),
+  getProfileMemories: vi.fn(),
+  forgetMemory: vi.fn(),
 }))
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
@@ -24,6 +26,10 @@ vi.mock('@/lib/api/settings.api', () => ({
 vi.mock('@/lib/api/profile.api', () => ({
   getProfile: (...args: unknown[]) => mocks.getProfile(...args),
   updateProfile: vi.fn(),
+}))
+vi.mock('@/lib/api/memories.api', () => ({
+  getProfileMemories: (...args: unknown[]) => mocks.getProfileMemories(...args),
+  forgetMemory: (...args: unknown[]) => mocks.forgetMemory(...args),
 }))
 vi.mock('@/lib/api/account.api', () => ({ downloadExport: vi.fn() }))
 vi.mock('@/lib/api/auth.api', () => ({ logout: vi.fn() }))
@@ -54,6 +60,8 @@ beforeEach(() => {
     share_progress: false, analytics_enabled: false, rest_timer_seconds: 90, created_at: '', updated_at: '',
   })
   mocks.getProfile.mockResolvedValue({ id: 'profile-1', user_id: 'u1', full_name: 'Test User', created_at: '', updated_at: '' })
+  mocks.getProfileMemories.mockResolvedValue([])
+  mocks.forgetMemory.mockResolvedValue(undefined)
 })
 
 describe('Settings health and subscription sections', () => {
@@ -118,5 +126,33 @@ describe('Settings menus', () => {
     render(<SettingsPage />)
     fireEvent.click(await screen.findByRole('button', { name: /Coaching style/ }))
     expect(screen.getByRole('menuitemradio', { name: /Drill sergeant/ })).toHaveTextContent('Get it in before 8')
+  })
+})
+
+describe('What Geo knows about you', () => {
+  it('renders memories with their captions and text', async () => {
+    mocks.getProfileMemories.mockResolvedValue([
+      { id: 'm1', content: 'Prefers early workouts', type: 'preference', created_at: '2026-11-02T08:00:00Z' },
+      { id: 'm2', content: 'Trains four days a week', type: 'pattern', created_at: '2026-11-03T08:00:00Z' },
+    ])
+
+    render(<SettingsPage />)
+
+    expect(await screen.findByText('Prefers early workouts')).toBeInTheDocument()
+    expect(screen.getByText('Preference')).toBeInTheDocument()
+    expect(screen.getByText('Trains four days a week')).toBeInTheDocument()
+    expect(screen.getByText('Routine')).toBeInTheDocument()
+  })
+
+  it('removes a memory and archives it', async () => {
+    mocks.getProfileMemories.mockResolvedValue([
+      { id: 'm1', content: 'Prefers early workouts', type: 'preference', created_at: '2026-11-02T08:00:00Z' },
+    ])
+    render(<SettingsPage />)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Remove: Prefers early workouts' }))
+
+    expect(screen.queryByText('Prefers early workouts')).not.toBeInTheDocument()
+    expect(mocks.forgetMemory).toHaveBeenCalledWith('m1')
   })
 })
