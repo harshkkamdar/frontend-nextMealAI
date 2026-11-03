@@ -88,6 +88,12 @@ export default function DiaryPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stale read of selectedDate; see comment above
   }, [tz])
+  // Opened on a day from elsewhere (Check-in's day detail): /food?date=YYYY-MM-DD, never a future day.
+  useEffect(() => {
+    const date = new URLSearchParams(window.location.search).get('date')
+    if (date && /^\d{4}-\d{2}-\d{2}$/.test(date) && date <= todayLocalISO(tz)) setSelectedDate(date)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
+  }, [])
   const [nameFavFor, setNameFavFor] = useState<string | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)

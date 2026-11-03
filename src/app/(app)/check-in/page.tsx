@@ -2,13 +2,16 @@
 
 import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 import { CheckInDue, currentTargets, type TodayContext } from '@/components/check-in/check-in-due'
 import { CheckInInsufficient } from '@/components/check-in/check-in-insufficient'
 import { CheckInMidWeek } from '@/components/check-in/check-in-mid-week'
 import { CARD, CheckInEntrance, useHealthSource } from '@/components/check-in/parts'
+import { WeekDetailSheet, type WeekDetail } from '@/components/check-in/week-detail'
+import { QuickLogSheet, type QuickLogType } from '@/components/dashboard/quick-log-sheet'
 import { LargeTitleHeader } from '@/components/layout/screen-header'
-import { PersonFill } from '@/components/ui/fiqr/icons'
+import { CloseIcon, PersonFill } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { FailCard } from '@/components/plans/spatial-parts'
 import { OfflineBand } from '@/components/shared/offline-band'
@@ -44,7 +47,7 @@ export default function CheckInPage() {
   const router = useRouter()
   const tz = useUserTimezone()
   const today = todayLocalISO(tz)
-  const { data, loading, error, refetch } = useCachedQuery('check-in', getCheckInStatus, [])
+  const { data, loading, error, refetch } = useCachedQuery('check-in', () => getCheckInStatus(), [])
   // Today's intake and the four current targets: a second, non-blocking read (the preview shows zeros without it).
   const fetchToday = useCallback(async (): Promise<TodayContext> => {
     const [summary, plans, profile] = await Promise.all([
@@ -67,8 +70,31 @@ export default function CheckInPage() {
   const source = useHealthSource()
   // After Apply the screen holds the week it applied, so the refetched next state never swaps the layout under the user.
   const [appliedFrom, setAppliedFrom] = useState<{ status: CheckInStatus; ctx: TodayContext } | null>(null)
-  const status = appliedFrom?.status ?? data
+  // Check in now: Geo's review of the last seven days, shown in place of the week until it is kept, applied or closed.
+  const [early, setEarly] = useState<CheckInStatus | null>(null)
+  const [starting, setStarting] = useState(false)
+  const [detail, setDetail] = useState<WeekDetail>(null)
+  const [quickLog, setQuickLog] = useState<QuickLogType>(null)
+  const status = appliedFrom?.status ?? early ?? data
   const ctx = appliedFrom?.ctx ?? todayData ?? NO_TODAY
+
+  const checkInNow = async () => {
+    if (starting) return
+    setStarting(true)
+    try {
+      setEarly(await getCheckInStatus(true))
+      window.scrollTo({ top: 0 })
+    } catch {
+      toast.error("Couldn't start your check-in. Try again.")
+    } finally {
+      setStarting(false)
+    }
+  }
+  const leaveEarly = () => {
+    setEarly(null)
+    setAppliedFrom(null)
+    void refetch()
+  }
 
   useSetGeoScreen('check-in', {
     state: data?.state ?? null,
@@ -76,17 +102,20 @@ export default function CheckInPage() {
   })
   useSyncRefetch(['logs:*'], useCallback(async () => { await Promise.all([refetch(), refetchToday()]) }, [refetch, refetchToday]))
 
-  // A tab now (George's nav); Keep and Done return to Home.
-  const back = () => goBack(router, '/dashboard')
+  // A tab now (George's nav); Keep and Done return to Home, or from a check-in started early, to the week.
+  const back = status?.early ? leaveEarly : () => goBack(router, '/dashboard')
 
-  const title = !status ? 'Check-in' : status.state === 'mid_week' ? `Week ${status.week.number} so far` : `Week ${status.week.number} check-in`
+  const title = !status ? 'Check-in' : status.early ? 'Your check-in' : status.state === 'mid_week' ? `Week ${status.week.number} so far` : `Week ${status.week.number} check-in`
+  const subtitle = status?.early ? `Last 7 days, ${status.week.label}` : status?.week.label
 
   return (
     <div className="mx-auto w-full max-w-md px-gutter">
       <LargeTitleHeader
         title={title}
-        subtitle={status?.week.label}
-        actions={<RoundButton aria-label="Profile and settings" onClick={() => router.push('/settings')}><PersonFill /></RoundButton>}
+        subtitle={subtitle}
+        actions={status?.early
+          ? <RoundButton aria-label="Close check-in" onClick={leaveEarly}><CloseIcon /></RoundButton>
+          : <RoundButton aria-label="Profile and settings" onClick={() => router.push('/settings')}><PersonFill /></RoundButton>}
       />
 
       <div className="-mx-gutter mb-3 mt-2">
@@ -109,12 +138,33 @@ export default function CheckInPage() {
               onApplied={() => setAppliedFrom({ status, ctx })}
               onDone={back}
               source={source}
+              onDetail={setDetail}
             />
           ) : null}
-          {status.state === 'mid_week' ? <CheckInMidWeek status={status} current={currentTargets(status, ctx)} enter={enter} source={source} /> : null}
+          {status.state === 'mid_week' ? (
+            <CheckInMidWeek
+              status={status}
+              current={currentTargets(status, ctx)}
+              enter={enter}
+              source={source}
+              today={today}
+              onDetail={setDetail}
+              onCheckInNow={() => void checkInNow()}
+              starting={starting}
+            />
+          ) : null}
           {status.state === 'insufficient' ? <CheckInInsufficient status={status} enter={enter} source={source} onDone={back} /> : null}
         </CheckInEntrance.Provider>
       ) : null}
+
+      {status ? <WeekDetailSheet detail={detail} status={status} today={today} onClose={() => setDetail(null)} onDetail={setDetail} onLog={setQuickLog} /> : null}
+      <QuickLogSheet
+        type={quickLog}
+        onClose={() => setQuickLog(null)}
+        onDone={() => { setQuickLog(null); void refetch() }}
+        water={0}
+        weight={{ kg: status?.weight.current_kg ?? null, weekDelta: status?.weight.delta_week_kg ?? null, series: status?.weight.points.map((point) => point.kg) ?? [], date: null, today }}
+      />
     </div>
   )
 }

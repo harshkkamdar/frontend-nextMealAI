@@ -1,10 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { CheckInStatus } from '@/lib/api/check-in.api'
 
 const mocks = vi.hoisted(() => ({
   applyCheckIn: vi.fn(),
+  getStatus: vi.fn(),
   emit: vi.fn(),
   push: vi.fn(),
   query: vi.fn(),
@@ -23,8 +24,8 @@ vi.mock('sonner', () => ({
 }))
 
 vi.mock('@/lib/api/check-in.api', () => ({
-  applyCheckIn: () => mocks.applyCheckIn(),
-  getCheckInStatus: vi.fn(),
+  applyCheckIn: (...args: unknown[]) => mocks.applyCheckIn(...args),
+  getCheckInStatus: (...args: unknown[]) => mocks.getStatus(...args),
 }))
 
 // Today's intake and the four current targets ride on a second query ('check-in-today').
@@ -56,9 +57,19 @@ vi.mock('@/lib/sync/sync-bus', () => ({
 
 import CheckInPage from '@/app/(app)/check-in/page'
 
+const week = (start: string, logged: number) => Array.from({ length: 7 }, (_, i) => {
+  const date = `2026-09-${String(Number(start.slice(8)) + i).padStart(2, '0')}`
+  const fed = i < logged
+  return { date, calories: fed ? 2100 + i * 10 : null, protein_g: fed ? 140 : null, carbs_g: fed ? 220 : null, fat_g: fed ? 70 : null, sessions: i === 1 ? ['Upper A'] : [], sleep_h: fed ? 7.5 : null, weight_kg: i === 0 ? 78.6 : null }
+})
+
 const baseStatus: CheckInStatus = {
   state: 'due',
+  early: false,
   week: { start: '2026-09-08', end: '2026-09-14', label: '8 – 14 Sep', number: 6 },
+  days_elapsed: 7,
+  days: week('2026-09-08', 6),
+  last_check_in: { date: '2026-09-07', applied: false, calories: null },
   days_logged: 6,
   days_needed: 5,
   next_check_in_date: '2026-09-21',
@@ -106,9 +117,14 @@ function renderStatus(status: CheckInStatus) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  // Today is the Wednesday of the mid-week fixture (15 to 21 Sep), so later days are still to come.
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date('2026-09-16T10:00:00'))
   mocks.applyCheckIn.mockResolvedValue(undefined)
   mocks.health = { label: null, connected: false }
 })
+
+afterEach(() => vi.useRealTimers())
 
 describe('check-in states', () => {
   it('renders the due state and only it applies the proposed targets', async () => {
@@ -119,31 +135,77 @@ describe('check-in states', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
 
-    await waitFor(() => expect(mocks.applyCheckIn).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(mocks.applyCheckIn).toHaveBeenCalledWith('2026-09-14'))
     expect(mocks.toastSuccess).toHaveBeenCalledWith('Targets updated')
     expect(refetch).toHaveBeenCalledTimes(1)
     expect(mocks.emit).toHaveBeenCalledWith('plans:updated')
   })
 
-  it('renders the mid-week state without an apply action', () => {
-    const midWeek: CheckInStatus = {
-      ...baseStatus,
-      state: 'mid_week',
-      week: { start: '2026-09-15', end: '2026-09-21', label: '15 – 21 Sep', number: 7 },
-      days_logged: 1,
-      days_to_go: 6,
-      proposal: null,
-      verdict: null,
-    }
+  const midWeek: CheckInStatus = {
+    ...baseStatus,
+    state: 'mid_week',
+    week: { start: '2026-09-15', end: '2026-09-21', label: '15 – 21 Sep', number: 7 },
+    days_elapsed: 2,
+    days: week('2026-09-15', 2),
+    days_logged: 2,
+    days_to_go: 5,
+    proposal: null,
+    verdict: null,
+  }
+
+  it('renders the week in progress with the days logged so far, and no apply action', () => {
     const { container } = renderStatus(midWeek)
 
-    expect(screen.getByText('6 days to go')).toBeInTheDocument()
+    expect(screen.getByText('5 days to go')).toBeInTheDocument()
+    expect(screen.getByText('2 of 2 days logged')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Wednesday 16 Sept?, 2,110 kcal logged/ })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /Saturday 19 Sept?, still to come/ })).toBeDisabled()
     expect(container.querySelector('polyline')).toHaveAttribute('stroke', 'var(--color-ink-35)')
     expect(screen.queryByRole('button', { name: /targets/i })).not.toBeInTheDocument()
     expect(mocks.applyCheckIn).not.toHaveBeenCalled()
   })
 
-  it('renders insufficient data and keeps targets without applying a check-in', () => {
+  it('Check in now opens Geo\'s review of the last seven days, and closing it returns to the week', async () => {
+    mocks.getStatus.mockResolvedValue({ ...baseStatus, early: true, week: { ...baseStatus.week, label: '10 – 16 Sep' } })
+    const { refetch } = renderStatus(midWeek)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Check in now' }))
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Your check-in' })).toBeInTheDocument())
+    expect(mocks.getStatus).toHaveBeenCalledWith(true)
+    expect(screen.getByText('Last 7 days, 10 – 16 Sep')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Close check-in' }))
+    expect(screen.getByRole('heading', { name: 'Week 7 so far' })).toBeInTheDocument()
+    expect(refetch).toHaveBeenCalled()
+  })
+
+  it('says the week is already checked in instead of offering another check-in', () => {
+    renderStatus({ ...midWeek, last_check_in: { date: '2026-09-16', applied: true, calories: 2300 } })
+
+    expect(screen.queryByRole('button', { name: 'Check in now' })).not.toBeInTheDocument()
+    expect(screen.getByText(/Your targets moved to 2,300 kcal/)).toBeInTheDocument()
+  })
+
+  it('every number opens its days: a tile lists the week, a day opens the food diary on that date', async () => {
+    renderStatus(midWeek)
+
+    fireEvent.click(screen.getByRole('button', { name: /Avg calories/ }))
+    expect((await screen.findAllByRole('heading', { name: 'Calories this week' })).length).toBeGreaterThan(0)
+    fireEvent.click(screen.getByRole('button', { name: /Wed 16 Sept?/ }))
+    expect(mocks.push).toHaveBeenCalledWith('/food?date=2026-09-16')
+  })
+
+  it('a day in the strip opens that day', async () => {
+    renderStatus(midWeek)
+
+    fireEvent.click(screen.getByRole('button', { name: /Wednesday 16 Sept?/ }))
+    expect((await screen.findAllByRole('heading', { name: 'Wednesday 16 September' })).length).toBeGreaterThan(0)
+    expect(screen.getByText('Upper A', { exact: false })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Open food diary' }))
+    expect(mocks.push).toHaveBeenCalledWith('/food?date=2026-09-16')
+  })
+
+  it('renders insufficient data and keeping records the check-in without changing targets', async () => {
     const insufficient: CheckInStatus = {
       ...baseStatus,
       state: 'insufficient',
@@ -165,8 +227,8 @@ describe('check-in states', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Keep current targets' }))
 
-    expect(mocks.applyCheckIn).not.toHaveBeenCalled()
-    expect(mocks.toastSuccess).toHaveBeenCalledWith('Targets unchanged')
+    await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith('Targets unchanged'))
+    expect(mocks.applyCheckIn).toHaveBeenCalledWith('2026-09-14', false)
     expect(mocks.push).toHaveBeenCalledWith('/dashboard')
   })
 
@@ -218,12 +280,21 @@ describe('check-in states', () => {
     expect(screen.getByRole('button', { name: 'Done' }).closest('[inert]')).not.toBeNull()
   })
 
-  it('keeps targets on a hold without calling Apply', () => {
+  it('keeping on a hold records the check-in without applying anything', async () => {
     renderStatus({ ...baseStatus, proposal: { new_calories: 2200, new_protein_g: 165, calorie_change_pct: 0, direction: 'hold' } })
 
     fireEvent.click(screen.getByRole('button', { name: 'Keep my targets' }))
 
-    expect(mocks.applyCheckIn).not.toHaveBeenCalled()
+    await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith('Targets unchanged'))
+    expect(mocks.applyCheckIn).toHaveBeenCalledWith('2026-09-14', false)
+  })
+
+  it('a proposal can be turned down', async () => {
+    renderStatus(baseStatus)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Keep current targets' }))
+
+    await waitFor(() => expect(mocks.applyCheckIn).toHaveBeenCalledWith('2026-09-14', false))
     expect(mocks.toastSuccess).toHaveBeenCalledWith('Targets unchanged')
   })
 

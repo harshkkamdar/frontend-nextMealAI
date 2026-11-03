@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { Busy, Dock, DockSpacer, INK_BUTTON, ORANGE_BUTTON, SOFT_BUTTON } from '@/components/plans/spatial-parts'
+import { Busy, Dock, DockSpacer, INK_BUTTON, ORANGE_BUTTON, SOFT_BUTTON, TextButton } from '@/components/plans/spatial-parts'
 import { applyCheckIn, type CheckInStatus } from '@/lib/api/check-in.api'
 import { useOnline } from '@/lib/platform/network'
 import { syncBus } from '@/lib/sync/sync-bus'
@@ -13,6 +13,7 @@ import { formatDelta, formatMetric } from './format'
 import { AskGeo, GeoRead, SectionTitle, weekPose } from './parts'
 import { ratio, StatTiles } from './stat-tiles'
 import { TodayPreview } from './today-preview'
+import type { WeekDetail } from './week-detail'
 import { WeightTrendCard } from './weight-trend-card'
 
 /** What the screen knows besides the status: today's intake, carbs and fat now, and the plan Apply also rewrites. */
@@ -31,6 +32,7 @@ interface CheckInDueProps {
   onApplied: () => void
   onDone: () => void
   source: string | null
+  onDetail: (detail: WeekDetail) => void
 }
 
 const fmt = (n: number) => Math.round(n).toLocaleString('en-AU')
@@ -45,9 +47,10 @@ export function currentTargets(status: Pick<CheckInStatus, 'targets'>, today: Pi
   return { calories, protein, carbs: today.carbs ?? split.carbs, fat: today.fat ?? split.fat }
 }
 
-export function CheckInDue({ status, today, refetch, onApplied, onDone, source }: CheckInDueProps) {
+export function CheckInDue({ status, today, refetch, onApplied, onDone, source, onDetail }: CheckInDueProps) {
   const online = useOnline()
   const [submitting, setSubmitting] = useState(false)
+  const [keeping, setKeeping] = useState(false)
   const [failed, setFailed] = useState(false)
   const [outcome, setOutcome] = useState<{ saved: DayTargets | null } | null>(null)
   const [showNew, setShowNew] = useState(true)
@@ -63,7 +66,7 @@ export function CheckInDue({ status, today, refetch, onApplied, onDone, source }
     setSubmitting(true)
     setFailed(false)
     try {
-      const result = await applyCheckIn()
+      const result = await applyCheckIn(status.week.end)
       const saved = savedTargets(result, proposal, targets.protein_g)
       setOutcome({ saved })
       onApplied()
@@ -77,9 +80,19 @@ export function CheckInDue({ status, today, refetch, onApplied, onDone, source }
     }
   }
 
-  const keep = () => {
-    toast.success('Targets unchanged')
-    onDone()
+  // Keeping is a decision too: it records this week's check-in, so the review doesn't come back until the next one.
+  const keep = async () => {
+    if (keeping || submitting) return
+    setKeeping(true)
+    try {
+      await applyCheckIn(status.week.end, false)
+      toast.success('Targets unchanged')
+      onDone()
+    } catch {
+      toast.error("Couldn't save that. Try again.")
+    } finally {
+      setKeeping(false)
+    }
   }
 
   const where = `Home, your food diary${today.planName ? ` and ${today.planName}` : ''}`
@@ -110,17 +123,17 @@ export function CheckInDue({ status, today, refetch, onApplied, onDone, source }
 
       <SectionTitle>Your week</SectionTitle>
       <div className="flex flex-col gap-2.5">
-        <WeightTrendCard currentKg={weight.current_kg} deltaKg={weight.delta_week_kg} points={weight.points} tone="strong" source={source} hideDelta={weight.delta_week_kg !== null} />
+        <WeightTrendCard currentKg={weight.current_kg} deltaKg={weight.delta_week_kg} points={weight.points} tone="strong" source={source} hideDelta={weight.delta_week_kg !== null} onOpen={() => onDetail({ kind: 'weight' })} />
         <StatTiles
           items={[
-            { label: 'Avg calories', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)} kcal`, fraction: ratio(week.avg_calories, targets.calories) },
-            { label: 'Avg protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)} g`, fraction: ratio(week.avg_protein_g, targets.protein_g) },
-            { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned`, fraction: ratio(week.sessions_done, week.sessions_planned) },
-            { label: 'Avg sleep', value: formatMetric(week.sleep_avg_h), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked`, fraction: ratio(week.sleep_avg_h, 8) },
+            { label: 'Avg calories', value: formatMetric(week.avg_calories), sub: `of ${formatMetric(targets.calories)} kcal`, fraction: ratio(week.avg_calories, targets.calories), onClick: () => onDetail({ kind: 'calories' }) },
+            { label: 'Avg protein', value: formatMetric(week.avg_protein_g), unit: 'g', sub: `of ${formatMetric(targets.protein_g)} g`, fraction: ratio(week.avg_protein_g, targets.protein_g), onClick: () => onDetail({ kind: 'protein' }) },
+            { label: 'Sessions', value: week.sessions_done, sub: `of ${week.sessions_planned} planned`, fraction: ratio(week.sessions_done, week.sessions_planned), onClick: () => onDetail({ kind: 'sessions' }) },
+            { label: 'Avg sleep', value: week.sleep_avg_h === null ? '—' : week.sleep_avg_h.toFixed(1), unit: 'h', sub: `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'} tracked`, fraction: ratio(week.sleep_avg_h, 8), onClick: () => onDetail({ kind: 'sleep' }) },
           ]}
         />
       </div>
-      <DockSpacer />
+      <DockSpacer tall={changes && !outcome} />
 
       <Dock>
         {/* Apply and Done share one cell and crossfade, so the swap never jumps (opacity only). */}
@@ -128,7 +141,7 @@ export function CheckInDue({ status, today, refetch, onApplied, onDone, source }
           <div inert={!!outcome} className={`col-start-1 row-start-1 transition-opacity duration-200 ease-out ${outcome ? 'opacity-0' : ''}`}>
             {!changes ? (
               // A hold changes nothing, so keeping records nothing: Apply is never called for it.
-              <button type="button" onClick={keep} className={INK_BUTTON}>Keep my targets</button>
+              <button type="button" onClick={() => void keep()} disabled={keeping} aria-busy={keeping || undefined} className={INK_BUTTON}>{keeping ? <Busy>Saving</Busy> : 'Keep my targets'}</button>
             ) : !online ? (
               <button type="button" disabled className={SOFT_BUTTON}>Apply when you&apos;re back online</button>
             ) : (
@@ -141,6 +154,8 @@ export function CheckInDue({ status, today, refetch, onApplied, onDone, source }
             <button type="button" onClick={onDone} className={INK_BUTTON}>Done</button>
           </div>
         </div>
+        {/* A proposal can be turned down: Keep records the check-in without changing anything. */}
+        {changes && !outcome ? <TextButton onClick={() => void keep()}>{keeping ? 'Saving…' : 'Keep current targets'}</TextButton> : null}
       </Dock>
     </div>
   )

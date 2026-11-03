@@ -1,10 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { Dock, DockSpacer, INK_BUTTON } from '@/components/plans/spatial-parts'
+import { Busy, Dock, DockSpacer, INK_BUTTON } from '@/components/plans/spatial-parts'
 import { MetricStrip } from '@/components/ui/fiqr/metric-strip'
-import type { CheckInStatus } from '@/lib/api/check-in.api'
+import { applyCheckIn, type CheckInStatus } from '@/lib/api/check-in.api'
 import { cn } from '@/lib/utils'
 
 import { formatMetric, numberWord } from './format'
@@ -22,12 +23,24 @@ export function CheckInInsufficient({ status, enter, source, onDone }: { status:
   const { week_so_far: week, weight } = status
   const trend = weight.points.length >= 2
 
-  const keepTargets = () => {
-    toast.success('Targets unchanged')
-    onDone()
+  const [saving, setSaving] = useState(false)
+  // A check-in day records the (deferred) check-in so the screen moves on to the new week; an early look records nothing,
+  // so the week's own check-in still comes.
+  const keepTargets = async () => {
+    if (saving) return
+    setSaving(true)
+    try {
+      if (!status.early) await applyCheckIn(status.week.end, false)
+      toast.success('Targets unchanged')
+      onDone()
+    } catch {
+      toast.error("Couldn't save that. Try again.")
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const sessions = { label: 'Sessions', value: week.sessions_done, unit: `of ${week.sessions_planned}`, sub: 'this week' }
+  const sessions = { label: 'Sessions', value: week.sessions_done, unit: `of ${week.sessions_planned}`, sub: status.early ? 'last 7 days' : 'this week' }
   const sleep = { label: 'Sleep', value: formatMetric(week.sleep_avg_h), unit: week.sleep_avg_h === null ? undefined : 'h', sub: week.sleep_nights ? `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'}` : 'not tracked' }
   const weighIn = { label: 'Weight', value: weight.current_kg === null ? '—' : weight.current_kg.toFixed(1), unit: weight.current_kg === null ? undefined : 'kg', sub: weight.points.length === 1 ? '1 weigh-in' : 'no trend yet' }
 
@@ -41,7 +54,7 @@ export function CheckInInsufficient({ status, enter, source, onDone }: { status:
         <div className="mt-[18px]">
           <SegmentsBar onNavy filled={status.days_logged} total={7} label={`${status.days_logged} of 7 days logged`} />
           <p className="mt-2.5 text-[14px] text-cream-60 tabular-nums">
-            {status.days_logged} of 7 days logged. {capitalise(numberWord(status.days_needed))} next week gives me a real answer.
+            {status.days_logged} of 7 days logged. {capitalise(numberWord(status.days_needed))} logged days in a week give me a real answer.
           </p>
         </div>
         )}
@@ -55,7 +68,7 @@ export function CheckInInsufficient({ status, enter, source, onDone }: { status:
       <DockSpacer tall />
 
       <Dock>
-        <button type="button" className={INK_BUTTON} onClick={keepTargets}>Keep current targets</button>
+        <button type="button" className={INK_BUTTON} onClick={() => void keepTargets()} disabled={saving} aria-busy={saving || undefined}>{saving ? <Busy>Saving</Busy> : 'Keep current targets'}</button>
         <AskGeo />
       </Dock>
     </div>

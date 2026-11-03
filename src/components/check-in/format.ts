@@ -5,7 +5,7 @@ export function numberWord(value: number): string {
 }
 
 export function formatMetric(value: number | null): string {
-  return value === null ? '—' : value.toLocaleString()
+  return value === null ? '—' : Math.round(value).toLocaleString('en-AU')
 }
 
 export function formatDelta(value: number): string {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useId } from 'react'
+import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { DRAW_MS } from '@/lib/motion'
 import { formatDelta } from './format'
 import { CARD, useDrawn } from './parts'
@@ -15,6 +16,8 @@ interface WeightTrendCardProps {
   source?: string | null
   /** The due screen already leads with the week's change, so the card leaves it out. */
   hideDelta?: boolean
+  /** Opens the weigh-ins behind the line. */
+  onOpen?: () => void
 }
 
 const H = 84
@@ -27,7 +30,7 @@ function chartY(points: WeightTrendCardProps['points']): number[] {
   return values.map((kg) => 6 + ((max - kg) / span) * (H - 12))
 }
 
-export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hideDelta }: WeightTrendCardProps) {
+export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hideDelta, onOpen }: WeightTrendCardProps) {
   const drawn = useDrawn()
   const clip = useId()
   const stroke = tone === 'strong' ? 'var(--color-ink)' : 'var(--color-ink-35)'
@@ -36,10 +39,12 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
   const line = ys.map((y, index) => `${(index / (ys.length - 1)) * 100},${y.toFixed(2)}`).join(' ')
 
   return (
-    <section className={`${CARD} p-4`} aria-label="Weight trend">
+    <section className={`${CARD} relative p-4`} aria-label="Weight trend">
+      {/* The whole card opens the weigh-ins; an overlay keeps the chart out of the button's content. */}
+      {onOpen ? <button type="button" onClick={onOpen} aria-label="Open weigh-ins" className="absolute inset-0 z-[1] rounded-card active:bg-ink-06/40" /> : null}
       {/* George's header: the title left, today's weight and the week's change right; the source under it (Q32). */}
       <div className="flex items-baseline gap-2">
-        <span className="text-[14px] font-semibold text-ink">Weight trend</span>
+        <span className="flex items-center gap-1 text-[14px] font-semibold text-ink">Weight trend{onOpen ? <ChevronRightIcon className="size-3.5 text-ink-35" /> : null}</span>
         <span className="ml-auto whitespace-nowrap text-[13.5px] tabular-nums">
           <b className="font-semibold text-ink">{currentKg === null ? '—' : `${currentKg.toFixed(1)} kg`}</b>
           {deltaKg === null || hideDelta ? null : <span className="text-ink-65"> · {formatDelta(deltaKg)} this week</span>}
@@ -84,7 +89,7 @@ export function WeightTrendCard({ points, currentKg, deltaKg, tone, source, hide
       )}
       {ys.length ? (
         <div aria-hidden="true" className="mt-2 flex justify-between pl-10 text-caption text-ink-65">
-          <span>{points.length - 1} weeks ago</span>
+          <span>{points.length - 1} {points.length === 2 ? 'week' : 'weeks'} ago</span>
           <span>Now</span>
         </div>
       ) : null}
