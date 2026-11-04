@@ -17,11 +17,19 @@ describe('memories api', () => {
     await expect(getProfileMemories()).resolves.toEqual([memory])
     await forgetMemory('m1')
 
-    expect(fetchMock).toHaveBeenNthCalledWith(1, '/v1/memories?limit=50')
+    expect(fetchMock).toHaveBeenNthCalledWith(1, '/v1/memories?limit=500')
     expect(fetchMock).toHaveBeenNthCalledWith(2, '/v1/memories/m1/archive', {
       method: 'POST',
       body: { reason: 'Removed by the user in Settings' },
     })
+  })
+
+  it('leaves out short-term notes past their end', async () => {
+    fetchMock.mockResolvedValueOnce({ memories: [
+      { id: 'a', content: 'Sore knee', type: 'context', created_at: '2026-11-01', metadata: { expires_at: '2000-01-01T00:00:00Z' } },
+      { id: 'b', content: 'Travelling', type: 'context', created_at: '2026-11-01', metadata: { expires_at: '2999-01-01T00:00:00Z' } },
+    ] })
+    expect((await getProfileMemories()).map((m) => m.id)).toEqual(['b'])
   })
 
   it('returns an empty list when memories are missing', async () => {

@@ -319,7 +319,7 @@ export default function SettingsPage() {
           ) : memories.map((memory) => (
             <div key={memory.id} className="flex items-start gap-3 py-3 pl-[18px] pr-2">
               <div className="min-w-0 flex-1">
-                <span className="block text-[11.5px] font-semibold uppercase tracking-[1.4px] text-ink-62">{MEMORY_LABEL[memory.type] ?? 'Note'}</span>
+                <span className="block text-[11.5px] font-semibold uppercase tracking-[1.4px] text-ink-62">{MEMORY_LABEL[memory.type] ?? 'Note'}{memory.metadata?.expires_at ? ` · until ${new Date(memory.metadata.expires_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}` : ''}</span>
                 <span className="mt-0.5 block text-body text-ink">{memory.content}</span>
               </div>
               <button
