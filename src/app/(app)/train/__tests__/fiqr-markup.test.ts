@@ -51,7 +51,7 @@ describe('FIQR train markup contract', () => {
 })
 
 describe('FIQR live-session markup contract', () => {
-  it('shows one exercise per screen with the depth step, B1 stepper rows, the All exercises sheet and a floating nav', () => {
+  it('shows one exercise per screen with the depth step, B1 stepper rows, the All exercises sheet and a docked nav', () => {
     expect(sessionPage).toContain('<PushedHeader')
     expect(sessionCards).toContain('<DigitTiles')
     expect(sessionCards).toContain('completedSets / totalSets')
@@ -60,7 +60,7 @@ describe('FIQR live-session markup contract', () => {
     expect(sessionCards).toContain('Exercise {index + 1} of {count}')
     expect(sessionPage).toContain('ariaLabel="All exercises"')
     expect(sessionCards).toContain('h-stepper')
-    expect(sessionPage).toContain('fixed inset-x-2')
+    expect(sessionPage).toContain('fixed inset-x-0 bottom-0')
     expect(sessionPage).toContain('<ExerciseVisual')
     expect(sessionPage).toContain("haptic('success')")
   })

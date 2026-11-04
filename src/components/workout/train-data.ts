@@ -69,9 +69,9 @@ export function formatHistoryDate(value: string, tz: string): string {
   return `${get('weekday')} ${get('day')} ${get('month')}`
 }
 
-/** "72.5" or "70": kilograms with at most one decimal. */
+/** "72.5" or "70": kilograms with at most two decimals. */
 export function formatKg(kg: number): string {
-  return String(Math.round(kg * 10) / 10)
+  return String(Math.round(kg * 100) / 100)
 }
 
 /** What a set shows and logs: the typed value, else the planned one. */
@@ -92,7 +92,7 @@ export function formatLast(set: Pick<SetData, 'previous_reps' | 'previous_weight
 
 /** One stepper press: weight moves 2.5 kg (never below 0), reps move 1 (0 to 200). */
 export function stepWeight(kg: number | null, dir: 1 | -1): number {
-  return Math.max(0, Math.round(((kg ?? 0) + dir * 2.5) * 10) / 10)
+  return Math.max(0, Math.round(((kg ?? 0) + dir * 2.5) * 100) / 100)
 }
 export function stepReps(reps: number, dir: 1 | -1): number {
   return Math.min(200, Math.max(0, reps + dir))
@@ -163,7 +163,7 @@ export function bestText(c: ExerciseCompare): string {
 export function deltaText(c: ExerciseCompare): { text: string; up: boolean } {
   if (!c.best) return { text: 'Skipped', up: false }
   if (!c.last) return { text: 'First time', up: false }
-  const dKg = Math.round(((c.best.kg ?? 0) - (c.last.kg ?? 0)) * 10) / 10
+  const dKg = Math.round(((c.best.kg ?? 0) - (c.last.kg ?? 0)) * 100) / 100
   if (dKg !== 0) return { text: `${dKg > 0 ? '+' : '−'}${formatKg(Math.abs(dKg))} kg`, up: dKg > 0 }
   const dReps = c.best.reps - c.last.reps
   if (dReps !== 0) return { text: `${dReps > 0 ? '+' : '−'}${Math.abs(dReps)} ${Math.abs(dReps) === 1 ? 'rep' : 'reps'}`, up: dReps > 0 }
@@ -174,7 +174,7 @@ export function deltaText(c: ExerciseCompare): { text: string; up: boolean } {
 export function receiptLine(compares: ExerciseCompare[]): string {
   const jumps = compares
     .filter((c) => c.best && c.last)
-    .map((c) => ({ c, d: Math.round(((c.best!.kg ?? 0) - (c.last!.kg ?? 0)) * 10) / 10 }))
+    .map((c) => ({ c, d: Math.round(((c.best!.kg ?? 0) - (c.last!.kg ?? 0)) * 100) / 100 }))
     .sort((a, b) => b.d - a.d)
   const up = jumps.filter((j) => j.d > 0)
   if (up.length) return `${up[0].c.name} moved up ${formatKg(up[0].d)} kg on last time.${up.length > 1 ? ` ${up.length - 1} more ${up.length === 2 ? 'lift' : 'lifts'} went up too.` : ''}`

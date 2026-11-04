@@ -526,23 +526,25 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       </motion.main>
 
       {/* Portalled to body: the route frame's enter transform would otherwise make this fixed bar ride with the page
-          and jump into place when the push ends. A solid floating bar so it can animate in (a moving glass bar skips paints). */}
+          and jump into place when the push ends. A solid bar docked to the bottom edge, so it never floats over the sets. */}
       {exercises.length > 0 && !summaryCovered ? createPortal(
-      <motion.nav aria-label="Workout" initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={reduce ? reducedFade : spring.sheet} className="fixed inset-x-2 z-20 mx-auto max-w-[calc(28rem-16px)] rounded-[28px] bg-cream p-2 shadow-[var(--shadow-glass)]" style={{ bottom: 'calc(8px + var(--safe-bottom))' }}>
-        {/* Previous stays on every exercise; on the last one (or when all are done) Next becomes Finish workout. */}
-        <div className="grid grid-cols-[1fr_1.4fr] gap-2">
-          <button type="button" onClick={() => goTo(currentIndex - 1)} disabled={currentIndex <= 0} className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-body font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:text-ink-35"><ChevronLeftIcon className="size-[18px]" /> Previous</button>
-          {allComplete || isLast ? (
-            <PrimaryButton type="button" className="rounded-[18px] px-3" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
-          ) : (
-            <button
-              type="button"
-              onClick={() => goTo(currentComplete && nextOpen >= 0 ? nextOpen : currentIndex + 1)}
-              className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97]"
-            >
-              {currentComplete ? 'Next exercise' : 'Next'} <ChevronRightIcon className="size-[18px]" />
-            </button>
-          )}
+      <motion.nav aria-label="Workout" initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={reduce ? reducedFade : spring.sheet} className="fixed inset-x-0 bottom-0 z-20 border-t border-ink-09 bg-cream" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
+        <div className="mx-auto max-w-md px-gutter pt-3">
+          {/* Previous stays on every exercise; on the last one (or when all are done) Next becomes Finish workout. */}
+          <div className="grid grid-cols-[1fr_1.4fr] gap-2">
+            <button type="button" onClick={() => goTo(currentIndex - 1)} disabled={currentIndex <= 0} className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-body font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:text-ink-35"><ChevronLeftIcon className="size-[18px]" /> Previous</button>
+            {allComplete || isLast ? (
+              <PrimaryButton type="button" className="rounded-[18px] px-3" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
+            ) : (
+              <button
+                type="button"
+                onClick={() => goTo(currentComplete && nextOpen >= 0 ? nextOpen : currentIndex + 1)}
+                className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97]"
+              >
+                {currentComplete ? 'Next exercise' : 'Next'} <ChevronRightIcon className="size-[18px]" />
+              </button>
+            )}
+          </div>
         </div>
       </motion.nav>,
       document.body,

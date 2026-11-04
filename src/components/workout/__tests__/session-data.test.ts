@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bestText, compareExercise, deltaText, formatLast, nextOpenSet, receiptLine, stepReps, stepWeight, upNextText } from '../train-data'
+import { bestText, compareExercise, deltaText, formatKg, formatLast, nextOpenSet, receiptLine, stepReps, stepWeight, upNextText } from '../train-data'
 import type { SessionExercise, SetData } from '@/types/workout-session.types'
 
 const s = (done: boolean, kg: number | null, reps: number, prev?: [number | null, number]): SetData => ({
@@ -16,6 +16,10 @@ describe('live session helpers', () => {
   })
 
   it('steps weight by 2.5 kg and reps by 1 within bounds', () => {
+    expect(formatKg(28.75)).toBe('28.75')
+    expect(formatKg(28.8)).toBe('28.8')
+    expect(formatKg(30)).toBe('30')
+    expect(stepWeight(28.75, 1)).toBe(31.25)
     expect(stepWeight(72.5, 1)).toBe(75)
     expect(stepWeight(1, -1)).toBe(0)
     expect(stepWeight(null, 1)).toBe(2.5)

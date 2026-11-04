@@ -91,7 +91,7 @@ function Stepper({ label, value, unit, decimal = false, onStep, onSet }: { label
   const [draft, setDraft] = useState<string | null>(null)
   const commitDraft = () => {
     const typed = draft == null ? NaN : Number(draft.replace(',', '.'))
-    if (Number.isFinite(typed) && typed >= 0) onSet(decimal ? Math.round(typed * 10) / 10 : Math.round(typed))
+    if (Number.isFinite(typed) && typed >= 0) onSet(decimal ? Math.round(typed * 100) / 100 : Math.round(typed))
     setDraft(null)
   }
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -126,7 +126,7 @@ function Stepper({ label, value, unit, decimal = false, onStep, onSet }: { label
           onChange={(event) => setDraft(event.target.value)}
           onBlur={commitDraft}
           onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
-          className="w-[4.5ch] min-w-0 bg-transparent text-center text-[20px] font-bold text-ink tabular-nums outline-none"
+          className="w-[5.5ch] min-w-0 bg-transparent text-center text-[20px] font-bold text-ink tabular-nums outline-none"
         />
         <small className="text-label font-semibold text-ink-65">{unit}</small>
       </label>

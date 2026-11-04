@@ -8,7 +8,8 @@ import './globals.css'
 const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo', display: 'swap' })
 
 export const metadata: Metadata = { title: 'FIQR', description: 'Food, training and weekly check-ins with Geo, your coach.' }
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#FDF6EC' }
+// maximumScale 1 stops iOS zooming into inputs under 16px on focus (it still allows pinch zoom).
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, maximumScale: 1, viewportFit: 'cover', themeColor: '#FDF6EC' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

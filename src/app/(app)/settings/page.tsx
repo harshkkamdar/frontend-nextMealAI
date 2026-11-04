@@ -281,7 +281,7 @@ export default function SettingsPage() {
         <div>
           <SettingsSection
             title="Reminders and check-in"
-            footer={`Next check-in: ${dayAndDate(nextWeekday(checkInDay))}. Geo only nudges after your reminder time.`}
+            footer={`Next check-in: ${dayAndDate(nextWeekday(checkInDay))}. Geo only nudges after your reminder time.${native ? '' : ' Notifications arrive in the FIQR phone app, not in the browser.'}`}
           >
             <SettingsRow label="Push notifications">
               <SettingsSwitch label="Push notifications" checked={settings.notifications_enabled} onChange={handleNotificationChange} />
