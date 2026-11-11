@@ -90,21 +90,22 @@ describe('MealGroup photo-led rows (journey-food C3, D1)', () => {
     expect(onAddFood).toHaveBeenCalledOnce()
   })
 
-  it('hides Copy to today from the meal actions sheet when viewing today', () => {
+  it('offers Copy foods on any day, and shows the meal macros beside its calories', () => {
+    const onCopy = vi.fn()
     render(
       <MealGroup
         mealType="Breakfast"
         items={[makeFoodLog()]}
         onAddFood={() => {}}
-        isToday
-        onCopyToToday={() => {}}
+        onCopy={onCopy}
         onSaveFavourite={() => {}}
       />
     )
 
+    expect(screen.getByText(/kcal · .* P · .* C · .* F/)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /breakfast actions/i }))
-
-    expect(screen.queryByRole('button', { name: /copy to today/i })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /copy foods/i }))
+    expect(onCopy).toHaveBeenCalledOnce()
     expect(screen.getByRole('button', { name: /save as meal/i })).toBeInTheDocument()
   })
 })

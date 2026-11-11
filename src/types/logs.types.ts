@@ -40,6 +40,8 @@ export interface FoodPayload {
   notes?: string
   /** FB-10 — optional per-component breakdown for image estimates */
   items?: FoodLogItem[]
+  /** The log this row was copied from: a copy is never merged into a same-food row made in the same minute. */
+  copied_from?: string
 }
 
 export interface WorkoutLogExerciseEntry {

@@ -12,7 +12,7 @@ import { copyDays, kcalText, mealOf, quantityLabel, shiftISO } from './diary-log
 const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
 
 /** "Today", "Tomorrow", "Yesterday", else the short weekday; the chip's second line is "27 Oct". */
-function dayChip(iso: string, today: string) {
+export function dayChip(iso: string, today: string) {
   const d = new Date(`${iso}T12:00:00`)
   const label = iso === today ? 'Today' : iso === shiftISO(today, 1) ? 'Tomorrow' : iso === shiftISO(today, -1) ? 'Yesterday' : d.toLocaleDateString('en-AU', { weekday: 'short' })
   return { value: iso, label, sub: d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) }

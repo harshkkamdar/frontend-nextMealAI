@@ -25,7 +25,6 @@ import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { toast } from 'sonner'
 import { createLog, createLogWithStatus, deleteLog, getLogs, updateLog } from '@/lib/api/logs.api'
-import { copyMeal } from '@/lib/api/meals.api'
 import { createFavourite } from '@/lib/api/favourites.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
@@ -95,7 +94,9 @@ export default function DiaryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
   }, [])
   const [nameFavFor, setNameFavFor] = useState<string | null>(null)
+  // The meal being copied stays set after close, so the sheet keeps its foods while it leaves.
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
+  const [copyOpen, setCopyOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedMealType, setSelectedMealType] = useState<string>('Breakfast')
   const [monthOpen, setMonthOpen] = useState(false)
@@ -222,30 +223,22 @@ export default function DiaryPage() {
     router.push(`/logs/new/food?meal=${encodeURIComponent(mealType)}&date=${encodeURIComponent(selectedDate)}`)
   }
 
-  // Copy the selected day's <mealType> onto today.
-  // Open the meal picker so the user chooses which slot to copy INTO (a lunch
-  // they ate for breakfast can go to Breakfast). Defaults to the source meal.
-  const handleCopyToToday = (mealType: string) => setCopyFrom(mealType)
+  // "today's dinner", "tomorrow's lunch", "Thu 12 Nov's snack".
+  const copyWhere = (date: string, meal: string) => `${date === today ? "today's" : date === addDays(today, 1) ? "tomorrow's" : `${dayLabel(date, today)}'s`} ${meal.toLowerCase()}`
 
-  const doCopyToToday = async (targetMeal: string) => {
-    const source = copyFrom
-    if (!source) return
-    setCopyFrom(null)
-    try {
-      const r = await copyMeal({
-        source_date: selectedDate,
-        source_meal_type: source.toLowerCase(),
-        target_meal_type: targetMeal.toLowerCase(),
-      })
-      toast[r.copied > 0 ? 'success' : 'error'](
-        r.copied > 0
-          ? `Copied ${r.copied} item${r.copied === 1 ? '' : 's'} to today's ${targetMeal.toLowerCase()}`
-          : `${source} is empty, so there's nothing to copy`,
-      )
-      if (r.copied > 0) refetch()
-    } catch {
-      toast.error("Couldn't copy that meal. Try again.")
-    }
+  // The ticked foods of a meal, each copied as its own log (the same write as copying one row), to any day this week.
+  const doCopyMeal = async (logs: Log[], date: string, meal: string) => {
+    setCopyOpen(false)
+    const results = await Promise.allSettled(logs.map((log) => createLogWithStatus({ type: 'food', payload: { ...(log.payload as FoodPayload), meal_type: meal.toLowerCase(), copied_from: log.id }, source: 'manual', local_date: date })))
+    const made = results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
+    if (made.length === 0) { toast.error("Couldn't copy. Try again."); return }
+    void haptic('success')
+    refetch()
+    const failed = logs.length - made.length
+    const message = `Copied ${made.length} ${made.length === 1 ? 'food' : 'foods'} to ${copyWhere(date, meal)}${failed ? `; ${failed} didn't copy, try those again` : ''}.`
+    const saved = made.flatMap((result) => (result.queued ? [] : [result.data.id]))
+    if (saved.length < made.length) toast.success(`${message} Syncs when you're online.`)
+    else undoToast(message, () => Promise.all(saved.map((id) => deleteLog(id))))
   }
 
   // Save the selected day's <mealType> as a reusable favourite. Opens a custom
@@ -300,8 +293,8 @@ export default function DiaryPage() {
 
   const handleCopyLog = async (log: Log, date: string, meal: string) => {
     setActionsOpen(false)
-    const payload = { ...(log.payload as FoodPayload), meal_type: meal.toLowerCase() }
-    const where = `${date === today ? "today's" : date === addDays(today, 1) ? "tomorrow's" : `${dayLabel(date, today)}'s`} ${meal.toLowerCase()}`
+    const payload = { ...(log.payload as FoodPayload), meal_type: meal.toLowerCase(), copied_from: log.id }
+    const where = copyWhere(date, meal)
     try {
       const result = await createLogWithStatus({ type: 'food', payload, source: 'manual', local_date: date })
       void haptic('success')
@@ -432,8 +425,7 @@ export default function DiaryPage() {
                       items={groupedMeals[mealType] || []}
                       onAddFood={() => handleAddFood(mealType)}
                       onOpenLog={handleEditLog}
-                      isToday={selectedDate === today}
-                      onCopyToToday={() => handleCopyToToday(mealType)}
+                      onCopy={() => { setCopyFrom(mealType); setCopyOpen(true) }}
                       onSaveFavourite={() => handleSaveFavourite(mealType)}
                       enterDelay={animateIn && isFirstBlock ? 0.24 + index * 0.03 : undefined}
                     />
@@ -501,10 +493,13 @@ export default function DiaryPage() {
       />
 
       <CopyMealDialog
-        open={copyFrom !== null}
+        open={copyOpen}
         sourceMeal={copyFrom}
-        onClose={() => setCopyFrom(null)}
-        onPick={doCopyToToday}
+        items={copyFrom ? groupedMeals[copyFrom] ?? [] : []}
+        sourceDate={selectedDate}
+        today={today}
+        onClose={() => setCopyOpen(false)}
+        onCopy={(logs, date, meal) => void doCopyMeal(logs, date, meal)}
       />
     </div>
   )

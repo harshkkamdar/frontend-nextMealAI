@@ -16,8 +16,8 @@ interface MealGroupProps {
   onAddFood: () => void
   /** A row tap opens that log's editor. */
   onOpenLog?: (log: Log) => void
-  isToday?: boolean
-  onCopyToToday?: () => void
+  /** Copy the meal's foods to a day and meal. */
+  onCopy?: () => void
   onSaveFavourite?: () => void
   /** First paint of the session: the section rises in with the others (motion-feel 3e). */
   enterDelay?: number
@@ -53,12 +53,16 @@ export function FoodThumb({ payload }: { payload: FoodPayload }) {
 
 const DIVIDER = <span aria-hidden="true" className="absolute left-4 right-0 top-0 h-px bg-ink-06" />
 
-export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = true, onCopyToToday, onSaveFavourite, enterDelay }: MealGroupProps) {
+export function MealGroup({ mealType, items, onAddFood, onOpenLog, onCopy, onSaveFavourite, enterDelay }: MealGroupProps) {
   const reduce = useReducedMotion()
   const [actionsOpen, setActionsOpen] = useState(false)
   const [unfolded, setUnfolded] = useState(false)
 
-  const calories = items.reduce((total, item) => total + ((item.payload as FoodPayload).est_macros?.calories ?? 0), 0)
+  const totals = items.reduce((sum, item) => {
+    const m = (item.payload as FoodPayload).est_macros
+    return { calories: sum.calories + (m?.calories ?? 0), protein: sum.protein + (m?.protein ?? 0), carbs: sum.carbs + (m?.carbs ?? 0), fat: sum.fat + (m?.fat ?? 0) }
+  }, { calories: 0, protein: 0, carbs: 0, fat: 0 })
+  const calories = totals.calories
   const folded = items.length > FOLD_AFTER && !unfolded
   const shown = folded ? items.slice(0, FOLD_TO) : items
 
@@ -79,7 +83,8 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
     >
       <div className="mb-1 flex min-h-11 items-center gap-2.5">
         <h2 className="min-w-0 flex-1 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">{mealType}</h2>
-        {calories > 0 ? <span className="text-[13px] text-ink-62 tabular-nums">{kcalText(calories)} kcal</span> : null}
+        {/* The meal's macros beside its calories (George: as before the rebrand). */}
+        {calories > 0 ? <span className="text-[13px] text-ink-62 tabular-nums">{kcalText(calories)} kcal · {macroLine(totals)}</span> : null}
         <button
           type="button"
           onClick={() => setActionsOpen(true)}
@@ -152,7 +157,7 @@ export function MealGroup({ mealType, items, onAddFood, onOpenLog, isToday = tru
           <h2 className="mb-3 px-1 text-headline font-bold text-ink">{mealType}</h2>
           <div className="overflow-hidden rounded-card tile">
             <ActionRow label={addLabel(mealType)} onClick={() => runAction(onAddFood)} />
-            {!isToday && onCopyToToday ? <ActionRow label="Copy to today" onClick={() => runAction(onCopyToToday)} /> : null}
+            {onCopy && items.length > 0 ? <ActionRow label="Copy foods" onClick={() => runAction(onCopy)} /> : null}
             {onSaveFavourite ? <ActionRow label="Save as meal" onClick={() => runAction(onSaveFavourite)} /> : null}
           </div>
         </div>

@@ -3,58 +3,78 @@
 import { useState } from 'react'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { cn } from '@/lib/utils'
+import type { FoodPayload, Log } from '@/types/logs.types'
+import { ChoiceGrid, GroupLabel } from './choice-grid'
+import { kcalText, shiftISO } from './diary-logic'
+import { dayChip } from './row-actions-sheet'
 
 const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
+/** Today and the week ahead: the backend takes meals preset up to 7 days forward. */
+const PLAN_DAYS = 8
 
 interface CopyMealDialogProps {
   open: boolean
-  /** The meal being copied FROM (e.g. "Snack") — pre-highlighted as the default target. */
+  /** The meal being copied FROM (e.g. "Snack"): the default target meal. */
   sourceMeal: string | null
+  /** The meal's foods; each can be left behind. */
+  items: Log[]
+  /** The day the meal is on, and the user's today (YYYY-MM-DD). */
+  sourceDate: string
+  today: string
   onClose: () => void
-  /** Called with the chosen target meal slot (e.g. "Breakfast"). */
-  onPick: (targetMeal: string) => void
+  onCopy: (logs: Log[], date: string, meal: string) => void
 }
 
 /**
- * Lets the user choose WHICH meal a "Copy to today" lands under — so a lunch
- * they actually ate for breakfast can be copied into Breakfast. Inset sheet;
- * the chosen slot carries the ink outline (selection is never a fill).
+ * Copy a meal's foods to a day and meal (George: pick the foods, plan days ahead). Every food starts ticked; the day
+ * defaults to today, or tomorrow when the meal is today's.
  */
-export function CopyMealDialog({ open, sourceMeal, onClose, onPick }: CopyMealDialogProps) {
-  const [targetMeal, setTargetMeal] = useState<string | null>(null)
-  const selectedMeal = targetMeal ?? sourceMeal ?? 'Breakfast'
+export function CopyMealDialog({ open, sourceMeal, items, sourceDate, today, onClose, onCopy }: CopyMealDialogProps) {
+  const [left, setLeft] = useState<string[]>([])
+  const [day, setDay] = useState<string | null>(null)
+  const [meal, setMeal] = useState<string | null>(null)
 
-  const close = () => {
-    setTargetMeal(null)
-    onClose()
+  // Each opening starts fresh (state adjusted during render, as in the row actions sheet).
+  const [wasOpen, setWasOpen] = useState(open)
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (open) { setLeft([]); setDay(null); setMeal(null) }
   }
 
+  const days = Array.from({ length: PLAN_DAYS }, (_, index) => shiftISO(today, index))
+  const pickedDay = day ?? (sourceDate === today ? days[1] : today)
+  const pickedMeal = meal ?? sourceMeal ?? 'Breakfast'
+  const chosen = items.filter((item) => !left.includes(item.id))
+  const toggle = (id: string) => setLeft((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))
+
   return (
-    <BottomSheet open={open} onClose={close} ariaLabel="Copy meal to which slot">
-      <div className="px-5 pb-5 pt-2">
-        <h2 className="text-[22px] font-bold tracking-[-0.3px] text-ink">Copy {sourceMeal?.toLowerCase()} to today</h2>
-        <p className="mt-1 text-[15px] text-ink-65">Which meal should it go under?</p>
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          {MEALS.map((m) => (
-            <button
-              key={m}
-              type="button"
-              aria-pressed={m === selectedMeal}
-              onClick={() => setTargetMeal(m)}
-              className={cn(
-                'h-12 rounded-[14px] text-[15px] font-semibold text-ink transition-transform active:scale-[.97]',
-                m === selectedMeal ? 'bg-card outline outline-[1.5px] -outline-offset-[1.5px] outline-ink' : 'bg-ink-06',
-              )}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
-        <PrimaryButton type="button" onClick={() => { setTargetMeal(null); onPick(selectedMeal) }} className="mt-5 justify-center">
-          Copy to {selectedMeal.toLowerCase()}
+    <BottomSheet open={open} onClose={onClose} ariaLabel={`Copy ${sourceMeal?.toLowerCase() ?? 'meal'}`}>
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-1">
+        <h2 className="px-1 text-[22px] font-bold tracking-[-0.3px] text-ink">Copy {sourceMeal?.toLowerCase()}</h2>
+        <GroupLabel>Foods</GroupLabel>
+        <ul className="overflow-hidden rounded-card tile">
+          {items.map((item) => {
+            const payload = item.payload as FoodPayload
+            const on = !left.includes(item.id)
+            return (
+              <li key={item.id} className="border-b border-ink-06 last:border-b-0">
+                <label className="flex min-h-12 cursor-pointer items-center gap-3 px-4 py-2 active:bg-ink-04">
+                  <input type="checkbox" checked={on} onChange={() => toggle(item.id)} className="size-5 shrink-0 accent-[var(--color-ink)]" />
+                  <span className="min-w-0 flex-1 truncate text-body font-semibold text-ink">{payload.food_name}</span>
+                  <span className="shrink-0 text-caption text-ink-65 tabular-nums">{kcalText(payload.est_macros?.calories)} kcal</span>
+                </label>
+              </li>
+            )
+          })}
+        </ul>
+        <GroupLabel>Day</GroupLabel>
+        <ChoiceGrid label="Day" cols={3} choices={days.map((d) => dayChip(d, today))} value={pickedDay} onPick={setDay} />
+        <GroupLabel>Meal</GroupLabel>
+        <ChoiceGrid label="Meal" choices={MEALS.map((m) => ({ value: m, label: m }))} value={pickedMeal} onPick={setMeal} />
+        <PrimaryButton type="button" disabled={chosen.length === 0} onClick={() => onCopy(chosen, pickedDay, pickedMeal)} className="mt-5 justify-center">
+          {chosen.length === 0 ? 'Pick a food to copy' : `Copy ${chosen.length} ${chosen.length === 1 ? 'food' : 'foods'}`}
         </PrimaryButton>
-        <button type="button" onClick={close} className="mt-2 h-11 w-full text-[15px] font-semibold text-ink-65">
+        <button type="button" onClick={onClose} className="mt-2 h-11 w-full text-[15px] font-semibold text-ink-65">
           Cancel
         </button>
       </div>
