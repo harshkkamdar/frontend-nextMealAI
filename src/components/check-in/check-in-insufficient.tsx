@@ -7,6 +7,7 @@ import { Busy, Dock, DockSpacer, INK_BUTTON } from '@/components/plans/spatial-p
 import { MetricStrip } from '@/components/ui/fiqr/metric-strip'
 import { applyCheckIn, type CheckInStatus } from '@/lib/api/check-in.api'
 import { cn } from '@/lib/utils'
+import { formatKg } from '@/components/workout/train-data'
 
 import { formatMetric, numberWord } from './format'
 import { AskGeo, GeoRead, SectionTitle } from './parts'
@@ -42,7 +43,7 @@ export function CheckInInsufficient({ status, enter, source, onDone }: { status:
 
   const sessions = { label: 'Sessions', value: week.sessions_done, unit: `of ${week.sessions_planned}`, sub: status.early ? 'last 7 days' : 'this week' }
   const sleep = { label: 'Sleep', value: formatMetric(week.sleep_avg_h), unit: week.sleep_avg_h === null ? undefined : 'h', sub: week.sleep_nights ? `${week.sleep_nights} ${week.sleep_nights === 1 ? 'night' : 'nights'}` : 'not tracked' }
-  const weighIn = { label: 'Weight', value: weight.current_kg === null ? '—' : weight.current_kg.toFixed(1), unit: weight.current_kg === null ? undefined : 'kg', sub: weight.points.length === 1 ? '1 weigh-in' : 'no trend yet' }
+  const weighIn = { label: 'Weight', value: weight.current_kg === null ? '—' : formatKg(weight.current_kg), unit: weight.current_kg === null ? undefined : 'kg', sub: weight.points.length === 1 ? '1 weigh-in' : 'no trend yet' }
 
   return (
     <div className="flex flex-col">

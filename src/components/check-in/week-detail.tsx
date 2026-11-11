@@ -8,6 +8,7 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import type { CheckInDay, CheckInStatus } from '@/lib/api/check-in.api'
 import { cn } from '@/lib/utils'
+import { formatKg } from '@/components/workout/train-data'
 
 /** What the Check-in screen drills into: one day of the week, or one measure across it. */
 export type WeekDetail = { kind: 'day'; date: string } | { kind: 'calories' | 'protein' | 'sessions' | 'sleep' | 'weight' } | null
@@ -139,7 +140,7 @@ export function WeekDetailSheet({ detail, status, today, onClose, onDetail, onLo
             <Row label={<span className="flex items-center gap-2"><HueDot macro="fat" />Fat</span>} value={day.fat_g === null ? none('—') : `${fmt(day.fat_g)} g`} />
             <Row label="Training" value={day.sessions.length ? day.sessions.join(', ') : none('No session')} onClick={() => { onClose(); router.push('/train') }} />
             <Row label="Sleep" value={day.sleep_h === null ? none('Not logged') : hours(day.sleep_h)} />
-            <Row label="Weight" value={day.weight_kg === null ? none('No weigh-in') : `${day.weight_kg.toFixed(1)} kg`} />
+            <Row label="Weight" value={day.weight_kg === null ? none('No weigh-in') : `${formatKg(day.weight_kg)} kg`} />
           </ul>
           <button type="button" className={cn(INK_BUTTON, 'mt-4')} onClick={() => diary(day.date)}>{day.calories === null ? 'Log food for this day' : 'Open food diary'}</button>
         </>
@@ -196,11 +197,11 @@ export function WeekDetailSheet({ detail, status, today, onClose, onDetail, onLo
     title = 'Weight'
     body = (
       <>
-        <Summary>{weight.current_kg === null ? 'No weigh-ins yet' : `Latest ${weight.current_kg.toFixed(1)} kg`}</Summary>
+        <Summary>{weight.current_kg === null ? 'No weigh-ins yet' : `Latest ${formatKg(weight.current_kg)} kg`}</Summary>
         <h3 className="mt-4 text-[11.5px] font-semibold uppercase tracking-[1.8px] text-ink-62">This week</h3>
         <ul>
           {weighIns.length
-            ? weighIns.map((day) => <Row key={day.date} label={dateLabel(day.date)} value={`${day.weight_kg!.toFixed(1)} kg`} onClick={() => onDetail({ kind: 'day', date: day.date })} />)
+            ? weighIns.map((day) => <Row key={day.date} label={dateLabel(day.date)} value={`${formatKg(day.weight_kg!)} kg`} onClick={() => onDetail({ kind: 'day', date: day.date })} />)
             : <li className="py-3 text-body text-ink-65">No weigh-ins this week</li>}
         </ul>
         {weight.points.length ? (

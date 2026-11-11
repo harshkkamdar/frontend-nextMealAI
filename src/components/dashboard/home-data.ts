@@ -69,8 +69,22 @@ export function weightTile(logs: Log[], fallbackKg: number | null | undefined, t
   return { kg, weekDelta, series, date: latestDay ?? null }
 }
 
+/** The progress chart's points, oldest first: the profile's weight on the day you joined, then one per day weighed. */
+export function weightJourney(logs: Log[], start: { kg: number | null | undefined; date: string | null | undefined }): { date: string; kg: number }[] {
+  const byDay = new Map<string, number>()
+  for (const log of ofType(logs, 'weight')) {
+    const kg = num((log.payload as { weight_kg?: number }).weight_kg)
+    if (kg !== null && !byDay.has(logDate(log))) byDay.set(logDate(log), kg)
+  }
+  const points = [...byDay].sort(([a], [b]) => a.localeCompare(b)).map(([date, kg]) => ({ date, kg }))
+  const startKg = num(start.kg)
+  const startDate = start.date?.slice(0, 10)
+  if (startKg !== null && startDate && (!points.length || startDate < points[0].date)) points.unshift({ date: startDate, kg: startKg })
+  return points
+}
+
 export interface SleepTile {
-  /** Hours for the most recent night logged today or yesterday. */
+  /** Hours logged today (last night); an older night never carries over. */
   hours: number | null
   /** Seven nights ending today, oldest first; null where nothing was logged. */
   nights: (number | null)[]
@@ -83,7 +97,7 @@ export function sleepTile(logs: Log[], today: string): SleepTile {
     return log ? num((log.payload as { hours?: number }).hours) : null
   }
   const nights = Array.from({ length: 7 }, (_, index) => on(shiftDate(today, index - 6)))
-  return { hours: nights[6] ?? nights[5], nights }
+  return { hours: nights[6], nights }
 }
 
 export function waterGlassesToday(logs: Log[], today: string): number {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatSleep, geoAction, mealRows, shiftDate, sleepTile, stepsTile, waterGlassesToday, weekSeries, weightTile } from '@/components/dashboard/home-data'
+import { formatSleep, geoAction, mealRows, shiftDate, sleepTile, stepsTile, waterGlassesToday, weekSeries, weightJourney, weightTile } from '@/components/dashboard/home-data'
 import type { Log } from '@/types/logs.types'
 
 const TODAY = '2026-10-26'
@@ -38,10 +38,19 @@ describe('home-data', () => {
     expect(weightTile([], null, TODAY).kg).toBeNull()
   })
 
-  it('builds a seven-night sleep strip and uses last night', () => {
+  it('charts the journey from the joining weight through each day weighed, keeping two decimals', () => {
+    const logs = [log('weight', '2026-11-08', { weight_kg: 72.75 }), log('weight', '2026-11-10', { weight_kg: 72.5 }), log('weight', '2026-11-10', { weight_kg: 73 }, '2026-11-10T06:00:00.000Z')]
+    expect(weightJourney(logs, { kg: 82, date: '2026-05-06T03:00:00Z' })).toEqual([
+      { date: '2026-05-06', kg: 82 }, { date: '2026-11-08', kg: 72.75 }, { date: '2026-11-10', kg: 72.5 },
+    ])
+    expect(weightJourney([], { kg: null, date: null })).toEqual([])
+  })
+
+  it('builds a seven-night sleep strip; last night is only what was logged today', () => {
     const tile = sleepTile([log('sleep', '2026-10-25', { hours: 7.2 }), log('sleep', '2026-10-21', { hours: 6 })], TODAY)
     expect(tile.nights).toEqual([null, 6, null, null, null, 7.2, null])
-    expect(tile.hours).toBe(7.2)
+    expect(tile.hours).toBeNull()
+    expect(sleepTile([log('sleep', TODAY, { hours: 6.5 })], TODAY).hours).toBe(6.5)
     expect(formatSleep(7.2)).toBe('7h 12m')
     expect(formatSleep(8)).toBe('8h')
   })

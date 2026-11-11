@@ -13,6 +13,7 @@ import type { CreateLogInput } from '@/types/logs.types'
 import { WATER_GOAL_GLASSES, weightDeltaText } from './home-cards'
 import { AlertIcon, MinusLine, PlusLine } from './home-icons'
 import { formatSleep } from './home-data'
+import { formatKg } from '@/components/workout/train-data'
 
 export type QuickLogType = 'water' | 'mood' | 'sleep' | 'energy' | 'weight' | null
 
@@ -211,7 +212,7 @@ function WeightTrend({ series }: { series: number[] }) {
 }
 
 function WeightSheet({ history, onDone }: { history: WeightHistory; onDone: () => void }) {
-  const [kg, setKg] = useState(history.kg ? history.kg.toFixed(1) : '')
+  const [kg, setKg] = useState(history.kg ? formatKg(history.kg) : '')
   const { saving, failed, save } = useSave(onDone)
   const hintId = useId()
   const value = Number(kg)
@@ -220,7 +221,7 @@ function WeightSheet({ history, onDone }: { history: WeightHistory; onDone: () =
   const nudge = (by: number) => {
     const base = kg !== '' && Number.isFinite(value) ? value : history.kg ?? 70
     void haptic('selection')
-    setKg((Math.round((base + by) * 10) / 10).toFixed(1))
+    setKg(formatKg(base + by))
   }
   const delta = weightDeltaText(history.weekDelta)
   const down = history.weekDelta !== null && history.weekDelta < 0
@@ -230,7 +231,7 @@ function WeightSheet({ history, onDone }: { history: WeightHistory; onDone: () =
         <span className="grid size-11 shrink-0 place-items-center rounded-full bg-macro-teal/12 text-macro-teal"><WeightFill className="size-5" /></span>
         <div className="min-w-32 flex-1">
           <Title>Weight</Title>
-          <p className="truncate text-caption text-ink-65">{history.date && history.kg ? `Last ${history.kg.toFixed(1)} kg ${dayLabel(history.date, history.today)}` : 'First weigh-in'}</p>
+          <p className="truncate text-caption text-ink-65">{history.date && history.kg ? `Last ${formatKg(history.kg)} kg ${dayLabel(history.date, history.today)}` : 'First weigh-in'}</p>
         </div>
         {delta ? <span className={cn('shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold', down ? 'bg-macro-teal text-card' : 'bg-ink-06 text-ink')}>{delta} this week</span> : null}
       </div>
@@ -253,8 +254,8 @@ function WeightSheet({ history, onDone }: { history: WeightHistory; onDone: () =
       <Hint id={hintId} bad={bad || failed}>
         {failed ? "Couldn't log weight. Check your connection and try again." : bad ? 'Enter a weight between 20 and 400 kg.' : 'Weigh at the same time each day for a clean trend.'}
       </Hint>
-      <SaveButton saving={saving} disabled={!valid} onClick={() => void save({ type: 'weight', payload: { weight_kg: value }, source: 'manual' }, `Weight logged, ${value.toFixed(1)} kg`)}>
-        {valid ? `Save ${value.toFixed(1)} kg` : 'Save'}
+      <SaveButton saving={saving} disabled={!valid} onClick={() => void save({ type: 'weight', payload: { weight_kg: value }, source: 'manual' }, `Weight logged, ${formatKg(value)} kg`)}>
+        {valid ? `Save ${formatKg(value)} kg` : 'Save'}
       </SaveButton>
     </>
   )

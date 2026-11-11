@@ -14,6 +14,8 @@ import { MacroSheet } from '@/components/dashboard/macro-sheet'
 import { QuickLogSheet, type QuickLogType } from '@/components/dashboard/quick-log-sheet'
 import { SuggestionCard } from '@/components/dashboard/suggestion-card'
 import { WorkoutCard } from '@/components/dashboard/workout-card'
+import { formatKg } from '@/components/workout/train-data'
+import { WeightTrendCard } from '@/components/check-in/weight-trend-card'
 import { LOG_SHEET } from '@/components/layout/tab-bar'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
 import { OfflineBand } from '@/components/shared/offline-band'
@@ -264,11 +266,11 @@ export default function DashboardPage() {
                 items={[
                   {
                     label: 'Weight',
-                    value: weight.kg !== null ? weight.kg.toFixed(1) : '—',
+                    value: weight.kg !== null ? formatKg(weight.kg) : '—',
                     unit: weight.kg !== null ? 'kg' : undefined,
                     sub: weightDeltaText(weight.weekDelta) ?? 'Log today',
                     onClick: () => setQuickLog('weight'),
-                    ariaLabel: weight.kg !== null ? `Weight ${weight.kg.toFixed(1)} kg, log weight` : 'Log weight',
+                    ariaLabel: weight.kg !== null ? `Weight ${formatKg(weight.kg)} kg, log weight` : 'Log weight',
                   },
                   {
                     label: 'Sleep',
@@ -295,6 +297,11 @@ export default function DashboardPage() {
                   },
                 ]}
               />
+
+              {/* Positive reinforcement on the front page (George): the whole weight journey against the goal. */}
+              <div className="mt-4">
+                <WeightTrendCard points={[]} currentKg={weight.kg} deltaKg={weight.weekDelta} tone="strong" onOpen={() => setQuickLog('weight')} />
+              </div>
 
               {(profile?.daily_targets_missing_fields?.length ?? 0) > 0 ? (
                 <button type="button" onClick={() => router.push('/settings/profile')} className="mt-4 flex min-h-14 w-full items-center rounded-[16px] border border-ink-12 bg-card px-4 text-left active:bg-ink-04">
