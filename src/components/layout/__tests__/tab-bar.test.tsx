@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import { TabBar, hidesTabBar } from '../tab-bar'
+import { useUIStore } from '@/stores/ui.store'
 
 const route = vi.hoisted(() => ({ pathname: '/dashboard' }))
 vi.mock('next/navigation', () => ({ usePathname: () => route.pathname }))
@@ -9,12 +10,19 @@ vi.mock('@/lib/platform/app', () => ({ haptic: () => Promise.resolve() }))
 describe('TabBar (George nav)', () => {
   afterEach(() => { route.pathname = '/dashboard' })
 
-  it('has five slots in order, with Geo in the centre leading to the conversation list', () => {
+  it('has five slots in order, with Geo in the centre opening over the current screen', () => {
     render(<TabBar />)
-    const links = screen.getAllByRole('link')
-    expect(links.map((link) => link.textContent)).toEqual(['Home', 'Food', 'Geo', 'Train', 'Check-in'])
-    expect(screen.getByRole('link', { name: 'Geo' })).toHaveAttribute('href', '/chat')
+    const slots = screen.getByRole('navigation').querySelectorAll('a, button')
+    expect([...slots].map((slot) => slot.textContent)).toEqual(['Home', 'Food', 'Geo', 'Train', 'Check-in'])
+    act(() => screen.getByRole('button', { name: 'Geo' }).click())
+    expect(useUIStore.getState().activeSheet).toBe('geo-companion')
     expect(screen.getByRole('link', { name: 'Check-in' })).toHaveAttribute('href', '/check-in')
+  })
+
+  it('is the conversation list tab while you are in Geo', () => {
+    route.pathname = '/chat'
+    render(<TabBar />)
+    expect(screen.getByRole('link', { name: 'Geo' })).toHaveAttribute('href', '/chat')
   })
 
   it('marks the open tab, and Check-in is a tab of its own', () => {
@@ -49,7 +57,7 @@ describe('Geo working', () => {
   it('orbits the nav mark while a Geo reply is in flight, and settles when the last one lands', async () => {
     const { useUIStore } = await import('@/stores/ui.store')
     const { container, rerender } = render(<TabBar />)
-    const mark = () => container.querySelector('a[href="/chat"] svg')
+    const mark = () => container.querySelector('button[aria-haspopup="dialog"] svg')
     expect(mark()).not.toHaveClass('geo-working')
     act(() => { useUIStore.getState().geoStart(); useUIStore.getState().geoStart() })
     rerender(<TabBar />)

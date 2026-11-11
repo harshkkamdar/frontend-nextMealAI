@@ -42,7 +42,8 @@ export function hidesTabBar(pathname: string): boolean {
 }
 
 /**
- * George's nav (DESIGN.md section 6): five columns, Geo raised in the centre as the app icon in miniature.
+ * George's nav (DESIGN.md section 6): five columns, Geo raised in the centre as the app icon in miniature; it opens Geo
+ * over the current screen, and is the conversation list's tab once you are in it.
  * Solid cream with a hairline; it slides away on full-screen routes rather than unmounting, so nothing pops.
  */
 export function TabBar() {
@@ -69,6 +70,15 @@ export function TabBar() {
     )
   }
 
+  const geo = (
+    <>
+      <span className="-mt-6 grid size-14 place-items-center rounded-full bg-ink shadow-[var(--shadow-raised)] transition-transform active:scale-[.94]">
+        <GeoMark key={geoDone} size={34} tone="cream" working={geoWorking} done={geoDone > 0} />
+      </span>
+      <span className={cn('mt-[6px] text-[11px] font-semibold leading-none', isActive('/chat') ? 'text-ink' : 'text-ink-62')}>Geo</span>
+    </>
+  )
+
   return (
     <nav
       aria-label="Main"
@@ -82,17 +92,12 @@ export function TabBar() {
       <div className="mx-auto grid max-w-md grid-cols-5 items-end px-2 pt-[10px]" style={{ paddingBottom: 'calc(22px + var(--safe-bottom))' }}>
         {item(SIDE[0])}
         {item(SIDE[1])}
-        <Link
-          href="/chat"
-          aria-current={isActive('/chat') ? 'page' : undefined}
-          onClick={() => void haptic('light')}
-          className="flex flex-col items-center"
-        >
-          <span className="-mt-6 grid size-14 place-items-center rounded-full bg-ink shadow-[var(--shadow-raised)] transition-transform active:scale-[.94]">
-            <GeoMark key={geoDone} size={34} tone="cream" working={geoWorking} done={geoDone > 0} />
-          </span>
-          <span className={cn('mt-[6px] text-[11px] leading-none text-ink-62', isActive('/chat') ? 'font-semibold text-ink' : 'font-semibold')}>Geo</span>
-        </Link>
+        {isActive('/chat') ? (
+          <Link href="/chat" aria-current="page" onClick={() => void haptic('light')} className="flex flex-col items-center">{geo}</Link>
+        ) : (
+          // Elsewhere Geo opens over the screen you are on, so it knows what you are looking at (George: Geo in every screen).
+          <button type="button" aria-haspopup="dialog" onClick={() => { void haptic('light'); useUIStore.getState().openSheet('geo-companion') }} className="flex flex-col items-center">{geo}</button>
+        )}
         {item(SIDE[2])}
         {item(SIDE[3])}
       </div>
