@@ -10,10 +10,10 @@ describe('rep ranges', () => {
     expect(repTarget('AMRAP')).toBeNull()
   })
 
-  it('records one number for a ranged set: typed, else last time inside the range, else the bottom', () => {
+  it('records one number for a ranged set: typed, else last time (in or out of the range), else the bottom', () => {
     expect(repsToRecord({ actual_reps: 9, planned_reps: '6-8', previous_reps: 7 })).toBe(9)
     expect(repsToRecord({ actual_reps: null, planned_reps: '6-8', previous_reps: 7 })).toBe(7)
-    expect(repsToRecord({ actual_reps: null, planned_reps: '6-8', previous_reps: 10 })).toBe(6)
+    expect(repsToRecord({ actual_reps: null, planned_reps: '8-12', previous_reps: 15 })).toBe(15)
     expect(repsToRecord({ actual_reps: null, planned_reps: '6-8', previous_reps: null })).toBe(6)
     expect(repsToRecord({ actual_reps: null, planned_reps: 'AMRAP', previous_reps: 14 })).toBe(14)
   })

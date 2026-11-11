@@ -115,9 +115,10 @@ function Stepper({ label, value, unit, decimal = false, onStep, onSet }: { label
     </button>
   )
   return (
-    <div className="grid h-stepper grid-cols-[48px_minmax(0,1fr)_48px] items-center rounded-[14px] bg-ink-06">
+    <div className="grid h-stepper grid-cols-[34px_minmax(0,1fr)_34px] items-center rounded-[14px] bg-ink-06">
       {button(-1)}
-      <label className="flex min-w-0 items-baseline justify-center gap-1">
+      {/* The unit sits under the number, so kg and reps fit side by side on a 375 pt phone. */}
+      <label className="flex min-w-0 flex-col items-center justify-center leading-none">
         <input
           aria-label={label}
           inputMode={decimal ? 'decimal' : 'numeric'}
@@ -126,9 +127,9 @@ function Stepper({ label, value, unit, decimal = false, onStep, onSet }: { label
           onChange={(event) => setDraft(event.target.value)}
           onBlur={commitDraft}
           onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
-          className="w-[5.5ch] min-w-0 bg-transparent text-center text-[20px] font-bold text-ink tabular-nums outline-none"
+          className="w-full min-w-0 bg-transparent text-center text-[18px] font-bold text-ink tabular-nums outline-none"
         />
-        <small className="text-label font-semibold text-ink-65">{unit}</small>
+        <small className="mt-0.5 text-[11px] font-semibold text-ink-65">{unit}</small>
       </label>
       {button(1)}
     </div>
@@ -138,8 +139,8 @@ function Stepper({ label, value, unit, decimal = false, onStep, onSet }: { label
 const ROW = 'grid grid-cols-[26px_minmax(0,1fr)_72px_56px_48px] items-center gap-x-1.5'
 
 /**
- * B1 Stepper rows: the set being worked on opens into two 56 pt steppers and a tall tick; every other set is one
- * compact row. Tapping an open set's numbers makes it the working set.
+ * B1 Stepper rows: the set being worked on opens into kg and reps steppers side by side with the tick (George: one
+ * line, like the other sets); every other set is one compact row. Tapping an open set's numbers makes it the working set.
  */
 export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onSet, onToggle }: {
   exercise: SessionExercise
@@ -165,15 +166,13 @@ export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onSe
             <motion.div
               key={index}
               initial={reduce ? false : { opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={reduce ? reducedFade : spring.glide}
-              className="grid grid-cols-[minmax(0,1fr)_64px] gap-1.5 border-t border-ink-06 pb-2.5 pt-2 first:border-t-0"
+              className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_52px] gap-1.5 border-t border-ink-06 pb-2.5 pt-2 first:border-t-0"
               data-active-set={index}
             >
-              <p className="col-span-2 text-body-sm font-semibold text-ink-65 tabular-nums">Set {index + 1} · last time {formatLast(set)}</p>
-              <div className="grid gap-1.5">
-                <Stepper label="weight" value={kgText} unit="kg" decimal onStep={(dir) => onStep(index, 'kg', dir)} onSet={(value) => onSet(index, 'kg', value)} />
-                <Stepper label="reps" value={String(reps)} unit="reps" onStep={(dir) => onStep(index, 'reps', dir)} onSet={(value) => onSet(index, 'reps', value)} />
-              </div>
-              <button type="button" onClick={() => onToggle(index)} aria-label={`Complete set ${set.set_number}`} aria-pressed={false} className="grid place-items-center rounded-[16px] bg-ink text-cream transition-transform active:scale-[.96]">
+              <p className="col-span-3 text-body-sm font-semibold text-ink-65 tabular-nums">Set {index + 1} · last time {formatLast(set)}</p>
+              <Stepper label="weight" value={kgText} unit="kg" decimal onStep={(dir) => onStep(index, 'kg', dir)} onSet={(value) => onSet(index, 'kg', value)} />
+              <Stepper label="reps" value={String(reps)} unit="reps" onStep={(dir) => onStep(index, 'reps', dir)} onSet={(value) => onSet(index, 'reps', value)} />
+              <button type="button" onClick={() => onToggle(index)} aria-label={`Complete set ${set.set_number}`} aria-pressed={false} className="grid h-stepper place-items-center rounded-[16px] bg-ink text-cream transition-transform active:scale-[.96]">
                 <TickIcon className="size-[22px]" />
               </button>
             </motion.div>

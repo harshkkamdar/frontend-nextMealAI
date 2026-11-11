@@ -19,15 +19,13 @@ export function repTarget(planned: number | string | null | undefined): [number,
 }
 
 /**
- * The reps a set shows and records: what the user entered, else last time's reps when they sit inside the planned
- * range, else the bottom of the range. The plan's target can be a range ("6-8"); the reps you did are one number.
+ * The reps a set shows and records: what the user entered, else last time's reps (even outside the planned range,
+ * so 15 last time never drops to 8), else the bottom of the range. The plan's target can be a range ("6-8").
  */
 export function repsToRecord(set: Pick<SetData, 'actual_reps' | 'planned_reps' | 'previous_reps'>): number {
   if (typeof set.actual_reps === 'number' && Number.isFinite(set.actual_reps)) return set.actual_reps
-  const target = repTarget(set.planned_reps)
-  const last = set.previous_reps
-  if (target && typeof last === 'number' && last >= target[0] && last <= target[1]) return last
-  return target ? target[0] : typeof last === 'number' ? last : 0
+  if (typeof set.previous_reps === 'number' && set.previous_reps > 0) return set.previous_reps
+  return repTarget(set.planned_reps)?.[0] ?? 0
 }
 
 export const STALE_SESSION_THRESHOLD_SECONDS = 6 * 60 * 60 // 6 hours

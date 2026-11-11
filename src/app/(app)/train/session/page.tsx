@@ -31,6 +31,7 @@ import { writeWorkoutToHealth } from '@/lib/platform/health'
 import { reducedFade, spring } from '@/lib/motion'
 import { computeCompleteSetResult, firstIncompleteExerciseIndex, isExerciseComplete, nextIncompleteExerciseIndex, resolveElapsedForSession } from '@/lib/workout-session'
 import { useUIStore } from '@/stores/ui.store'
+import { GeoMark } from '@/components/shared/geo-avatar'
 import type { SessionExercise, SetData, WorkoutSession } from '@/types/workout-session.types'
 import { goBack } from '@/lib/navigation'
 
@@ -117,6 +118,9 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const [addSets, setAddSets] = useState<number | undefined>(3)
   const [addReps, setAddReps] = useState<number | undefined>(10)
   const [addRest, setAddRest] = useState<number | undefined>(90)
+  // Swap: the machine is taken, so pick another exercise for this slot.
+  const [swapOpen, setSwapOpen] = useState(false)
+  const [swapPick, setSwapPick] = useState<ExerciseSearchResult | null>(null)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reduce = useReducedMotion()
 
@@ -388,6 +392,28 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       .catch(() => toast.error('Failed to add exercise'))
   }
 
+  // The new exercise takes the slot's sets, reps and rest; sets still to do lose the old exercise's numbers.
+  const handleSwapExercise = () => {
+    const base = sessionRef.current
+    const slot = base?.exercises[currentIndex]
+    if (!base || !slot || !swapPick) return
+    const swapped: SessionExercise = {
+      ...slot,
+      name: swapPick.name,
+      muscle_group: swapPick.primary_muscles?.[0] ?? null,
+      instructions: [],
+      sets: slot.sets.map((set) => (set.completed ? set : { ...set, actual_reps: null, actual_weight_kg: null, planned_weight_kg: null, previous_reps: null, previous_weight_kg: null })),
+    }
+    const next = [...base.exercises]
+    next[currentIndex] = swapped
+    setSession({ ...base, exercises: next })
+    setSwapOpen(false)
+    setSwapPick(null)
+    updateWorkoutSession(sessionId, { exercises: next })
+      .then(() => toast.success(`Swapped to ${swapPick.name}`))
+      .catch(() => toast.error("Couldn't save the swap. Try again."))
+  }
+
   const optionsButton = (
     <RoundButton aria-label="Workout options" onClick={() => setShowMenu(true)}>
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="19" cy="12" r="1.8" /></svg>
@@ -472,9 +498,12 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                     {/* The how-to toggle shares the plan line so the set rows start higher up the screen. */}
                     <div className="flex min-h-11 items-center justify-between gap-3">
                       <p className="text-body-sm text-ink-65 tabular-nums">{current.planned_sets} × {current.planned_reps}{current.rest_seconds ? ` · ${restText(current.rest_seconds)} rest` : ''}</p>
-                      {current.instructions && current.instructions.length > 0 ? (
-                        <button type="button" aria-expanded={howToOpen} onClick={() => setHowToOpen((open) => !open)} className="-mr-2 min-h-11 shrink-0 px-2 text-body-sm font-bold text-ink">{howToOpen ? 'Hide steps' : 'How to'}</button>
-                      ) : null}
+                      <span className="-mr-2 flex shrink-0">
+                        <button type="button" onClick={() => setSwapOpen(true)} aria-haspopup="dialog" aria-label={`Swap ${current.name}`} className="min-h-11 px-2 text-body-sm font-bold text-ink">Swap</button>
+                        {current.instructions && current.instructions.length > 0 ? (
+                          <button type="button" aria-expanded={howToOpen} onClick={() => setHowToOpen((open) => !open)} className="min-h-11 px-2 text-body-sm font-bold text-ink">{howToOpen ? 'Hide steps' : 'How to'}</button>
+                        ) : null}
+                      </span>
                     </div>
                     {howToOpen && current.instructions?.length ? (
                       <ol className="mb-2 list-decimal space-y-1 pl-5">{current.instructions.map((step, index) => <li key={index} className="text-body-sm text-ink-65">{step}</li>)}</ol>
@@ -531,7 +560,11 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       <motion.nav aria-label="Workout" initial={reduce ? { opacity: 0 } : { y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={reduce ? reducedFade : spring.sheet} className="fixed inset-x-0 bottom-0 z-20 border-t border-ink-09 bg-cream" style={{ paddingBottom: 'calc(12px + var(--safe-bottom))' }}>
         <div className="mx-auto max-w-md px-gutter pt-3">
           {/* Previous stays on every exercise; on the last one (or when all are done) Next becomes Finish workout. */}
-          <div className="grid grid-cols-[1fr_1.4fr] gap-2">
+          <div className="grid grid-cols-[56px_1fr_1.4fr] gap-2">
+            {/* Geo rides along in the workout, opened over it so it knows the exercise you are on. */}
+            <button type="button" aria-label="Ask Geo" aria-haspopup="dialog" onClick={() => useUIStore.getState().openSheet('geo-companion')} className="grid h-btn place-items-center rounded-[18px] bg-ink-06 transition-transform active:scale-[.97]">
+              <GeoMark size={30} />
+            </button>
             <button type="button" onClick={() => goTo(currentIndex - 1)} disabled={currentIndex <= 0} className="flex h-btn items-center justify-center gap-1 rounded-[18px] bg-ink-06 text-body font-bold text-ink transition-transform enabled:active:scale-[.97] disabled:text-ink-35"><ChevronLeftIcon className="size-[18px]" /> Previous</button>
             {allComplete || isLast ? (
               <PrimaryButton type="button" className="rounded-[18px] px-3" onClick={() => void handleComplete()} disabled={completing}>{completing ? 'Finishing…' : 'Finish workout'}</PrimaryButton>
@@ -557,6 +590,21 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5">
           <AllExercisesList exercises={exercises} currentIndex={currentIndex} nextIndex={nextOpen} onPick={(index) => { setShowAll(false); goTo(index) }} />
+        </div>
+      </BottomSheet>
+
+      <BottomSheet open={swapOpen} onClose={() => { setSwapOpen(false); setSwapPick(null) }} ariaLabel="Swap exercise">
+        <div className="px-5 pb-5 pt-2">
+          <h2 className="text-hero text-ink">Swap exercise</h2>
+          <p className="mt-1 truncate text-body-sm text-ink-65">Instead of {current?.name}. Keeps its sets, reps and rest.</p>
+          <div className="mt-4">
+            <SearchablePicker<ExerciseSearchResult>
+              label="Exercise" placeholder="Search exercises…" search={searchExercises}
+              renderItem={(item) => <div className="flex flex-col"><span className="text-sm text-ink">{item.name}</span>{item.primary_muscles?.length ? <span className="text-[12px] text-ink-65">{item.primary_muscles.join(', ')}</span> : null}</div>}
+              getItemKey={(item) => item.id} onSelect={(item) => setSwapPick(item)} value={swapPick?.name} onClear={() => setSwapPick(null)}
+            />
+          </div>
+          <button type="button" onClick={handleSwapExercise} disabled={!swapPick} className="mt-4 flex h-btn w-full items-center justify-center rounded-[15px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97] disabled:bg-ink-08 disabled:text-ink-35">Swap</button>
         </div>
       </BottomSheet>
 
