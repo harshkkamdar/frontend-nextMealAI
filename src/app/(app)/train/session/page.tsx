@@ -593,18 +593,21 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
         </div>
       </BottomSheet>
 
-      <BottomSheet open={swapOpen} onClose={() => { setSwapOpen(false); setSwapPick(null) }} ariaLabel="Swap exercise">
-        <div className="px-5 pb-5 pt-2">
+      {/* Full height with the results in the scrolling body (as Log food's search), so the keyboard never hides them. */}
+      <BottomSheet open={swapOpen} onClose={() => { setSwapOpen(false); setSwapPick(null) }} ariaLabel="Swap exercise" className="h-[calc(92vh-var(--nav-clearance)-var(--safe-top))]">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-2">
           <h2 className="text-hero text-ink">Swap exercise</h2>
           <p className="mt-1 truncate text-body-sm text-ink-65">Instead of {current?.name}. Keeps its sets, reps and rest.</p>
-          <div className="mt-4">
+          <div className="mt-4 pb-2">
             <SearchablePicker<ExerciseSearchResult>
-              label="Exercise" placeholder="Search exercises…" search={searchExercises}
+              inline label="Exercise" placeholder="Search exercises…" search={searchExercises}
               renderItem={(item) => <div className="flex flex-col"><span className="text-sm text-ink">{item.name}</span>{item.primary_muscles?.length ? <span className="text-[12px] text-ink-65">{item.primary_muscles.join(', ')}</span> : null}</div>}
               getItemKey={(item) => item.id} onSelect={(item) => setSwapPick(item)} value={swapPick?.name} onClear={() => setSwapPick(null)}
             />
           </div>
-          <button type="button" onClick={handleSwapExercise} disabled={!swapPick} className="mt-4 flex h-btn w-full items-center justify-center rounded-[15px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97] disabled:bg-ink-08 disabled:text-ink-35">Swap</button>
+        </div>
+        <div className="px-5 pb-5 pt-3">
+          <button type="button" onClick={handleSwapExercise} disabled={!swapPick} className="flex h-btn w-full items-center justify-center rounded-[15px] bg-ink text-body font-bold text-cream transition-transform active:scale-[.97] disabled:bg-ink-08 disabled:text-ink-35">Swap</button>
         </div>
       </BottomSheet>
 
