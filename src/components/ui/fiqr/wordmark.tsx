@@ -1,11 +1,13 @@
+import { MarkShapes } from './mark'
+
 export function Wordmark({ size = 30, reversed = false }: { size?: number; reversed?: boolean }) {
   const markColor = reversed ? '#FDF6EC' : '#111C35'
 
   return (
     <div className="flex items-center gap-[9px]">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width={size} aria-hidden="true">
-        <circle cx="50" cy="50" r="41" fill="none" stroke={markColor} strokeWidth="9" />
-        <line x1="67" y1="67" x2="91" y2="91" stroke="#E8622A" strokeWidth="9" strokeLinecap="round" />
+      {/* Boxed to the ring, the bar hanging outside it, so the ring centres on the word as in the logo lockup. */}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="14 14 72 72" width={size} height={size} overflow="visible" aria-hidden="true">
+        <MarkShapes ring={markColor} />
       </svg>
       <span className={`text-[15px] font-bold tracking-[2.2px] ${reversed ? 'text-cream' : 'text-ink'}`}>
         FIQR

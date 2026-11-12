@@ -93,7 +93,7 @@ export function SessionReceipt({ session, tz, title = 'Session done', animate, o
         ))}
       </motion.section>
 
-      <motion.div {...enter(2)} className="px-1"><GeoLine pose={compares.some((c) => c.best && c.last && (c.best.kg ?? 0) > (c.last.kg ?? 0)) ? 'up' : 'speak'}>{receiptLine(compares)}</GeoLine></motion.div>
+      <motion.div {...enter(2)} className="px-1"><GeoLine>{receiptLine(compares)}</GeoLine></motion.div>
 
       {charted ? <motion.div {...enter(3)}><VolumeCompareChart compares={compares} animate={animate} /></motion.div> : null}
 

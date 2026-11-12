@@ -313,7 +313,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
 function NewChatIntro() {
   return (
     <div className="mb-6 flex flex-col gap-3">
-      <span role="img" aria-label="Geo"><GeoMark size={36} pose="speak" arrive /></span>
+      <span role="img" aria-label="Geo"><GeoMark size={36} /></span>
       <p className="text-[16px] leading-[1.5] text-ink">
         Hi, I&apos;m Geo. Tell me what you ate, ask what to eat next, or ask how your week is going. A photo works too.
       </p>

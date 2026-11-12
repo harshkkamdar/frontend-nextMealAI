@@ -55,7 +55,7 @@ Neutral surfaces never cast a shadow: a white tile (the `tile` class, with `roun
 The whole app is built from these. A screen that needs something else needs a reason.
 
 1. **Screen header.** Every tab root, Home included: a `date` eyebrow, a `title`, and one 44 pt round profile button on the right (`ink-08` fill, 1 pt `ink-16` border). Home carries no wordmark: the mark already sits in Geo's line and the nav (refined). The header starts 10 below the safe area; on the web the safe area is at least 20, a stand-in status bar. Pushed screens: a plain back chevron (44 pt target) and a 17 / 600 centred title; it gains a cream bar with an `ink-09` hairline once content scrolls under it.
-2. **Geo's line.** Geo's avatar (a 36 pt navy disc holding the cream mark, the app icon in miniature), then Geo's sentence in `geo-line` ink, two lines max; emphasised numbers 600 in `accent-ink`. Geo speaks in the first person. The avatar shows what the line means: it makes one `done` turn into `speak` as the screen opens, `nudge` when the line is a suggestion, `up` for a new best, `down` for an error, `working` while Geo acts. An optional action sits under it as a text button. Tapping the line opens Geo.
+2. **Geo's line.** Geo's avatar (a 36 pt navy disc holding the cream mark, the app icon in miniature), then Geo's sentence in `geo-line` ink, two lines max; emphasised numbers 600 in `accent-ink`. Geo speaks in the first person. The avatar makes one `done` turn as the screen opens, `nudge` when the line is a suggestion, `working` while Geo acts, and otherwise rests as the logo. An optional action sits under it as a text button. Tapping the line opens Geo.
 3. **Primary action.** Full gutter width, 64 tall, `accent`, radius 18, action shadow. A 32 pt `cream-22` circle with +, the label in `button` cream, optional trailing text 13.5 / 600 in ink. One per screen at most.
 4. **Feature card (navy).** Radius 22, padding 22. `date` eyebrow `cream-55`, a `display` title in cream, `meta` in `cream-60`, then a secondary button: cream fill, ink text, 56 tall, radius 15, trailing arrow. Used for Next Up and Geo's read.
 5. **Macro bars.** Name in `body` 600 left, readout right on the same baseline, the bar 6 below: 7 tall, radius 4, track `ink-10`, fill capped at 100%. Calories `accent` (readout adds `· N left` in `accent-ink` 600), protein `ink`, carbs `macro-teal`, fat `macro-ochre`. Calories leads and may run 9 tall (refined).
@@ -78,23 +78,20 @@ Scrolling content always clears the bar and the raised button (`--tabbar-clearan
 
 ## 7. The Geo mark
 
-A stroked circle with a short bar crossing its lower-right edge at -45 deg. Stroke 9% of the outer diameter, bar 33% of the diameter, round caps. Cream ring and orange bar on navy; ink ring and orange bar on cream. Smallest size 16.
+Exactly as `FIQR/FIQR Logo.dc.html` draws it (`MarkShapes`): a stroked circle with a short bar at -45 deg just off its lower-right edge. Stroke 9% of the outer diameter, bar 33% of the diameter and 2% corners (not round caps). Cream ring and orange bar on navy; ink ring and orange bar on cream. Smallest size 16. At rest it is always the logo (George, 12 Nov: one logo everywhere), so the bar has no held poses.
 
-Geo's only expression is the bar (`GeoMark`). Nine expressions, no more; the live reference is `/geo`:
+Geo's only expression is the bar moving and returning (`GeoMark`). Six expressions, no more:
 
 | Expression | What it is | Used for |
 |---|---|---|
 | Rest | Bar at the lower right, still | The icon, the nav, anywhere Geo has nothing to add |
-| Speak | Bar turns to point at the words (420 ms) | A new chat, the companion sheet |
 | Listening | Bar sways 10 deg either side, 1.1 s each way | While the user types to Geo |
 | Working | Bar travels round the ring, 1.4 s a turn | Chat replies, photo reads (the nav's Geo, chat's anchor) |
 | Done | One turn, 760 ms, back to rest | A Geo task landed; Geo's line on Home as it opens |
 | Nudge | 16 deg out and back once, 560 ms | Something new to look at (a suggestion, check-in ready) |
-| Up | Bar to the upper right | Check-in for a week that went to plan; a new best |
-| Down | Bar straight down | Check-in for a week that didn't; a failure |
 | Offline | Ring at 35%, bar still | The offline capsule, the companion sheet offline |
 
-Rules: Geo moves only in answer to something; one Geo moves at a time; Working is the only loop; no face, eyes or limbs. Reduced motion: poses change instantly and Working dims the bar instead of orbiting.
+Rules: Geo moves only in answer to something; one Geo moves at a time; Working is the only loop; no face, eyes or limbs. Reduced motion: no movement, and Working dims the bar instead of orbiting.
 
 ## 8. Motion
 

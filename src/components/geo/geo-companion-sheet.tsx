@@ -86,11 +86,11 @@ const SCREEN_NAMES: Record<string, string> = {
   dashboard: 'Today',
   food_diary: 'Food',
   food_database: 'Foods',
-  logs: 'Your logs',
+  logs: 'your logs',
   activity: 'Train',
-  workout_follow: 'Your workout',
+  workout_follow: 'your workout',
   plans: 'Plans',
-  plan_detail: 'This plan',
+  plan_detail: 'this plan',
   settings: 'Settings',
   chat_list: 'Geo',
   chat: 'Geo',
@@ -298,7 +298,7 @@ export function GeoCompanionSheet() {
     <ResizableSheet open={isOpen} onClose={handleClose} ariaLabel="Geo" levels={[0.55, 0.94]} defaultLevelIndex={0}>
       <div ref={bodyRef} className="flex min-h-0 flex-1 flex-col">
       <div className="flex shrink-0 items-center gap-3 px-5 pb-3">
-        <span role="img" aria-label="Geo"><GeoMark size={36} pose="speak" arrive muted={!online} /></span>
+        <span role="img" aria-label="Geo"><GeoMark size={36} muted={!online} /></span>
         <div className="min-w-0 flex-1">
           <p className="text-[19px] font-bold leading-tight text-ink">Geo</p>
           <p className="truncate text-caption font-medium text-ink-65">{!online ? "You're offline" : screen ? `Looking at ${screen}` : 'Here to help'}</p>

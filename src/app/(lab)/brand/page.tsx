@@ -5,6 +5,7 @@ import { GeoRead } from '@/components/check-in/parts'
 import { SegmentsBar } from '@/components/check-in/segments-bar'
 import { GeoMark } from '@/components/shared/geo-avatar'
 import { GeoLine } from '@/components/ui/fiqr/geo-line'
+import { MarkShapes } from '@/components/ui/fiqr/mark'
 import { Wordmark } from '@/components/ui/fiqr/wordmark'
 import { Chapter, LabShell } from '../_parts'
 
@@ -69,22 +70,18 @@ function AppIcon({ size }: { size: number }) {
   )
 }
 
-/** The mark's construction: the ring on its centre, the bar on the -45 degree line, measured in the 100 unit box. */
+/** The mark's construction (FIQR Logo.dc.html), measured in the 100 unit box. */
 function Construction() {
   return (
     <svg viewBox="-10 -10 120 120" className="w-full max-w-[340px]" role="img" aria-label="Construction of the Geo mark">
       <rect x="0" y="0" width="100" height="100" fill="none" stroke="var(--color-ink-12)" strokeWidth=".4" />
       <line x1="50" y1="0" x2="50" y2="100" stroke="var(--color-ink-12)" strokeWidth=".4" />
       <line x1="0" y1="50" x2="100" y2="50" stroke="var(--color-ink-12)" strokeWidth=".4" />
-      <line x1="12" y1="12" x2="96" y2="96" stroke="var(--color-accent)" strokeOpacity=".5" strokeWidth=".4" strokeDasharray="1.5 1.5" />
-      <circle cx="50" cy="50" r="31.5" fill="none" stroke="var(--color-ink)" strokeWidth="7" />
-      <line x1="65.4" y1="65.4" x2="81" y2="81" stroke="var(--color-accent)" strokeWidth="7" strokeLinecap="round" />
+      <MarkShapes ring="var(--color-ink)" />
       <circle cx="50" cy="50" r="1.2" fill="var(--color-ink)" />
-      <path d="M 66 50 A 16 16 0 0 1 61.3 61.3" fill="none" stroke="var(--color-ink-50)" strokeWidth=".5" />
-      <text x="68" y="58" fontSize="4.2" fill="var(--color-ink-65)" fontFamily="var(--font-archivo)">45°</text>
       <text x="3" y="7" fontSize="4.2" fill="var(--color-ink-65)" fontFamily="var(--font-archivo)">100 unit box</text>
-      <text x="58" y="7" fontSize="4.2" fill="var(--color-ink-65)" fontFamily="var(--font-archivo)">ring r 31.5, stroke 7</text>
-      <text x="58" y="98" fontSize="4.2" fill="var(--color-accent-ink)" fontFamily="var(--font-archivo)">bar 22, round caps</text>
+      <text x="50" y="7" fontSize="4.2" fill="var(--color-ink-65)" fontFamily="var(--font-archivo)">ring stroke 9% of diameter</text>
+      <text x="3" y="98" fontSize="4.2" fill="var(--color-accent-ink)" fontFamily="var(--font-archivo)">bar 33% of diameter, at −45°</text>
     </svg>
   )
 }
