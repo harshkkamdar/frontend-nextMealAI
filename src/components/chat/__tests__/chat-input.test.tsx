@@ -364,6 +364,22 @@ describe('ChatInput — FB-R6-03 multi-image + FB-R6-FE-C paste', () => {
     expect(screen.getAllByTestId('attached-thumb')).toHaveLength(1)
   })
 
+  it('keeps a prefill when a photo is attached, and sends it with the photo (George: the Menu prompt vanished)', async () => {
+    __resetComposerStoreForTests()
+    mocks.upload.mockResolvedValueOnce({ storage_path: 'u/menu.png', expires_in_seconds: 3600 })
+    const onSend = vi.fn()
+    const prompt = 'Scan this menu and suggest what fits my remaining macros'
+    const { container } = render(<ChatInput onSend={onSend} showCamera sessionId="menu-A" defaultValue={prompt} />)
+    const input = getFileInput(container)
+    Object.defineProperty(input, 'files', { value: [makeImageFile('menu.png')], configurable: true })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+    await waitFor(() => expect(screen.getAllByTestId('attached-thumb')).toHaveLength(1))
+
+    expect((screen.getByLabelText(/type a message/i) as HTMLTextAreaElement).value).toBe(prompt)
+    screen.getByRole('button', { name: /send message/i }).click()
+    expect(onSend).toHaveBeenCalledWith(prompt, [expect.objectContaining({ storage_path: 'u/menu.png' })])
+  })
+
   it('FE-D: send clears the draft for that sessionId', async () => {
     __resetComposerStoreForTests()
 

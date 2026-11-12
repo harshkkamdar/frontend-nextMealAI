@@ -107,6 +107,12 @@ export function ChatInput({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run once at mount
   }, [])
 
+  // In the store a prefill must be the draft's own text: attaching a photo starts the draft, and a prefill shown only as
+  // the fallback vanished with it (George: "Scan this menu…" went out as the photo default).
+  useEffect(() => {
+    if (storeMode && sessionId && defaultValue && !useComposerStore.getState().drafts[sessionId]?.text) setStoreText(sessionId, defaultValue)
+  }, [storeMode, sessionId, defaultValue, setStoreText])
+
   const adjustHeight = useCallback(() => {
     const textarea = textareaRef.current
     if (!textarea) return
@@ -177,7 +183,8 @@ export function ChatInput({
     const trimmed = value.trim()
     const hasAttachment = attached.length > 0
     if ((!trimmed && !hasAttachment) || disabled || uploadingCount > 0) return
-    onSend(trimmed || 'What is this?', hasAttachment ? attached : undefined)
+    // A bare photo answers the conversation (Geo asked for the menu); "What is this?" made Geo describe it instead.
+    onSend(trimmed || 'Here’s the photo', hasAttachment ? attached : undefined)
     if (storeMode && sessionId) {
       clearStoreDraft(sessionId)
     } else {
