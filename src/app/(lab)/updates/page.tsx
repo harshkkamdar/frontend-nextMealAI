@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { Chapter, LabShell } from '../_parts'
 
 type Item = [title: string, line: ReactNode]
@@ -82,13 +82,63 @@ const FEEDBACK: [string, 'Fixed' | 'Improved', string][] = [
   ['The problems found in real Geo conversations', 'Fixed', 'All 13 are fixed, from Geo saying "done" when nothing saved to plans failing to build and meals copied twice.'],
 ]
 
-/** Newest first: what George flagged, what changed, how it was checked. */
-const LATEST: [flagged: string, fix: string, proof: string][] = [
-  ['Geo refused to log "600g raw chicken breast" because the macros didn\'t match the calories', 'When Geo\'s numbers don\'t add up, it now works the food out again from its nutrition per 100 g and logs it, without stopping to ask you. If that fails too, it searches the web.', 'Your exact message, "600g raw chicken breast, 10ml olive oil lunch", now logs straight away: 622 kcal and 139 g protein for the chicken, with no warning.'],
-  ['You had to ask Geo to use raw chicken numbers', 'A food you call raw, cooked or dry is checked against that state, and Geo\'s reply quotes the numbers that were saved.', 'The chicken now logs at 23 g protein per 100 g, the raw figure, instead of the cooked figure of 31 g that Geo used before.'],
-  ['The olive oil was blocked as a duplicate, then logged twice', 'When Geo retries a meal, an item that already saved counts as logged. It is no longer blocked or added a second time.', 'In the same test the olive oil was logged once.'],
-  ['The "Heads up" note repeated the same sentence three times', 'The note lists each problem once.', 'Your message no longer brings up the note at all.'],
+type Fix = [flagged: string, fix: string, proof: string]
+
+/** What George flagged on the new design, newest round first: the fix and how it was checked. */
+const ROUNDS: [round: string, fixes: Fix[]][] = [
+  ['Round 5', [
+    ['Geo refused to log "600g raw chicken breast" because the macros didn\'t match the calories', 'When Geo\'s numbers don\'t add up, it now works the food out again from its nutrition per 100 g and logs it, without stopping to ask you. If that fails too, it searches the web.', 'Your exact message, "600g raw chicken breast, 10ml olive oil lunch", now logs straight away: 622 kcal and 139 g protein for the chicken, with no warning.'],
+    ['You had to ask Geo to use raw chicken numbers', 'A food you call raw, cooked or dry is checked against that state, and Geo\'s reply quotes the numbers that were saved.', 'The chicken now logs at 23 g protein per 100 g, the raw figure, instead of the cooked figure of 31 g that Geo used before.'],
+    ['The olive oil was blocked as a duplicate, then logged twice', 'When Geo retries a meal, an item that already saved counts as logged. It is no longer blocked or added a second time.', 'In the same test the olive oil was logged once.'],
+    ['The "Heads up" note repeated the same sentence three times', 'The note lists each problem once.', 'Your message no longer brings up the note at all.'],
+  ]],
+  ['Round 4', [
+    ['Geo misreads kJ, or reads the per-100 g column', 'The kJ conversion was right. Your label photo was sideways and the rows got mixed up, with sugars read as carbs. Labels are now read by a stronger image model, the macros are checked against the energy on the label, and in chat the label\'s numbers replace Geo\'s own guess.', 'Your exact photo with "Salmon nigiri 6 pieces" now logs 320 kcal, 14.8 g protein, 48.1 g carbs and 6.3 g fat, as on the label.'],
+    ['Geo said the swap didn\'t go through, but it did', 'Geo has a check that stops it claiming changes it didn\'t make. It didn\'t know about swaps, so it replaced Geo\'s correct reply. It now knows every change Geo can make.', 'In a live workout, Geo swapped the exercise and kept its "I\'ve swapped" reply.'],
+    ['The swap search doesn\'t fit the page', 'The swap sheet opens full height, like the Log food search, and the results scroll inside it.', 'Checked at phone size with the screen cut to the height left when the keyboard is open.'],
+    ['The menu prompt disappears when a photo is attached', '"Scan this menu…" stays in the box when you attach the photo. A photo sent without text now goes as "Here\'s the photo", so Geo scans the menu instead of answering "What is this?".', 'An automated test picks the menu prompt, attaches a photo and checks the prompt is still there and sent with it.'],
+    ['The logo is inconsistent, and the orange part of the Q doesn\'t match the logo file', 'Every Q is now drawn from your logo file: in Geo, the tab bar, Check-in, the wordmark and the browser tab icon.', 'Every Q now comes from one shared drawing, built from the measurements in your logo file.'],
+  ]],
+  ['Round 3', [
+    ['Check-in lost the weight progress chart, and Home needs positive reinforcement', 'The weight chart is back on Check-in and now on Home too: your start weight, every weigh-in, a dashed goal line and how much you\'ve lost, in green when you\'re heading to your goal.', 'Checked on the live app: the weight card shows on Home.'],
+    ['Sleep logged days ago carries into the next days', 'The Sleep tile shows only a night logged today, so it resets each day.', 'An automated test checks that a night logged on an earlier day no longer shows today.'],
+    ['Reps pre-fill to the bottom of the range when last time was outside it', 'Each set starts from last time\'s reps, even when they were outside the range.', 'An automated test: an 8–12 set with 15 reps last time starts at 15, not 8.'],
+    ['The current set has too many numbers', 'Kg, reps and the tick sit side by side on one line.', '28.75 kg fits on that line on the narrowest iPhone.'],
+    ['Train\'s "This week" doesn\'t move', 'The workout history didn\'t mark workouts as finished, so the week counted none. It now does.', 'Your 4 sessions that week now count, instead of 0 of 6.'],
+    ['The Geo bubble is gone, and there\'s no way to swap an exercise mid-workout', 'Geo has a button in the workout\'s bottom bar, and each exercise has a Swap button that keeps your sets, reps and rest. Tapping Geo anywhere opens it over the screen you\'re on, like before.', 'Checked on the live app: Geo opens over Train.'],
+    ['Meals show calories only', 'Each meal header shows protein, carbs and fat next to the calories, like "622 kcal · 25.7 P · 118.9 C · 16 F".', 'An automated test checks every meal header shows all four.'],
+    ['Copy should let me pick foods and plan ahead, and it left foods off', '"Copy foods" on any meal: tick the foods you want, then pick any day in the next week and any meal. Foods with a zero macro, like mince with no carbs, were being dropped; they now copy.', 'A snack with 3 identical kiwis copied with all 4 foods.'],
+    ['72.75 kg shows as 72.8', 'It was saved as 72.75; only the display rounded. Weights now show two decimals everywhere.', 'An automated test checks the weight chart keeps 72.75.'],
+    ['An iced long black was refused for having no macros', 'Zero-calorie drinks only matched a short list. Long black, tea, Coke Zero and the like now log.', '"Add iced long black for breakfast" logged through Geo.'],
+  ]],
+  ['Round 2', [
+    ['Adjust guessed "2 servings"', 'Adjust now asks what to change it to (half a serving, 2 servings or a different amount) and changes nothing until you choose.', 'It is one of the 31 Geo test cases, and all 31 pass.'],
+    ['28.75 kg shows as 28.8 in the live workout', 'The live workout keeps two decimals, and the +2.5 kg button keeps them too.', 'An automated test checks 28.75 shows as 28.75 and steps up to 31.25.'],
+    ['Previous and Next float over the sets', 'They sit in a solid bar docked to the bottom of the screen.', 'Checked in a live workout at phone size.'],
+    ['Settings says "Couldn\'t save that" for push notifications', 'A bug on our side: every Settings change failed once your settings had been saved the first time. Notifications come through the phone app, not the web link.', 'Confirmed on the live app: Settings changes save.'],
+    ['iPhone zooms in on the grams field and stays zoomed', 'iPhone zooms into small text boxes when you tap them. The app now tells it not to, and you can still pinch to zoom.', 'The setting is on every page of the live app.'],
+  ]],
+  ['Round 1', [
+    ['Rep-range fields can\'t be typed in, and + or − shows "NaN"', 'Kg and reps can be typed, and a rep range records the one number you hit.', 'An automated test reads ranges like 8–12 and records one number for each set.'],
+    ['Label photos in Log food don\'t work properly, and should work like the chat', 'Four faults, all fixed: chat photos had stopped working, two-column labels read the per-100 g column as the serving (a 192 kcal serving showed as 77), some label layouts lost their calories, and non-food items were added at 0 kcal.', 'A photo check sends 5 real photos, 2 labels and 3 plates, through Log food and chat on every test run, and passes 23 of 23.'],
+    ['No real way to interact with the Check-in page', 'Opening the review used up your check-in, so it vanished as soon as you looked; now only Apply or Keep records it. "Check in now" works on any day, every day and tile opens a breakdown, and "Ask Geo about my week" talks it through.', 'Checked on the live app with a test account.'],
+  ]],
 ]
+
+/** One round's fixes: what was flagged, then the fix and its proof. */
+function Fixes({ fixes }: { fixes: Fix[] }) {
+  return (
+    <ul className="overflow-hidden rounded-[16px] border border-ink-12 bg-card">
+      {fixes.map(([flagged, fix, proof]) => (
+        <li key={flagged} className="border-b border-ink-09 px-5 py-4 last:border-b-0">
+          <span className="block text-[16px] font-semibold leading-[1.35]">{flagged}</span>
+          <span className="mt-1 block max-w-[70ch] text-[15px] leading-[1.5] text-ink-65"><b className="font-semibold text-ink">Fix.</b> {fix}</span>
+          <span className="mt-1 block max-w-[70ch] text-[15px] leading-[1.5] text-ink-65"><b className="font-semibold text-ink">Proof.</b> {proof}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 const MOVED: [string, string][] = [
   ['Tabs', 'Home, Food, Geo, Train and Check-in. "More" is gone: Settings is behind the person button on Home, and Plans, the activity log and the food database are in Settings.'],
@@ -115,16 +165,8 @@ export default function UpdatesPage() {
     >
       <a href="/login" className="mb-2 inline-flex h-12 items-center gap-2 rounded-[15px] bg-ink px-5 text-[16px] font-semibold text-cream active:opacity-80">Open the new app <span aria-hidden="true">→</span></a>
 
-      <Chapter n="New" id="latest" title="Your latest feedback" intro="What you flagged, what we changed and how we checked it.">
-        <ul className="overflow-hidden rounded-[16px] border border-ink-12 bg-card">
-          {LATEST.map(([flagged, fix, proof]) => (
-            <li key={flagged} className="border-b border-ink-09 px-5 py-4 last:border-b-0">
-              <span className="block text-[16px] font-semibold leading-[1.35]">{flagged}</span>
-              <span className="mt-1 block max-w-[70ch] text-[15px] leading-[1.5] text-ink-65"><b className="font-semibold text-ink">Fix.</b> {fix}</span>
-              <span className="mt-1 block max-w-[70ch] text-[15px] leading-[1.5] text-ink-65"><b className="font-semibold text-ink">Proof.</b> {proof}</span>
-            </li>
-          ))}
-        </ul>
+      <Chapter n="New" id="latest" title="Your feedback on the new design" intro="Newest first: what you flagged, what we changed and how we checked it.">
+        {ROUNDS.map(([round, fixes]) => <Fragment key={round}><Sub>{round}</Sub><Fixes fixes={fixes} /></Fragment>)}
       </Chapter>
 
       <Chapter n="00" id="glance" title="At a glance">
