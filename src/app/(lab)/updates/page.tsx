@@ -82,6 +82,14 @@ const FEEDBACK: [string, 'Fixed' | 'Improved', string][] = [
   ['The problems found in real Geo conversations', 'Fixed', 'All 13 are fixed, from Geo saying "done" when nothing saved to plans failing to build and meals copied twice.'],
 ]
 
+/** Newest first: what George flagged, what changed, how it was checked. */
+const LATEST: [flagged: string, fix: string, proof: string][] = [
+  ['Geo refused to log "600g raw chicken breast" because the macros didn\'t match the calories', 'When Geo\'s numbers don\'t add up, it now works the food out again from its nutrition per 100 g and logs it, without stopping to ask you. If that fails too, it searches the web.', 'Your exact message, "600g raw chicken breast, 10ml olive oil lunch", now logs straight away: 622 kcal and 139 g protein for the chicken, with no warning.'],
+  ['You had to ask Geo to use raw chicken numbers', 'A food you call raw, cooked or dry is checked against that state, and Geo\'s reply quotes the numbers that were saved.', 'The chicken now logs at 23 g protein per 100 g, the raw figure, instead of the cooked figure of 31 g that Geo used before.'],
+  ['The olive oil was blocked as a duplicate, then logged twice', 'When Geo retries a meal, an item that already saved counts as logged. It is no longer blocked or added a second time.', 'In the same test the olive oil was logged once.'],
+  ['The "Heads up" note repeated the same sentence three times', 'The note lists each problem once.', 'Your message no longer brings up the note at all.'],
+]
+
 const MOVED: [string, string][] = [
   ['Tabs', 'Home, Food, Geo, Train and Check-in. "More" is gone: Settings is behind the person button on Home, and Plans, the activity log and the food database are in Settings.'],
   ['The Geo button', 'The centre button opens your conversations with Geo. "Ask Geo" buttons on each screen open a quick chat.'],
@@ -106,6 +114,18 @@ export default function UpdatesPage() {
       lede={<>Everything that has changed since the version you are using now. Geo&apos;s improvements are already live in your app. The new design is on this link, and you can sign in with your usual account.</>}
     >
       <a href="/login" className="mb-2 inline-flex h-12 items-center gap-2 rounded-[15px] bg-ink px-5 text-[16px] font-semibold text-cream active:opacity-80">Open the new app <span aria-hidden="true">→</span></a>
+
+      <Chapter n="New" id="latest" title="Your latest feedback" intro="What you flagged, what we changed and how we checked it.">
+        <ul className="overflow-hidden rounded-[16px] border border-ink-12 bg-card">
+          {LATEST.map(([flagged, fix, proof]) => (
+            <li key={flagged} className="border-b border-ink-09 px-5 py-4 last:border-b-0">
+              <span className="block text-[16px] font-semibold leading-[1.35]">{flagged}</span>
+              <span className="mt-1 block max-w-[70ch] text-[15px] leading-[1.5] text-ink-65"><b className="font-semibold text-ink">Fix.</b> {fix}</span>
+              <span className="mt-1 block max-w-[70ch] text-[15px] leading-[1.5] text-ink-65"><b className="font-semibold text-ink">Proof.</b> {proof}</span>
+            </li>
+          ))}
+        </ul>
+      </Chapter>
 
       <Chapter n="00" id="glance" title="At a glance">
         <ul className="grid max-w-[72ch] list-disc gap-3 pl-5 text-[16px] leading-[1.5]">
