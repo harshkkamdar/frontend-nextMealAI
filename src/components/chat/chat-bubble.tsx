@@ -86,7 +86,7 @@ function describeFailure(a: { tool: string; error?: string }) {
     image_analysis_failed: "I couldn't read that image",
   }
   const base =
-    a.tool === 'create_log' ? "I couldn't save that log" :
+    a.tool === 'create_log' || a.tool === 'create_logs' ? "I couldn't save that log" :
     a.tool === 'update_log' ? "I couldn't update that entry" :
     a.tool === 'delete_log' ? "I couldn't delete that entry" :
     a.tool === 'create_plan' ? "I couldn't create that plan" :
@@ -251,7 +251,8 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId, cluste
         {failures.length > 0 ? (
           <p className="rounded-[16px] bg-ink-04 px-4 py-3 text-[14px] leading-[1.45] text-ink">
             <span className="font-semibold">Heads up.</span>{' '}
-            {failures.map((a) => describeFailure(a)).join('. ')}.
+            {/* One line per kind of failure: a retried batch repeats the same one (George 15 Nov). */}
+            {[...new Set(failures.map((a) => describeFailure(a)))].join('. ')}.
           </p>
         ) : null}
         {/* The time sits 4 pt under the reply; its 44 pt target hangs into the gap before the next turn. */}
