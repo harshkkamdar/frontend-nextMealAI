@@ -58,8 +58,8 @@ const BANANA: UserFood = { ...FOOD, id: 'f2', name: 'Banana', serving_size_g: 11
 const ESTIMATE = {
   estimate_id: 'est-1',
   items: [
-    { name: 'Chicken', quantity_g: 150, calories: 250, protein: 40, carbs: 0, fat: 8, confidence: 0.85 },
-    { name: 'Sauce', quantity_g: 30, calories: 90, protein: 1, carbs: 6, fat: 7, confidence: 0.4 },
+    { name: 'Chicken', estimated_portion_g: 150, estimated_macros: { calories: 250, protein: 40, carbs: 0, fat: 8 }, confidence: 0.85 },
+    { name: 'Sauce', estimated_portion_g: 30, estimated_macros: { calories: 90, protein: 1, carbs: 6, fat: 7 }, confidence: 0.4 },
   ],
   totals: { calories: 340, protein: 41, carbs: 6, fat: 15 },
   confidence: 0.75,
@@ -169,6 +169,7 @@ describe('FoodLogForm', () => {
     const { container } = render(<FoodLogForm />)
     pickPhoto(container)
     await screen.findByTestId('photo-result')
+    expect(screen.getByText('340')).toBeInTheDocument() // the backend's estimated_macros, not 0 (George: gummies at 0 kcal)
     expect(screen.getByText('Not sure, check this')).toBeInTheDocument()
     const grams = screen.getByLabelText('Chicken, grams')
     fireEvent.change(grams, { target: { value: '150' } })
@@ -180,7 +181,7 @@ describe('FoodLogForm', () => {
     await waitFor(() => expect(mocks.logFromEstimate).toHaveBeenCalledTimes(1))
     const [id, edits, opts] = mocks.logFromEstimate.mock.calls[0]
     expect(id).toBe('est-1')
-    expect(edits.items).toEqual([expect.objectContaining({ name: 'Chicken', quantity_g: 150, protein: 30 })])
+    expect(edits.items).toEqual([expect.objectContaining({ name: 'Chicken', estimated_portion_g: 150, estimated_macros: expect.objectContaining({ protein: 30 }) })])
     expect(opts).toEqual({ meal_type: 'lunch', local_date: '2026-10-25' })
     expect(mocks.updateLog).not.toHaveBeenCalled()
     expect(mocks.back).toHaveBeenCalled()

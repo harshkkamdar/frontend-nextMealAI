@@ -34,9 +34,9 @@ describe('scaleMacros', () => {
 const EST: FoodEstimate = {
   estimate_id: 'e1',
   items: [
-    { name: 'Chicken', quantity_g: 160, calories: 330, protein: 34, carbs: 0, fat: 21, confidence: 0.82 },
-    { name: 'Rice', quantity_g: 200, calories: 260, protein: 5, carbs: 56, fat: 1, confidence: 0.74 },
-    { name: 'Sauce', calories: 85, protein: 3, carbs: 6, fat: 6, confidence: 0.4 },
+    { name: 'Chicken', estimated_portion_g: 160, estimated_macros: { calories: 330, protein: 34, carbs: 0, fat: 21 }, confidence: 0.82 },
+    { name: 'Rice', estimated_portion_g: 200, estimated_macros: { calories: 260, protein: 5, carbs: 56, fat: 1 }, confidence: 0.74 },
+    { name: 'Sauce', estimated_macros: { calories: 85, protein: 3, carbs: 6, fat: 6 }, confidence: 0.4 },
   ],
   totals: { calories: 675, protein: 42, carbs: 62, fat: 28 },
   confidence: 0.4,
@@ -66,7 +66,7 @@ describe('photo items', () => {
 
 /** The backend's R7-03 rule (food-estimates.controller.ts resolvePhotoLogQuantityAndMacros), mirrored to prove the round trip. */
 function backendLogged(original: FoodEstimate, edits: ReturnType<typeof estimateEdits>) {
-  const sum = (items: { quantity_g?: number }[]) => items.reduce((s, i) => s + (i.quantity_g ?? 0), 0)
+  const sum = (items: { estimated_portion_g?: number }[]) => items.reduce((s, i) => s + (i.estimated_portion_g ?? 0), 0)
   const entered = sum(edits.items)
   const orig = sum(original.items)
   const q = entered > 0 ? entered : orig > 0 ? orig : 100
@@ -79,7 +79,7 @@ describe('estimateEdits', () => {
     const edits = estimateEdits(EST, photoItemsFrom(EST))
     expect(edits.totals.calories).toBe(675)
     expect(edits.items).toHaveLength(3)
-    expect(edits.items[2].quantity_g).toBeUndefined()
+    expect(edits.items[2].estimated_portion_g).toBeUndefined()
   })
   it('logs exactly the sum the user saw after per-item edits and a removal', () => {
     const items = photoItemsFrom(EST)
@@ -88,7 +88,7 @@ describe('estimateEdits', () => {
     const seen = photoTotals(items).calories
     const edits = estimateEdits(EST, items)
     expect(edits.items.map((i) => i.name)).toEqual(['Chicken', 'Rice'])
-    expect(edits.items[1].quantity_g).toBe(220)
+    expect(edits.items[1]).toMatchObject({ estimated_portion_g: 220, estimated_macros: { calories: 286 } })
     expect(backendLogged(EST, edits)).toBe(seen)
   })
 })

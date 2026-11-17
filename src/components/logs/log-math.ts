@@ -80,12 +80,13 @@ export function editPhotoMacros(item: PhotoItem, macros: Macros): PhotoItem {
 
 export function photoItemsFrom(estimate: FoodEstimate): PhotoItem[] {
   return estimate.items.map((item) => {
-    const g = typeof item.quantity_g === 'number' && item.quantity_g > 0 ? Math.round(item.quantity_g) : 0
+    const g = typeof item.estimated_portion_g === 'number' && item.estimated_portion_g > 0 ? Math.round(item.estimated_portion_g) : 0
+    const m = item.estimated_macros
     return {
       name: item.name,
       baseG: g,
       amount: g || 1,
-      base: { calories: item.calories ?? 0, protein: item.protein ?? 0, carbs: item.carbs ?? 0, fat: item.fat ?? 0 },
+      base: { calories: m?.calories ?? 0, protein: m?.protein ?? 0, carbs: m?.carbs ?? 0, fat: m?.fat ?? 0 },
       confidence: typeof item.confidence === 'number' ? item.confidence : estimate.confidence,
       removed: false,
     }
@@ -120,13 +121,13 @@ export function estimateEdits(estimate: FoodEstimate, items: PhotoItem[]): { ite
   const kept = items.filter((i) => !i.removed)
   const editItems: FoodEstimateItem[] = kept.map((i) => ({
     name: i.name,
-    ...(i.baseG ? { quantity_g: i.amount } : {}),
-    ...photoItemMacros(i),
+    ...(i.baseG ? { estimated_portion_g: i.amount } : {}),
+    estimated_macros: photoItemMacros(i),
     confidence: i.confidence,
   }))
   const wanted = photoTotals(kept)
-  const originalG = estimate.items.reduce((s, i) => s + (typeof i.quantity_g === 'number' ? i.quantity_g : 0), 0)
-  const enteredG = editItems.reduce((s, i) => s + (i.quantity_g ?? 0), 0)
+  const originalG = estimate.items.reduce((s, i) => s + (typeof i.estimated_portion_g === 'number' ? i.estimated_portion_g : 0), 0)
+  const enteredG = editItems.reduce((s, i) => s + (i.estimated_portion_g ?? 0), 0)
   const loggedG = enteredG > 0 ? enteredG : originalG > 0 ? originalG : 100
   if (!(originalG > 0 && Math.abs(loggedG - originalG) > 0.5)) return { items: editItems, totals: wanted }
   const back = originalG / loggedG

@@ -2,14 +2,11 @@ import { geoTask } from '@/stores/ui.store'
 import { apiFetch } from './client'
 import type { FoodSearchResult, UserFood, CreateFoodInput } from '@/types/foods.types'
 
-// FB-R6-13 — Food estimate from photo (vision pipeline).
+// FB-R6-13 — Food estimate from photo (vision pipeline), as the backend's FoodEstimateItem sends it.
 export interface FoodEstimateItem {
   name: string
-  quantity_g?: number
-  calories: number
-  protein: number
-  carbs: number
-  fat: number
+  estimated_portion_g?: number
+  estimated_macros: { calories: number; protein: number; carbs: number; fat: number }
   confidence: number
 }
 
