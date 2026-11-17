@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
     "lint": "eslint src",
+    "live-check": "node scripts/live-check.mjs",
     "postinstall": "patch-package"
   },
   "dependencies": {
