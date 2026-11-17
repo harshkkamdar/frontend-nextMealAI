@@ -65,24 +65,22 @@ export async function updateWorkoutSessionWithStatus(
   )
 }
 
-export async function completeWorkoutSession(id: string): Promise<WorkoutSession> {
-  const result = await completeWorkoutSessionWithStatus(id)
+/** `current`: the session on screen, which stands in (marked completed) when the finish is queued offline. */
+export async function completeWorkoutSession(id: string, current: WorkoutSession): Promise<WorkoutSession> {
+  const result = await completeWorkoutSessionWithStatus(id, current)
   return result.queued ? result.optimistic : result.data
 }
 
 export async function completeWorkoutSessionWithStatus(
   id: string,
+  current: WorkoutSession,
 ): Promise<OfflineResult<WorkoutSession>> {
   return offlineMutate(
     'workout_complete',
     'POST',
     `/v1/workout-sessions/${id}/complete`,
     undefined,
-    () => ({
-      id,
-      status: 'completed',
-      completed_at: new Date().toISOString(),
-    } as unknown as WorkoutSession),
+    () => ({ ...current, id, status: 'completed', completed_at: new Date().toISOString() }),
   )
 }
 

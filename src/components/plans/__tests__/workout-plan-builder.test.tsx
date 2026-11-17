@@ -204,4 +204,29 @@ describe('WorkoutPlanBuilder component', () => {
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-42')
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-42-v2'))
   })
+
+  // The backend merges content shallowly ({ ...old, ...new }) and JSON drops undefined, so a cleared field must be sent.
+  it('clearing the notes sends them empty, so the backend drops the old ones', async () => {
+    const initialPlan: WorkoutPlan = {
+      id: 'plan-42', user_id: 'u1', type: 'workout', status: 'active',
+      content: {
+        notes: 'Deload in week 4',
+        // Geo's modify tool writes weight_kg (plans.service.ts).
+        days: [{ date: '', name: 'Chest', is_rest_day: false, exercises: [{ name: 'Bench Press', sets: 4, reps: 8, weight_kg: 60 }] }],
+      },
+      created_at: 'n', updated_at: 'n',
+    }
+    updatePlanMock.mockImplementation((id: string, input: { content?: object }) => Promise.resolve({ ...initialPlan, id: `${id}-v2`, content: { ...initialPlan.content, ...JSON.parse(JSON.stringify(input.content)) } }))
+
+    render(<WorkoutPlanBuilder mode="edit" initialPlan={initialPlan} />)
+    fireEvent.change(screen.getByLabelText('Notes'), { target: { value: '' } })
+    await toDays('Chest day')
+    expect(screen.getByLabelText('Bench Press weight, kg')).toHaveValue(60)
+    fireEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
+    const sent = JSON.parse(JSON.stringify(updatePlanMock.mock.calls[0][1]))
+    expect(sent.content.notes).toBe('')
+    expect(sent.content.days[0].exercises[0]).toEqual({ name: 'Bench Press', sets: 4, reps: 8, weight: 60 })
+    expect((await updatePlanMock.mock.results[0].value).content.notes).toBe('')
+  })
 })

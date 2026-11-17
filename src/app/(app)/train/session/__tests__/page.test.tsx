@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ getWorkoutSession: vi.fn(), updateWorkoutSession: vi.fn() }))
+const mocks = vi.hoisted(() => ({ getWorkoutSession: vi.fn(), updateWorkoutSession: vi.fn(), completeWorkoutSession: vi.fn(), searchExercises: vi.fn() }))
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), back: vi.fn() }), useSearchParams: () => new URLSearchParams('id=s-old') }))
 vi.mock('sonner', () => ({ toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }) }))
@@ -9,10 +9,10 @@ vi.mock('@/contexts/geo-screen-context', () => ({ useSetGeoScreen: () => {} }))
 vi.mock('@/hooks/useUserTimezone', () => ({ useUserTimezone: () => 'UTC' }))
 vi.mock('@/lib/platform/app', () => ({ haptic: vi.fn() }))
 vi.mock('@/lib/platform/health', () => ({ writeWorkoutToHealth: vi.fn() }))
-vi.mock('@/lib/api/exercises.api', () => ({ searchExercises: vi.fn() }))
+vi.mock('@/lib/api/exercises.api', () => ({ searchExercises: mocks.searchExercises }))
 vi.mock('@/lib/api/workout-sessions.api', () => ({
   getWorkoutSession: mocks.getWorkoutSession, updateWorkoutSession: mocks.updateWorkoutSession,
-  completeWorkoutSession: vi.fn(), abandonWorkoutSession: vi.fn(),
+  completeWorkoutSession: mocks.completeWorkoutSession, abandonWorkoutSession: vi.fn(),
 }))
 // The number as it is, so a NaN shows instead of the count's first frame.
 vi.mock('@/components/ui/fiqr/count-up', () => ({ CountUp: ({ value }: { value: number }) => <span>{String(value)}</span> }))
@@ -47,5 +47,83 @@ describe('Opening a past workout', () => {
     expect(totals.textContent).not.toContain('NaN')
     expect(totals.textContent).toContain('10kg')
     expect(screen.getByText('Best 1 kg × 10 · 2 sets')).toBeInTheDocument()
+  })
+})
+
+// startSession's row for a session under way: carried-forward sets hold last time's numbers in previous_*.
+const set = (n: number, extra: Record<string, unknown> = {}) => ({
+  set_number: n, planned_reps: 10, planned_weight_kg: null, actual_reps: null, actual_weight_kg: null, completed: false, completed_at: null, ...extra,
+})
+const liveSession = (exercises: Record<string, unknown>[]) => ({
+  id: 's-old', user_id: 'u', plan_id: 'p1', plan_day_index: 1, day_name: 'Pull', status: 'in_progress',
+  started_at: new Date(Date.now() - 20 * 60_000).toISOString(), completed_at: null,
+  total_volume_kg: null, duration_minutes: null, notes: null, created_at: new Date().toISOString(), deleted_at: null,
+  exercises: exercises.map((exercise) => ({ muscle_group: 'back', planned_sets: 2, planned_reps: 10, rest_seconds: 90, instructions: [], notes: null, status: 'pending', ...exercise })),
+})
+
+describe('A workout under way', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.updateWorkoutSession.mockImplementation(async (id: string, data: object) => ({ ...liveSession([]), id, ...data }))
+  })
+
+  it('shows a timed exercise\'s target in seconds', async () => {
+    // A plank from the plan: startSession copies duration_seconds and still fills planned_reps with its default 10.
+    mocks.getWorkoutSession.mockResolvedValue(liveSession([{ name: 'Plank', planned_sets: 3, rest_seconds: 60, duration_seconds: 60, sets: [set(1), set(2), set(3)] }]))
+    render(<WorkoutFollowPage />)
+    expect(await screen.findByText(/^3 × 60 s/)).toBeInTheDocument()
+    expect(screen.queryByText(/3 × 10/)).not.toBeInTheDocument()
+  })
+
+  it('saves the set ticked just before Finish, then finishes', async () => {
+    const session = liveSession([{ name: 'Lat Pulldown', planned_sets: 1, sets: [set(1, { planned_weight_kg: 50, previous_reps: 10, previous_weight_kg: 50 })] }])
+    mocks.getWorkoutSession.mockResolvedValue(session)
+    mocks.completeWorkoutSession.mockImplementation(async () => ({ ...session, status: 'completed', completed_at: new Date().toISOString(), total_volume_kg: 500, duration_minutes: 20 }))
+    render(<WorkoutFollowPage />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Complete set 1' }))
+    fireEvent.click(screen.getAllByRole('button', { name: 'Finish workout' })[0])
+
+    await waitFor(() => expect(mocks.completeWorkoutSession).toHaveBeenCalled())
+    expect(mocks.updateWorkoutSession).toHaveBeenCalledWith('s-old', { exercises: [expect.objectContaining({ sets: [expect.objectContaining({ completed: true, actual_weight_kg: 50, actual_reps: 10 })] })] })
+    expect(mocks.updateWorkoutSession.mock.invocationCallOrder[0]).toBeLessThan(mocks.completeWorkoutSession.mock.invocationCallOrder[0])
+  })
+
+  it('+ Add set starts from the weight of the last set, done or typed', async () => {
+    // First time on Bench Press: startSession left planned_weight_kg null; set 1 was done at 60 kg.
+    mocks.getWorkoutSession.mockResolvedValue(liveSession([{ name: 'Bench Press', planned_sets: 1, status: 'completed', sets: [set(1, { actual_reps: 10, actual_weight_kg: 60, completed: true, completed_at: new Date().toISOString() })] }]))
+    const { unmount } = render(<WorkoutFollowPage />)
+    fireEvent.click(await screen.findByRole('button', { name: '+ Add set' }))
+    expect(screen.getByLabelText('weight')).toHaveValue('60')
+    unmount()
+
+    // Set 2 has 62.5 typed but isn't done yet.
+    mocks.getWorkoutSession.mockResolvedValue(liveSession([{ name: 'Bench Press', status: 'in_progress', sets: [set(1, { actual_reps: 10, actual_weight_kg: 60, completed: true, completed_at: new Date().toISOString() }), set(2, { actual_weight_kg: 62.5 })] }]))
+    render(<WorkoutFollowPage />)
+    fireEvent.click(await screen.findByRole('button', { name: '+ Add set' }))
+    expect(screen.getByRole('button', { name: 'Set 3 62.5 kilograms, edit' })).toBeInTheDocument()
+  })
+
+  it('drops the old exercise\'s last-time numbers when it is swapped', async () => {
+    // Set 1 of Row is done; last time was bodyweight × 10 on both sets.
+    mocks.getWorkoutSession.mockResolvedValue(liveSession([{
+      name: 'Row', status: 'in_progress',
+      sets: [
+        set(1, { actual_reps: 10, completed: true, completed_at: new Date().toISOString(), previous_reps: 10, previous_weight_kg: null }),
+        set(2, { previous_reps: 10, previous_weight_kg: null }),
+      ],
+    }]))
+    mocks.searchExercises.mockResolvedValue([{ id: 'x1', name: 'Wide-Grip Lat Pulldown', primary_muscles: ['lats'], equipment: 'cable', category: 'strength' }])
+    render(<WorkoutFollowPage />)
+    expect((await screen.findAllByText(/BW × 10/)).length).toBeGreaterThan(0)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Swap Row' }))
+    fireEvent.change(await screen.findByPlaceholderText('Search exercises…'), { target: { value: 'lat' } })
+    fireEvent.click(await screen.findByText('Wide-Grip Lat Pulldown'))
+    fireEvent.click(screen.getByRole('button', { name: 'Swap' }))
+
+    // The Row card may still be fading out beside it; read the new one.
+    const card = (await screen.findByText('Wide-Grip Lat Pulldown', { selector: 'h2' })).closest('article')!
+    expect(within(card).getByText(/^Set 2 · last time/)).toHaveTextContent('Set 2 · last time —')
+    expect(within(card).queryByText(/BW × 10/)).not.toBeInTheDocument()
   })
 })

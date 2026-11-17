@@ -57,10 +57,12 @@ vi.mock('@/lib/sync/sync-bus', () => ({
 
 import CheckInPage from '@/app/(app)/check-in/page'
 
+// Three weigh-ins: the engine (check-in-engine.ts) reads no week with fewer.
+const WEIGH_INS: Record<number, number> = { 0: 78.6, 2: 78.4, 4: 78.2 }
 const week = (start: string, logged: number) => Array.from({ length: 7 }, (_, i) => {
   const date = `2026-09-${String(Number(start.slice(8)) + i).padStart(2, '0')}`
   const fed = i < logged
-  return { date, calories: fed ? 2100 + i * 10 : null, protein_g: fed ? 140 : null, carbs_g: fed ? 220 : null, fat_g: fed ? 70 : null, sessions: i === 1 ? ['Upper A'] : [], sleep_h: fed ? 7.5 : null, weight_kg: i === 0 ? 78.6 : null }
+  return { date, calories: fed ? 2100 + i * 10 : null, protein_g: fed ? 140 : null, carbs_g: fed ? 220 : null, fat_g: fed ? 70 : null, sessions: i === 1 ? ['Upper A'] : [], sleep_h: fed ? 7.5 : null, weight_kg: fed ? WEIGH_INS[i] ?? null : null }
 })
 
 const baseStatus: CheckInStatus = {
@@ -75,12 +77,13 @@ const baseStatus: CheckInStatus = {
   next_check_in_date: '2026-09-21',
   days_to_go: 0,
   weight: {
-    current_kg: 78.4,
-    delta_week_kg: -0.6,
+    current_kg: 78.2,
+    delta_week_kg: -0.9,
+    // Weekly averages, each ending on the check-in weekday (Monday).
     points: [
-      { week_end: '2026-08-24', kg: 79.2 },
-      { week_end: '2026-08-31', kg: 79 },
-      { week_end: '2026-09-07', kg: 78.4 },
+      { week_end: '2026-08-31', kg: 80.1 },
+      { week_end: '2026-09-07', kg: 79.3 },
+      { week_end: '2026-09-14', kg: 78.4 },
     ],
   },
   week_so_far: {
@@ -92,14 +95,36 @@ const baseStatus: CheckInStatus = {
     sleep_nights: 6,
   },
   targets: { calories: 2200, protein_g: 165 },
-  verdict: "You lost 0.6kg and trained four times — a bit faster than planned, so I'm raising your calories.",
+  verdict: "You lost 0.9 kg this week, the second week running ahead of your 0.5 kg target, so I'm raising your calories to 2,375 to protect your muscle.",
+  // What getCheckInStatus builds from runWeeklyCheckIn: fat loss ahead of target two valid weeks running is +7.5%,
+  // 2200 × 1.075 rounded to 25 kcal = 2375, a change of 8.0%. Protein stays.
   proposal: {
-    new_calories: 2380,
+    new_calories: 2375,
     new_protein_g: 165,
     calorie_change_pct: 8,
     direction: 'up',
   },
 }
+
+// POST /v1/check-in answers with runWeeklyCheckIn's CheckInResult (check-in.service.ts).
+const checkInInput = (calories: number, thisWeekKg: number) => ({
+  goal: { type: 'fat_loss', target_weekly_change_kg: -0.5, current_calorie_target: calories, current_protein_target_g: 165 },
+  compliance: { workout_compliance_pct: 100, nutrition_compliance_pct: 86, calories_logged_days: 6, weigh_ins_logged: 3, sleep_avg_hours: 7.1, mood_avg: 4, energy_avg: 4 },
+  metrics: { weight_trend_avg_this_week_kg: thisWeekKg, weight_trend_avg_last_week_kg: 79.3, actual_weekly_change_kg: Math.round((thisWeekKg - 79.3) * 10) / 10, weeks_on_current_targets: 3 },
+  context: { prior_progress_state: 'ahead_of_target', prior_recovery_concern: false, bmr: 1720, protein_floor_g: 125 },
+})
+const raised = (calories: number, newCalories: number, pct: number, applied: boolean) => ({
+  week_validity: 'valid', progress_state: 'ahead_of_target', program_action: 'calorie_adjustment',
+  calorie_adjustment_pct: pct, adjustment_direction: 'increase', wellness_flags: [], next_checkin_days: 7,
+  new_calorie_target: newCalories, new_protein_target_g: 165, reached_bmr_floor: false,
+  follow_up_question: 'Does the new target feel doable for the week ahead?',
+  geo_response: `You're losing faster than planned, so your target goes up to ${newCalories} kcal.`,
+  applied, metrics: checkInInput(calories, 78.4), data_notes: [],
+})
+// Apply on the proposal above: the backend re-decides on the same week and saves 2375.
+const APPLIED = raised(2200, 2375, 8, true)
+// Keep (apply: false) still runs the engine and records the check-in; nothing is saved.
+const KEPT = raised(2200, 2375, 8, false)
 
 function renderStatus(status: CheckInStatus) {
   const refetch = vi.fn().mockResolvedValue(undefined)
@@ -120,7 +145,7 @@ beforeEach(() => {
   // Today is the Wednesday of the mid-week fixture (15 to 21 Sep), so later days are still to come.
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date('2026-09-16T10:00:00'))
-  mocks.applyCheckIn.mockResolvedValue(undefined)
+  mocks.applyCheckIn.mockImplementation(async (_weekEnd: string, apply = true) => (apply ? APPLIED : KEPT))
   mocks.health = { label: null, connected: false }
 })
 
@@ -234,11 +259,11 @@ describe('check-in states', () => {
 
   it('shows all four targets Apply writes, as their effect on today', () => {
     renderStatus(baseStatus)
-    // 2380 kcal: fat round(2380 * 0.28 / 9) = 74, carbs round((2380 - 660 - 666) / 4) = 264
-    expect(screen.getByText(/of 264 g/)).toBeInTheDocument()
+    // 2375 kcal: fat round(2375 * 0.28 / 9) = 74, carbs round((2375 - 660 - 666) / 4) = 262
+    expect(screen.getByText(/of 262 g/)).toBeInTheDocument()
     expect(screen.getByText(/of 74 g/)).toBeInTheDocument()
     expect(screen.getByLabelText('was 248 g')).toBeInTheDocument()
-    expect(screen.getByText('1,140')).toBeInTheDocument()
+    expect(screen.getByText('1,135')).toBeInTheDocument()
     expect(screen.getByText('Calories, carbs and fat go up; protein stays. Lean cut updates too.')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Current' }))
@@ -247,19 +272,28 @@ describe('check-in states', () => {
   })
 
   it('settles into what the backend saved and swaps Apply for Done', async () => {
-    mocks.applyCheckIn.mockResolvedValue({ applied: true, new_calorie_target: 2300, new_protein_target_g: 165 })
+    // The status is cached for up to 6 hours; targets edited to 2300 since then make the POST decide from 2300:
+    // 2300 × 1.075 rounded to 25 = 2475 (+7.6%). The screen shows what was saved, not the cached proposal.
+    mocks.applyCheckIn.mockResolvedValue(raised(2300, 2475, 7.6, true))
     renderStatus(baseStatus)
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))
 
-    await waitFor(() => expect(screen.getByText('Saved. Home, your food diary and Lean cut now use 2,300 kcal.')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Saved. Home, your food diary and Lean cut now use 2,475 kcal.')).toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Done' }).closest('[inert]')).toBeNull()
     expect(screen.getByRole('button', { name: /Updating your targets/ }).closest('[inert]')).not.toBeNull()
     expect(screen.queryByRole('button', { name: 'New targets' })).not.toBeInTheDocument()
   })
 
   it('says nothing changed when the backend applied nothing', async () => {
-    mocks.applyCheckIn.mockResolvedValue({ applied: false, new_calorie_target: null })
+    // A weigh-in since the cached status put the week on track (-0.5 kg): the POST re-decides a hold and saves nothing.
+    mocks.applyCheckIn.mockResolvedValue({
+      week_validity: 'valid', progress_state: 'on_track', program_action: 'none',
+      calorie_adjustment_pct: null, adjustment_direction: null, wellness_flags: [], next_checkin_days: 7,
+      new_calorie_target: null, new_protein_target_g: null, reached_bmr_floor: false, follow_up_question: null,
+      geo_response: "You're right on track, so nothing changes this week.", applied: false,
+      metrics: checkInInput(2200, 78.8), data_notes: [],
+    })
     renderStatus(baseStatus)
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply new targets' }))

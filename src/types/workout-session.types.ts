@@ -21,6 +21,8 @@ export interface SessionExercise {
   /** A number or a range such as "6-8". */
   planned_reps: number | string
   rest_seconds: number
+  /** A timed exercise (a plank), copied from the plan; planned_reps then holds only startSession's default. */
+  duration_seconds?: number | null
   instructions?: string[]
   notes?: string | null
   status: ExerciseStatus

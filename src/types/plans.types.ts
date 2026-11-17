@@ -31,6 +31,8 @@ export interface WorkoutExercise {
   sets?: number
   reps?: number
   weight?: number
+  /** What Geo wrote before plans used `weight`. */
+  weight_kg?: number
   duration_seconds?: number
   rest_seconds?: number
   notes?: string

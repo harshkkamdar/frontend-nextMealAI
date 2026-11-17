@@ -14,14 +14,15 @@ import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
 import { Enter, HistoryCard, NextUpCard, ProgramCard, SectionTitle, TrainSkeleton, VolumeCard } from '@/components/workout/train-cards'
-import { completedSessions, plannedDates, weekVolume } from '@/components/workout/train-data'
+import { OFFLINE_START, completedSessions, plannedDays, startedOnText, weekVolume } from '@/components/workout/train-data'
+import { UnfinishedWorkoutSheet } from '@/components/workout/unfinished-workout-sheet'
 import { WeekStrip, weekDays } from '@/components/ui/fiqr/week-strip'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { getPlans } from '@/lib/api/plans.api'
-import { abandonWorkoutSession, getInProgressSession, getWorkoutHistory, startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { abandonWorkoutSession, getInProgressSession, getWorkoutHistory, startWorkoutSessionWithStatus } from '@/lib/api/workout-sessions.api'
 import { todayLocalISO } from '@/lib/timezone'
 import { useFirstPaint } from '@/lib/use-first-paint'
 import { plural } from '@/lib/utils'
@@ -46,6 +47,7 @@ export default function ActivityPage() {
   const [selectedDate, setSelectedDate] = useState(() => todayLocalISO(tz))
   const [starting, setStarting] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
+  const [askOpen, setAskOpen] = useState(false)
   // Read once per visit: the in-progress card's minutes need not tick.
   const [mountedAt] = useState(() => Date.now())
   const programRef = useRef<HTMLElement>(null)
@@ -107,7 +109,9 @@ export default function ActivityPage() {
     return set
   }, [history, tz])
 
-  const planned = useMemo(() => plannedDates(workoutPlan?.content?.days ?? [], nextIdx, today, doneDates.has(today)), [workoutPlan, nextIdx, today, doneDates])
+  const plannedByDate = useMemo(() => plannedDays(workoutPlan?.content?.days ?? [], nextIdx, today, doneDates.has(today)), [workoutPlan, nextIdx, today, doneDates])
+  const planned = useMemo(() => new Set(plannedByDate.keys()), [plannedByDate])
+  const plannedOn = plannedByDate.get(selectedDate)
 
   const selectedDateHistory = useMemo(() => history.filter((session) => (
     Boolean(session.completed_at) && todayLocalISO(tz, new Date(session.completed_at!)) === selectedDate
@@ -118,15 +122,20 @@ export default function ActivityPage() {
   const perDay = useMemo(() => weekVolume(completedHistory, week, tz), [completedHistory, week, tz])
   const sessionsThisWeek = useMemo(() => completedHistory.filter((session) => week.includes(todayLocalISO(tz, new Date(session.completed_at!)))).length, [completedHistory, week, tz])
 
-  const handleStartWorkout = async () => {
+  const handleStartWorkout = async (discard?: WorkoutSession) => {
     if (starting) return
     setStarting(true)
+    setAskOpen(false)
     try {
-      const session = await startWorkoutSession({ plan_id: workoutPlan?.id, plan_day_index: nextIdx >= 0 ? nextIdx : undefined, day_name: nextWorkout?.name })
-      if (!session?.id) throw new Error('No session id')
-      router.push(`/train/session?id=${session.id}`)
+      if (discard) await abandonWorkoutSession(discard.id)
+      const result = await startWorkoutSessionWithStatus({ plan_id: workoutPlan?.id, plan_day_index: nextIdx >= 0 ? nextIdx : undefined, day_name: nextWorkout?.name })
+      // A start queued offline has no session to open yet (its pending id never loads), so Train stays put.
+      if (result.queued) { toast.success(OFFLINE_START); return }
+      if (!result.data?.id) throw new Error('No session id')
+      router.push(`/train/session?id=${result.data.id}`)
     } catch {
       toast.error("Couldn't start the workout. Try again.")
+      void refetch()
     } finally {
       setStarting(false)
     }
@@ -147,6 +156,7 @@ export default function ActivityPage() {
   const liveSets = inProgress ? inProgress.exercises.flatMap((exercise) => exercise.sets) : []
   const liveMinutes = inProgress?.started_at ? Math.max(0, Math.floor((mountedAt - new Date(inProgress.started_at).getTime()) / 60000)) : 0
   const afterRest = isRestDay ? days.slice(nextIdx + 1).concat(days.slice(0, nextIdx)).find((day) => !day.is_rest_day) : undefined
+  const nextName = nextWorkout?.name || `Day ${nextIdx + 1}`
 
   const hero = !workoutPlan ? (
     <NextUpCard
@@ -164,12 +174,12 @@ export default function ActivityPage() {
     />
   ) : (
     <NextUpCard
-      eyebrow={isResume ? (liveMinutes < 120 ? `In progress · ${liveMinutes} min` : `Unfinished since ${new Date(inProgress!.started_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}`) : 'Today'}
+      eyebrow={isResume ? (liveMinutes < 120 ? `In progress · ${liveMinutes} min` : `Unfinished since ${startedOnText(inProgress!.started_at)}`) : 'Today'}
       title={(isResume ? inProgress?.day_name : nextWorkout?.name) || `Day ${nextIdx + 1}`}
       meta={isResume ? `${liveSets.filter((set) => set.completed).length} of ${liveSets.length} sets` : `${plural(exerciseCount, 'exercise')} · ${Math.max(15, Math.round((exerciseCount * 7.5) / 5) * 5)} min`}
       action={(
         <>
-          <SecondaryButton onNavy arrow type="button" disabled={starting} data-testid="activity-start-workout-button" onClick={() => (isResume ? handleResume() : void handleStartWorkout())}>
+          <SecondaryButton onNavy arrow type="button" disabled={starting} data-testid="activity-start-workout-button" onClick={() => (isResume ? handleResume() : inProgress ? setAskOpen(true) : void handleStartWorkout())}>
             {starting ? 'Starting…' : isResume ? 'Resume workout' : 'Start workout'}
           </SecondaryButton>
           {isResume && liveMinutes >= 720 ? (
@@ -228,7 +238,7 @@ export default function ActivityPage() {
         <div className="px-4 pb-6 pt-3">
           <WeekStrip selected={selectedDate} today={today} onSelect={setSelectedDate} marked={doneDates} markLabel="workout done" planned={planned} weekStartsOn={1} />
           <div className="mt-4 overflow-hidden rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]">
-            {selectedDateHistory.length === 0 ? <p className="px-5 py-5 text-[14px] text-ink-65">No workout on this day</p> : selectedDateHistory.map((session) => (
+            {selectedDateHistory.length === 0 ? <p className="px-5 py-5 text-[14px] text-ink-65">{plannedOn ? `${plannedOn.name || 'A workout'} is planned` : 'No workout on this day'}</p> : selectedDateHistory.map((session) => (
               <button key={session.id} type="button" onClick={() => router.push(`/train/session?id=${session.id}`)} className="flex min-h-16 w-full items-center gap-3 border-b border-ink-06 px-5 py-3 text-left last:border-b-0 active:bg-ink-04">
                 <span className="min-w-0 flex-1"><span className="block truncate text-[15.5px] font-semibold text-ink">{session.day_name}</span><span className="block text-[13px] text-ink-65">{session.duration_minutes ?? 0} min</span></span>
                 <ChevronRightIcon className="size-4 shrink-0 text-ink-35" />
@@ -237,6 +247,8 @@ export default function ActivityPage() {
           </div>
         </div>
       </BottomSheet>
+
+      <UnfinishedWorkoutSheet open={askOpen} session={inProgress} nextName={nextName} onClose={() => setAskOpen(false)} onResume={handleResume} onDiscard={() => void handleStartWorkout(inProgress ?? undefined)} />
     </div>
   )
 }

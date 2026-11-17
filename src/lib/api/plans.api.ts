@@ -6,6 +6,8 @@ export async function getPlans(params?: { type?: string; active_only?: boolean; 
   const query = new URLSearchParams()
   if (params?.type) query.set('type', params.type)
   if (params?.active_only) query.set('active_only', 'true')
+  // The backend returns 20 rows unless asked, which cut "Earlier" short. Its validator sets no maximum.
+  query.set('limit', '100')
   if (params?.bustCache) query.set('_t', String(Date.now()))
   const qs = query.toString()
   const res = await apiFetch<{ plans: Plan[] } | Plan[]>(`/v1/plans${qs ? `?${qs}` : ''}`)

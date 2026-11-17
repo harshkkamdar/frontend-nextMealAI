@@ -197,7 +197,21 @@ describe('FB-05 computeCompleteSetResult (AC01.4, AC01.6, AC01.7, AC01.8, AC01.9
     const result = computeCompleteSetResult(exercises, 0, 99, NOW_ISO)
     expect(result.rest.show).toBe(false)
   })
+
+  // First time on a lift, startSession leaves planned_weight_kg null on every set: set 2 picks up set 1's weight.
+  it('carries a completed set\'s weight to the next set when that set has none', () => {
+    const fresh = makeExercise({ sets: [1, 2, 3].map((n) => makeSet({ set_number: n, planned_reps: 10, planned_weight_kg: null })) })
+    fresh.sets[0] = { ...fresh.sets[0], actual_weight_kg: 60 }
+    const result = computeCompleteSetResult([fresh], 0, 0, NOW_ISO)
+    expect(setWeightOf(result.exercises[0].sets[1])).toBe(60)
+    // Only the next set; a set that already has a weight (typed or carried from last time) keeps it.
+    expect(setWeightOf(result.exercises[0].sets[2])).toBeNull()
+    const carried = makeExercise({ sets: [makeSet({ set_number: 1, actual_weight_kg: 65 }), makeSet({ set_number: 2, planned_weight_kg: 60 })] })
+    expect(setWeightOf(computeCompleteSetResult([carried], 0, 0, NOW_ISO).exercises[0].sets[1])).toBe(60)
+  })
 })
+
+const setWeightOf = (set: SessionExercise['sets'][number]) => set.actual_weight_kg ?? set.planned_weight_kg
 
 // FB-R6-16+17 · Resume label + state on Start Workout
 //

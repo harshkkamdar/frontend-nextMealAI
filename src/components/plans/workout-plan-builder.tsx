@@ -78,7 +78,8 @@ function fromInitial(plan: WorkoutPlan | undefined): {
     date: d.date ?? '',
     name: d.name ?? `Day ${i + 1}`,
     is_rest_day: !!d.is_rest_day,
-    exercises: (d.exercises ?? []).map((ex) => ({ ...ex, _key: nextKey() })),
+    // Geo's older plans hold the weight as weight_kg: edit it in the kg cell, saved back as weight.
+    exercises: (d.exercises ?? []).map(({ weight_kg, ...ex }) => ({ ...ex, weight: ex.weight ?? weight_kg, _key: nextKey() })),
   }))
   return {
     name: plan.content.name ?? '',
@@ -169,7 +170,8 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
                 name: ex.name.trim(),
               })),
         })) as WorkoutPlanDay[],
-        notes: notes.trim() || undefined,
+        // Empty, not undefined: JSON drops undefined and the backend's merge would keep the old notes.
+        notes: notes.trim(),
       }
 
       if (mode === 'create') {

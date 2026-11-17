@@ -204,4 +204,27 @@ describe('MealPlanBuilder component', () => {
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-77')
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-77-v2'))
   })
+
+  // The backend merges content shallowly ({ ...old, ...new }) and JSON drops undefined, so a cleared field must be sent.
+  it('clearing the notes sends them empty, so the backend drops the old ones', async () => {
+    const initialPlan: MealPlan = {
+      id: 'plan-77', user_id: 'u1', type: 'meal', status: 'active',
+      content: {
+        notes: 'No dairy',
+        daily_targets: { calories: 1800, protein: 140, carbs: 180, fat: 50 },
+        days: [{ date: '2025-03-01', meals: [{ type: 'Breakfast', name: 'Eggs' }] }],
+      },
+      created_at: 'n', updated_at: 'n',
+    }
+    updatePlanMock.mockImplementation((id: string, input: { content?: object }) => Promise.resolve({ ...initialPlan, id: `${id}-v2`, content: { ...initialPlan.content, ...JSON.parse(JSON.stringify(input.content)) } }))
+
+    render(<MealPlanBuilder mode="edit" initialPlan={initialPlan} />)
+    fireEvent.change(screen.getByLabelText('Notes'), { target: { value: '' } })
+    await toDays('Recut')
+    fireEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
+    const sent = JSON.parse(JSON.stringify(updatePlanMock.mock.calls[0][1]))
+    expect(sent.content.notes).toBe('')
+    expect((await updatePlanMock.mock.results[0].value).content.notes).toBe('')
+  })
 })

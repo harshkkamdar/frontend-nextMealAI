@@ -58,9 +58,10 @@ export function WorkoutLogForm() {
         exercises: named.map((e) => ({
           name: e.name.trim(),
           muscle_group: e.muscle || undefined,
-          planned_sets: typeof e.sets === 'number' ? e.sets : 3,
-          planned_reps: typeof e.reps === 'number' ? e.reps : 10,
-          rest_seconds: typeof e.rest === 'number' ? e.rest : 90,
+          // Whole numbers: the backend's start schema takes integers only, and the fields accept decimals.
+          planned_sets: Math.round(e.sets ?? 3),
+          planned_reps: Math.round(e.reps ?? 10),
+          rest_seconds: Math.round(e.rest ?? 90),
         })),
       })
       // replace() so Back from the session doesn't return to this builder.

@@ -12,6 +12,7 @@ vi.mock('@/lib/api/client', () => ({
 
 import {
   createPlan,
+  getPlans,
   updatePlan,
   deletePlan,
   isManualBuilderType,
@@ -135,6 +136,18 @@ describe('plans.api — FB-08 manual create / customise wrappers', () => {
       expect(apiFetchMock).toHaveBeenCalledWith('/v1/plans/plan-1', {
         method: 'DELETE',
       })
+    })
+  })
+
+  describe('getPlans', () => {
+    // GET /v1/plans returns 20 rows unless asked (plans.validators.ts GetPlansQuerySchema), which cut "Earlier" short.
+    it('asks for up to 100 plans', async () => {
+      apiFetchMock.mockResolvedValueOnce({ plans: [], pagination: { total: 0, limit: 100, offset: 0, hasMore: false } })
+      await getPlans()
+      expect(apiFetchMock).toHaveBeenCalledWith('/v1/plans?limit=100')
+      apiFetchMock.mockResolvedValueOnce({ plans: [], pagination: { total: 0, limit: 100, offset: 0, hasMore: false } })
+      await getPlans({ type: 'workout', active_only: true })
+      expect(apiFetchMock).toHaveBeenLastCalledWith('/v1/plans?type=workout&active_only=true&limit=100')
     })
   })
 

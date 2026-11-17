@@ -4,14 +4,15 @@ import { addDays } from '@/components/ui/fiqr/week-strip'
 import type { WorkoutExercise, WorkoutPlanDay } from '@/types/plans.types'
 import type { SessionExercise, SetData, WorkoutSession } from '@/types/workout-session.types'
 
-/** "3 × 10 · 90s rest" for a plan exercise; empty when it has neither sets nor reps. */
+/** "3 × 10 · 60 kg · 90s rest" for a plan exercise; empty when it has neither sets nor reps. */
 export function formatExDetail(ex: Partial<WorkoutExercise> | null | undefined): string {
   const reps = ex?.reps as unknown
   const validReps = (typeof reps === 'number' && reps > 0) || (typeof reps === 'string' && reps.trim().length > 0)
   const repsStr = typeof reps === 'number' ? String(reps) : String(reps ?? '').trim()
   const validSets = typeof ex?.sets === 'number' && ex.sets > 0
   const rs = typeof ex?.rest_seconds === 'number' && ex.rest_seconds > 0 ? ex.rest_seconds : 0
-  const rest = rs ? ` · ${rs < 60 ? `${rs}s` : `${Math.floor(rs / 60)}m${rs % 60 ? ` ${rs % 60}s` : ''}`} rest` : ''
+  const kg = ex?.weight ?? ex?.weight_kg
+  const rest = `${kg != null ? ` · ${formatKg(kg)} kg` : ''}${rs ? ` · ${rs < 60 ? `${rs}s` : `${Math.floor(rs / 60)}m${rs % 60 ? ` ${rs % 60}s` : ''}`} rest` : ''}`
   if (validSets && validReps) return `${ex!.sets} × ${repsStr}${rest}`
   if (validSets) return `${ex!.sets} sets${rest}`
   if (validReps) return `${repsStr} reps${rest}`
@@ -25,16 +26,24 @@ export function completedSessions(history: WorkoutSession[]): WorkoutSession[] {
     .sort((a, b) => new Date(b.completed_at!).getTime() - new Date(a.completed_at!).getTime())
 }
 
+/** "12 Nov": the day an unfinished workout was started. */
+export function startedOnText(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
+}
+
+/** The toast when a workout start is queued offline: there is no session to open until it syncs. */
+export const OFFLINE_START = "Workout saved on your phone. It starts when you're back online"
+
 /**
- * Future dates with a training day on them, walking the cycle one plan day per calendar day from the next workout.
+ * The training day planned on each date, walking the cycle one plan day per calendar day from the next workout.
  * The next workout lands today unless today is already done, then tomorrow. Rest days get no date.
  */
-export function plannedDates(days: WorkoutPlanDay[], nextIdx: number, today: string, doneToday: boolean, ahead = 13): Set<string> {
-  const out = new Set<string>()
+export function plannedDays(days: WorkoutPlanDay[], nextIdx: number, today: string, doneToday: boolean, ahead = 13): Map<string, WorkoutPlanDay> {
+  const out = new Map<string, WorkoutPlanDay>()
   if (!days.length || nextIdx < 0) return out
-  for (let k = 1; k <= ahead; k += 1) {
+  for (let k = doneToday ? 1 : 0; k <= ahead; k += 1) {
     const day = days[(nextIdx + k - (doneToday ? 1 : 0)) % days.length]
-    if (!day.is_rest_day) out.add(addDays(today, k))
+    if (!day.is_rest_day) out.set(addDays(today, k), day)
   }
   return out
 }

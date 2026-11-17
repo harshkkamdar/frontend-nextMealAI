@@ -10,7 +10,6 @@ import { timeLeft } from '@/components/plans/plan-overview-card'
 import { formatDateRange, statusLabel } from '@/components/plans/plan-format'
 import { Busy, CARD, Dock, DockSpacer, ORANGE_BUTTON, SectionHeading } from '@/components/plans/spatial-parts'
 import { PushedHeader } from '@/components/layout/screen-header'
-import { goBack } from '@/lib/navigation'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { spring } from '@/lib/motion'
 import type { Plan } from '@/types/plans.types'
@@ -47,7 +46,7 @@ export function PlanDetailFrame({ plan, kind, fallbackTitle, activating, onActiv
         title={plan.content.name || fallbackTitle}
         barTitle={kind}
         subtitle={planSubtitle(plan)}
-        onBack={() => goBack(router, '/plans')}
+        onBack={() => router.push('/plans')}
         backLabel="Back to plans"
         actions={<RoundButton aria-label="Edit plan" onClick={() => router.push(`/plans/edit?id=${plan.id}`)}><Pencil strokeWidth={1.75} /></RoundButton>}
       />

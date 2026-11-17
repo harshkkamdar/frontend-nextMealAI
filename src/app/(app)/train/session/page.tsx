@@ -122,6 +122,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const [swapOpen, setSwapOpen] = useState(false)
   const [swapPick, setSwapPick] = useState<ExerciseSearchResult | null>(null)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const savingRef = useRef<Promise<unknown>>(Promise.resolve())
   const reduce = useReducedMotion()
 
   const exercises = session?.exercises ?? []
@@ -208,9 +209,20 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   const saveExercises = useCallback((nextExercises: SessionExercise[]) => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
     saveTimeoutRef.current = setTimeout(() => {
-      updateWorkoutSession(sessionId, { exercises: nextExercises }).catch(() => {})
+      saveTimeoutRef.current = null
+      savingRef.current = updateWorkoutSession(sessionId, { exercises: nextExercises }).catch(() => {})
     }, 500)
   }, [sessionId])
+
+  /** Sends a save still waiting out its 500 ms now, and resolves once the last save is done. */
+  const flushSave = () => {
+    if (saveTimeoutRef.current && sessionRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+      saveTimeoutRef.current = null
+      savingRef.current = updateWorkoutSession(sessionId, { exercises: sessionRef.current.exercises }).catch(() => {})
+    }
+    return savingRef.current
+  }
 
   /** Writes new exercises through a ref, so a held stepper's repeats each build on the last one. */
   const commit = useCallback((nextExercises: SessionExercise[]) => {
@@ -295,7 +307,8 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     const nextSet: SetData = {
       set_number: exercise.sets.length + 1,
       planned_reps: lastSet?.planned_reps ?? exercise.planned_reps,
-      planned_weight_kg: lastSet?.planned_weight_kg ?? null,
+      // The last set's weight, typed or done, so the extra set starts where that one ended.
+      planned_weight_kg: lastSet ? setWeight(lastSet) : null,
       actual_reps: null,
       actual_weight_kg: null,
       completed: false,
@@ -309,7 +322,9 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     if (completing) return
     setCompleting(true)
     try {
-      const completed = await completeWorkoutSession(sessionId)
+      // The set ticked just before Finish must reach the backend first: it computes the volume from the saved sets.
+      await flushSave()
+      const completed = await completeWorkoutSession(sessionId, sessionRef.current!)
       void writeWorkoutToHealth(completed)
       setSession(completed)
       setShowSummary(true)
@@ -393,7 +408,8 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       .catch(() => toast.error('Failed to add exercise'))
   }
 
-  // The new exercise takes the slot's sets, reps and rest; sets still to do lose the old exercise's numbers.
+  // The new exercise takes the slot's sets, reps and rest. Last time's numbers belong to the old exercise, so every set
+  // loses them; done sets keep what was lifted, sets still to do lose the old exercise's weights too.
   const handleSwapExercise = () => {
     const base = sessionRef.current
     const slot = base?.exercises[currentIndex]
@@ -403,7 +419,10 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       name: swapPick.name,
       muscle_group: swapPick.primary_muscles?.[0] ?? null,
       instructions: [],
-      sets: slot.sets.map((set) => (set.completed ? set : { ...set, actual_reps: null, actual_weight_kg: null, planned_weight_kg: null, previous_reps: null, previous_weight_kg: null })),
+      sets: slot.sets.map((set) => {
+        const fresh = { ...set, previous_reps: null, previous_weight_kg: null }
+        return set.completed ? fresh : { ...fresh, actual_reps: null, actual_weight_kg: null, planned_weight_kg: null }
+      }),
     }
     const next = [...base.exercises]
     next[currentIndex] = swapped
@@ -498,7 +517,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
                     <h2 className="mt-3 line-clamp-3 break-words text-balance text-[22px] font-bold leading-[1.14] tracking-[-0.01em] text-ink">{current.name}</h2>
                     {/* The how-to toggle shares the plan line so the set rows start higher up the screen. */}
                     <div className="flex min-h-11 items-center justify-between gap-3">
-                      <p className="text-body-sm text-ink-65 tabular-nums">{current.planned_sets} × {current.planned_reps}{current.rest_seconds ? ` · ${restText(current.rest_seconds)} rest` : ''}</p>
+                      <p className="text-body-sm text-ink-65 tabular-nums">{current.planned_sets} × {current.duration_seconds ? `${current.duration_seconds} s` : current.planned_reps}{current.rest_seconds ? ` · ${restText(current.rest_seconds)} rest` : ''}</p>
                       <span className="-mr-2 flex shrink-0">
                         <button type="button" onClick={() => setSwapOpen(true)} aria-haspopup="dialog" aria-label={`Swap ${current.name}`} className="min-h-11 px-2 text-body-sm font-bold text-ink">Swap</button>
                         {current.instructions && current.instructions.length > 0 ? (

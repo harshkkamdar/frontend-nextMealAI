@@ -112,6 +112,13 @@ export function computeCompleteSetResult(
     actual_weight_kg: set.actual_weight_kg ?? set.planned_weight_kg ?? null,
   } as SetData
 
+  // The next set with no weight yet (first time on a lift) starts from the weight just lifted.
+  const lifted = target.sets[setIndex].actual_weight_kg
+  const following = target.sets[setIndex + 1]
+  if (lifted != null && following && !following.completed && following.actual_weight_kg == null && following.planned_weight_kg == null) {
+    target.sets[setIndex + 1] = { ...following, planned_weight_kg: lifted }
+  }
+
   if (target.status === 'pending') {
     target.status = 'in_progress'
   }

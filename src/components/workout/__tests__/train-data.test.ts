@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clockHMS, completedSessions, formatExDetail, plannedDates, sessionVolumeKg, weekVolume } from '../train-data'
+import { clockHMS, completedSessions, formatExDetail, plannedDays, sessionVolumeKg, weekVolume } from '../train-data'
 import type { WorkoutPlanDay } from '@/types/plans.types'
 import { weekDays } from '@/components/ui/fiqr/week-strip'
 import { leadIndex } from '../digit-tiles'
@@ -10,13 +10,14 @@ const set = (completed: boolean, kg: number | null, reps: number | null) => ({ s
 const session = (id: string, completedAt: string | null, kg: number, status: WorkoutSession['status'] = 'completed') => ({ id, completed_at: completedAt, total_volume_kg: kg, status } as WorkoutSession)
 
 describe('train data helpers', () => {
-  it('plannedDates walks the cycle from the next workout and skips rest days', () => {
+  it('plannedDays walks the cycle from the next workout and skips rest days', () => {
     const cycle = [{ name: 'A' }, { name: 'B' }, { name: 'Rest', is_rest_day: true }, { name: 'C' }] as WorkoutPlanDay[]
+    const names = (map: Map<string, WorkoutPlanDay>) => [...map].map(([date, day]) => `${date} ${day.name}`)
     // Next is C (index 3) today: tomorrow A, then B, then rest.
-    expect([...plannedDates(cycle, 3, '2026-10-29', false, 4)]).toEqual(['2026-10-30', '2026-10-31', '2026-11-02'])
+    expect(names(plannedDays(cycle, 3, '2026-10-29', false, 4))).toEqual(['2026-10-29 C', '2026-10-30 A', '2026-10-31 B', '2026-11-02 C'])
     // Today already done: C moves to tomorrow.
-    expect([...plannedDates(cycle, 3, '2026-10-29', true, 2)]).toEqual(['2026-10-30', '2026-10-31'])
-    expect(plannedDates([], 0, '2026-10-29', false).size).toBe(0)
+    expect(names(plannedDays(cycle, 3, '2026-10-29', true, 2))).toEqual(['2026-10-30 C', '2026-10-31 A'])
+    expect(plannedDays([], 0, '2026-10-29', false).size).toBe(0)
   })
 
   it('weekVolume buckets completed sessions by local day and ignores other weeks', () => {
@@ -47,6 +48,13 @@ describe('train data helpers', () => {
     expect(formatExDetail({ sets: 3, reps: 10, rest_seconds: 90 })).toBe('3 × 10 · 1m 30s rest')
     expect(formatExDetail({ sets: 4 })).toBe('4 sets')
     expect(formatExDetail({})).toBe('')
+  })
+
+  it('formatExDetail shows the weight, as plans or Geo store it', () => {
+    expect(formatExDetail({ sets: 3, reps: 8, rest_seconds: 90, weight: 60 })).toBe('3 × 8 · 60 kg · 1m 30s rest')
+    // Geo's modify tool writes weight_kg (plans.service.ts).
+    expect(formatExDetail({ sets: 3, reps: 8, weight_kg: 62.5 })).toBe('3 × 8 · 62.5 kg')
+    expect(formatExDetail({ sets: 4, weight_kg: 20 })).toBe('4 sets · 20 kg')
   })
 
   it('leadIndex dims leading zeros but never the last digit', () => {

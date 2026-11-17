@@ -9,11 +9,14 @@ import { dayWeekday, nextTrainingDay } from '@/components/plans/plan-format'
 import { Busy, CARD, SOFT_BUTTON, SectionHeading } from '@/components/plans/spatial-parts'
 import { ChevronRightIcon, PlayFill } from '@/components/ui/fiqr/icons'
 import { activatePlan } from '@/lib/api/plans.api'
-import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { abandonWorkoutSession, getInProgressSession, startWorkoutSessionWithStatus } from '@/lib/api/workout-sessions.api'
 import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import type { WorkoutExercise, WorkoutPlan } from '@/types/plans.types'
+import type { WorkoutSession } from '@/types/workout-session.types'
+import { OFFLINE_START } from '@/components/workout/train-data'
+import { UnfinishedWorkoutSheet } from '@/components/workout/unfinished-workout-sheet'
 
 export function formatExerciseDetail(exercise: Omit<WorkoutExercise, 'reps'> & { reps?: number | string }): string {
   const parts: string[] = []
@@ -21,7 +24,8 @@ export function formatExerciseDetail(exercise: Omit<WorkoutExercise, 'reps'> & {
   if (exercise.sets && reps) parts.push(`${exercise.sets} × ${reps}`)
   else if (exercise.sets) parts.push(`${exercise.sets} sets`)
   else if (reps) parts.push(`${reps} reps`)
-  if (exercise.weight != null) parts.push(`${exercise.weight} kg`)
+  const weight = exercise.weight ?? exercise.weight_kg
+  if (weight != null) parts.push(`${weight} kg`)
   if (exercise.duration_seconds) parts.push(`${exercise.duration_seconds} s`)
   if (exercise.rest_seconds) parts.push(`${exercise.rest_seconds} s`)
   return parts.join(' · ')
@@ -36,9 +40,28 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
   const [expanded, setExpanded] = useState<number | null>(next)
   const [startingIdx, setStartingIdx] = useState<number | null>(null)
   const [activating, setActivating] = useState(false)
+  // Another workout still open when Start is tapped: which one, and the day asked for (kept while the sheet closes).
+  const [ask, setAsk] = useState<{ session: WorkoutSession; dayIdx: number } | null>(null)
+  const [askOpen, setAskOpen] = useState(false)
   const training = days.filter((day) => !day.is_rest_day)
   const exerciseCount = training.reduce((sum, day) => sum + (day.exercises?.length ?? 0), 0)
-  async function handleStartWorkout(dayIdx: number) { if (startingIdx !== null) return; setStartingIdx(dayIdx); try { const session = await startWorkoutSession({ plan_id: plan.id, plan_day_index: dayIdx }); router.push(`/train/session?id=${session.id}`) } catch { toast.error("Couldn't start the workout. Try again."); setStartingIdx(null) } }
+  async function handleStartWorkout(dayIdx: number, discard?: WorkoutSession) {
+    if (startingIdx !== null) return
+    setStartingIdx(dayIdx)
+    setAskOpen(false)
+    try {
+      if (discard) await abandonWorkoutSession(discard.id)
+      else {
+        // Not knowing (offline) starts anyway. The same plan day already open needs no question: startSession returns it.
+        const open = await getInProgressSession().catch(() => null)
+        if (open && !(open.plan_id === plan.id && open.plan_day_index === dayIdx)) { setAsk({ session: open, dayIdx }); setAskOpen(true); setStartingIdx(null); return }
+      }
+      const result = await startWorkoutSessionWithStatus({ plan_id: plan.id, plan_day_index: dayIdx })
+      // A start queued offline has no session to open yet (its pending id never loads).
+      if (result.queued) { toast.success(OFFLINE_START); setStartingIdx(null); return }
+      router.push(`/train/session?id=${result.data.id}`)
+    } catch { toast.error("Couldn't start the workout. Try again."); setStartingIdx(null) }
+  }
   async function makeActive() { setActivating(true); try { await activatePlan(plan.id); toast.success('This is your plan now'); router.refresh() } catch { toast.error("Couldn't make it active. Try again.") } finally { setActivating(false) } }
   // Height never animates: the card and the rows below glide by transform (framer layout), the panel fades.
   const layout = reduce ? { duration: 0 } : spring.glide
@@ -109,6 +132,14 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
           <span><span className="block text-center">No workout days yet</span><span className="block text-center">Edit the plan to add some, or ask Geo</span></span>
         </div>
       )}
+      <UnfinishedWorkoutSheet
+        open={askOpen}
+        session={ask?.session ?? null}
+        nextName={ask ? days[ask.dayIdx]?.name || `Day ${ask.dayIdx + 1}` : ''}
+        onClose={() => setAskOpen(false)}
+        onResume={() => ask && router.push(`/train/session?id=${ask.session.id}`)}
+        onDiscard={() => ask && void handleStartWorkout(ask.dayIdx, ask.session)}
+      />
     </PlanDetailFrame>
   )
 }

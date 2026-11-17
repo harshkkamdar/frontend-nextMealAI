@@ -180,7 +180,8 @@ export function MealPlanBuilder({ mode, initialPlan }: MealPlanBuilderProps) {
           date: d.date,
           meals: d.meals.map(({ _key, ...m }) => ({ ...m, name: m.name.trim() })),
         })) as MealPlanDay[],
-        notes: notes.trim() || undefined,
+        // Empty, not undefined: JSON drops undefined and the backend's merge would keep the old notes.
+        notes: notes.trim(),
       }
 
       if (mode === 'create') {

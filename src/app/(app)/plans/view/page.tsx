@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { PushedHeader } from '@/components/layout/screen-header'
 import { MealPlanDetail } from '@/components/plans/meal-plan-detail'
 import { SkeletonCard } from '@/components/plans/plan-overview-card'
-import { goBack } from '@/lib/navigation'
 import { WorkoutPlanDetail } from '@/components/plans/workout-plan-detail'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
@@ -27,7 +26,7 @@ function PlanDetailRoute() {
   if (!id) {
     return (
       <div className="mx-auto w-full max-w-md px-gutter">
-        <PushedHeader title="Plan" onBack={() => goBack(router, '/plans')} backLabel="Back to plans" />
+        <PushedHeader title="Plan" onBack={() => router.push('/plans')} backLabel="Back to plans" />
         <p className="mt-4 px-1 text-[15px] text-ink-65">No plan picked. <Link href="/plans" className="inline-flex min-h-11 items-center font-semibold text-ink underline">Back to plans</Link></p>
       </div>
     )
@@ -48,7 +47,7 @@ function PlanDetailView({ id }: { id: string }) {
     <div className="mx-auto w-full max-w-md px-gutter">
       {loading && !plan ? (
         <>
-          <PushedHeader title="Plan" onBack={() => goBack(router, '/plans')} backLabel="Back to plans" />
+          <PushedHeader title="Plan" onBack={() => router.push('/plans')} backLabel="Back to plans" />
           <div className="-mx-gutter"><OfflineBand /></div>
           <div className="mt-1 flex flex-col gap-2.5 px-1" role="status" aria-busy="true" aria-label="Loading this plan">
             <div aria-hidden="true" className="h-8 w-3/4 animate-pulse rounded-[10px] bg-ink-06" />
@@ -59,7 +58,7 @@ function PlanDetailView({ id }: { id: string }) {
         </>
       ) : !plan ? (
         <>
-          <PushedHeader title="Plan" onBack={() => goBack(router, '/plans')} backLabel="Back to plans" />
+          <PushedHeader title="Plan" onBack={() => router.push('/plans')} backLabel="Back to plans" />
           <div className="-mx-gutter"><OfflineBand /></div>
           <div className="mt-1">
             {error && !(error instanceof ApiException && error.statusCode === 404)
