@@ -19,6 +19,7 @@ import { useComposerStore } from '@/stores/composer.store'
 import { cn } from '@/lib/utils'
 import { ApiException } from '@/types/api.types'
 import { CARD, FIELD, LIST } from './log-ui'
+import { toastLogged } from './diet-warning'
 import { MacroDots } from './food-item-sheet'
 import { editPhotoMacros, estimateEdits, photoItemMacros, photoItemsFrom, photoTotals, stepItem, UNSURE, type Meal, type PhotoItem } from './log-math'
 
@@ -93,9 +94,9 @@ export function PhotoResult({ file, meal, localDate, onRetake, onSearch, onGeo, 
         estimate.estimate_id,
         estimateEdits(estimate, items),
         { meal_type: chosenMeal, local_date: localDate },
-      ) as { log?: { id: string; payload?: { meal_type?: string } } } | undefined
+      )
       let filed = true
-      if (res?.log?.id && res.log.payload?.meal_type !== chosenMeal) {
+      if (res?.log?.id && (res.log.payload as { meal_type?: string } | undefined)?.meal_type !== chosenMeal) {
         try {
           await updateLog(res.log.id, { meal_type: chosenMeal })
         } catch {
@@ -103,12 +104,14 @@ export function PhotoResult({ file, meal, localDate, onRetake, onSearch, onGeo, 
         }
       }
       void haptic('success')
-      if (filed) toast.success(`Logged ${kept.length === 1 ? kept[0].name : `${kept.length} items`} to ${meal}`)
+      if (filed) toastLogged(`Logged ${kept.length === 1 ? kept[0].name : `${kept.length} items`} to ${meal}`, [res?.diet_warning])
       else toast.error(`Logged, but I couldn't file it under ${meal}. Move it from Food.`)
       onLogged()
     } catch (error) {
       if (error instanceof ApiException && error.error === 'estimate_expired') setPhase('expired')
       else if (error instanceof ApiException && error.error === 'estimate_already_used') { toast.success('Already logged'); onLogged() }
+      // A refusal (a date too far back, say) carries the backend's reason; only a request that never got an answer is the connection.
+      else if (error instanceof ApiException) toast.error(error.statusCode < 500 && error.details ? error.details : "Couldn't log that. Try again.")
       else toast.error("Couldn't log that. Check your connection and try again.")
     } finally {
       setLogging(false)

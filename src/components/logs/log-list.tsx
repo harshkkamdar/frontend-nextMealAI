@@ -58,13 +58,15 @@ function getLogDescription(log: Log): string {
     case 'food':
       return (log.payload as FoodPayload).food_name
     case 'workout': {
-      // Workout logs come from two sources:
+      // Workout logs come from three sources:
       //   (a) manual form entry — payload has `exercise`
       //   (b) session completion (POST /v1/workout-sessions/:id/complete) —
       //       payload has `day_name` + `session_id`, no `exercise`
+      //   (c) health import and freestyle multi-exercise logs — payload has only `title`
       // Fall back through the chain so no row ever renders a blank title. See FB-09.
       const w = log.payload as WorkoutPayload
       if (w.exercise) return w.exercise
+      if (w.title) return w.title
       if (w.day_name) return `${w.day_name} completed`
       return 'Workout completed'
     }

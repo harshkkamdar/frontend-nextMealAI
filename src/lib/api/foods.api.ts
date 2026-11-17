@@ -2,6 +2,7 @@ import { geoTask } from '@/stores/ui.store'
 import { apiFetch } from './client'
 import { syncBus } from '@/lib/sync/sync-bus'
 import type { FoodSearchResult, UserFood, CreateFoodInput } from '@/types/foods.types'
+import type { DietWarning, Log } from '@/types/logs.types'
 
 // FB-R6-13 — Food estimate from photo (vision pipeline), as the backend's FoodEstimateItem sends it.
 export interface FoodEstimateItem {
@@ -29,13 +30,16 @@ export async function estimateFoodFromPhoto(file: File): Promise<FoodEstimate> {
   return geoTask(() => apiFetch<FoodEstimate>('/v1/foods/estimate-from-photo', { method: 'POST', body: form }))
 }
 
+/** log-from-estimate's 201; `diet_warning` when a food clashes with the profile's diet (it logged anyway). */
+type EstimateLogged = { log?: Log; estimate_id: string; consumed_at: string; diet_warning?: DietWarning }
+
 /** FB-R6-13 — POST /v1/foods/log-from-estimate. `edits` merges over saved estimate. */
 export async function logFromEstimate(
   estimate_id: string,
   edits?: Partial<FoodEstimate>,
   opts?: { meal_type?: string; local_date?: string },
-): Promise<unknown> {
-  const result = await apiFetch('/v1/foods/log-from-estimate', {
+): Promise<EstimateLogged> {
+  const result = await apiFetch<EstimateLogged>('/v1/foods/log-from-estimate', {
     method: 'POST',
     body: { estimate_id, ...(edits ? { edits } : {}), ...opts },
   })

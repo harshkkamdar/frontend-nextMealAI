@@ -1,5 +1,6 @@
 import { toast } from 'sonner'
 import { createLogWithStatus, deleteLog } from '@/lib/api/logs.api'
+import { toastLogged } from '@/components/logs/diet-warning'
 import { haptic } from '@/lib/platform/app'
 import type { CreateLogInput } from '@/types/logs.types'
 
@@ -16,7 +17,7 @@ export async function logWithUndo(input: CreateLogInput, message: string, after:
     if (result.queued) {
       toast.success(`${message}. Saved on your phone, syncs when you're back online`)
     } else {
-      toast.success(message, {
+      toastLogged(message, [result.data.diet_warning], {
         // Sonner's default action is 24 pt tall; Undo is a real target (>= 44 pt).
         actionButtonStyle: UNDO_STYLE,
         action: {

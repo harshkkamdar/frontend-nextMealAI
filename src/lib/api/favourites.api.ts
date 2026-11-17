@@ -1,5 +1,6 @@
 import { apiFetch } from './client'
 import { offlineMutate } from '@/lib/offline/mutate'
+import type { DietWarning } from '@/types/logs.types'
 import type { OfflineResult } from '@/types/offline.types'
 
 export interface FavouriteItem {
@@ -36,23 +37,18 @@ export async function deleteFavourite(id: string): Promise<void> {
   await apiFetch(`/v1/favourites/${id}`, { method: 'DELETE' })
 }
 
-/** One-tap log every item of a favourite (default today + the favourite's meal). */
-export async function logFavourite(
-  id: string,
-  body?: { target_date?: string; target_meal_type?: string },
-): Promise<{ success: boolean; favourite: string; logged: number; total: number; target_date: string }> {
-  const result = await logFavouriteWithStatus(id, body)
-  return result.queued ? result.optimistic : result.data
-}
-
+/** POST /v1/favourites/:id/log. Nothing logged is a 400 NOTHING_LOGGED, not a 200 with `logged: 0`. */
 type LogFavouriteResult = {
   success: boolean
   favourite: string
   logged: number
   total: number
   target_date: string
+  /** An item clashes with the profile's diet; it logged anyway. */
+  diet_warning?: DietWarning
 }
 
+/** One-tap log every item of a favourite (default today + the favourite's meal); offline it queues. */
 export async function logFavouriteWithStatus(
   id: string,
   body?: { target_date?: string; target_meal_type?: string },

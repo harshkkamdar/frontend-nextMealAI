@@ -47,12 +47,13 @@ export function summaryCopy({ eaten, target, kind, logged, dayLabel }: { eaten: 
   return { value: Math.abs(left), unit: left >= 0 ? 'kcal left' : 'kcal over', strong: fmt(eaten), rest: ` eaten of ${fmt(target)}` }
 }
 
-/** Days a single item can be copied to (mock copy sheet): up to three, never the day it is on. The first is the default. */
-export function copyDays(date: string, today: string): string[] {
-  const days = [today, shiftISO(today, 1), shiftISO(today, 2)]
-  if (date !== today) days.unshift(shiftISO(today, -1))
-  return days.filter((d) => d !== date).slice(0, 3)
+/** Days a food or a meal can be copied to: today and the week ahead (the backend takes logs preset up to 7 days forward). */
+export function copyDays(today: string): string[] {
+  return Array.from({ length: 8 }, (_, index) => shiftISO(today, index))
 }
+
+/** The copy's default day: tomorrow for something on today, else today. */
+export const defaultCopyDay = (date: string, today: string) => (date === today ? shiftISO(today, 1) : today)
 
 export type MacroHue = 'protein' | 'carbs' | 'fat'
 

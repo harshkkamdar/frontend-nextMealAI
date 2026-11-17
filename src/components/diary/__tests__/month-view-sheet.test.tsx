@@ -40,4 +40,20 @@ describe('MonthViewSheet on a past month', () => {
     render(<MonthViewSheet isOpen initialDate="2026-10-26" onClose={() => {}} onSelectDate={() => {}} tz="UTC" />)
     expect(await screen.findByText('31 days logged')).toBeInTheDocument()
   })
+
+  it('food set ahead on a later day this month is not counted as logged, nor in the average', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-11-17T10:00:00Z'))
+    const rows = [
+      logRow('a', 'food', '2026-11-16', '2026-11-16T08:00:00.000Z', { food_name: 'Oats', est_macros: { calories: 1800 } }),
+      logRow('b', 'food', '2026-11-17', '2026-11-17T08:00:00.000Z', { food_name: 'Toast', est_macros: { calories: 2200 } }),
+      // Copied to Thursday on Tuesday: the backend takes it up to 7 days ahead.
+      logRow('c', 'food', '2026-11-19', '2026-11-17T08:05:00.000Z', { food_name: 'Dal', est_macros: { calories: 600 }, copied_from: 'a' }),
+    ]
+    getLogs.mockImplementation((await vi.importActual<typeof import('@/lib/api/logs.api')>('@/lib/api/logs.api')).getLogs)
+    apiFetch.mockImplementation(backendGetLogs(rows, '2026-11-17'))
+    render(<MonthViewSheet isOpen initialDate="2026-11-17" onClose={() => {}} onSelectDate={() => {}} tz="UTC" />)
+    expect(await screen.findByText('2 days logged')).toBeInTheDocument()
+    expect(screen.getByText('Average 2,000 kcal')).toBeInTheDocument()
+  })
 })

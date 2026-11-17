@@ -32,6 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             classNames: {
               toast: "flex items-center gap-2.5 rounded-[24px] bg-ink py-0.5 pl-4 pr-0.5 text-[14px] font-medium leading-[1.35] text-cream before:size-2 before:shrink-0 before:rounded-full before:bg-cream before:content-['']",
               error: 'before:bg-transparent before:shadow-[inset_0_0_0_2px_#FDF6EC]',
+              // A log that saved but clashes with the diet: the orange mark, as problems are marked elsewhere.
+              warning: 'before:bg-accent',
               content: 'min-w-0 flex-1 py-[13px] pr-3.5',
               actionButton: 'relative h-11 min-w-11 shrink-0 rounded-[20px] px-3.5 text-[14px] font-bold text-cream active:opacity-60',
             },

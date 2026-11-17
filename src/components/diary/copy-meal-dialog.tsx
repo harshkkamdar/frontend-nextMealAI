@@ -5,12 +5,10 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import type { FoodPayload, Log } from '@/types/logs.types'
 import { ChoiceGrid, GroupLabel } from './choice-grid'
-import { kcalText, shiftISO } from './diary-logic'
+import { copyDays, defaultCopyDay, kcalText } from './diary-logic'
 import { dayChip } from './row-actions-sheet'
 
 const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const
-/** Today and the week ahead: the backend takes meals preset up to 7 days forward. */
-const PLAN_DAYS = 8
 
 interface CopyMealDialogProps {
   open: boolean
@@ -41,8 +39,8 @@ export function CopyMealDialog({ open, sourceMeal, items, sourceDate, today, onC
     if (open) { setLeft([]); setDay(null); setMeal(null) }
   }
 
-  const days = Array.from({ length: PLAN_DAYS }, (_, index) => shiftISO(today, index))
-  const pickedDay = day ?? (sourceDate === today ? days[1] : today)
+  const days = copyDays(today)
+  const pickedDay = day ?? defaultCopyDay(sourceDate, today)
   const pickedMeal = meal ?? sourceMeal ?? 'Breakfast'
   const chosen = items.filter((item) => !left.includes(item.id))
   const toggle = (id: string) => setLeft((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))

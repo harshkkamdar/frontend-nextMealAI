@@ -65,12 +65,9 @@ describe('MealGroup photo-led rows (journey-food C3, D1)', () => {
     expect(screen.queryByRole('button', { name: /expand items/i })).toBeNull()
   })
 
-  it('a row without a photo shows a glyph, and an https photo_url shows the photo', () => {
-    const { container, rerender } = render(<MealGroup mealType="Lunch" items={[makeFoodLog()]} onAddFood={() => {}} />)
+  it('a row shows its meal glyph (the backend writes no photo to a food log)', () => {
+    const { container } = render(<MealGroup mealType="Lunch" items={[makeFoodLog()]} onAddFood={() => {}} />)
     expect(container.querySelector('img')).toBeNull()
-    const withPhoto = makeFoodLog({ payload: { food_name: 'Bowl', est_macros: { calories: 10 }, photo_url: 'https://cdn.example.com/p.jpg' } as never })
-    rerender(<MealGroup mealType="Lunch" items={[withPhoto]} onAddFood={() => {}} />)
-    expect(container.querySelector('img')?.getAttribute('src')).toBe('https://cdn.example.com/p.jpg')
   })
 
   it('a meal with more than 7 rows shows 6 and a Show more row', () => {

@@ -29,3 +29,20 @@ export function backendGetLogs(rows: Log[], today: string) {
 export function logRow(id: string, type: string, localDate: string, createdAt: string, payload: Record<string, unknown>): Log {
   return { id, user_id: 'u', type, source: 'manual', local_date: localDate, deleted_at: null, client_dedupe_key: null, payload, created_at: createdAt, updated_at: null } as unknown as Log
 }
+
+/**
+ * PATCH /v1/logs/:id as the backend answers it (logs.controller.ts updateLog): the body crosses the wire as JSON (an
+ * undefined key never arrives), the payload merges over the stored one, a key sent as null is removed, and the reply
+ * is the updated row. Rows are updated in place, so a test reads what was stored.
+ */
+export function backendUpdateLog(rows: Log[]) {
+  return (id: string, payload: unknown) => {
+    const row = rows.find((r) => r.id === id)
+    if (!row) return Promise.reject(new Error('404 NOT_FOUND: Log not found'))
+    const sent = JSON.parse(JSON.stringify(payload ?? {})) as Record<string, unknown>
+    const merged: Record<string, unknown> = { ...(row.payload as unknown as Record<string, unknown>), ...sent }
+    for (const key of Object.keys(sent)) if (sent[key] === null) delete merged[key]
+    row.payload = merged as unknown as Log['payload']
+    return Promise.resolve(row)
+  }
+}

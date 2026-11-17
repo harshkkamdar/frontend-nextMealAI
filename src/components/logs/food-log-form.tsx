@@ -21,6 +21,7 @@ import type { FoodSearchResult, UserFood } from '@/types/foods.types'
 import { FoodFormSheet } from './food-form-sheet'
 import { FoodItemSheet, plateItemFor, SOURCE_LABELS } from './food-item-sheet'
 import { CARD, Chips, LIST, RiseList, RowsSkeleton, SearchField, SectionTitle } from './log-ui'
+import { toastLogged } from './diet-warning'
 import { MEALS, mealForTime, parseMeal, type Meal, type PlateItem } from './log-math'
 import { PhotoResult } from './photo-result'
 import { PlatePill, PlateSheet } from './plate-tray'
@@ -136,11 +137,11 @@ export function FoodLogForm() {
     setSaving(true)
     try {
       const drafts = items.map((i) => ({ food_name: i.name, quantity_g: i.grams, est_macros: i.macros, meal_type: meal.toLowerCase(), user_food_id: i.user_food_id, servings: i.servings, serving_size_g: i.serving_size_g }))
-      const { failures } = await createLogs(buildFoodLogItems(drafts, null, logDate))
+      const { created, failures } = await createLogs(buildFoodLogItems(drafts, null, logDate))
       const done = items.length - failures.length
       if (failures.length === 0) {
         void haptic('success')
-        toast.success(`Logged ${items.length === 1 ? items[0].name : `${items.length} items`} to ${meal}`)
+        toastLogged(`Logged ${items.length === 1 ? items[0].name : `${items.length} items`} to ${meal}`, created.map((log) => log.diet_warning))
         router.back()
         return
       }
@@ -162,6 +163,12 @@ export function FoodLogForm() {
   const trimmed = query.trim()
   const showResults = trimmed.length >= 2
   const noMatch = showResults && !searching && !searchFailed && results.length === 0 && searchedQuery === trimmed
+
+  const createButton = (
+    <button type="button" onClick={() => setCreateForm((current) => ({ open: true, name: trimmed, seq: current.seq + 1 }))} className={`${SOFT_BUTTON} mt-3`}>
+      {`Create "${trimmed}"`}
+    </button>
+  )
 
   const header = (
     <PushedHeader
@@ -273,13 +280,15 @@ export function FoodLogForm() {
         ) : noMatch ? (
           <>
             <p role="status" className="px-1 text-body-sm leading-[1.4] text-ink">Nothing matches &ldquo;{trimmed}&rdquo;. Try a shorter name, or snap a photo.</p>
-            <button type="button" onClick={() => setCreateForm((current) => ({ open: true, name: trimmed, seq: current.seq + 1 }))} className={`${SOFT_BUTTON} mt-3`}>
-              {`Create "${trimmed}"`}
-            </button>
+            {createButton}
             <FoodList title="Recent" foods={usual.slice(0, 4).map(asResult)} onPick={setPicked} onAdd={quickAdd} personal className="mt-5" />
           </>
         ) : (
-          <FoodList foods={results} onPick={setPicked} onAdd={quickAdd} label="Search results" />
+          <>
+            <FoodList foods={results} onPick={setPicked} onAdd={quickAdd} label="Search results" />
+            {/* Loose matches ("Lamb testes" for "veg pulao") must not hide making the food you meant. */}
+            {createButton}
+          </>
         )}
       </div>
 

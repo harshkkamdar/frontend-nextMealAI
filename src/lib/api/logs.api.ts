@@ -107,9 +107,12 @@ export async function createLogs(items: CreateLogInput[]): Promise<BatchCreateLo
   return { created, failures }
 }
 
+/** A PATCH payload: merged over the stored one. Send null to remove a key; undefined never reaches the server (JSON drops it). */
+export type LogPayloadPatch<T = Log['payload']> = { [K in keyof T]?: T[K] | null }
+
 export async function updateLog(
   id: string,
-  payload: Partial<Log['payload']>
+  payload: LogPayloadPatch
 ): Promise<Log> {
   const log = await apiFetch<Log>(`/v1/logs/${id}`, { method: 'PATCH', body: { payload } })
   syncBus.emit('logs:updated')

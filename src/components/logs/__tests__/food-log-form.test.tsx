@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   upload: vi.fn(),
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
+  toastWarning: vi.fn(),
   back: vi.fn(),
   push: vi.fn(),
   searchParamsStr: '',
@@ -25,7 +26,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ back: mocks.back, push: mocks.push }),
   useSearchParams: () => new URLSearchParams(mocks.searchParamsStr),
 }))
-vi.mock('sonner', () => ({ toast: { error: mocks.toastError, success: mocks.toastSuccess } }))
+vi.mock('sonner', () => ({ toast: { error: mocks.toastError, success: mocks.toastSuccess, warning: mocks.toastWarning } }))
 vi.mock('@/components/ui/bottom-sheet', () => ({
   BottomSheet: ({ open, children }: { open: boolean; children: React.ReactNode }) => (open ? <div role="dialog">{children}</div> : null),
 }))
@@ -48,6 +49,9 @@ vi.mock('@/lib/image/compress', () => ({ compressImage: (file: File) => Promise.
 
 import { FoodLogForm } from '@/components/logs/food-log-form'
 import { __resetComposerStoreForTests, useComposerStore } from '@/stores/composer.store'
+import { logRow } from '@/test/backend-logs'
+import { ApiException } from '@/types/api.types'
+import type { CreateFoodInput, FoodSearchResult } from '@/types/foods.types'
 
 const FOOD: UserFood = {
   id: 'f1', user_id: 'u', name: 'Greek yoghurt', serving_size_g: 170, source: 'manual', is_favorite: true, use_count: 3,
@@ -72,12 +76,24 @@ function pickPhoto(container: HTMLElement) {
   fireEvent.change(input)
 }
 
+/** POST /v1/foods as the backend answers it: a name you already have updates that food and returns it; a new name is a new row. */
+function backendSaveFood(foods: UserFood[]) {
+  return (body: CreateFoodInput) => {
+    const name = (n: string) => n.trim().toLowerCase().replace(/\s+/g, ' ')
+    const existing = foods.find((food) => name(food.name) === name(body.name))
+    if (existing) return Promise.resolve(Object.assign(existing, body, { name: existing.name }))
+    const created: UserFood = { id: `created-${foods.length}`, user_id: 'u', use_count: 0, created_at: '2026-11-17T00:00:00Z', is_favorite: false, ...body } as UserFood
+    foods.push(created)
+    return Promise.resolve(created)
+  }
+}
+
 describe('FoodLogForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.getPersonalFoods.mockResolvedValue([FOOD, BANANA])
     mocks.searchFoods.mockResolvedValue([])
-    mocks.saveFood.mockResolvedValue({ ...FOOD, id: 'created', name: 'dosa', source: 'manual', serving_size_g: 100, macros_per_serving: { calories: 0, protein: 0, carbs: 0, fat: 0 } })
+    mocks.saveFood.mockImplementation(backendSaveFood([structuredClone(FOOD), structuredClone(BANANA)]))
     mocks.createLogs.mockResolvedValue({ created: [{}], failures: [] })
     mocks.upload.mockResolvedValue({ storage_path: 'chat/photo.jpg' })
     mocks.searchParamsStr = ''
@@ -147,7 +163,7 @@ describe('FoodLogForm', () => {
     expect(items).toHaveLength(2)
     expect(items[0]).toMatchObject({ type: 'food', local_date: '2026-10-25', payload: { food_name: 'Greek yoghurt', quantity_g: 340, servings: 2, serving_size_g: 170, meal_type: 'dinner', user_food_id: 'f1', est_macros: { calories: 200 } } })
     await waitFor(() => expect(mocks.back).toHaveBeenCalled())
-    expect(mocks.toastSuccess).toHaveBeenCalledWith('Logged 2 items to Dinner')
+    expect(mocks.toastSuccess).toHaveBeenCalledWith('Logged 2 items to Dinner', undefined)
   })
 
   it('a partial save keeps only what failed on the plate and says so', async () => {
@@ -245,5 +261,70 @@ describe('FoodLogForm', () => {
     await waitFor(() => expect(mocks.saveFood).toHaveBeenCalledWith(expect.objectContaining({ name: 'dosa', serving_size_g: 100, source: 'manual' })))
     const sheet = await screen.findByTestId('food-item-sheet')
     expect(within(sheet).getByRole('heading', { name: 'dosa' })).toBeInTheDocument()
+  })
+  it('a plate food that clashes with the diet still logs, and the logged toast says so', async () => {
+    const salmon = { ...logRow('l1', 'food', '2026-11-17', '2026-11-17T09:00:00.000Z', { food_name: 'Salmon nigiri', quantity_g: 170, meal_type: 'snack' }), diet_warning: { food_name: 'salmon nigiri', restriction: 'vegetarian', source: 'dietary_style' as const } }
+    mocks.createLogs.mockResolvedValueOnce({ created: [salmon], failures: [] })
+    mocks.searchParamsStr = 'meal=snack'
+    render(<FoodLogForm />)
+    await screen.findAllByTestId('personal-food-row')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Greek yoghurt to your plate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Log' }))
+    await waitFor(() => expect(mocks.toastWarning).toHaveBeenCalledWith("Logged Greek yoghurt to Snack. Salmon nigiri doesn't fit your vegetarian diet.", undefined))
+    expect(mocks.toastSuccess).not.toHaveBeenCalled()
+    expect(mocks.back).toHaveBeenCalled()
+  })
+
+  it('photo: a refused log shows the backend reason; only a network failure says check your connection', async () => {
+    mocks.searchParamsStr = 'meal=lunch&date=2026-10-01'
+    mocks.estimate.mockResolvedValueOnce(ESTIMATE)
+    // What client.ts throws for log-from-estimate's 400 { error: 'backdate_out_of_range', message }.
+    mocks.logFromEstimate.mockRejectedValueOnce(new ApiException(400, 'backdate_out_of_range', undefined, 'Requested date is older than the 7-day backfill window.'))
+    const { container } = render(<FoodLogForm />)
+    pickPhoto(container)
+    await screen.findByTestId('photo-result')
+    fireEvent.click(screen.getByRole('button', { name: 'Log 2 items to Lunch' }))
+    await waitFor(() => expect(mocks.toastError).toHaveBeenCalledWith('Requested date is older than the 7-day backfill window.'))
+    mocks.logFromEstimate.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    fireEvent.click(screen.getByRole('button', { name: 'Log 2 items to Lunch' }))
+    await waitFor(() => expect(mocks.toastError).toHaveBeenLastCalledWith("Couldn't log that. Check your connection and try again."))
+  })
+
+  it('photo: a diet clash rides on the logged toast', async () => {
+    mocks.searchParamsStr = 'meal=lunch'
+    mocks.estimate.mockResolvedValueOnce(ESTIMATE)
+    mocks.logFromEstimate.mockResolvedValueOnce({
+      log: logRow('log-9', 'food', '2026-11-17', '2026-11-17T09:00:00.000Z', { food_name: 'Chicken + Sauce', meal_type: 'lunch', source: 'photo_estimate' }),
+      estimate_id: 'est-1',
+      consumed_at: '2026-11-17T09:00:01.000Z',
+      diet_warning: { food_name: 'chicken', restriction: 'vegetarian', source: 'dietary_style' },
+    })
+    const { container } = render(<FoodLogForm />)
+    pickPhoto(container)
+    await screen.findByTestId('photo-result')
+    fireEvent.click(screen.getByRole('button', { name: 'Log 2 items to Lunch' }))
+    await waitFor(() => expect(mocks.toastWarning).toHaveBeenCalledWith("Logged 2 items to Lunch. Chicken doesn't fit your vegetarian diet.", undefined))
+  })
+
+  it('offers Create at the end of loose search results', async () => {
+    const lamb: FoodSearchResult = { id: null, usda_fdc_id: 174353, name: 'Lamb, variety meats and by-products, testes, cooked', serving_size_g: 100, macros_per_serving: { calories: 135, protein: 26, carbs: 0, fat: 3 }, source: 'usda', is_favorite: false, use_count: 0 }
+    mocks.searchFoods.mockResolvedValue([lamb])
+    render(<FoodLogForm />)
+    fireEvent.change(screen.getByTestId('food-search-input'), { target: { value: 'veg pulao' } })
+    expect(await screen.findByText(/testes/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Create "veg pulao"' })).toBeInTheDocument()
+  })
+
+  it('creating a food you already have shows that food as the backend updated it, once', async () => {
+    mocks.searchFoods.mockResolvedValue([{ ...BANANA, source: 'personal' }])
+    render(<FoodLogForm />)
+    fireEvent.change(screen.getByTestId('food-search-input'), { target: { value: 'banana' } })
+    fireEvent.click(await screen.findByRole('button', { name: 'Create "banana"' }))
+    fireEvent.change(screen.getByLabelText('Calories'), { target: { value: '90' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save food' }))
+    const sheet = await screen.findByTestId('food-item-sheet')
+    expect(within(sheet).getByRole('heading', { name: 'Banana' })).toBeInTheDocument()
+    expect(within(sheet).getByTestId('item-kcal').textContent).toBe('90')
+    expect(mocks.toastSuccess).toHaveBeenCalledWith('Food saved')
   })
 })

@@ -12,8 +12,10 @@ import { CARD, Chips, EmptySlot, FIELD, LIST, ROW, RiseList, RowsSkeleton, Searc
 import { FieldLabel } from '@/components/logs/manual-log-shell'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
-import { getFavourites, logFavourite, deleteFavourite, type Favourite } from '@/lib/api/favourites.api'
-import { createLog, createLogs, updateLog, deleteLog } from '@/lib/api/logs.api'
+import { getFavourites, logFavouriteWithStatus, deleteFavourite, type Favourite } from '@/lib/api/favourites.api'
+import { createLog, createLogs, updateLog, deleteLog, type LogPayloadPatch } from '@/lib/api/logs.api'
+import { toastLogged } from '@/components/logs/diet-warning'
+import { ApiException } from '@/types/api.types'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import type { CreateLogInput } from '@/types/logs.types'
@@ -283,13 +285,15 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   const handleLogFavourite = async (f: Favourite) => {
     setLoggingFav(f.id)
     try {
-      const r = await logFavourite(f.id, { target_date: logDate, target_meal_type: mealType.toLowerCase() })
+      const result = await logFavouriteWithStatus(f.id, { target_date: logDate, target_meal_type: mealType.toLowerCase() })
       void haptic('success')
-      toast.success(`Logged ${f.name}, ${r.logged} item${r.logged === 1 ? '' : 's'}`)
+      if (result.queued) toast.success(`Logged ${f.name}. Saved on your phone, syncs when you're back online`)
+      else toastLogged(`Logged ${f.name}, ${result.data.logged} item${result.data.logged === 1 ? '' : 's'}`, [result.data.diet_warning])
       onFoodLogged()
       onClose()
-    } catch {
-      toast.error('Failed to log meal')
+    } catch (error) {
+      // Nothing logged (every item refused) is a 400 with the reason.
+      toast.error(error instanceof ApiException && error.statusCode < 500 && error.details ? error.details : 'Failed to log meal')
     } finally {
       setLoggingFav(null)
     }
@@ -531,12 +535,15 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
       calculatedMacros ?? (existingLog.payload as FoodPayload).est_macros ?? null
     )
     // An itemised log saves its components (the backend re-sums the parent); a single food saves its amount.
-    const updated: Partial<FoodPayload> = editItems
+    // Grams clear the serving count and its label (null removes the key; "2 eggs" must not survive a switch to 150 g).
+    const updated: LogPayloadPatch<FoodPayload> = editItems
       ? { items: editItems, est_macros: quantizeMacros(sumItems(editItems)), meal_type: editMeal.toLowerCase() }
-      : { quantity_g: quantity, servings: inputMode === 'servings' ? servings : undefined, est_macros: macros, meal_type: editMeal.toLowerCase() }
+      : inputMode === 'servings'
+        ? { quantity_g: quantity, servings, est_macros: macros, meal_type: editMeal.toLowerCase() }
+        : { quantity_g: quantity, servings: null, serving_label: null, est_macros: macros, meal_type: editMeal.toLowerCase() }
     try {
       await updateLog(existingLog.id, updated)
-      onLogUpdated?.(existingLog.id, { ...(existingLog.payload as FoodPayload), ...updated })
+      onLogUpdated?.(existingLog.id, { ...(existingLog.payload as FoodPayload), ...updated } as FoodPayload)
       toast.success('Updated')
       onClose()
     } catch {

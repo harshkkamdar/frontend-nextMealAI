@@ -1,18 +1,18 @@
 'use client'
 
-import { useId, useState, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { WeightFill } from '@/components/ui/fiqr/icons'
 import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
-import { createLogWithStatus } from '@/lib/api/logs.api'
+import { createLogWithStatus, getLogs } from '@/lib/api/logs.api'
 import { haptic } from '@/lib/platform/app'
 import { useOnline } from '@/lib/platform/network'
 import { cn } from '@/lib/utils'
 import type { CreateLogInput } from '@/types/logs.types'
 import { WATER_GOAL_GLASSES, weightDeltaText } from './home-cards'
 import { AlertIcon, MinusLine, PlusLine } from './home-icons'
-import { formatSleep } from './home-data'
+import { formatSleep, weightTile } from './home-data'
 import { formatKg } from '@/components/workout/train-data'
 
 export type QuickLogType = 'water' | 'mood' | 'sleep' | 'energy' | 'weight' | null
@@ -213,6 +213,14 @@ function WeightTrend({ series }: { series: number[] }) {
 
 function WeightSheet({ history, onDone }: { history: WeightHistory; onDone: () => void }) {
   const [kg, setKg] = useState(history.kg ? formatKg(history.kg) : '')
+  // Home holds 8 days of logs and Check-in one week, so a weigh-in before that never reached the trend ("draws after
+  // two weigh-ins" with two logged). The sheet reads the weigh-ins themselves, the caller's series until they arrive.
+  const [series, setSeries] = useState(history.series)
+  useEffect(() => {
+    let alive = true
+    getLogs({ type: 'weight', days: 90 }).then((logs) => { if (alive) setSeries(weightTile(logs, null, history.today).series) }, () => {})
+    return () => { alive = false }
+  }, [history.today])
   const { saving, failed, save } = useSave(onDone)
   const hintId = useId()
   const value = Number(kg)
@@ -235,7 +243,7 @@ function WeightSheet({ history, onDone }: { history: WeightHistory; onDone: () =
         </div>
         {delta ? <span className={cn('shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold', down ? 'bg-macro-teal text-card' : 'bg-ink-06 text-ink')}>{delta} this week</span> : null}
       </div>
-      <WeightTrend series={history.series.slice(-14)} />
+      <WeightTrend series={series.slice(-14)} />
       <div className={cn('flex h-field items-center gap-2 rounded-[20px] bg-card px-2 outline outline-1 -outline-offset-1', bad ? 'outline-accent' : 'outline-ink-10')}>
         <button type="button" aria-label="Down 0.1 kg" onClick={() => nudge(-0.1)} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink-06 text-ink active:scale-[.94]"><MinusLine className="size-5" /></button>
         <input

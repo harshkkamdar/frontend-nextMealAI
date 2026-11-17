@@ -138,8 +138,8 @@ export function MonthViewSheet({
     [anchor, breakdown, today]
   )
 
-  // Footer: days with food logged in the shown month, and their average (journey-food month sheet).
-  const monthDays = breakdown.filter((r) => r.date.startsWith(anchor.slice(0, 7)) && r.calories > 0)
+  // Footer: days with food logged in the shown month, and their average (journey-food month sheet). A day planned ahead isn't logged yet.
+  const monthDays = breakdown.filter((r) => r.date.startsWith(anchor.slice(0, 7)) && r.date <= today && r.calories > 0)
   const average = monthDays.length ? Math.round(monthDays.reduce((t, r) => t + r.calories, 0) / monthDays.length) : 0
   // The backend accepts logs up to 7 days ahead, so later days have nothing to open.
   const lastOpenDay = shiftISO(today, 7)

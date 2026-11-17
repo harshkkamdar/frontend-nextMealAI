@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { macroSplit } from '../plan-parts'
-import { copyDays, dayKind, dominantMacro, logPhoto, mealOf, quantityLabel, shiftISO, summaryCopy } from '../diary-logic'
+import { copyDays, dayKind, defaultCopyDay, dominantMacro, logPhoto, mealOf, quantityLabel, shiftISO, summaryCopy } from '../diary-logic'
 
 const base = { dayLabel: 'Thu 22 Oct', logged: true }
 
@@ -32,10 +32,10 @@ describe('days', () => {
     expect(shiftISO('2026-10-31', 1)).toBe('2026-11-01')
     expect(shiftISO('2026-04-05', -1)).toBe('2026-04-04')
   })
-  it('copyDays skips the source day and offers at most three', () => {
-    expect(copyDays('2026-10-26', '2026-10-26')).toEqual(['2026-10-27', '2026-10-28'])
-    expect(copyDays('2026-10-25', '2026-10-26')).toEqual(['2026-10-26', '2026-10-27', '2026-10-28'])
-    expect(copyDays('2026-10-20', '2026-10-26')).toEqual(['2026-10-25', '2026-10-26', '2026-10-27'])
+  it('copyDays offers today and the week ahead; the default is tomorrow for today\'s food, else today', () => {
+    expect(copyDays('2026-10-26')).toEqual(['2026-10-26', '2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02'])
+    expect(defaultCopyDay('2026-10-26', '2026-10-26')).toBe('2026-10-27')
+    expect(defaultCopyDay('2026-10-20', '2026-10-26')).toBe('2026-10-26')
   })
 })
 

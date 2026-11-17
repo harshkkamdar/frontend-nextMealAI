@@ -80,7 +80,7 @@ export function HealthWeek({ metric }: { metric: 'steps' | 'sleep' }) {
           </ol>
         </section>
         <p className="mt-3 px-0.5 text-caption text-ink-65">7-day average {show(average!)}</p>
-      </> : <p className="mt-2 text-[15px] text-ink-65">{metric === 'sleep' ? 'No nights logged this week.' : 'No steps synced this week.'}</p>}
+      </> : <p className="mt-2 text-[15px] text-ink-65">{metric === 'sleep' ? 'No nights logged this week.' : `No steps synced this week.${health.label ? '' : ' Steps sync from the FIQR phone app.'}`}</p>}
       {metric === 'sleep' ? (
         <>
           <button type="button" className={`${INK_BUTTON} mt-4`} onClick={() => setLogging(true)}>Log last night</button>

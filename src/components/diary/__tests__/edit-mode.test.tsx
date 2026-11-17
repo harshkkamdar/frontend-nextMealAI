@@ -3,6 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { FoodSearchSheet } from '../food-search-sheet'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import { updateLog } from '@/lib/api/logs.api'
+import { backendUpdateLog, logRow } from '@/test/backend-logs'
+import { quantityLabel } from '../diary-logic'
 
 vi.mock('@/lib/api/foods.api', () => ({
   searchFoods: vi.fn().mockResolvedValue([]),
@@ -12,33 +14,27 @@ vi.mock('@/lib/api/foods.api', () => ({
 }))
 vi.mock('@/lib/api/logs.api', () => ({
   createLog: vi.fn(),
-  updateLog: vi.fn().mockResolvedValue({} as any),
+  updateLog: vi.fn(),
   deleteLog: vi.fn(),
 }))
 
 describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
-  // Each test reads updateLog.mock.calls[0]; clear call history so one test's
-  // call doesn't shift another's index.
+  // The backend's rows: a test files the log it edits with stored(), and updateLog merges into it as PATCH does.
+  let rows: Log[] = []
+  const stored = (log: Log) => { const row = structuredClone(log); rows.push(row); return row }
   beforeEach(() => {
-    vi.mocked(updateLog).mockClear()
+    rows = []
+    vi.mocked(updateLog).mockReset().mockImplementation(backendUpdateLog(rows))
   })
 
-  const baseLog: Log = {
-    id: 'log-1',
-    user_id: 'u',
-    type: 'food',
-    payload: {
-      food_name: 'Yopro vanilla yogurt',
-      quantity_g: 350,
-      servings: 1,
-      est_macros: { calories: 200, protein: 33.3, carbs: 13.3, fat: 1.8 },
-      meal_type: 'breakfast',
-      user_food_id: 'food-1',
-    },
-    source: 'manual',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
+  const baseLog: Log = logRow('log-1', 'food', '2026-10-26', '2026-10-26T08:00:00.000Z', {
+    food_name: 'Yopro vanilla yogurt',
+    quantity_g: 350,
+    servings: 1,
+    est_macros: { calories: 200, protein: 33.3, carbs: 13.3, fat: 1.8 },
+    meal_type: 'breakfast',
+    user_food_id: 'food-1',
+  })
 
   it('opens in servings mode when log was logged as a serving', () => {
     render(
@@ -107,7 +103,7 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
       } as FoodPayload,
     }
     const updateLogMock = vi.mocked(updateLog)
-    updateLogMock.mockResolvedValue({} as any)
+    stored(twoServingLog)
     render(
       <FoodSearchSheet isOpen mode="edit" existingLog={twoServingLog}
         mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
@@ -122,7 +118,7 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
 
   it('save flow updates the log with recomputed quantity_g when servings change', async () => {
     const updateLogMock = vi.mocked(updateLog)
-    updateLogMock.mockResolvedValue({} as any)
+    stored(baseLog)
     const onLogUpdated = vi.fn()
     render(
       <FoodSearchSheet isOpen mode="edit" existingLog={baseLog}
@@ -141,6 +137,7 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
 
   it('changing the meal saves meal_type with the amount', async () => {
     const updateLogMock = vi.mocked(updateLog)
+    stored(baseLog)
     render(
       <FoodSearchSheet isOpen mode="edit" existingLog={baseLog} editSubtitle="Breakfast, Mon 26 Oct"
         mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
@@ -150,6 +147,24 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
     fireEvent.click(screen.getByRole('button', { name: /save/i }))
     await waitFor(() => expect(updateLogMock).toHaveBeenCalled())
     expect((updateLogMock.mock.calls[0][1] as Partial<FoodPayload>).meal_type).toBe('lunch')
+  })
+
+  it('switching "2 eggs" to grams stores grams only: the serving count and its label are cleared', async () => {
+    const eggs = logRow('log-2', 'food', '2026-10-26', '2026-10-26T08:00:00.000Z', {
+      food_name: 'Eggs', quantity_g: 100, servings: 2, serving_label: 'egg', serving_size_g: 50,
+      est_macros: { calories: 143, protein: 12.6, carbs: 0.7, fat: 9.5 }, meal_type: 'breakfast',
+    })
+    const row = stored(eggs)
+    render(
+      <FoodSearchSheet isOpen mode="edit" existingLog={eggs}
+        mealType="Breakfast" onClose={() => {}} onFoodLogged={() => {}} />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Grams' }))
+    fireEvent.change(screen.getByLabelText('Grams'), { target: { value: '150' } })
+    fireEvent.click(screen.getByRole('button', { name: /save/i }))
+    await waitFor(() => expect(updateLog).toHaveBeenCalled())
+    expect(row.payload).not.toHaveProperty('servings')
+    expect(quantityLabel(row.payload as FoodPayload)).toBe('150g') // was still "2 eggs"
   })
 
   it('an itemised log edits one component and saves the items with summed totals', async () => {
@@ -165,6 +180,7 @@ describe('FoodSearchSheet edit mode (FB-R5-03)', () => {
         ],
       } as FoodPayload,
     }
+    stored(itemised)
     render(
       <FoodSearchSheet isOpen mode="edit" existingLog={itemised}
         mealType="Lunch" onClose={() => {}} onFoodLogged={() => {}} />

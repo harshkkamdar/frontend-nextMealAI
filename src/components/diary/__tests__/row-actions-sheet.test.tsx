@@ -43,6 +43,15 @@ describe('RowActionsSheet', () => {
     expect(h.onCopy).toHaveBeenCalledWith(log, '2026-10-27', 'Breakfast')
   })
 
+  it('Copy offers the same days as copying a meal: today and the week ahead', () => {
+    const h = setup('2026-10-24')
+    fireEvent.click(screen.getByRole('button', { name: 'Copy to today' }))
+    const days = screen.getAllByRole('button').filter((b) => /\d+ Oct|\d+ Nov/.test(b.textContent ?? ''))
+    expect(days.map((b) => b.textContent)).toEqual(['Today26 Oct', 'Tomorrow27 Oct', 'Wed28 Oct', 'Thu29 Oct', 'Fri30 Oct', 'Sat31 Oct', 'Sun1 Nov', 'Mon2 Nov'])
+    fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
+    expect(h.onCopy).toHaveBeenCalledWith(log, '2026-10-26', 'Breakfast')
+  })
+
   it('Delete hands the log to the caller, which confirms', () => {
     const h = setup()
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))

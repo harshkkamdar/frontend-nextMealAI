@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react'
 import type { Log } from '@/types/logs.types'
+import { logRow } from '@/test/backend-logs'
 
 // Mock the logs API — must be hoisted before the component import
 vi.mock('@/lib/api/logs.api', () => ({
@@ -103,6 +104,18 @@ describe('LogList — FB-09 icons + workout title', () => {
       }),
     ])
     expect(await screen.findByText('Day 1: Chest completed')).toBeInTheDocument()
+  })
+
+  it('AC02.5 — health-imported and freestyle workouts show their title', async () => {
+    await renderWithLogs([
+      // health-sync.service.ts upsertImportedLog: source import, payload { title, duration_min, calories?, external_id, source_app }.
+      { ...logRow('h1', 'workout', '2026-11-16', '2026-11-16T07:00:00.000Z', { title: 'Outdoor Run', duration_min: 32, calories: 310, external_id: 'hk-123', source_app: 'apple_health' }), source: 'import' } as Log,
+      // A freestyle multi-exercise log (FB-D5): a title and its exercises, no `exercise`.
+      logRow('w5', 'workout', '2026-11-15', '2026-11-15T07:00:00.000Z', { title: 'Hotel gym', exercises: [{ name: 'Push-up', sets: 3, reps: 15 }], duration_min: 25 }),
+    ])
+    expect(await screen.findByText('Outdoor Run')).toBeInTheDocument()
+    expect(screen.getByText('Hotel gym')).toBeInTheDocument()
+    expect(screen.queryByText('Workout completed')).toBeNull()
   })
 
   it('AC02.3 — workout row with no exercise or day_name falls back to "Workout completed"', async () => {

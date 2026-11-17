@@ -117,6 +117,14 @@ export interface Log {
   local_date?: string | null
   created_at: string
   updated_at: string
+  /** Only on a manual log's create reply: the food clashes with the profile's diet, and the log saved anyway. */
+  diet_warning?: DietWarning
+}
+
+export interface DietWarning {
+  food_name: string
+  restriction: string
+  source: 'allergy' | 'dietary_restriction' | 'dietary_style'
 }
 
 export interface LogsSummary {
