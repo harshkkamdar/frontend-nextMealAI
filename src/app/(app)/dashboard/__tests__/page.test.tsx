@@ -9,14 +9,18 @@ const mocks = vi.hoisted(() => ({
   success: vi.fn(),
   create: vi.fn(),
   remove: vi.fn(),
+  getLogs: vi.fn(),
+  apiFetch: vi.fn(),
+  fetchers: {} as Record<string, () => Promise<unknown>>,
 }))
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mocks.push }) }))
 vi.mock('sonner', () => ({ toast: { success: mocks.success, error: vi.fn() } }))
-vi.mock('@/lib/api/logs.api', () => ({ createLogWithStatus: mocks.create, deleteLog: mocks.remove, getLogs: vi.fn(), getLogsSummary: vi.fn() }))
+vi.mock('@/lib/api/logs.api', () => ({ createLogWithStatus: mocks.create, deleteLog: mocks.remove, getLogs: mocks.getLogs, getLogsSummary: vi.fn() }))
+vi.mock('@/lib/api/client', async (original) => ({ ...(await original<object>()), apiFetch: mocks.apiFetch }))
 vi.mock('@/lib/platform/app', () => ({ haptic: vi.fn() }))
 vi.mock('@/hooks/use-cached-query', () => ({
-  useCachedQuery: (key: string) => ({ data: key === 'dashboard' ? mocks.data : [], loading: false, error: null, stale: false, savedAt: null, refetch: vi.fn() }),
+  useCachedQuery: (key: string, fetcher: () => Promise<unknown>) => (mocks.fetchers[key] = fetcher, { data: key === 'dashboard' ? mocks.data : [], loading: false, error: null, stale: false, savedAt: null, refetch: vi.fn() }),
 }))
 vi.mock('@/components/ui/fiqr/count-up', () => ({ CountUp: ({ value }: { value: number }) => value.toLocaleString('en-AU') }))
 vi.mock('@/hooks/use-sync-refetch', () => ({ useSyncRefetch: () => {} }))
@@ -31,6 +35,7 @@ vi.mock('@/lib/platform/health', () => ({ healthLabel: () => null, isHealthConne
 
 import DashboardPage from '@/app/(app)/dashboard/page'
 import { todayLocalISO } from '@/lib/timezone'
+import { backendGetLogs, logRow, shiftDay } from '@/test/backend-logs'
 
 function dashboardData(stepLogs: Log[]) {
   return {
@@ -129,5 +134,28 @@ describe('Dashboard one-tap logs with Undo', () => {
     render(<DashboardPage />)
     fireEvent.click(screen.getByRole('button', { name: 'Log Greek yoghurt again, 17 g protein' }))
     await waitFor(() => expect(mocks.success).toHaveBeenCalledWith("Greek yoghurt logged to Snack. Saved on your phone, syncs when you're back online"))
+  })
+})
+
+describe('Dashboard week of logs', () => {
+  it("reads the whole week, so last week's weigh-in survives a busy week of food and water", async () => {
+    const today = todayLocalISO('UTC')
+    // Eight days of 8 food + 8 water rows, and one weigh-in 7 days back: 129 rows, past one 100-row page.
+    const rows = [logRow('w', 'weight', shiftDay(today, -7), `${shiftDay(today, -7)}T06:00:00.000Z`, { weight_kg: 81.4 })]
+    for (let day = 0; day < 8; day += 1) {
+      for (let i = 0; i < 16; i += 1) {
+        const date = shiftDay(today, -day)
+        rows.push(logRow(`${day}-${i}`, i < 8 ? 'food' : 'water', date, `${date}T${String(7 + i).padStart(2, '0')}:00:00.000Z`, i < 8 ? { food_name: 'Rice', est_macros: { calories: 200 } } : { glasses: 1 }))
+      }
+    }
+    const actual = await vi.importActual<typeof import('@/lib/api/logs.api')>('@/lib/api/logs.api')
+    mocks.getLogs.mockImplementation(actual.getLogs)
+    const logsApi = backendGetLogs(rows, today)
+    mocks.apiFetch.mockImplementation((path: string) => path.startsWith('/v1/logs') ? logsApi(path) : Promise.reject(new Error('404')))
+    mocks.data = dashboardData([])
+    render(<DashboardPage />)
+    const data = await mocks.fetchers.dashboard() as { logs: Log[] }
+    expect(data.logs).toHaveLength(129)
+    expect(data.logs.find((log) => log.type === 'weight')?.payload).toEqual({ weight_kg: 81.4 })
   })
 })

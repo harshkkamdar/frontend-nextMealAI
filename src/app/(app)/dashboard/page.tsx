@@ -42,6 +42,7 @@ import { getProfile } from '@/lib/api/profile.api'
 import { getSuggestions } from '@/lib/api/suggestions.api'
 import { abandonWorkoutSession, getInProgressSession, startWorkoutSession } from '@/lib/api/workout-sessions.api'
 import type { MacroKey } from '@/lib/macros'
+import { effectiveTargets } from '@/lib/tdee'
 import { computeNudges } from '@/lib/nudges'
 import { todayLocalISO } from '@/lib/timezone'
 import { computeSelectedPlanDayIndex } from '@/lib/workout-session'
@@ -97,8 +98,8 @@ export default function DashboardPage() {
       withFallback(getLogsSummary('day'), null, failures),
       withFallback(getPlans({ active_only: true }), [] as Plan[], failures),
       withFallback(getProfile(), null, failures),
-      // The API caps a page at 100 rows; a larger limit is rejected with 400.
-      withFallback(getLogs({ days: 8, limit: 100 }), [] as Log[]),
+      // No limit: getLogs pages through the whole window (the API rejects a page over 100 rows).
+      withFallback(getLogs({ days: 8 }), [] as Log[]),
       withFallback(getDashboardCheckIn().then((response) => response.check_in), null),
       withFallback(getCheckInStatus(), null),
       withFallback(getInProgressSession(), null),
@@ -128,13 +129,7 @@ export default function DashboardPage() {
   const workoutPlan = (plans.find((plan) => plan.type === 'workout') as WorkoutPlan) ?? null
   const mealPlan = (plans.find((plan) => plan.type === 'meal') as MealPlan) ?? null
   const day = summary?.daily_breakdown?.find((entry) => entry.date === today)
-  const planTargets = mealPlan?.content.daily_targets
-  const targets: Record<MacroKey, number> = {
-    calories: planTargets?.calories ?? profile?.daily_calorie_target ?? 0,
-    protein: planTargets?.protein ?? profile?.daily_protein_g ?? 0,
-    carbs: planTargets?.carbs ?? profile?.daily_carbs_g ?? 0,
-    fat: planTargets?.fat ?? profile?.daily_fat_g ?? 0,
-  }
+  const targets: Record<MacroKey, number> = effectiveTargets(mealPlan, profile, 0)
   const todayLogs = useMemo(() => logs.filter((log) => (log.local_date ?? log.created_at.slice(0, 10)) === today), [logs, today])
   const todayFood = useMemo(() => todayLogs.filter((log) => log.type === 'food'), [todayLogs])
   const nudges = useMemo(

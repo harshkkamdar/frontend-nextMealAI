@@ -4,15 +4,33 @@ import { syncBus } from '@/lib/sync/sync-bus'
 import type { Log, LogsSummary, CreateLogInput } from '@/types/logs.types'
 import type { OfflineResult } from '@/types/offline.types'
 
-export async function getLogs(params?: { type?: string; days?: number; limit?: number; offset?: number }): Promise<Log[]> {
+type LogsParams = { type?: string; days?: number; limit?: number; offset?: number }
+
+async function getLogsPage(params?: LogsParams): Promise<{ logs: Log[]; hasMore: boolean }> {
   const query = new URLSearchParams()
   if (params?.type) query.set('type', params.type)
   if (params?.days) query.set('days', String(params.days))
   if (params?.limit) query.set('limit', String(params.limit))
   if (params?.offset) query.set('offset', String(params.offset))
   const qs = query.toString()
-  const res = await apiFetch<{ logs: Log[] } | Log[]>(`/v1/logs${qs ? `?${qs}` : ''}`)
-  return Array.isArray(res) ? res : res.logs ?? []
+  const res = await apiFetch<{ logs: Log[]; pagination?: { hasMore?: boolean } } | Log[]>(`/v1/logs${qs ? `?${qs}` : ''}`)
+  return Array.isArray(res) ? { logs: res, hasMore: false } : { logs: res.logs ?? [], hasMore: !!res.pagination?.hasMore }
+}
+
+/**
+ * A `days` window without a limit returns every log in it: the API sends 50 a page by default and rejects more
+ * than 100, so a diary day two weeks back used to come up empty.
+ * shortcut: the API reads at most 500 rows of a window, so a heavy logger's oldest days in a long window can still
+ * be cut; upgrade when GET /v1/logs takes a date range.
+ */
+export async function getLogs(params?: LogsParams): Promise<Log[]> {
+  if (!params?.days || params.limit) return (await getLogsPage(params)).logs
+  const logs: Log[] = []
+  for (let offset = 0; ; offset += 100) {
+    const page = await getLogsPage({ ...params, limit: 100, offset })
+    logs.push(...page.logs)
+    if (!page.hasMore || !page.logs.length) return logs
+  }
 }
 
 export async function getLogsSummary(period: 'day' | 'week' | 'month'): Promise<LogsSummary> {

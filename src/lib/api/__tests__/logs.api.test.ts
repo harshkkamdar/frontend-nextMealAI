@@ -21,8 +21,9 @@ vi.mock('@/lib/api/client', () => ({
 }))
 
 import { apiFetch } from '@/lib/api/client'
-import { createLogs, createLog, deleteLog, updateLog } from '@/lib/api/logs.api'
+import { createLogs, createLog, deleteLog, getLogs, updateLog } from '@/lib/api/logs.api'
 import { syncBus } from '@/lib/sync/sync-bus'
+import { backendGetLogs, logRow, shiftDay } from '@/test/backend-logs'
 import type { CreateLogInput } from '@/types/logs.types'
 
 const mockedApiFetch = vi.mocked(apiFetch)
@@ -155,5 +156,33 @@ describe('log sync events', () => {
     mockedApiFetch.mockRejectedValueOnce(new Error('500'))
     await expect(updateLog('log-1', {})).rejects.toThrow('500')
     expect(emitSpy).not.toHaveBeenCalled()
+  })
+})
+
+describe('getLogs over a days window', () => {
+  const TODAY = '2026-11-17'
+  // Six food rows a day for 60 days.
+  const rows = Array.from({ length: 60 * 6 }, (_, i) => {
+    const date = shiftDay(TODAY, -Math.floor(i / 6))
+    return logRow(`log-${i}`, 'food', date, `${date}T12:00:${String(59 - (i % 6)).padStart(2, '0')}.000Z`, {
+      food_name: `Food ${i}`, quantity_g: 100, est_macros: { calories: 100, protein: 10, carbs: 10, fat: 1 }, meal_type: 'lunch',
+    })
+  })
+
+  beforeEach(() => {
+    mockedApiFetch.mockReset()
+    mockedApiFetch.mockImplementation(backendGetLogs(rows, TODAY) as typeof apiFetch)
+  })
+
+  it('returns a diary day five weeks back, not just the newest 50 rows', async () => {
+    // The Food page on a day 30 days back asks for 37 days.
+    const logs = await getLogs({ type: 'food', days: 37 })
+    expect(logs).toHaveLength(37 * 6)
+    expect(logs.filter((log) => log.local_date === shiftDay(TODAY, -30))).toHaveLength(6)
+  })
+
+  it('keeps one page when the caller sets a limit', async () => {
+    expect(await getLogs({ type: 'food', days: 37, limit: 10 })).toHaveLength(10)
+    expect(mockedApiFetch).toHaveBeenCalledTimes(1)
   })
 })
