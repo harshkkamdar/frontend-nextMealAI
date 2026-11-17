@@ -8,14 +8,11 @@ import { PrimaryButton } from '@/components/ui/fiqr/primary-button'
 import { MetricStrip } from '@/components/ui/fiqr/metric-strip'
 import { CloseIcon } from '@/components/ui/fiqr/icons'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
-import { CARD, Chips, EmptySlot, FIELD, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
+import { CARD, FIELD, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
 import { FieldLabel } from '@/components/logs/manual-log-shell'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
-import { getFavourites, logFavouriteWithStatus, deleteFavourite, type Favourite } from '@/lib/api/favourites.api'
 import { createLog, createLogs, updateLog, deleteLog, type LogPayloadPatch } from '@/lib/api/logs.api'
-import { toastLogged } from '@/components/logs/diet-warning'
-import { ApiException } from '@/types/api.types'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import type { CreateLogInput } from '@/types/logs.types'
@@ -95,7 +92,6 @@ function sumItems(items: FoodLogItem[]) {
   )
 }
 
-const TABS = [{ value: 'food', label: 'Foods' }, { value: 'meals', label: 'Saved meals' }] as const
 const AMOUNTS = [{ value: 'servings', label: 'Servings' }, { value: 'grams', label: 'Grams' }] as const
 
 interface FoodSearchSheetProps {
@@ -139,19 +135,10 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
   const [customFat, setCustomFat] = useState<number | ''>('')
   const [customServingG, setCustomServingG] = useState<number | ''>(100)
   const [recentFoods, setRecentFoods] = useState<FoodSearchResult[]>([])
-  // Favourites surfaced right where the user adds food (the #1 place they look
-  // for a saved meal). Tapping one logs the whole favourite onto the viewed
-  // day + this meal in one go.
-  const [favourites, setFavourites] = useState<Favourite[]>([])
-  const [loggingFav, setLoggingFav] = useState<string | null>(null)
-  const [confirmDeleteFav, setConfirmDeleteFav] = useState<string | null>(null)
   const [confirmDeleteEdit, setConfirmDeleteEdit] = useState(false)
   // Edit mode: the meal the entry files under, and an itemised (photo) log's components, both saved on Save.
   const [editMeal, setEditMeal] = useState('Snack')
   const [editItems, setEditItems] = useState<FoodLogItem[] | null>(null)
-  // Add-food sheet has two tabs: search individual Foods, or log a saved Meal.
-  const [activeTab, setActiveTab] = useState<'food' | 'meals'>('food')
-  const [mealQuery, setMealQuery] = useState('')
   // FE-RCA F3 — multi-select pending tray. Each entry carries enough state
   // to reconstruct a CreateLogInput at commit time. The atom of work the
   // user expresses ("log breakfast") commits as N rows via createLogs().
@@ -248,9 +235,6 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
     setCustomFat('')
     setCustomServingG(100)
     setPending([])  // FE-RCA F3 — clear pending tray on each fresh open
-    setActiveTab('food')
-    setMealQuery('')
-    setConfirmDeleteFav(null)
     setTimeout(() => inputRef.current?.focus(), 300)
     getRecentFoods(8).then((foods) =>
       setRecentFoods(foods.map((f) => ({
@@ -265,51 +249,12 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
         use_count: f.use_count,
       })))
     ).catch(() => {})
-    getFavourites()
-      .then((f) => {
-        // Favourites whose saved meal matches THIS meal float to the top.
-        const meal = mealType.toLowerCase()
-        setFavourites(
-          [...f].sort((a, b) => Number((b.default_meal_type ?? '') === meal) - Number((a.default_meal_type ?? '') === meal)),
-        )
-      })
-      .catch(() => setFavourites([]))
   }, [isOpen, mode, existingLog, mealType])
 
   // Clean up debounce on unmount
   useEffect(() => {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [])
-
-  // One-tap log a whole saved meal onto the viewed day + this meal slot.
-  const handleLogFavourite = async (f: Favourite) => {
-    setLoggingFav(f.id)
-    try {
-      const result = await logFavouriteWithStatus(f.id, { target_date: logDate, target_meal_type: mealType.toLowerCase() })
-      void haptic('success')
-      if (result.queued) toast.success(`Logged ${f.name}. Saved on your phone, syncs when you're back online`)
-      else toastLogged(`Logged ${f.name}, ${result.data.logged} item${result.data.logged === 1 ? '' : 's'}`, [result.data.diet_warning])
-      onFoodLogged()
-      onClose()
-    } catch (error) {
-      // Nothing logged (every item refused) is a 400 with the reason.
-      toast.error(error instanceof ApiException && error.statusCode < 500 && error.details ? error.details : 'Failed to log meal')
-    } finally {
-      setLoggingFav(null)
-    }
-  }
-
-  const handleDeleteFavourite = async (f: Favourite) => {
-    try {
-      await deleteFavourite(f.id)
-      setFavourites((prev) => prev.filter((x) => x.id !== f.id))
-      toast.success(`Removed ${f.name}`)
-    } catch {
-      toast.error('Failed to remove meal')
-    } finally {
-      setConfirmDeleteFav(null)
-    }
-  }
 
   // Debounced search
   const handleSearch = useCallback((q: string) => {
@@ -863,160 +808,90 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
             <p className="mt-2 text-center text-[13px] text-ink-65">It&apos;s saved to your foods for next time.</p>
           </div>
         ) : (
-          /* Search view */
+          /* Search view (saved meals live on Log food, components/logs/saved-meals.tsx) */
           <>
-            {mode !== 'edit' && (
-              <Chips
-                className="px-5 pb-3"
-                label="Add from"
-                options={TABS.map((t) => (t.value === 'meals' && favourites.length > 0 ? { ...t, label: `${t.label} · ${favourites.length}` } : t))}
-                value={activeTab}
-                onChange={(next) => { if (next) setActiveTab(next) }}
-              />
+            <div className="px-5 pb-3">
+              <SearchField inputRef={inputRef} label="Search foods" value={query} onChange={handleSearch} placeholder="Search foods" />
+            </div>
+
+            {/* FE-RCA F3 — pending tray summary. Only visible in log mode
+                and only when at least one item has been staged. Lets the
+                user review/remove items before committing the meal. */}
+            {mode !== 'edit' && pending.length > 0 && (
+              <div className="px-5 pb-3">
+                <div className={cn(CARD, 'p-4')}>
+                  <p className="px-1 text-[13px] font-semibold text-ink-65">In this meal · {pending.length}</p>
+                  <ul className="mt-1">
+                    {pending.map((item, idx) => (
+                      <li key={`pending-${idx}-${item.food.id ?? item.food.name}`} className="flex items-center justify-between gap-2 border-b border-ink-06 py-1 pl-1 last:border-b-0">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[15.5px] font-semibold text-ink">{item.food.name}</p>
+                          <p className="text-[13px] tabular-nums text-ink-65">
+                            {item.inputMode === 'servings'
+                              ? `${item.servings} × ${item.food.serving_size_g ?? 100} g`
+                              : `${item.quantity_g} g`}
+                            {' · '}
+                            {formatMacroKcal(item.est_macros.calories)} kcal
+                          </p>
+                        </div>
+                        <button type="button" onClick={() => handleRemovePendingItem(idx)} aria-label={`Remove ${item.food.name}`} className="grid size-11 shrink-0 place-items-center rounded-full text-ink-65">
+                          <X className="size-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <PrimaryButton onClick={handleCommitMeal} disabled={saving} aria-busy={saving} className="mt-3 justify-center">
+                    {saving ? 'Logging…' : `Log meal (${pending.length})`}
+                  </PrimaryButton>
+                </div>
+              </div>
             )}
 
-            {activeTab === 'meals' && mode !== 'edit' ? (
-              /* Meals tab — your saved meals, one tap to log the whole thing */
-              <>
-                {favourites.length > 0 && (
-                  <div className="px-5 pb-3">
-                    <SearchField label="Search saved meals" value={mealQuery} onChange={setMealQuery} placeholder="Search saved meals" />
-                  </div>
-                )}
-                <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
-                  {favourites.length === 0 ? (
-                    <EmptySlot>No saved meals yet. In your diary, open a meal&apos;s menu and choose Save as meal.</EmptySlot>
-                  ) : (() => {
-                    const q = mealQuery.trim().toLowerCase()
-                    const shown = q
-                      ? favourites.filter((f) => f.name.toLowerCase().includes(q) || f.items.some((it) => (it.food_name ?? '').toLowerCase().includes(q)))
-                      : favourites
-                    if (shown.length === 0) {
-                      return <p className="px-1 py-4 text-[15.5px] text-ink">No saved meals match &ldquo;{mealQuery}&rdquo;.</p>
-                    }
-                    return (
-                      <div className={LIST} role="list" aria-label="Saved meals">
-                        {shown.map((f) => (
-                          <div key={f.id} role="listitem" className={cn(ROW, 'gap-1 py-0 pr-2')}>
-                            <button
-                              type="button"
-                              onClick={() => handleLogFavourite(f)}
-                              disabled={loggingFav === f.id}
-                              className="flex min-h-16 min-w-0 flex-1 items-center justify-between gap-2 py-3 text-left disabled:opacity-50"
-                              aria-label={`Log ${f.name}`}
-                            >
-                              <span className="min-w-0">
-                                <span className="block truncate text-[15.5px] font-semibold text-ink">{f.name}</span>
-                                <span className="block truncate text-[13px] text-ink-65">
-                                  {f.items.length} item{f.items.length === 1 ? '' : 's'}
-                                  {f.items.length > 0 ? ` · ${f.items.map((it) => it.food_name).slice(0, 3).join(', ')}${f.items.length > 3 ? '…' : ''}` : ''}
-                                </span>
-                              </span>
-                              <span className="inline-flex shrink-0 items-center gap-1 text-[14px] font-semibold text-ink">
-                                <Plus aria-hidden="true" className="size-4" />
-                                {loggingFav === f.id ? 'Logging…' : 'Log'}
-                              </span>
-                            </button>
-                            {confirmDeleteFav === f.id ? (
-                              <button type="button" onClick={() => handleDeleteFavourite(f)} className="h-11 shrink-0 rounded-full px-3 text-[14px] font-semibold text-ink" aria-label={`Confirm remove ${f.name}`}>Remove?</button>
-                            ) : (
-                              <button type="button" onClick={() => setConfirmDeleteFav(f.id)} aria-label={`Remove ${f.name}`} className="grid size-11 shrink-0 place-items-center rounded-full text-ink-65">
-                                <X className="size-4" />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )
-                  })()}
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="px-5 pb-3">
-                  <SearchField inputRef={inputRef} label="Search foods" value={query} onChange={handleSearch} placeholder="Search foods" />
-                </div>
-
-                {/* FE-RCA F3 — pending tray summary. Only visible in log mode
-                    and only when at least one item has been staged. Lets the
-                    user review/remove items before committing the meal. */}
-                {mode !== 'edit' && pending.length > 0 && (
-                  <div className="px-5 pb-3">
-                    <div className={cn(CARD, 'p-4')}>
-                      <p className="px-1 text-[13px] font-semibold text-ink-65">In this meal · {pending.length}</p>
-                      <ul className="mt-1">
-                        {pending.map((item, idx) => (
-                          <li key={`pending-${idx}-${item.food.id ?? item.food.name}`} className="flex items-center justify-between gap-2 border-b border-ink-06 py-1 pl-1 last:border-b-0">
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-[15.5px] font-semibold text-ink">{item.food.name}</p>
-                              <p className="text-[13px] tabular-nums text-ink-65">
-                                {item.inputMode === 'servings'
-                                  ? `${item.servings} × ${item.food.serving_size_g ?? 100} g`
-                                  : `${item.quantity_g} g`}
-                                {' · '}
-                                {formatMacroKcal(item.est_macros.calories)} kcal
-                              </p>
-                            </div>
-                            <button type="button" onClick={() => handleRemovePendingItem(idx)} aria-label={`Remove ${item.food.name}`} className="grid size-11 shrink-0 place-items-center rounded-full text-ink-65">
-                              <X className="size-4" />
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                      <PrimaryButton onClick={handleCommitMeal} disabled={saving} aria-busy={saving} className="mt-3 justify-center">
-                        {saving ? 'Logging…' : `Log meal (${pending.length})`}
-                      </PrimaryButton>
-                    </div>
-                  </div>
-                )}
-
-                <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
-                  {searching ? (
-                    <RowsSkeleton label="Searching" />
-                  ) : results.length > 0 ? (
-                    <RiseList className={LIST} role="list" aria-label="Food search results">
-                      {results.map((food, i) => (
-                        <FoodRow key={food.id ?? `usda-${food.usda_fdc_id ?? i}`} food={food} onSelect={handleSelectFood} onToggleFavorite={handleToggleFavorite} />
-                      ))}
-                    </RiseList>
-                  ) : query.length >= 2 ? (
-                    <div className="px-1 py-4">
-                      <p className="text-[15.5px] text-ink">Nothing matches &ldquo;{query}&rdquo;.</p>
-                      <button
-                        type="button"
-                        onClick={() => { setShowCustomForm(true); setCustomName(query) }}
-                        className="mt-3 inline-flex h-11 max-w-full items-center gap-1.5 rounded-full bg-ink px-4 text-[15px] font-semibold text-cream"
-                      >
-                        <Plus aria-hidden="true" className="size-4 shrink-0" />
-                        <span className="truncate">Add &ldquo;{query}&rdquo; as a new food</span>
-                      </button>
-                    </div>
-                  ) : recentFoods.length > 0 ? (
-                    <section>
-                      <SectionTitle>Recent</SectionTitle>
-                      <div className={LIST} role="list" aria-label="Recent foods">
-                        {recentFoods.map((food, i) => (
-                          <FoodRow key={food.id ?? `recent-${i}`} food={food} onSelect={handleSelectFood} onToggleFavorite={handleToggleFavorite} />
-                        ))}
-                      </div>
-                    </section>
-                  ) : (
-                    <p className="px-1 py-6 text-center text-[15.5px] text-ink-65">Start typing to find a food.</p>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between border-t border-ink-06 px-3 pb-4 pt-2">
-                  <button type="button" onClick={handleAskGeo} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[15px] font-semibold text-ink-65">
-                    <MessageCircle aria-hidden="true" className="size-4" />
-                    Ask Geo to estimate
-                  </button>
-                  <button type="button" onClick={() => setShowCustomForm(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[15px] font-semibold text-ink-65">
-                    <Plus aria-hidden="true" className="size-4" />
-                    New food
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
+              {searching ? (
+                <RowsSkeleton label="Searching" />
+              ) : results.length > 0 ? (
+                <RiseList className={LIST} role="list" aria-label="Food search results">
+                  {results.map((food, i) => (
+                    <FoodRow key={food.id ?? `usda-${food.usda_fdc_id ?? i}`} food={food} onSelect={handleSelectFood} onToggleFavorite={handleToggleFavorite} />
+                  ))}
+                </RiseList>
+              ) : query.length >= 2 ? (
+                <div className="px-1 py-4">
+                  <p className="text-[15.5px] text-ink">Nothing matches &ldquo;{query}&rdquo;.</p>
+                  <button
+                    type="button"
+                    onClick={() => { setShowCustomForm(true); setCustomName(query) }}
+                    className="mt-3 inline-flex h-11 max-w-full items-center gap-1.5 rounded-full bg-ink px-4 text-[15px] font-semibold text-cream"
+                  >
+                    <Plus aria-hidden="true" className="size-4 shrink-0" />
+                    <span className="truncate">Add &ldquo;{query}&rdquo; as a new food</span>
                   </button>
                 </div>
-              </>
-            )}
+              ) : recentFoods.length > 0 ? (
+                <section>
+                  <SectionTitle>Recent</SectionTitle>
+                  <div className={LIST} role="list" aria-label="Recent foods">
+                    {recentFoods.map((food, i) => (
+                      <FoodRow key={food.id ?? `recent-${i}`} food={food} onSelect={handleSelectFood} onToggleFavorite={handleToggleFavorite} />
+                    ))}
+                  </div>
+                </section>
+              ) : (
+                <p className="px-1 py-6 text-center text-[15.5px] text-ink-65">Start typing to find a food.</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between border-t border-ink-06 px-3 pb-4 pt-2">
+              <button type="button" onClick={handleAskGeo} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[15px] font-semibold text-ink-65">
+                <MessageCircle aria-hidden="true" className="size-4" />
+                Ask Geo to estimate
+              </button>
+              <button type="button" onClick={() => setShowCustomForm(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[15px] font-semibold text-ink-65">
+                <Plus aria-hidden="true" className="size-4" />
+                New food
+              </button>
+            </div>
           </>
         )}
       </BottomSheet>

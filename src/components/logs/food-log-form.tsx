@@ -25,6 +25,7 @@ import { toastLogged } from './diet-warning'
 import { MEALS, mealForTime, parseMeal, type Meal, type PlateItem } from './log-math'
 import { PhotoResult } from './photo-result'
 import { PlatePill, PlateSheet } from './plate-tray'
+import { SavedMeals } from './saved-meals'
 
 const MENU_PROMPT = 'Scan this menu and suggest what fits my remaining macros'
 const MEAL_OPTIONS = MEALS.map((value) => ({ value, label: value }))
@@ -290,6 +291,10 @@ export function FoodLogForm() {
             {createButton}
           </>
         )}
+        {/* Saved meals sit beside your foods (not search results); mounted through going offline, where a tap queues. */}
+        {!online || !showResults ? (
+          <SavedMeals className="mt-5" meal={meal} logDate={logDate} onLogged={() => { if (plate.length === 0) router.back() }} />
+        ) : null}
       </div>
 
       <FoodFormSheet

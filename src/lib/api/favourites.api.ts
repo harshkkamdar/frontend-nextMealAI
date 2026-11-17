@@ -1,5 +1,6 @@
 import { apiFetch } from './client'
 import { offlineMutate } from '@/lib/offline/mutate'
+import { syncBus } from '@/lib/sync/sync-bus'
 import type { DietWarning } from '@/types/logs.types'
 import type { OfflineResult } from '@/types/offline.types'
 
@@ -54,7 +55,7 @@ export async function logFavouriteWithStatus(
   body?: { target_date?: string; target_meal_type?: string },
 ): Promise<OfflineResult<LogFavouriteResult>> {
   const payload = body ?? {}
-  return offlineMutate(
+  const result = await offlineMutate(
     'favourite_log',
     'POST',
     `/v1/favourites/${id}/log`,
@@ -67,4 +68,7 @@ export async function logFavouriteWithStatus(
       target_date: payload.target_date ?? new Date().toISOString().slice(0, 10),
     }),
   )
+  // Home and Food refetch; a queued log tells them itself when the queue sends it.
+  if (!result.queued) syncBus.emit('logs:created')
+  return result
 }

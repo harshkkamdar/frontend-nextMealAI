@@ -42,6 +42,7 @@ vi.mock('@/lib/api/logs.api', () => ({
   createLogs: (...args: unknown[]) => mocks.createLogs(...args),
   updateLog: (...args: unknown[]) => mocks.updateLog(...args),
 }))
+vi.mock('@/lib/api/favourites.api', () => ({ getFavourites: () => Promise.resolve([]) }))
 vi.mock('@/lib/api/chat.api', () => ({
   uploadChatAttachment: (...args: unknown[]) => mocks.upload(...args),
 }))
