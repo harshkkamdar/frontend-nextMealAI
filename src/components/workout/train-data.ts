@@ -49,10 +49,16 @@ export function weekVolume(sessions: WorkoutSession[], days: string[], tz: strin
   return totals
 }
 
+/** A stored set number as a number: old rows hold a rep range ("10-12") in actual_reps, which counts as 10. */
+const num = (value: unknown) => {
+  const n = parseFloat(String(value))
+  return Number.isFinite(n) ? n : 0
+}
+
 /** Live volume: weight × reps over completed sets. */
 export function sessionVolumeKg(exercises: SessionExercise[]): number {
   return exercises.reduce((sum, exercise) => sum + exercise.sets.reduce((setSum, set) => (
-    set.completed ? setSum + (set.actual_weight_kg ?? 0) * (set.actual_reps ?? 0) : setSum
+    set.completed ? setSum + num(set.actual_weight_kg) * num(set.actual_reps) : setSum
   ), 0), 0)
 }
 
@@ -140,13 +146,15 @@ export function compareExercise(exercise: SessionExercise): ExerciseCompare {
   for (const set of exercise.sets) {
     if (set.completed) {
       const kg = set.actual_weight_kg ?? null
-      const reps = set.actual_reps ?? 0
+      const reps = num(set.actual_reps)
       best = better(best, { kg, reps })
-      volume += (kg ?? 0) * reps
+      volume += num(kg) * reps
     }
     if (set.previous_reps != null) {
-      last = better(last, { kg: set.previous_weight_kg ?? null, reps: set.previous_reps })
-      lastVolume += (set.previous_weight_kg ?? 0) * set.previous_reps
+      // Carried forward from last time's actual_reps, so an old row's range string lands here too.
+      const reps = num(set.previous_reps)
+      last = better(last, { kg: set.previous_weight_kg ?? null, reps })
+      lastVolume += num(set.previous_weight_kg) * reps
     }
   }
   return { name: exercise.name, setsDone: exercise.sets.filter((set) => set.completed).length, best, last, volume, lastVolume }

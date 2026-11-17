@@ -180,7 +180,8 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
   }, [session])
 
   useEffect(() => {
-    if (!session?.started_at) return
+    // A finished session needs no clock; resetting it would rewrite a past workout's start time.
+    if (!session?.started_at || session.status !== 'in_progress') return
     const { elapsedSeconds: resolved, needsReset } = resolveElapsedForSession(session.started_at, Date.now())
     if (needsReset) {
       setElapsedSeconds(0)
@@ -190,7 +191,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
       return
     }
     setElapsedSeconds(resolved)
-  }, [session?.started_at, sessionId])
+  }, [session?.started_at, session?.status, sessionId])
 
   useEffect(() => {
     if (!session?.started_at || session.status !== 'in_progress') return
