@@ -189,9 +189,10 @@ export function WorkoutPlanBuilder({ mode, initialPlan }: WorkoutPlanBuilderProp
         toast.success('Workout plan created')
         router.push(`/plans/view?id=${plan.id}`)
       } else if (initialPlan) {
-        await updatePlan(initialPlan.id, { content: content as WorkoutPlan['content'] })
+        // Saving a live plan supersedes it with a new row: open that one, not the old copy.
+        const saved = await updatePlan(initialPlan.id, { content: content as WorkoutPlan['content'] })
         toast.success('Workout plan updated')
-        router.push(`/plans/view?id=${initialPlan.id}`)
+        router.push(`/plans/view?id=${saved.id}`)
       }
     } catch {
       // Said in the dock above Try again; the answers stay as they were.

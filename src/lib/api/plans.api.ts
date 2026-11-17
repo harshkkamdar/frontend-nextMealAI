@@ -1,4 +1,5 @@
 import { apiFetch } from './client'
+import { syncBus } from '@/lib/sync/sync-bus'
 import type { Plan, PlanType, MealPlan, WorkoutPlan } from '@/types/plans.types'
 
 export async function getPlans(params?: { type?: string; active_only?: boolean; bustCache?: boolean }): Promise<Plan[]> {
@@ -17,6 +18,8 @@ export async function getPlan(id: string): Promise<Plan> {
 
 export async function activatePlan(id: string): Promise<void> {
   await apiFetch(`/v1/plans/${id}/activate`, { method: 'POST' })
+  // The open plan, Home and Food refetch, so "Make this my plan" doesn't stay on screen after it worked.
+  syncBus.emit('plans:updated')
 }
 
 export async function generatePlans(): Promise<{ success: boolean; plans: Plan[] }> {

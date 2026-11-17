@@ -185,7 +185,11 @@ describe('WorkoutPlanBuilder component', () => {
       created_at: 'now',
       updated_at: 'now',
     }
-    updatePlanMock.mockResolvedValue({ id: 'plan-42' })
+    // Mirrors plans.controller.ts updatePlan: a draft updates in place; any other plan is superseded by a new row
+    // (new id, version + 1, previous_version_id) and that row comes back.
+    updatePlanMock.mockImplementation((id: string, input: { content?: object }) => Promise.resolve(initialPlan.status === 'draft'
+      ? { ...initialPlan, content: { ...initialPlan.content, ...input.content } }
+      : { ...initialPlan, id: `${id}-v2`, status: 'active', version: 2, previous_version_id: id, content: { ...initialPlan.content, ...input.content } }))
 
     render(<WorkoutPlanBuilder mode="edit" initialPlan={initialPlan} />)
     // The name input is empty because content.name isn't persisted; type a name.
@@ -198,6 +202,6 @@ describe('WorkoutPlanBuilder component', () => {
     fireEvent.click((await screen.findByRole('button', { name: 'Save changes' })))
     await waitFor(() => expect(updatePlanMock).toHaveBeenCalled())
     expect(updatePlanMock.mock.calls[0][0]).toBe('plan-42')
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-42'))
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/plans/view?id=plan-42-v2'))
   })
 })
