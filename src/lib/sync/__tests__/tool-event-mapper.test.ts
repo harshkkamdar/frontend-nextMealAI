@@ -27,6 +27,20 @@ describe('mapToolsToInvalidations', () => {
     expect(r.topics).toEqual(['logs:created'])
   })
 
+  // Write tool names from the backend's orchestrator/operations (logs/create-logs.ts, logs/copy-meal.ts,
+  // favourites/log-favourite.ts, profile/update-profile.ts, workout/modify-workout-session-exercise.ts,
+  // workout/cancel-workout-session.ts), each mapped like its single-item sibling.
+  it.each([
+    ['create_logs', 'logs:created'],
+    ['copy_meal', 'logs:created'],
+    ['log_favourite', 'logs:created'],
+    ['update_profile', 'plans:updated'],
+    ['modify_workout_session_exercise', 'workout:session-updated'],
+    ['cancel_workout_session', 'workout:session-updated'],
+  ])('maps %s to %s', (tool, topic) => {
+    expect(mapToolsToInvalidations({ tools_used: [tool] }).topics).toEqual([topic])
+  })
+
   it('maps advance_to_workout to workout:advanced + plans:updated', () => {
     const r = mapToolsToInvalidations({ tools_used: ['advance_to_workout'] })
     expect(new Set(r.topics)).toEqual(new Set(['workout:advanced', 'plans:updated']))

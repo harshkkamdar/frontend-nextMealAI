@@ -22,10 +22,17 @@ const TOOL_TOPIC_MAP: Record<string, readonly SyncTopic[]> = {
   update_plan: ['plans:updated'],
   deactivate_active_plan: ['plans:deactivated', 'plans:updated'],
   create_log: ['logs:created'],
+  create_logs: ['logs:created'],
+  copy_meal: ['logs:created'],
+  log_favourite: ['logs:created'],
   update_log: ['logs:updated'],
   delete_log: ['logs:deleted'],
+  // Target changes also land on the active nutrition plan, and the screens showing targets refetch on plans.
+  update_profile: ['plans:updated'],
   advance_to_workout: ['workout:advanced', 'plans:updated'],
   update_today_workout: ['workout:session-updated'],
+  modify_workout_session_exercise: ['workout:session-updated'],
+  cancel_workout_session: ['workout:session-updated'],
 }
 
 export interface ToolInvalidationResult {

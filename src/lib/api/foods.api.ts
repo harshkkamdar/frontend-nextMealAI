@@ -1,5 +1,6 @@
 import { geoTask } from '@/stores/ui.store'
 import { apiFetch } from './client'
+import { syncBus } from '@/lib/sync/sync-bus'
 import type { FoodSearchResult, UserFood, CreateFoodInput } from '@/types/foods.types'
 
 // FB-R6-13 — Food estimate from photo (vision pipeline), as the backend's FoodEstimateItem sends it.
@@ -34,10 +35,13 @@ export async function logFromEstimate(
   edits?: Partial<FoodEstimate>,
   opts?: { meal_type?: string; local_date?: string },
 ): Promise<unknown> {
-  return apiFetch('/v1/foods/log-from-estimate', {
+  const result = await apiFetch('/v1/foods/log-from-estimate', {
     method: 'POST',
     body: { estimate_id, ...(edits ? { edits } : {}), ...opts },
   })
+  // Like createLog: the Food diary and Home under the log page refetch, so a photo meal isn't logged twice.
+  syncBus.emit('logs:created')
+  return result
 }
 
 export async function getPersonalFoods(): Promise<UserFood[]> {
