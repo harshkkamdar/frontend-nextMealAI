@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
 
 import { ChatBubble } from '@/components/chat/chat-bubble'
 import type { ChatMessage } from '@/types/chat.types'
@@ -9,12 +9,16 @@ import type { ChatMessage } from '@/types/chat.types'
 // `attachments[]` over the legacy singular `image` field; these tests lock
 // that rendering contract so a future edit can't silently regress it.
 
+/** A user row from GET /v1/chat/sessions/:id: created_at, and timestamp equal to it. */
 function userMessage(extra: Partial<ChatMessage> = {}): ChatMessage {
   return {
-    id: 'temp-1',
+    id: 'c0ffee00-0000-4000-8000-000000000001',
     role: 'user',
     content: 'whats this bro',
+    created_at: '2026-05-22T00:14:00Z',
     timestamp: '2026-05-22T00:14:00Z',
+    metadata: {},
+    attachments: [],
     ...extra,
   }
 }
@@ -144,5 +148,21 @@ describe('ChatBubble — FB-R6-UAT-A optimistic message shape', () => {
     }
     render(<ChatBubble message={optimistic} />)
     expect(screen.getAllByRole('img')).toHaveLength(3)
+  })
+})
+
+describe('ChatBubble failed send', () => {
+  it('a message refused at the daily coaching limit shows the reason and no Retry', () => {
+    const onRetry = vi.fn()
+    render(<ChatBubble message={userMessage({ id: 'temp-9', attachments: undefined, created_at: undefined })} failed onRetry={onRetry} failedNote="You've reached today's coaching limit. It resets at midnight UTC." />)
+    expect(screen.getByRole('alert')).toHaveTextContent("Didn't send. You've reached today's coaching limit. It resets at midnight UTC.")
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull()
+  })
+
+  it('any other failure keeps Retry', () => {
+    const onRetry = vi.fn()
+    render(<ChatBubble message={userMessage({ id: 'temp-9' })} failed onRetry={onRetry} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(onRetry).toHaveBeenCalled()
   })
 })

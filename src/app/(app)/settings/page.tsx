@@ -30,8 +30,9 @@ import type { GeoPersonality, RestTimerDuration, Settings } from '@/types/settin
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { goBack } from '@/lib/navigation'
+import { version } from '../../../../package.json'
 
-const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev'
+const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || version
 
 const MEMORY_LABEL: Record<string, string> = {
   preference: 'Preference',

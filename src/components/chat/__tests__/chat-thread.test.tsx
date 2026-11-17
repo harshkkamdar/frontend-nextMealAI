@@ -47,11 +47,20 @@ describe('ChatThread', () => {
   })
 
   it('anchors a run of Geo turns once and times it once, on its last turn', () => {
-    const at = '2026-10-26T01:00:00Z'
-    render(<ChatThread messages={[{ role: 'user', content: 'hi', timestamp: at }, geo('One', { timestamp: at }), geo('Two', { timestamp: at }), { role: 'user', content: 'ok', timestamp: at }, geo('Three', { timestamp: at })]} />)
+    // History rows: created_at, and timestamp equal to it.
+    const at = { created_at: '2026-10-26T01:00:00Z', timestamp: '2026-10-26T01:00:00Z' }
+    render(<ChatThread messages={[{ id: 'u1', role: 'user', content: 'hi', ...at }, geo('One', at), geo('Two', at), { id: 'u2', role: 'user', content: 'ok', ...at }, geo('Three', at)]} />)
     expect(screen.getAllByRole('img', { name: 'Geo' })).toHaveLength(2)
     const options = screen.getAllByRole('button', { name: 'Message options' })
     expect(options.map((button) => button.textContent !== '')).toEqual([false, true, true])
+  })
+})
+
+describe('ChatThread failed sends', () => {
+  it('a message with a failure note shows the note in place of Retry', () => {
+    render(<ChatThread messages={[{ id: 'temp-1', role: 'user', content: 'hi', timestamp: '2026-10-26T01:00:00Z' }]} failed={['temp-1']} onRetry={() => {}} failedNotes={{ 'temp-1': "You've reached today's coaching limit. It resets at midnight UTC." }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent("today's coaching limit")
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull()
   })
 })
 

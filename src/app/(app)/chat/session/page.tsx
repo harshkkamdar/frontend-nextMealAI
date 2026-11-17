@@ -19,7 +19,6 @@ import type { AttachedImage, ChatMessage, ChatSession } from '@/types/chat.types
 import type { WorkoutProgramContent } from '@/types/plans.types'
 import { GeoMark } from '@/components/shared/geo-avatar'
 import { ApiException } from '@/types/api.types'
-import { goBack } from '@/lib/navigation'
 
 // FB-R6-02 — FB-15 (program extraction) still wants a base64 payload. The
 // chat-input no longer keeps base64 around (it has a File + storage_path
@@ -70,6 +69,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
   const [historyTry, setHistoryTry] = useState(0)
   // Messages that did not reach Geo stay in the thread with "Didn't send. Retry" under them.
   const [failed, setFailed] = useState<string[]>([])
+  const [failedNotes, setFailedNotes] = useState<Record<string, string>>({})
   const unsent = useRef(new Map<string, AttachedImage[] | undefined>())
   // Messages from this index on arrived while the screen was open and play their entrance; history paints at rest.
   const [freshFrom, setFreshFrom] = useState(Infinity)
@@ -204,7 +204,10 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
       // bridges the legacy DOM CustomEvents during the rollout.
       // A saved plan shows as a card in the thread (pick A2), not a toast.
       handleGeoToolResults(res)
-    } catch {
+    } catch (error) {
+      // The daily coaching limit and the rate limit (429) would fail again on Retry: say the backend's reason instead.
+      const note = error instanceof ApiException && error.statusCode === 429 ? error.message : null
+      if (note) setFailedNotes((notes) => ({ ...notes, [userMessage.id as string]: note }))
       setFailed((ids) => [...ids, userMessage.id as string])
     } finally {
       setIsTyping(false)
@@ -263,7 +266,8 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
           <PrefillReader onPrefill={setPrefill} />
         </Suspense>
       )}
-      <PushedHeader title={sessionTitle ?? 'Geo'} onBack={() => goBack(router, '/chat')} backLabel="Back to conversations" />
+      {/* The label names the list, so the button goes there, wherever the chat was opened from (Home, Food, the companion). */}
+      <PushedHeader title={sessionTitle ?? 'Geo'} onBack={() => router.push('/chat')} backLabel="Back to conversations" />
       <div aria-hidden="true" className={`pointer-events-none fixed inset-x-0 top-0 z-[39] h-[calc(var(--safe-top)+88px)] border-b border-ink-09 bg-cream transition-opacity duration-200 ${scrolled ? 'opacity-100' : 'opacity-0'}`} />
       <div className="-mx-gutter">
         <OfflineBand />
@@ -293,7 +297,7 @@ function ActiveChatSession({ sessionId, autoSend }: { sessionId: string; autoSen
             ) : messages.length === 0 && !isTyping && !autoSend ? (
               <NewChatIntro />
             ) : null}
-            <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} failed={failed} onRetry={retry} />
+            <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} failed={failed} onRetry={retry} failedNotes={failedNotes} />
           </motion.div>
         )}
       </div>

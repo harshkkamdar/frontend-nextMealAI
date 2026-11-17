@@ -178,3 +178,13 @@ describe('What Geo knows about you', () => {
     expect(mocks.forgetMemory).toHaveBeenCalledWith('m1')
   })
 })
+
+describe('Settings version', () => {
+  it('shows the app version, not "dev", when the build sets no NEXT_PUBLIC_APP_VERSION', async () => {
+    const { version } = await import('../../../../../package.json')
+    render(<SettingsPage />)
+    await screen.findByText('Test User')
+    expect(screen.getByText(version)).toBeInTheDocument()
+    expect(screen.queryByText('dev')).toBeNull()
+  })
+})

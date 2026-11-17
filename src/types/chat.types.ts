@@ -28,7 +28,9 @@ export interface ChatMessage {
   id?: string
   role: MessageRole
   content: string
+  /** History rows send it equal to created_at; a message made on this phone sets it when sent. */
   timestamp?: string
+  created_at?: string
   tokens_used?: number
   /**
    * Local-only image for the optimistic user-message bubble between submit

@@ -9,7 +9,8 @@ export function mergeHistory(history: ChatMessage[], local: ChatMessage[], unsen
   const keep = local.filter((m) => {
     if (!m.id || !unsentIds.has(m.id as string)) return false
     const at = m.timestamp ? Date.parse(m.timestamp) : 0
-    return !history.some((h) => h.role === 'user' && h.content === m.content && (!h.timestamp || Date.parse(h.timestamp) >= at))
+    // A row without a time can't be placed after this message, so it isn't taken for it (a failed repeat keeps Retry).
+    return !history.some((h) => h.role === 'user' && h.content === m.content && !!h.timestamp && Date.parse(h.timestamp) >= at)
   })
   return keep.length ? [...history, ...keep] : history
 }

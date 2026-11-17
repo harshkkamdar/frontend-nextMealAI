@@ -8,13 +8,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { OnboardingStep } from '@/components/onboarding/onboarding-step'
 import { FormNotice } from '@/components/auth/form-notice'
+import { PasswordChecklist, passwordOk } from '@/components/auth/password-rules'
 import { TextField } from '@/components/ui/fiqr/text-field'
 import { updatePassword } from '@/lib/api/auth.api'
 import { depthTo } from '@/components/onboarding/depth-nav'
 
 const resetPasswordSchema = z
   .object({
-    password: z.string().min(8, 'Use at least 8 characters'),
+    password: z.string().refine(passwordOk, 'Meet every rule below'),
     confirmPassword: z.string().min(1, 'Type the password again'),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -42,6 +43,7 @@ function ResetPasswordForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ResetPasswordValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -107,7 +109,7 @@ function ResetPasswordForm() {
     <OnboardingStep
       stepKey="reset"
       question="Choose a new password"
-      why="Use at least 8 characters, one you haven't used here before."
+      why="Pick one you haven't used here before."
       onBack={() => depthTo(() => router.push('/login'), -1)}
       cta="Update password"
       busyLabel="Updating…"
@@ -117,7 +119,10 @@ function ResetPasswordForm() {
       notice={failure ? <FormNotice key={failure.attempt}>{failure.message}</FormNotice> : null}
     >
       <div className="flex flex-col gap-5">
-        <TextField id="password" label="New password" type="password" placeholder="Choose a password" autoComplete="new-password" error={errors.password?.message} i={2} {...register('password')} />
+        <div>
+          <TextField id="password" label="New password" type="password" placeholder="Choose a password" autoComplete="new-password" error={errors.password?.message} i={2} {...register('password')} />
+          <PasswordChecklist password={watch('password')} />
+        </div>
         <TextField id="confirmPassword" label="Confirm new password" type="password" placeholder="Type it again" autoComplete="new-password" error={errors.confirmPassword?.message} i={3} {...register('confirmPassword')} />
       </div>
     </OnboardingStep>

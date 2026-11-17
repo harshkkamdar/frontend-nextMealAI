@@ -22,6 +22,7 @@ export function ChatThread({
   chipSent = null,
   failed = [],
   onRetry,
+  failedNotes,
 }: {
   messages: ChatMessage[]
   isTyping?: boolean
@@ -35,6 +36,8 @@ export function ChatThread({
   /** Ids of the user's messages that did not send. */
   failed?: string[]
   onRetry?: (messageId: string) => void
+  /** Failed messages that Retry can't fix yet, by id, with the reason shown instead (the daily coaching limit). */
+  failedNotes?: Record<string, string>
 }) {
   const reduce = useReducedMotion()
   // Offline a chip or card button would send into nothing: they stay visible but take no taps.
@@ -82,6 +85,7 @@ export function ChatThread({
           onAction={onReply && !isTyping && online ? onReply : undefined}
           failed={Boolean(message.id && failed.includes(message.id))}
           onRetry={message.id && onRetry ? () => onRetry(message.id as string) : undefined}
+          failedNote={message.id ? failedNotes?.[message.id] : undefined}
         />
       ))}
       {isTyping ? <TypingIndicator anchor={last?.role !== 'assistant'} /> : null}

@@ -127,10 +127,12 @@ interface ChatBubbleProps {
   /** The user's message did not reach Geo: "Didn't send. Retry" sits under it. */
   failed?: boolean
   onRetry?: () => void
+  /** Why it can't send yet (the daily coaching limit): shown in place of Retry, which would only fail again. */
+  failedNote?: string
 }
 
 /** One turn of the running conversation: the user's ink-tint pill, or Geo's plain text with logged-food rows. */
-export function ChatBubble({ message, sessionId, fresh = false, layoutId, clusterStart = false, showTime = true, card = null, onAction, failed = false, onRetry }: ChatBubbleProps) {
+export function ChatBubble({ message, sessionId, fresh = false, layoutId, clusterStart = false, showTime = true, card = null, onAction, failed = false, onRetry, failedNote }: ChatBubbleProps) {
   const reduce = useReducedMotion()
   const isUser = message.role === 'user'
   const [menuOpen, setMenuOpen] = useState(false)
@@ -196,7 +198,9 @@ export function ChatBubble({ message, sessionId, fresh = false, layoutId, cluste
             {displayContent}
           </motion.p>
         ) : null}
-        {failed ? (
+        {failed && failedNote ? (
+          <p role="alert" className="text-right text-caption font-medium text-ink-65">Didn&apos;t send. {failedNote}</p>
+        ) : failed ? (
           <p role="alert" className="-my-2 flex items-center text-caption font-medium text-ink-65">
             Didn&apos;t send.
             <button type="button" onClick={onRetry} className="h-11 px-2 font-semibold text-ink underline underline-offset-4">Retry</button>

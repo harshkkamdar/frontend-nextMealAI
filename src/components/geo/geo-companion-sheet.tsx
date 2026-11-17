@@ -21,6 +21,7 @@ import {
   getChatSession,
 } from '@/lib/api/chat.api'
 import { handleGeoToolResults } from '@/lib/sync/dispatch-from-chat'
+import { ApiException } from '@/types/api.types'
 import type { AttachedImage, ChatMessage } from '@/types/chat.types'
 
 // FE-RCA F2 — Companion sheet persistence.
@@ -118,6 +119,7 @@ export function GeoCompanionSheet() {
   // The screen the sheet was opened over, named in the header and the context chip.
   const [screen, setScreen] = useState<string | null>(null)
   const [failed, setFailed] = useState<string[]>([])
+  const [failedNotes, setFailedNotes] = useState<Record<string, string>>({})
   const unsent = useRef(new Map<string, AttachedImage[] | undefined>())
   const initializingRef = useRef(false)
 
@@ -166,8 +168,9 @@ export function GeoCompanionSheet() {
         const res = await startCompanionSession(screen, context)
         setSessionId(res.session_id)
         writeStoredCompanionSession(res.session_id)
-      } catch {
-        toast.error("I couldn't connect. Check your connection and try again.")
+      } catch (error) {
+        // At the daily coaching limit the backend says when it resets; that isn't the connection.
+        toast.error(error instanceof ApiException && error.statusCode === 429 ? error.message : "I couldn't connect. Check your connection and try again.")
         closeSheet()
       } finally {
         setInitializing(false)
@@ -254,7 +257,10 @@ export function GeoCompanionSheet() {
       // and bridges legacy DOM events). The actions_failed cross-reference
       // means failed tools no longer trigger a phantom refetch.
       handleGeoToolResults(res)
-    } catch {
+    } catch (error) {
+      // The daily coaching limit and the rate limit (429) would fail again on Retry: say the backend's reason instead.
+      const note = error instanceof ApiException && error.statusCode === 429 ? error.message : null
+      if (note) setFailedNotes((notes) => ({ ...notes, [userMsg.id as string]: note }))
       setFailed((ids) => [...ids, userMsg.id as string])
     } finally {
       setIsTyping(false)
@@ -353,7 +359,7 @@ export function GeoCompanionSheet() {
                 </p>
               </>
             ) : (
-              <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId ?? undefined} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} failed={failed} onRetry={retry} />
+              <ChatThread messages={messages} isTyping={isTyping} sessionId={sessionId ?? undefined} onReply={reply} freshFrom={freshFrom} chipSent={chipSent} failed={failed} onRetry={retry} failedNotes={failedNotes} />
             )}
           </motion.div>
         )}
