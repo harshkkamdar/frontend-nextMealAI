@@ -84,8 +84,26 @@ const FEEDBACK: [string, 'Fixed' | 'Improved', string][] = [
 
 type Fix = [flagged: string, fix: string, proof: string]
 
-/** What George flagged on the new design, newest round first: the fix and how it was checked. */
+/** What George flagged on the new design, newest round first: the fix and how it was checked. Round 7 is our own. */
 const ROUNDS: [round: string, fixes: Fix[]][] = [
+  ['Round 7: found in our own testing', [
+    ['Opening a past workout moved its start time to now', 'Opening a finished workout from History reset its start time, so some workouts showed on the wrong day or with "NaN kg" volume. Opening a workout no longer changes it, and the server refuses to move a finished one. The 91 workouts of yours this touched are back to their real start times.', 'On the live app, a past workout opens on its real date with its volume (30 kg), and its start time is the same after opening it.'],
+    ['Food search showed wrong calories', 'Some foods read kilojoules as calories, and branded foods showed the calories for 100 g as one serving: 28 g of cheddar showed 432 kcal and green kiwifruit showed 0. Search now converts kilojoules, scales to the serving and leaves out products with no nutrition data.', 'On the live app, 28 g of cheddar shows 120 kcal, green kiwifruit 58 kcal per 100 g and 15 g of olive oil 120 kcal.'],
+    ['Older days in the food diary showed "Nothing logged"', 'The diary and the month view loaded only your latest 50 logs, so days older than about ten days looked empty. They now load every log in the range.', 'An automated test with six foods a day for 60 days, served 50 at a time like the real server, shows a day five weeks back, and the month view shows all 31 days.'],
+    ['Home and Settings showed different calorie targets', 'Home used your nutrition plan\'s targets and Settings used your profile\'s. Every screen now shows the same targets, and changing them in Settings updates your plan.', 'On the live app, Settings shows 2,600 kcal a day, the same as Home.'],
+    ['Editing an active plan opened the old copy, and "Make this my plan" failed', 'Saving changes now opens the new version of the plan, and any earlier plan can be made active again.', 'Automated tests that answer the way the real server does.'],
+    ['Geo conversations couldn\'t be deleted, and a new name didn\'t stick', 'Both work now.', 'On the live app, a renamed conversation keeps its name after reloading, and a deleted one is gone.'],
+    ['Geo didn\'t save foods you dislike, and didn\'t use your name', 'Saving dislikes or favourite cuisines failed, and took any other change in the same message with it. They now save and Geo sees them. Geo also reads your name correctly now.', 'Automated tests against a copy of the real profile table.'],
+    ['Unfinished workouts piled up', 'Cancelling a plan with Geo left its workout running, and starting a new workout left the old one open. Cancelling now ends the workout, and Start asks whether to resume the open workout or discard it. Workouts left open this way were closed.', 'With Push left open, tapping Start on Pull asks "Push is still open" with Resume Push or Discard it and start Pull, and discarding starts Pull. No workout from a cancelled plan is still open.'],
+    ['Foods logged from search, Geo or a photo didn\'t show until a reload', 'Home and Food now update straight away after "Log now", a multi-food meal through Geo, a photo or a favourite.', 'Automated tests for each way of logging.'],
+    ['Foods you log yourself skipped the diet and allergy check', 'Geo checked every food against your diet and allergies, but search, "Log again", favourites and photos didn\'t. They now log the food and warn you, for example "Salmon nigiri doesn\'t fit your vegetarian diet", with Undo.', 'On a vegetarian test account, "Log again" on salmon nigiri logs it and shows "Salmon nigiri doesn\'t fit your vegetarian diet." with Undo.'],
+    ['Check-in numbers', 'Check-in now suggests the usual adjustment after two weeks of steady progress, uses only the weigh-ins inside that week, and a weigh-in updates the weight in Settings.', 'Automated tests, including a weigh-in from after the week that is no longer counted.'],
+    ['Workout numbers', 'Weights Geo puts on a plan now show, a 60-second plank shows as seconds, "last time" comes from finished workouts and follows a swapped exercise, the next set starts from the weight you just lifted, a set ticked just before Finish is kept, and a rest of 0 is allowed.', 'An automated test for each.'],
+    ['Saved meals couldn\'t be found', 'Saving a meal said "It\'s under Meals when you add food", but there was no Meals list there. Saved meals now sit on Log food under Meals, and one tap logs the whole meal.', 'On the test account, a saved Protein Shake shows under Meals on Log food.'],
+    ['Food logging details', 'Switching an entry from servings to grams no longer keeps "2 eggs", saving a food under a name you already have saves your new numbers, favourites log onto any past day, and a photo of a packaged food starts at one serving instead of the whole pack.', 'On the live server, a photo of a 60-gummy jar comes back as one serving of 2 gummies, 25 kcal. The rest have automated tests.'],
+    ['Messages that hid the real problem', 'A photo that couldn\'t be saved said "Check your connection", and reaching Geo\'s daily limit said "Didn\'t send. Retry". Both now say what happened. Sign-up shows every password rule before you submit.', 'Automated tests with the server\'s real error answers.'],
+    ['Our tests passed while these bugs were live', 'Our automated tests used made-up server answers that didn\'t always match the real ones. Tests now use the real answers, and before each update a live check signs in to a test account and checks the main screens\' data on the real server.', 'Its first runs caught a cheddar listed at 0 kcal and a cracker at 533 kcal for 3.8 g. Both are fixed.'],
+  ]],
   ['Round 6', [
     ['Photo recognition still isn\'t right: the creatine gummies came back at 0 kcal', 'The photo was recognised as creatine infused gummies, but the Your photo screen read the result in the wrong format, so every item showed 0 kcal. It now shows each item\'s grams and calories, and logging keeps them.', 'On the live app, a chicken and rice photo shows 451 kcal across 5 items with their grams, and a tortellini photo logs at 458 kcal.'],
   ]],
@@ -123,7 +141,7 @@ const ROUNDS: [round: string, fixes: Fix[]][] = [
   ]],
   ['Round 1', [
     ['Rep-range fields can\'t be typed in, and + or − shows "NaN"', 'Kg and reps can be typed, and a rep range records the one number you hit.', 'An automated test reads ranges like 8–12 and records one number for each set.'],
-    ['Label photos in Log food don\'t work properly, and should work like the chat', 'Four faults, all fixed: chat photos had stopped working, two-column labels read the per-100 g column as the serving (a 192 kcal serving showed as 77), some label layouts lost their calories, and non-food items were added at 0 kcal.', 'A photo check sends 5 real photos, 2 labels and 3 plates, through Log food and chat on every test run, and passes 23 of 23.'],
+    ['Label photos in Log food don\'t work properly, and should work like the chat', 'Four faults, all fixed: chat photos had stopped working, two-column labels read the per-100 g column as the serving (a 192 kcal serving showed as 77), some label layouts lost their calories, and non-food items were added at 0 kcal.', 'A photo check sends 5 real photos, 2 labels and 3 plates, through the same recognition Log food and chat use, and passes 23 of 23. The Your photo screen itself was fixed in Round 6.'],
     ['No real way to interact with the Check-in page', 'Opening the review used up your check-in, so it vanished as soon as you looked; now only Apply or Keep records it. "Check in now" works on any day, every day and tile opens a breakdown, and "Ask Geo about my week" talks it through.', 'Checked on the live app with a test account.'],
   ]],
 ]
@@ -168,7 +186,7 @@ export default function UpdatesPage() {
     >
       <a href="/login" className="mb-2 inline-flex h-12 items-center gap-2 rounded-[15px] bg-ink px-5 text-[16px] font-semibold text-cream active:opacity-80">Open the new app <span aria-hidden="true">→</span></a>
 
-      <Chapter n="New" id="latest" title="Your feedback on the new design" intro="Newest first: what you flagged, what we changed and how we checked it.">
+      <Chapter n="New" id="latest" title="Your feedback on the new design" intro="Newest first: what you flagged or we found, what we changed and how we checked it.">
         {ROUNDS.map(([round, fixes]) => <Fragment key={round}><Sub>{round}</Sub><Fixes fixes={fixes} /></Fragment>)}
       </Chapter>
 
