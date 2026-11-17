@@ -16,6 +16,7 @@ import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { formatMacroKcal } from '@/lib/macros'
 import { goBack } from '@/lib/navigation'
+import { effectiveTargets } from '@/lib/tdee'
 import { todayLocalISO } from '@/lib/timezone'
 import { useUIStore } from '@/stores/ui.store'
 import type { MealPlan } from '@/types/plans.types'
@@ -42,14 +43,7 @@ export default function NutritionPlanPage() {
   const plan = data?.plan ?? null
   useSetGeoScreen('food_plan', { planId: plan?.id ?? null })
 
-  const planTargets = plan?.content?.daily_targets
-  const profile = data?.profile
-  const targets: Targets = {
-    calories: planTargets?.calories ?? profile?.daily_calorie_target ?? 0,
-    protein: planTargets?.protein ?? profile?.daily_protein_g ?? 0,
-    carbs: planTargets?.carbs ?? profile?.daily_carbs_g ?? 0,
-    fat: planTargets?.fat ?? profile?.daily_fat_g ?? 0,
-  }
+  const targets: Targets = effectiveTargets(plan, data?.profile, 0)
   const split = macroSplit(targets)
   const todayPlan = plan?.content?.days?.find((d) => d.date?.slice(0, 10) === today)
   const todayMeals = todayPlan ? [...todayPlan.meals.map((m) => ({ label: m.type, name: m.name, kcal: m.calories })), ...(todayPlan.snacks ?? []).map((s) => ({ label: 'Snack', name: s.name, kcal: s.calories }))] : []

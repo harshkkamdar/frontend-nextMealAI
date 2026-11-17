@@ -34,6 +34,7 @@ import { todayLocalISO } from '@/lib/timezone'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import type { Log, FoodPayload } from '@/types/logs.types'
 import type { MealPlan } from '@/types/plans.types'
+import { effectiveTargets } from '@/lib/tdee'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
 import { useUIStore } from '@/stores/ui.store'
 
@@ -195,13 +196,7 @@ export default function DiaryPage() {
   // Targets: active nutrition plan first, then the user's profile targets, then
   // 0. No hardcoded numbers —
   // a 2000-cal default was wrong for anyone whose real target differs.
-  const planTargets = mealPlan?.content?.daily_targets
-  const targets = {
-    calories: planTargets?.calories ?? profile?.daily_calorie_target ?? 0,
-    protein: planTargets?.protein ?? profile?.daily_protein_g ?? 0,
-    carbs: planTargets?.carbs ?? profile?.daily_carbs_g ?? 0,
-    fat: planTargets?.fat ?? profile?.daily_fat_g ?? 0,
-  }
+  const targets = effectiveTargets(mealPlan, profile, 0)
 
   // Calendar indicators — FB-12: bucket the dot under the user's local date.
   const indicators = useMemo(() => {

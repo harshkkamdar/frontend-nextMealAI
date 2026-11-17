@@ -16,12 +16,15 @@ import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { downloadExport } from '@/lib/api/account.api'
 import { logout } from '@/lib/api/auth.api'
 import { forgetMemory, getProfileMemories, type ProfileMemory } from '@/lib/api/memories.api'
+import { getPlans } from '@/lib/api/plans.api'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
 import { getSettings, updateSettings } from '@/lib/api/settings.api'
 import { isNative } from '@/lib/platform'
 import { disconnectHealth, healthLabel, isHealthConnected, lastHealthSync } from '@/lib/platform/health'
 import { isSubscribed, manageSubscription, restorePurchases } from '@/lib/platform/purchases'
+import { effectiveTargets } from '@/lib/tdee'
 import { useAuthStore } from '@/stores/auth.store'
+import type { MealPlan } from '@/types/plans.types'
 import type { Profile } from '@/types/profile.types'
 import type { GeoPersonality, RestTimerDuration, Settings } from '@/types/settings.types'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
@@ -79,6 +82,7 @@ export default function SettingsPage() {
   const isAdmin = useIsAdmin()
   const [settings, setSettings] = useState<Settings | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
   const [loading, setLoading] = useState(true)
   const [loggingOut, setLoggingOut] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -93,10 +97,11 @@ export default function SettingsPage() {
   const [memories, setMemories] = useState<ProfileMemory[] | null>(null)
 
   const loadSettings = useCallback(() => {
-    Promise.all([getSettings(), getProfile()])
-      .then(([nextSettings, nextProfile]) => {
+    Promise.all([getSettings(), getProfile(), getPlans({ type: 'meal', active_only: true }).catch(() => [])])
+      .then(([nextSettings, nextProfile, plans]) => {
         setSettings(nextSettings)
         setProfile(nextProfile)
+        setMealPlan((plans.find((plan) => plan.type === 'meal') as MealPlan | undefined) ?? null)
       })
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -229,7 +234,8 @@ export default function SettingsPage() {
   }
 
   const profileName = profile.full_name || user?.email?.split('@')[0] || 'Profile'
-  const summary = profileSummary(profile) || user?.email || 'Body, targets and goals'
+  // The calories Home and Food show: the nutrition plan's target wins over the profile's.
+  const summary = profileSummary({ ...profile, daily_calorie_target: effectiveTargets(mealPlan, profile, null).calories }) || user?.email || 'Body, targets and goals'
   const aiEnabled = Boolean(profile.ai_consent_at)
   const native = isNative()
   const healthName = healthLabel()

@@ -10,6 +10,8 @@
  * — this is just a UX preview.
  */
 
+import type { Profile } from '@/types/profile.types'
+
 export interface ComputeTdeeInput {
   weightKg: number | null
   heightCm: number | null
@@ -25,6 +27,24 @@ export interface DailyTargets {
   protein: number
   carbs: number
   fat: number
+}
+
+/**
+ * The targets every screen shows: the active nutrition plan's `daily_targets` when it has them, else the profile's
+ * daily_* columns, else `fallback`. The backend reads them in the same order (diary, get_today_summary).
+ */
+export function effectiveTargets<F extends number | null>(
+  plan: { content?: { daily_targets?: Partial<DailyTargets> } } | null | undefined,
+  profile: Pick<Profile, 'daily_calorie_target' | 'daily_protein_g' | 'daily_carbs_g' | 'daily_fat_g'> | null | undefined,
+  fallback: F,
+): Record<keyof DailyTargets, number | F> {
+  const pinned = plan?.content?.daily_targets
+  return {
+    calories: pinned?.calories ?? profile?.daily_calorie_target ?? fallback,
+    protein: pinned?.protein ?? profile?.daily_protein_g ?? fallback,
+    carbs: pinned?.carbs ?? profile?.daily_carbs_g ?? fallback,
+    fat: pinned?.fat ?? profile?.daily_fat_g ?? fallback,
+  }
 }
 
 const ACTIVITY_MULTIPLIERS: Record<string, number> = {

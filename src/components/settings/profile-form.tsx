@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { getPlans } from '@/lib/api/plans.api'
 import { getProfile, updateProfile } from '@/lib/api/profile.api'
 import { Chip } from '@/components/ui/fiqr/chip'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
@@ -8,7 +9,8 @@ import { PushedHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { GROUP_CARD, SettingsRow, SettingsSection, SettingsSkeleton } from '@/components/settings/settings-section'
 import { toast } from 'sonner'
-import { computeAgeFromDob, computeDailyTargets } from '@/lib/tdee'
+import { computeAgeFromDob, computeDailyTargets, effectiveTargets } from '@/lib/tdee'
+import type { MealPlan } from '@/types/plans.types'
 import type { Profile, PrimaryGoal, ActivityLevel, DietaryStyle } from '@/types/profile.types'
 
 const GOAL_OPTIONS: { value: PrimaryGoal; label: string }[] = [
@@ -46,6 +48,12 @@ const DIETARY_OPTIONS: { value: DietaryStyle; label: string }[] = [
   { value: 'kosher', label: 'Kosher' },
 ]
 
+/** The profile, and the targets Home and Food show: the active nutrition plan's when it has them, else the profile's. */
+async function loadProfile() {
+  const [profile, plans] = await Promise.all([getProfile(), getPlans({ type: 'meal', active_only: true }).catch(() => [])])
+  return { profile, targets: effectiveTargets(plans.find((plan) => plan.type === 'meal') as MealPlan | undefined, profile, null) }
+}
+
 const EQUIPMENT_OPTIONS = [
   'Dumbbells',
   'Barbell',
@@ -70,9 +78,9 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
   const [activity, setActivity] = useState<ActivityLevel | undefined>()
   const [diet, setDiet] = useState<DietaryStyle | undefined>()
   const [equipment, setEquipment] = useState<string[]>([])
-  // Daily target overrides — only sent on save if user touched the input
-  // (touchedTargets[field] = true). Untouched fields are omitted from the
-  // PUT body so the backend recomputes them from TDEE on every save.
+  // Daily targets as every screen shows them. Sent on save only once one is touched, then all four, so the
+  // backend writes the numbers you see to the profile and the active plan (one typed calorie must not pull
+  // the plan's untouched macros back to the profile's).
   const [dailyCalories, setDailyCalories] = useState('')
   const [dailyProtein, setDailyProtein] = useState('')
   const [dailyCarbs, setDailyCarbs] = useState('')
@@ -85,9 +93,16 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
   })
   const [resettingTargets, setResettingTargets] = useState(false)
 
+  const showTargets = (t: Awaited<ReturnType<typeof loadProfile>>['targets']) => {
+    setDailyCalories(t.calories?.toString() ?? '')
+    setDailyProtein(t.protein?.toString() ?? '')
+    setDailyCarbs(t.carbs?.toString() ?? '')
+    setDailyFat(t.fat?.toString() ?? '')
+  }
+
   const load = useCallback(() => {
-    getProfile()
-      .then((p) => {
+    loadProfile()
+      .then(({ profile: p, targets }) => {
         setProfile(p)
         setCurrentWeight(p.current_weight_kg?.toString() ?? '')
         setTargetWeight(p.target_weight_kg?.toString() ?? '')
@@ -96,10 +111,7 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
         setActivity(normalizeActivityLevel(p.activity_level))
         setDiet(p.dietary_style)
         setEquipment(p.equipment ?? [])
-        setDailyCalories(p.daily_calorie_target?.toString() ?? '')
-        setDailyProtein(p.daily_protein_g?.toString() ?? '')
-        setDailyCarbs(p.daily_carbs_g?.toString() ?? '')
-        setDailyFat(p.daily_fat_g?.toString() ?? '')
+        showTargets(targets)
       })
       .catch(() => setProfile(null))
       .finally(() => setLoading(false))
@@ -133,31 +145,20 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
         equipment,
       }
 
-      // Only include daily_* targets the user actually touched. Untouched
-      // fields are omitted so the backend recomputes them from TDEE every
-      // save (so changing goal/weight propagates without you having to
-      // re-type any Daily Targets values).
-      if (touchedTargets.calories) {
-        data.daily_calorie_target = dailyCalories.trim() === '' ? null : Number(dailyCalories)
-      }
-      if (touchedTargets.protein) {
-        data.daily_protein_g = dailyProtein.trim() === '' ? null : Number(dailyProtein)
-      }
-      if (touchedTargets.carbs) {
-        data.daily_carbs_g = dailyCarbs.trim() === '' ? null : Number(dailyCarbs)
-      }
-      if (touchedTargets.fat) {
-        data.daily_fat_g = dailyFat.trim() === '' ? null : Number(dailyFat)
+      // No target touched: none sent, so the backend keeps them (and the plan's) as they are.
+      if (Object.values(touchedTargets).some(Boolean)) {
+        const num = (value: string) => (value.trim() === '' ? null : Number(value))
+        data.daily_calorie_target = num(dailyCalories)
+        data.daily_protein_g = num(dailyProtein)
+        data.daily_carbs_g = num(dailyCarbs)
+        data.daily_fat_g = num(dailyFat)
       }
 
       await updateProfile(data)
       // Re-fetch so inputs reflect the backend's recomputed values.
-      const fresh = await getProfile()
-      setProfile(fresh)
-      setDailyCalories(fresh.daily_calorie_target?.toString() ?? '')
-      setDailyProtein(fresh.daily_protein_g?.toString() ?? '')
-      setDailyCarbs(fresh.daily_carbs_g?.toString() ?? '')
-      setDailyFat(fresh.daily_fat_g?.toString() ?? '')
+      const fresh = await loadProfile()
+      setProfile(fresh.profile)
+      showTargets(fresh.targets)
       setTouchedTargets({ calories: false, protein: false, carbs: false, fat: false })
       toast.success('Saved')
     } catch {
@@ -176,12 +177,9 @@ export function ProfileForm({ onBack }: { onBack: () => void }) {
         daily_carbs_g: null,
         daily_fat_g: null,
       })
-      const fresh = await getProfile()
-      setProfile(fresh)
-      setDailyCalories(fresh.daily_calorie_target?.toString() ?? '')
-      setDailyProtein(fresh.daily_protein_g?.toString() ?? '')
-      setDailyCarbs(fresh.daily_carbs_g?.toString() ?? '')
-      setDailyFat(fresh.daily_fat_g?.toString() ?? '')
+      const fresh = await loadProfile()
+      setProfile(fresh.profile)
+      showTargets(fresh.targets)
       toast.success('Back to the suggested targets')
     } catch {
       toast.error("Couldn't reset your targets. Try again.")

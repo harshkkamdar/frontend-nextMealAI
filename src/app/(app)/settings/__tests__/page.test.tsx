@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   subscribed: false,
   getSettings: vi.fn(),
   getProfile: vi.fn(),
+  getPlans: vi.fn(),
   updateSettings: vi.fn(),
   getProfileMemories: vi.fn(),
   forgetMemory: vi.fn(),
@@ -27,6 +28,7 @@ vi.mock('@/lib/api/profile.api', () => ({
   getProfile: (...args: unknown[]) => mocks.getProfile(...args),
   updateProfile: vi.fn(),
 }))
+vi.mock('@/lib/api/plans.api', () => ({ getPlans: (...args: unknown[]) => mocks.getPlans(...args) }))
 vi.mock('@/lib/api/memories.api', () => ({
   getProfileMemories: (...args: unknown[]) => mocks.getProfileMemories(...args),
   forgetMemory: (...args: unknown[]) => mocks.forgetMemory(...args),
@@ -60,8 +62,28 @@ beforeEach(() => {
     share_progress: false, analytics_enabled: false, rest_timer_seconds: 90, created_at: '', updated_at: '',
   })
   mocks.getProfile.mockResolvedValue({ id: 'profile-1', user_id: 'u1', full_name: 'Test User', created_at: '', updated_at: '' })
+  mocks.getPlans.mockResolvedValue([])
   mocks.getProfileMemories.mockResolvedValue([])
   mocks.forgetMemory.mockResolvedValue(undefined)
+})
+
+describe('Settings profile card', () => {
+  it("shows the nutrition plan's calorie target, the one Home and Food show", async () => {
+    // Mirrors profile.controller.ts getProfile and plans.controller.ts getPlans rows (the test account's numbers).
+    mocks.getProfile.mockResolvedValue({
+      id: 'u1', full_name: 'Test User', current_weight_kg: 92, primary_goal: 'fat_loss', daily_calorie_target: 2000,
+      daily_protein_g: 190, daily_carbs_g: 153, daily_fat_g: 70, daily_targets_missing_fields: [], created_at: '', updated_at: '',
+    })
+    const plans = [
+      { id: 'p1', user_id: 'u1', type: 'meal', status: 'active', version: 2, start_date: '2026-11-01', end_date: '2026-11-30', content: { name: 'Cut', daily_targets: { calories: 2600, protein: 180, carbs: 280, fat: 80 } }, created_at: '', updated_at: '' },
+      { id: 'p0', user_id: 'u1', type: 'meal', status: 'superseded', version: 1, start_date: '2026-10-01', end_date: '2026-10-31', content: { name: 'Cut', daily_targets: { calories: 2400, protein: 170, carbs: 250, fat: 75 } }, created_at: '', updated_at: '' },
+    ]
+    // Honours type and active_only like the backend's filter.
+    mocks.getPlans.mockImplementation(({ type, active_only }: { type?: string; active_only?: boolean }) =>
+      Promise.resolve(plans.filter((plan) => (!type || plan.type === type) && (!active_only || plan.status === 'active'))))
+    render(<SettingsPage />)
+    expect(await screen.findByText('92.0 kg, 2,600 kcal a day, fat loss')).toBeInTheDocument()
+  })
 })
 
 describe('Settings health and subscription sections', () => {

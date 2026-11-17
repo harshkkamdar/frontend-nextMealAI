@@ -2,6 +2,7 @@ import type { Log, LogsSummary, FoodPayload } from '@/types/logs.types'
 import type { MealPlan, WorkoutPlan } from '@/types/plans.types'
 import type { Profile } from '@/types/profile.types'
 import { formatMacroGrams } from '@/lib/macros'
+import { effectiveTargets } from '@/lib/tdee'
 import { nextWorkoutDayIndex } from '@/lib/workout-session'
 
 export type NudgeType = 'time_to_eat' | 'workout_today' | 'protein_check' | 'program_complete'
@@ -43,9 +44,7 @@ export function computeNudges(input: NudgeInput): Nudge[] {
   // FB-tdee-baseline: targets come from meal-plan override → profile baseline.
   // Never fall back to hardcoded numbers — if both are null the user's profile
   // is incomplete and we suppress this nudge entirely so we don't lie.
-  const caloriesTarget = mealPlan?.content?.daily_targets?.calories
-    ?? profile?.daily_calorie_target
-    ?? 0
+  const caloriesTarget = effectiveTargets(mealPlan, profile, 0).calories
   const caloriesConsumed = summary?.daily_breakdown?.[0]?.calories ?? 0
   const remaining = caloriesTarget - caloriesConsumed
 
@@ -102,9 +101,7 @@ export function computeNudges(input: NudgeInput): Nudge[] {
   if (hour >= 19) {
     // FB-tdee-baseline: same precedence as calories. Skip the nudge if both
     // sources are null — we won't fabricate a 150g default.
-    const proteinTarget = mealPlan?.content?.daily_targets?.protein
-      ?? profile?.daily_protein_g
-      ?? 0
+    const proteinTarget = effectiveTargets(mealPlan, profile, 0).protein
     const proteinConsumed = summary?.daily_breakdown?.[0]?.protein ?? 0
     const proteinPct = proteinTarget > 0 ? (proteinConsumed / proteinTarget) * 100 : 100
 
