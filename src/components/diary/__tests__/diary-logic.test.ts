@@ -60,6 +60,8 @@ describe('rows', () => {
   it('quantityLabel', () => {
     expect(quantityLabel({ food_name: 'x', servings: 2, serving_label: 'slice' })).toBe('2 slices')
     expect(quantityLabel({ food_name: 'x', quantity_g: 150 })).toBe('150g')
+    expect(quantityLabel({ food_name: 'x', quantity_g: 29.899999618530273 })).toBe('29.9g')
+    expect(quantityLabel({ food_name: 'x', servings: 1, serving_label: 'servings' })).toBe('1 serving')
     expect(quantityLabel({ food_name: 'x', items: [{ name: 'a', est_macros: {} }, { name: 'b', est_macros: {} }] })).toBe('2 items, from your photo')
   })
 })

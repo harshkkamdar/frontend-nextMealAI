@@ -84,10 +84,10 @@ export function quantityLabel(payload: FoodPayload): string {
   const servings = typeof payload.servings === 'number' ? payload.servings : undefined
   const label = typeof payload.serving_label === 'string' ? payload.serving_label.trim() : ''
   if (servings !== undefined && label) {
-    const plural = servings === 1 || /s$/i.test(label) ? label : `${label}s`
+    const plural = servings === 1 ? label.replace(/^servings$/i, 'serving') : /s$/i.test(label) ? label : `${label}s`
     return `${servings} ${plural}`
   }
   if (servings !== undefined) return `${servings} serving${servings === 1 ? '' : 's'}`
-  if (payload.quantity_g) return `${payload.quantity_g}g`
+  if (payload.quantity_g) return `${Math.round(payload.quantity_g * 10) / 10}g`
   return '1 serving'
 }
