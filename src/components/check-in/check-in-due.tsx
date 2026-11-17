@@ -23,6 +23,8 @@ export interface TodayContext {
   fat: number | null
   /** The active nutrition plan's name when it pins daily targets (Apply patches those in place). */
   planName: string | null
+  /** The newest logged weigh-in, for the weight sheet's "Last 78.2 kg on Sat". */
+  weighIn?: { kg: number; date: string } | null
 }
 
 interface CheckInDueProps {

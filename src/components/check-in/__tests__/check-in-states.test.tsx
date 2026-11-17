@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { CheckInStatus } from '@/lib/api/check-in.api'
@@ -12,6 +12,9 @@ const mocks = vi.hoisted(() => ({
   toastSuccess: vi.fn(),
   toastError: vi.fn(),
   health: { label: null as string | null, connected: false },
+  apiFetch: vi.fn(),
+  fetchers: {} as Record<string, () => Promise<unknown>>,
+  today: null as unknown,
 }))
 
 vi.mock('next/navigation', () => ({
@@ -31,8 +34,13 @@ vi.mock('@/lib/api/check-in.api', () => ({
 // Today's intake and the four current targets ride on a second query ('check-in-today').
 const TODAY = { eaten: { calories: 1240, protein: 92, carbs: 120, fat: 38 }, carbs: 248, fat: 72, planName: 'Lean cut' }
 vi.mock('@/hooks/use-cached-query', () => ({
-  useCachedQuery: (key: string) => key === 'check-in' ? mocks.query() : { data: TODAY, loading: false, error: null, refetch: vi.fn() },
+  useCachedQuery: (key: string, fetcher: () => Promise<unknown>) => {
+    mocks.fetchers[key] = fetcher
+    return key === 'check-in' ? mocks.query() : { data: mocks.today ?? TODAY, loading: false, error: null, refetch: vi.fn() }
+  },
 }))
+// The today read and the weight sheet go through the real api modules to this backend.
+vi.mock('@/lib/api/client', async (original) => ({ ...(await original<object>()), apiFetch: mocks.apiFetch }))
 
 vi.mock('@/hooks/use-sync-refetch', () => ({
   useSyncRefetch: vi.fn(),
@@ -56,6 +64,7 @@ vi.mock('@/lib/sync/sync-bus', () => ({
 }))
 
 import CheckInPage from '@/app/(app)/check-in/page'
+import { backendGetLogs, logRow } from '@/test/backend-logs'
 
 // Three weigh-ins: the engine (check-in-engine.ts) reads no week with fewer.
 const WEIGH_INS: Record<number, number> = { 0: 78.6, 2: 78.4, 4: 78.2 }
@@ -147,6 +156,8 @@ beforeEach(() => {
   vi.setSystemTime(new Date('2026-09-16T10:00:00'))
   mocks.applyCheckIn.mockImplementation(async (_weekEnd: string, apply = true) => (apply ? APPLIED : KEPT))
   mocks.health = { label: null, connected: false }
+  mocks.today = null
+  mocks.apiFetch.mockRejectedValue(new Error('404'))
 })
 
 afterEach(() => vi.useRealTimers())
@@ -337,5 +348,23 @@ describe('check-in states', () => {
     renderStatus(baseStatus)
 
     expect(await screen.findByText('Apple Health')).toBeInTheDocument()
+  })
+
+  it('the weight sheet says when the last weigh-in was, not "First weigh-in"', async () => {
+    // Saturday's weigh-in is the newest; today (Wednesday 16 Sep) has none yet.
+    const rows = [
+      logRow('w1', 'weight', '2026-09-08', '2026-09-08T06:00:00.000Z', { weight_kg: 78.6 }),
+      logRow('w2', 'weight', '2026-09-12', '2026-09-12T06:00:00.000Z', { weight_kg: 78.2 }),
+    ]
+    const logs = backendGetLogs(rows, '2026-09-16')
+    mocks.apiFetch.mockImplementation((path: string) => path.startsWith('/v1/logs?') ? logs(path) : Promise.reject(new Error('404')))
+    renderStatus(baseStatus)
+    mocks.today = await mocks.fetchers['check-in-today']()
+    cleanup()
+    renderStatus(baseStatus)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open weigh-ins' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Log weight' }))
+    expect(await screen.findByText('Last 78.2 kg on Sat')).toBeInTheDocument()
   })
 })

@@ -6,7 +6,8 @@ import { toast } from 'sonner'
 import { Plus, X } from 'lucide-react'
 import { NumberField, SearchablePicker } from '@/components/plans/plan-builder-shared'
 import { searchExercises, type ExerciseSearchResult } from '@/lib/api/exercises.api'
-import { startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { startWorkoutSessionWithStatus } from '@/lib/api/workout-sessions.api'
+import { OFFLINE_START } from '@/components/workout/train-data'
 import { FieldLabel, ManualLogShell } from './manual-log-shell'
 import { FIELD, LIST } from './log-ui'
 
@@ -53,7 +54,7 @@ export function WorkoutLogForm() {
     const named = exercises.filter((e) => e.name.trim())
     setStarting(true)
     try {
-      const session = await startWorkoutSession({
+      const result = await startWorkoutSessionWithStatus({
         day_name: title.trim() || 'Freestyle Workout',
         exercises: named.map((e) => ({
           name: e.name.trim(),
@@ -64,8 +65,10 @@ export function WorkoutLogForm() {
           rest_seconds: Math.round(e.rest ?? 90),
         })),
       })
+      // A start queued offline has no session to open yet (its pending id never loads), so the form stays.
+      if (result.queued) { toast.success(OFFLINE_START); setStarting(false); return }
       // replace() so Back from the session doesn't return to this builder.
-      router.replace(`/train/session?id=${session.id}`)
+      router.replace(`/train/session?id=${result.data.id}`)
     } catch {
       toast.error('Failed to start workout')
       setStarting(false)

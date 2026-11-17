@@ -28,7 +28,7 @@ vi.mock('@/lib/api/exercises.api', () => ({
 }))
 
 vi.mock('@/lib/api/workout-sessions.api', () => ({
-  startWorkoutSession: (...args: unknown[]) => mocks.startWorkoutSession(...args),
+  startWorkoutSessionWithStatus: (...args: unknown[]) => mocks.startWorkoutSession(...args),
 }))
 
 import { EnergyLogForm } from '../energy-log-form'
@@ -99,7 +99,7 @@ describe('manual log form guards and FIQR inputs', () => {
   })
 
   it('starts the existing freestyle session flow from the new action', async () => {
-    mocks.startWorkoutSession.mockResolvedValueOnce({ id: 'session-1' })
+    mocks.startWorkoutSession.mockResolvedValueOnce({ queued: false, data: { id: 'session-1', status: 'in_progress', exercises: [] } })
     render(<WorkoutLogForm />)
     fireEvent.click(screen.getByRole('button', { name: 'Start session' }))
 

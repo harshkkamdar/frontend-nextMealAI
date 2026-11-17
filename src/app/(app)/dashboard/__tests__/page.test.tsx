@@ -12,10 +12,24 @@ const mocks = vi.hoisted(() => ({
   getLogs: vi.fn(),
   apiFetch: vi.fn(),
   fetchers: {} as Record<string, () => Promise<unknown>>,
+  error: vi.fn(),
+  getInProgress: vi.fn(async (): Promise<unknown> => null),
+  abandon: vi.fn(),
+  startWithStatus: vi.fn(),
 }))
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mocks.push }) }))
-vi.mock('sonner', () => ({ toast: { success: mocks.success, error: vi.fn() } }))
+vi.mock('sonner', () => ({ toast: { success: mocks.success, error: mocks.error } }))
+vi.mock('@/lib/api/workout-sessions.api', () => ({
+  getInProgressSession: mocks.getInProgress,
+  abandonWorkoutSession: mocks.abandon,
+  startWorkoutSessionWithStatus: mocks.startWithStatus,
+  // As the real one: the optimistic stand-in when the start was queued offline.
+  startWorkoutSession: async (input: unknown) => {
+    const result = await mocks.startWithStatus(input)
+    return result.queued ? result.optimistic : result.data
+  },
+}))
 vi.mock('@/lib/api/logs.api', () => ({ createLogWithStatus: mocks.create, deleteLog: mocks.remove, getLogs: mocks.getLogs, getLogsSummary: vi.fn() }))
 vi.mock('@/lib/api/client', async (original) => ({ ...(await original<object>()), apiFetch: mocks.apiFetch }))
 vi.mock('@/lib/platform/app', () => ({ haptic: vi.fn() }))
@@ -157,5 +171,54 @@ describe('Dashboard week of logs', () => {
     const data = await mocks.fetchers.dashboard() as { logs: Log[] }
     expect(data.logs).toHaveLength(129)
     expect(data.logs.find((log) => log.type === 'weight')?.payload).toEqual({ weight_kg: 81.4 })
+  })
+})
+
+// A plans row (select *): an active PPL program whose cursor is on Pull.
+const ppl = {
+  id: 'p1', user_id: 'u1', type: 'workout', status: 'active', version: 1, previous_version_id: null, generated_by: 'ai',
+  start_date: '2026-10-01', end_date: null, current_position: 1, deleted_at: null, created_at: '2026-10-01T00:00:00.000Z', updated_at: '2026-10-01T00:00:00.000Z',
+  content: { name: 'PPL', days: ['Push', 'Pull', 'Legs'].map((name) => ({ date: '', name, is_rest_day: false, exercises: [{ name: 'Row', sets: 3, reps: 10, rest_seconds: 90 }] })) },
+}
+// A workout_sessions row still in progress.
+const openSession = (id: string, dayIndex: number, dayName: string) => ({
+  id, user_id: 'u1', plan_id: 'p1', plan_day_index: dayIndex, day_name: dayName, status: 'in_progress',
+  started_at: '2026-11-12T08:00:00.000Z', completed_at: null, total_volume_kg: null, duration_minutes: null, notes: null, created_at: '2026-11-12T08:00:00.000Z', deleted_at: null,
+  exercises: [{ name: 'Bench Press', muscle_group: 'chest', planned_sets: 1, planned_reps: 10, rest_seconds: 90, instructions: [], notes: null, status: 'pending', sets: [{ set_number: 1, planned_reps: 10, planned_weight_kg: null, actual_reps: null, actual_weight_kg: null, completed: false, completed_at: null }] }],
+})
+
+describe('Dashboard Start workout', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.getInProgress.mockResolvedValue(null)
+    mocks.abandon.mockResolvedValue({ ...openSession('w-push', 0, 'Push'), status: 'abandoned' })
+    mocks.startWithStatus.mockResolvedValue({ queued: false, data: openSession('w-pull', 1, 'Pull') })
+    // Home's last read saw no open workout (it was started on another device since, or that read failed).
+    mocks.data = { ...dashboardData([]), plans: [ppl], inProgress: null }
+  })
+
+  it('asks about a workout open elsewhere; discarding it abandons it, then starts today\'s', async () => {
+    mocks.getInProgress.mockResolvedValue(openSession('w-push', 0, 'Push'))
+    render(<DashboardPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'Start workout' }))
+    expect(await screen.findByText('Push is still open')).toBeInTheDocument()
+    expect(mocks.startWithStatus).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Discard it and start Pull' }))
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith('/train/session?id=w-pull'))
+    expect(mocks.abandon).toHaveBeenCalledWith('w-push')
+    expect(mocks.startWithStatus).toHaveBeenCalledWith({ plan_id: 'p1', plan_day_index: 1 })
+  })
+
+  it('offline, the start waits on the phone and Home stays put', async () => {
+    mocks.startWithStatus.mockResolvedValue({
+      queued: true,
+      item: { id: 'q1', kind: 'workout_start', method: 'POST', path: '/v1/workout-sessions', body: {}, attempts: 0, createdAt: '2026-11-17T10:00:00.000Z' },
+      optimistic: openSession('pending-q1', 1, 'Pull'),
+    })
+    render(<DashboardPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'Start workout' }))
+    await waitFor(() => expect(mocks.success).toHaveBeenCalledWith("Workout saved on your phone. It starts when you're back online"))
+    expect(mocks.push).not.toHaveBeenCalled()
   })
 })

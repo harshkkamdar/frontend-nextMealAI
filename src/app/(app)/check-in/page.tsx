@@ -10,6 +10,7 @@ import { CheckInMidWeek } from '@/components/check-in/check-in-mid-week'
 import { CARD, CheckInEntrance, useHealthSource } from '@/components/check-in/parts'
 import { WeekDetailSheet, type WeekDetail } from '@/components/check-in/week-detail'
 import { QuickLogSheet, type QuickLogType } from '@/components/dashboard/quick-log-sheet'
+import { weightTile } from '@/components/dashboard/home-data'
 import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { CloseIcon, PersonFill } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
@@ -20,7 +21,7 @@ import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { getCheckInStatus, type CheckInStatus } from '@/lib/api/check-in.api'
-import { getLogsSummary } from '@/lib/api/logs.api'
+import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { goBack } from '@/lib/navigation'
@@ -50,11 +51,14 @@ export default function CheckInPage() {
   const { data, loading, error, refetch } = useCachedQuery('check-in', () => getCheckInStatus(), [])
   // Today's intake and the four current targets: a second, non-blocking read (the preview shows zeros without it).
   const fetchToday = useCallback(async (): Promise<TodayContext> => {
-    const [summary, plans, profile] = await Promise.all([
+    const [summary, plans, profile, weights] = await Promise.all([
       getLogsSummary('day').catch(() => null),
       getPlans({ active_only: true }).catch(() => []),
       getProfile().catch(() => null),
+      // The window the weight sheet reads its trend from.
+      getLogs({ type: 'weight', days: 90 }).catch(() => []),
     ])
+    const last = weightTile(weights, null, today)
     const day = summary?.daily_breakdown?.find((entry) => entry.date === today)
     const meal = plans.find((plan) => plan.type === 'meal') as MealPlan | undefined
     const pinned = meal?.content.daily_targets
@@ -63,6 +67,7 @@ export default function CheckInPage() {
       carbs: pinned?.carbs ?? profile?.daily_carbs_g ?? null,
       fat: pinned?.fat ?? profile?.daily_fat_g ?? null,
       planName: pinned ? meal?.content.name || 'your nutrition plan' : null,
+      weighIn: last.date && last.kg !== null ? { kg: last.kg, date: last.date } : null,
     }
   }, [today])
   const { data: todayData, refetch: refetchToday } = useCachedQuery('check-in-today', fetchToday, [today])
@@ -163,7 +168,8 @@ export default function CheckInPage() {
         onClose={() => setQuickLog(null)}
         onDone={() => { setQuickLog(null); void refetch() }}
         water={0}
-        weight={{ kg: status?.weight.current_kg ?? null, weekDelta: status?.weight.delta_week_kg ?? null, series: status?.weight.points.map((point) => point.kg) ?? [], date: null, today }}
+        // The newest weigh-in's own kg and day, so the sheet says "Last 78.2 kg on Sat"; the status alone has no date.
+        weight={{ kg: ctx.weighIn?.kg ?? status?.weight.current_kg ?? null, weekDelta: status?.weight.delta_week_kg ?? null, series: status?.weight.points.map((point) => point.kg) ?? [], date: ctx.weighIn?.date ?? null, today }}
       />
     </div>
   )

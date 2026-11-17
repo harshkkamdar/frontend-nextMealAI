@@ -15,6 +15,7 @@ import { QuickLogSheet, type QuickLogType } from '@/components/dashboard/quick-l
 import { SuggestionCard } from '@/components/dashboard/suggestion-card'
 import { WorkoutCard } from '@/components/dashboard/workout-card'
 import { formatKg } from '@/components/workout/train-data'
+import { useStartWorkout } from '@/components/workout/use-start-workout'
 import { WeightTrendCard } from '@/components/check-in/weight-trend-card'
 import { LOG_SHEET } from '@/components/layout/tab-bar'
 import { HealthConnectSheet } from '@/components/native/health-connect-sheet'
@@ -40,7 +41,7 @@ import { getLogs, getLogsSummary } from '@/lib/api/logs.api'
 import { getPlans } from '@/lib/api/plans.api'
 import { getProfile } from '@/lib/api/profile.api'
 import { getSuggestions } from '@/lib/api/suggestions.api'
-import { abandonWorkoutSession, getInProgressSession, startWorkoutSession } from '@/lib/api/workout-sessions.api'
+import { abandonWorkoutSession, getInProgressSession } from '@/lib/api/workout-sessions.api'
 import type { MacroKey } from '@/lib/macros'
 import { effectiveTargets } from '@/lib/tdee'
 import { computeNudges } from '@/lib/nudges'
@@ -89,6 +90,8 @@ export default function DashboardPage() {
   const [connectOpen, setConnectOpen] = useState(false)
   const [geoBusy, setGeoBusy] = useState(false)
   const health = useHealthSource()
+  // Start asks first when another workout is open (Home's last read may not know), and stays put offline.
+  const { start: startWorkout, sheet: unfinishedSheet } = useStartWorkout()
   const enter = useFirstPaint('dashboard')
 
   // All in parallel; suggestions follow once the screen is drawn.
@@ -172,14 +175,6 @@ export default function DashboardPage() {
   }
   const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? null
 
-  const startWorkout = async (plan: WorkoutPlan, dayIndex: number) => {
-    try {
-      const session = await startWorkoutSession({ plan_id: plan.id, plan_day_index: dayIndex })
-      router.push(`/train/session?id=${session.id}`)
-    } catch {
-      toast.error("Couldn't start the workout. Try again.")
-    }
-  }
 
   return (
     <div className="relative mx-auto w-full max-w-md px-gutter">
@@ -335,6 +330,7 @@ export default function DashboardPage() {
         weight={{ ...weight, today }}
       />
       <HealthConnectSheet open={connectOpen} onClose={() => setConnectOpen(false)} onConnected={() => { recheck(); refresh(); toast.success(`${health.label ?? 'Health'} connected, 30 days synced`) }} />
+      {unfinishedSheet}
     </div>
   )
 }

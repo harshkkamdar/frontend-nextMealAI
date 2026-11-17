@@ -9,14 +9,11 @@ import { dayWeekday, nextTrainingDay } from '@/components/plans/plan-format'
 import { Busy, CARD, SOFT_BUTTON, SectionHeading } from '@/components/plans/spatial-parts'
 import { ChevronRightIcon, PlayFill } from '@/components/ui/fiqr/icons'
 import { activatePlan } from '@/lib/api/plans.api'
-import { abandonWorkoutSession, getInProgressSession, startWorkoutSessionWithStatus } from '@/lib/api/workout-sessions.api'
 import { reducedFade, spring } from '@/lib/motion'
 import { haptic } from '@/lib/platform/app'
 import { cn } from '@/lib/utils'
 import type { WorkoutExercise, WorkoutPlan } from '@/types/plans.types'
-import type { WorkoutSession } from '@/types/workout-session.types'
-import { OFFLINE_START } from '@/components/workout/train-data'
-import { UnfinishedWorkoutSheet } from '@/components/workout/unfinished-workout-sheet'
+import { useStartWorkout } from '@/components/workout/use-start-workout'
 
 export function formatExerciseDetail(exercise: Omit<WorkoutExercise, 'reps'> & { reps?: number | string }): string {
   const parts: string[] = []
@@ -38,30 +35,10 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
   const days = plan.content.days ?? []
   const next = nextTrainingDay(days, plan.current_position)
   const [expanded, setExpanded] = useState<number | null>(next)
-  const [startingIdx, setStartingIdx] = useState<number | null>(null)
+  const { start, startingIdx, sheet } = useStartWorkout()
   const [activating, setActivating] = useState(false)
-  // Another workout still open when Start is tapped: which one, and the day asked for (kept while the sheet closes).
-  const [ask, setAsk] = useState<{ session: WorkoutSession; dayIdx: number } | null>(null)
-  const [askOpen, setAskOpen] = useState(false)
   const training = days.filter((day) => !day.is_rest_day)
   const exerciseCount = training.reduce((sum, day) => sum + (day.exercises?.length ?? 0), 0)
-  async function handleStartWorkout(dayIdx: number, discard?: WorkoutSession) {
-    if (startingIdx !== null) return
-    setStartingIdx(dayIdx)
-    setAskOpen(false)
-    try {
-      if (discard) await abandonWorkoutSession(discard.id)
-      else {
-        // Not knowing (offline) starts anyway. The same plan day already open needs no question: startSession returns it.
-        const open = await getInProgressSession().catch(() => null)
-        if (open && !(open.plan_id === plan.id && open.plan_day_index === dayIdx)) { setAsk({ session: open, dayIdx }); setAskOpen(true); setStartingIdx(null); return }
-      }
-      const result = await startWorkoutSessionWithStatus({ plan_id: plan.id, plan_day_index: dayIdx })
-      // A start queued offline has no session to open yet (its pending id never loads).
-      if (result.queued) { toast.success(OFFLINE_START); setStartingIdx(null); return }
-      router.push(`/train/session?id=${result.data.id}`)
-    } catch { toast.error("Couldn't start the workout. Try again."); setStartingIdx(null) }
-  }
   async function makeActive() { setActivating(true); try { await activatePlan(plan.id); toast.success('This is your plan now'); router.refresh() } catch { toast.error("Couldn't make it active. Try again.") } finally { setActivating(false) } }
   // Height never animates: the card and the rows below glide by transform (framer layout), the panel fades.
   const layout = reduce ? { duration: 0 } : spring.glide
@@ -117,7 +94,7 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
                           ))}
                         </ol>
                       ) : null}
-                      <button type="button" onClick={() => handleStartWorkout(index)} disabled={startingIdx !== null} aria-busy={startingIdx === index || undefined} className={`${SOFT_BUTTON} mx-4 mb-4 mt-1 max-w-[calc(100%-2rem)]`}>
+                      <button type="button" onClick={() => void start(plan, index)} disabled={startingIdx !== null} aria-busy={startingIdx === index || undefined} className={`${SOFT_BUTTON} mx-4 mb-4 mt-1 max-w-[calc(100%-2rem)]`}>
                         {startingIdx === index ? <Busy>Starting {title}</Busy> : <><PlayFill className="size-4" aria-hidden="true" />Start {title}</>}
                       </button>
                     </motion.div>
@@ -132,14 +109,7 @@ export function WorkoutPlanDetail({ plan }: { plan: WorkoutPlan }) {
           <span><span className="block text-center">No workout days yet</span><span className="block text-center">Edit the plan to add some, or ask Geo</span></span>
         </div>
       )}
-      <UnfinishedWorkoutSheet
-        open={askOpen}
-        session={ask?.session ?? null}
-        nextName={ask ? days[ask.dayIdx]?.name || `Day ${ask.dayIdx + 1}` : ''}
-        onClose={() => setAskOpen(false)}
-        onResume={() => ask && router.push(`/train/session?id=${ask.session.id}`)}
-        onDiscard={() => ask && void handleStartWorkout(ask.dayIdx, ask.session)}
-      />
+      {sheet}
     </PlanDetailFrame>
   )
 }
