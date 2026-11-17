@@ -116,6 +116,9 @@ if (logId) {
   } finally {
     const removed = await call('DELETE', `/v1/logs/${logId}`)
     check('delete the food', removed.status === 200 || removed.status === 204, `answered ${removed.status}`)
+    // Logging a new food name also saves it to My Foods; take that out too.
+    const foods = await call('GET', '/v1/foods')
+    for (const food of (foods.json?.foods ?? []).filter((f) => f.name === 'Live check apple')) await call('DELETE', `/v1/foods/${food.id}`)
   }
 }
 
