@@ -86,6 +86,9 @@ type Fix = [flagged: string, fix: string, proof: string]
 
 /** What George flagged on the new design, newest round first: the fix and how it was checked. */
 const ROUNDS: [round: string, fixes: Fix[]][] = [
+  ['Round 6', [
+    ['Photo recognition still isn\'t right: the creatine gummies came back at 0 kcal', 'The photo was recognised as creatine infused gummies, but the Your photo screen read the result in the wrong format, so every item showed 0 kcal. It now shows each item\'s grams and calories, and logging keeps them.', 'On the live app, a chicken and rice photo shows 451 kcal across 5 items with their grams, and a tortellini photo logs at 458 kcal.'],
+  ]],
   ['Round 5', [
     ['Geo refused to log "600g raw chicken breast" because the macros didn\'t match the calories', 'When Geo\'s numbers don\'t add up, it now works the food out again from its nutrition per 100 g and logs it, without stopping to ask you. If that fails too, it searches the web.', 'Your exact message, "600g raw chicken breast, 10ml olive oil lunch", now logs straight away: 622 kcal and 139 g protein for the chicken, with no warning.'],
     ['You had to ask Geo to use raw chicken numbers', 'A food you call raw, cooked or dry is checked against that state, and Geo\'s reply quotes the numbers that were saved.', 'The chicken now logs at 23 g protein per 100 g, the raw figure, instead of the cooked figure of 31 g that Geo used before.'],
