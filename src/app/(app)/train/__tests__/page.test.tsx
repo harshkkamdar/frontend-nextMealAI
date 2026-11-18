@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
@@ -113,5 +113,26 @@ describe('Train calendar', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Wednesday 18 November, planned' }))
     expect(await screen.findByText('Legs is planned')).toBeInTheDocument()
     expect(screen.queryByText('No workout on this day')).not.toBeInTheDocument()
+  })
+
+  it('steps back a week to find last week\'s workout, and forward only as far as the plan goes', async () => {
+    // getWorkoutHistory's row: Legs, finished last Tuesday.
+    mocks.getWorkoutHistory.mockResolvedValue([{ ...session('w-legs', 2, 'Legs', '2026-11-10T07:00:00.000Z'), status: 'completed', completed_at: '2026-11-10T08:00:00.000Z', duration_minutes: 55 }])
+    render(<ActivityPage />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Open workout calendar' }))
+    const calendar = await screen.findByRole('dialog', { name: 'Workout history calendar' })
+
+    fireEvent.click(within(calendar).getByRole('button', { name: 'Previous week' }))
+    expect(within(calendar).getByRole('button', { name: 'Tuesday 10 November, workout done' })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(calendar).getByText('Legs')).toBeInTheDocument()
+
+    // Planned days run two weeks ahead (to 30 Nov): back to this week, then two weeks on, then no further.
+    const next = within(calendar).getByRole('button', { name: 'Next week' })
+    fireEvent.click(next)
+    fireEvent.click(next)
+    expect(next).toBeEnabled()
+    fireEvent.click(next)
+    expect(within(calendar).getByRole('button', { name: 'Tuesday 1 December' })).toHaveAttribute('aria-pressed', 'true')
+    expect(next).toBeDisabled()
   })
 })

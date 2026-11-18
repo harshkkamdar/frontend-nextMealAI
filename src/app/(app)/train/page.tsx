@@ -10,13 +10,13 @@ import { LargeTitleHeader } from '@/components/layout/screen-header'
 import { OfflineBand } from '@/components/shared/offline-band'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { ErrorState } from '@/components/ui/fiqr/error-state'
-import { ChevronRightIcon } from '@/components/ui/fiqr/icons'
+import { ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/fiqr/icons'
 import { RoundButton } from '@/components/ui/fiqr/round-button'
 import { SecondaryButton } from '@/components/ui/fiqr/secondary-button'
 import { Enter, HistoryCard, NextUpCard, ProgramCard, SectionTitle, TrainSkeleton, VolumeCard } from '@/components/workout/train-cards'
 import { OFFLINE_START, completedSessions, plannedDays, startedOnText, weekVolume } from '@/components/workout/train-data'
 import { UnfinishedWorkoutSheet } from '@/components/workout/unfinished-workout-sheet'
-import { WeekStrip, weekDays } from '@/components/ui/fiqr/week-strip'
+import { WeekStrip, addDays, weekDays } from '@/components/ui/fiqr/week-strip'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useCachedQuery } from '@/hooks/use-cached-query'
 import { useSyncRefetch } from '@/hooks/use-sync-refetch'
@@ -151,6 +151,9 @@ export default function ActivityPage() {
     setSelectedDate(iso)
     if (!weekShift) setCalendarOpen(true)
   }
+  // The calendar goes back any number of weeks, and forward only into weeks with a planned day.
+  const nextWeekStart = weekDays(addDays(selectedDate, 7), 1)[0]
+  const canNextWeek = nextWeekStart <= today || [...planned].some((day) => day >= nextWeekStart)
   const plannedSessions = workoutPlan ? days.filter((day) => !day.is_rest_day).length : null
   const exerciseCount = nextWorkout?.exercises?.length ?? 0
   const liveSets = inProgress ? inProgress.exercises.flatMap((exercise) => exercise.sets) : []
@@ -236,6 +239,11 @@ export default function ActivityPage() {
 
       <BottomSheet open={calendarOpen} onClose={() => setCalendarOpen(false)} ariaLabel="Workout history calendar">
         <div className="px-4 pb-6 pt-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <RoundButton aria-label="Previous week" onClick={() => setSelectedDate(addDays(selectedDate, -7))}><ChevronLeftIcon /></RoundButton>
+            <p aria-live="polite" className="truncate text-body font-semibold text-ink">{new Date(`${selectedDate}T12:00:00`).toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            <RoundButton aria-label="Next week" onClick={() => setSelectedDate(addDays(selectedDate, 7))} disabled={!canNextWeek} className="disabled:opacity-40"><ChevronRightIcon /></RoundButton>
+          </div>
           <WeekStrip selected={selectedDate} today={today} onSelect={setSelectedDate} marked={doneDates} markLabel="workout done" planned={planned} weekStartsOn={1} />
           <div className="mt-4 overflow-hidden rounded-card bg-[var(--surface-card,var(--color-card))] shadow-[var(--shadow-card)]">
             {selectedDateHistory.length === 0 ? <p className="px-5 py-5 text-[14px] text-ink-65">{plannedOn ? `${plannedOn.name || 'A workout'} is planned` : 'No workout on this day'}</p> : selectedDateHistory.map((session) => (
