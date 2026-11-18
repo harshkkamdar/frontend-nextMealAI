@@ -179,6 +179,16 @@ describe('FoodLogForm', () => {
     expect(mocks.back).not.toHaveBeenCalled()
   })
 
+  it('a partial save still says when a food that saved clashes with the diet', async () => {
+    mocks.createLogs.mockResolvedValueOnce({ created: [{ diet_warning: { food_name: 'greek yoghurt', restriction: 'vegan', source: 'dietary_style' } }], failures: [{ index: 1, error: 'x' }] })
+    render(<FoodLogForm />)
+    await screen.findAllByTestId('personal-food-row')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Greek yoghurt to your plate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Banana to your plate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Log' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent("Banana didn't save. The other 1 did. Greek yoghurt doesn't fit your vegan diet.")
+  })
+
   it('photo: editable grams and macros are sent with the chosen meal and date', async () => {
     mocks.searchParamsStr = 'meal=lunch&date=2026-10-25'
     mocks.estimate.mockResolvedValueOnce(ESTIMATE)

@@ -15,7 +15,16 @@ describe('live session helpers', () => {
     expect(upNextText([plank], 0)).toBe('set 2 · 60 s')
     const c = compareExercise(plank)
     expect(bestText(c)).toBe('Best 45 s · 1 set')
-    expect(deltaText(c).text).toBe('—')
+    // An old plank's carried-forward "10 reps" isn't a last time for seconds.
+    expect(deltaText(c).text).toBe('First time')
+    expect(formatLast(plank.sets[0], true)).toBe('—')
+  })
+
+  it('a timed exercise compares against last time\'s seconds', () => {
+    const plank: SessionExercise = { ...ex('Plank', [{ ...s(true, null, 10), actual_seconds: 75, previous_seconds: 60 }]), duration_seconds: 60 }
+    expect(formatLast(plank.sets[0], true)).toBe('60 s')
+    expect(formatLast({ previous_weight_kg: 10, previous_seconds: 45 }, true)).toBe('10 × 45 s')
+    expect(deltaText(compareExercise(plank))).toEqual({ text: '+15 s', up: true })
   })
 
   it('formats the Last column as kg × reps', () => {

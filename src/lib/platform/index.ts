@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core'
+import { version } from '../../../package.json'
 
 export function isNative(): boolean {
   return typeof window !== 'undefined' && Capacitor.isNativePlatform()
@@ -10,4 +11,4 @@ export function platform(): 'ios' | 'android' | 'web' {
   return current === 'ios' || current === 'android' ? current : 'web'
 }
 
-export const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? '0.0.0'
+export const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || version

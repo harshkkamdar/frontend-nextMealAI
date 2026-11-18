@@ -165,8 +165,7 @@ export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onSe
         const kg = setWeight(set)
         const kgText = kg == null ? '—' : formatKg(kg)
         const amount = timed ? setSeconds(set, exercise) : setReps(set)
-        // Last time's numbers are reps, carried forward by the backend; a timed set has none to show.
-        const last = timed ? '—' : formatLast(set)
+        const last = formatLast(set, timed)
         if (index === activeSet && !set.completed) {
           return (
             <motion.div

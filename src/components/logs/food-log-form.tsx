@@ -21,7 +21,7 @@ import type { FoodSearchResult, UserFood } from '@/types/foods.types'
 import { FoodFormSheet } from './food-form-sheet'
 import { FoodItemSheet, plateItemFor, SOURCE_LABELS } from './food-item-sheet'
 import { CARD, Chips, LIST, RiseList, RowsSkeleton, SearchField, SectionTitle } from './log-ui'
-import { toastLogged } from './diet-warning'
+import { dietNotes, toastLogged } from './diet-warning'
 import { MEALS, mealForTime, parseMeal, type Meal, type PlateItem } from './log-math'
 import { PhotoResult } from './photo-result'
 import { PlatePill, PlateSheet } from './plate-tray'
@@ -151,7 +151,7 @@ export function FoodLogForm() {
       setPlate(failed)
       setLoggedCount((n) => n + done)
       setFailedNote(done > 0
-        ? `${failed.length === 1 ? failed[0].name : `${failed.length} items`} didn't save. The other ${done} did.`
+        ? `${failed.length === 1 ? failed[0].name : `${failed.length} items`} didn't save. The other ${done} did. ${dietNotes(created.map((log) => log.diet_warning))}`.trim()
         : 'Nothing saved. Check your connection and try again.')
       setPlateOpen(true)
     } catch {

@@ -9,9 +9,14 @@ export function dietWarningText(warning: DietWarning): string {
   return `${food} has ${warning.restriction}, which you avoid.`
 }
 
+/** The warnings as sentences, each once; '' when there are none. */
+export function dietNotes(warnings: Array<DietWarning | undefined>): string {
+  return [...new Set(warnings.flatMap((warning) => (warning ? [dietWarningText(warning)] : [])))].join(' ')
+}
+
 /** A flow's "logged" toast. A food that clashes with the profile's diet still logs, so the same toast (Undo and all) says so. */
 export function toastLogged(message: string, warnings: Array<DietWarning | undefined>, options?: ExternalToast) {
-  const notes = [...new Set(warnings.flatMap((warning) => (warning ? [dietWarningText(warning)] : [])))]
-  if (!notes.length) return toast.success(message, options)
-  return toast.warning(`${message}. ${notes.join(' ')}`, options)
+  const notes = dietNotes(warnings)
+  if (!notes) return toast.success(message, options)
+  return toast.warning(`${message}. ${notes}`, options)
 }

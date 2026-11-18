@@ -14,6 +14,8 @@ export interface SetData {
   completed_at: string | null
   previous_reps?: number | null
   previous_weight_kg?: number | null
+  /** A timed set's seconds last time, carried forward like previous_reps. */
+  previous_seconds?: number | null
 }
 
 export interface SessionExercise {

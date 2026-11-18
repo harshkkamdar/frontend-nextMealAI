@@ -10,7 +10,7 @@ import { CloseIcon } from '@/components/ui/fiqr/icons'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { CARD, FIELD, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
 import { FieldLabel } from '@/components/logs/manual-log-shell'
-import { toastLogged } from '@/components/logs/diet-warning'
+import { dietNotes, toastLogged } from '@/components/logs/diet-warning'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
 import { createLog, createLogs, updateLog, deleteLog, type LogPayloadPatch } from '@/lib/api/logs.api'
@@ -455,7 +455,7 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
           created.map((log) => log.diet_warning),
         )
       } else if (created.length > 0) {
-        toast.error(`Logged ${created.length} of ${items.length} items — some failed`)
+        toast.error([`Logged ${created.length} of ${items.length} items — some failed.`, dietNotes(created.map((log) => log.diet_warning))].join(' ').trim())
       } else {
         toast.error('Failed to log meal')
       }
