@@ -21,6 +21,7 @@ export function useCachedQuery<T>(
 ): CachedQueryResult<T> {
   const fetcherRef = useRef(fetcher)
   const mountedRef = useRef(true)
+  const latestRef = useRef(0)
   const [data, setData] = useState<T | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
@@ -32,9 +33,13 @@ export function useCachedQuery<T>(
   }, [fetcher])
 
   const refetch = useCallback(async () => {
+    const request = ++latestRef.current
+    // Only the newest read lands: an older one finishing later (begun before a save) would put stale data back.
+    const superseded = () => request !== latestRef.current || !mountedRef.current
     setLoading(true)
     try {
       const fresh = await fetcherRef.current()
+      if (superseded()) return
       const saved = new Date().toISOString()
       await remember(key, fresh)
       if (!mountedRef.current) return
@@ -43,7 +48,7 @@ export function useCachedQuery<T>(
       setStale(false)
       setError(null)
     } catch (nextError) {
-      if (!mountedRef.current) return
+      if (superseded()) return
       if (nextError instanceof OfflineError) {
         setStale(true)
         setError(null)
@@ -51,7 +56,7 @@ export function useCachedQuery<T>(
         setError(nextError)
       }
     } finally {
-      if (mountedRef.current) setLoading(false)
+      if (!superseded()) setLoading(false)
     }
   }, [key])
 
