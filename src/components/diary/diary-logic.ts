@@ -81,7 +81,9 @@ export function mealOf(payload: FoodPayload): 'Breakfast' | 'Lunch' | 'Dinner' |
 
 /** "1 bowl", "2 slices", "150g", "5 items, from your photo". */
 export function quantityLabel(payload: FoodPayload): string {
-  if (payload.items?.length) return `${payload.items.length} item${payload.items.length === 1 ? '' : 's'}, from your photo`
+  // Geo's itemised logs carry items; a Log-food photo (log-from-estimate) keeps them under estimate.items.
+  const items = payload.items?.length || (payload as { estimate?: { items?: unknown[] } }).estimate?.items?.length
+  if (items) return `${items} item${items === 1 ? '' : 's'}, from your photo`
   const servings = typeof payload.servings === 'number' ? payload.servings : undefined
   const label = typeof payload.serving_label === 'string' ? payload.serving_label.trim() : ''
   if (servings !== undefined && label) {

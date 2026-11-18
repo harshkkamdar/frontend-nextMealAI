@@ -64,6 +64,23 @@ describe('rows', () => {
     expect(quantityLabel({ food_name: 'x', servings: 1, serving_label: 'servings' })).toBe('1 serving')
     expect(quantityLabel({ food_name: 'x', items: [{ name: 'a', est_macros: {} }, { name: 'b', est_macros: {} }] })).toBe('2 items, from your photo')
   })
+  it('quantityLabel reads a Log-food photo log, which keeps its items under estimate', () => {
+    // food-estimates.controller.ts logFromEstimate's payload: totals at the top, the item breakdown in estimate.items, no photo.
+    const photoLog = {
+      food_name: 'Chicken breast + White rice', quantity_g: 330, est_macros: { calories: 451, protein: 48, carbs: 50, fat: 5 },
+      source: 'photo_estimate', estimate_id: 'est-1', meal_type: 'lunch',
+      estimate: {
+        estimate_id: 'est-1', confidence: 0.8, text_content: null, coverage_notes: null, expires_at: '2026-11-17T10:00:00.000Z',
+        totals: { calories: 451, protein: 48, carbs: 50, fat: 5 },
+        items: [
+          { name: 'Chicken breast', estimated_portion_g: 150, confidence: 0.9, estimated_macros: { calories: 248, protein: 46, carbs: 0, fat: 5 } },
+          { name: 'White rice', estimated_portion_g: 180, confidence: 0.8, estimated_macros: { calories: 203, protein: 2, carbs: 50, fat: 0 } },
+        ],
+      },
+    }
+    expect(quantityLabel(photoLog)).toBe('2 items, from your photo')
+    expect(logPhoto(photoLog)).toBeNull()
+  })
 })
 
 describe('macroSplit', () => {
