@@ -1,4 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
@@ -186,5 +188,11 @@ describe('Settings version', () => {
     await screen.findByText('Test User')
     expect(screen.getByText(version)).toBeInTheDocument()
     expect(screen.queryByText('dev')).toBeNull()
+  })
+
+  it('the example env sets the same version as package.json, so a build made from it shows the real one', async () => {
+    const { version } = await import('../../../../../package.json')
+    const example = readFileSync(join(process.cwd(), '.env.local.example'), 'utf8')
+    expect(example).toContain(`NEXT_PUBLIC_APP_VERSION=${version}\n`)
   })
 })
