@@ -108,7 +108,8 @@ export function computeCompleteSetResult(
     ...set,
     completed: true,
     completed_at: nowIso,
-    actual_reps: repsToRecord(set),
+    // A timed set (a plank) records its seconds; reps mean nothing there.
+    ...(target.duration_seconds ? { actual_seconds: set.actual_seconds ?? target.duration_seconds } : { actual_reps: repsToRecord(set) }),
     actual_weight_kg: set.actual_weight_kg ?? set.planned_weight_kg ?? null,
   } as SetData
 

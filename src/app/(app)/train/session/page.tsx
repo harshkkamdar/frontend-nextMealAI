@@ -20,7 +20,7 @@ import { ExerciseVisual } from '@/components/workout/muscle-map'
 import { RestTimer } from '@/components/workout/rest-timer'
 import { AllExercisesList, ExerciseNav, SessionSkeleton, SessionTimerCard, SetTable } from '@/components/workout/session-cards'
 import { SessionReceipt } from '@/components/workout/session-receipt'
-import { setReps, setWeight, stepReps, stepWeight, upNextText } from '@/components/workout/train-data'
+import { setReps, setSeconds, setWeight, stepReps, stepSeconds, stepWeight, upNextText } from '@/components/workout/train-data'
 import { useSetGeoScreen } from '@/contexts/geo-screen-context'
 import { useUserTimezone } from '@/hooks/useUserTimezone'
 import { unlockAudio } from '@/lib/audio'
@@ -246,7 +246,7 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
   }, [reduce])
 
-  const stepSet = (setIndex: number, field: 'kg' | 'reps', dir: 1 | -1) => {
+  const stepSet = (setIndex: number, field: 'kg' | 'reps' | 'seconds', dir: 1 | -1) => {
     const base = sessionRef.current
     if (!base) return
     const updated = [...base.exercises]
@@ -255,18 +255,22 @@ function WorkoutFollowSession({ sessionId }: { sessionId: string }) {
     const set = sets[setIndex]
     sets[setIndex] = field === 'kg'
       ? { ...set, actual_weight_kg: stepWeight(setWeight(set), dir) }
-      : { ...set, actual_reps: stepReps(setReps(set), dir) }
+      : field === 'seconds'
+        ? { ...set, actual_seconds: stepSeconds(setSeconds(set, exercise), dir) }
+        : { ...set, actual_reps: stepReps(setReps(set), dir) }
     updated[currentIndex] = { ...exercise, sets }
     commit(updated)
   }
 
-  const setSetValue = (setIndex: number, field: 'kg' | 'reps', value: number) => {
+  const setSetValue = (setIndex: number, field: 'kg' | 'reps' | 'seconds', value: number) => {
     const base = sessionRef.current
     if (!base) return
     const updated = [...base.exercises]
     const exercise = updated[currentIndex]
     const sets = [...exercise.sets]
-    sets[setIndex] = field === 'kg' ? { ...sets[setIndex], actual_weight_kg: value } : { ...sets[setIndex], actual_reps: Math.min(200, value) }
+    sets[setIndex] = field === 'kg'
+      ? { ...sets[setIndex], actual_weight_kg: value }
+      : field === 'seconds' ? { ...sets[setIndex], actual_seconds: Math.min(3600, value) } : { ...sets[setIndex], actual_reps: Math.min(200, value) }
     updated[currentIndex] = { ...exercise, sets }
     commit(updated)
   }

@@ -9,6 +9,15 @@ const s = (done: boolean, kg: number | null, reps: number, prev?: [number | null
 const ex = (name: string, sets: SetData[]): SessionExercise => ({ name, muscle_group: null, planned_sets: sets.length, planned_reps: 8, rest_seconds: 90, status: 'pending', sets })
 
 describe('live session helpers', () => {
+  it('a timed exercise counts seconds: the up-next line, the best set, and no reps-based last time', () => {
+    // A plank from the plan (startSession: duration_seconds 60, planned_reps its default 10, previous_reps carried as 10).
+    const plank: SessionExercise = { ...ex('Plank', [{ ...s(true, null, 10, [null, 10]), actual_seconds: 45 }, s(false, null, 10, [null, 10])]), duration_seconds: 60 }
+    expect(upNextText([plank], 0)).toBe('set 2 · 60 s')
+    const c = compareExercise(plank)
+    expect(bestText(c)).toBe('Best 45 s · 1 set')
+    expect(deltaText(c).text).toBe('—')
+  })
+
   it('formats the Last column as kg × reps', () => {
     expect(formatLast({ previous_weight_kg: 72.5, previous_reps: 8 })).toBe('72.5 × 8')
     expect(formatLast({ previous_weight_kg: null, previous_reps: 12 })).toBe('BW × 12')

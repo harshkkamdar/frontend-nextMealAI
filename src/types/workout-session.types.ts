@@ -8,6 +8,8 @@ export interface SetData {
   planned_weight_kg: number | null
   actual_reps: number | null
   actual_weight_kg: number | null
+  /** Seconds held on a timed exercise's set (the exercise has duration_seconds); its reps stay unset. */
+  actual_seconds?: number | null
   completed: boolean
   completed_at: string | null
   previous_reps?: number | null

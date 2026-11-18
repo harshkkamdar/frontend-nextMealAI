@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import { isExerciseComplete } from '@/lib/workout-session'
 import type { SessionExercise } from '@/types/workout-session.types'
 import { DigitTiles } from './digit-tiles'
-import { clockHMS, formatKg, formatLast, sessionVolumeKg, setReps, setWeight } from './train-data'
+import { clockHMS, formatKg, formatLast, sessionVolumeKg, setReps, setSeconds, setWeight } from './train-data'
 
 const CARD = 'rounded-card tile'
 
@@ -87,7 +87,7 @@ export function ExerciseNav({ index, count, onPrev, onNext, onAll }: { index: nu
 }
 
 /** A stepper: tap for one step, hold to repeat (after 420 ms, every 90 ms), or tap the number and type it. */
-function Stepper({ label, value, unit, decimal = false, onStep, onSet }: { label: string; value: string; unit: string; decimal?: boolean; onStep: (dir: 1 | -1) => void; onSet: (value: number) => void }) {
+function Stepper({ label, value, unit, decimal = false, onStep, onSet, className }: { label: string; value: string; unit: string; decimal?: boolean; onStep: (dir: 1 | -1) => void; onSet: (value: number) => void; className?: string }) {
   const [draft, setDraft] = useState<string | null>(null)
   const commitDraft = () => {
     const typed = draft == null ? NaN : Number(draft.replace(',', '.'))
@@ -115,7 +115,7 @@ function Stepper({ label, value, unit, decimal = false, onStep, onSet }: { label
     </button>
   )
   return (
-    <div className="grid h-stepper grid-cols-[34px_minmax(0,1fr)_34px] items-center rounded-[14px] bg-ink-06">
+    <div className={cn('grid h-stepper grid-cols-[34px_minmax(0,1fr)_34px] items-center rounded-[14px] bg-ink-06', className)}>
       {button(-1)}
       {/* The unit sits under the number, so kg and reps fit side by side on a 375 pt phone. */}
       <label className="flex min-w-0 flex-col items-center justify-center leading-none">
@@ -141,26 +141,32 @@ const ROW = 'grid grid-cols-[26px_minmax(0,1fr)_72px_56px_48px] items-center gap
 /**
  * B1 Stepper rows: the set being worked on opens into kg and reps steppers side by side with the tick (George: one
  * line, like the other sets); every other set is one compact row. Tapping an open set's numbers makes it the working set.
+ * A timed exercise (a plank) counts seconds instead of reps, and has no kg unless a set carries a weight.
  */
 export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onSet, onToggle }: {
   exercise: SessionExercise
   activeSet: number
   celebrate: boolean
   onFocus: (set: number) => void
-  onStep: (set: number, field: 'kg' | 'reps', dir: 1 | -1) => void
-  onSet: (set: number, field: 'kg' | 'reps', value: number) => void
+  onStep: (set: number, field: 'kg' | 'reps' | 'seconds', dir: 1 | -1) => void
+  onSet: (set: number, field: 'kg' | 'reps' | 'seconds', value: number) => void
   onToggle: (set: number) => void
 }) {
   const reduce = useReducedMotion()
+  const timed = !!exercise.duration_seconds
+  const field = timed ? 'seconds' : 'reps'
+  const showKg = !timed || exercise.sets.some((set) => setWeight(set) != null)
   return (
     <div>
       <div className={cn(ROW, 'pb-1 text-label text-ink-65')}>
-        <span>Set</span><span>Last time</span><span className="text-center">kg</span><span className="text-center">Reps</span><span className="text-center">Done</span>
+        <span>Set</span><span>Last time</span><span className="text-center">{showKg ? 'kg' : ''}</span><span className="text-center">{timed ? 'Secs' : 'Reps'}</span><span className="text-center">Done</span>
       </div>
       {exercise.sets.map((set, index) => {
         const kg = setWeight(set)
         const kgText = kg == null ? '—' : formatKg(kg)
-        const reps = setReps(set)
+        const amount = timed ? setSeconds(set, exercise) : setReps(set)
+        // Last time's numbers are reps, carried forward by the backend; a timed set has none to show.
+        const last = timed ? '—' : formatLast(set)
         if (index === activeSet && !set.completed) {
           return (
             <motion.div
@@ -169,9 +175,9 @@ export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onSe
               className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_52px] gap-1.5 border-t border-ink-06 pb-2.5 pt-2 first:border-t-0"
               data-active-set={index}
             >
-              <p className="col-span-3 text-body-sm font-semibold text-ink-65 tabular-nums">Set {index + 1} · last time {formatLast(set)}</p>
-              <Stepper label="weight" value={kgText} unit="kg" decimal onStep={(dir) => onStep(index, 'kg', dir)} onSet={(value) => onSet(index, 'kg', value)} />
-              <Stepper label="reps" value={String(reps)} unit="reps" onStep={(dir) => onStep(index, 'reps', dir)} onSet={(value) => onSet(index, 'reps', value)} />
+              <p className="col-span-3 text-body-sm font-semibold text-ink-65 tabular-nums">Set {index + 1} · last time {last}</p>
+              {showKg ? <Stepper label="weight" value={kgText} unit="kg" decimal onStep={(dir) => onStep(index, 'kg', dir)} onSet={(value) => onSet(index, 'kg', value)} /> : null}
+              <Stepper label={field} value={String(amount)} unit={field} onStep={(dir) => onStep(index, field, dir)} onSet={(value) => onSet(index, field, value)} className={showKg ? undefined : 'col-span-2'} />
               <button type="button" onClick={() => onToggle(index)} aria-label={`Complete set ${set.set_number}`} aria-pressed={false} className="grid h-stepper place-items-center rounded-[16px] bg-ink text-cream transition-transform active:scale-[.96]">
                 <TickIcon className="size-[22px]" />
               </button>
@@ -181,16 +187,16 @@ export function SetTable({ exercise, activeSet, celebrate, onFocus, onStep, onSe
         return (
           <div key={index} className={cn(ROW, 'min-h-14 border-t border-ink-06 tabular-nums first:border-t-0')}>
             <span className="text-[17px] font-bold text-ink">{set.set_number}</span>
-            <span className="truncate text-body-sm text-ink-65">{formatLast(set)}</span>
+            <span className="truncate text-body-sm text-ink-65">{last}</span>
             {set.completed ? (
               <>
-                <span className="text-center text-[19px] font-bold text-ink">{kgText}</span>
-                <span className="text-center text-[19px] font-bold text-ink">{reps}</span>
+                <span className="text-center text-[19px] font-bold text-ink">{showKg ? kgText : ''}</span>
+                <span className="text-center text-[19px] font-bold text-ink">{amount}</span>
               </>
             ) : (
               <>
-                <button type="button" onClick={() => onFocus(index)} aria-label={`Set ${set.set_number} ${kgText} kilograms, edit`} className="h-11 min-w-0 rounded-[12px] bg-ink-06 text-[19px] font-bold text-ink">{kgText}</button>
-                <button type="button" onClick={() => onFocus(index)} aria-label={`Set ${set.set_number} ${reps} reps, edit`} className="h-11 min-w-0 rounded-[12px] bg-ink-06 text-[19px] font-bold text-ink">{reps}</button>
+                {showKg ? <button type="button" onClick={() => onFocus(index)} aria-label={`Set ${set.set_number} ${kgText} kilograms, edit`} className="h-11 min-w-0 rounded-[12px] bg-ink-06 text-[19px] font-bold text-ink">{kgText}</button> : <span />}
+                <button type="button" onClick={() => onFocus(index)} aria-label={`Set ${set.set_number} ${amount} ${field}, edit`} className="h-11 min-w-0 rounded-[12px] bg-ink-06 text-[19px] font-bold text-ink">{amount}</button>
               </>
             )}
             <button type="button" onClick={() => onToggle(index)} aria-label={`Complete set ${set.set_number}`} aria-pressed={set.completed} className="mx-auto grid size-11 place-items-center transition-transform active:scale-[.9]">

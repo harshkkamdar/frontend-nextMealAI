@@ -96,6 +96,10 @@ export function setWeight(set: SetData): number | null {
 export function setReps(set: SetData): number {
   return repsToRecord(set)
 }
+/** A timed set's seconds: the typed value, else the plan's duration. */
+export function setSeconds(set: SetData, exercise: Pick<SessionExercise, 'duration_seconds'>): number {
+  return set.actual_seconds ?? exercise.duration_seconds ?? 0
+}
 
 /** "kg × reps" for a set with no weight reads "BW × 8". */
 const kgTimesReps = (kg: number | null, reps: number) => `${kg == null ? 'BW' : formatKg(kg)} × ${reps}`
@@ -112,6 +116,10 @@ export function stepWeight(kg: number | null, dir: 1 | -1): number {
 export function stepReps(reps: number, dir: 1 | -1): number {
   return Math.min(200, Math.max(0, reps + dir))
 }
+/** A timed set moves 5 s a press (0 to an hour). */
+export function stepSeconds(seconds: number, dir: 1 | -1): number {
+  return Math.min(3600, Math.max(0, seconds + dir * 5))
+}
 
 /** The first set still to do: on this exercise, else on the next unfinished one. Null when every set is done. */
 export function nextOpenSet(exercises: SessionExercise[], current: number): { exercise: number; set: number } | null {
@@ -127,14 +135,18 @@ export function nextOpenSet(exercises: SessionExercise[], current: number): { ex
 export function upNextText(exercises: SessionExercise[], current: number): string {
   const next = nextOpenSet(exercises, current)
   if (!next) return 'Last set done. Finish when ready.'
-  const set = exercises[next.exercise].sets[next.set]
+  const exercise = exercises[next.exercise]
+  const set = exercise.sets[next.set]
   const weight = setWeight(set)
-  const line = `set ${next.set + 1} · ${weight == null ? `${setReps(set)} reps` : `${formatKg(weight)} kg × ${setReps(set)}`}`
+  const timed = exercise.duration_seconds ? `${setSeconds(set, exercise)} s` : null
+  const line = `set ${next.set + 1} · ${weight == null ? timed ?? `${setReps(set)} reps` : `${formatKg(weight)} kg × ${timed ?? setReps(set)}`}`
   return next.exercise === current && next.set > 0 ? line : `${exercises[next.exercise].name}, ${line}`
 }
 
 export interface ExerciseCompare {
   name: string
+  /** A timed exercise: `reps` below hold seconds, and there is no last time (the backend carries reps forward only). */
+  timed: boolean
   setsDone: number
   best: { kg: number | null; reps: number } | null
   last: { kg: number | null; reps: number } | null
@@ -152,34 +164,36 @@ export function compareExercise(exercise: SessionExercise): ExerciseCompare {
   let last: ExerciseCompare['last'] = null
   let volume = 0
   let lastVolume = 0
+  const timed = !!exercise.duration_seconds
   for (const set of exercise.sets) {
     if (set.completed) {
       const kg = set.actual_weight_kg ?? null
-      const reps = num(set.actual_reps)
+      const reps = timed ? setSeconds(set, exercise) : num(set.actual_reps)
       best = better(best, { kg, reps })
-      volume += num(kg) * reps
+      if (!timed) volume += num(kg) * reps
     }
-    if (set.previous_reps != null) {
+    if (set.previous_reps != null && !timed) {
       // Carried forward from last time's actual_reps, so an old row's range string lands here too.
       const reps = num(set.previous_reps)
       last = better(last, { kg: set.previous_weight_kg ?? null, reps })
       lastVolume += num(set.previous_weight_kg) * reps
     }
   }
-  return { name: exercise.name, setsDone: exercise.sets.filter((set) => set.completed).length, best, last, volume, lastVolume }
+  return { name: exercise.name, timed, setsDone: exercise.sets.filter((set) => set.completed).length, best, last, volume, lastVolume }
 }
 
 /** "Best 75 kg × 8 · 4 sets" under each exercise on the receipt. */
 export function bestText(c: ExerciseCompare): string {
   if (!c.best) return 'Not done'
   const sets = `${c.setsDone} ${c.setsDone === 1 ? 'set' : 'sets'}`
-  return c.best.kg == null ? `Best ${c.best.reps} reps · ${sets}` : `Best ${formatKg(c.best.kg)} kg × ${c.best.reps} · ${sets}`
+  const amount = c.timed ? `${c.best.reps} s` : null
+  return c.best.kg == null ? `Best ${amount ?? `${c.best.reps} reps`} · ${sets}` : `Best ${formatKg(c.best.kg)} kg × ${amount ?? c.best.reps} · ${sets}`
 }
 
 /** The receipt's right-hand column: weight change first, then reps, else "Same as last". Up is true when it went up. */
 export function deltaText(c: ExerciseCompare): { text: string; up: boolean } {
   if (!c.best) return { text: 'Skipped', up: false }
-  if (!c.last) return { text: 'First time', up: false }
+  if (!c.last) return { text: c.timed ? '—' : 'First time', up: false }
   const dKg = Math.round(((c.best.kg ?? 0) - (c.last.kg ?? 0)) * 100) / 100
   if (dKg !== 0) return { text: `${dKg > 0 ? '+' : '−'}${formatKg(Math.abs(dKg))} kg`, up: dKg > 0 }
   const dReps = c.best.reps - c.last.reps

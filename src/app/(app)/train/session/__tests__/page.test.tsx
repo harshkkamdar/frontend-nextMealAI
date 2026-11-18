@@ -75,6 +75,31 @@ describe('A workout under way', () => {
     expect(screen.queryByText(/3 × 10/)).not.toBeInTheDocument()
   })
 
+  it('a timed set records seconds, not reps, and the receipt shows them', async () => {
+    const session = liveSession([{ name: 'Plank', planned_sets: 1, rest_seconds: 60, duration_seconds: 60, sets: [set(1)] }])
+    mocks.getWorkoutSession.mockResolvedValue(session)
+    // completeSession as the backend runs it: a completed set with no actual_reps is backfilled from planned_reps.
+    mocks.completeWorkoutSession.mockImplementation(async () => {
+      const saved = mocks.updateWorkoutSession.mock.lastCall![1].exercises
+      const exercises = saved.map((exercise: { sets: Record<string, unknown>[] }) => ({ ...exercise, sets: exercise.sets.map((s) => (s.completed ? { ...s, actual_reps: s.actual_reps ?? s.planned_reps } : s)) }))
+      return { ...session, exercises, status: 'completed', completed_at: new Date().toISOString(), total_volume_kg: 0, duration_minutes: 5 }
+    })
+    render(<WorkoutFollowPage />)
+
+    expect(await screen.findByLabelText('seconds')).toHaveValue('60')
+    expect(screen.queryByLabelText('reps')).toBeNull()
+    expect(screen.queryByLabelText('weight')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'More seconds' }))
+    expect(screen.getByLabelText('seconds')).toHaveValue('65')
+    fireEvent.click(screen.getByRole('button', { name: 'Complete set 1' }))
+    fireEvent.click(screen.getAllByRole('button', { name: 'Finish workout' })[0])
+
+    await waitFor(() => expect(mocks.completeWorkoutSession).toHaveBeenCalled())
+    expect(mocks.updateWorkoutSession.mock.lastCall![1].exercises[0].sets[0]).toMatchObject({ completed: true, actual_seconds: 65, actual_reps: null })
+    expect(await screen.findByText('Best 65 s · 1 set')).toBeInTheDocument()
+    expect(screen.queryByText(/reps/)).toBeNull()
+  })
+
   it('saves the set ticked just before Finish, then finishes', async () => {
     const session = liveSession([{ name: 'Lat Pulldown', planned_sets: 1, sets: [set(1, { planned_weight_kg: 50, previous_reps: 10, previous_weight_kg: 50 })] }])
     mocks.getWorkoutSession.mockResolvedValue(session)
