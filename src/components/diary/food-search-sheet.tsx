@@ -10,6 +10,7 @@ import { CloseIcon } from '@/components/ui/fiqr/icons'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { CARD, FIELD, LIST, ROW, RiseList, RowsSkeleton, SearchField, SectionTitle } from '@/components/logs/log-ui'
 import { FieldLabel } from '@/components/logs/manual-log-shell'
+import { toastLogged } from '@/components/logs/diet-warning'
 import { useUIStore } from '@/stores/ui.store'
 import { searchFoods, updateFood, saveFood, getRecentFoods } from '@/lib/api/foods.api'
 import { createLog, createLogs, updateLog, deleteLog, type LogPayloadPatch } from '@/lib/api/logs.api'
@@ -372,9 +373,9 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
         return
       }
       // BUG-A — stamp the viewed date so it doesn't land on "today".
-      await createLog({ type: 'food', payload, source: 'manual', local_date: logDate })
+      const log = await createLog({ type: 'food', payload, source: 'manual', local_date: logDate })
       void haptic('success')
-      toast.success(`${selectedFood.name} logged`)
+      toastLogged(`${selectedFood.name} logged`, [log.diet_warning])
       onFoodLogged()
     } catch {
       toast.error('Failed to log food')
@@ -447,10 +448,11 @@ export function FoodSearchSheet({ isOpen, onClose, mealType, onFoodLogged, logDa
       const { created, failures } = await createLogs(items)
       if (failures.length === 0) {
         void haptic('success')
-        toast.success(
+        toastLogged(
           items.length === 1
             ? `${(items[0].payload as FoodPayload).food_name} logged`
             : `Logged ${created.length} items`,
+          created.map((log) => log.diet_warning),
         )
       } else if (created.length > 0) {
         toast.error(`Logged ${created.length} of ${items.length} items — some failed`)
