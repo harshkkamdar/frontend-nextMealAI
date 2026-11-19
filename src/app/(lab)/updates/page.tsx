@@ -121,6 +121,7 @@ const ROUNDS: [round: string, fixes: Fix[]][] = [
     ['The logo is inconsistent, and the orange part of the Q doesn\'t match the logo file', 'Every Q is now drawn from your logo file: in Geo, the tab bar, Check-in, the wordmark and the browser tab icon.', 'Every Q now comes from one shared drawing, built from the measurements in your logo file.'],
   ]],
   ['Round 3', [
+    ['The reset password email opens a page that can\'t be reached', 'The link in the email pointed to a test address. It now opens "Choose a new password" in the app.', 'On the live app, a new reset link opens "Choose a new password".'],
     ['Check-in lost the weight progress chart, and Home needs positive reinforcement', 'The weight chart is back on Check-in and now on Home too: your start weight, every weigh-in, a dashed goal line and how much you\'ve lost, in green when you\'re heading to your goal.', 'Checked on the live app: the weight card shows on Home.'],
     ['Sleep logged days ago carries into the next days', 'The Sleep tile shows only a night logged today, so it resets each day.', 'An automated test checks that a night logged on an earlier day no longer shows today.'],
     ['Reps pre-fill to the bottom of the range when last time was outside it', 'Each set starts from last time\'s reps, even when they were outside the range.', 'An automated test: an 8–12 set with 15 reps last time starts at 15, not 8.'],
